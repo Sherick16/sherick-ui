@@ -12,7 +12,7 @@ export interface DropdownOption {
 }
 
 export interface DropdownProps
-  extends Omit<SelectHTMLAttributes<HTMLSelectElement>, "onChange" | "value"> {
+  extends Omit<SelectHTMLAttributes<HTMLSelectElement>, "onChange" | "onSelect" | "value"> {
   options: DropdownOption[];
   variant?: Variant;
   onSelect?: (value: string) => void;
