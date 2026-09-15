@@ -28,9 +28,9 @@ const Avatar = ({
   return (
     <div
       className={cn(
-        "overflow-hidden bg-zinc-700/60",
+        "overflow-hidden bg-sherick-surface-high/70 shadow-sm",
         dimensions.styles,
-        shape === "circle" ? "rounded-full" : "rounded-2xl",
+        shape === "circle" ? "rounded-full" : "rounded-[1.25rem]",
         className
       )}
     >
