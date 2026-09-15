@@ -19,7 +19,7 @@ export const shape = {
   pill: "rounded-full",
   control: "rounded-[1.25rem]",
   surface: "rounded-[1.75rem]",
-  hero: "rounded-[2.5rem]",
+  hero: "rounded-[3rem]",
   circle: "rounded-full",
 } as const;
 
@@ -27,19 +27,19 @@ export const surface = {
   control:
     "bg-sherick-surface-high/[0.78] text-sherick-ink placeholder:text-sherick-ink-muted hover:bg-sherick-surface-high/[0.92] focus:bg-sherick-surface-high focus:shadow-[0_10px_30px_-22px_rgba(72,132,255,0.72)]",
   controlError:
-    "bg-sherick-danger/[0.14] text-sherick-ink placeholder:text-sherick-danger/[0.65] hover:bg-sherick-danger/[0.18] focus:bg-sherick-danger/20",
-  passive: "bg-sherick-surface/90 text-sherick-ink",
+    "bg-sherick-danger/[0.10] text-sherick-ink placeholder:text-sherick-danger/[0.72] hover:bg-sherick-danger/[0.13] focus:bg-sherick-danger/[0.16]",
+  passive: "bg-sherick-surface/[0.90] text-sherick-ink",
   tonalHigh: "bg-sherick-surface-high/[0.84] text-sherick-ink",
   raised:
-    "bg-sherick-surface-float/[0.88] text-sherick-ink shadow-sherick-soft ring-1 ring-inset ring-white/[0.035]",
+    "bg-sherick-surface-float/[0.90] text-sherick-ink shadow-sherick-soft",
   acrylic:
-    "bg-sherick-surface-float/[0.74] text-sherick-ink shadow-sherick-float backdrop-blur-2xl backdrop-saturate-150 ring-1 ring-inset ring-white/[0.055]",
+    "bg-sherick-surface-float/[0.72] text-sherick-ink shadow-sherick-float backdrop-blur-2xl backdrop-saturate-150 ring-1 ring-inset ring-white/[0.055]",
   acrylicDense:
-    "bg-sherick-surface-float/90 text-sherick-ink shadow-sherick-soft backdrop-blur-xl backdrop-saturate-150 ring-1 ring-inset ring-white/[0.05]",
+    "bg-sherick-surface-float/[0.88] text-sherick-ink shadow-sherick-soft backdrop-blur-xl backdrop-saturate-150 ring-1 ring-inset ring-white/[0.05]",
   modal:
-    "bg-sherick-surface-float/80 text-sherick-ink shadow-sherick-float backdrop-blur-2xl backdrop-saturate-150 ring-1 ring-inset ring-white/[0.06]",
+    "bg-sherick-surface-float/[0.74] text-sherick-ink shadow-sherick-float backdrop-blur-2xl backdrop-saturate-150 ring-1 ring-inset ring-white/[0.06]",
   tooltip:
-    "bg-sherick-surface-float/[0.92] text-sherick-ink shadow-sherick-soft backdrop-blur-xl backdrop-saturate-150 ring-1 ring-inset ring-white/[0.05]",
+    "bg-sherick-surface-float/[0.90] text-sherick-ink shadow-sherick-soft backdrop-blur-xl backdrop-saturate-150 ring-1 ring-inset ring-white/[0.05]",
 } as const;
 
 export const toneTextMap: Record<Variant, string> = {
@@ -92,13 +92,12 @@ export const toneStrongMap: Record<Variant, string> = {
 
 export const toneSoftMap: Record<Variant, string> = {
   primary: "bg-sherick-primary/[0.16] text-sherick-primary",
-  secondary: "bg-sherick-surface/90 text-sherick-ink",
-  danger: "bg-sherick-danger/[0.14] text-sherick-danger",
-  warning: "bg-sherick-warning/[0.14] text-sherick-warning",
-  success: "bg-sherick-success/[0.14] text-sherick-success",
+  secondary: "bg-sherick-surface/[0.90] text-sherick-ink",
+  danger: "bg-sherick-danger/[0.12] text-sherick-danger",
+  warning: "bg-sherick-warning/[0.12] text-sherick-warning",
+  success: "bg-sherick-success/[0.12] text-sherick-success",
 };
 
-// Backwards-compatible internal aliases. New components should use the focused maps above.
 export const styleMap: Record<Variant, string> = Object.fromEntries(
   (Object.keys(toneTextMap) as Variant[]).map((variant) => [
     variant,
