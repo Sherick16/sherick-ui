@@ -216,7 +216,7 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
                   onKeyDown={(event) => handleOptionKeyDown(event, index)}
                   onClick={() => selectOption(index)}
                   className={cn(
-                    "flex cursor-pointer items-center justify-between gap-4 rounded-xl px-4 py-3 text-left text-sm text-sherick-ink/92",
+                    "flex cursor-pointer items-center justify-between gap-4 rounded-xl px-4 py-3 text-left text-sm text-sherick-ink/[0.92]",
                     motionState,
                     focusRingInset,
                     isSelected && toneSelectedMap[variant],
