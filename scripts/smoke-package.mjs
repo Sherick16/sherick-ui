@@ -57,7 +57,11 @@ const normalizeVariables = (variables) =>
   Object.fromEntries(
     Object.entries(variables).map(([name, value]) => [
       name,
-      value.replace(/\s+/g, " ").trim(),
+      value
+        .replace(/\s+/g, " ")
+        .trim()
+        .replace(/\(\s+/g, "(")
+        .replace(/\s+\)/g, ")"),
     ])
   );
 
