@@ -1,12 +1,15 @@
 import React from "react";
 import { cn } from "@/libs/utils";
-import { shape } from "./ui.common";
+import { material, shape } from "./ui.common";
 
+/* Loading feedback sits outside the interaction motion families: it reports progress
+   rather than responding to a press, so it keeps its own loop. */
 export const Skeleton = ({ className, ...props }: { className?: string }) => {
   return (
     <div
       className={cn(
-        "animate-pulse bg-sherick-surface-high/60 motion-reduce:animate-none",
+        "animate-pulse motion-reduce:animate-none",
+        material.matteHigh,
         shape.control,
         className
       )}

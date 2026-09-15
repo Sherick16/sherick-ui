@@ -7,8 +7,18 @@ import React, {
   type InputHTMLAttributes,
 } from "react";
 import { Search as SearchIcon } from "lucide-react";
-import { cn } from "@/libs/utils";
-import { motionState, pressable, shape, surface, toneTextMap } from "./ui.common";
+import { cn, type TimerHandle } from "@/libs/utils";
+import {
+  density,
+  focusRingInset,
+  material,
+  motion,
+  shape,
+  state,
+  stateLayer,
+  text,
+  tone,
+} from "./ui.common";
 import { Variant } from "./ui.types";
 import { Spinner } from "./Spinner";
 
@@ -34,7 +44,7 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
     ...props
   }, forwardedRef) => {
     const inputRef = useRef<HTMLInputElement | null>(null);
-    const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const timerRef = useRef<TimerHandle | null>(null);
     const isDisabled = disabled || loading;
 
     useEffect(() => {
@@ -57,12 +67,16 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
     return (
       <div
         className={cn(
+          /* A composite field: the outer surface owns the whole field language, the
+             input inside stays borderless and the focus step arrives through
+             `focus-within`. */
           "relative inline-flex min-h-12 min-w-64 items-center",
           shape.control,
-          surface.control,
-          motionState,
-          "focus-within:outline focus-within:outline-2 focus-within:outline-sherick-focus focus-within:outline-offset-[3px] focus-within:bg-sherick-surface-high/[0.9]",
-          isDisabled && "cursor-not-allowed opacity-45 hover:bg-sherick-surface-high/[0.66]",
+          material.control,
+          motion.press,
+          "focus-within:outline focus-within:outline-2 focus-within:outline-sherick-focus focus-within:outline-offset-[3px]",
+          !isDisabled && state.field.focusWithin,
+          isDisabled && state.disabled,
           className
         )}
       >
@@ -71,7 +85,7 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
           disabled={isDisabled}
           aria-busy={loading || undefined}
           className={cn(
-            "min-h-12 w-full bg-transparent px-5 py-3 pr-12 text-[0.95rem] text-inherit placeholder:text-sherick-ink-muted outline-none",
+            "min-h-12 w-full min-w-0 bg-transparent py-3 pl-5 pr-12 text-inherit outline-none placeholder:text-sherick-ink-muted",
             shape.control,
             inputClassName
           )}
@@ -85,16 +99,22 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
           disabled={isDisabled}
           onClick={() => onSearch(inputRef.current?.value || "")}
           className={cn(
-            "absolute right-1.5 inline-flex min-h-9 min-w-9 items-center justify-center rounded-full",
-            "outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-focus",
-            motionState,
-            toneTextMap[variant],
-            !isDisabled && "hover:bg-sherick-primary/10 active:bg-sherick-primary/[0.18]",
-            !isDisabled && pressable,
-            isDisabled ? "cursor-not-allowed" : "cursor-pointer"
+            "absolute right-1.5 inline-flex items-center justify-center",
+            density.target,
+            shape.circle,
+            focusRingInset,
+            motion.release,
+            tone.text[variant],
+            !isDisabled && stateLayer.quiet,
+            !isDisabled && state.press,
+            isDisabled ? state.disabled : state.enabled
           )}
         >
-          {loading ? <Spinner className="h-5 w-5" size="small" /> : <SearchIcon className="h-5 w-5" />}
+          {loading ? (
+            <Spinner className="size-5" size="small" />
+          ) : (
+            <SearchIcon className={cn("size-5", text.medium)} />
+          )}
         </button>
       </div>
     );

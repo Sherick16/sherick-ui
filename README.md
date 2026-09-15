@@ -2,7 +2,7 @@
 
 Sherick UI is a small React component library inspired by Material 3 Expressive: soft tonal surfaces, deliberate shape contrast, strong hierarchy and restrained motion without cloning Google's component system. The published component package is framework-agnostic and supports React 18/19.
 
-The guiding rule is **quiet by default, expressive where it matters**. Sherick UI keeps ordinary information and form controls matte and predictable, then introduces richer color, motion and smoked liquid-glass depth when UI floats, activates or deserves emphasis.
+The guiding rule is **quiet by default, expressive where it matters**. Sherick UI keeps ordinary information and form controls matte and predictable, then introduces richer color, motion and smoked liquid-glass depth when UI floats, activates or deserves emphasis. Every component draws on the same small design language — material, elevation, shape, edge, tone, state, density and motion — so a new one can be designed by choosing existing primitives rather than inventing new visual rules.
 
 ## Installation
 
@@ -76,11 +76,44 @@ The Tailwind names exposed by the library are semantic, while their actual value
 }
 ```
 
-Core variables include the canvas/surface ladder, foregrounds, primary/accent colors, semantic colors, inverse foregrounds, focus/scrim roles, the elevation ladder, liquid-glass gradients and syntax-highlighting colors. Components continue to reference semantic Tailwind classes such as `bg-sherick-surface`, `text-sherick-ink` and `text-sherick-primary`, so the same markup works in both modes.
+Core variables include the canvas/surface levels, the three-step text hierarchy, the accent hierarchy (`--sui-primary`, `--sui-primary-strong`, `--sui-primary-soft`, `--sui-accent`), semantic states, the structural edge tint (`--sui-edge`), focus/scrim roles, the elevation ladder, the liquid-glass recipes and syntax-highlighting colors. Components reference semantic Tailwind classes such as `bg-sherick-surface`, `text-sherick-ink` and `text-sherick-edge`, so the same markup works in both modes.
 
-Depth is token-driven too, and is the only source of shadow in the library: `shadow-sherick-grounded` resolves to `--sui-elevation-grounded` (no shadow — separation comes from surface color), `shadow-sherick-raised` to `--sui-elevation-raised` (soft contact shadow) and `shadow-sherick-floating` to `--sui-elevation-floating` (deeper shadow plus a hairline glass edge light). Overriding those three variables re-tunes elevation for every surface without touching components.
+### One light source
 
-Matte interactive controls use a separate tactile pair rather than the surface ladder: `shadow-sherick-control` (`--sui-elevation-control`) is the faint contact shadow and microscopic top highlight a control holds at rest, and `shadow-sherick-pressed` (`--sui-elevation-pressed`) is the shallow inset it takes while pressed or selected. Both stay shallower than any surface step, so a control reads as tactile rather than raised.
+Every depth cue derives from a single light model: light comes from **directly above** the surface plane. `--sui-light-top` (the highlight color) and `--sui-light-bottom` (the shade color) are the only two lighting values, and everything else composites from them:
+
+- upper edges catch light — `inset 0 1px 0` highlights, brighter acrylic tops
+- lower edges fall into shade — shadows offset straight down (`0 Ypx`), acrylic gradients run top to bottom
+- a recessed surface inverts it — the upper lip is shaded, the lower lip catches a faint bounce
+- structural edges are shade-tinted hairlines (`--sui-edge`), which is why a dark theme rims with light instead of shade
+
+Re-tinting those two values re-lights the entire library: shadows, pressed states, edge highlights and acrylic gradients all follow.
+
+### Elevation
+
+Depth is token-driven, and the ladder is the only source of shadow in the library. Overriding these variables re-tunes elevation for every surface without touching a component:
+
+| Utility | Token | Role |
+| --- | --- | --- |
+| `shadow-sherick-flat` | `--sui-elevation-flat` | no shadow — matte surfaces separate by tone alone |
+| `shadow-sherick-raised` | `--sui-elevation-raised` | raised matte surfaces and tactile tonal controls |
+| `shadow-sherick-floating` | `--sui-elevation-floating` | acrylic surfaces above the application |
+| `shadow-sherick-control` | `--sui-elevation-control` | matte controls at rest, a hair above their own track |
+| `shadow-sherick-pressed` | `--sui-elevation-pressed` | those controls pressed or selected, recessed into the track |
+
+The tactile pair (`control`/`pressed`) stays shallower and geometry-neutral: it is a restrained echo of neumorphism on matte controls, not a neumorphic surface.
+
+### Motion
+
+Motion is three families, each a token pair. Retiming the library is a token edit:
+
+| Family | Durations | Easings | Used for |
+| --- | --- | --- | --- |
+| press | `--sui-duration-press` | `--sui-ease-press` | a press, or a tonality change such as hover or focus |
+| release | `--sui-duration-release` | `--sui-ease-release` | release, selection, a thumb sliding, a sheet arriving |
+| overlay | `--sui-duration-overlay`, `--sui-duration-overlay-exit` | `--sui-ease-release`, `--sui-ease-exit` | the entrance and exit of anything that floats |
+
+Floating overlays (menus, tooltips, modals) share one entrance and one exit through `useOverlayPresence`, plus a matching scrim family, so they arrive and leave identically. Every family collapses under `prefers-reduced-motion`.
 
 ## Usage
 
@@ -123,22 +156,53 @@ The public package exports:
 
 Public prop types and the shared `Variant` type are exported from the package root as well.
 
-## Visual principles
+## Design language
 
-- ordinary controls and dense information use matte tonal surfaces
-- shadow expresses elevation and nothing else: grounded surfaces are matte, tonal controls and lifted surfaces take a soft contact shadow, floating surfaces take the deepest one
-- matte interactive controls stay tactile: a faint lift at rest, a shallow inset once pressed or selected, and no elevation change on hover
-- genuinely floating UI may use smoked liquid glass: translucency, blur, saturation and a hairline edge light
-- glass is reserved for overlays such as menus, tooltips and modals rather than normal cards
+Every component is assembled from one small set of primitives (internal module `components/UI/ui.common.ts`) instead of inventing visual rules locally. A new component should be designed by choosing from these, not by writing new CSS:
+
+| Primitive | Values |
+| --- | --- |
+| material | `canvas`, `matte`, `matteHigh`, `matteRaised`, `control` (`controlError`), `acrylic`, `acrylicDense` |
+| elevation | `flat`, `raised`, `floating`, `control`, `pressed` |
+| shape | `control` 1.25rem, `prominent` 1.5rem, `surface` 1.75rem, `expressive` 2.25rem, `pill`, `circle` |
+| edge | `faint` hairlines, `hover`/`focus`/`focusWithin`/`engaged` steps, `row`/`header`/`rule` separators |
+| tone | `text`, `soft`, `tonal`, `selected`, `strong` — each per semantic variant |
+| state | `press`, `recess`, `selected`, `groupPress`, `disabled`, `rowHover`, `field.*` |
+| density | `compact`, `normal`, `prominent`, `target` |
+| motion | `press`, `release`, `overlayIn`/`overlayOut`, `scrimIn`/`scrimOut` |
+
+### Material
+
+Tone separates matte surfaces from the canvas; depth is added by the elevation ladder and never baked into a material. Acrylic is reserved for what genuinely floats above the application.
+
+### Interaction states
+
+One language, applied the same way everywhere:
+
+- **rest** — the material plus its resting elevation
+- **hover** — one tonality step (a state layer over the fill, or a step up the surface ladder), never a change in depth
+- **pressed** — recessed into the control's own track, plus a slight compression
+- **selected** — that recess held, with a selected tone
+- **disabled** — 45% opacity, no pointer affordance, no interactive state at all
+- **focus** — one visible ring everywhere, drawn outside a standalone control and inset for a control nested in another surface
+
+### Edge lighting instead of borders
+
+Matte controls have no conventional border. What separates them from the page is light: a faint structural edge traces the shape, the elevation step adds a microscopic upper highlight and a soft lower shadow, and together they read as a lit rim rather than a drawn line. The same hairline tone is reused for every structural line in the library, so tables, code blocks, dividers and quotes agree.
+
+### Density
+
+Three control sizes — compact, normal, prominent — with one accessible hit-target floor for icon-only controls. Density changes padding, height and the type step; it never changes the interaction language. Even the prominent step stays compact, because the library targets dense desktop and product UI.
+
+### Principles
+
+- ordinary controls and dense information use matte tonal surfaces; glass is reserved for overlays
+- semantic color marks meaning on a surface or icon; it never floods a surface
 - light mode is a separately designed soft theme, not an inversion of the dark palette
-- shape variation has a role: controls, pills, surfaces, hero overlays and circles
-- semantic color communicates hierarchy or state instead of flooding every surface
-- fields become subtly more luminous on focus rather than relying on borders
-- button-like controls use restrained compression and expressive release motion
 - passive surfaces do not react to hover unless they are actually interactive
-- dense desktop UI remains compact; expressive does not mean oversized everywhere
-- `prefers-reduced-motion` is respected
-- the package remains font-agnostic
+- shape variation has a role: control, prominent, surface, expressive, pill and circle
+- expressive treatment is reserved for what floats, activates or deserves emphasis
+- `prefers-reduced-motion` is respected, and the package remains font-agnostic
 
 ## Development
 
@@ -150,7 +214,7 @@ bun run verify
 
 The development workbench includes `System`, `Light` and `Dark` controls so every component and state can be reviewed against all supported themes.
 
-`bun run verify` lints, runs TypeScript checking, builds both ESM/CJS plus declarations, and runs consumer-oriented smoke verification against the built package. It also rejects unsupported numeric Tailwind opacity modifiers that Tailwind 3 would otherwise silently omit and rejects raw theme-specific neutral utilities in reusable UI code. Pull requests run the same verification in GitHub Actions.
+`bun run verify` lints, runs TypeScript checking, builds both ESM/CJS plus declarations, and runs consumer-oriented smoke verification against the built package. The smoke checks also protect the design language: they reject unsupported numeric Tailwind opacity modifiers that Tailwind 3 would otherwise silently omit, raw theme-specific neutral utilities and literal colors in reusable UI, theme-unsafe focus utilities, and any one-off shadow recipe outside the elevation ladder. Pull requests run the same verification in GitHub Actions.
 
 The Next.js app in this repository is a development/showcase surface only; the published component runtime does not depend on Next.js.
 

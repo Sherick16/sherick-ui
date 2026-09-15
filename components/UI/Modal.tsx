@@ -4,10 +4,20 @@ import React, { type ReactNode, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { cn } from "@/libs/utils";
-import { focusRing, motionState, pressable, shape, surface } from "./ui.common";
+import {
+  density,
+  focusRing,
+  material,
+  motion,
+  shape,
+  state,
+  stateLayer,
+  text,
+} from "./ui.common";
 import { ModalContent } from "./ModalContent";
 import { ModalFooter } from "./ModalFooter";
 import { ModalHeader } from "./ModalHeader";
+import { useOverlayPresence } from "./useOverlayPresence";
 
 export interface ModalProps {
   children: ReactNode;
@@ -28,6 +38,7 @@ const FOCUSABLE_SELECTOR = [
 export default function Modal({ children, open, onClose, className }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedElement = useRef<HTMLElement | null>(null);
+  const { mounted, closing } = useOverlayPresence(open);
 
   useEffect(() => {
     if (!open) return;
@@ -81,18 +92,22 @@ export default function Modal({ children, open, onClose, className }: ModalProps
     };
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!mounted) return null;
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50"
+      className={cn("fixed inset-0 z-50", closing && "pointer-events-none")}
       role="dialog"
       aria-modal="true"
+      aria-hidden={closing || undefined}
       aria-labelledby="modal-title"
       aria-describedby="modal-description"
     >
       <div
-        className="absolute inset-0 bg-sherick-scrim/[0.32] backdrop-blur-lg animate-fade motion-reduce:animate-none"
+        className={cn(
+          "absolute inset-0 bg-sherick-scrim/[0.32] backdrop-blur-lg",
+          closing ? motion.scrimOut : motion.scrimIn
+        )}
         aria-hidden="true"
       />
 
@@ -108,9 +123,9 @@ export default function Modal({ children, open, onClose, className }: ModalProps
             tabIndex={-1}
             className={cn(
               "relative w-full max-w-lg outline-none",
-              shape.hero,
-              surface.modal,
-              "animate-overlay motion-reduce:animate-none",
+              shape.expressive,
+              material.acrylic,
+              closing ? motion.overlayOut : motion.overlayIn,
               className
             )}
           >
@@ -119,14 +134,20 @@ export default function Modal({ children, open, onClose, className }: ModalProps
               aria-label="Close dialog"
               onClick={onClose}
               className={cn(
-                "absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full",
-                "bg-sherick-surface-high/[0.72] text-sherick-ink-muted hover:bg-sherick-surface-high hover:text-sherick-ink active:bg-sherick-surface-high/[0.9]",
-                motionState,
+                "absolute right-4 top-4 inline-flex items-center justify-center",
+                density.target,
+                shape.circle,
+                material.matteHigh,
+                text.medium,
+                "hover:text-sherick-ink",
+                motion.release,
                 focusRing,
-                pressable
+                stateLayer.quiet,
+                state.press,
+                state.enabled
               )}
             >
-              <X className="h-5 w-5" aria-hidden="true" />
+              <X className="size-5" aria-hidden="true" />
             </button>
 
             {children}

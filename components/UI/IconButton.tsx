@@ -3,17 +3,16 @@
 import React, { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import {
+  density,
+  edge,
   elevation,
   focusRing,
-  motionComponent,
-  pressable,
+  material,
+  motion,
   shape,
+  state,
   stateLayer,
-  surface,
-  toneActiveMap,
-  toneHoverMap,
-  toneSurfaceMap,
-  toneTextMap,
+  tone,
 } from "./ui.common";
 import { Variant } from "./ui.types";
 import { Spinner } from "./Spinner";
@@ -38,6 +37,7 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
     ...props
   }, ref) => {
     const isDisabled = disabled || loading;
+    const isTonal = appearance === "tonal";
 
     return (
       <button
@@ -46,22 +46,24 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
         disabled={isDisabled}
         aria-busy={loading || undefined}
         className={cn(
-          "inline-flex min-h-11 min-w-11 items-center justify-center p-2.5 [&>svg]:size-5",
+          "inline-flex items-center justify-center p-2.5 [&>svg]:size-5",
+          density.target,
           shape.circle,
-          motionComponent,
+          motion.release,
           focusRing,
-          toneTextMap[variant],
-          appearance === "tonal" && toneSurfaceMap[variant],
-          appearance === "tonal" && !isDisabled && elevation.raised,
-          appearance === "tonal" && !isDisabled && "active:shadow-sherick-pressed",
-          appearance === "acrylic" && surface.acrylicDense,
+          tone.text[variant],
+          isTonal && tone.tonal[variant],
+          isTonal && !isDisabled && edge.faint,
+          isTonal && !isDisabled && elevation.raised,
+          isTonal && !isDisabled && state.recess,
           appearance === "ghost" && "bg-transparent",
-          appearance === "tonal" && !isDisabled && stateLayer.tonal,
-          appearance === "ghost" && !isDisabled && toneHoverMap[variant],
-          appearance === "ghost" && !isDisabled && toneActiveMap[variant],
-          appearance === "acrylic" && !isDisabled && "hover:brightness-110 active:brightness-95",
-          !isDisabled && pressable,
-          isDisabled ? "cursor-not-allowed opacity-45 shadow-none" : "cursor-pointer",
+          /* Acrylic and tonal share one interaction language: the material behind the
+             button changes, the way it responds does not. */
+          (isTonal || appearance === "acrylic") && !isDisabled && stateLayer.tonal,
+          appearance === "ghost" && !isDisabled && stateLayer.quiet,
+          appearance === "acrylic" && material.acrylicDense,
+          !isDisabled && state.press,
+          isDisabled ? state.disabled : state.enabled,
           className
         )}
       >

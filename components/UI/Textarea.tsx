@@ -2,7 +2,15 @@
 
 import React, { forwardRef, useId, type TextareaHTMLAttributes } from "react";
 import { cn } from "@/libs/utils";
-import { focusRing, motionState, shape, surface } from "./ui.common";
+import {
+  density,
+  focusRing,
+  material,
+  motion,
+  shape,
+  state,
+  text,
+} from "./ui.common";
 
 export interface TextareaProps
   extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "onChange"> {
@@ -20,6 +28,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     required,
     error = false,
     id,
+    disabled,
     onChange,
     ...props
   }, ref) => {
@@ -29,7 +38,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     return (
       <div className={cn("flex w-full flex-col", className)}>
         {label && (
-          <label htmlFor={textareaId} className="mb-2 text-sm font-medium text-sherick-ink/[0.88]">
+          <label htmlFor={textareaId} className={cn("mb-2 text-sm font-medium", text.high)}>
             {label}
             {required && <span className="ml-1 text-sherick-danger" aria-hidden="true">*</span>}
           </label>
@@ -38,14 +47,18 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           ref={ref}
           id={textareaId}
           required={required}
+          disabled={disabled}
           aria-invalid={error || undefined}
           className={cn(
-            "min-h-28 min-w-64 w-full resize-y px-5 py-4 text-[0.95rem]",
+            "min-h-28 w-full min-w-64 resize-y",
+            density.normal,
             shape.control,
-            motionState,
+            motion.press,
             focusRing,
-            error ? surface.controlError : surface.control,
-            "disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-sherick-surface-high/[0.78]",
+            error ? material.controlError : material.control,
+            !disabled && (error ? state.field.errorHover : state.field.hover),
+            !disabled && (error ? state.field.errorFocus : state.field.focus),
+            disabled ? state.disabled : state.enabled,
             textareaClassName
           )}
           onChange={(event) => onChange?.(event.target.value)}

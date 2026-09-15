@@ -1,94 +1,114 @@
 const color = (name, fallback) =>
   `oklch(var(--sui-${name}, ${fallback}) / <alpha-value>)`;
 
+/* Dark-theme fallbacks. `theme.css` is the source of truth; these values only keep
+   consumers that skip the stylesheet on a dark-scheme surface instead of collapsing
+   to unstyled output. They mirror the `[data-sherick-theme="dark"]` block. */
+const DARK = {
+  canvas: "0.205 0.012 260",
+  surface: "0.245 0.014 260",
+  "surface-high": "0.295 0.016 260",
+  "surface-float": "0.27 0.018 260",
+  ink: "0.94 0.008 255",
+  "ink-muted": "0.76 0.014 255",
+  "ink-faint": "0.60 0.014 256",
+  primary: "0.72 0.15 255",
+  "primary-strong": "0.66 0.18 257",
+  "primary-soft": "0.42 0.055 257",
+  accent: "0.80 0.08 215",
+  danger: "0.72 0.13 25",
+  warning: "0.82 0.12 80",
+  success: "0.75 0.10 160",
+  "on-primary": "0.205 0.012 260",
+  "on-danger": "0.205 0.012 260",
+  "on-warning": "0.205 0.012 260",
+  "on-success": "0.205 0.012 260",
+  focus: "0.72 0.15 255",
+  outline: "0.76 0.014 255",
+  edge: "0.92 0.01 256",
+  scrim: "0.08 0.01 260",
+};
+
 module.exports = {
   theme: {
     extend: {
+      /* Tonality roles. Components name a role (`text-sherick-ink-muted`), never a
+         raw color, so a theme swap re-tunes the whole library. */
       colors: {
-        sherick: {
-          canvas: color("canvas", "0.205 0.012 260"),
-          surface: color("surface", "0.245 0.014 260"),
-          "surface-high": color("surface-high", "0.295 0.016 260"),
-          "surface-float": color("surface-float", "0.27 0.018 260"),
-          ink: color("ink", "0.94 0.008 255"),
-          "ink-muted": color("ink-muted", "0.76 0.014 255"),
-          primary: color("primary", "0.72 0.15 255"),
-          "primary-strong": color("primary-strong", "0.66 0.18 257"),
-          "primary-soft": color("primary-soft", "0.42 0.055 257"),
-          accent: color("accent", "0.80 0.08 215"),
-          danger: color("danger", "0.72 0.13 25"),
-          warning: color("warning", "0.82 0.12 80"),
-          success: color("success", "0.75 0.10 160"),
-          "on-primary": color("on-primary", "0.205 0.012 260"),
-          "on-danger": color("on-danger", "0.205 0.012 260"),
-          "on-warning": color("on-warning", "0.205 0.012 260"),
-          "on-success": color("on-success", "0.205 0.012 260"),
-          focus: color("focus", "0.72 0.15 255"),
-          outline: color("outline", "0.76 0.014 255"),
-          scrim: color("scrim", "0.08 0.01 260"),
-        },
+        sherick: Object.fromEntries(
+          Object.entries(DARK).map(([name, fallback]) => [name, color(name, fallback)])
+        ),
       },
       backgroundImage: {
         "sherick-glass":
-          "var(--sui-glass-gradient, linear-gradient(135deg, rgba(255,255,255,0.055) 0%, rgba(255,255,255,0.018) 32%, rgba(112,156,255,0.022) 72%, rgba(255,255,255,0.01) 100%))",
+          "var(--sui-glass-gradient, linear-gradient(180deg, rgba(255,255,255,0.075) 0%, rgba(255,255,255,0.028) 30%, rgba(112,156,255,0.02) 70%, rgba(0,0,0,0.10) 100%))",
         "sherick-glass-dense":
-          "var(--sui-glass-gradient-dense, linear-gradient(135deg, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0.012) 38%, rgba(112,156,255,0.018) 78%, rgba(255,255,255,0.008) 100%))",
+          "var(--sui-glass-gradient-dense, linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.018) 36%, rgba(112,156,255,0.016) 76%, rgba(0,0,0,0.08) 100%))",
       },
-      borderRadius: {
-        "4xl": "2rem",
-      },
-      /* Elevation ladder — the only sanctioned source of depth. Shadow is a function of
-         how far a surface sits above the ground, never per-component decoration:
-         grounded surfaces separate by surface color alone, raised tonal surfaces lift
-         with a soft contact shadow, floating glass lifts decisively with a wider one. */
+      /* Elevation ladder — the only sanctioned source of depth, and the only place a
+         shadow is defined. Shadow is a function of how far a surface sits above the
+         ground, never per-component decoration:
+           flat      matte surfaces that separate by tone alone
+           raised    raised matte surfaces and tactile tonal controls
+           floating  acrylic surfaces above the application
+           control   matte interactive controls at rest, a hair above their track
+           pressed   those controls pressed or selected, recessed into the track */
       boxShadow: {
-        "sherick-grounded": "var(--sui-elevation-grounded, none)",
+        "sherick-flat": "var(--sui-elevation-flat, none)",
         "sherick-raised":
           "var(--sui-elevation-raised, 0 1px 2px rgba(0, 0, 0, 0.26), 0 4px 12px rgba(0, 0, 0, 0.15))",
         "sherick-floating":
           "var(--sui-elevation-floating, 0 18px 44px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.05))",
-        /* Tactile control depth — matte interactive controls only: a faint contact shadow
-           with a microscopic top highlight at rest, a shallow inset when pressed. */
         "sherick-control":
           "var(--sui-elevation-control, 0 1px 2px rgba(0, 0, 0, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.08))",
         "sherick-pressed":
           "var(--sui-elevation-pressed, inset 0 1px 3px rgba(0, 0, 0, 0.38), inset 0 -1px 0 rgba(255, 255, 255, 0.06))",
-        "sherick-focus":
-          "var(--sui-shadow-focus, 0 10px 28px -22px rgba(90, 145, 255, 0.42))",
-        "sherick-primary":
-          "var(--sui-shadow-primary, 0 12px 30px -22px rgba(82, 139, 255, 0.34))",
+      },
+      /* Motion families. Durations and easings are tokens, so retiming the library is
+         a token edit: `press` is the fast response to a press or a tonality change,
+         `release` is the expressive settle when a control is released or a selection
+         moves, `overlay` covers anything that floats above the page.
+         Entry animations use the individual `translate`/`scale` properties on purpose:
+         the `transform` shorthand would override positioning utilities such as
+         `-translate-x-1/2` for the duration of the animation, so anchored popups would
+         jump and then snap once the animation ends. */
+      transitionDuration: {
+        press: "var(--sui-duration-press, 150ms)",
+        release: "var(--sui-duration-release, 200ms)",
+        overlay: "var(--sui-duration-overlay, 240ms)",
+        "overlay-exit": "var(--sui-duration-overlay-exit, 160ms)",
+      },
+      transitionTimingFunction: {
+        press: "var(--sui-ease-press, cubic-bezier(0.4, 0, 0.2, 1))",
+        release: "var(--sui-ease-release, cubic-bezier(0.16, 1, 0.3, 1))",
+        exit: "var(--sui-ease-exit, cubic-bezier(0.4, 0, 1, 1))",
       },
       animation: {
-        fade: "sherick-fade 140ms ease-out",
-        menu: "sherick-menu 220ms cubic-bezier(0.16, 1, 0.3, 1)",
-        overlay: "sherick-overlay 280ms cubic-bezier(0.16, 1, 0.3, 1)",
-        pop: "sherick-pop 240ms cubic-bezier(0.16, 1, 0.3, 1)",
-        "slide-up": "sherick-slide-up 220ms cubic-bezier(0.16, 1, 0.3, 1)",
+        "sherick-overlay-in":
+          "sherick-overlay-in var(--sui-duration-overlay, 240ms) var(--sui-ease-release, cubic-bezier(0.16, 1, 0.3, 1))",
+        "sherick-overlay-out":
+          "sherick-overlay-out var(--sui-duration-overlay-exit, 160ms) var(--sui-ease-exit, cubic-bezier(0.4, 0, 1, 1)) both",
+        "sherick-scrim-in":
+          "sherick-scrim-in var(--sui-duration-overlay, 240ms) var(--sui-ease-release, cubic-bezier(0.16, 1, 0.3, 1))",
+        "sherick-scrim-out":
+          "sherick-scrim-out var(--sui-duration-overlay-exit, 160ms) var(--sui-ease-exit, cubic-bezier(0.4, 0, 1, 1)) both",
       },
       keyframes: {
-        "sherick-fade": {
+        "sherick-overlay-in": {
+          from: { opacity: "0", scale: "0.98" },
+          to: { opacity: "1", scale: "1" },
+        },
+        "sherick-overlay-out": {
+          from: { opacity: "1", scale: "1" },
+          to: { opacity: "0", scale: "0.98" },
+        },
+        "sherick-scrim-in": {
           from: { opacity: "0" },
           to: { opacity: "1" },
         },
-        /* Entry motion uses the individual `translate`/`scale` properties on purpose:
-           the `transform` shorthand would override positioning utilities such as
-           `-translate-x-1/2` for the duration of the animation, so anchored popups
-           would jump and then snap once the animation ends. */
-        "sherick-menu": {
-          from: { opacity: "0", translate: "0 -4px", scale: "0.985" },
-          to: { opacity: "1", translate: "0 0", scale: "1" },
-        },
-        "sherick-overlay": {
-          from: { opacity: "0", translate: "0 8px", scale: "0.985" },
-          to: { opacity: "1", translate: "0 0", scale: "1" },
-        },
-        "sherick-pop": {
-          from: { opacity: "0", scale: "0.97" },
-          to: { opacity: "1", scale: "1" },
-        },
-        "sherick-slide-up": {
-          from: { opacity: "0", translate: "0 6px" },
-          to: { opacity: "1", translate: "0 0" },
+        "sherick-scrim-out": {
+          from: { opacity: "1" },
+          to: { opacity: "0" },
         },
       },
     },

@@ -3,7 +3,16 @@
 import React, { type ReactNode, useState } from "react";
 import { AlertCircle, CheckCircle, Info, X, XCircle } from "lucide-react";
 import { cn } from "@/libs/utils";
-import { focusRingInset, motionState, shape, toneSoftMap, toneTextMap } from "./ui.common";
+import {
+  density,
+  focusRingInset,
+  motion,
+  shape,
+  state,
+  stateLayer,
+  text,
+  tone,
+} from "./ui.common";
 import { Variant } from "./ui.types";
 
 const iconMap = {
@@ -14,6 +23,8 @@ const iconMap = {
   success: CheckCircle,
 };
 
+/* An alert is a tinted matte surface: the tone marks its meaning on the surface and
+   the icon, while the copy stays at full text emphasis so it never fights the color. */
 export const Alert = ({
   children,
   variant = "primary",
@@ -36,11 +47,12 @@ export const Alert = ({
       className={cn(
         "flex items-center gap-3 px-4 py-3.5",
         shape.surface,
-        toneSoftMap[variant],
+        tone.soft[variant],
+        text.high,
         className
       )}
     >
-      <Icon aria-hidden="true" className={cn("h-5 w-5 shrink-0", toneTextMap[variant])} />
+      <Icon aria-hidden="true" className={cn("size-5 shrink-0", tone.text[variant])} />
       <div className="min-w-0 flex-1 text-sm leading-6">{children}</div>
       {closeable && (
         <button
@@ -48,13 +60,17 @@ export const Alert = ({
           aria-label="Dismiss alert"
           onClick={() => setIsVisible(false)}
           className={cn(
-            "ml-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-current",
-            "hover:bg-sherick-ink/[0.08] active:bg-sherick-ink/[0.13]",
-            motionState,
-            focusRingInset
+            "ml-1 inline-flex shrink-0 items-center justify-center",
+            density.target,
+            shape.circle,
+            focusRingInset,
+            motion.release,
+            stateLayer.quiet,
+            state.press,
+            state.enabled
           )}
         >
-          <X aria-hidden="true" className="h-4 w-4" />
+          <X aria-hidden="true" className="size-4" />
         </button>
       )}
     </div>

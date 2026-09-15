@@ -1,6 +1,6 @@
 import React, { type HTMLAttributes, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { shape, toneSoftMap } from "./ui.common";
+import { shape, tone } from "./ui.common";
 import { Variant } from "./ui.types";
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
@@ -8,6 +8,8 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
   variant?: Variant;
 }
 
+/* A card is a large matte surface: tone separates it from the canvas, and it carries
+   no elevation until something lifts it. */
 export const Card = ({
   children,
   variant = "secondary",
@@ -19,7 +21,7 @@ export const Card = ({
       className={cn(
         "p-6",
         shape.surface,
-        toneSoftMap[variant],
+        tone.soft[variant],
         className
       )}
       {...props}

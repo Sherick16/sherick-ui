@@ -21,8 +21,19 @@ import "prismjs/components/prism-markup";
 import "prismjs/components/prism-python";
 import "prismjs/components/prism-sql";
 import "prismjs/components/prism-yaml";
-import { cn } from "@/libs/utils";
-import { focusRing, motionState } from "./ui.common";
+import { cn, type TimerHandle } from "@/libs/utils";
+import {
+  edge,
+  elevation,
+  focusRing,
+  material,
+  motion,
+  shape,
+  state,
+  stateLayer,
+  text,
+  tone,
+} from "./ui.common";
 import theme from "./prism-theme";
 
 export interface CodeBlockProps {
@@ -34,7 +45,7 @@ export interface CodeBlockProps {
 
 const CodeBlock = ({ inline = false, className, language = "text", children }: CodeBlockProps) => {
   const [copied, setCopied] = useState(false);
-  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const resetTimer = useRef<TimerHandle | null>(null);
   const code = String(children ?? "").trim();
 
   useEffect(() => () => {
@@ -50,29 +61,36 @@ const CodeBlock = ({ inline = false, className, language = "text", children }: C
   };
 
   if (inline) {
+    /* Inline code is a chip, like a badge: same shape role, matte material. */
     return (
-      <code className={cn("rounded-md bg-sherick-surface-high px-1.5 py-0.5 font-mono text-[0.9em] text-sherick-primary", className)}>
+      <code className={cn("px-1.5 py-0.5 font-mono text-[0.9em]", material.matteHigh, shape.pill, tone.text.primary, className)}>
         {children}
       </code>
     );
   }
 
   return (
-    <div className="mt-4 overflow-hidden rounded-[1.5rem] bg-sherick-surface/[0.78] shadow-inner">
+    <div className={cn("mt-4 overflow-hidden", shape.prominent, material.matte, edge.faint, elevation.control)}>
       <div className="flex min-h-11 items-center justify-between gap-4 px-4 py-2">
-        <span className="font-mono text-[11px] uppercase tracking-[0.08em] text-sherick-ink-muted">
+        <span className={cn("font-mono text-[11px] uppercase tracking-[0.08em]", text.medium)}>
           {language}
         </span>
         <button
           type="button"
           onClick={() => void onCopy()}
           className={cn(
-            "inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-sherick-ink-muted hover:bg-sherick-ink/[0.055] hover:text-sherick-ink",
-            motionState,
-            focusRing
+            "inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs",
+            shape.control,
+            motion.press,
+            focusRing,
+            text.medium,
+            "hover:text-sherick-ink",
+            stateLayer.quiet,
+            state.press,
+            state.enabled
           )}
         >
-          {copied ? <Check className="h-3.5 w-3.5" aria-hidden="true" /> : <Copy className="h-3.5 w-3.5" aria-hidden="true" />}
+          {copied ? <Check className="size-3.5" aria-hidden="true" /> : <Copy className="size-3.5" aria-hidden="true" />}
           <span>{copied ? "Copied" : "Copy"}</span>
         </button>
       </div>
@@ -86,7 +104,8 @@ const CodeBlock = ({ inline = false, className, language = "text", children }: C
         {({ className: highlightClassName, style, tokens, getLineProps, getTokenProps }) => (
           <pre
             className={cn(
-              "overflow-x-auto border-t border-sherick-ink/[0.045] px-4 py-4 text-sm leading-6",
+              "overflow-x-auto border-t px-4 py-4 text-sm leading-6",
+              edge.rule,
               "bg-sherick-canvas/[0.28]",
               highlightClassName
             )}
@@ -95,7 +114,7 @@ const CodeBlock = ({ inline = false, className, language = "text", children }: C
             <code className="inline-block min-w-full">
               {tokens.map((line, i) => (
                 <div key={i} {...getLineProps({ line })}>
-                  <span className="mr-4 inline-block w-4 select-none text-right text-sherick-ink-muted/[0.55]">
+                  <span className={cn("mr-4 inline-block w-4 select-none text-right", text.low)}>
                     {i + 1}
                   </span>
                   {line.map((token, key) => (
