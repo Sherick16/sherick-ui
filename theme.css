@@ -252,7 +252,7 @@
   /* A clear tonal step above the canvas, so the sheet separates in its own right
      rather than almost entirely through its shadow — but a step, not a jump: a light
      grey sheet over a near-black page is what reads as fog. */
-  --sui-surface-overlay: 0.262 0.013 260;
+  --sui-surface-overlay: 0.236 0.012 260;
   --sui-overlay-fill: 0.965;
 
   --sui-scrim-blur: 6px;
@@ -314,7 +314,7 @@
     --sui-glass-hero-saturation: 1.03;
     --sui-glass-hero-brightness: 1.0;
     --sui-glass-hero-gradient: linear-gradient(180deg, rgb(255 255 255 / 0.028) 0%, rgb(255 255 255 / 0.009) 12%, rgb(255 255 255 / 0) 44%, rgb(0 0 0 / 0.16) 100%);
-    --sui-surface-overlay: 0.262 0.013 260;
+    --sui-surface-overlay: 0.236 0.012 260;
     --sui-overlay-fill: 0.965;
     --sui-scrim-blur: 6px;
     --sui-code-text: #e2e8f0;
