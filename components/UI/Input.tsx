@@ -2,6 +2,7 @@
 
 import React, { forwardRef, useId, type InputHTMLAttributes } from "react";
 import { cn } from "@/libs/utils";
+import { focusRing } from "./ui.common";
 
 export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
   label?: string;
@@ -38,10 +39,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           required={required}
           aria-invalid={error || undefined}
           className={cn(
-            "px-6 py-4 rounded-4xl bg-opacity-20 hover:bg-opacity-40 transition-all min-w-64 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20",
+            "px-6 py-4 rounded-4xl bg-opacity-20 hover:bg-opacity-40 transition-all min-w-64",
+            focusRing,
             !error
               ? "bg-gray-400 text-gray-300 hover:bg-gray-500"
-              : "text-red-300 bg-red-500 bg-opacity-15 hover:bg-opacity-25 hover:bg-red-500 focus-visible:ring-red-400/30",
+              : "text-red-300 bg-red-500 bg-opacity-15 hover:bg-opacity-25 hover:bg-red-500",
             inputClassName
           )}
           onChange={(event) => onChange?.(event.target.value)}
