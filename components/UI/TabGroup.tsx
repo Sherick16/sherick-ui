@@ -2,7 +2,7 @@
 
 import React, { type KeyboardEvent, type ReactNode, useId, useRef, useState } from "react";
 import { cn } from "@/libs/utils";
-import { bgMap, styleMap } from "./ui.common";
+import { bgMap, focusRing, styleMap } from "./ui.common";
 import { Variant } from "./ui.types";
 
 export interface Tab {
@@ -99,6 +99,7 @@ export const TabGroup = ({
               onKeyDown={(event) => handleKeyDown(event, index)}
               className={cn(
                 "relative z-10 min-w-28 flex-1 whitespace-nowrap px-8 py-5 text-sm font-medium transition-colors duration-200 rounded-4xl",
+                focusRing,
                 selected
                   ? cn(styleMap[variant], "bg-opacity-0 hover:bg-opacity-0")
                   : cn(styleMap[variant], "bg-opacity-0 hover:bg-opacity-10 text-opacity-80")
