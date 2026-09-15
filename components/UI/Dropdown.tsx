@@ -11,7 +11,7 @@ import React, {
 } from "react";
 import { ChevronDown } from "lucide-react";
 import { cn } from "@/libs/utils";
-import { bgMap, rowStyleMap, styleMap } from "./ui.common";
+import { bgMap, focusRing, rowStyleMap, styleMap } from "./ui.common";
 import { Variant } from "./ui.types";
 
 export interface DropdownOption {
@@ -147,7 +147,8 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
           }}
           onKeyDown={handleTriggerKeyDown}
           className={cn(
-            "flex w-full min-w-64 items-center justify-between rounded-4xl px-6 py-4 bg-opacity-20 hover:bg-opacity-40 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20",
+            "flex w-full min-w-64 items-center justify-between rounded-4xl px-6 py-4 bg-opacity-20 hover:bg-opacity-40 transition-all",
+            focusRing,
             styleMap[variant] || styleMap.primary,
             disabled && "cursor-not-allowed opacity-60"
           )}
@@ -186,7 +187,8 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
                   onKeyDown={(event) => handleOptionKeyDown(event, index)}
                   onClick={() => selectOption(index)}
                   className={cn(
-                    "cursor-pointer rounded-2xl px-6 py-3 text-left transition-colors outline-none",
+                    "cursor-pointer rounded-2xl px-6 py-3 text-left transition-colors",
+                    focusRing,
                     rowStyleMap[variant] || rowStyleMap.primary,
                     isActive && cn(bgMap[variant] || bgMap.primary, "bg-opacity-20"),
                     isSelected && "font-semibold"
