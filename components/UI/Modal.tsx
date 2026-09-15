@@ -92,25 +92,29 @@ export default function Modal({ children, open, onClose, className }: ModalProps
       aria-describedby="modal-description"
     >
       <div
-        className="absolute inset-0 bg-black/50 backdrop-blur-md animate-fade motion-reduce:animate-none"
+        className="absolute inset-0 bg-sherick-canvas/72 backdrop-blur-md animate-fade motion-reduce:animate-none"
         aria-hidden="true"
       />
 
       <div className="absolute inset-0 overflow-y-auto">
         <div
-          className="flex min-h-full items-center justify-center p-4 sm:p-8"
+          className="relative flex min-h-full items-center justify-center p-4 sm:p-8"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) onClose();
           }}
         >
+          <div
+            aria-hidden="true"
+            className="pointer-events-none absolute h-72 w-[28rem] max-w-[80vw] rounded-full bg-sherick-primary/10 blur-[110px]"
+          />
           <div
             ref={modalRef}
             tabIndex={-1}
             className={cn(
               "relative w-full max-w-xl outline-none",
               shape.hero,
-              surface.raised,
-              "animate-pop motion-reduce:animate-none",
+              surface.modal,
+              "animate-overlay motion-reduce:animate-none",
               className
             )}
           >
@@ -120,7 +124,7 @@ export default function Modal({ children, open, onClose, className }: ModalProps
               onClick={onClose}
               className={cn(
                 "absolute right-4 top-4 inline-flex min-h-11 min-w-11 items-center justify-center rounded-full",
-                "bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-white active:bg-white/20",
+                "bg-white/[0.055] text-sherick-ink-muted hover:bg-white/[0.1] hover:text-sherick-ink active:bg-white/[0.16]",
                 motionState,
                 focusRing,
                 pressable
