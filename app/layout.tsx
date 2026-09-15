@@ -1,12 +1,25 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import "../theme.css";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
+const themeScript = `
+(function () {
+  try {
+    var theme = localStorage.getItem("sherick-ui-theme");
+    if (theme === "light" || theme === "dark") {
+      document.documentElement.dataset.sherickTheme = theme;
+    } else {
+      document.documentElement.removeAttribute("data-sherick-theme");
+    }
+  } catch (_) {}
+})();`;
+
 export const metadata: Metadata = {
   title: "Sherick UI",
-  description: "A dark, expressive React component library.",
+  description: "A soft, expressive React component library with light and dark themes.",
 };
 
 export default function RootLayout({
@@ -15,7 +28,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+      </head>
       <body className={inter.className}>{children}</body>
     </html>
   );
