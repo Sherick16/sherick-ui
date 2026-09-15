@@ -1,10 +1,10 @@
 import type { Variant } from "./ui.types";
 
 export const focusRing =
-  "focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sherick-primary focus-visible:ring-offset-2 focus-visible:ring-offset-sherick-canvas";
+  "focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-sherick-focus focus-visible:outline-offset-[3px]";
 
 export const focusRingInset =
-  "focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-primary";
+  "focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-focus";
 
 export const motionState =
   "transition-[background-color,color,box-shadow,transform,opacity,filter] duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none";
@@ -25,7 +25,7 @@ export const shape = {
 
 export const surface = {
   control:
-    "bg-sherick-surface-high/[0.66] text-sherick-ink placeholder:text-sherick-ink-muted hover:bg-sherick-surface-high/[0.82] focus:bg-sherick-surface-high/[0.9] focus:shadow-[0_10px_30px_-24px_rgba(90,145,255,0.42)]",
+    "bg-sherick-surface-high/[0.66] text-sherick-ink placeholder:text-sherick-ink-muted hover:bg-sherick-surface-high/[0.82] focus:bg-sherick-surface-high/[0.9] focus:shadow-sherick-focus",
   controlError:
     "bg-sherick-danger/[0.075] text-sherick-ink placeholder:text-sherick-danger/[0.72] hover:bg-sherick-danger/[0.10] focus:bg-sherick-danger/[0.13]",
   passive: "bg-sherick-surface/[0.78] text-sherick-ink",
@@ -85,9 +85,9 @@ export const toneActiveMap: Record<Variant, string> = {
 export const toneStrongMap: Record<Variant, string> = {
   primary: "bg-sherick-primary-strong text-sherick-on-primary",
   secondary: "bg-sherick-surface-high text-sherick-ink",
-  danger: "bg-sherick-danger text-sherick-on-primary",
-  warning: "bg-sherick-warning text-sherick-canvas",
-  success: "bg-sherick-success text-sherick-canvas",
+  danger: "bg-sherick-danger text-sherick-on-danger",
+  warning: "bg-sherick-warning text-sherick-on-warning",
+  success: "bg-sherick-success text-sherick-on-success",
 };
 
 export const toneSoftMap: Record<Variant, string> = {
