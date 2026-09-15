@@ -12,7 +12,7 @@ const NavItem = ({ children, icon, className, to, ...props }: NavItemProps) => (
   <a
     href={to}
     className={cn(
-      "flex min-h-10 max-w-xs items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap rounded-xl px-3 py-2 text-sm text-zinc-300 hover:bg-white/5 hover:text-zinc-100 active:bg-white/10",
+      "flex min-h-10 max-w-xs items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap rounded-xl px-3 py-2 text-sm text-sherick-ink-muted hover:bg-sherick-ink/[0.05] hover:text-sherick-ink active:bg-sherick-ink/[0.09]",
       motionState,
       focusRing,
       pressable,
@@ -20,7 +20,7 @@ const NavItem = ({ children, icon, className, to, ...props }: NavItemProps) => (
     )}
     {...props}
   >
-    {icon && <span className="inline-flex shrink-0 items-center" aria-hidden="true">{icon}</span>}
+    {icon && <span className="inline-flex shrink-0 items-center [&>svg]:size-5" aria-hidden="true">{icon}</span>}
     <span className="truncate">{children}</span>
   </a>
 );
