@@ -8,7 +8,10 @@ export interface ModalContentProps {
 
 export const ModalContent = ({ children, className }: ModalContentProps) => {
   return (
-    <div id="modal-description" className={cn("px-6 py-4 text-gray-300", className)}>
+    <div
+      id="modal-description"
+      className={cn("px-6 py-4 text-sm leading-7 text-zinc-300 sm:px-7", className)}
+    >
       {children}
     </div>
   );
