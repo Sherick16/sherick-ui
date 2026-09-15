@@ -62,7 +62,7 @@ const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
           focusRing,
           !isDisabled && pressable,
           appearance === "filled" && toneStrongMap[variant],
-          appearance === "filled" && variant === "primary" && "shadow-sherick-primary hover:brightness-105",
+          appearance === "filled" && variant === "primary" && "hover:brightness-105",
           appearance === "tonal" && toneSurfaceMap[variant],
           appearance === "tonal" && toneTextMap[variant],
           appearance !== "text" && !isDisabled && toneHoverMap[variant],
