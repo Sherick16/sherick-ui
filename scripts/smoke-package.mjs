@@ -53,6 +53,13 @@ const variablesFor = (predicate) => {
   });
   return variables;
 };
+const normalizeVariables = (variables) =>
+  Object.fromEntries(
+    Object.entries(variables).map(([name, value]) => [
+      name,
+      value.replace(/\s+/g, " ").trim(),
+    ])
+  );
 
 const lightVariables = variablesFor(
   (rule) => rule.parent === themeRoot && rule.selector.includes('[data-sherick-theme="light"]')
@@ -91,8 +98,8 @@ for (const token of [
 }
 
 assert.deepEqual(
-  systemDarkVariables,
-  darkVariables,
+  normalizeVariables(systemDarkVariables),
+  normalizeVariables(darkVariables),
   "forced dark and prefers-color-scheme dark tokens must stay identical"
 );
 
