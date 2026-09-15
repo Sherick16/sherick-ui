@@ -19,11 +19,11 @@ export const Table = ({
     <div className={cn("w-full overflow-auto rounded-2xl bg-zinc-900/30", className)}>
       <table className="w-full border-collapse">
         <thead>
-          <tr className="border-b border-white/8">
+          <tr className="border-b border-white/10">
             {headers.map((header) => (
               <th
                 key={header}
-                className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-zinc-400"
+                className="px-4 py-3 text-left text-sm font-medium text-zinc-400"
               >
                 {header}
               </th>
@@ -34,7 +34,7 @@ export const Table = ({
           {rows.map((row, i) => (
             <tr
               key={i}
-              className="border-b border-white/6 transition-colors duration-150 last:border-b-0 hover:bg-white/4"
+              className="border-b border-white/5 transition-colors duration-150 last:border-b-0 hover:bg-white/5"
             >
               {row.map((cell, j) => (
                 <td key={j} className="px-4 py-3 text-sm text-zinc-200">
