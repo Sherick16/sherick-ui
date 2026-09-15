@@ -62,7 +62,7 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
           surface.control,
           motionState,
           "focus-within:outline-none focus-within:ring-2 focus-within:ring-sherick-primary focus-within:ring-offset-2 focus-within:ring-offset-sherick-canvas focus-within:bg-sherick-surface-high",
-          isDisabled && "cursor-not-allowed opacity-45 hover:bg-sherick-surface-high/78",
+          isDisabled && "cursor-not-allowed opacity-45 hover:bg-sherick-surface-high/[0.78]",
           className
         )}
       >
@@ -89,7 +89,7 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
             "outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-primary",
             motionState,
             toneTextMap[variant],
-            !isDisabled && "hover:bg-sherick-primary/10 active:bg-sherick-primary/18",
+            !isDisabled && "hover:bg-sherick-primary/10 active:bg-sherick-primary/[0.18]",
             !isDisabled && pressable,
             isDisabled ? "cursor-not-allowed" : "cursor-pointer"
           )}
