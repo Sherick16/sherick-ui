@@ -1,150 +1,337 @@
 import type { Variant } from "./ui.types";
 
+/* Sherick UI design primitives
+   ==========================================================================
+   One module owns every visual rule in the library. A component composes these
+   primitives; it does not write a color, shadow, radius, duration or hairline of
+   its own. The system has seven parts:
+
+     material   what a surface is made of          (canvas, matte, control, acrylic)
+     elevation  how far it sits off the page       (flat, raised, floating, control, pressed)
+     shape      its corner role                    (control, prominent, surface, expressive, pill, circle)
+     edge       the hairline between stacked parts (row, header, rule)
+     state      how it responds                    (rest, hover, pressed, selected, disabled, focus)
+     tone       its color role                     (text, soft, tonal, selected, strong)
+     density    how tightly it is packed           (compact, normal, prominent, target)
+     motion     how it moves                       (press, release, overlay)
+
+   material, elevation and edge are orthogonal, and that is the point:
+   a material is a fill, an elevation is a distance, and an edge is a structural
+   line. A component adds elevation only where its anatomy is genuinely lifted,
+   and a hairline only where two parts actually meet. Nothing is baked in.
+
+   The physical language, in order:
+     flat matte by default
+       -> tactile depth on manipulated controls
+       -> recessed depth while pressed, and for tracks and grooves
+       -> acrylic only for surfaces that genuinely float above the page
+
+   Elevation, edge tone and acrylic all derive from the single light model in
+   `theme.css` (light above the surface plane), so a highlight, a shadow, a
+   floating sheet's gradient and a pressed inset stay physically related. */
+
+/* Focus visibility — one language for every interactive element.
+   `focusRing` draws the ring outside the shape, for a control that stands alone.
+   `focusRingInset` draws it inside, for a control nested within another surface
+   where an outer ring would collide with the parent's edge. Fields use the outer
+   ring only: no inner rim is added, so focus reads as one ring, never two. */
 export const focusRing =
   "focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-sherick-focus focus-visible:outline-offset-[3px]";
 
 export const focusRingInset =
   "focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-focus";
 
-export const motionState =
-  "transition-[background-color,color,box-shadow,transform,opacity,filter] duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none";
-
-export const motionComponent =
-  "transition-[background-color,color,box-shadow,transform,opacity,filter] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none motion-reduce:transform-none";
-
-export const pressable =
-  "active:scale-[0.98] motion-reduce:active:scale-100";
-
-/* State layers.
-   Replacing `background-color` on hover erases whatever fill a control owns: an opaque
-   fill collapses to a bare tint and a tinted fill loses most of its step. This overlay
-   instead composites over the fill, tinted with `currentColor` — the container's own
-   on-color, which is also the color furthest from that fill, and the same color as the
-   label, so the glyphs themselves are unaffected. Opacity carries the state, so it fades
-   on the shared motion curve instead of snapping. */
-const stateLayerBase =
-  "before:pointer-events-none before:absolute before:inset-0 before:content-[''] before:opacity-0 before:transition-opacity before:duration-200 before:ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:before:transition-none";
-
-export const stateLayer = {
-  /* Tinted containers: the fill is nearly page color already, so the container's own
-     on-color (`current`) carries the state at a light step. */
-  tonal: `relative ${stateLayerBase} before:rounded-[inherit] before:bg-current hover:before:opacity-[0.1] active:before:opacity-[0.16]`,
-  /* Opaque fills: `current` is the fill's own on-color — the color furthest from it in
-     either theme — so one step reads on a saturated blue and a neutral gray alike. */
-  filled: `relative ${stateLayerBase} before:rounded-[inherit] before:bg-current hover:before:opacity-[0.18] active:before:opacity-[0.26]`,
-  /* Switch track: same layer, but hover arrives from the wrapping button. */
-  switchTrack: `${stateLayerBase} before:rounded-[inherit] before:bg-current group-hover:before:opacity-[0.18] group-active:before:opacity-[0.26]`,
+/* Motion — three families. A component picks a family, never a duration:
+   - press:   a tonality change with no physical travel: hover, focus, an engaged
+              field. Fast and decisive in both directions.
+   - release: a tactile control. It carries every property a tactile control can
+              animate — colour, shadow, transform and the size a selection or a thumb
+              travels with — and it takes the press timing while it is held (`active:`),
+              so the press lands immediately, while the release timing carries the
+              settle, so letting go is expressive.
+   A control whose transform changes must use `release`; `press` is for pure tonality
+   and colour transitions that never move or resize anything.
+   - overlay: the entrance and exit of anything that floats above the page, with a
+              matching scrim family for the plane behind it.
+   Every family is neutralised under `prefers-reduced-motion`; the overlay family
+   additionally drops its exit window entirely, so nothing lingers.
+   Loading feedback (`animate-spin`, `animate-pulse`) sits outside these families:
+   it reports progress rather than responding to interaction. */
+export const motion = {
+  press:
+    "transition-[background-color,color,box-shadow,opacity] duration-press ease-press motion-reduce:transition-none",
+  release:
+    "transition-[background-color,color,box-shadow,transform,opacity,width,height] duration-release ease-release active:duration-press active:ease-press motion-reduce:transition-none motion-reduce:transform-none",
+  overlayIn: "animate-sherick-overlay-in motion-reduce:animate-none",
+  overlayOut: "animate-sherick-overlay-out motion-reduce:animate-none",
+  scrimIn: "animate-sherick-scrim-in motion-reduce:animate-none",
+  scrimOut: "animate-sherick-scrim-out motion-reduce:animate-none",
 } as const;
 
-export const shape = {
-  pill: "rounded-full",
-  control: "rounded-[1.25rem]",
-  surface: "rounded-[1.75rem]",
-  hero: "rounded-[2.25rem]",
-  circle: "rounded-full",
-} as const;
-
-/* Elevation steps, expressed once so no component hand-writes a shadow. Two families:
-   the surface ladder below, and the tactile control pair used by matte interactive
-   controls. Only these values may appear anywhere in the library:
-   - grounded: matte, no shadow — separation comes from surface color alone.
-   - raised: tonal controls and lifted surfaces, on a soft contact-shadow step.
-   - floating: liquid-glass overlays that sit above the application.
-   - control: matte interactive controls, a hair above their own track at rest.
-   - pressed: the same controls pressed or selected, recessed into that track. Applied
-     through the state that fits each control — `active:` for buttons, the selected
-     condition for segmented controls — so the variant class is written at the call site. */
+/* Elevation — distance from the surface plane, and nothing else. Three depth roles
+   exist, and the last two are a single tactile pair:
+   - flat:     at rest on the page. Separation comes from tone alone.
+   - raised:   a manipulated control, lifted a hair above its own track so it feels
+               touchable; pressing it returns it to the track.
+   - floating: a surface that genuinely sits above the application.
+   - control:  the resting half of the tactile pair, for a part the user moves —
+               a switch thumb, a selected segment.
+   - recessed: the other half of that pair: a groove, a track or a well, which is
+               recessed by definition, and an actively pressed control, which lands at
+               the same depth. `pressed` is the published alias for that depth; prefer
+               `recessed` whenever the surface is simply sunk rather than being held.
+   A passive surface never takes any of these. */
 export const elevation = {
-  grounded: "shadow-sherick-grounded",
+  flat: "shadow-sherick-flat",
   raised: "shadow-sherick-raised",
   floating: "shadow-sherick-floating",
   control: "shadow-sherick-control",
+  recessed: "shadow-sherick-recessed",
+  /* The same physical depth, named for the moment a control reaches it by being held
+     down. Kept because it is published: a control that is actively pressed and a
+     passive groove resolve to one recessed depth, so neither name describes a
+     different height. */
   pressed: "shadow-sherick-pressed",
 } as const;
 
-/* Surface depth roles. Depth comes from the elevation steps and nothing else: the
-   palette, shape and blur of a role do not change as it steps up the ladder. */
-export const surface = {
-  control:
-    "bg-sherick-surface-high/[0.66] text-sherick-ink placeholder:text-sherick-ink-muted hover:bg-sherick-surface-high/[0.82] focus:bg-sherick-surface-high/[0.9] focus:shadow-sherick-focus",
-  controlError:
-    "bg-sherick-danger/[0.075] text-sherick-ink placeholder:text-sherick-danger/[0.72] hover:bg-sherick-danger/[0.10] focus:bg-sherick-danger/[0.13]",
-  grounded: "bg-sherick-surface/[0.78] text-sherick-ink",
-  groundedHigh: "bg-sherick-surface-high/[0.72] text-sherick-ink",
-  raised: `bg-sherick-surface-float/[0.82] text-sherick-ink ${elevation.raised}`,
-  acrylic: `bg-sherick-surface-float/[0.60] bg-sherick-glass text-sherick-ink ${elevation.floating} backdrop-blur-[var(--sui-glass-blur,32px)] backdrop-saturate-[var(--sui-glass-saturation,1.45)] backdrop-brightness-[var(--sui-glass-brightness,1.04)]`,
-  acrylicDense: `bg-sherick-surface-float/[0.72] bg-sherick-glass-dense text-sherick-ink ${elevation.floating} backdrop-blur-[var(--sui-glass-dense-blur,26px)] backdrop-saturate-[var(--sui-glass-dense-saturation,1.38)] backdrop-brightness-[var(--sui-glass-dense-brightness,1.035)]`,
-  modal: `bg-sherick-surface-float/[0.68] bg-sherick-glass text-sherick-ink ${elevation.floating} backdrop-blur-[var(--sui-glass-blur,32px)] backdrop-saturate-[var(--sui-glass-saturation,1.45)] backdrop-brightness-[var(--sui-glass-brightness,1.04)]`,
+/* Shape — semantic corner roles, never an arbitrary radius. Softness grows with
+   the size of the object and the emphasis it carries:
+   - control:     ordinary controls and dense data regions — fields, rows, options,
+                  chips, tables.
+   - prominent:   prominent controls and compact floating surfaces.
+   - surface:     large surfaces — cards, menus, panels.
+   - expressive:  an expressive surface that owns the viewport — the large overlay
+                  sheet, tightened so it reads as a focused surface rather than a
+                  pillowy one.
+   - pill:        fully rounded controls whose width follows their content.
+   - circle:      fully rounded square targets. */
+export const shape = {
+  control: "rounded-[1.25rem]",
+  prominent: "rounded-[1.5rem]",
+  surface: "rounded-[1.75rem]",
+  expressive: "rounded-[2rem]",
+  pill: "rounded-full",
+  circle: "rounded-full",
 } as const;
 
-export const toneTextMap: Record<Variant, string> = {
-  primary: "text-sherick-primary",
-  secondary: "text-sherick-ink",
-  danger: "text-sherick-danger",
-  warning: "text-sherick-warning",
-  success: "text-sherick-success",
-};
+/* Structural edges — the hairline where two parts of one surface meet, and the
+   only structural lines in the library. A matte control has no rim: a 1px inset
+   ring that traces a filled object is still a drawn border, so filled controls
+   are separated by tone, not by a line. Light does the rest: a raised control
+   carries a lower shadow, and the elevation steps add the upper highlight.
+   One tone serves every line, so table rows, dividers, code sections and quotes
+   agree with each other. */
+export const edge = {
+  /* Rows of a stacked list or table. */
+  row: "border-b border-sherick-edge/[0.06] last:border-b-0",
+  /* The heavier rule beneath a column header. */
+  header: "border-b border-sherick-edge/[0.10]",
+  /* A section break inside one surface, or a standalone rule. Pair it with the
+     directional border class at the call site (`border-t`, `border-l`). */
+  rule: "border-sherick-edge/[0.075]",
+} as const;
 
-export const toneSurfaceMap: Record<Variant, string> = {
-  primary: "bg-sherick-primary/[0.12]",
-  secondary: "bg-sherick-surface-high/[0.56]",
-  danger: "bg-sherick-danger/[0.09]",
-  warning: "bg-sherick-warning/[0.09]",
-  success: "bg-sherick-success/[0.09]",
-};
+/* Interaction states:
+     rest       the material, at whatever elevation its anatomy calls for
+     hover      one tonality step, never a change in depth or a new border
+     pressed    recessed into its own track, plus a slight compression
+     selected   a selected tone; depth comes from the component's anatomy — a
+                segment inside a groove is raised, a row in a list is not
+     disabled   45% opacity, no pointer affordance, no interactive state at all
+     focus      the shared outer focus ring, visible on keyboard focus */
+export const state = {
+  /* Tactile compression — matte controls only, never wide surfaces. */
+  press: "active:scale-[0.98] motion-reduce:active:scale-100",
+  /* The same compression, driven by the wrapping button instead of the track. */
+  groupPress: "group-active:scale-[0.98] motion-reduce:group-active:scale-100",
+  /* A raised matte control presses back into the track beneath it — the same physical
+     depth a groove or a well sits at. */
+  recess: "active:shadow-sherick-recessed",
+  disabled: "cursor-not-allowed opacity-45",
+  /* A control nested inside a disabled composite. The composite already applied the
+     opacity step, and a second one would dim the field unevenly; this carries only the
+     disabled cursor and semantics. */
+  disabledDescendant: "cursor-not-allowed",
+  /* A control with a hit area of its own. */
+  enabled: "cursor-pointer",
+  /* A text field: the normal text cursor, never a pointer. */
+  text: "cursor-text",
+  /* Quiet scan feedback for non-interactive data rows: tonality only. */
+  rowHover: "hover:bg-sherick-ink/[0.05]",
+  /* The matte field family — one tonality ladder, four triggers, no rims. A field
+     steps its surface up once on hover and once more while it is engaged; a
+     composite field focuses its outer surface while the input inside stays
+     borderless; an expanded control holds the engaged step while its popup is
+     open. Tonality carries the state, so no border appears and disappears. */
+  field: {
+    hover: "hover:bg-sherick-surface-high/[0.82]",
+    focus: "focus:bg-sherick-surface-high/[0.9]",
+    focusWithin: "focus-within:bg-sherick-surface-high/[0.9]",
+    engaged: "bg-sherick-surface-high/[0.9]",
+    errorHover: "hover:bg-sherick-danger/[0.10]",
+    errorFocus: "focus:bg-sherick-danger/[0.13]",
+    errorEngaged: "bg-sherick-danger/[0.13]",
+  },
+} as const;
 
-export const toneSelectedMap: Record<Variant, string> = {
-  primary: "bg-sherick-primary/[0.22] text-sherick-ink",
-  secondary: "bg-sherick-surface-high/[0.82] text-sherick-ink",
-  danger: "bg-sherick-danger/[0.16] text-sherick-ink",
-  warning: "bg-sherick-warning/[0.16] text-sherick-ink",
-  success: "bg-sherick-success/[0.16] text-sherick-ink",
-};
+/* State layers.
+   Replacing `background-color` on hover erases whatever fill a control owns: an
+   opaque fill collapses to a bare tint and a tinted fill loses most of its step.
+   This overlay instead composites over the fill, tinted with `currentColor` — the
+   container's own on-color, which is also the color furthest from that fill, and
+   the same color as the label, so the glyphs themselves are unaffected. Opacity
+   carries the state, so it fades on the shared motion curve instead of snapping,
+   and it takes the press timing while the control is held.
+   One step per fill strength: a quiet surface tints lightly, an opaque accent fill
+   takes the heaviest step. */
+const stateLayerBase =
+  "before:pointer-events-none before:absolute before:inset-0 before:content-[''] before:opacity-0 before:transition-opacity before:duration-release before:ease-release active:before:duration-press active:before:ease-press motion-reduce:before:transition-none";
 
-export const toneHoverMap: Record<Variant, string> = {
-  primary: "hover:bg-sherick-primary/[0.18]",
-  secondary: "hover:bg-sherick-surface-high/[0.72]",
-  danger: "hover:bg-sherick-danger/[0.14]",
-  warning: "hover:bg-sherick-warning/[0.14]",
-  success: "hover:bg-sherick-success/[0.14]",
-};
+export const stateLayer = {
+  /* Quiet surfaces — ghost controls, navigation rows, menu options. */
+  quiet: `relative ${stateLayerBase} before:rounded-[inherit] before:bg-current hover:before:opacity-[0.05] active:before:opacity-[0.09]`,
+  /* Tinted containers: the fill is nearly page color already, so the container's own
+     on-color (`current`) carries the state at a light step. Shared by every matte
+     control with a fill — tonal buttons, icon buttons, acrylic buttons. */
+  tonal: `relative ${stateLayerBase} before:rounded-[inherit] before:bg-current hover:before:opacity-[0.09] active:before:opacity-[0.15]`,
+  /* Opaque fills: `current` is the fill's own on-color — the color furthest from it in
+     either theme — so one step reads on a saturated blue and a neutral gray alike. */
+  filled: `relative ${stateLayerBase} before:rounded-[inherit] before:bg-current hover:before:opacity-[0.18] active:before:opacity-[0.26]`,
+  /* Tracks: the same layer, but hover arrives from the wrapping button rather than
+     the track itself. */
+  track: `${stateLayerBase} before:rounded-[inherit] before:bg-current group-hover:before:opacity-[0.18] group-active:before:opacity-[0.26] group-active:before:duration-press group-active:before:ease-press`,
+  /* A menu row highlighted by keyboard navigation rather than a pointer. */
+  activeRow: "data-[active=true]:before:opacity-[0.06]",
+} as const;
 
-export const toneActiveMap: Record<Variant, string> = {
-  primary: "active:bg-sherick-primary/[0.24]",
-  secondary: "active:bg-sherick-surface-high/[0.88]",
-  danger: "active:bg-sherick-danger/[0.20]",
-  warning: "active:bg-sherick-warning/[0.20]",
-  success: "active:bg-sherick-success/[0.20]",
-};
+/* Material — fill only. No material carries elevation or a rim: the same matte
+   fill appears flat in a card, lifted on a button and recessed in a groove.
+   - canvas:      the page itself.
+   - matteQuiet:  the quietest matte step, for dense data regions and wells that
+                  should sit back from the surface around them.
+   - matte:       a matte surface that separates from the canvas by tone alone.
+   - matteHigh:   the second matte step, for nesting inside another matte surface.
+   - control:     the fill every text control shares, plus its placeholder tone.
+   - acrylic:     a translucent sheet lit from above, for surfaces that float above
+                  the application. The gradient, fill, blur and saturation are part of
+                  the material. A gradient arrives as a typed image arbitrary value
+                  rather than through the colour scale, because `tailwind-merge`
+                  collapses two background utilities into one and would silently drop
+                  either the fill or the gradient. Each one is written out literally, so
+                  the class scanner never meets a half-built name. The fill stays an
+                  ordinary background colour, so a caller can retone a sheet without
+                  touching its lighting. `acrylicDense` is the same sheet at higher opacity for
+                  small floating surfaces that must stay legible.
+   - acrylicHero: the large-overlay sheet, for a surface that owns the viewport. It is
+                  markedly more opaque and calmer than the smaller sheets: it has to
+                  read first as a physical surface and only secondarily as glass, so the
+                  scrim behind it does the separating, the blur only defocuses, and the
+                  gradient is a restrained top-to-bottom light rather than a frosted
+                  haze. Its tone sits above the floating level in every theme, which is
+                  how it separates in dark mode without leaning on its shadow — the dark
+                  tone is a subtle step above the canvas, not a light grey sheet — and
+                  `--sui-overlay-fill` tunes how much of the sheet is its own tone rather
+                  than the defocused page — a large overlay leans on that, not on blur. */
+export const material = {
+  canvas: "bg-sherick-canvas text-sherick-ink",
+  matteQuiet: "bg-sherick-surface/[0.42] text-sherick-ink",
+  matte: "bg-sherick-surface/[0.78] text-sherick-ink",
+  matteHigh: "bg-sherick-surface-high/[0.72] text-sherick-ink",
+  control: "bg-sherick-surface-high/[0.66] text-sherick-ink placeholder:text-sherick-ink-muted",
+  controlError: "bg-sherick-danger/[0.075] text-sherick-ink placeholder:text-sherick-danger/[0.72]",
+  acrylic:
+    "bg-sherick-surface-float/[0.60] bg-[image:var(--sui-glass-gradient)] text-sherick-ink backdrop-blur-[var(--sui-glass-blur,32px)] backdrop-saturate-[var(--sui-glass-saturation,1.45)] backdrop-brightness-[var(--sui-glass-brightness,1.04)]",
+  acrylicDense:
+    "bg-sherick-surface-float/[0.72] bg-[image:var(--sui-glass-gradient-dense)] text-sherick-ink backdrop-blur-[var(--sui-glass-dense-blur,26px)] backdrop-saturate-[var(--sui-glass-dense-saturation,1.38)] backdrop-brightness-[var(--sui-glass-dense-brightness,1.035)]",
+  acrylicHero:
+    "bg-sherick-surface-overlay/[var(--sui-overlay-fill,0.9)] bg-[image:var(--sui-glass-hero-gradient)] text-sherick-ink backdrop-blur-[var(--sui-glass-hero-blur,14px)] backdrop-saturate-[var(--sui-glass-hero-saturation,1.06)] backdrop-brightness-[var(--sui-glass-hero-brightness,1)]",
+} as const;
 
-export const toneStrongMap: Record<Variant, string> = {
-  primary: "bg-sherick-primary-strong text-sherick-on-primary",
-  secondary: "bg-sherick-surface-high text-sherick-ink",
-  danger: "bg-sherick-danger text-sherick-on-danger",
-  warning: "bg-sherick-warning text-sherick-on-warning",
-  success: "bg-sherick-success text-sherick-on-success",
-};
+/* Density — three control steps plus the accessible hit target.
+   Density owns height and the type step, so controls of one density share a
+   rhythm. A component's anatomy owns its padding: a button's inline padding is
+   set by how it is gripped, a field's by how much text it holds, and neither is
+   derived from the other. The library targets dense desktop and product UI, so
+   even the prominent step stays compact. Body copy, headings and labels are
+   content, not controls, and set their own type. */
+export const density = {
+  compact: "min-h-10 text-sm",
+  normal: "min-h-12 text-[0.95rem]",
+  prominent: "min-h-14 text-lg",
+  /* Minimum interactive target for an icon-only control. */
+  target: "min-h-11 min-w-11",
+} as const;
 
-export const toneSoftMap: Record<Variant, string> = {
-  primary: "bg-sherick-primary/[0.12] text-sherick-primary",
-  secondary: "bg-sherick-surface/[0.78] text-sherick-ink",
-  danger: "bg-sherick-danger/[0.09] text-sherick-danger",
-  warning: "bg-sherick-warning/[0.09] text-sherick-warning",
-  success: "bg-sherick-success/[0.09] text-sherick-success",
-};
+/* Floating overlay shells.
+   These recipes only exist while an overlay is open, so no closed-state render can
+   reach them: they live here, once, and every overlay composes them. Each entry is the
+   surface of one overlay — its corner role, its material, its elevation and the
+   geometry its entrance grows from — while the entrance/exit selection and the pointer
+   and focus suppression stay in the component, because only the component knows whether
+   it is opening or closing. `motion.overlayIn`/`overlayOut` are the family every entry
+   animates with. */
+export const overlay = {
+  /* A menu grows out of its trigger. */
+  menu: `origin-top [--sui-overlay-from-scale:0.985] [--sui-overlay-from-lift:-4px] ${shape.surface} ${material.acrylic} ${elevation.floating}`,
+  /* A tooltip grows out of the edge it is anchored to, so its geometry is per position
+     and is applied with the position in the component. */
+  tooltip: `${shape.prominent} ${material.acrylicDense} ${elevation.floating}`,
+  /* A dialog rises further than a menu, from its own scale. */
+  dialog: `[--sui-overlay-from-scale:0.985] [--sui-overlay-from-lift:8px] ${shape.expressive} ${material.acrylicHero} ${elevation.floating}`,
+} as const;
 
-export const styleMap: Record<Variant, string> = Object.fromEntries(
-  (Object.keys(toneTextMap) as Variant[]).map((variant) => [
-    variant,
-    `${toneSurfaceMap[variant]} ${toneTextMap[variant]} ${toneHoverMap[variant]}`,
-  ])
-) as Record<Variant, string>;
+/* Text hierarchy — three steps, no more. High emphasis carries labels and values,
+   medium emphasis carries supporting copy, low emphasis carries the dimmest
+   furniture such as gutters and hints. */
+export const text = {
+  high: "text-sherick-ink",
+  medium: "text-sherick-ink-muted",
+  low: "text-sherick-ink-faint",
+} as const;
 
-export const bgMap: Record<Variant, string> = toneStrongMap;
-
-export const rowStyleMap: Record<Variant, string> = Object.fromEntries(
-  (Object.keys(toneTextMap) as Variant[]).map((variant) => [
-    variant,
-    `${toneTextMap[variant]} ${toneHoverMap[variant]}`,
-  ])
-) as Record<Variant, string>;
+/* Tone hierarchy — the color roles a surface can take, in rising strength:
+     text      foreground only, for quiet rows and links.
+     soft      a de-emphasised tinted surface: alerts, badges, quiet cards.
+     tonal     a matte control fill at rest: tonal buttons, icon buttons.
+     selected  the fill a selected control holds: menu options, navigation, the
+               selected segment of a segmented control.
+     strong    the opaque accent fill that marks priority.
+   A fill step is composited over whatever sits beneath it, so one tone reads
+   correctly on the canvas, inside a card and on an acrylic sheet. */
+export const tone = {
+  text: {
+    primary: "text-sherick-primary",
+    secondary: "text-sherick-ink",
+    danger: "text-sherick-danger",
+    warning: "text-sherick-warning",
+    success: "text-sherick-success",
+  },
+  soft: {
+    primary: "bg-sherick-primary/[0.12] text-sherick-primary",
+    secondary: "bg-sherick-surface/[0.78] text-sherick-ink",
+    danger: "bg-sherick-danger/[0.09] text-sherick-danger",
+    warning: "bg-sherick-warning/[0.09] text-sherick-warning",
+    success: "bg-sherick-success/[0.09] text-sherick-success",
+  },
+  tonal: {
+    primary: "bg-sherick-primary/[0.12]",
+    secondary: "bg-sherick-surface-high/[0.56]",
+    danger: "bg-sherick-danger/[0.09]",
+    warning: "bg-sherick-warning/[0.09]",
+    success: "bg-sherick-success/[0.09]",
+  },
+  selected: {
+    primary: "bg-sherick-primary/[0.22] text-sherick-ink",
+    secondary: "bg-sherick-surface-high/[0.82] text-sherick-ink",
+    danger: "bg-sherick-danger/[0.16] text-sherick-ink",
+    warning: "bg-sherick-warning/[0.16] text-sherick-ink",
+    success: "bg-sherick-success/[0.16] text-sherick-ink",
+  },
+  strong: {
+    primary: "bg-sherick-primary-strong text-sherick-on-primary",
+    secondary: "bg-sherick-surface-high text-sherick-ink",
+    danger: "bg-sherick-danger text-sherick-on-danger",
+    warning: "bg-sherick-warning text-sherick-on-warning",
+    success: "bg-sherick-success text-sherick-on-success",
+  },
+} satisfies Record<string, Record<Variant, string>>;

@@ -3,15 +3,14 @@
 import React, { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import {
+  density,
   elevation,
   focusRing,
-  motionComponent,
-  pressable,
+  motion,
   shape,
+  state,
   stateLayer,
-  toneStrongMap,
-  toneSurfaceMap,
-  toneTextMap,
+  tone,
 } from "./ui.common";
 import { Variant } from "./ui.types";
 import { Spinner } from "./Spinner";
@@ -28,10 +27,12 @@ export interface ActionButtonProps extends ButtonHTMLAttributes<HTMLButtonElemen
   loading?: boolean;
 }
 
+/* Density owns height and type; the button's anatomy owns its padding, because a
+   button is gripped at its ends and a field is not. */
 const sizeMap: Record<ButtonSize, string> = {
-  sm: "min-h-10 px-4 py-2 text-sm",
-  md: "min-h-12 px-6 py-3 text-[0.95rem]",
-  lg: "min-h-14 px-8 py-4 text-lg",
+  sm: `${density.compact} px-4 py-2`,
+  md: `${density.normal} px-6 py-3`,
+  lg: `${density.prominent} px-8 py-4`,
 };
 
 const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
@@ -47,6 +48,10 @@ const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
     ...props
   }, ref) => {
     const isDisabled = disabled || loading;
+    /* A tonal button is matte and tactile: it rests a hair above its own track and
+       presses back into it. No rim — a filled control is separated by tone and by
+       that lift, and an outline would only draw a border around it. */
+    const isTactile = appearance === "tonal" && !isDisabled;
 
     return (
       <button
@@ -58,19 +63,19 @@ const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
           "inline-flex items-center justify-center gap-2 font-medium tracking-[-0.01em]",
           shape.pill,
           sizeMap[size],
-          motionComponent,
+          motion.release,
           focusRing,
-          !isDisabled && pressable,
-          appearance === "filled" && toneStrongMap[variant],
-          appearance === "tonal" && toneSurfaceMap[variant],
-          appearance === "tonal" && !isDisabled && elevation.raised,
-          appearance === "tonal" && !isDisabled && "active:shadow-sherick-pressed",
-          appearance === "tonal" && toneTextMap[variant],
+          appearance === "filled" && tone.strong[variant],
           appearance === "filled" && !isDisabled && stateLayer.filled,
+          appearance === "tonal" && tone.tonal[variant],
+          appearance === "tonal" && tone.text[variant],
           appearance === "tonal" && !isDisabled && stateLayer.tonal,
-          appearance === "text" && toneTextMap[variant],
-          appearance === "text" && !isDisabled && "hover:bg-sherick-ink/[0.055] active:bg-sherick-ink/[0.1]",
-          isDisabled ? "cursor-not-allowed opacity-45 shadow-none" : "cursor-pointer",
+          appearance === "text" && tone.text[variant],
+          appearance === "text" && !isDisabled && stateLayer.quiet,
+          isTactile && elevation.raised,
+          isTactile && state.recess,
+          !isDisabled && state.press,
+          isDisabled ? state.disabled : state.enabled,
           className
         )}
       >

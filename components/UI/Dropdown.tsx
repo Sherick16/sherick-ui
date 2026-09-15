@@ -12,16 +12,19 @@ import React, {
 import { Check, ChevronDown } from "lucide-react";
 import { cn } from "@/libs/utils";
 import {
+  density,
   focusRing,
-  motionComponent,
-  motionState,
-  pressable,
+  material,
+  motion,
+  overlay,
   shape,
-  surface,
-  toneSelectedMap,
-  toneTextMap,
+  state,
+  stateLayer,
+  text,
+  tone,
 } from "./ui.common";
 import { Variant } from "./ui.types";
+import { useOverlayPresence } from "./useOverlayPresence";
 
 export interface DropdownOption {
   label: string;
@@ -58,6 +61,7 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
     const triggerRef = useRef<HTMLButtonElement | null>(null);
     const optionRefs = useRef<Array<HTMLDivElement | null>>([]);
     const [isOpen, setIsOpen] = useState(false);
+    const { mounted, closing, onExitEnd } = useOverlayPresence(isOpen);
     const selectedIndex = options.findIndex((option) => option.value === selected);
     const [activeIndex, setActiveIndex] = useState(selectedIndex >= 0 ? selectedIndex : 0);
     const selectedOption = selectedIndex >= 0 ? options[selectedIndex] : undefined;
@@ -86,14 +90,12 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
       requestAnimationFrame(() => optionRefs.current[nextIndex]?.focus());
     }, [isOpen, selectedIndex]);
 
-    const focusTrigger = () => requestAnimationFrame(() => triggerRef.current?.focus());
-
     const selectOption = (index: number) => {
       const option = options[index];
       if (!option) return;
       onSelect?.(option.value);
       setIsOpen(false);
-      focusTrigger();
+      requestAnimationFrame(() => triggerRef.current?.focus());
     };
 
     const moveActive = (nextIndex: number) => {
@@ -139,7 +141,7 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
       } else if (event.key === "Escape") {
         event.preventDefault();
         setIsOpen(false);
-        focusTrigger();
+        requestAnimationFrame(() => triggerRef.current?.focus());
       } else if (event.key === "Tab") {
         setIsOpen(false);
       }
@@ -162,41 +164,46 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
           }}
           onKeyDown={handleTriggerKeyDown}
           className={cn(
-            "flex min-h-12 w-full min-w-64 items-center justify-between px-5 py-3 text-left text-[0.95rem]",
+            density.normal,
+            "flex w-full min-w-64 items-center justify-between gap-3 px-5 py-3 text-left",
             shape.control,
-            surface.control,
-            motionState,
+            material.control,
+            motion.release,
             focusRing,
-            isOpen && "bg-sherick-surface-high/[0.88]",
-            !disabled && pressable,
-            disabled && "cursor-not-allowed opacity-45"
+            !disabled && state.field.hover,
+            !disabled && state.field.focus,
+            /* The trigger holds the engaged step for as long as the popup is open,
+               even though focus has moved into the listbox. */
+            isOpen && state.field.engaged,
+            !disabled && state.press,
+            disabled ? state.disabled : state.enabled
           )}
         >
-          <span className={cn("truncate", !selectedOption && "text-sherick-ink-muted")}>
+          <span className={cn("truncate", !selectedOption && text.medium)}>
             {selectedOption?.label ?? placeholder}
           </span>
           <ChevronDown
             aria-hidden="true"
-            className={cn(
-              "ml-3 h-5 w-5 shrink-0 text-sherick-ink",
-              motionComponent,
-              isOpen && "rotate-180"
-            )}
+            className={cn("size-5 shrink-0", text.high, motion.release, isOpen && "rotate-180")}
           />
         </button>
 
-        {isOpen && options.length > 0 && (
+        {mounted && options.length > 0 && (
           <div
             id={listboxId}
             role="listbox"
             aria-labelledby={triggerId}
+            aria-hidden={closing || undefined}
+            onAnimationEnd={onExitEnd}
+            /* A closing overlay keeps its node for the exit step, so it must stop
+               responding to pointers and to the keyboard while it leaves. */
+            inert={closing || undefined}
             className={cn(
               /* A hairline gap keeps the rounded option fills from touching, so hover and
                  selection read as separate rows instead of one merged highlight. */
               "absolute z-30 mt-2 w-full min-w-max space-y-1 p-2",
-              shape.surface,
-              surface.acrylic,
-              "origin-top animate-menu motion-reduce:animate-none"
+              overlay.menu,
+              closing ? cn(motion.overlayOut, "pointer-events-none") : motion.overlayIn
             )}
           >
             {options.map((option, index) => {
@@ -211,26 +218,24 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
                   }}
                   role="option"
                   aria-selected={isSelected}
+                  data-active={isActive}
                   tabIndex={isActive ? 0 : -1}
                   onFocus={() => setActiveIndex(index)}
                   onKeyDown={(event) => handleOptionKeyDown(event, index)}
                   onClick={() => selectOption(index)}
                   className={cn(
-                    "flex cursor-pointer items-center justify-between gap-4 px-4 py-3 text-left text-sm text-sherick-ink outline-none",
+                    "flex cursor-pointer items-center justify-between gap-4 px-4 py-3 text-left text-sm outline-none",
                     shape.control,
-                    motionState,
-                    isSelected && toneSelectedMap[variant],
-                    !isSelected && isActive && "bg-sherick-ink/[0.07]",
-                    !isSelected && "hover:bg-sherick-ink/[0.05]",
-                    "focus-visible:bg-sherick-ink/[0.08] active:bg-sherick-ink/[0.1]"
+                    motion.press,
+                    text.high,
+                    isSelected
+                      ? tone.selected[variant]
+                      : cn(stateLayer.quiet, stateLayer.activeRow)
                   )}
                 >
                   <span className={cn(isSelected && "font-medium")}>{option.label}</span>
                   {isSelected && (
-                    <Check
-                      aria-hidden="true"
-                      className={cn("h-4 w-4 animate-fade motion-reduce:animate-none", toneTextMap[variant])}
-                    />
+                    <Check aria-hidden="true" className={cn("size-4", tone.text[variant])} />
                   )}
                 </div>
               );

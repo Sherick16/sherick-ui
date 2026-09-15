@@ -4,10 +4,20 @@ import React, { type ReactNode, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { cn } from "@/libs/utils";
-import { focusRing, motionState, pressable, shape, surface } from "./ui.common";
+import {
+  density,
+  focusRing,
+  motion,
+  overlay,
+  shape,
+  state,
+  stateLayer,
+  text,
+} from "./ui.common";
 import { ModalContent } from "./ModalContent";
 import { ModalFooter } from "./ModalFooter";
 import { ModalHeader } from "./ModalHeader";
+import { useOverlayPresence } from "./useOverlayPresence";
 
 export interface ModalProps {
   children: ReactNode;
@@ -28,6 +38,7 @@ const FOCUSABLE_SELECTOR = [
 export default function Modal({ children, open, onClose, className }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedElement = useRef<HTMLElement | null>(null);
+  const { mounted, closing, onExitEnd } = useOverlayPresence(open);
 
   useEffect(() => {
     if (!open) return;
@@ -69,10 +80,11 @@ export default function Modal({ children, open, onClose, className }: ModalProps
     };
 
     document.addEventListener("keydown", handleKeyDown);
-    requestAnimationFrame(() => {
-      const first = focusables()[0];
-      (first ?? modalRef.current)?.focus();
-    });
+    /* Focus the dialog itself rather than its first control: the surface opens quiet
+       (no ring drawn on an action the user has not chosen), screen readers announce the
+       dialog with its title, and the trap already handles the container as the
+       pre-first position for both Tab directions. */
+    requestAnimationFrame(() => modalRef.current?.focus());
 
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
@@ -81,18 +93,28 @@ export default function Modal({ children, open, onClose, className }: ModalProps
     };
   }, [open, onClose]);
 
-  if (!open) return null;
+  if (!mounted) return null;
 
   return createPortal(
     <div
-      className="fixed inset-0 z-50"
+      /* A closing dialog keeps its node for the exit step, so it must stop responding to
+         pointers and stop holding focusable descendants while it leaves. */
+      inert={closing || undefined}
+      className={cn("fixed inset-0 z-50", closing && "pointer-events-none")}
       role="dialog"
       aria-modal="true"
+      aria-hidden={closing || undefined}
       aria-labelledby="modal-title"
       aria-describedby="modal-description"
     >
       <div
-        className="absolute inset-0 bg-sherick-scrim/[0.32] backdrop-blur-lg animate-fade motion-reduce:animate-none"
+        className={cn(
+          /* The scrim carries the separation; the blur only defocuses the page far
+             enough that it stops competing with the surface above it. */
+          "absolute inset-0 bg-sherick-scrim/[0.38] backdrop-blur-[var(--sui-scrim-blur,6px)]",
+          closing ? motion.scrimOut : motion.scrimIn
+        )}
+        onAnimationEnd={onExitEnd}
         aria-hidden="true"
       />
 
@@ -106,11 +128,11 @@ export default function Modal({ children, open, onClose, className }: ModalProps
           <div
             ref={modalRef}
             tabIndex={-1}
+            onAnimationEnd={onExitEnd}
             className={cn(
               "relative w-full max-w-lg outline-none",
-              shape.hero,
-              surface.modal,
-              "animate-overlay motion-reduce:animate-none",
+              overlay.dialog,
+              closing ? motion.overlayOut : motion.overlayIn,
               className
             )}
           >
@@ -119,14 +141,24 @@ export default function Modal({ children, open, onClose, className }: ModalProps
               aria-label="Close dialog"
               onClick={onClose}
               className={cn(
-                "absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full",
-                "bg-sherick-surface-high/[0.72] text-sherick-ink-muted hover:bg-sherick-surface-high hover:text-sherick-ink active:bg-sherick-surface-high/[0.9]",
-                motionState,
+                /* A quiet ghost at rest: the dialog reads as one surface, and the
+                   action only claims its own tone on hover, press or focus. */
+                density.target,
+                shape.circle,
+                text.medium,
+                "hover:text-sherick-ink",
+                motion.release,
                 focusRing,
-                pressable
+                stateLayer.quiet,
+                state.press,
+                state.enabled,
+                /* `stateLayer` supplies a containing block for its overlay, so an
+                   absolutely positioned control declares its position after the layer
+                   and becomes its own containing block. */
+                "absolute right-4 top-4 inline-flex items-center justify-center"
               )}
             >
-              <X className="h-5 w-5" aria-hidden="true" />
+              <X className="size-5" aria-hidden="true" />
             </button>
 
             {children}

@@ -51,8 +51,9 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "node scripts/smoke-package.mjs",
-    "verify": "bun run lint && bun run typecheck && bun run build && bun run next:build && bun run test",
-    "clean": "rimraf dist"
+    "verify": "bun run lint && bun run typecheck && bun run build && bun run next:build && bun run test && bun run visual",
+    "clean": "rimraf dist",
+    "visual": "bun scripts/visual-regression.mjs"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",

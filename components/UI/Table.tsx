@@ -1,5 +1,6 @@
 import React, { type ReactNode } from "react";
 import { cn } from "@/libs/utils";
+import { edge, material, motion, shape, state, text } from "./ui.common";
 import { Variant } from "./ui.types";
 
 export interface TableProps {
@@ -10,20 +11,23 @@ export interface TableProps {
   className?: string;
 }
 
+/* A table is a quiet, dense data region: the lightest matte fill, tighter geometry than
+   a card, and hairlines between rows. Row feedback is tonality only — the rows are
+   scannable, not manipulated. */
 export const Table = ({
   headers,
   rows,
   className,
 }: TableProps) => {
   return (
-    <div className={cn("w-full overflow-auto rounded-2xl bg-sherick-surface/[0.42]", className)}>
+    <div className={cn("w-full overflow-auto", shape.control, material.matteQuiet, className)}>
       <table className="w-full border-collapse">
         <thead>
-          <tr className="border-b border-sherick-ink/[0.08]">
+          <tr className={edge.header}>
             {headers.map((header) => (
               <th
                 key={header}
-                className="px-4 py-3 text-left text-sm font-medium text-sherick-ink-muted"
+                className={cn("px-4 py-3 text-left text-sm font-medium", text.medium)}
               >
                 {header}
               </th>
@@ -32,12 +36,9 @@ export const Table = ({
         </thead>
         <tbody>
           {rows.map((row, i) => (
-            <tr
-              key={i}
-              className="border-b border-sherick-ink/[0.045] transition-colors duration-150 last:border-b-0 hover:bg-sherick-ink/[0.04]"
-            >
+            <tr key={i} className={cn(edge.row, motion.press, state.rowHover)}>
               {row.map((cell, j) => (
-                <td key={j} className="px-4 py-3 text-sm text-sherick-ink/90">
+                <td key={j} className={cn("px-4 py-3 text-sm", text.high)}>
                   {cell}
                 </td>
               ))}

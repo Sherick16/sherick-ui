@@ -2,7 +2,15 @@
 
 import React, { forwardRef, useId, type InputHTMLAttributes } from "react";
 import { cn } from "@/libs/utils";
-import { focusRing, motionState, shape, surface } from "./ui.common";
+import {
+  density,
+  focusRing,
+  material,
+  motion,
+  shape,
+  state,
+  text,
+} from "./ui.common";
 
 export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
   label?: string;
@@ -11,6 +19,9 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   onChange?: (value: string) => void;
 }
 
+/* A field is flat matte and borderless: it rests on its surface-high fill and steps
+   that fill up on hover and focus. No ring, no lift — a border that appears on focus
+   is still a border, and the keyboard ring belongs outside the shape. */
 const Input = forwardRef<HTMLInputElement, InputProps>(
   ({
     label,
@@ -19,6 +30,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     required,
     error = false,
     id,
+    disabled,
     onChange,
     ...props
   }, ref) => {
@@ -28,7 +40,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className={cn("flex flex-col", className)}>
         {label && (
-          <label htmlFor={inputId} className="mb-2 text-sm font-medium text-sherick-ink/[0.88]">
+          <label htmlFor={inputId} className={cn("mb-2 text-sm font-medium", text.high)}>
             {label}
             {required && <span className="ml-1 text-sherick-danger" aria-hidden="true">*</span>}
           </label>
@@ -37,14 +49,20 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           ref={ref}
           id={inputId}
           required={required}
+          disabled={disabled}
           aria-invalid={error || undefined}
           className={cn(
-            "min-h-12 min-w-64 px-5 py-3 text-[0.95rem]",
+            density.normal,
+            /* Density owns the type step and the control floor; the anatomy sets the
+               padding a field holds its text in. */
+            "min-w-64 px-5 py-3",
             shape.control,
-            motionState,
+            motion.press,
             focusRing,
-            error ? surface.controlError : surface.control,
-            "disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-sherick-surface-high/[0.78]",
+            error ? material.controlError : material.control,
+            !disabled && (error ? state.field.errorHover : state.field.hover),
+            !disabled && (error ? state.field.errorFocus : state.field.focus),
+            disabled ? state.disabled : state.text,
             inputClassName
           )}
           onChange={(event) => onChange?.(event.target.value)}

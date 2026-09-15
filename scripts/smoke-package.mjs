@@ -74,6 +74,7 @@ const darkVariables = variablesFor(
 const systemDarkVariables = variablesFor(
   (rule) => rule.selector.includes(':root:not([data-sherick-theme])')
 );
+const rootVariables = variablesFor((rule) => rule.selector.trim() === ":root");
 
 for (const token of [
   "--sui-canvas",
@@ -82,27 +83,73 @@ for (const token of [
   "--sui-surface-float",
   "--sui-ink",
   "--sui-ink-muted",
+  "--sui-ink-faint",
   "--sui-primary",
+  "--sui-primary-strong",
+  "--sui-primary-soft",
+  "--sui-accent",
   "--sui-on-primary",
   "--sui-on-danger",
   "--sui-on-warning",
   "--sui-on-success",
   "--sui-focus",
+  "--sui-edge",
+  "--sui-light-top",
+  "--sui-light-bottom",
   "--sui-scrim",
   "--sui-glass-blur",
   "--sui-glass-saturation",
   "--sui-glass-brightness",
   "--sui-glass-gradient",
+  "--sui-glass-gradient-dense",
+  "--sui-elevation-flat",
   "--sui-elevation-grounded",
   "--sui-elevation-raised",
   "--sui-elevation-floating",
   "--sui-elevation-control",
+  "--sui-elevation-recessed",
   "--sui-elevation-pressed",
+  "--sui-shadow-focus",
+  "--sui-shadow-primary",
   "--sui-code-text",
 ]) {
   assert.ok(lightVariables[token], `light theme missing ${token}`);
   assert.ok(darkVariables[token], `dark theme missing ${token}`);
   assert.ok(systemDarkVariables[token], `system dark theme missing ${token}`);
+}
+
+// Motion is theme-independent, so its tokens live in a single `:root` block.
+for (const token of [
+  "--sui-duration-press",
+  "--sui-duration-release",
+  "--sui-duration-overlay",
+  "--sui-duration-overlay-exit",
+  "--sui-ease-press",
+  "--sui-ease-release",
+  "--sui-ease-exit",
+]) {
+  assert.ok(rootVariables[token], `root missing motion token ${token}`);
+  assert.ok(!lightVariables[token], `${token} must not be duplicated per theme`);
+  assert.ok(!darkVariables[token], `${token} must not be duplicated per theme`);
+}
+
+// Every depth cue derives from the two light-model colors, so a theme that drops one
+// silently loses its edge lighting rather than failing loudly.
+for (const shadow of ["raised", "floating", "control", "recessed"]) {
+  const value = lightVariables[`--sui-elevation-${shadow}`];
+  assert.match(value, /var\(--sui-light-bottom\)/, `light --sui-elevation-${shadow} must use the shade token`);
+}
+assert.match(lightVariables["--sui-elevation-floating"], /var\(--sui-light-top\)/);
+assert.match(lightVariables["--sui-elevation-control"], /var\(--sui-light-top\)/);
+assert.match(darkVariables["--sui-elevation-recessed"], /var\(--sui-light-top\)/);
+
+// `pressed` is published, so it has to keep resolving — as the same recessed depth.
+for (const variables of [lightVariables, darkVariables, systemDarkVariables]) {
+  assert.equal(
+    variables["--sui-elevation-pressed"],
+    "var(--sui-elevation-recessed)",
+    "the pressed alias must resolve to the canonical recessed depth"
+  );
 }
 
 assert.deepEqual(
@@ -116,7 +163,7 @@ const tailwindResult = await postcss([
     presets: [sherickPreset],
     content: [
       {
-        raw: '<div class="bg-sherick-canvas text-sherick-ink/90 bg-sherick-surface-high/[0.66] bg-sherick-primary/[0.12] text-sherick-on-warning outline-sherick-focus bg-sherick-glass shadow-sherick-grounded shadow-sherick-raised shadow-sherick-floating shadow-sherick-control active:shadow-sherick-pressed backdrop-blur-[var(--sui-glass-blur,32px)] backdrop-saturate-[var(--sui-glass-saturation,1.45)] backdrop-brightness-[var(--sui-glass-brightness,1.04)]"></div>',
+        raw: '<div class="bg-sherick-canvas text-sherick-ink/90 text-sherick-ink-faint bg-sherick-surface-high/[0.66] bg-sherick-primary/[0.12] text-sherick-on-warning outline-sherick-focus ring-1 ring-inset ring-sherick-edge/[0.09] bg-sherick-glass bg-sherick-glass-dense shadow-sherick-flat shadow-sherick-grounded shadow-sherick-raised shadow-sherick-focus shadow-sherick-primary shadow-sherick-floating shadow-sherick-control shadow-sherick-recessed active:shadow-sherick-pressed duration-press duration-release ease-press ease-release animate-sherick-overlay-in animate-sherick-overlay-out animate-sherick-scrim-in animate-sherick-scrim-out backdrop-blur-[var(--sui-glass-blur,32px)] backdrop-saturate-[var(--sui-glass-saturation,1.45)] backdrop-brightness-[var(--sui-glass-brightness,1.04)]"></div>',
         extension: "html",
       },
     ],
@@ -126,19 +173,34 @@ const tailwindResult = await postcss([
 
 assert.match(tailwindResult.css, /var\(--sui-canvas/);
 assert.match(tailwindResult.css, /var\(--sui-ink/);
+assert.match(tailwindResult.css, /var\(--sui-ink-faint/);
 assert.match(tailwindResult.css, /var\(--sui-surface-high/);
 assert.match(tailwindResult.css, /var\(--sui-primary/);
 assert.match(tailwindResult.css, /var\(--sui-on-warning/);
 assert.match(tailwindResult.css, /var\(--sui-focus/);
+assert.match(tailwindResult.css, /var\(--sui-edge/);
 assert.match(tailwindResult.css, /var\(--sui-glass-gradient/);
+assert.match(tailwindResult.css, /var\(--sui-glass-gradient-dense/);
+assert.match(tailwindResult.css, /var\(--sui-elevation-flat/);
+// Published 1.0.x utilities: an existing consumer's markup must keep its styling.
 assert.match(tailwindResult.css, /var\(--sui-elevation-grounded/);
+assert.match(tailwindResult.css, /var\(--sui-shadow-focus/);
+assert.match(tailwindResult.css, /var\(--sui-shadow-primary/);
 assert.match(tailwindResult.css, /var\(--sui-elevation-raised/);
 assert.match(tailwindResult.css, /var\(--sui-elevation-floating/);
 assert.match(tailwindResult.css, /var\(--sui-elevation-control/);
+assert.match(tailwindResult.css, /var\(--sui-elevation-recessed/);
 assert.match(tailwindResult.css, /var\(--sui-elevation-pressed/);
 assert.match(tailwindResult.css, /var\(--sui-glass-blur/);
 assert.match(tailwindResult.css, /var\(--sui-glass-saturation/);
 assert.match(tailwindResult.css, /var\(--sui-glass-brightness/);
+// The three motion families must reach the stylesheet as tokens, not as literals.
+assert.match(tailwindResult.css, /var\(--sui-duration-press/);
+assert.match(tailwindResult.css, /var\(--sui-duration-release/);
+assert.match(tailwindResult.css, /var\(--sui-ease-press/);
+assert.match(tailwindResult.css, /var\(--sui-ease-release/);
+assert.match(tailwindResult.css, /@keyframes sherick-overlay-out/);
+assert.match(tailwindResult.css, /@keyframes sherick-scrim-out/);
 
 const buttonMarkup = renderToStaticMarkup(
   React.createElement(library.ActionButton, { loading: true }, "Save")
@@ -183,6 +245,7 @@ const invalidOpacityModifiers = [];
 const rawNeutralUtilities = [];
 const rawLiteralColors = [];
 const unsafeFocusUtilities = [];
+const rawShadowUtilities = [];
 
 async function scanDirectory(directory, { enforceThemeTokens = false } = {}) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
@@ -220,6 +283,13 @@ async function scanDirectory(directory, { enforceThemeTokens = false } = {}) {
       for (const match of source.matchAll(unsafeFocusPattern)) {
         unsafeFocusUtilities.push(`${path.replace(`${sourceRoot}/`, "")}: ${match[1]}`);
       }
+
+      // Depth comes from the elevation ladder and nothing else. A one-off Tailwind
+      // shadow step in reusable UI means a component invented its own elevation.
+      const rawShadowPattern = /((?:[a-z-]+:)*shadow-(?:sm|md|lg|xl|2xl|inner)\b)/g;
+      for (const match of source.matchAll(rawShadowPattern)) {
+        rawShadowUtilities.push(`${path.replace(`${sourceRoot}/`, "")}: ${match[1]}`);
+      }
     }
   }
 }
@@ -245,6 +315,11 @@ assert.deepEqual(
   unsafeFocusUtilities,
   [],
   `theme-unsafe focus utilities found in reusable UI:\n${unsafeFocusUtilities.join("\n")}`
+);
+assert.deepEqual(
+  rawShadowUtilities,
+  [],
+  `one-off shadow recipes found in reusable UI:\n${rawShadowUtilities.join("\n")}`
 );
 
 console.log("Package smoke verification passed.");
