@@ -116,7 +116,7 @@ export const TabGroup = ({
                 pressable,
                 selected
                   ? "text-sherick-ink"
-                  : "text-sherick-ink-muted hover:bg-white/[0.045] hover:text-sherick-ink active:bg-white/[0.085]"
+                  : "text-sherick-ink-muted hover:bg-sherick-ink/[0.045] hover:text-sherick-ink active:bg-sherick-ink/[0.085]"
               )}
             >
               {tab.label}
