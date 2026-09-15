@@ -62,7 +62,7 @@ export default function Home() {
       </header>
 
       <section className="grid gap-4 lg:grid-cols-[1.25fr_0.75fr]">
-        <div className="flex min-h-[26rem] flex-col justify-between rounded-[2.75rem] bg-sherick-surface/82 p-7 sm:p-10 lg:p-12">
+        <div className="flex min-h-[26rem] flex-col justify-between rounded-[2.75rem] bg-sherick-surface/[0.82] p-7 shadow-sherick-soft sm:p-10 lg:p-12">
           <div className="max-w-3xl">
             <Badge variant="primary" icon={<Sparkles className="h-3.5 w-3.5" />}>
               Material 3 Expressive inspired
@@ -86,8 +86,8 @@ export default function Home() {
         </div>
 
         <div className="relative min-h-[26rem] overflow-hidden rounded-[2.75rem] bg-sherick-primary-soft/70 p-8 shadow-sherick-soft ring-1 ring-inset ring-white/[0.035]">
-          <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-sherick-primary/18 blur-[90px]" />
-          <div className="absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-sherick-accent/12 blur-[100px]" />
+          <div className="absolute -right-20 -top-20 h-72 w-72 rounded-full bg-sherick-primary/[0.18] blur-[90px]" />
+          <div className="absolute -bottom-24 -left-16 h-64 w-64 rounded-full bg-sherick-accent/[0.12] blur-[100px]" />
           <div className="relative flex h-full flex-col justify-between">
             <div className="flex justify-end">
               <Badge variant="success" icon={<Check className="h-3.5 w-3.5" />}>Stable baseline</Badge>
@@ -95,7 +95,7 @@ export default function Home() {
             <div className="mx-auto flex h-44 w-44 items-center justify-center rounded-full bg-sherick-primary-strong shadow-sherick-primary sm:h-52 sm:w-52">
               <div className="h-20 w-20 rotate-12 rounded-[2rem] bg-sherick-accent/90" />
             </div>
-            <p className="max-w-sm text-sm leading-6 text-sherick-ink/65">
+            <p className="max-w-sm text-sm leading-6 text-sherick-ink/[0.65]">
               Strong geometry is reserved for focal moments; dense information stays deliberately calm.
             </p>
           </div>
@@ -107,7 +107,7 @@ export default function Home() {
           title="Actions"
           description="Hierarchy comes from emphasis and scale, not five equally loud colors."
         />
-        <div className="mt-6 flex flex-wrap items-center gap-3 rounded-[2.25rem] bg-sherick-surface/58 p-6 sm:p-8">
+        <div className="mt-6 flex flex-wrap items-center gap-3 rounded-[2.25rem] bg-sherick-surface/[0.58] p-6 sm:p-8">
           <ActionButton appearance="filled">Primary action</ActionButton>
           <ActionButton appearance="tonal" variant="secondary">Secondary</ActionButton>
           <ActionButton appearance="text" variant="secondary">Quiet action</ActionButton>
@@ -144,7 +144,7 @@ export default function Home() {
           title="Navigation & state"
           description="Selected states can be expressive while the surrounding structure remains restrained."
         />
-        <div className="mt-6 rounded-[2.25rem] bg-sherick-surface/58 p-5 sm:p-8">
+        <div className="mt-6 rounded-[2.25rem] bg-sherick-surface/[0.58] p-5 sm:p-8">
           <TabGroup
             tabs={[
               {
@@ -202,7 +202,7 @@ export default function Home() {
           title="Dense information"
           description="Expressive systems still need quiet places for scanning and comparison."
         />
-        <div className="mt-6 overflow-hidden rounded-[2.25rem] bg-sherick-surface/58 p-4 sm:p-6">
+        <div className="mt-6 overflow-hidden rounded-[2.25rem] bg-sherick-surface/[0.58] p-4 sm:p-6">
           <Table
             headers={["Component", "Role", "Status"]}
             rows={[
@@ -223,7 +223,7 @@ export default function Home() {
               alt="Example profile"
               size="sm"
             />
-            <p className="pr-6 leading-7 text-sherick-ink/78">
+            <p className="pr-6 leading-7 text-sherick-ink/[0.78]">
               Large surfaces can carry personality while controls inside them remain predictable, accessible and easy to scan.
             </p>
           </div>
