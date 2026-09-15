@@ -92,7 +92,7 @@ export default function Modal({ children, open, onClose, className }: ModalProps
       aria-describedby="modal-description"
     >
       <div
-        className="absolute inset-0 bg-sherick-canvas/72 backdrop-blur-md animate-fade motion-reduce:animate-none"
+        className="absolute inset-0 bg-sherick-canvas/[0.72] backdrop-blur-md animate-fade motion-reduce:animate-none"
         aria-hidden="true"
       />
 
