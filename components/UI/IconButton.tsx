@@ -2,7 +2,16 @@
 
 import React, { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { focusRing, styleMap } from "./ui.common";
+import {
+  focusRing,
+  motionState,
+  pressable,
+  shape,
+  toneActiveMap,
+  toneHoverMap,
+  toneSurfaceMap,
+  toneTextMap,
+} from "./ui.common";
 import { Variant } from "./ui.types";
 import { Spinner } from "./Spinner";
 
@@ -23,10 +32,16 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
         disabled={isDisabled}
         aria-busy={loading || undefined}
         className={cn(
-          "p-2 rounded-2xl bg-opacity-0 hover:bg-opacity-40 transition-all flex items-center justify-center",
+          "inline-flex min-h-11 min-w-11 items-center justify-center p-2.5",
+          shape.circle,
+          motionState,
           focusRing,
-          styleMap[variant] || styleMap.primary,
-          isDisabled ? "cursor-not-allowed opacity-60" : "cursor-pointer",
+          toneSurfaceMap[variant],
+          toneTextMap[variant],
+          !isDisabled && toneHoverMap[variant],
+          !isDisabled && toneActiveMap[variant],
+          !isDisabled && pressable,
+          isDisabled ? "cursor-not-allowed opacity-45" : "cursor-pointer",
           className
         )}
       >
