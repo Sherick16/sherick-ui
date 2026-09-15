@@ -2,7 +2,7 @@
 
 import React, { forwardRef, useId, type InputHTMLAttributes } from "react";
 import { cn } from "@/libs/utils";
-import { focusRing } from "./ui.common";
+import { focusRing, motionState, shape, surface } from "./ui.common";
 
 export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
   label?: string;
@@ -28,9 +28,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className={cn("flex flex-col", className)}>
         {label && (
-          <label htmlFor={inputId} className="mb-2 font-semibold">
+          <label htmlFor={inputId} className="mb-2 text-sm font-medium text-sherick-ink/[0.88]">
             {label}
-            {required && <span className="ml-1 text-red-500" aria-hidden="true">*</span>}
+            {required && <span className="ml-1 text-sherick-danger" aria-hidden="true">*</span>}
           </label>
         )}
         <input
@@ -39,11 +39,12 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           required={required}
           aria-invalid={error || undefined}
           className={cn(
-            "px-6 py-4 rounded-4xl bg-opacity-20 hover:bg-opacity-40 transition-all min-w-64",
+            "min-h-12 min-w-64 px-5 py-3 text-[0.95rem]",
+            shape.control,
+            motionState,
             focusRing,
-            !error
-              ? "bg-gray-400 text-gray-300 hover:bg-gray-500"
-              : "text-red-300 bg-red-500 bg-opacity-15 hover:bg-opacity-25 hover:bg-red-500",
+            error ? surface.controlError : surface.control,
+            "disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-sherick-surface-high/[0.78]",
             inputClassName
           )}
           onChange={(event) => onChange?.(event.target.value)}

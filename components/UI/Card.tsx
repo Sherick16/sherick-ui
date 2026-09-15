@@ -1,24 +1,28 @@
-import React, { ReactNode } from "react";
+import React, { type HTMLAttributes, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { styleMap } from "./ui.common";
+import { shape, toneSoftMap } from "./ui.common";
 import { Variant } from "./ui.types";
+
+export interface CardProps extends HTMLAttributes<HTMLDivElement> {
+  children: ReactNode;
+  variant?: Variant;
+}
 
 export const Card = ({
   children,
-  variant = "primary",
+  variant = "secondary",
   className,
-}: {
-  children: ReactNode;
-  variant?: Variant;
-  className?: string;
-}) => {
+  ...props
+}: CardProps) => {
   return (
     <div
       className={cn(
-        "p-6 rounded-4xl bg-opacity-20 hover:bg-opacity-20",
-        styleMap[variant],
+        "p-6",
+        shape.surface,
+        toneSoftMap[variant],
         className
       )}
+      {...props}
     >
       {children}
     </div>

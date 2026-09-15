@@ -1,25 +1,32 @@
 import React, { type AnchorHTMLAttributes, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { focusRing } from "./ui.common";
+import { focusRing, motionState, pressable } from "./ui.common";
 
 export interface NavItemProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   children: ReactNode;
   icon?: ReactNode;
   to: string;
+  active?: boolean;
 }
 
-const NavItem = ({ children, icon, className, to, ...props }: NavItemProps) => (
+const NavItem = ({ children, icon, className, to, active = false, ...props }: NavItemProps) => (
   <a
     href={to}
+    aria-current={active ? "page" : undefined}
     className={cn(
-      "right-2 relative max-w-xs block overflow-hidden whitespace-nowrap text-ellipsis text-sm text-gray-200 hover:bg-gray-700 hover:bg-opacity-40 p-2 rounded-3xl",
+      "flex min-h-10 max-w-xs items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap rounded-xl px-3 py-2 text-sm",
+      motionState,
       focusRing,
+      pressable,
+      active
+        ? "bg-sherick-primary/[0.16] font-medium text-sherick-primary"
+        : "text-sherick-ink-muted hover:bg-sherick-ink/[0.05] hover:text-sherick-ink active:bg-sherick-ink/[0.09]",
       className
     )}
     {...props}
   >
-    {icon && <span className="mr-2 inline-block align-middle">{icon}</span>}
-    {children}
+    {icon && <span className="inline-flex shrink-0 items-center [&>svg]:size-5" aria-hidden="true">{icon}</span>}
+    <span className="truncate">{children}</span>
   </a>
 );
 

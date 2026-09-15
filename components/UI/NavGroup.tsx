@@ -9,13 +9,14 @@ export interface NavGroupItem {
 export interface NavGroupProps {
   title: string;
   items: NavGroupItem[];
+  activeHref?: string;
 }
 
-const NavGroup = ({ title, items }: NavGroupProps) => (
-  <div className="space-y-2 px-4 py-6 pb-0 rounded-2xl">
-    <h3 className="text-sm text-white font-semibold">{title}</h3>
+const NavGroup = ({ title, items, activeHref }: NavGroupProps) => (
+  <div className="space-y-1.5 py-2">
+    <h3 className="px-3 pb-1 text-xs font-semibold text-sherick-ink-muted">{title}</h3>
     {items.map((item) => (
-      <NavItem key={item.href} to={item.href}>
+      <NavItem key={item.href} to={item.href} active={item.href === activeHref}>
         {item.label}
       </NavItem>
     ))}

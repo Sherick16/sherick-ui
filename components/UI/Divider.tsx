@@ -9,9 +9,10 @@ const Divider = ({
   orientation?: "horizontal" | "vertical";
 }) => (
   <div
+    aria-hidden="true"
     className={cn(
-      orientation === "horizontal" ? "h-0.5 w-full" : "w-0.5 h-full",
-      "bg-gray-600 bg-opacity-40",
+      orientation === "horizontal" ? "h-px w-full" : "h-full w-px",
+      "bg-sherick-ink/[0.075]",
       className
     )}
   />

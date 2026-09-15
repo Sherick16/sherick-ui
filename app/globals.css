@@ -3,27 +3,30 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 29, 31, 34;
-  --background-end-rgb: 29, 31, 34;
+  color-scheme: dark;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 29, 31, 34;
-    --background-end-rgb: 29, 31, 34;
-  }
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: oklch(0.205 0.012 260);
 }
 
 body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
+  min-height: 100dvh;
+  margin: 0;
+  color: oklch(0.94 0.008 255);
+  background:
+    radial-gradient(circle at 12% 4%, oklch(0.72 0.15 255 / 0.055), transparent 34rem),
+    radial-gradient(circle at 92% 18%, oklch(0.80 0.08 215 / 0.035), transparent 30rem),
+    oklch(0.205 0.012 260);
+}
+
+::selection {
+  color: oklch(0.98 0.005 255);
+  background: oklch(0.72 0.15 255 / 0.34);
 }
 
 @layer utilities {
@@ -32,64 +35,30 @@ body {
   }
 }
 
-/* Typography */
-h1 {
-  font-size: 2.5rem;
-  line-height: 1.2;
-  font-weight: 700;
-}
-
-h2 {
-  font-size: 2rem;
-  line-height: 1.3;
-  font-weight: 700;
-}
-
-h3 {
-  font-size: 1.75rem;
-  line-height: 1.3;
-  font-weight: 700;
-}
-
-h4 {
-  font-size: 1.5rem;
-  line-height: 1.3;
-  font-weight: 700;
-}
-
-h5 {
-  font-size: 1.25rem;
-  line-height: 1.3;
-  font-weight: 700;
-}
-
-h6 {
-  font-size: 1.125rem;
-  line-height: 1.3;
-  font-weight: 700;
-}
-
-p {
-  font-size: 1rem;
-  line-height: 1.6;
-}
-
-/* Scrollbar styling */
 ::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-800;
-  border-radius: 8px;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-gray-600;
-  border-radius: 8px;
+  @apply rounded-full bg-sherick-surface-high;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-gray-500;
+  @apply bg-sherick-ink/20;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

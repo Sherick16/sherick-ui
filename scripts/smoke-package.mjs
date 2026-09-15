@@ -1,5 +1,7 @@
 import assert from "node:assert/strict";
-import { readFile } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
+import { extname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { renderToStaticMarkup } from "react-dom/server";
 import React from "react";
 
@@ -44,5 +46,56 @@ const avatarMarkup = renderToStaticMarkup(
 );
 assert.match(avatarMarkup, /<img/);
 assert.match(avatarMarkup, /alt="Example avatar"/);
+
+// Tailwind 3 silently drops numeric opacity modifiers that are not in its default
+// opacity scale. Arbitrary percentages must use slash-bracket syntax, e.g. /[0.78].
+const validOpacityModifiers = new Set([
+  "0",
+  "5",
+  "10",
+  "20",
+  "25",
+  "30",
+  "40",
+  "50",
+  "60",
+  "70",
+  "75",
+  "80",
+  "90",
+  "95",
+  "100",
+]);
+const sourceRoot = fileURLToPath(new URL("..", import.meta.url));
+const invalidOpacityModifiers = [];
+
+async function scanDirectory(directory) {
+  for (const entry of await readdir(directory, { withFileTypes: true })) {
+    const path = join(directory, entry.name);
+    if (entry.isDirectory()) {
+      await scanDirectory(path);
+      continue;
+    }
+
+    if (![".ts", ".tsx", ".css"].includes(extname(entry.name))) continue;
+
+    const source = await readFile(path, "utf8");
+    const pattern = /((?:[a-z-]+:)*(?:bg|text|border|ring|fill|stroke)-[A-Za-z0-9_-]+\/(\d{1,3}))/g;
+
+    for (const match of source.matchAll(pattern)) {
+      if (!validOpacityModifiers.has(match[2])) {
+        invalidOpacityModifiers.push(`${path.replace(`${sourceRoot}/`, "")}: ${match[1]}`);
+      }
+    }
+  }
+}
+
+await scanDirectory(join(sourceRoot, "app"));
+await scanDirectory(join(sourceRoot, "components"));
+assert.deepEqual(
+  invalidOpacityModifiers,
+  [],
+  `unsupported Tailwind opacity modifiers:\n${invalidOpacityModifiers.join("\n")}`
+);
 
 console.log("Package smoke verification passed.");

@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import { Search as SearchIcon } from "lucide-react";
 import { cn } from "@/libs/utils";
-import { focusRing, styleMap } from "./ui.common";
+import { motionState, pressable, shape, surface, toneTextMap } from "./ui.common";
 import { Variant } from "./ui.types";
 import { Spinner } from "./Spinner";
 
@@ -55,16 +55,24 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
     };
 
     return (
-      <div className={cn("relative inline-block text-left", className)}>
+      <div
+        className={cn(
+          "relative inline-flex min-h-12 min-w-64 items-center",
+          shape.control,
+          surface.control,
+          motionState,
+          "focus-within:outline-none focus-within:ring-2 focus-within:ring-sherick-primary focus-within:ring-offset-2 focus-within:ring-offset-sherick-canvas focus-within:bg-sherick-surface-high",
+          isDisabled && "cursor-not-allowed opacity-45 hover:bg-sherick-surface-high/[0.78]",
+          className
+        )}
+      >
         <input
           ref={setRefs}
           disabled={isDisabled}
           aria-busy={loading || undefined}
           className={cn(
-            "px-6 py-4 pr-14 rounded-4xl bg-opacity-20 hover:bg-opacity-40 transition-all",
-            focusRing,
-            styleMap[variant] || styleMap.primary,
-            isDisabled && "cursor-not-allowed opacity-60",
+            "min-h-12 w-full bg-transparent px-5 py-3 pr-12 text-[0.95rem] text-inherit placeholder:text-sherick-ink-muted outline-none",
+            shape.control,
             inputClassName
           )}
           placeholder={placeholder}
@@ -77,12 +85,16 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
           disabled={isDisabled}
           onClick={() => onSearch(inputRef.current?.value || "")}
           className={cn(
-            "absolute right-0 top-0 px-4 py-4 rounded-4xl bg-gray-400 bg-opacity-0 hover:bg-opacity-10 transition-all",
-            focusRing,
-            isDisabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+            "absolute right-1.5 inline-flex min-h-9 min-w-9 items-center justify-center rounded-full",
+            "outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-primary",
+            motionState,
+            toneTextMap[variant],
+            !isDisabled && "hover:bg-sherick-primary/10 active:bg-sherick-primary/[0.18]",
+            !isDisabled && pressable,
+            isDisabled ? "cursor-not-allowed" : "cursor-pointer"
           )}
         >
-          {loading ? <Spinner className="w-6 h-6" /> : <SearchIcon className="w-6 h-6" />}
+          {loading ? <Spinner className="h-5 w-5" size="small" /> : <SearchIcon className="h-5 w-5" />}
         </button>
       </div>
     );
