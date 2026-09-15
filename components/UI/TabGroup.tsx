@@ -72,7 +72,7 @@ export const TabGroup = ({
         role="tablist"
         aria-label="Tabs"
         className={cn(
-          "relative flex min-w-max bg-sherick-surface/92 p-1.5 shadow-inner",
+          "relative flex min-w-max bg-sherick-surface/[0.92] p-1.5 shadow-inner",
           shape.pill
         )}
       >
