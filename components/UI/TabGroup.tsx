@@ -2,7 +2,14 @@
 
 import React, { type KeyboardEvent, type ReactNode, useId, useRef, useState } from "react";
 import { cn } from "@/libs/utils";
-import { bgMap, focusRing, styleMap } from "./ui.common";
+import {
+  focusRing,
+  motionComponent,
+  pressable,
+  shape,
+  toneStrongMap,
+  toneTextMap,
+} from "./ui.common";
 import { Variant } from "./ui.types";
 
 export interface Tab {
@@ -64,16 +71,21 @@ export const TabGroup = ({
       <div
         role="tablist"
         aria-label="Tabs"
-        className="relative flex min-w-max rounded-4xl bg-gray-500 bg-opacity-10"
+        className={cn(
+          "relative flex min-w-max bg-zinc-800/70 p-1.5",
+          shape.pill
+        )}
       >
         <div
           aria-hidden="true"
           className={cn(
-            "absolute inset-y-0 left-0 transition-transform duration-200 rounded-3xl bg-opacity-30",
-            bgMap[variant]
+            "absolute inset-y-1.5 left-1.5 shadow-sm",
+            shape.pill,
+            motionComponent,
+            toneStrongMap[variant]
           )}
           style={{
-            width: `${100 / tabs.length}%`,
+            width: `calc(${100 / tabs.length}% - ${12 / tabs.length}px)`,
             transform: `translateX(${activeIndex * 100}%)`,
           }}
         />
@@ -98,11 +110,12 @@ export const TabGroup = ({
               onClick={() => activate(index)}
               onKeyDown={(event) => handleKeyDown(event, index)}
               className={cn(
-                "relative z-10 min-w-28 flex-1 whitespace-nowrap px-8 py-5 text-sm font-medium transition-colors duration-200 rounded-4xl",
+                "relative z-10 min-h-12 min-w-28 flex-1 whitespace-nowrap px-7 py-3 text-sm font-medium",
+                shape.pill,
+                motionComponent,
                 focusRing,
-                selected
-                  ? cn(styleMap[variant], "bg-opacity-0 hover:bg-opacity-0")
-                  : cn(styleMap[variant], "bg-opacity-0 hover:bg-opacity-10 text-opacity-80")
+                pressable,
+                selected ? "text-current" : cn("text-zinc-300 hover:bg-white/5 active:bg-white/10", toneTextMap[variant])
               )}
             >
               {tab.label}
@@ -115,7 +128,7 @@ export const TabGroup = ({
         role="tabpanel"
         id={`${groupId}-panel-${active.id}`}
         aria-labelledby={`${groupId}-tab-${active.id}`}
-        className="mt-4"
+        className="mt-5"
       >
         {active.content}
       </div>
