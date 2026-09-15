@@ -92,7 +92,7 @@ export default function Modal({ children, open, onClose, className }: ModalProps
       aria-describedby="modal-description"
     >
       <div
-        className="absolute inset-0 bg-black/45 backdrop-blur-md animate-fade motion-reduce:animate-none"
+        className="absolute inset-0 bg-black/50 backdrop-blur-md animate-fade motion-reduce:animate-none"
         aria-hidden="true"
       />
 
@@ -110,7 +110,7 @@ export default function Modal({ children, open, onClose, className }: ModalProps
               "relative w-full max-w-xl outline-none",
               shape.hero,
               surface.raised,
-              "animate-fade motion-reduce:animate-none",
+              "animate-pop motion-reduce:animate-none",
               className
             )}
           >
@@ -120,7 +120,7 @@ export default function Modal({ children, open, onClose, className }: ModalProps
               onClick={onClose}
               className={cn(
                 "absolute right-4 top-4 inline-flex min-h-11 min-w-11 items-center justify-center rounded-full",
-                "bg-white/6 text-zinc-300 hover:bg-white/10 hover:text-white active:bg-white/14",
+                "bg-white/5 text-zinc-300 hover:bg-white/10 hover:text-white active:bg-white/20",
                 motionState,
                 focusRing,
                 pressable
