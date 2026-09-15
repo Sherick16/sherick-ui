@@ -3,10 +3,12 @@
 import React, { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import {
+  elevation,
   focusRing,
   motionComponent,
   pressable,
   shape,
+  stateLayer,
   surface,
   toneActiveMap,
   toneHoverMap,
@@ -50,10 +52,13 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
           focusRing,
           toneTextMap[variant],
           appearance === "tonal" && toneSurfaceMap[variant],
+          appearance === "tonal" && !isDisabled && elevation.raised,
+          appearance === "tonal" && !isDisabled && "active:shadow-sherick-pressed",
           appearance === "acrylic" && surface.acrylicDense,
           appearance === "ghost" && "bg-transparent",
-          appearance !== "acrylic" && !isDisabled && toneHoverMap[variant],
-          appearance !== "acrylic" && !isDisabled && toneActiveMap[variant],
+          appearance === "tonal" && !isDisabled && stateLayer.tonal,
+          appearance === "ghost" && !isDisabled && toneHoverMap[variant],
+          appearance === "ghost" && !isDisabled && toneActiveMap[variant],
           appearance === "acrylic" && !isDisabled && "hover:brightness-110 active:brightness-95",
           !isDisabled && pressable,
           isDisabled ? "cursor-not-allowed opacity-45 shadow-none" : "cursor-pointer",

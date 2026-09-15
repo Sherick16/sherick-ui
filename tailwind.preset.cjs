@@ -37,13 +37,22 @@ module.exports = {
       borderRadius: {
         "4xl": "2rem",
       },
+      /* Elevation ladder — the only sanctioned source of depth. Shadow is a function of
+         how far a surface sits above the ground, never per-component decoration:
+         grounded surfaces separate by surface color alone, raised tonal surfaces lift
+         with a soft contact shadow, floating glass lifts decisively with a wider one. */
       boxShadow: {
-        "sherick-soft":
-          "var(--sui-shadow-soft, 0 14px 36px -24px rgba(5, 8, 14, 0.42))",
-        "sherick-float":
-          "var(--sui-shadow-float, 0 28px 72px -34px rgba(5, 8, 14, 0.5), inset 0 1px 0 rgba(255,255,255,0.09), inset 0 -1px 0 rgba(0,0,0,0.11))",
-        "sherick-glass":
-          "var(--sui-shadow-glass, 0 22px 64px -34px rgba(5, 8, 14, 0.46), inset 1px 1px 0 rgba(255,255,255,0.085), inset -1px -1px 0 rgba(0,0,0,0.10))",
+        "sherick-grounded": "var(--sui-elevation-grounded, none)",
+        "sherick-raised":
+          "var(--sui-elevation-raised, 0 1px 2px rgba(0, 0, 0, 0.26), 0 4px 12px rgba(0, 0, 0, 0.15))",
+        "sherick-floating":
+          "var(--sui-elevation-floating, 0 18px 44px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.05))",
+        /* Tactile control depth — matte interactive controls only: a faint contact shadow
+           with a microscopic top highlight at rest, a shallow inset when pressed. */
+        "sherick-control":
+          "var(--sui-elevation-control, 0 1px 2px rgba(0, 0, 0, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.08))",
+        "sherick-pressed":
+          "var(--sui-elevation-pressed, inset 0 1px 3px rgba(0, 0, 0, 0.38), inset 0 -1px 0 rgba(255, 255, 255, 0.06))",
         "sherick-focus":
           "var(--sui-shadow-focus, 0 10px 28px -22px rgba(90, 145, 255, 0.42))",
         "sherick-primary":
@@ -61,21 +70,25 @@ module.exports = {
           from: { opacity: "0" },
           to: { opacity: "1" },
         },
+        /* Entry motion uses the individual `translate`/`scale` properties on purpose:
+           the `transform` shorthand would override positioning utilities such as
+           `-translate-x-1/2` for the duration of the animation, so anchored popups
+           would jump and then snap once the animation ends. */
         "sherick-menu": {
-          from: { opacity: "0", transform: "translateY(-4px) scale(0.985)" },
-          to: { opacity: "1", transform: "translateY(0) scale(1)" },
+          from: { opacity: "0", translate: "0 -4px", scale: "0.985" },
+          to: { opacity: "1", translate: "0 0", scale: "1" },
         },
         "sherick-overlay": {
-          from: { opacity: "0", transform: "translateY(8px) scale(0.985)" },
-          to: { opacity: "1", transform: "translateY(0) scale(1)" },
+          from: { opacity: "0", translate: "0 8px", scale: "0.985" },
+          to: { opacity: "1", translate: "0 0", scale: "1" },
         },
         "sherick-pop": {
-          from: { opacity: "0", transform: "scale(0.97)" },
-          to: { opacity: "1", transform: "scale(1)" },
+          from: { opacity: "0", scale: "0.97" },
+          to: { opacity: "1", scale: "1" },
         },
         "sherick-slide-up": {
-          from: { opacity: "0", transform: "translateY(6px)" },
-          to: { opacity: "1", transform: "translateY(0)" },
+          from: { opacity: "0", translate: "0 6px" },
+          to: { opacity: "1", translate: "0 0" },
         },
       },
     },

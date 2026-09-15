@@ -11,6 +11,10 @@ export interface TooltipProps {
   position?: "top" | "right" | "bottom" | "left";
 }
 
+/* Sizing is intrinsic (`w-max`) because a `left-1/2` offset halves the shrink-to-fit
+   width available to an absolutely positioned box — the tooltip wrapped every label at
+   ~half the trigger width. Centering stays on `-translate-x-1/2` since auto margins
+   collapse when the tooltip is wider than the trigger. */
 const positionClass = {
   top: "bottom-full left-1/2 mb-2 -translate-x-1/2 origin-bottom",
   right: "left-full top-1/2 ml-2 -translate-y-1/2 origin-left",
@@ -41,7 +45,7 @@ const Tooltip = ({ children, content, className, position = "bottom" }: TooltipP
           id={tooltipId}
           role="tooltip"
           className={cn(
-            "absolute z-40 max-w-64 whitespace-normal px-3 py-2 text-xs leading-5 text-sherick-ink/[0.92]",
+            "absolute z-40 w-max max-w-64 whitespace-normal px-3 py-2 text-xs leading-5 text-sherick-ink/[0.92]",
             shape.control,
             surface.acrylicDense,
             "animate-menu motion-reduce:animate-none",

@@ -87,7 +87,7 @@ export default function Home() {
 
         <div className="space-y-16">
           <section>
-            <SectionHeading title="Foundations" description="Core palette, shape and material language used by every component." />
+            <SectionHeading title="Foundations" description="Core palette, shape, material and elevation language used by every component." />
             <div className="mt-6 grid gap-4 xl:grid-cols-3">
               <Specimen title="Color roles" description="Primary, semantic and neutral roles—not raw component colors.">
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -100,16 +100,20 @@ export default function Home() {
                 </div>
               </Specimen>
 
-              <Specimen title="Surface hierarchy" description="Grounded UI stays matte; floating UI becomes smoked liquid glass.">
-                <div className="space-y-3">
-                  <div className="rounded-[1.25rem] bg-sherick-surface p-4 text-sm">Matte surface</div>
-                  <div className="rounded-[1.5rem] bg-sherick-surface-high p-4 text-sm shadow-sherick-soft">Elevated tonal surface</div>
-                  <div className="relative overflow-hidden rounded-[1.5rem] bg-sherick-canvas/[0.55] p-4">
-                    <div className="absolute -left-8 -top-4 h-24 w-36 rounded-full bg-sherick-primary/[0.30] blur-[28px]" />
-                    <div className="absolute bottom-1 right-1 h-20 w-28 rounded-full bg-sherick-accent/[0.22] blur-[26px]" />
-                    <div className="absolute left-7 top-6 text-[10px] font-medium tracking-wide text-sherick-ink/[0.42]">CONTENT BEHIND</div>
-                    <div className="absolute right-8 top-11 h-2 w-24 rounded-full bg-sherick-ink/[0.13]" />
-                    <div className="relative rounded-[1.25rem] bg-sherick-surface-float/[0.60] bg-sherick-glass p-4 text-sm shadow-sherick-glass backdrop-blur-[32px] backdrop-saturate-[1.45] backdrop-brightness-[1.04]">
+              <Specimen
+                title="Surface & elevation"
+                description="Shadow is tied to elevation, not decoration: matte surfaces separate by color, raised surfaces lift slightly, floating glass lifts decisively above the page."
+              >
+                <div className="space-y-5">
+                  <div className="rounded-[1.25rem] bg-sherick-surface p-4 text-sm shadow-sherick-grounded">Matte surface</div>
+                  <div className="rounded-[1.5rem] bg-sherick-surface-high p-4 text-sm shadow-sherick-raised">Elevated tonal surface</div>
+
+                  <div className="relative rounded-[1.5rem] bg-sherick-canvas/[0.55] p-5">
+                    <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[1.5rem]">
+                      <div className="absolute -left-8 -top-4 h-24 w-36 rounded-full bg-sherick-primary/[0.30] blur-[28px]" />
+                      <div className="absolute bottom-1 right-1 h-20 w-28 rounded-full bg-sherick-accent/[0.22] blur-[26px]" />
+                    </div>
+                    <div className="relative rounded-[1.25rem] bg-sherick-surface-float/[0.60] bg-sherick-glass p-4 text-sm shadow-sherick-floating backdrop-blur-[32px] backdrop-saturate-[1.45] backdrop-brightness-[1.04]">
                       Floating liquid glass
                     </div>
                   </div>
@@ -130,12 +134,13 @@ export default function Home() {
           <section>
             <SectionHeading title="Buttons" description="Appearance, size and state are separate parts of the API." />
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
-              <Specimen title="Appearances" description="Filled for priority, tonal for normal actions, text for quiet actions.">
+              <Specimen title="Appearances" description="Filled for priority, tonal for normal actions, text for quiet actions. Only tonal controls carry the raised elevation step, and pressing one recesses it.">
                 <div className="flex flex-wrap items-center gap-3">
                   <ActionButton appearance="filled">Filled</ActionButton>
                   <ActionButton appearance="tonal" variant="secondary">Tonal</ActionButton>
                   <ActionButton appearance="text" variant="secondary">Text</ActionButton>
                   <ActionButton appearance="tonal" variant="danger" icon={<Trash2 />}>Delete</ActionButton>
+                  <IconButton appearance="tonal" variant="secondary" icon={<Bell />} aria-label="Tonal icon button" />
                 </div>
               </Specimen>
 
@@ -212,7 +217,7 @@ export default function Home() {
                 </div>
               </Specimen>
 
-              <Specimen title="Tabs" description="Matte track with a softly elevated sliding selection.">
+              <Specimen title="Tabs" description="Matte track; the selected segment presses into it like a held control.">
                 <TabGroup tabs={[
                   { id: "one", label: "Overview", content: <p className="text-sm text-sherick-ink-muted">Overview content</p> },
                   { id: "two", label: "Motion", content: <p className="text-sm text-sherick-ink-muted">Motion content</p> },
@@ -345,7 +350,7 @@ function ThemePicker({ theme, onChange }: { theme: ThemeMode; onChange: (theme: 
               onClick={() => onChange(value)}
               className={`inline-flex min-h-9 items-center gap-1.5 rounded-full px-3 text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-sherick-focus focus-visible:outline-offset-2 ${
                 selected
-                  ? "bg-sherick-primary/[0.16] text-sherick-ink shadow-sherick-soft"
+                  ? "bg-sherick-primary/[0.16] text-sherick-ink shadow-sherick-pressed"
                   : "text-sherick-ink-muted hover:bg-sherick-ink/[0.05] hover:text-sherick-ink"
               }`}
             >

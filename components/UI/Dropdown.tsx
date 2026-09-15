@@ -191,7 +191,9 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
             role="listbox"
             aria-labelledby={triggerId}
             className={cn(
-              "absolute z-30 mt-2 w-full min-w-max p-2",
+              /* A hairline gap keeps the rounded option fills from touching, so hover and
+                 selection read as separate rows instead of one merged highlight. */
+              "absolute z-30 mt-2 w-full min-w-max space-y-1 p-2",
               shape.surface,
               surface.acrylic,
               "origin-top animate-menu motion-reduce:animate-none"

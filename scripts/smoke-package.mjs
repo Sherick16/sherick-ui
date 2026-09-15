@@ -93,7 +93,11 @@ for (const token of [
   "--sui-glass-saturation",
   "--sui-glass-brightness",
   "--sui-glass-gradient",
-  "--sui-shadow-glass",
+  "--sui-elevation-grounded",
+  "--sui-elevation-raised",
+  "--sui-elevation-floating",
+  "--sui-elevation-control",
+  "--sui-elevation-pressed",
   "--sui-code-text",
 ]) {
   assert.ok(lightVariables[token], `light theme missing ${token}`);
@@ -112,7 +116,7 @@ const tailwindResult = await postcss([
     presets: [sherickPreset],
     content: [
       {
-        raw: '<div class="bg-sherick-canvas text-sherick-ink/90 bg-sherick-surface-high/[0.66] bg-sherick-primary/[0.12] text-sherick-on-warning outline-sherick-focus bg-sherick-glass shadow-sherick-glass backdrop-blur-[var(--sui-glass-blur,32px)] backdrop-saturate-[var(--sui-glass-saturation,1.45)] backdrop-brightness-[var(--sui-glass-brightness,1.04)]"></div>',
+        raw: '<div class="bg-sherick-canvas text-sherick-ink/90 bg-sherick-surface-high/[0.66] bg-sherick-primary/[0.12] text-sherick-on-warning outline-sherick-focus bg-sherick-glass shadow-sherick-grounded shadow-sherick-raised shadow-sherick-floating shadow-sherick-control active:shadow-sherick-pressed backdrop-blur-[var(--sui-glass-blur,32px)] backdrop-saturate-[var(--sui-glass-saturation,1.45)] backdrop-brightness-[var(--sui-glass-brightness,1.04)]"></div>',
         extension: "html",
       },
     ],
@@ -127,7 +131,11 @@ assert.match(tailwindResult.css, /var\(--sui-primary/);
 assert.match(tailwindResult.css, /var\(--sui-on-warning/);
 assert.match(tailwindResult.css, /var\(--sui-focus/);
 assert.match(tailwindResult.css, /var\(--sui-glass-gradient/);
-assert.match(tailwindResult.css, /var\(--sui-shadow-glass/);
+assert.match(tailwindResult.css, /var\(--sui-elevation-grounded/);
+assert.match(tailwindResult.css, /var\(--sui-elevation-raised/);
+assert.match(tailwindResult.css, /var\(--sui-elevation-floating/);
+assert.match(tailwindResult.css, /var\(--sui-elevation-control/);
+assert.match(tailwindResult.css, /var\(--sui-elevation-pressed/);
 assert.match(tailwindResult.css, /var\(--sui-glass-blur/);
 assert.match(tailwindResult.css, /var\(--sui-glass-saturation/);
 assert.match(tailwindResult.css, /var\(--sui-glass-brightness/);

@@ -2,7 +2,7 @@
 
 import React, { type ButtonHTMLAttributes } from "react";
 import { cn } from "@/libs/utils";
-import { motionComponent, toneStrongMap } from "./ui.common";
+import { elevation, motionComponent, stateLayer, toneStrongMap } from "./ui.common";
 import { Variant } from "./ui.types";
 
 export interface SwitchProps
@@ -43,13 +43,15 @@ export const Switch = ({
           checked ? toneStrongMap[variant] : "bg-sherick-surface-high text-sherick-ink-muted",
           disabled && checked && "bg-sherick-primary-soft/[0.55] text-sherick-ink-muted saturate-50",
           disabled && !checked && "bg-sherick-surface-high/[0.62] text-sherick-ink-muted/70",
-          !disabled && "group-hover:brightness-110 group-active:scale-[0.985]",
+          !disabled && stateLayer.switchTrack,
+          !disabled && "group-active:scale-[0.985]",
           "motion-reduce:group-active:scale-100"
         )}
       >
         <span
           className={cn(
-            "absolute left-1 top-1/2 -translate-y-1/2 rounded-full bg-current shadow-sm",
+            "absolute left-1 top-1/2 -translate-y-1/2 rounded-full bg-current",
+            elevation.control,
             "transition-[width,height,transform,background-color] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
             checked
               ? "h-6 w-6 translate-x-5 text-sherick-on-primary"
