@@ -3,7 +3,7 @@
 import React, { type ReactNode, useState } from "react";
 import { AlertCircle, CheckCircle, Info, X, XCircle } from "lucide-react";
 import { cn } from "@/libs/utils";
-import { focusRing, styleMap } from "./ui.common";
+import { focusRingInset, motionState, shape, toneSoftMap, toneTextMap } from "./ui.common";
 import { Variant } from "./ui.types";
 
 const iconMap = {
@@ -34,23 +34,28 @@ export const Alert = ({
     <div
       role={variant === "danger" || variant === "warning" ? "alert" : "status"}
       className={cn(
-        "p-4 rounded-4xl bg-opacity-20 flex items-center justify-between hover:bg-opacity-20",
-        styleMap[variant],
+        "flex items-start justify-between gap-4 p-4",
+        shape.surface,
+        toneSoftMap[variant],
         className
       )}
     >
-      <div className="flex items-center">
-        <Icon aria-hidden="true" className="w-5 h-5 mr-3" />
-        <div>{children}</div>
+      <div className="flex min-w-0 items-start gap-3">
+        <Icon aria-hidden="true" className={cn("mt-0.5 h-5 w-5 shrink-0", toneTextMap[variant])} />
+        <div className="min-w-0 text-sm leading-6">{children}</div>
       </div>
       {closeable && (
         <button
           type="button"
           aria-label="Dismiss alert"
           onClick={() => setIsVisible(false)}
-          className={cn("ml-3 p-1 rounded-lg", focusRing)}
+          className={cn(
+            "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full hover:bg-black/10 active:bg-black/15",
+            motionState,
+            focusRingInset
+          )}
         >
-          <X aria-hidden="true" className="w-4 h-4" />
+          <X aria-hidden="true" className="h-4 w-4" />
         </button>
       )}
     </div>
