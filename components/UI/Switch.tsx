@@ -2,7 +2,7 @@
 
 import React, { type ButtonHTMLAttributes } from "react";
 import { cn } from "@/libs/utils";
-import { bgMap, focusRing } from "./ui.common";
+import { focusRing, motionComponent, pressable, toneStrongMap } from "./ui.common";
 import { Variant } from "./ui.types";
 
 export interface SwitchProps
@@ -28,10 +28,12 @@ export const Switch = ({
       disabled={disabled}
       onClick={() => onChange?.(!checked)}
       className={cn(
-        "relative inline-flex h-6 w-11 items-center rounded-full transition-colors",
+        "relative inline-flex min-h-11 min-w-14 items-center rounded-full p-1.5",
+        motionComponent,
         focusRing,
-        checked ? bgMap[variant] : "bg-gray-500 bg-opacity-20",
-        disabled && "cursor-not-allowed opacity-60",
+        !disabled && pressable,
+        checked ? toneStrongMap[variant] : "bg-zinc-600/55 text-zinc-100",
+        disabled ? "cursor-not-allowed opacity-45" : "cursor-pointer",
         className
       )}
       {...props}
@@ -39,8 +41,8 @@ export const Switch = ({
       <span
         aria-hidden="true"
         className={cn(
-          "inline-block h-4 w-4 rounded-full bg-white transition-transform",
-          checked ? "translate-x-6" : "translate-x-1"
+          "block h-5 w-5 rounded-full bg-current shadow-sm transition-transform duration-200 ease-out motion-reduce:transition-none",
+          checked ? "translate-x-5" : "translate-x-0"
         )}
       />
     </button>
