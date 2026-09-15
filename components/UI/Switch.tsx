@@ -39,7 +39,7 @@ export const Switch = ({
         className={cn(
           "relative block h-8 w-[3.25rem] shrink-0 rounded-full shadow-inner",
           motionComponent,
-          "group-focus-visible:ring-2 group-focus-visible:ring-sherick-primary group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-sherick-canvas",
+          "group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-sherick-focus group-focus-visible:outline-offset-[3px]",
           checked ? toneStrongMap[variant] : "bg-sherick-surface-high text-sherick-ink-muted",
           disabled && checked && "bg-sherick-primary-soft/[0.55] text-sherick-ink-muted saturate-50",
           disabled && !checked && "bg-sherick-surface-high/[0.62] text-sherick-ink-muted/70",
