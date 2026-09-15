@@ -93,7 +93,10 @@ export default function Modal({ children, open, onClose, className }: ModalProps
         if (event.target === event.currentTarget) onClose();
       }}
     >
-      <div className="absolute inset-0 bg-black/50" aria-hidden="true" />
+      <div
+        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        aria-hidden="true"
+      />
 
       <div className="absolute inset-0 overflow-y-auto">
         <div className="min-h-full flex items-center justify-center p-4">
