@@ -16,14 +16,14 @@ export const Table = ({
   className,
 }: TableProps) => {
   return (
-    <div className={cn("w-full overflow-auto rounded-2xl bg-zinc-900/30", className)}>
+    <div className={cn("w-full overflow-auto rounded-2xl bg-sherick-surface/42", className)}>
       <table className="w-full border-collapse">
         <thead>
-          <tr className="border-b border-white/10">
+          <tr className="border-b border-sherick-ink/[0.08]">
             {headers.map((header) => (
               <th
                 key={header}
-                className="px-4 py-3 text-left text-sm font-medium text-zinc-400"
+                className="px-4 py-3 text-left text-sm font-medium text-sherick-ink-muted"
               >
                 {header}
               </th>
@@ -34,10 +34,10 @@ export const Table = ({
           {rows.map((row, i) => (
             <tr
               key={i}
-              className="border-b border-white/5 transition-colors duration-150 last:border-b-0 hover:bg-white/5"
+              className="border-b border-sherick-ink/[0.045] transition-colors duration-150 last:border-b-0 hover:bg-sherick-ink/[0.04]"
             >
               {row.map((cell, j) => (
-                <td key={j} className="px-4 py-3 text-sm text-zinc-200">
+                <td key={j} className="px-4 py-3 text-sm text-sherick-ink/90">
                   {cell}
                 </td>
               ))}
