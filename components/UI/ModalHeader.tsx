@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 
 export interface ModalHeaderProps {
@@ -9,7 +9,9 @@ export interface ModalHeaderProps {
 export const ModalHeader = ({ children, className }: ModalHeaderProps) => {
   return (
     <div className={cn("px-6 pt-6 pb-4", className)}>
-      <div className="text-lg font-semibold text-gray-200">{children}</div>
+      <div id="modal-title" className="text-lg font-semibold text-gray-200">
+        {children}
+      </div>
     </div>
   );
 };
