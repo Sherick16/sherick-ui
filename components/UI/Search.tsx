@@ -16,7 +16,6 @@ import {
   shape,
   state,
   stateLayer,
-  text,
   tone,
 } from "./ui.common";
 import { Variant } from "./ui.types";
@@ -67,14 +66,16 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
     return (
       <div
         className={cn(
-          /* A composite field: the outer surface owns the whole field language, the
-             input inside stays borderless and the focus step arrives through
-             `focus-within`. */
-          "relative inline-flex min-h-12 min-w-64 items-center",
+          /* A composite field: the outer surface owns the whole field language — the
+             same hover and focus steps as a single input — while the input inside stays
+             borderless and carries the text cursor. */
+          "relative inline-flex min-w-64 items-center",
+          density.normal,
           shape.control,
           material.control,
           motion.press,
           "focus-within:outline focus-within:outline-2 focus-within:outline-sherick-focus focus-within:outline-offset-[3px]",
+          !isDisabled && state.field.hover,
           !isDisabled && state.field.focusWithin,
           isDisabled && state.disabled,
           className
@@ -85,8 +86,10 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
           disabled={isDisabled}
           aria-busy={loading || undefined}
           className={cn(
-            "min-h-12 w-full min-w-0 bg-transparent py-3 pl-5 pr-12 text-inherit outline-none placeholder:text-sherick-ink-muted",
+            "w-full bg-transparent py-3 pl-5 pr-12 text-inherit outline-none placeholder:text-sherick-ink-muted",
+            density.normal,
             shape.control,
+            isDisabled ? state.disabled : state.text,
             inputClassName
           )}
           placeholder={placeholder}
@@ -99,21 +102,25 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
           disabled={isDisabled}
           onClick={() => onSearch(inputRef.current?.value || "")}
           className={cn(
-            "absolute right-1.5 inline-flex items-center justify-center",
             density.target,
             shape.circle,
             focusRingInset,
             motion.release,
+            /* The action inherits the requested tone rather than imposing its own. */
             tone.text[variant],
             !isDisabled && stateLayer.quiet,
             !isDisabled && state.press,
-            isDisabled ? state.disabled : state.enabled
+            isDisabled ? state.disabled : state.enabled,
+            /* `stateLayer` supplies a containing block for its overlay, so an
+               absolutely positioned control declares its position after the layer and
+               becomes its own containing block. */
+            "absolute right-1.5 inline-flex items-center justify-center"
           )}
         >
           {loading ? (
             <Spinner className="size-5" size="small" />
           ) : (
-            <SearchIcon className={cn("size-5", text.medium)} />
+            <SearchIcon className="size-5" />
           )}
         </button>
       </div>

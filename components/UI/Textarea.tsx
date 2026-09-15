@@ -50,15 +50,18 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           disabled={disabled}
           aria-invalid={error || undefined}
           className={cn(
-            "min-h-28 w-full min-w-64 resize-y",
+            "w-full resize-y",
+            /* Density owns the type step and the control floor; the anatomy sets how
+               tall the field actually is. Order matters: the later utility wins. */
             density.normal,
+            "min-h-28 min-w-64 px-5 py-4",
             shape.control,
             motion.press,
             focusRing,
             error ? material.controlError : material.control,
             !disabled && (error ? state.field.errorHover : state.field.hover),
             !disabled && (error ? state.field.errorFocus : state.field.focus),
-            disabled ? state.disabled : state.enabled,
+            disabled ? state.disabled : state.text,
             textareaClassName
           )}
           onChange={(event) => onChange?.(event.target.value)}

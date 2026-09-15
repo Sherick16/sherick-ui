@@ -39,3 +39,6 @@ next-env.d.ts
 dist
 .rollup.cache
 bundle-analysis.html
+
+# Visual regression preview output (scripts/visual-regression.mjs --preview)
+/.visual/

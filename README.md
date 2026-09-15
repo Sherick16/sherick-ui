@@ -109,11 +109,11 @@ Motion is three families, each a token pair. Retiming the library is a token edi
 
 | Family | Durations | Easings | Used for |
 | --- | --- | --- | --- |
-| press | `--sui-duration-press` | `--sui-ease-press` | a press, or a tonality change such as hover or focus |
-| release | `--sui-duration-release` | `--sui-ease-release` | release, selection, a thumb sliding, a sheet arriving |
+| press | `--sui-duration-press` | `--sui-ease-press` | a tonality change with no travel — hover, focus, an engaged field |
+| release | `--sui-duration-release` | `--sui-ease-release` | a tactile control: press timing while held (`active:`), release timing as it settles, and the travel of a thumb or segment |
 | overlay | `--sui-duration-overlay`, `--sui-duration-overlay-exit` | `--sui-ease-release`, `--sui-ease-exit` | the entrance and exit of anything that floats |
 
-Floating overlays (menus, tooltips, modals) share one entrance and one exit through `useOverlayPresence`, plus a matching scrim family, so they arrive and leave identically. Every family collapses under `prefers-reduced-motion`.
+Floating overlays (menus, tooltips, dialogs) share one entrance and one exit through `useOverlayPresence`, plus a matching scrim family, so they arrive and leave identically while each keeps its own geometry: a menu grows from its trigger, a tooltip grows out of the edge it is anchored to and a dialog rises into place. The exit window is read from `--sui-duration-overlay-exit` rather than copied beside it, is released on `animationend`, and is skipped entirely under `prefers-reduced-motion`, so a closing overlay never lingers.
 
 ## Usage
 
@@ -162,18 +162,28 @@ Every component is assembled from one small set of primitives (internal module `
 
 | Primitive | Values |
 | --- | --- |
-| material | `canvas`, `matte`, `matteHigh`, `matteRaised`, `control` (`controlError`), `acrylic`, `acrylicDense` |
+| material | `canvas`, `matteQuiet`, `matte`, `matteHigh`, `control` (`controlError`), `acrylic`, `acrylicDense`, `acrylicModal` |
 | elevation | `flat`, `raised`, `floating`, `control`, `pressed` |
 | shape | `control` 1.25rem, `prominent` 1.5rem, `surface` 1.75rem, `expressive` 2.25rem, `pill`, `circle` |
-| edge | `faint` hairlines, `hover`/`focus`/`focusWithin`/`engaged` steps, `row`/`header`/`rule` separators |
+| edge | `row`, `header`, `rule` — the structural hairlines between stacked parts |
 | tone | `text`, `soft`, `tonal`, `selected`, `strong` — each per semantic variant |
-| state | `press`, `recess`, `selected`, `groupPress`, `disabled`, `rowHover`, `field.*` |
+| state | `press`, `recess`, `groupPress`, `disabled`, `enabled`, `text`, `rowHover`, `field.*` |
 | density | `compact`, `normal`, `prominent`, `target` |
 | motion | `press`, `release`, `overlayIn`/`overlayOut`, `scrimIn`/`scrimOut` |
 
-### Material
+`material`, `elevation` and `edge` are orthogonal, and that is the point: a material is a fill, an elevation is a distance, and an edge is a structural line. Nothing is baked into a material, so the same matte fill appears flat in a card, lifted on a button and recessed in a groove.
 
-Tone separates matte surfaces from the canvas; depth is added by the elevation ladder and never baked into a material. Acrylic is reserved for what genuinely floats above the application.
+### Material, elevation and edge are separate
+
+A material is a fill. Tone separates matte surfaces from the canvas, and a component chooses an elevation only where its anatomy is genuinely lifted:
+
+- **flat** by default — every passive matte surface separates by tone alone
+- **raised** on a manipulated control, which presses back into its own track
+- **control** for a part the user moves — a switch thumb, a selected segment
+- **pressed** while a control is physically held, and for tracks and grooves
+- **floating** only for surfaces that sit above the application
+
+Acrylic is reserved for genuinely floating UI: menus, tooltips and dialogs. A 1px inset ring that traces a filled object is still a drawn border, so matte controls carry no rim: light does the separating, and a hairline (`edge.row`, `edge.header`, `edge.rule`) is reserved for where two parts of one surface actually meet.
 
 ### Interaction states
 
@@ -182,17 +192,17 @@ One language, applied the same way everywhere:
 - **rest** — the material plus its resting elevation
 - **hover** — one tonality step (a state layer over the fill, or a step up the surface ladder), never a change in depth
 - **pressed** — recessed into the control's own track, plus a slight compression
-- **selected** — that recess held, with a selected tone
+- **selected** — a selected tone; depth depends on anatomy, since a segment inside a groove is raised while a row in a list stays flat
 - **disabled** — 45% opacity, no pointer affordance, no interactive state at all
 - **focus** — one visible ring everywhere, drawn outside a standalone control and inset for a control nested in another surface
 
-### Edge lighting instead of borders
+### Fields are borderless and flat
 
-Matte controls have no conventional border. What separates them from the page is light: a faint structural edge traces the shape, the elevation step adds a microscopic upper highlight and a soft lower shadow, and together they read as a lit rim rather than a drawn line. The same hairline tone is reused for every structural line in the library, so tables, code blocks, dividers and quotes agree.
+`Input`, `Textarea`, `Search` and the `Dropdown` trigger share one field language: a matte `surface-high` fill that steps up on hover and once more while engaged, no ring and no lift, and the shared outer focus ring for keyboard focus — one ring, never an inner rim plus an outer ring. Variant, error and disabled states change tonality only.
 
 ### Density
 
-Three control sizes — compact, normal, prominent — with one accessible hit-target floor for icon-only controls. Density changes padding, height and the type step; it never changes the interaction language. Even the prominent step stays compact, because the library targets dense desktop and product UI.
+Three control sizes — compact, normal, prominent — with one accessible hit-target floor for icon-only controls. Density owns height and the type step, so controls of one density share a rhythm; a component's anatomy owns its padding, because a button is gripped at its ends and a field is not. Even the prominent step stays compact, because the library targets dense desktop and product UI.
 
 ### Principles
 
@@ -201,6 +211,7 @@ Three control sizes — compact, normal, prominent — with one accessible hit-t
 - light mode is a separately designed soft theme, not an inversion of the dark palette
 - passive surfaces do not react to hover unless they are actually interactive
 - shape variation has a role: control, prominent, surface, expressive, pill and circle
+- a state is shown by tonality, depth and light together; a control that only swaps a color is the exception
 - expressive treatment is reserved for what floats, activates or deserves emphasis
 - `prefers-reduced-motion` is respected, and the package remains font-agnostic
 

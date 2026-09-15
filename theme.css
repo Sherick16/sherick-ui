@@ -97,6 +97,14 @@
   --sui-elevation-control: 0 1px 2px oklch(var(--sui-light-bottom) / 0.19), inset 0 1px 0 oklch(var(--sui-light-top) / 0.55);
   --sui-elevation-pressed: inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.22), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.50);
 
+  /* Compatibility aliases. `grounded` was the published name of the flat step, and
+     both glow tokens shipped in 1.0.x; a consumer may still reference the variable
+     or the Tailwind utility, so they keep resolving rather than silently falling
+     back. New code uses `--sui-elevation-flat` and the shared focus ring. */
+  --sui-elevation-grounded: var(--sui-elevation-flat);
+  --sui-shadow-focus: 0 10px 28px -22px rgb(65 112 220 / 0.30);
+  --sui-shadow-primary: 0 12px 30px -22px rgb(63 108 214 / 0.20);
+
   /* Material — acrylic. The gradient runs top to bottom so the sheet is lit by
      the same source as everything else: brighter where it faces the light,
      shaded along its lower edge. Translucency, blur and saturation are the only
@@ -174,6 +182,9 @@
   --sui-elevation-floating: 0 18px 44px oklch(var(--sui-light-bottom) / 0.38), inset 0 1px 0 oklch(var(--sui-light-top) / 0.05);
   --sui-elevation-control: 0 1px 2px oklch(var(--sui-light-bottom) / 0.30), inset 0 1px 0 oklch(var(--sui-light-top) / 0.08);
   --sui-elevation-pressed: inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.38), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.06);
+  --sui-elevation-grounded: var(--sui-elevation-flat);
+  --sui-shadow-focus: 0 10px 28px -22px rgb(90 145 255 / 0.42);
+  --sui-shadow-primary: 0 12px 30px -22px rgb(82 139 255 / 0.34);
 
   --sui-glass-blur: 32px;
   --sui-glass-saturation: 1.45;
@@ -239,6 +250,9 @@
     --sui-elevation-floating: 0 18px 44px oklch(var(--sui-light-bottom) / 0.38), inset 0 1px 0 oklch(var(--sui-light-top) / 0.05);
     --sui-elevation-control: 0 1px 2px oklch(var(--sui-light-bottom) / 0.30), inset 0 1px 0 oklch(var(--sui-light-top) / 0.08);
     --sui-elevation-pressed: inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.38), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.06);
+    --sui-elevation-grounded: var(--sui-elevation-flat);
+    --sui-shadow-focus: 0 10px 28px -22px rgb(90 145 255 / 0.42);
+    --sui-shadow-primary: 0 12px 30px -22px rgb(82 139 255 / 0.34);
     --sui-glass-blur: 32px;
     --sui-glass-saturation: 1.45;
     --sui-glass-brightness: 1.04;

@@ -103,10 +103,13 @@ for (const token of [
   "--sui-glass-gradient",
   "--sui-glass-gradient-dense",
   "--sui-elevation-flat",
+  "--sui-elevation-grounded",
   "--sui-elevation-raised",
   "--sui-elevation-floating",
   "--sui-elevation-control",
   "--sui-elevation-pressed",
+  "--sui-shadow-focus",
+  "--sui-shadow-primary",
   "--sui-code-text",
 ]) {
   assert.ok(lightVariables[token], `light theme missing ${token}`);
@@ -150,7 +153,7 @@ const tailwindResult = await postcss([
     presets: [sherickPreset],
     content: [
       {
-        raw: '<div class="bg-sherick-canvas text-sherick-ink/90 text-sherick-ink-faint bg-sherick-surface-high/[0.66] bg-sherick-primary/[0.12] text-sherick-on-warning outline-sherick-focus ring-1 ring-inset ring-sherick-edge/[0.09] bg-sherick-glass bg-sherick-glass-dense shadow-sherick-flat shadow-sherick-raised shadow-sherick-floating shadow-sherick-control active:shadow-sherick-pressed duration-press duration-release ease-press ease-release animate-sherick-overlay-in animate-sherick-overlay-out animate-sherick-scrim-in animate-sherick-scrim-out backdrop-blur-[var(--sui-glass-blur,32px)] backdrop-saturate-[var(--sui-glass-saturation,1.45)] backdrop-brightness-[var(--sui-glass-brightness,1.04)]"></div>',
+        raw: '<div class="bg-sherick-canvas text-sherick-ink/90 text-sherick-ink-faint bg-sherick-surface-high/[0.66] bg-sherick-primary/[0.12] text-sherick-on-warning outline-sherick-focus ring-1 ring-inset ring-sherick-edge/[0.09] bg-sherick-glass bg-sherick-glass-dense shadow-sherick-flat shadow-sherick-grounded shadow-sherick-raised shadow-sherick-focus shadow-sherick-primary shadow-sherick-floating shadow-sherick-control active:shadow-sherick-pressed duration-press duration-release ease-press ease-release animate-sherick-overlay-in animate-sherick-overlay-out animate-sherick-scrim-in animate-sherick-scrim-out backdrop-blur-[var(--sui-glass-blur,32px)] backdrop-saturate-[var(--sui-glass-saturation,1.45)] backdrop-brightness-[var(--sui-glass-brightness,1.04)]"></div>',
         extension: "html",
       },
     ],
@@ -169,6 +172,10 @@ assert.match(tailwindResult.css, /var\(--sui-edge/);
 assert.match(tailwindResult.css, /var\(--sui-glass-gradient/);
 assert.match(tailwindResult.css, /var\(--sui-glass-gradient-dense/);
 assert.match(tailwindResult.css, /var\(--sui-elevation-flat/);
+// Published 1.0.x utilities: an existing consumer's markup must keep its styling.
+assert.match(tailwindResult.css, /var\(--sui-elevation-grounded/);
+assert.match(tailwindResult.css, /var\(--sui-shadow-focus/);
+assert.match(tailwindResult.css, /var\(--sui-shadow-primary/);
 assert.match(tailwindResult.css, /var\(--sui-elevation-raised/);
 assert.match(tailwindResult.css, /var\(--sui-elevation-floating/);
 assert.match(tailwindResult.css, /var\(--sui-elevation-control/);

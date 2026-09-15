@@ -6,6 +6,7 @@ import { X } from "lucide-react";
 import { cn } from "@/libs/utils";
 import {
   density,
+  elevation,
   focusRing,
   material,
   motion,
@@ -38,7 +39,7 @@ const FOCUSABLE_SELECTOR = [
 export default function Modal({ children, open, onClose, className }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedElement = useRef<HTMLElement | null>(null);
-  const { mounted, closing } = useOverlayPresence(open);
+  const { mounted, closing, onExitEnd } = useOverlayPresence(open);
 
   useEffect(() => {
     if (!open) return;
@@ -108,6 +109,7 @@ export default function Modal({ children, open, onClose, className }: ModalProps
           "absolute inset-0 bg-sherick-scrim/[0.32] backdrop-blur-lg",
           closing ? motion.scrimOut : motion.scrimIn
         )}
+        onAnimationEnd={onExitEnd}
         aria-hidden="true"
       />
 
@@ -121,10 +123,15 @@ export default function Modal({ children, open, onClose, className }: ModalProps
           <div
             ref={modalRef}
             tabIndex={-1}
+            onAnimationEnd={onExitEnd}
             className={cn(
+              /* A dialog rises further than a menu, from its own scale, on the same
+                 overlay timing. */
               "relative w-full max-w-lg outline-none",
+              "[--sui-overlay-from-scale:0.985] [--sui-overlay-from-lift:8px]",
               shape.expressive,
-              material.acrylic,
+              material.acrylicModal,
+              elevation.floating,
               closing ? motion.overlayOut : motion.overlayIn,
               className
             )}
@@ -134,7 +141,6 @@ export default function Modal({ children, open, onClose, className }: ModalProps
               aria-label="Close dialog"
               onClick={onClose}
               className={cn(
-                "absolute right-4 top-4 inline-flex items-center justify-center",
                 density.target,
                 shape.circle,
                 material.matteHigh,
@@ -144,7 +150,11 @@ export default function Modal({ children, open, onClose, className }: ModalProps
                 focusRing,
                 stateLayer.quiet,
                 state.press,
-                state.enabled
+                state.enabled,
+                /* `stateLayer` supplies a containing block for its overlay, so an
+                   absolutely positioned control declares its position after the layer
+                   and becomes its own containing block. */
+                "absolute right-4 top-4 inline-flex items-center justify-center"
               )}
             >
               <X className="size-5" aria-hidden="true" />

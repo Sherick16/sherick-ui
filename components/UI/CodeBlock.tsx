@@ -70,7 +70,7 @@ const CodeBlock = ({ inline = false, className, language = "text", children }: C
   }
 
   return (
-    <div className={cn("mt-4 overflow-hidden", shape.prominent, material.matte, edge.faint, elevation.control)}>
+    <div className={cn("mt-4 overflow-hidden", shape.prominent, material.matte, elevation.pressed)}>
       <div className="flex min-h-11 items-center justify-between gap-4 px-4 py-2">
         <span className={cn("font-mono text-[11px] uppercase tracking-[0.08em]", text.medium)}>
           {language}

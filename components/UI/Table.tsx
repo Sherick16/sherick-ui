@@ -11,15 +11,16 @@ export interface TableProps {
   className?: string;
 }
 
-/* A table is a large matte surface. Its lines are the shared hairline tone, and row
-   feedback is tonality only: the rows are scannable, not interactive. */
+/* A table is a quiet, dense data region: the lightest matte fill, tighter geometry than
+   a card, and hairlines between rows. Row feedback is tonality only — the rows are
+   scannable, not manipulated. */
 export const Table = ({
   headers,
   rows,
   className,
 }: TableProps) => {
   return (
-    <div className={cn("w-full overflow-auto", shape.surface, material.matte, className)}>
+    <div className={cn("w-full overflow-auto", shape.control, material.matteQuiet, className)}>
       <table className="w-full border-collapse">
         <thead>
           <tr className={edge.header}>

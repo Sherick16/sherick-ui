@@ -4,7 +4,6 @@ import React, { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "re
 import { cn } from "@/libs/utils";
 import {
   density,
-  edge,
   elevation,
   focusRing,
   material,
@@ -38,6 +37,7 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
   }, ref) => {
     const isDisabled = disabled || loading;
     const isTonal = appearance === "tonal";
+    const isAcrylic = appearance === "acrylic";
 
     return (
       <button
@@ -53,15 +53,16 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
           focusRing,
           tone.text[variant],
           isTonal && tone.tonal[variant],
-          isTonal && !isDisabled && edge.faint,
+          /* Tonal and acrylic share one interaction language: only the material behind
+             the button changes, so both take the same state layer. */
+          (isTonal || isAcrylic) && !isDisabled && stateLayer.tonal,
+          appearance === "ghost" && "bg-transparent",
+          appearance === "ghost" && !isDisabled && stateLayer.quiet,
+          /* Tactile pair for a matte control; the acrylic button floats instead. */
           isTonal && !isDisabled && elevation.raised,
           isTonal && !isDisabled && state.recess,
-          appearance === "ghost" && "bg-transparent",
-          /* Acrylic and tonal share one interaction language: the material behind the
-             button changes, the way it responds does not. */
-          (isTonal || appearance === "acrylic") && !isDisabled && stateLayer.tonal,
-          appearance === "ghost" && !isDisabled && stateLayer.quiet,
-          appearance === "acrylic" && material.acrylicDense,
+          isAcrylic && material.acrylicDense,
+          isAcrylic && elevation.floating,
           !isDisabled && state.press,
           isDisabled ? state.disabled : state.enabled,
           className

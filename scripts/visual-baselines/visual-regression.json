@@ -1,0 +1,1075 @@
+{
+  "tokens": {
+    ":root, [data-sherick-theme=\"light\"]": {
+      "--sui-canvas": "0.965 0.008 255",
+      "--sui-surface": "0.985 0.006 255",
+      "--sui-surface-high": "0.925 0.014 255",
+      "--sui-surface-float": "0.992 0.006 255",
+      "--sui-ink": "0.245 0.018 260",
+      "--sui-ink-muted": "0.50 0.018 260",
+      "--sui-ink-faint": "0.63 0.016 258",
+      "--sui-primary": "0.52 0.17 255",
+      "--sui-primary-strong": "0.49 0.19 257",
+      "--sui-primary-soft": "0.91 0.035 255",
+      "--sui-accent": "0.62 0.10 215",
+      "--sui-danger": "0.54 0.17 25",
+      "--sui-warning": "0.53 0.13 75",
+      "--sui-success": "0.50 0.12 160",
+      "--sui-on-primary": "0.985 0.005 255",
+      "--sui-on-danger": "0.985 0.005 255",
+      "--sui-on-warning": "0.985 0.005 255",
+      "--sui-on-success": "0.985 0.005 255",
+      "--sui-focus": "0.52 0.18 255",
+      "--sui-outline": "0.50 0.018 260",
+      "--sui-scrim": "0.16 0.01 260",
+      "--sui-edge": "0.42 0.02 258",
+      "--sui-light-top": "1 0 0",
+      "--sui-light-bottom": "0.32 0.02 256",
+      "--sui-elevation-flat": "none",
+      "--sui-elevation-raised": "0 1px 2px oklch(var(--sui-light-bottom) / 0.16), 0 4px 13px oklch(var(--sui-light-bottom) / 0.09)",
+      "--sui-elevation-floating": "0 16px 40px oklch(var(--sui-light-bottom) / 0.20), inset 0 1px 0 oklch(var(--sui-light-top) / 0.70)",
+      "--sui-elevation-control": "0 1px 2px oklch(var(--sui-light-bottom) / 0.19), inset 0 1px 0 oklch(var(--sui-light-top) / 0.55)",
+      "--sui-elevation-pressed": "inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.22), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.50)",
+      "--sui-elevation-grounded": "var(--sui-elevation-flat)",
+      "--sui-shadow-focus": "0 10px 28px -22px rgb(65 112 220 / 0.30)",
+      "--sui-shadow-primary": "0 12px 30px -22px rgb(63 108 214 / 0.20)",
+      "--sui-glass-blur": "28px",
+      "--sui-glass-saturation": "1.18",
+      "--sui-glass-brightness": "1.012",
+      "--sui-glass-dense-blur": "22px",
+      "--sui-glass-dense-saturation": "1.12",
+      "--sui-glass-dense-brightness": "1.008",
+      "--sui-glass-gradient": "linear-gradient( 180deg, rgb(255 255 255 / 0.76) 0%, rgb(255 255 255 / 0.30) 30%, rgb(112 156 224 / 0.05) 70%, rgb(38 46 62 / 0.05) 100% )",
+      "--sui-glass-gradient-dense": "linear-gradient( 180deg, rgb(255 255 255 / 0.68) 0%, rgb(255 255 255 / 0.24) 36%, rgb(112 156 224 / 0.04) 76%, rgb(38 46 62 / 0.045) 100% )",
+      "--sui-code-text": "oklch(0.30 0.018 260)",
+      "--sui-code-comment": "oklch(0.56 0.015 255)",
+      "--sui-code-string": "oklch(0.48 0.11 235)",
+      "--sui-code-number": "oklch(0.52 0.14 55)",
+      "--sui-code-keyword": "oklch(0.50 0.15 305)",
+      "--sui-code-function": "oklch(0.50 0.15 25)",
+      "--sui-code-tag": "oklch(0.48 0.12 220)"
+    },
+    "[data-sherick-theme=\"dark\"]": {
+      "--sui-canvas": "0.205 0.012 260",
+      "--sui-surface": "0.245 0.014 260",
+      "--sui-surface-high": "0.295 0.016 260",
+      "--sui-surface-float": "0.27 0.018 260",
+      "--sui-ink": "0.94 0.008 255",
+      "--sui-ink-muted": "0.76 0.014 255",
+      "--sui-ink-faint": "0.60 0.014 256",
+      "--sui-primary": "0.72 0.15 255",
+      "--sui-primary-strong": "0.66 0.18 257",
+      "--sui-primary-soft": "0.42 0.055 257",
+      "--sui-accent": "0.80 0.08 215",
+      "--sui-danger": "0.72 0.13 25",
+      "--sui-warning": "0.82 0.12 80",
+      "--sui-success": "0.75 0.10 160",
+      "--sui-on-primary": "0.205 0.012 260",
+      "--sui-on-danger": "0.205 0.012 260",
+      "--sui-on-warning": "0.205 0.012 260",
+      "--sui-on-success": "0.205 0.012 260",
+      "--sui-focus": "0.72 0.15 255",
+      "--sui-outline": "0.76 0.014 255",
+      "--sui-scrim": "0.08 0.01 260",
+      "--sui-edge": "0.92 0.01 256",
+      "--sui-light-top": "1 0 0",
+      "--sui-light-bottom": "0.12 0.012 260",
+      "--sui-elevation-flat": "none",
+      "--sui-elevation-raised": "0 1px 2px oklch(var(--sui-light-bottom) / 0.26), 0 4px 12px oklch(var(--sui-light-bottom) / 0.15)",
+      "--sui-elevation-floating": "0 18px 44px oklch(var(--sui-light-bottom) / 0.38), inset 0 1px 0 oklch(var(--sui-light-top) / 0.05)",
+      "--sui-elevation-control": "0 1px 2px oklch(var(--sui-light-bottom) / 0.30), inset 0 1px 0 oklch(var(--sui-light-top) / 0.08)",
+      "--sui-elevation-pressed": "inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.38), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.06)",
+      "--sui-elevation-grounded": "var(--sui-elevation-flat)",
+      "--sui-shadow-focus": "0 10px 28px -22px rgb(90 145 255 / 0.42)",
+      "--sui-shadow-primary": "0 12px 30px -22px rgb(82 139 255 / 0.34)",
+      "--sui-glass-blur": "32px",
+      "--sui-glass-saturation": "1.45",
+      "--sui-glass-brightness": "1.04",
+      "--sui-glass-dense-blur": "26px",
+      "--sui-glass-dense-saturation": "1.38",
+      "--sui-glass-dense-brightness": "1.035",
+      "--sui-glass-gradient": "linear-gradient( 180deg, rgb(255 255 255 / 0.075) 0%, rgb(255 255 255 / 0.028) 30%, rgb(112 156 255 / 0.02) 70%, rgb(0 0 0 / 0.10) 100% )",
+      "--sui-glass-gradient-dense": "linear-gradient( 180deg, rgb(255 255 255 / 0.06) 0%, rgb(255 255 255 / 0.018) 36%, rgb(112 156 255 / 0.016) 76%, rgb(0 0 0 / 0.08) 100% )",
+      "--sui-code-text": "#e2e8f0",
+      "--sui-code-comment": "#64748b",
+      "--sui-code-string": "#a5d6ff",
+      "--sui-code-number": "#f97316",
+      "--sui-code-keyword": "#c084fc",
+      "--sui-code-function": "#ff7b72",
+      "--sui-code-tag": "#7dd3fc"
+    },
+    "@media (prefers-color-scheme: dark) | :root:not([data-sherick-theme])": {
+      "--sui-canvas": "0.205 0.012 260",
+      "--sui-surface": "0.245 0.014 260",
+      "--sui-surface-high": "0.295 0.016 260",
+      "--sui-surface-float": "0.27 0.018 260",
+      "--sui-ink": "0.94 0.008 255",
+      "--sui-ink-muted": "0.76 0.014 255",
+      "--sui-ink-faint": "0.60 0.014 256",
+      "--sui-primary": "0.72 0.15 255",
+      "--sui-primary-strong": "0.66 0.18 257",
+      "--sui-primary-soft": "0.42 0.055 257",
+      "--sui-accent": "0.80 0.08 215",
+      "--sui-danger": "0.72 0.13 25",
+      "--sui-warning": "0.82 0.12 80",
+      "--sui-success": "0.75 0.10 160",
+      "--sui-on-primary": "0.205 0.012 260",
+      "--sui-on-danger": "0.205 0.012 260",
+      "--sui-on-warning": "0.205 0.012 260",
+      "--sui-on-success": "0.205 0.012 260",
+      "--sui-focus": "0.72 0.15 255",
+      "--sui-outline": "0.76 0.014 255",
+      "--sui-scrim": "0.08 0.01 260",
+      "--sui-edge": "0.92 0.01 256",
+      "--sui-light-top": "1 0 0",
+      "--sui-light-bottom": "0.12 0.012 260",
+      "--sui-elevation-flat": "none",
+      "--sui-elevation-raised": "0 1px 2px oklch(var(--sui-light-bottom) / 0.26), 0 4px 12px oklch(var(--sui-light-bottom) / 0.15)",
+      "--sui-elevation-floating": "0 18px 44px oklch(var(--sui-light-bottom) / 0.38), inset 0 1px 0 oklch(var(--sui-light-top) / 0.05)",
+      "--sui-elevation-control": "0 1px 2px oklch(var(--sui-light-bottom) / 0.30), inset 0 1px 0 oklch(var(--sui-light-top) / 0.08)",
+      "--sui-elevation-pressed": "inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.38), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.06)",
+      "--sui-elevation-grounded": "var(--sui-elevation-flat)",
+      "--sui-shadow-focus": "0 10px 28px -22px rgb(90 145 255 / 0.42)",
+      "--sui-shadow-primary": "0 12px 30px -22px rgb(82 139 255 / 0.34)",
+      "--sui-glass-blur": "32px",
+      "--sui-glass-saturation": "1.45",
+      "--sui-glass-brightness": "1.04",
+      "--sui-glass-dense-blur": "26px",
+      "--sui-glass-dense-saturation": "1.38",
+      "--sui-glass-dense-brightness": "1.035",
+      "--sui-glass-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.075) 0%, rgb(255 255 255 / 0.028) 30%, rgb(112 156 255 / 0.02) 70%, rgb(0 0 0 / 0.10) 100%)",
+      "--sui-glass-gradient-dense": "linear-gradient(180deg, rgb(255 255 255 / 0.06) 0%, rgb(255 255 255 / 0.018) 36%, rgb(112 156 255 / 0.016) 76%, rgb(0 0 0 / 0.08) 100%)",
+      "--sui-code-text": "#e2e8f0",
+      "--sui-code-comment": "#64748b",
+      "--sui-code-string": "#a5d6ff",
+      "--sui-code-number": "#f97316",
+      "--sui-code-keyword": "#c084fc",
+      "--sui-code-function": "#ff7b72",
+      "--sui-code-tag": "#7dd3fc"
+    },
+    ":root": {
+      "--sui-duration-press": "150ms",
+      "--sui-duration-release": "200ms",
+      "--sui-duration-overlay": "240ms",
+      "--sui-duration-overlay-exit": "160ms",
+      "--sui-ease-press": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "--sui-ease-release": "cubic-bezier(0.16, 1, 0.3, 1)",
+      "--sui-ease-exit": "cubic-bezier(0.4, 0, 1, 1)"
+    }
+  },
+  "utilities": {
+    ".absolute": [
+      "position: absolute"
+    ],
+    ".relative": [
+      "position: relative"
+    ],
+    ".inset-y-1\\.5": [
+      "bottom: 0.375rem",
+      "top: 0.375rem"
+    ],
+    ".left-1": [
+      "left: 0.25rem"
+    ],
+    ".left-1\\.5": [
+      "left: 0.375rem"
+    ],
+    ".right-1\\.5": [
+      "right: 0.375rem"
+    ],
+    ".top-1\\/2": [
+      "top: 50%"
+    ],
+    ".z-10": [
+      "z-index: 10"
+    ],
+    ".my-3": [
+      "margin-bottom: 0.75rem",
+      "margin-top: 0.75rem"
+    ],
+    ".my-5": [
+      "margin-bottom: 1.25rem",
+      "margin-top: 1.25rem"
+    ],
+    ".mb-2": [
+      "margin-bottom: 0.5rem"
+    ],
+    ".mb-3": [
+      "margin-bottom: 0.75rem"
+    ],
+    ".ml-1": [
+      "margin-left: 0.25rem"
+    ],
+    ".mr-4": [
+      "margin-right: 1rem"
+    ],
+    ".mt-4": [
+      "margin-top: 1rem"
+    ],
+    ".mt-5": [
+      "margin-top: 1.25rem"
+    ],
+    ".mt-7": [
+      "margin-top: 1.75rem"
+    ],
+    ".mt-auto": [
+      "margin-top: auto"
+    ],
+    ".block": [
+      "display: block"
+    ],
+    ".inline-block": [
+      "display: inline-block"
+    ],
+    ".inline": [
+      "display: inline"
+    ],
+    ".flex": [
+      "display: flex"
+    ],
+    ".inline-flex": [
+      "display: inline-flex"
+    ],
+    ".table": [
+      "display: table"
+    ],
+    ".size-3\\.5": [
+      "height: 0.875rem",
+      "width: 0.875rem"
+    ],
+    ".size-4": [
+      "height: 1rem",
+      "width: 1rem"
+    ],
+    ".size-5": [
+      "height: 1.25rem",
+      "width: 1.25rem"
+    ],
+    ".h-0": [
+      "height: 0px"
+    ],
+    ".h-16": [
+      "height: 4rem"
+    ],
+    ".h-4": [
+      "height: 1rem"
+    ],
+    ".h-5": [
+      "height: 1.25rem"
+    ],
+    ".h-6": [
+      "height: 1.5rem"
+    ],
+    ".h-8": [
+      "height: 2rem"
+    ],
+    ".h-full": [
+      "height: 100%"
+    ],
+    ".min-h-10": [
+      "min-height: 2.5rem"
+    ],
+    ".min-h-11": [
+      "min-height: 2.75rem"
+    ],
+    ".min-h-12": [
+      "min-height: 3rem"
+    ],
+    ".min-h-14": [
+      "min-height: 3.5rem"
+    ],
+    ".min-h-28": [
+      "min-height: 7rem"
+    ],
+    ".min-h-7": [
+      "min-height: 1.75rem"
+    ],
+    ".w-0": [
+      "width: 0px"
+    ],
+    ".w-16": [
+      "width: 4rem"
+    ],
+    ".w-3\\/4": [
+      "width: 75%"
+    ],
+    ".w-4": [
+      "width: 1rem"
+    ],
+    ".w-5": [
+      "width: 1.25rem"
+    ],
+    ".w-6": [
+      "width: 1.5rem"
+    ],
+    ".w-8": [
+      "width: 2rem"
+    ],
+    ".w-\\[3\\.25rem\\]": [
+      "width: 3.25rem"
+    ],
+    ".w-full": [
+      "width: 100%"
+    ],
+    ".min-w-0": [
+      "min-width: 0px"
+    ],
+    ".min-w-11": [
+      "min-width: 2.75rem"
+    ],
+    ".min-w-14": [
+      "min-width: 3.5rem"
+    ],
+    ".min-w-28": [
+      "min-width: 7rem"
+    ],
+    ".min-w-64": [
+      "min-width: 16rem"
+    ],
+    ".min-w-full": [
+      "min-width: 100%"
+    ],
+    ".min-w-max": [
+      "min-width: max-content"
+    ],
+    ".max-w-xs": [
+      "max-width: 20rem"
+    ],
+    ".flex-1": [
+      "flex: 1 1 0%"
+    ],
+    ".shrink-0": [
+      "flex-shrink: 0"
+    ],
+    ".border-collapse": [
+      "border-collapse: collapse"
+    ],
+    ".-translate-y-1\\/2": [
+      "--tw-translate-y: -50%",
+      "transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))"
+    ],
+    ".translate-x-5": [
+      "--tw-translate-x: 1.25rem",
+      "transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))"
+    ],
+    "@keyframes pulse | 50%": [
+      "opacity: .5"
+    ],
+    ".animate-pulse": [
+      "animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite"
+    ],
+    "@keyframes spin | to": [
+      "transform: rotate(360deg)"
+    ],
+    ".animate-spin": [
+      "animation: spin 1s linear infinite"
+    ],
+    ".cursor-not-allowed": [
+      "cursor: not-allowed"
+    ],
+    ".cursor-pointer": [
+      "cursor: pointer"
+    ],
+    ".cursor-text": [
+      "cursor: text"
+    ],
+    ".select-none": [
+      "user-select: none"
+    ],
+    ".resize-y": [
+      "resize: vertical"
+    ],
+    ".flex-col": [
+      "flex-direction: column"
+    ],
+    ".items-center": [
+      "align-items: center"
+    ],
+    ".justify-end": [
+      "justify-content: flex-end"
+    ],
+    ".justify-center": [
+      "justify-content: center"
+    ],
+    ".justify-between": [
+      "justify-content: space-between"
+    ],
+    ".gap-1\\.5": [
+      "gap: 0.375rem"
+    ],
+    ".gap-2": [
+      "gap: 0.5rem"
+    ],
+    ".gap-3": [
+      "gap: 0.75rem"
+    ],
+    ".gap-4": [
+      "gap: 1rem"
+    ],
+    ".space-y-1\\.5 > :not([hidden]) ~ :not([hidden])": [
+      "--tw-space-y-reverse: 0",
+      "margin-bottom: calc(0.375rem * var(--tw-space-y-reverse))",
+      "margin-top: calc(0.375rem * calc(1 - var(--tw-space-y-reverse)))"
+    ],
+    ".overflow-auto": [
+      "overflow: auto"
+    ],
+    ".overflow-hidden": [
+      "overflow: hidden"
+    ],
+    ".overflow-x-auto": [
+      "overflow-x: auto"
+    ],
+    ".truncate": [
+      "overflow: hidden",
+      "text-overflow: ellipsis",
+      "white-space: nowrap"
+    ],
+    ".text-ellipsis": [
+      "text-overflow: ellipsis"
+    ],
+    ".whitespace-nowrap": [
+      "white-space: nowrap"
+    ],
+    ".rounded-\\[1\\.25rem\\]": [
+      "border-radius: 1.25rem"
+    ],
+    ".rounded-\\[1\\.5rem\\]": [
+      "border-radius: 1.5rem"
+    ],
+    ".rounded-\\[1\\.75rem\\]": [
+      "border-radius: 1.75rem"
+    ],
+    ".rounded-full": [
+      "border-radius: 9999px"
+    ],
+    ".rounded-l-none": [
+      "border-bottom-left-radius: 0px",
+      "border-top-left-radius: 0px"
+    ],
+    ".border-b": [
+      "border-bottom-width: 1px"
+    ],
+    ".border-l": [
+      "border-left-width: 1px"
+    ],
+    ".border-l-2": [
+      "border-left-width: 2px"
+    ],
+    ".border-t": [
+      "border-top-width: 1px"
+    ],
+    ".border-sherick-edge\\/\\[0\\.06\\]": [
+      "border-color: oklch(var(--sui-edge, 0.92 0.01 256) / 0.06)"
+    ],
+    ".border-sherick-edge\\/\\[0\\.075\\]": [
+      "border-color: oklch(var(--sui-edge, 0.92 0.01 256) / 0.075)"
+    ],
+    ".border-sherick-edge\\/\\[0\\.10\\]": [
+      "border-color: oklch(var(--sui-edge, 0.92 0.01 256) / 0.10)"
+    ],
+    ".border-sherick-primary\\/\\[0\\.45\\]": [
+      "border-color: oklch(var(--sui-primary, 0.72 0.15 255) / 0.45)"
+    ],
+    ".bg-current": [
+      "background-color: currentColor"
+    ],
+    ".bg-sherick-canvas\\/\\[0\\.28\\]": [
+      "background-color: oklch(var(--sui-canvas, 0.205 0.012 260) / 0.28)"
+    ],
+    ".bg-sherick-danger": [
+      "--tw-bg-opacity: 1",
+      "background-color: oklch(var(--sui-danger, 0.72 0.13 25) / var(--tw-bg-opacity, 1))"
+    ],
+    ".bg-sherick-danger\\/\\[0\\.075\\]": [
+      "background-color: oklch(var(--sui-danger, 0.72 0.13 25) / 0.075)"
+    ],
+    ".bg-sherick-danger\\/\\[0\\.09\\]": [
+      "background-color: oklch(var(--sui-danger, 0.72 0.13 25) / 0.09)"
+    ],
+    ".bg-sherick-primary-strong": [
+      "--tw-bg-opacity: 1",
+      "background-color: oklch(var(--sui-primary-strong, 0.66 0.18 257) / var(--tw-bg-opacity, 1))"
+    ],
+    ".bg-sherick-primary\\/\\[0\\.12\\]": [
+      "background-color: oklch(var(--sui-primary, 0.72 0.15 255) / 0.12)"
+    ],
+    ".bg-sherick-primary\\/\\[0\\.22\\]": [
+      "background-color: oklch(var(--sui-primary, 0.72 0.15 255) / 0.22)"
+    ],
+    ".bg-sherick-success\\/\\[0\\.09\\]": [
+      "background-color: oklch(var(--sui-success, 0.75 0.10 160) / 0.09)"
+    ],
+    ".bg-sherick-surface-high": [
+      "--tw-bg-opacity: 1",
+      "background-color: oklch(var(--sui-surface-high, 0.295 0.016 260) / var(--tw-bg-opacity, 1))"
+    ],
+    ".bg-sherick-surface-high\\/\\[0\\.56\\]": [
+      "background-color: oklch(var(--sui-surface-high, 0.295 0.016 260) / 0.56)"
+    ],
+    ".bg-sherick-surface-high\\/\\[0\\.66\\]": [
+      "background-color: oklch(var(--sui-surface-high, 0.295 0.016 260) / 0.66)"
+    ],
+    ".bg-sherick-surface-high\\/\\[0\\.72\\]": [
+      "background-color: oklch(var(--sui-surface-high, 0.295 0.016 260) / 0.72)"
+    ],
+    ".bg-sherick-surface\\/\\[0\\.42\\]": [
+      "background-color: oklch(var(--sui-surface, 0.245 0.014 260) / 0.42)"
+    ],
+    ".bg-sherick-surface\\/\\[0\\.72\\]": [
+      "background-color: oklch(var(--sui-surface, 0.245 0.014 260) / 0.72)"
+    ],
+    ".bg-sherick-surface\\/\\[0\\.78\\]": [
+      "background-color: oklch(var(--sui-surface, 0.245 0.014 260) / 0.78)"
+    ],
+    ".bg-transparent": [
+      "background-color: transparent"
+    ],
+    ".bg-sherick-glass-dense": [
+      "background-image: var(--sui-glass-gradient-dense, linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.018) 36%, rgba(112,156,255,0.016) 76%, rgba(0,0,0,0.08) 100%))"
+    ],
+    ".object-cover": [
+      "object-fit: cover"
+    ],
+    ".p-1\\.5": [
+      "padding: 0.375rem"
+    ],
+    ".p-2\\.5": [
+      "padding: 0.625rem"
+    ],
+    ".p-6": [
+      "padding: 1.5rem"
+    ],
+    ".px-1\\.5": [
+      "padding-left: 0.375rem",
+      "padding-right: 0.375rem"
+    ],
+    ".px-2\\.5": [
+      "padding-left: 0.625rem",
+      "padding-right: 0.625rem"
+    ],
+    ".px-3": [
+      "padding-left: 0.75rem",
+      "padding-right: 0.75rem"
+    ],
+    ".px-4": [
+      "padding-left: 1rem",
+      "padding-right: 1rem"
+    ],
+    ".px-5": [
+      "padding-left: 1.25rem",
+      "padding-right: 1.25rem"
+    ],
+    ".px-6": [
+      "padding-left: 1.5rem",
+      "padding-right: 1.5rem"
+    ],
+    ".px-7": [
+      "padding-left: 1.75rem",
+      "padding-right: 1.75rem"
+    ],
+    ".px-8": [
+      "padding-left: 2rem",
+      "padding-right: 2rem"
+    ],
+    ".py-0\\.5": [
+      "padding-bottom: 0.125rem",
+      "padding-top: 0.125rem"
+    ],
+    ".py-1": [
+      "padding-bottom: 0.25rem",
+      "padding-top: 0.25rem"
+    ],
+    ".py-1\\.5": [
+      "padding-bottom: 0.375rem",
+      "padding-top: 0.375rem"
+    ],
+    ".py-2": [
+      "padding-bottom: 0.5rem",
+      "padding-top: 0.5rem"
+    ],
+    ".py-3": [
+      "padding-bottom: 0.75rem",
+      "padding-top: 0.75rem"
+    ],
+    ".py-3\\.5": [
+      "padding-bottom: 0.875rem",
+      "padding-top: 0.875rem"
+    ],
+    ".py-4": [
+      "padding-bottom: 1rem",
+      "padding-top: 1rem"
+    ],
+    ".pb-1": [
+      "padding-bottom: 0.25rem"
+    ],
+    ".pb-2": [
+      "padding-bottom: 0.5rem"
+    ],
+    ".pb-6": [
+      "padding-bottom: 1.5rem"
+    ],
+    ".pl-5": [
+      "padding-left: 1.25rem"
+    ],
+    ".pr-12": [
+      "padding-right: 3rem"
+    ],
+    ".pr-20": [
+      "padding-right: 5rem"
+    ],
+    ".pt-3": [
+      "padding-top: 0.75rem"
+    ],
+    ".pt-6": [
+      "padding-top: 1.5rem"
+    ],
+    ".text-left": [
+      "text-align: left"
+    ],
+    ".text-right": [
+      "text-align: right"
+    ],
+    ".font-mono": [
+      "font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace"
+    ],
+    ".text-2xl": [
+      "font-size: 1.5rem",
+      "line-height: 2rem"
+    ],
+    ".text-\\[0\\.95rem\\]": [
+      "font-size: 0.95rem"
+    ],
+    ".text-\\[0\\.9em\\]": [
+      "font-size: 0.9em"
+    ],
+    ".text-\\[11px\\]": [
+      "font-size: 11px"
+    ],
+    ".text-lg": [
+      "font-size: 1.125rem",
+      "line-height: 1.75rem"
+    ],
+    ".text-sm": [
+      "font-size: 0.875rem",
+      "line-height: 1.25rem"
+    ],
+    ".text-xl": [
+      "font-size: 1.25rem",
+      "line-height: 1.75rem"
+    ],
+    ".text-xs": [
+      "font-size: 0.75rem",
+      "line-height: 1rem"
+    ],
+    ".font-medium": [
+      "font-weight: 500"
+    ],
+    ".font-semibold": [
+      "font-weight: 600"
+    ],
+    ".uppercase": [
+      "text-transform: uppercase"
+    ],
+    ".leading-6": [
+      "line-height: 1.5rem"
+    ],
+    ".leading-7": [
+      "line-height: 1.75rem"
+    ],
+    ".tracking-\\[-0\\.01em\\]": [
+      "letter-spacing: -0.01em"
+    ],
+    ".tracking-\\[-0\\.025em\\]": [
+      "letter-spacing: -0.025em"
+    ],
+    ".tracking-\\[-0\\.02em\\]": [
+      "letter-spacing: -0.02em"
+    ],
+    ".tracking-\\[0\\.08em\\]": [
+      "letter-spacing: 0.08em"
+    ],
+    ".text-current": [
+      "color: currentColor"
+    ],
+    ".text-inherit": [
+      "color: inherit"
+    ],
+    ".text-sherick-danger": [
+      "--tw-text-opacity: 1",
+      "color: oklch(var(--sui-danger, 0.72 0.13 25) / var(--tw-text-opacity, 1))"
+    ],
+    ".text-sherick-ink": [
+      "--tw-text-opacity: 1",
+      "color: oklch(var(--sui-ink, 0.94 0.008 255) / var(--tw-text-opacity, 1))"
+    ],
+    ".text-sherick-ink-faint": [
+      "--tw-text-opacity: 1",
+      "color: oklch(var(--sui-ink-faint, 0.60 0.014 256) / var(--tw-text-opacity, 1))"
+    ],
+    ".text-sherick-ink-muted": [
+      "--tw-text-opacity: 1",
+      "color: oklch(var(--sui-ink-muted, 0.76 0.014 255) / var(--tw-text-opacity, 1))"
+    ],
+    ".text-sherick-on-danger": [
+      "--tw-text-opacity: 1",
+      "color: oklch(var(--sui-on-danger, 0.205 0.012 260) / var(--tw-text-opacity, 1))"
+    ],
+    ".text-sherick-on-primary": [
+      "--tw-text-opacity: 1",
+      "color: oklch(var(--sui-on-primary, 0.205 0.012 260) / var(--tw-text-opacity, 1))"
+    ],
+    ".text-sherick-primary": [
+      "--tw-text-opacity: 1",
+      "color: oklch(var(--sui-primary, 0.72 0.15 255) / var(--tw-text-opacity, 1))"
+    ],
+    ".text-sherick-success": [
+      "--tw-text-opacity: 1",
+      "color: oklch(var(--sui-success, 0.75 0.10 160) / var(--tw-text-opacity, 1))"
+    ],
+    ".opacity-45": [
+      "opacity: 0.45"
+    ],
+    ".shadow-sherick-control": [
+      "--tw-shadow-colored: inset 0 1px 2px 0 var(--tw-shadow-color)",
+      "--tw-shadow: var(--sui-elevation-control, 0 1px 2px rgba(0, 0, 0, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.08))",
+      "box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)"
+    ],
+    ".shadow-sherick-floating": [
+      "--tw-shadow-colored: inset 0 18px 44px 0 var(--tw-shadow-color)",
+      "--tw-shadow: var(--sui-elevation-floating, 0 18px 44px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.05))",
+      "box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)"
+    ],
+    ".shadow-sherick-pressed": [
+      "--tw-shadow-colored: inset 0 1px 3px 0 var(--tw-shadow-color)",
+      "--tw-shadow: var(--sui-elevation-pressed, inset 0 1px 3px rgba(0, 0, 0, 0.38), inset 0 -1px 0 rgba(255, 255, 255, 0.06))",
+      "box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)"
+    ],
+    ".shadow-sherick-raised": [
+      "--tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color)",
+      "--tw-shadow: var(--sui-elevation-raised, 0 1px 2px rgba(0, 0, 0, 0.26), 0 4px 12px rgba(0, 0, 0, 0.15))",
+      "box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)"
+    ],
+    ".outline-none": [
+      "outline-offset: 2px",
+      "outline: 2px solid transparent"
+    ],
+    ".backdrop-blur-\\[var\\(--sui-glass-dense-blur\\2c 26px\\)\\]": [
+      "--tw-backdrop-blur: blur(var(--sui-glass-dense-blur,26px))",
+      "-webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)",
+      "backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)"
+    ],
+    ".backdrop-brightness-\\[var\\(--sui-glass-dense-brightness\\2c 1\\.035\\)\\]": [
+      "--tw-backdrop-brightness: brightness(var(--sui-glass-dense-brightness,1.035))",
+      "-webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)",
+      "backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)"
+    ],
+    ".backdrop-saturate-\\[var\\(--sui-glass-dense-saturation\\2c 1\\.38\\)\\]": [
+      "--tw-backdrop-saturate: saturate(var(--sui-glass-dense-saturation,1.38))",
+      "-webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)",
+      "backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)"
+    ],
+    ".transition-\\[background-color\\2c color\\2c box-shadow\\2c opacity\\]": [
+      "transition-duration: 150ms",
+      "transition-property: background-color,color,box-shadow,opacity",
+      "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)"
+    ],
+    ".transition-\\[background-color\\2c color\\2c box-shadow\\2c transform\\2c opacity\\]": [
+      "transition-duration: 150ms",
+      "transition-property: background-color,color,box-shadow,transform,opacity",
+      "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)"
+    ],
+    ".duration-press": [
+      "transition-duration: var(--sui-duration-press, 150ms)"
+    ],
+    ".duration-release": [
+      "transition-duration: var(--sui-duration-release, 200ms)"
+    ],
+    ".ease-press": [
+      "transition-timing-function: var(--sui-ease-press, cubic-bezier(0.4, 0, 0.2, 1))"
+    ],
+    ".ease-release": [
+      "transition-timing-function: var(--sui-ease-release, cubic-bezier(0.16, 1, 0.3, 1))"
+    ],
+    ".placeholder\\:text-sherick-danger\\/\\[0\\.72\\]::placeholder": [
+      "color: oklch(var(--sui-danger, 0.72 0.13 25) / 0.72)"
+    ],
+    ".placeholder\\:text-sherick-ink-muted::placeholder": [
+      "--tw-text-opacity: 1",
+      "color: oklch(var(--sui-ink-muted, 0.76 0.014 255) / var(--tw-text-opacity, 1))"
+    ],
+    ".before\\:pointer-events-none::before": [
+      "content: var(--tw-content)",
+      "pointer-events: none"
+    ],
+    ".before\\:absolute::before": [
+      "content: var(--tw-content)",
+      "position: absolute"
+    ],
+    ".before\\:inset-0::before": [
+      "content: var(--tw-content)",
+      "inset: 0px"
+    ],
+    ".before\\:rounded-\\[inherit\\]::before": [
+      "border-radius: inherit",
+      "content: var(--tw-content)"
+    ],
+    ".before\\:bg-current::before": [
+      "background-color: currentColor",
+      "content: var(--tw-content)"
+    ],
+    ".before\\:opacity-0::before": [
+      "content: var(--tw-content)",
+      "opacity: 0"
+    ],
+    ".before\\:transition-opacity::before": [
+      "content: var(--tw-content)",
+      "transition-duration: 150ms",
+      "transition-property: opacity",
+      "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)"
+    ],
+    ".before\\:duration-release::before": [
+      "content: var(--tw-content)",
+      "transition-duration: var(--sui-duration-release, 200ms)"
+    ],
+    ".before\\:ease-release::before": [
+      "content: var(--tw-content)",
+      "transition-timing-function: var(--sui-ease-release, cubic-bezier(0.16, 1, 0.3, 1))"
+    ],
+    ".first\\:mt-0:first-child": [
+      "margin-top: 0px"
+    ],
+    ".last\\:border-b-0:last-child": [
+      "border-bottom-width: 0px"
+    ],
+    ".focus-within\\:bg-sherick-surface-high\\/\\[0\\.9\\]:focus-within": [
+      "background-color: oklch(var(--sui-surface-high, 0.295 0.016 260) / 0.9)"
+    ],
+    ".focus-within\\:outline:focus-within": [
+      "outline-style: solid"
+    ],
+    ".focus-within\\:outline-2:focus-within": [
+      "outline-width: 2px"
+    ],
+    ".focus-within\\:outline-offset-\\[3px\\]:focus-within": [
+      "outline-offset: 3px"
+    ],
+    ".focus-within\\:outline-sherick-focus:focus-within": [
+      "outline-color: oklch(var(--sui-focus, 0.72 0.15 255) / 1)"
+    ],
+    ".hover\\:bg-sherick-danger\\/\\[0\\.10\\]:hover": [
+      "background-color: oklch(var(--sui-danger, 0.72 0.13 25) / 0.10)"
+    ],
+    ".hover\\:bg-sherick-ink\\/\\[0\\.05\\]:hover": [
+      "background-color: oklch(var(--sui-ink, 0.94 0.008 255) / 0.05)"
+    ],
+    ".hover\\:bg-sherick-surface-high\\/\\[0\\.82\\]:hover": [
+      "background-color: oklch(var(--sui-surface-high, 0.295 0.016 260) / 0.82)"
+    ],
+    ".hover\\:text-sherick-ink:hover": [
+      "--tw-text-opacity: 1",
+      "color: oklch(var(--sui-ink, 0.94 0.008 255) / var(--tw-text-opacity, 1))"
+    ],
+    ".hover\\:before\\:opacity-\\[0\\.05\\]:hover::before": [
+      "content: var(--tw-content)",
+      "opacity: 0.05"
+    ],
+    ".hover\\:before\\:opacity-\\[0\\.09\\]:hover::before": [
+      "content: var(--tw-content)",
+      "opacity: 0.09"
+    ],
+    ".hover\\:before\\:opacity-\\[0\\.18\\]:hover::before": [
+      "content: var(--tw-content)",
+      "opacity: 0.18"
+    ],
+    ".focus\\:bg-sherick-danger\\/\\[0\\.13\\]:focus": [
+      "background-color: oklch(var(--sui-danger, 0.72 0.13 25) / 0.13)"
+    ],
+    ".focus\\:bg-sherick-surface-high\\/\\[0\\.9\\]:focus": [
+      "background-color: oklch(var(--sui-surface-high, 0.295 0.016 260) / 0.9)"
+    ],
+    ".focus\\:outline-none:focus": [
+      "outline-offset: 2px",
+      "outline: 2px solid transparent"
+    ],
+    ".focus-visible\\:outline-none:focus-visible": [
+      "outline-offset: 2px",
+      "outline: 2px solid transparent"
+    ],
+    ".focus-visible\\:outline:focus-visible": [
+      "outline-style: solid"
+    ],
+    ".focus-visible\\:outline-2:focus-visible": [
+      "outline-width: 2px"
+    ],
+    ".focus-visible\\:outline-offset-\\[3px\\]:focus-visible": [
+      "outline-offset: 3px"
+    ],
+    ".focus-visible\\:outline-sherick-focus:focus-visible": [
+      "outline-color: oklch(var(--sui-focus, 0.72 0.15 255) / 1)"
+    ],
+    ".focus-visible\\:ring-2:focus-visible": [
+      "--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color)",
+      "--tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color)",
+      "box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)"
+    ],
+    ".focus-visible\\:ring-inset:focus-visible": [
+      "--tw-ring-inset: inset\n"
+    ],
+    ".focus-visible\\:ring-sherick-focus:focus-visible": [
+      "--tw-ring-color: oklch(var(--sui-focus, 0.72 0.15 255) / var(--tw-ring-opacity, 1))\n",
+      "--tw-ring-opacity: 1"
+    ],
+    ".active\\:scale-\\[0\\.98\\]:active": [
+      "--tw-scale-x: 0.98",
+      "--tw-scale-y: 0.98",
+      "transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))"
+    ],
+    ".active\\:shadow-sherick-pressed:active": [
+      "--tw-shadow-colored: inset 0 1px 3px 0 var(--tw-shadow-color)",
+      "--tw-shadow: var(--sui-elevation-pressed, inset 0 1px 3px rgba(0, 0, 0, 0.38), inset 0 -1px 0 rgba(255, 255, 255, 0.06))",
+      "box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)"
+    ],
+    ".active\\:duration-press:active": [
+      "transition-duration: var(--sui-duration-press, 150ms)"
+    ],
+    ".active\\:ease-press:active": [
+      "transition-timing-function: var(--sui-ease-press, cubic-bezier(0.4, 0, 0.2, 1))"
+    ],
+    ".active\\:before\\:opacity-\\[0\\.09\\]:active::before": [
+      "content: var(--tw-content)",
+      "opacity: 0.09"
+    ],
+    ".active\\:before\\:opacity-\\[0\\.15\\]:active::before": [
+      "content: var(--tw-content)",
+      "opacity: 0.15"
+    ],
+    ".active\\:before\\:opacity-\\[0\\.26\\]:active::before": [
+      "content: var(--tw-content)",
+      "opacity: 0.26"
+    ],
+    ".active\\:before\\:duration-press:active::before": [
+      "content: var(--tw-content)",
+      "transition-duration: var(--sui-duration-press, 150ms)"
+    ],
+    ".active\\:before\\:ease-press:active::before": [
+      "content: var(--tw-content)",
+      "transition-timing-function: var(--sui-ease-press, cubic-bezier(0.4, 0, 0.2, 1))"
+    ],
+    ".group:hover .group-hover\\:before\\:opacity-\\[0\\.18\\]::before": [
+      "content: var(--tw-content)",
+      "opacity: 0.18"
+    ],
+    ".group:focus-visible .group-focus-visible\\:outline": [
+      "outline-style: solid"
+    ],
+    ".group:focus-visible .group-focus-visible\\:outline-2": [
+      "outline-width: 2px"
+    ],
+    ".group:focus-visible .group-focus-visible\\:outline-offset-\\[3px\\]": [
+      "outline-offset: 3px"
+    ],
+    ".group:focus-visible .group-focus-visible\\:outline-sherick-focus": [
+      "outline-color: oklch(var(--sui-focus, 0.72 0.15 255) / 1)"
+    ],
+    ".group:active .group-active\\:scale-\\[0\\.98\\]": [
+      "--tw-scale-x: 0.98",
+      "--tw-scale-y: 0.98",
+      "transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))"
+    ],
+    ".group:active .group-active\\:before\\:opacity-\\[0\\.26\\]::before": [
+      "content: var(--tw-content)",
+      "opacity: 0.26"
+    ],
+    ".group:active .group-active\\:before\\:duration-press::before": [
+      "content: var(--tw-content)",
+      "transition-duration: var(--sui-duration-press, 150ms)"
+    ],
+    ".group:active .group-active\\:before\\:ease-press::before": [
+      "content: var(--tw-content)",
+      "transition-timing-function: var(--sui-ease-press, cubic-bezier(0.4, 0, 0.2, 1))"
+    ],
+    "@media (prefers-reduced-motion: reduce) | .motion-reduce\\:transform-none": [
+      "transform: none"
+    ],
+    "@media (prefers-reduced-motion: reduce) | .motion-reduce\\:animate-none": [
+      "animation: none"
+    ],
+    "@media (prefers-reduced-motion: reduce) | .motion-reduce\\:transition-none": [
+      "transition-property: none"
+    ],
+    "@media (prefers-reduced-motion: reduce) | .motion-reduce\\:before\\:transition-none::before": [
+      "content: var(--tw-content)",
+      "transition-property: none"
+    ],
+    "@media (prefers-reduced-motion: reduce) | .motion-reduce\\:active\\:scale-100:active": [
+      "--tw-scale-x: 1",
+      "--tw-scale-y: 1",
+      "transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))"
+    ],
+    "@media (prefers-reduced-motion: reduce) | .group:active .motion-reduce\\:group-active\\:scale-100": [
+      "--tw-scale-x: 1",
+      "--tw-scale-y: 1",
+      "transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))"
+    ],
+    "@media (min-width: 640px) | .sm\\:px-7": [
+      "padding-left: 1.75rem",
+      "padding-right: 1.75rem"
+    ]
+  },
+  "specimens": {
+    "action-button.filled": "<button class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.26] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary-strong cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.18] inline-flex items-center justify-center min-h-12 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-6 py-3 relative rounded-full text-[0.95rem] text-sherick-on-primary tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity]\"><span>Save</span></button>",
+    "action-button.filled.danger": "<button class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.26] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-danger cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.18] inline-flex items-center justify-center min-h-12 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-6 py-3 relative rounded-full text-[0.95rem] text-sherick-on-danger tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity]\"><span>Delete</span></button>",
+    "action-button.tonal": "<button class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.15] active:duration-press active:ease-press active:scale-[0.98] active:shadow-sherick-pressed before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-surface-high/[0.56] cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.09] inline-flex items-center justify-center min-h-12 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-6 py-3 relative rounded-full shadow-sherick-raised text-[0.95rem] text-sherick-ink tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity]\"><span>Cancel</span></button>",
+    "action-button.tonal.primary": "<button class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.15] active:duration-press active:ease-press active:scale-[0.98] active:shadow-sherick-pressed before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary/[0.12] cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.09] inline-flex items-center justify-center min-h-12 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-6 py-3 relative rounded-full shadow-sherick-raised text-[0.95rem] text-sherick-primary tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity]\"><span>Continue</span></button>",
+    "action-button.text": "<button class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.09] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.05] inline-flex items-center justify-center min-h-12 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-6 py-3 relative rounded-full text-[0.95rem] text-sherick-ink tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity]\"><span>Skip</span></button>",
+    "action-button.icon": "<button class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.15] active:duration-press active:ease-press active:scale-[0.98] active:shadow-sherick-pressed before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary/[0.12] cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.09] inline-flex items-center justify-center min-h-12 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-6 py-3 relative rounded-full shadow-sherick-raised text-[0.95rem] text-sherick-primary tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity]\"><span class=\"[&amp;&gt;svg]:size-5 inline-flex items-center shrink-0\" aria-hidden=\"true\"><span class=\"flex flex-col items-center justify-center\" role=\"status\" aria-live=\"polite\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"animate-spin lucide lucide-loader-2 lucide-loader-circle motion-reduce:animate-none size-4 text-current\" aria-hidden=\"true\"><path d=\"M21 12a9 9 0 1 1-6.219-8.56\"></path></svg></span></span><span>Sync</span></button>",
+    "action-button.size.sm": "<button class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.15] active:duration-press active:ease-press active:scale-[0.98] active:shadow-sherick-pressed before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary/[0.12] cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.09] inline-flex items-center justify-center min-h-10 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-4 py-2 relative rounded-full shadow-sherick-raised text-sherick-primary text-sm tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity]\"><span>Small</span></button>",
+    "action-button.size.md": "<button class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.15] active:duration-press active:ease-press active:scale-[0.98] active:shadow-sherick-pressed before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary/[0.12] cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.09] inline-flex items-center justify-center min-h-12 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-6 py-3 relative rounded-full shadow-sherick-raised text-[0.95rem] text-sherick-primary tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity]\"><span>Medium</span></button>",
+    "action-button.size.lg": "<button class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.15] active:duration-press active:ease-press active:scale-[0.98] active:shadow-sherick-pressed before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary/[0.12] cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.09] inline-flex items-center justify-center min-h-14 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-8 py-4 relative rounded-full shadow-sherick-raised text-lg text-sherick-primary tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity]\"><span>Large</span></button>",
+    "action-button.disabled": "<button disabled=\"\" class=\"active:duration-press active:ease-press bg-sherick-primary/[0.12] cursor-not-allowed duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 inline-flex items-center justify-center min-h-12 motion-reduce:transform-none motion-reduce:transition-none opacity-45 px-6 py-3 rounded-full text-[0.95rem] text-sherick-primary tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity]\"><span>Disabled</span></button>",
+    "action-button.loading": "<button disabled=\"\" aria-busy=\"true\" class=\"active:duration-press active:ease-press bg-sherick-primary/[0.12] cursor-not-allowed duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 inline-flex items-center justify-center min-h-12 motion-reduce:transform-none motion-reduce:transition-none opacity-45 px-6 py-3 rounded-full text-[0.95rem] text-sherick-primary tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity]\"><span class=\"flex flex-col items-center justify-center\" role=\"status\" aria-live=\"polite\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"animate-spin lucide lucide-loader-2 lucide-loader-circle motion-reduce:animate-none size-4 text-current\" aria-hidden=\"true\"><path d=\"M21 12a9 9 0 1 1-6.219-8.56\"></path></svg></span><span>Saving</span></button>",
+    "alert.primary": "<div role=\"status\" class=\"bg-sherick-primary/[0.12] flex gap-3 items-center px-4 py-3.5 rounded-[1.75rem] text-sherick-ink\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-info shrink-0 size-5 text-sherick-primary\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><path d=\"M12 16v-4\"></path><path d=\"M12 8h.01\"></path></svg><div class=\"flex-1 leading-6 min-w-0 text-sm\">A useful piece of information.</div></div>",
+    "alert.danger.closeable": "<div role=\"alert\" class=\"bg-sherick-danger/[0.09] flex gap-3 items-center px-4 py-3.5 rounded-[1.75rem] text-sherick-ink\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-circle-x lucide-x-circle shrink-0 size-5 text-sherick-danger\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><path d=\"m15 9-6 6\"></path><path d=\"m9 9 6 6\"></path></svg><div class=\"flex-1 leading-6 min-w-0 text-sm\">Something needs your attention.</div><button type=\"button\" aria-label=\"Dismiss alert\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.09] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity cursor-pointer duration-release ease-release focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-focus focus:outline-none hover:before:opacity-[0.05] inline-flex items-center justify-center min-h-11 min-w-11 ml-1 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none relative rounded-full shrink-0 transition-[background-color,color,box-shadow,transform,opacity]\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-x size-4\" aria-hidden=\"true\"><path d=\"M18 6 6 18\"></path><path d=\"m6 6 12 12\"></path></svg></button></div>",
+    "alert.success": "<div role=\"status\" class=\"bg-sherick-success/[0.09] flex gap-3 items-center px-4 py-3.5 rounded-[1.75rem] text-sherick-ink\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-check-circle lucide-circle-check-big shrink-0 size-5 text-sherick-success\" aria-hidden=\"true\"><path d=\"M21.801 10A10 10 0 1 1 17 3.335\"></path><path d=\"m9 11 3 3L22 4\"></path></svg><div class=\"flex-1 leading-6 min-w-0 text-sm\">Changes were saved.</div></div>",
+    "avatar.circle.sm": "<div class=\"bg-sherick-surface-high/[0.72] h-8 overflow-hidden rounded-full text-sherick-ink w-8\"><img src=\"/avatar.png\" alt=\"Example avatar\" width=\"32\" height=\"32\" loading=\"lazy\" class=\"h-full object-cover w-full\"/></div>",
+    "avatar.rounded.md": "<div class=\"bg-sherick-surface-high/[0.72] h-16 overflow-hidden rounded-[1.25rem] text-sherick-ink w-16\"><img src=\"/avatar.png\" alt=\"Example avatar\" width=\"64\" height=\"64\" loading=\"lazy\" class=\"h-full object-cover w-full\"/></div>",
+    "badge.primary": "<span class=\"bg-sherick-primary/[0.12] font-semibold gap-1.5 inline-flex items-center justify-center min-h-7 px-3 py-1 rounded-full text-sherick-primary text-xs\">Primary</span>",
+    "badge.secondary": "<span class=\"bg-sherick-surface/[0.78] font-semibold gap-1.5 inline-flex items-center justify-center min-h-7 px-3 py-1 rounded-full text-sherick-ink text-xs\">Neutral</span>",
+    "badge.success.icon": "<span class=\"bg-sherick-success/[0.09] font-semibold gap-1.5 inline-flex items-center justify-center min-h-7 px-3 py-1 rounded-full text-sherick-success text-xs\"><span class=\"inline-flex items-center\" aria-hidden=\"true\"><span>·</span></span>Ready</span>",
+    "card.secondary": "<div class=\"bg-sherick-surface/[0.78] p-6 rounded-[1.75rem] text-sherick-ink\">Neutral card</div>",
+    "card.primary": "<div class=\"bg-sherick-primary/[0.12] p-6 rounded-[1.75rem] text-sherick-primary\">Tonal card</div>",
+    "code-block.block": "<div class=\"bg-sherick-surface/[0.78] mt-4 overflow-hidden rounded-[1.5rem] shadow-sherick-pressed text-sherick-ink\"><div class=\"flex gap-4 items-center justify-between min-h-11 px-4 py-2\"><span class=\"font-mono text-[11px] text-sherick-ink-muted tracking-[0.08em] uppercase\">tsx</span><button type=\"button\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.09] active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity cursor-pointer duration-press ease-press focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none gap-1.5 hover:before:opacity-[0.05] hover:text-sherick-ink inline-flex items-center motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transition-none px-2.5 py-1.5 relative rounded-[1.25rem] text-sherick-ink-muted text-xs transition-[background-color,color,box-shadow,opacity]\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-copy size-3.5\" aria-hidden=\"true\"><rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg><span>Copy</span></button></div><pre class=\"bg-sherick-canvas/[0.28] border-sherick-edge/[0.075] border-t language-jsx leading-6 overflow-x-auto prism-code px-4 py-4 text-sm\" style=\"color:var(--sui-code-text, #e2e8f0);background-color:transparent\"><code class=\"inline-block min-w-full\"><div class=\"token-line\" style=\"color:var(--sui-code-text, #e2e8f0)\"><span class=\"inline-block mr-4 select-none text-right text-sherick-ink-faint w-4\">1</span><span class=\"plain token\">&lt;ActionButton appearance=&quot;filled&quot;&gt;Save&lt;/ActionButton&gt;</span></div></code></pre></div>",
+    "code-block.inline": "<code class=\"bg-sherick-surface-high/[0.72] font-mono px-1.5 py-0.5 rounded-full text-[0.9em] text-sherick-primary\">ActionButton</code>",
+    "divider.horizontal": "<div aria-hidden=\"true\" class=\"border-sherick-edge/[0.075] border-t h-0 shrink-0 w-full\"></div>",
+    "divider.vertical": "<div aria-hidden=\"true\" class=\"border-l border-sherick-edge/[0.075] h-full shrink-0 w-0\"></div>",
+    "dropdown.trigger": "<div class=\"inline-block min-w-64 relative\"><button id=\"#\" type=\"button\" aria-haspopup=\"listbox\" aria-expanded=\"false\" aria-controls=\"#\" class=\"active:scale-[0.98] bg-sherick-surface-high/[0.66] cursor-pointer duration-press ease-press flex focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:bg-sherick-surface-high/[0.9] focus:outline-none gap-3 hover:bg-sherick-surface-high/[0.82] items-center justify-between min-h-12 min-w-64 motion-reduce:active:scale-100 motion-reduce:transition-none placeholder:text-sherick-ink-muted px-5 py-3 rounded-[1.25rem] text-[0.95rem] text-left text-sherick-ink transition-[background-color,color,box-shadow,opacity] w-full\"><span class=\"truncate\">Design system</span><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"duration-press ease-press lucide lucide-chevron-down motion-reduce:transition-none shrink-0 size-5 text-sherick-ink transition-[background-color,color,box-shadow,opacity]\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"></path></svg></button></div>",
+    "dropdown.disabled": "<div class=\"inline-block min-w-64 relative\"><button id=\"#\" type=\"button\" disabled=\"\" aria-haspopup=\"listbox\" aria-expanded=\"false\" aria-controls=\"#\" class=\"bg-sherick-surface-high/[0.66] cursor-not-allowed duration-press ease-press flex focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none gap-3 items-center justify-between min-h-12 min-w-64 motion-reduce:transition-none opacity-45 placeholder:text-sherick-ink-muted px-5 py-3 rounded-[1.25rem] text-[0.95rem] text-left text-sherick-ink transition-[background-color,color,box-shadow,opacity] w-full\"><span class=\"text-sherick-ink-muted truncate\">Select an option</span><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"duration-press ease-press lucide lucide-chevron-down motion-reduce:transition-none shrink-0 size-5 text-sherick-ink transition-[background-color,color,box-shadow,opacity]\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"></path></svg></button></div>",
+    "icon-button.tonal": "<button aria-label=\"Notifications\" class=\"[&amp;&gt;svg]:size-5 active:before:duration-press active:before:ease-press active:before:opacity-[0.15] active:duration-press active:ease-press active:scale-[0.98] active:shadow-sherick-pressed before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary/[0.12] cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none hover:before:opacity-[0.09] inline-flex items-center justify-center min-h-11 min-w-11 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none p-2.5 relative rounded-full shadow-sherick-raised text-sherick-primary transition-[background-color,color,box-shadow,transform,opacity]\"><span>·</span></button>",
+    "icon-button.ghost": "<button aria-label=\"Search\" class=\"[&amp;&gt;svg]:size-5 active:before:duration-press active:before:ease-press active:before:opacity-[0.09] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-transparent cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none hover:before:opacity-[0.05] inline-flex items-center justify-center min-h-11 min-w-11 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none p-2.5 relative rounded-full text-sherick-ink transition-[background-color,color,box-shadow,transform,opacity]\"><span>·</span></button>",
+    "icon-button.acrylic": "<button aria-label=\"Download\" class=\"[&amp;&gt;svg]:size-5 active:before:duration-press active:before:ease-press active:before:opacity-[0.15] active:duration-press active:ease-press active:scale-[0.98] backdrop-blur-[var(--sui-glass-dense-blur,26px)] backdrop-brightness-[var(--sui-glass-dense-brightness,1.035)] backdrop-saturate-[var(--sui-glass-dense-saturation,1.38)] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-glass-dense cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none hover:before:opacity-[0.09] inline-flex items-center justify-center min-h-11 min-w-11 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none p-2.5 relative rounded-full shadow-sherick-floating text-sherick-ink transition-[background-color,color,box-shadow,transform,opacity]\"><span>·</span></button>",
+    "icon-button.disabled": "<button aria-label=\"Favorite\" disabled=\"\" class=\"[&amp;&gt;svg]:size-5 active:duration-press active:ease-press bg-sherick-primary/[0.12] cursor-not-allowed duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none inline-flex items-center justify-center min-h-11 min-w-11 motion-reduce:transform-none motion-reduce:transition-none opacity-45 p-2.5 rounded-full text-sherick-primary transition-[background-color,color,box-shadow,transform,opacity]\"><span>·</span></button>",
+    "input.default": "<div class=\"flex flex-col\"><label for=\"#\" class=\"font-medium mb-2 text-sherick-ink text-sm\">Project name</label><input id=\"#\" class=\"bg-sherick-surface-high/[0.66] cursor-text duration-press ease-press focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:bg-sherick-surface-high/[0.9] focus:outline-none hover:bg-sherick-surface-high/[0.82] min-h-12 min-w-64 motion-reduce:transition-none placeholder:text-sherick-ink-muted px-5 py-3 rounded-[1.25rem] text-[0.95rem] text-sherick-ink transition-[background-color,color,box-shadow,opacity]\" placeholder=\"Sherick UI\"/></div>",
+    "input.required": "<div class=\"flex flex-col\"><label for=\"#\" class=\"font-medium mb-2 text-sherick-ink text-sm\">Email<span class=\"ml-1 text-sherick-danger\" aria-hidden=\"true\">*</span></label><input id=\"#\" required=\"\" class=\"bg-sherick-surface-high/[0.66] cursor-text duration-press ease-press focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:bg-sherick-surface-high/[0.9] focus:outline-none hover:bg-sherick-surface-high/[0.82] min-h-12 min-w-64 motion-reduce:transition-none placeholder:text-sherick-ink-muted px-5 py-3 rounded-[1.25rem] text-[0.95rem] text-sherick-ink transition-[background-color,color,box-shadow,opacity]\" type=\"email\" name=\"email\"/></div>",
+    "input.error": "<div class=\"flex flex-col\"><label for=\"#\" class=\"font-medium mb-2 text-sherick-ink text-sm\">Invalid</label><input id=\"#\" aria-invalid=\"#\" class=\"bg-sherick-danger/[0.075] cursor-text duration-press ease-press focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:bg-sherick-danger/[0.13] focus:outline-none hover:bg-sherick-danger/[0.10] min-h-12 min-w-64 motion-reduce:transition-none placeholder:text-sherick-danger/[0.72] px-5 py-3 rounded-[1.25rem] text-[0.95rem] text-sherick-ink transition-[background-color,color,box-shadow,opacity]\" placeholder=\"Required value\"/></div>",
+    "input.disabled": "<div class=\"flex flex-col\"><label for=\"#\" class=\"font-medium mb-2 text-sherick-ink text-sm\">Disabled</label><input id=\"#\" disabled=\"\" class=\"bg-sherick-surface-high/[0.66] cursor-not-allowed duration-press ease-press focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none min-h-12 min-w-64 motion-reduce:transition-none opacity-45 placeholder:text-sherick-ink-muted px-5 py-3 rounded-[1.25rem] text-[0.95rem] text-sherick-ink transition-[background-color,color,box-shadow,opacity]\" placeholder=\"Unavailable\"/></div>",
+    "markdown.document": "<h2 class=\"first:mt-0 font-semibold mb-3 mt-7 text-2xl text-sherick-ink tracking-[-0.025em]\" node=\"[object Object]\">Example</h2>\n<p class=\"leading-7 my-3 text-sherick-ink\" node=\"[object Object]\">Body copy with <code class=\"bg-sherick-surface-high/[0.72] font-mono px-1.5 py-0.5 rounded-full text-[0.9em] text-sherick-primary\">inline</code> code.</p>\n<blockquote class=\"bg-sherick-primary/[0.12] border-l-2 border-sherick-primary/[0.45] my-5 px-4 py-2 rounded-[1.25rem] rounded-l-none text-sherick-ink-muted\" node=\"[object Object]\">\n<p class=\"leading-7 my-3 text-sherick-ink\" node=\"[object Object]\">A quote.</p>\n</blockquote>\n<div class=\"bg-sherick-surface/[0.78] mt-4 overflow-hidden rounded-[1.5rem] shadow-sherick-pressed text-sherick-ink\"><div class=\"flex gap-4 items-center justify-between min-h-11 px-4 py-2\"><span class=\"font-mono text-[11px] text-sherick-ink-muted tracking-[0.08em] uppercase\">ts</span><button type=\"button\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.09] active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity cursor-pointer duration-press ease-press focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none gap-1.5 hover:before:opacity-[0.05] hover:text-sherick-ink inline-flex items-center motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transition-none px-2.5 py-1.5 relative rounded-[1.25rem] text-sherick-ink-muted text-xs transition-[background-color,color,box-shadow,opacity]\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-copy size-3.5\" aria-hidden=\"true\"><rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg><span>Copy</span></button></div><pre class=\"bg-sherick-canvas/[0.28] border-sherick-edge/[0.075] border-t language-ts leading-6 overflow-x-auto prism-code px-4 py-4 text-sm\" style=\"color:var(--sui-code-text, #e2e8f0);background-color:transparent\"><code class=\"inline-block min-w-full\"><div class=\"token-line\" style=\"color:var(--sui-code-text, #e2e8f0)\"><span class=\"inline-block mr-4 select-none text-right text-sherick-ink-faint w-4\">1</span><span class=\"plain token\">const a = 1;</span></div></code></pre></div>",
+    "modal.header": "<div class=\"pb-2 pr-20 pt-6 px-6 sm:px-7\"><div id=\"#\" class=\"font-semibold text-sherick-ink text-xl tracking-[-0.02em]\">Modal specimen</div></div>",
+    "modal.content": "<div id=\"#\" class=\"leading-7 px-6 py-3 sm:px-7 text-sherick-ink-muted text-sm\">Focused, translucent and separated from the page beneath it.</div>",
+    "modal.footer": "<div class=\"flex gap-3 items-center justify-end mt-auto pb-6 pt-3 px-6\"><button class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.26] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary-strong cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.18] inline-flex items-center justify-center min-h-12 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-6 py-3 relative rounded-full text-[0.95rem] text-sherick-on-primary tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity]\"><span>Confirm</span></button></div>",
+    "nav-group": "<div class=\"py-2 space-y-1.5\"><h3 class=\"font-semibold pb-1 px-3 text-sherick-ink-muted text-xs\">Components</h3><a href=\"#buttons\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.09] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity duration-release ease-release flex focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none gap-2 hover:before:opacity-[0.05] hover:text-sherick-ink items-center max-w-xs min-h-10 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none overflow-hidden px-3 py-2 relative rounded-[1.25rem] text-ellipsis text-sherick-ink-muted text-sm transition-[background-color,color,box-shadow,transform,opacity] whitespace-nowrap\"><span class=\"truncate\">Buttons</span></a><a href=\"#fields\" aria-current=\"page\" class=\"active:duration-press active:ease-press active:scale-[0.98] bg-sherick-primary/[0.22] duration-release ease-release flex focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 items-center max-w-xs min-h-10 motion-reduce:active:scale-100 motion-reduce:transform-none motion-reduce:transition-none overflow-hidden px-3 py-2 rounded-[1.25rem] text-ellipsis text-sherick-primary text-sm transition-[background-color,color,box-shadow,transform,opacity] whitespace-nowrap\"><span class=\"truncate\">Fields</span></a></div>",
+    "search.default": "<div class=\"bg-sherick-surface-high/[0.66] duration-press ease-press focus-within:bg-sherick-surface-high/[0.9] focus-within:outline focus-within:outline-2 focus-within:outline-offset-[3px] focus-within:outline-sherick-focus hover:bg-sherick-surface-high/[0.82] inline-flex items-center min-h-12 min-w-64 motion-reduce:transition-none placeholder:text-sherick-ink-muted relative rounded-[1.25rem] text-[0.95rem] text-sherick-ink transition-[background-color,color,box-shadow,opacity]\"><input class=\"bg-transparent cursor-text min-h-12 outline-none pl-5 placeholder:text-sherick-ink-muted pr-12 py-3 rounded-[1.25rem] text-[0.95rem] text-inherit w-full\" placeholder=\"Search components\"/><button type=\"button\" aria-label=\"Submit search\" class=\"absolute active:before:duration-press active:before:ease-press active:before:opacity-[0.09] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity cursor-pointer duration-release ease-release focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-focus focus:outline-none hover:before:opacity-[0.05] inline-flex items-center justify-center min-h-11 min-w-11 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none right-1.5 rounded-full text-sherick-ink transition-[background-color,color,box-shadow,transform,opacity]\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-search size-5\" aria-hidden=\"true\"><path d=\"m21 21-4.34-4.34\"></path><circle cx=\"11\" cy=\"11\" r=\"8\"></circle></svg></button></div>",
+    "search.loading": "<div class=\"bg-sherick-surface-high/[0.66] cursor-not-allowed duration-press ease-press focus-within:outline focus-within:outline-2 focus-within:outline-offset-[3px] focus-within:outline-sherick-focus inline-flex items-center min-h-12 min-w-64 motion-reduce:transition-none opacity-45 placeholder:text-sherick-ink-muted relative rounded-[1.25rem] text-[0.95rem] text-sherick-ink transition-[background-color,color,box-shadow,opacity]\"><input disabled=\"\" aria-busy=\"true\" class=\"bg-transparent cursor-not-allowed min-h-12 opacity-45 outline-none pl-5 placeholder:text-sherick-ink-muted pr-12 py-3 rounded-[1.25rem] text-[0.95rem] text-inherit w-full\" placeholder=\"Search...\"/><button type=\"button\" aria-label=\"Submit search\" disabled=\"\" class=\"absolute active:duration-press active:ease-press cursor-not-allowed duration-release ease-release focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-focus focus:outline-none inline-flex items-center justify-center min-h-11 min-w-11 motion-reduce:transform-none motion-reduce:transition-none opacity-45 right-1.5 rounded-full text-sherick-ink transition-[background-color,color,box-shadow,transform,opacity]\"><span class=\"flex flex-col items-center justify-center\" role=\"status\" aria-live=\"polite\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"animate-spin lucide lucide-loader-2 lucide-loader-circle motion-reduce:animate-none size-5 text-current\" aria-hidden=\"true\"><path d=\"M21 12a9 9 0 1 1-6.219-8.56\"></path></svg></span></button></div>",
+    "search.variant.primary": "<div class=\"bg-sherick-surface-high/[0.66] duration-press ease-press focus-within:bg-sherick-surface-high/[0.9] focus-within:outline focus-within:outline-2 focus-within:outline-offset-[3px] focus-within:outline-sherick-focus hover:bg-sherick-surface-high/[0.82] inline-flex items-center min-h-12 min-w-64 motion-reduce:transition-none placeholder:text-sherick-ink-muted relative rounded-[1.25rem] text-[0.95rem] text-sherick-ink transition-[background-color,color,box-shadow,opacity]\"><input class=\"bg-transparent cursor-text min-h-12 outline-none pl-5 placeholder:text-sherick-ink-muted pr-12 py-3 rounded-[1.25rem] text-[0.95rem] text-inherit w-full\" placeholder=\"Search...\"/><button type=\"button\" aria-label=\"Submit search\" class=\"absolute active:before:duration-press active:before:ease-press active:before:opacity-[0.09] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity cursor-pointer duration-release ease-release focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-focus focus:outline-none hover:before:opacity-[0.05] inline-flex items-center justify-center min-h-11 min-w-11 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none right-1.5 rounded-full text-sherick-primary transition-[background-color,color,box-shadow,transform,opacity]\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-search size-5\" aria-hidden=\"true\"><path d=\"m21 21-4.34-4.34\"></path><circle cx=\"11\" cy=\"11\" r=\"8\"></circle></svg></button></div>",
+    "skeleton": "<div class=\"animate-pulse bg-sherick-surface-high/[0.72] h-4 motion-reduce:animate-none rounded-[1.25rem] text-sherick-ink w-3/4\"></div>",
+    "spinner.small": "<span class=\"flex flex-col items-center justify-center\" role=\"status\" aria-live=\"polite\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"animate-spin lucide lucide-loader-2 lucide-loader-circle motion-reduce:animate-none size-4 text-current\" aria-hidden=\"true\"><path d=\"M21 12a9 9 0 1 1-6.219-8.56\"></path></svg></span>",
+    "switch.on": "<button type=\"button\" role=\"switch\" aria-checked=\"true\" class=\"cursor-pointer group inline-flex items-center justify-center min-h-12 min-w-14 outline-none rounded-full\"><span aria-hidden=\"true\" class=\"active:before:duration-press active:before:ease-press active:duration-press active:ease-press before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary-strong block duration-release ease-release group-active:before:duration-press group-active:before:ease-press group-active:before:opacity-[0.26] group-active:scale-[0.98] group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-offset-[3px] group-focus-visible:outline-sherick-focus group-hover:before:opacity-[0.18] h-8 motion-reduce:before:transition-none motion-reduce:group-active:scale-100 motion-reduce:transform-none motion-reduce:transition-none relative rounded-full shadow-sherick-pressed shrink-0 text-sherick-on-primary transition-[background-color,color,box-shadow,transform,opacity] w-[3.25rem]\"><span class=\"-translate-y-1/2 absolute active:duration-press active:ease-press bg-current duration-release ease-release h-6 left-1 motion-reduce:transform-none motion-reduce:transition-none rounded-full shadow-sherick-control text-sherick-on-primary top-1/2 transition-[background-color,color,box-shadow,transform,opacity] translate-x-5 w-6\"></span></span></button>",
+    "switch.off": "<button type=\"button\" role=\"switch\" aria-checked=\"false\" class=\"cursor-pointer group inline-flex items-center justify-center min-h-12 min-w-14 outline-none rounded-full\"><span aria-hidden=\"true\" class=\"active:before:duration-press active:before:ease-press active:duration-press active:ease-press before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-surface-high block duration-release ease-release group-active:before:duration-press group-active:before:ease-press group-active:before:opacity-[0.26] group-active:scale-[0.98] group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-offset-[3px] group-focus-visible:outline-sherick-focus group-hover:before:opacity-[0.18] h-8 motion-reduce:before:transition-none motion-reduce:group-active:scale-100 motion-reduce:transform-none motion-reduce:transition-none relative rounded-full shadow-sherick-pressed shrink-0 text-sherick-ink-muted transition-[background-color,color,box-shadow,transform,opacity] w-[3.25rem]\"><span class=\"-translate-y-1/2 absolute active:duration-press active:ease-press bg-current duration-release ease-release h-5 left-1 motion-reduce:transform-none motion-reduce:transition-none rounded-full shadow-sherick-control text-sherick-ink-muted top-1/2 transition-[background-color,color,box-shadow,transform,opacity] w-5\"></span></span></button>",
+    "switch.disabled": "<button type=\"button\" role=\"switch\" aria-checked=\"true\" disabled=\"\" class=\"cursor-not-allowed group inline-flex items-center justify-center min-h-12 min-w-14 opacity-45 outline-none rounded-full\"><span aria-hidden=\"true\" class=\"active:duration-press active:ease-press bg-sherick-primary-strong block duration-release ease-release group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-offset-[3px] group-focus-visible:outline-sherick-focus h-8 motion-reduce:transform-none motion-reduce:transition-none relative rounded-full shadow-sherick-pressed shrink-0 text-sherick-on-primary transition-[background-color,color,box-shadow,transform,opacity] w-[3.25rem]\"><span class=\"-translate-y-1/2 absolute active:duration-press active:ease-press bg-current duration-release ease-release h-6 left-1 motion-reduce:transform-none motion-reduce:transition-none rounded-full shadow-sherick-control text-sherick-on-primary top-1/2 transition-[background-color,color,box-shadow,transform,opacity] translate-x-5 w-6\"></span></span></button>",
+    "tab-group": "<div class=\"w-full\"><div role=\"tablist\" aria-label=\"Tabs\" class=\"bg-sherick-surface/[0.72] flex min-w-max p-1.5 relative rounded-full shadow-sherick-pressed\"><div aria-hidden=\"true\" class=\"absolute active:duration-press active:ease-press bg-sherick-primary/[0.22] duration-release ease-release inset-y-1.5 left-1.5 motion-reduce:transform-none motion-reduce:transition-none rounded-full shadow-sherick-control text-sherick-ink transition-[background-color,color,box-shadow,transform,opacity]\" style=\"width:calc(50% - 6px);transform:translateX(0%)\"></div><button type=\"button\" role=\"tab\" id=\"#\" aria-selected=\"true\" aria-controls=\"#\" tabindex=\"0\" class=\"active:duration-press active:ease-press active:scale-[0.98] duration-release ease-release flex-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium min-h-12 min-w-28 motion-reduce:active:scale-100 motion-reduce:transform-none motion-reduce:transition-none px-7 py-3 relative rounded-full text-sherick-ink text-sm transition-[background-color,color,box-shadow,transform,opacity] whitespace-nowrap z-10\">Overview</button><button type=\"button\" role=\"tab\" id=\"#\" aria-selected=\"false\" aria-controls=\"#\" tabindex=\"-1\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.09] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity duration-release ease-release flex-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium hover:before:opacity-[0.05] hover:text-sherick-ink min-h-12 min-w-28 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-7 py-3 relative rounded-full text-sherick-ink-muted text-sm transition-[background-color,color,box-shadow,transform,opacity] whitespace-nowrap z-10\">Motion</button></div><div role=\"tabpanel\" id=\"#\" aria-labelledby=\"#\" class=\"mt-5\">Overview</div></div>",
+    "table": "<div class=\"bg-sherick-surface/[0.42] overflow-auto rounded-[1.25rem] text-sherick-ink w-full\"><table class=\"border-collapse w-full\"><thead><tr class=\"border-b border-sherick-edge/[0.10]\"><th class=\"font-medium px-4 py-3 text-left text-sherick-ink-muted text-sm\">Component</th><th class=\"font-medium px-4 py-3 text-left text-sherick-ink-muted text-sm\">Role</th></tr></thead><tbody><tr class=\"border-b border-sherick-edge/[0.06] duration-press ease-press hover:bg-sherick-ink/[0.05] last:border-b-0 motion-reduce:transition-none transition-[background-color,color,box-shadow,opacity]\"><td class=\"px-4 py-3 text-sherick-ink text-sm\">Dropdown</td><td class=\"px-4 py-3 text-sherick-ink text-sm\">Selection</td></tr><tr class=\"border-b border-sherick-edge/[0.06] duration-press ease-press hover:bg-sherick-ink/[0.05] last:border-b-0 motion-reduce:transition-none transition-[background-color,color,box-shadow,opacity]\"><td class=\"px-4 py-3 text-sherick-ink text-sm\">Table</td><td class=\"px-4 py-3 text-sherick-ink text-sm\">Data</td></tr></tbody></table></div>",
+    "textarea.default": "<div class=\"flex flex-col w-full\"><label for=\"#\" class=\"font-medium mb-2 text-sherick-ink text-sm\">Notes</label><textarea id=\"#\" class=\"bg-sherick-surface-high/[0.66] cursor-text duration-press ease-press focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:bg-sherick-surface-high/[0.9] focus:outline-none hover:bg-sherick-surface-high/[0.82] min-h-28 min-w-64 motion-reduce:transition-none placeholder:text-sherick-ink-muted px-5 py-4 resize-y rounded-[1.25rem] text-[0.95rem] text-sherick-ink transition-[background-color,color,box-shadow,opacity] w-full\" placeholder=\"Describe what you want to build…\"></textarea></div>",
+    "textarea.error": "<div class=\"flex flex-col w-full\"><label for=\"#\" class=\"font-medium mb-2 text-sherick-ink text-sm\">Invalid notes</label><textarea id=\"#\" aria-invalid=\"#\" class=\"bg-sherick-danger/[0.075] cursor-text duration-press ease-press focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:bg-sherick-danger/[0.13] focus:outline-none hover:bg-sherick-danger/[0.10] min-h-28 min-w-64 motion-reduce:transition-none placeholder:text-sherick-danger/[0.72] px-5 py-4 resize-y rounded-[1.25rem] text-[0.95rem] text-sherick-ink transition-[background-color,color,box-shadow,opacity] w-full\"></textarea></div>",
+    "tooltip.trigger": "<span class=\"inline-block relative\"><button class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.15] active:duration-press active:ease-press active:scale-[0.98] active:shadow-sherick-pressed before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary/[0.12] cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.09] inline-flex items-center justify-center min-h-12 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-6 py-3 relative rounded-full shadow-sherick-raised text-[0.95rem] text-sherick-primary tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity]\"><span>Hover</span></button></span>"
+  }
+}

@@ -13,6 +13,7 @@ import { Check, ChevronDown } from "lucide-react";
 import { cn } from "@/libs/utils";
 import {
   density,
+  elevation,
   focusRing,
   material,
   motion,
@@ -60,7 +61,7 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
     const triggerRef = useRef<HTMLButtonElement | null>(null);
     const optionRefs = useRef<Array<HTMLDivElement | null>>([]);
     const [isOpen, setIsOpen] = useState(false);
-    const { mounted, closing } = useOverlayPresence(isOpen);
+    const { mounted, closing, onExitEnd } = useOverlayPresence(isOpen);
     const selectedIndex = options.findIndex((option) => option.value === selected);
     const [activeIndex, setActiveIndex] = useState(selectedIndex >= 0 ? selectedIndex : 0);
     const selectedOption = selectedIndex >= 0 ? options[selectedIndex] : undefined;
@@ -163,9 +164,8 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
           }}
           onKeyDown={handleTriggerKeyDown}
           className={cn(
-            "flex w-full items-center justify-between gap-3 text-left",
-            "min-w-64",
             density.normal,
+            "flex w-full min-w-64 items-center justify-between gap-3 px-5 py-3 text-left",
             shape.control,
             material.control,
             motion.press,
@@ -184,7 +184,7 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
           </span>
           <ChevronDown
             aria-hidden="true"
-            className={cn("size-5 shrink-0", text.high, motion.release, isOpen && "rotate-180")}
+            className={cn("size-5 shrink-0", text.high, motion.press, isOpen && "rotate-180")}
           />
         </button>
 
@@ -194,13 +194,16 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
             role="listbox"
             aria-labelledby={triggerId}
             aria-hidden={closing || undefined}
+            onAnimationEnd={onExitEnd}
             className={cn(
               /* A hairline gap keeps the rounded option fills from touching, so hover and
                  selection read as separate rows instead of one merged highlight. */
               "absolute z-30 mt-2 w-full min-w-max space-y-1 p-2",
+              "[--sui-overlay-from-scale:0.985] [--sui-overlay-from-lift:-4px]",
+              "origin-top",
               shape.surface,
               material.acrylic,
-              "origin-top",
+              elevation.floating,
               closing ? cn(motion.overlayOut, "pointer-events-none") : motion.overlayIn
             )}
           >
@@ -227,16 +230,13 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
                     motion.press,
                     text.high,
                     isSelected
-                      ? cn(tone.selected[variant], state.selected)
+                      ? tone.selected[variant]
                       : cn(stateLayer.quiet, stateLayer.activeRow)
                   )}
                 >
                   <span className={cn(isSelected && "font-medium")}>{option.label}</span>
                   {isSelected && (
-                    <Check
-                      aria-hidden="true"
-                      className={cn("size-4", tone.text[variant])}
-                    />
+                    <Check aria-hidden="true" className={cn("size-4", tone.text[variant])} />
                   )}
                 </div>
               );

@@ -49,12 +49,15 @@ module.exports = {
          shadow is defined. Shadow is a function of how far a surface sits above the
          ground, never per-component decoration:
            flat      matte surfaces that separate by tone alone
-           raised    raised matte surfaces and tactile tonal controls
+           raised    a manipulated control, lifted a hair above its own track
            floating  acrylic surfaces above the application
-           control   matte interactive controls at rest, a hair above their track
-           pressed   those controls pressed or selected, recessed into the track */
+           control   the resting half of the tactile pair, for a part the user moves
+           pressed   the recessed half: physically pressed, or a track/groove
+         `sherick-grounded`, `sherick-focus` and `sherick-primary` are retained from
+         1.0.x so an existing consumer's markup keeps its styling. */
       boxShadow: {
         "sherick-flat": "var(--sui-elevation-flat, none)",
+        "sherick-grounded": "var(--sui-elevation-grounded, var(--sui-elevation-flat, none))",
         "sherick-raised":
           "var(--sui-elevation-raised, 0 1px 2px rgba(0, 0, 0, 0.26), 0 4px 12px rgba(0, 0, 0, 0.15))",
         "sherick-floating":
@@ -63,6 +66,10 @@ module.exports = {
           "var(--sui-elevation-control, 0 1px 2px rgba(0, 0, 0, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.08))",
         "sherick-pressed":
           "var(--sui-elevation-pressed, inset 0 1px 3px rgba(0, 0, 0, 0.38), inset 0 -1px 0 rgba(255, 255, 255, 0.06))",
+        "sherick-focus":
+          "var(--sui-shadow-focus, 0 10px 28px -22px rgba(90, 145, 255, 0.42))",
+        "sherick-primary":
+          "var(--sui-shadow-primary, 0 12px 30px -22px rgba(82, 139, 255, 0.34))",
       },
       /* Motion families. Durations and easings are tokens, so retiming the library is
          a token edit: `press` is the fast response to a press or a tonality change,
@@ -94,13 +101,26 @@ module.exports = {
           "sherick-scrim-out var(--sui-duration-overlay-exit, 160ms) var(--sui-ease-exit, cubic-bezier(0.4, 0, 1, 1)) both",
       },
       keyframes: {
+        /* Entrance and exit geometry is contextual: an overlay sets
+           `--sui-overlay-from-scale` and `--sui-overlay-from-lift` where it starts
+           from, so a menu can grow from its trigger, a tooltip can lean out of the
+           edge it is anchored to and a dialog can rise into place, while all of them
+           keep one duration, one easing and one exit. */
         "sherick-overlay-in": {
-          from: { opacity: "0", scale: "0.98" },
-          to: { opacity: "1", scale: "1" },
+          from: {
+            opacity: "0",
+            scale: "var(--sui-overlay-from-scale, 0.98)",
+            translate: "0 var(--sui-overlay-from-lift, 0px)",
+          },
+          to: { opacity: "1", scale: "1", translate: "0 0" },
         },
         "sherick-overlay-out": {
-          from: { opacity: "1", scale: "1" },
-          to: { opacity: "0", scale: "0.98" },
+          from: { opacity: "1", scale: "1", translate: "0 0" },
+          to: {
+            opacity: "0",
+            scale: "var(--sui-overlay-from-scale, 0.98)",
+            translate: "0 var(--sui-overlay-from-lift, 0px)",
+          },
         },
         "sherick-scrim-in": {
           from: { opacity: "0" },

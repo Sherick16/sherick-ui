@@ -4,7 +4,6 @@ import React, { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "re
 import { cn } from "@/libs/utils";
 import {
   density,
-  edge,
   elevation,
   focusRing,
   motion,
@@ -28,12 +27,12 @@ export interface ActionButtonProps extends ButtonHTMLAttributes<HTMLButtonElemen
   loading?: boolean;
 }
 
-/* Size is density: the same three control steps every other control in the library
-   uses, so a button and a field of the same density line up. */
+/* Density owns height and type; the button's anatomy owns its padding, because a
+   button is gripped at its ends and a field is not. */
 const sizeMap: Record<ButtonSize, string> = {
-  sm: density.compact,
-  md: density.normal,
-  lg: density.prominent,
+  sm: `${density.compact} px-4 py-2`,
+  md: `${density.normal} px-6 py-3`,
+  lg: `${density.prominent} px-8 py-4`,
 };
 
 const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
@@ -49,10 +48,10 @@ const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
     ...props
   }, ref) => {
     const isDisabled = disabled || loading;
-    /* A tonal button is a raised matte control: it carries the tactile pair, and it
-       presses into its own track while held. Filled buttons stay flat — their fill
-       already marks them as priority, and a second depth cue would fight it. */
-    const isRaised = appearance === "tonal" && !isDisabled;
+    /* A tonal button is matte and tactile: it rests a hair above its own track and
+       presses back into it. No rim — a filled control is separated by tone and by
+       that lift, and an outline would only draw a border around it. */
+    const isTactile = appearance === "tonal" && !isDisabled;
 
     return (
       <button
@@ -73,9 +72,8 @@ const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
           appearance === "tonal" && !isDisabled && stateLayer.tonal,
           appearance === "text" && tone.text[variant],
           appearance === "text" && !isDisabled && stateLayer.quiet,
-          isRaised && edge.faint,
-          isRaised && elevation.raised,
-          isRaised && state.recess,
+          isTactile && elevation.raised,
+          isTactile && state.recess,
           !isDisabled && state.press,
           isDisabled ? state.disabled : state.enabled,
           className

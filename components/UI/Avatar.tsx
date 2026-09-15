@@ -1,6 +1,6 @@
 import React, { type ImgHTMLAttributes } from "react";
 import { cn } from "@/libs/utils";
-import { edge, material, shape } from "./ui.common";
+import { material, shape } from "./ui.common";
 
 const sizeMap: Record<"sm" | "md" | "lg", { element: number; styles: string }> = {
   sm: { element: 32, styles: "h-8 w-8" },
@@ -16,6 +16,8 @@ export interface AvatarProps
   shape?: "circle" | "rounded";
 }
 
+/* A passive identity surface: a matte fill behind the image while it loads, no rim and
+   no depth. */
 const Avatar = ({
   src,
   alt,
@@ -32,7 +34,6 @@ const Avatar = ({
         "overflow-hidden",
         dimensions.styles,
         material.matteHigh,
-        edge.faint,
         shapeRole === "circle" ? shape.circle : shape.control,
         className
       )}

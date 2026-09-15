@@ -4,7 +4,6 @@ import React, { type ButtonHTMLAttributes } from "react";
 import { cn } from "@/libs/utils";
 import {
   elevation,
-  material,
   motion,
   shape,
   state,
@@ -54,7 +53,7 @@ export const Switch = ({
           elevation.pressed,
           motion.release,
           "group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-sherick-focus group-focus-visible:outline-offset-[3px]",
-          checked ? tone.strong[variant] : cn(material.matteHigh, text.medium),
+          checked ? tone.strong[variant] : cn(tone.strong.secondary, text.medium),
           !disabled && stateLayer.track,
           !disabled && state.groupPress
         )}

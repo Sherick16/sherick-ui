@@ -19,6 +19,9 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   onChange?: (value: string) => void;
 }
 
+/* A field is flat matte and borderless: it rests on its surface-high fill and steps
+   that fill up on hover and focus. No ring, no lift — a border that appears on focus
+   is still a border, and the keyboard ring belongs outside the shape. */
 const Input = forwardRef<HTMLInputElement, InputProps>(
   ({
     label,
@@ -49,17 +52,17 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           disabled={disabled}
           aria-invalid={error || undefined}
           className={cn(
-            "min-w-64",
             density.normal,
+            /* Density owns the type step and the control floor; the anatomy sets the
+               padding a field holds its text in. */
+            "min-w-64 px-5 py-3",
             shape.control,
             motion.press,
             focusRing,
             error ? material.controlError : material.control,
-            /* A disabled field keeps its resting surface: no hover step, no depth
-               change, just the disabled state. */
             !disabled && (error ? state.field.errorHover : state.field.hover),
             !disabled && (error ? state.field.errorFocus : state.field.focus),
-            disabled ? state.disabled : state.enabled,
+            disabled ? state.disabled : state.text,
             inputClassName
           )}
           onChange={(event) => onChange?.(event.target.value)}
