@@ -2,7 +2,7 @@
 
 Sherick UI is a small React component library inspired by Material 3 Expressive: soft tonal surfaces, deliberate shape contrast, strong hierarchy and restrained motion without cloning Google's component system. The published component package is framework-agnostic and supports React 18/19.
 
-The guiding rule is **quiet by default, expressive where it matters**. Dense information and ordinary form controls stay predictable; primary actions, selected states and overlays carry more visual emphasis.
+The guiding rule is **quiet by default, expressive where it matters**. Sherick UI keeps ordinary information and form controls matte and predictable, then introduces richer color, motion and frosted depth when UI floats, activates or deserves emphasis.
 
 ## Installation
 
@@ -42,7 +42,7 @@ export function Example() {
 }
 ```
 
-`ActionButton` supports `filled`, `tonal` and `text` appearances plus `sm`, `md` and `lg` sizes. Semantic variants remain available for meaningful states such as danger or success rather than requiring every component to be chromatically loud.
+`ActionButton` supports `filled`, `tonal` and `text` appearances plus `sm`, `md` and `lg` sizes. `IconButton` supports `tonal`, `ghost` and `acrylic` appearances. Semantic variants remain available for meaningful states such as danger or success rather than requiring every component to be chromatically loud.
 
 Components expose their relevant native HTML props and refs where appropriate. Loading buttons are disabled automatically, form labels are associated with their controls, and interactive primitives include keyboard/ARIA behavior and a consistent visible focus language.
 
@@ -68,11 +68,15 @@ Public prop types and the shared `Variant` type are exported from the package ro
 
 ## Visual principles
 
-- form controls share one neutral, borderless field language
+- ordinary controls and dense information use matte tonal surfaces
+- genuinely floating UI may use dark acrylic: translucency, blur, saturation, an almost invisible edge light and soft elevation
+- frosted material is reserved for overlays such as menus, tooltips and modals rather than normal cards
 - shape variation has a role: controls, pills, surfaces, hero overlays and circles
 - semantic color communicates hierarchy or state instead of flooding every surface
+- fields become subtly more luminous on focus rather than relying on borders
+- button-like controls use restrained compression and expressive release motion
 - passive surfaces do not react to hover unless they are actually interactive
-- short state motion is restrained; overlays and selection changes may be more expressive
+- dense desktop UI remains compact; expressive does not mean oversized everywhere
 - `prefers-reduced-motion` is respected
 - the package remains font-agnostic
 
