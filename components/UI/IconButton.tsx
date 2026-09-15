@@ -1,41 +1,40 @@
-import React, { ReactNode } from "react";
+"use client";
+
+import React, { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import { styleMap } from "./ui.common";
 import { Variant } from "./ui.types";
 import { Spinner } from "./Spinner";
 
-const IconButton = ({
-  variant = "primary",
-  icon,
-  className,
-  loading = false,
-  onClick,
-  ...props
-}: {
+export interface IconButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
   icon?: ReactNode;
-  className?: string;
   loading?: boolean;
-  onClick?: () => void;
-}) => {
-  return (
-    <button
-      {...props}
-      className={cn(
-        "p-2 rounded-2xl bg-opacity-0 hover:bg-opacity-40 transition-all flex items-center justify-center",
-        styleMap?.[variant] || styleMap["primary"],
-        loading ? "cursor-not-allowed opacity-60" : "cursor-pointer",
-        className
-      )}
-      onClick={onClick}
-    >
-      {icon && !loading ? (
-        <span className="inline-block align-middle">{icon}</span>
-      ) : loading ? (
-        <Spinner className="mr-2" size="small" />
-      ) : null}
-    </button>
-  );
-};
+}
+
+const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
+  ({ variant = "primary", icon, className, loading = false, disabled, ...props }, ref) => {
+    const isDisabled = disabled || loading;
+
+    return (
+      <button
+        ref={ref}
+        {...props}
+        disabled={isDisabled}
+        aria-busy={loading || undefined}
+        className={cn(
+          "p-2 rounded-2xl bg-opacity-0 hover:bg-opacity-40 transition-all flex items-center justify-center",
+          styleMap[variant] || styleMap.primary,
+          isDisabled ? "cursor-not-allowed opacity-60" : "cursor-pointer",
+          className
+        )}
+      >
+        {loading ? <Spinner size="small" /> : icon ?? null}
+      </button>
+    );
+  }
+);
+
+IconButton.displayName = "IconButton";
 
 export default IconButton;
