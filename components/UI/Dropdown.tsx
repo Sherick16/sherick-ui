@@ -218,9 +218,9 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
                     shape.control,
                     motionState,
                     isSelected && toneSelectedMap[variant],
-                    !isSelected && isActive && "bg-white/[0.07]",
-                    !isSelected && "hover:bg-white/[0.05]",
-                    "focus-visible:bg-white/[0.08] active:bg-white/[0.1]"
+                    !isSelected && isActive && "bg-sherick-ink/[0.07]",
+                    !isSelected && "hover:bg-sherick-ink/[0.05]",
+                    "focus-visible:bg-sherick-ink/[0.08] active:bg-sherick-ink/[0.1]"
                   )}
                 >
                   <span className={cn(isSelected && "font-medium")}>{option.label}</span>
