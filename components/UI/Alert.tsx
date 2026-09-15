@@ -34,23 +34,22 @@ export const Alert = ({
     <div
       role={variant === "danger" || variant === "warning" ? "alert" : "status"}
       className={cn(
-        "flex items-start justify-between gap-4 p-4",
+        "flex items-center gap-3 px-4 py-3.5",
         shape.surface,
         toneSoftMap[variant],
         className
       )}
     >
-      <div className="flex min-w-0 items-start gap-3">
-        <Icon aria-hidden="true" className={cn("mt-0.5 h-5 w-5 shrink-0", toneTextMap[variant])} />
-        <div className="min-w-0 text-sm leading-6">{children}</div>
-      </div>
+      <Icon aria-hidden="true" className={cn("h-5 w-5 shrink-0", toneTextMap[variant])} />
+      <div className="min-w-0 flex-1 text-sm leading-6">{children}</div>
       {closeable && (
         <button
           type="button"
           aria-label="Dismiss alert"
           onClick={() => setIsVisible(false)}
           className={cn(
-            "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full hover:bg-black/10 active:bg-black/[0.15]",
+            "ml-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-current",
+            "hover:bg-white/[0.08] active:bg-white/[0.13]",
             motionState,
             focusRingInset
           )}
