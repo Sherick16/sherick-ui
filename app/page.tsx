@@ -7,7 +7,6 @@ import {
   Download,
   Heart,
   Layers3,
-  Plus,
   Search as SearchIcon,
   Settings2,
   Trash2,
@@ -58,7 +57,7 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-sherick-canvas text-sherick-ink">
-      <header className="sticky top-0 z-40 border-b border-white/[0.05] bg-sherick-canvas/[0.86] backdrop-blur-xl">
+      <header className="sticky top-0 z-40 border-b border-white/[0.045] bg-sherick-canvas/[0.88] backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1480px] items-center justify-between gap-4 px-5 py-4 sm:px-8 lg:px-10">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-[1rem] bg-sherick-primary-strong text-sherick-on-primary">
@@ -66,11 +65,11 @@ export default function Home() {
             </div>
             <div>
               <div className="font-semibold tracking-[-0.015em]">Sherick UI</div>
-              <div className="text-xs text-sherick-ink-muted">Component showcase · development</div>
+              <div className="text-xs text-sherick-ink-muted">Design system workbench</div>
             </div>
           </div>
           <div className="hidden items-center gap-2 sm:flex">
-            <Badge variant="primary">Material 3 Expressive inspired</Badge>
+            <Badge variant="primary">Development</Badge>
             <Tooltip content="Component settings">
               <IconButton appearance="acrylic" variant="secondary" icon={<Settings2 />} aria-label="Component settings" />
             </Tooltip>
@@ -85,11 +84,7 @@ export default function Home() {
               <div className="text-xs font-semibold uppercase tracking-[0.12em] text-sherick-ink-muted">Library</div>
               <nav className="mt-3 space-y-1">
                 {nav.map(([label, href]) => (
-                  <a
-                    key={href}
-                    href={href}
-                    className="block rounded-xl px-3 py-2 text-sm text-sherick-ink-muted transition-colors hover:bg-white/[0.045] hover:text-sherick-ink"
-                  >
+                  <a key={href} href={href} className="block rounded-xl px-3 py-2 text-sm text-sherick-ink-muted transition-colors hover:bg-white/[0.045] hover:text-sherick-ink">
                     {label}
                   </a>
                 ))}
@@ -105,10 +100,7 @@ export default function Home() {
 
         <div className="min-w-0 space-y-16">
           <section id="foundations" className="scroll-mt-28">
-            <SectionHeading
-              title="Foundations"
-              description="Core palette, shape and material language used by the components below."
-            />
+            <SectionHeading title="Foundations" description="Core palette, shape and material language used by every component." />
             <div className="mt-6 grid gap-4 xl:grid-cols-3">
               <Specimen title="Color roles" description="Primary, semantic and neutral roles—not raw component colors.">
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -121,12 +113,16 @@ export default function Home() {
                 </div>
               </Specimen>
 
-              <Specimen title="Surface hierarchy" description="Ordinary UI stays matte; overlays can become frosted.">
+              <Specimen title="Surface hierarchy" description="Grounded UI stays matte; floating UI can become frosted.">
                 <div className="space-y-3">
                   <div className="rounded-[1.25rem] bg-sherick-surface p-4 text-sm">Matte surface</div>
-                  <div className="rounded-[1.5rem] bg-sherick-surface-high p-4 text-sm">Elevated tonal surface</div>
-                  <div className="rounded-[1.5rem] bg-sherick-surface-float/[0.78] p-4 text-sm shadow-sherick-float ring-1 ring-inset ring-white/[0.05] backdrop-blur-2xl">
-                    Floating acrylic
+                  <div className="rounded-[1.5rem] bg-sherick-surface-high p-4 text-sm shadow-sherick-soft">Elevated tonal surface</div>
+                  <div className="relative overflow-hidden rounded-[1.5rem] bg-sherick-canvas p-4">
+                    <div className="absolute -left-4 top-2 h-16 w-24 rounded-full bg-sherick-primary/[0.28] blur-2xl" />
+                    <div className="absolute right-3 top-5 text-[10px] text-sherick-ink-muted">content behind</div>
+                    <div className="relative rounded-[1.25rem] bg-sherick-surface-float/[0.72] p-4 text-sm shadow-sherick-float ring-1 ring-inset ring-white/[0.055] backdrop-blur-2xl backdrop-saturate-150">
+                      Floating acrylic
+                    </div>
                   </div>
                 </div>
               </Specimen>
@@ -136,14 +132,14 @@ export default function Home() {
                   <div className="rounded-[1.25rem] bg-sherick-surface-high p-5">Control</div>
                   <div className="rounded-full bg-sherick-primary/[0.16] p-5 text-sherick-primary">Pill</div>
                   <div className="rounded-[1.75rem] bg-sherick-surface p-5">Surface</div>
-                  <div className="rounded-[2.5rem] bg-sherick-surface-high p-5">Hero</div>
+                  <div className="rounded-[3rem] bg-sherick-surface-high p-5">Hero</div>
                 </div>
               </Specimen>
             </div>
           </section>
 
           <section id="buttons" className="scroll-mt-28">
-            <SectionHeading title="Buttons" description="Emphasis, size and semantic states without decorative glow." />
+            <SectionHeading title="Buttons" description="Appearance, size and state are separate parts of the API." />
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
               <Specimen title="Appearances" description="Filled for priority, tonal for normal actions, text for quiet actions.">
                 <div className="flex flex-wrap items-center gap-3">
@@ -154,11 +150,18 @@ export default function Home() {
                 </div>
               </Specimen>
 
-              <Specimen title="States" description="Loading and disabled suppress press/hover behavior.">
+              <Specimen title="States" description="Loading and disabled suppress press and hover behavior.">
                 <div className="flex flex-wrap items-center gap-3">
                   <ActionButton loading>Saving</ActionButton>
                   <ActionButton disabled>Disabled</ActionButton>
+                  <ActionButton className="ring-2 ring-sherick-primary ring-offset-2 ring-offset-sherick-canvas">Focus-visible</ActionButton>
+                </div>
+              </Specimen>
+
+              <Specimen title="Sizes" description="Scale changes hierarchy without changing the interaction language.">
+                <div className="flex flex-wrap items-center gap-3">
                   <ActionButton appearance="filled" size="sm">Small</ActionButton>
+                  <ActionButton appearance="filled" size="md">Medium</ActionButton>
                   <ActionButton appearance="filled" size="lg">Large</ActionButton>
                 </div>
               </Specimen>
@@ -177,10 +180,11 @@ export default function Home() {
           <section id="fields" className="scroll-mt-28">
             <SectionHeading title="Fields" description="One borderless field language across text input, textarea, search and select." />
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
-              <Specimen title="Text input" description="Default, invalid and disabled states.">
+              <Specimen title="Text input" description="Default, error, focus-visible and disabled states.">
                 <div className="space-y-4">
                   <Input label="Project name" placeholder="Sherick UI" />
                   <Input label="Invalid" placeholder="Required value" error />
+                  <Input label="Focus-visible" placeholder="Keyboard focus" inputClassName="ring-2 ring-sherick-primary ring-offset-2 ring-offset-sherick-canvas bg-sherick-surface-high" />
                   <Input label="Disabled" placeholder="Unavailable" disabled />
                 </div>
               </Specimen>
@@ -201,13 +205,7 @@ export default function Home() {
 
               <Specimen title="Dropdown" description="Matte trigger, frosted floating listbox, clear selection.">
                 <div className="space-y-4">
-                  <Dropdown
-                    options={selectOptions}
-                    selected={selection}
-                    onSelect={setSelection}
-                    aria-label="Project type"
-                    className="w-full"
-                  />
+                  <Dropdown options={selectOptions} selected={selection} onSelect={setSelection} aria-label="Project type" className="w-full" />
                   <Dropdown options={selectOptions} disabled aria-label="Disabled project type" className="w-full" />
                 </div>
               </Specimen>
@@ -217,7 +215,7 @@ export default function Home() {
           <section id="selection" className="scroll-mt-28">
             <SectionHeading title="Selection & navigation" description="Persistent state can carry stronger shape and tone than surrounding UI." />
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
-              <Specimen title="Switch" description="44–48px hit target, compact 52×32 visual track.">
+              <Specimen title="Switch" description="Large hit target, compact 52×32 visual track.">
                 <div className="flex flex-wrap items-center gap-6">
                   <StateLabel label="On"><Switch checked={switchOn} onChange={setSwitchOn} /></StateLabel>
                   <StateLabel label="Off"><Switch checked={false} onChange={() => undefined} /></StateLabel>
@@ -226,25 +224,20 @@ export default function Home() {
               </Specimen>
 
               <Specimen title="Tabs" description="Matte track with a softly elevated sliding selection.">
-                <TabGroup
-                  tabs={[
-                    { id: "one", label: "Overview", content: <p className="text-sm text-sherick-ink-muted">Overview content</p> },
-                    { id: "two", label: "Motion", content: <p className="text-sm text-sherick-ink-muted">Motion content</p> },
-                    { id: "three", label: "Density", content: <p className="text-sm text-sherick-ink-muted">Density content</p> },
-                  ]}
-                />
+                <TabGroup tabs={[
+                  { id: "one", label: "Overview", content: <p className="text-sm text-sherick-ink-muted">Overview content</p> },
+                  { id: "two", label: "Motion", content: <p className="text-sm text-sherick-ink-muted">Motion content</p> },
+                  { id: "three", label: "Density", content: <p className="text-sm text-sherick-ink-muted">Density content</p> },
+                ]} />
               </Specimen>
 
-              <Specimen title="Navigation groups" description="Compact navigation stays quiet until hovered or focused.">
-                <div className="max-w-sm rounded-[1.5rem] bg-sherick-surface/[0.68] p-3">
-                  <NavGroup
-                    title="Components"
-                    items={[
-                      { label: "Buttons", href: "#buttons" },
-                      { label: "Fields", href: "#fields" },
-                      { label: "Feedback", href: "#feedback" },
-                    ]}
-                  />
+              <Specimen title="Navigation groups" description="Current navigation gets a persistent tonal selection.">
+                <div className="max-w-xs rounded-[1.25rem] bg-sherick-surface/[0.45] p-2">
+                  <NavGroup title="Components" activeHref="#fields" items={[
+                    { label: "Buttons", href: "#buttons" },
+                    { label: "Fields", href: "#fields" },
+                    { label: "Feedback", href: "#feedback" },
+                  ]} />
                 </div>
               </Specimen>
             </div>
@@ -264,16 +257,8 @@ export default function Home() {
 
               <Specimen title="Loading & skeleton" description="Loading inherits foreground; skeletons remain neutral.">
                 <div className="space-y-7">
-                  <div className="flex items-center gap-4 text-sherick-ink-muted">
-                    <Spinner size="small" />
-                    <Spinner size="medium" />
-                    <Spinner size="large" />
-                  </div>
-                  <div className="space-y-3">
-                    <Skeleton className="h-4 w-3/4" />
-                    <Skeleton className="h-4 w-1/2" />
-                    <Skeleton className="h-20 w-full" />
-                  </div>
+                  <div className="flex items-center gap-4 text-sherick-ink-muted"><Spinner size="small" /><Spinner size="medium" /><Spinner size="large" /></div>
+                  <div className="space-y-3"><Skeleton className="h-4 w-3/4" /><Skeleton className="h-4 w-1/2" /><Skeleton className="h-20 w-full" /></div>
                 </div>
               </Specimen>
             </div>
@@ -284,67 +269,49 @@ export default function Home() {
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
               <Specimen title="Cards & badges" description="Passive content surfaces and compact semantic labels.">
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <Card variant="secondary">
-                    <div className="font-medium">Neutral card</div>
-                    <p className="mt-2 text-sm leading-6 text-sherick-ink-muted">Normal information stays matte and grounded.</p>
-                  </Card>
-                  <Card variant="primary">
-                    <div className="font-medium">Tonal card</div>
-                    <p className="mt-2 text-sm leading-6 text-sherick-ink-muted">Use stronger tone only when it adds meaning.</p>
-                  </Card>
+                  <Card variant="secondary"><div className="font-medium">Neutral card</div><p className="mt-2 text-sm leading-6 text-sherick-ink-muted">Normal information stays matte and grounded.</p></Card>
+                  <Card variant="primary"><div className="font-medium">Tonal card</div><p className="mt-2 text-sm leading-6 text-sherick-ink-muted">Use stronger tone only when it adds meaning.</p></Card>
                 </div>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  <Badge variant="primary">Primary</Badge>
-                  <Badge variant="success" icon={<Check className="h-3.5 w-3.5" />}>Ready</Badge>
-                  <Badge variant="warning">Warning</Badge>
-                  <Badge variant="danger">Danger</Badge>
-                  <Badge variant="secondary">Neutral</Badge>
+                <div className="mt-4 flex flex-wrap gap-2"><Badge variant="primary">Primary</Badge><Badge variant="success" icon={<Check className="h-3.5 w-3.5" />}>Ready</Badge><Badge variant="warning">Warning</Badge><Badge variant="danger">Danger</Badge><Badge variant="secondary">Neutral</Badge></div>
+              </Specimen>
+
+              <Specimen title="Avatar & tooltip" description="Compact identity and denser floating material.">
+                <div className="relative overflow-hidden rounded-[1.5rem] bg-sherick-canvas p-5">
+                  <div className="absolute -right-6 top-0 h-24 w-28 rounded-full bg-sherick-accent/[0.18] blur-3xl" />
+                  <div className="relative flex items-center gap-5">
+                    <Avatar src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg" alt="Example avatar" size="sm" />
+                    <Avatar src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg" alt="Example rounded avatar" size="md" shape="rounded" />
+                    <Tooltip content="Frosted tooltip material"><ActionButton appearance="tonal" variant="secondary">Hover or focus</ActionButton></Tooltip>
+                  </div>
                 </div>
               </Specimen>
 
-              <Specimen title="Avatar & tooltip" description="Compact identity and the denser floating material.">
-                <div className="flex items-center gap-5">
-                  <Avatar src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg" alt="Example avatar" size="sm" />
-                  <Avatar src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg" alt="Example rounded avatar" size="md" shape="rounded" />
-                  <Tooltip content="This tooltip uses the same floating acrylic language as other overlays.">
-                    <ActionButton appearance="tonal" variant="secondary">Hover or focus</ActionButton>
-                  </Tooltip>
-                </div>
-              </Specimen>
-
-              <Specimen title="Modal" description="Strongest elevation layer: acrylic material, backdrop blur and focus trap.">
-                <ActionButton appearance="filled" onClick={() => setModalOpen(true)} icon={<Plus />}>Open modal</ActionButton>
+              <Specimen title="Modal" description="Highest elevation uses the strongest acrylic treatment.">
+                <ActionButton appearance="tonal" onClick={() => setModalOpen(true)}>Open modal</ActionButton>
               </Specimen>
             </div>
           </section>
 
           <section id="data" className="scroll-mt-28">
             <SectionHeading title="Data display" description="Dense information remains quiet, compact and easy to scan." />
-            <div className="mt-6">
-              <Specimen title="Table" description="Neutral row treatment; semantic color belongs inside cells, not across the whole table.">
-                <Table
-                  headers={["Component", "Role", "Status"]}
-                  rows={[
-                    ["Dropdown", "Custom selection", <Badge key="dropdown" variant="success">Ready</Badge>],
-                    ["Modal", "Focused overlay", <Badge key="modal" variant="success">Ready</Badge>],
-                    ["Table", "Dense information", <Badge key="table" variant="secondary">Quiet</Badge>],
-                    ["Input", "Form control", <Badge key="input" variant="primary">Core</Badge>],
-                  ]}
-                />
-              </Specimen>
-            </div>
+            <Specimen className="mt-6" title="Table" description="Semantic color belongs inside cells, not across the whole table.">
+              <Table headers={["Component", "Role", "Status"]} rows={[
+                ["Dropdown", "Custom selection", <Badge key="d" variant="success">Ready</Badge>],
+                ["Modal", "Focused overlay", <Badge key="m" variant="success">Ready</Badge>],
+                ["Table", "Dense information", <Badge key="t" variant="secondary">Quiet</Badge>],
+                ["Input", "Form control", <Badge key="i" variant="primary">Core</Badge>],
+              ]} />
+            </Specimen>
           </section>
 
-          <section id="content" className="scroll-mt-28 pb-16">
+          <section id="content" className="scroll-mt-28 pb-12">
             <SectionHeading title="Content" description="Code and Markdown primitives for documentation and rich text surfaces." />
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
-              <Specimen title="Code block" description="Copyable syntax-highlighted code.">
-                <CodeBlock language="tsx">{`<ActionButton appearance="filled">Save</ActionButton>`}</CodeBlock>
+              <Specimen title="Code block" description="Actions live outside the code viewport and never obscure content.">
+                <CodeBlock language="tsx">{'<ActionButton appearance="filled">Save</ActionButton>'}</CodeBlock>
               </Specimen>
-              <Specimen title="Markdown" description="GFM and code rendering through the library's Markdown primitive.">
-                <div className="prose prose-invert max-w-none text-sm">
-                  <Markdown>{`### Example\n\nSherick UI keeps **dense information quiet** and lets floating UI carry more depth.`}</Markdown>
-                </div>
+              <Specimen title="Markdown" description="Readable defaults for rich text without imposing a documentation theme.">
+                <Markdown>{`## Example\nSherick UI keeps **dense information quiet** and lets [floating UI](#surfaces) carry more depth.\n\n- Clear hierarchy\n- Inline \`code\`\n- Restrained semantic color\n\n> Floating material should signal elevation, not decorate everything.`}</Markdown>
               </Specimen>
             </div>
           </section>
@@ -353,9 +320,7 @@ export default function Home() {
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <Modal.Header>Modal specimen</Modal.Header>
-        <Modal.Content>
-          <p>This is the highest elevation layer in the system: focused, frosted and deliberately separated from the page beneath it.</p>
-        </Modal.Content>
+        <Modal.Content>This is the highest elevation layer in the system: focused, frosted and deliberately separated from the page beneath it.</Modal.Content>
         <Modal.Footer>
           <ActionButton appearance="text" variant="secondary" onClick={() => setModalOpen(false)}>Cancel</ActionButton>
           <ActionButton appearance="filled" onClick={() => setModalOpen(false)}>Confirm</ActionButton>
@@ -366,48 +331,17 @@ export default function Home() {
 }
 
 function SectionHeading({ title, description }: { title: string; description: string }) {
-  return (
-    <div className="border-b border-white/[0.055] pb-5">
-      <h2 className="text-2xl font-semibold tracking-[-0.025em] text-sherick-ink sm:text-3xl">{title}</h2>
-      <p className="mt-2 max-w-3xl text-sm leading-6 text-sherick-ink-muted sm:text-base">{description}</p>
-    </div>
-  );
+  return <div className="border-b border-white/[0.045] pb-5"><h2 className="text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">{title}</h2><p className="mt-2 text-base leading-7 text-sherick-ink-muted">{description}</p></div>;
 }
 
-function Specimen({
-  title,
-  description,
-  children,
-}: {
-  title: string;
-  description: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className="rounded-[1.75rem] bg-sherick-surface/[0.72] p-5 ring-1 ring-inset ring-white/[0.035] sm:p-6">
-      <div className="mb-5">
-        <h3 className="text-sm font-medium text-sherick-ink">{title}</h3>
-        <p className="mt-1 text-xs leading-5 text-sherick-ink-muted">{description}</p>
-      </div>
-      {children}
-    </div>
-  );
+function Specimen({ title, description, children, className = "" }: { title: string; description: string; children: React.ReactNode; className?: string }) {
+  return <div className={`rounded-[1.75rem] bg-sherick-surface/[0.72] p-5 sm:p-6 ${className}`}><div className="mb-5"><h3 className="font-medium tracking-[-0.01em]">{title}</h3><p className="mt-1 text-sm leading-6 text-sherick-ink-muted">{description}</p></div>{children}</div>;
 }
 
 function Swatch({ label, className }: { label: string; className: string }) {
-  return (
-    <div>
-      <div className={`h-14 rounded-[1rem] ${className}`} />
-      <div className="mt-2 text-xs text-sherick-ink-muted">{label}</div>
-    </div>
-  );
+  return <div><div className={`h-14 rounded-[1rem] ${className}`} /><div className="mt-2 text-xs text-sherick-ink-muted">{label}</div></div>;
 }
 
 function StateLabel({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <div className="flex items-center gap-3">
-      {children}
-      <span className="text-xs text-sherick-ink-muted">{label}</span>
-    </div>
-  );
+  return <div className="flex items-center gap-2"><div>{children}</div><span className="text-sm text-sherick-ink-muted">{label}</span></div>;
 }
