@@ -12,8 +12,8 @@ export interface NavGroupProps {
 }
 
 const NavGroup = ({ title, items }: NavGroupProps) => (
-  <div className="space-y-2 px-4 py-6 pb-0 rounded-2xl">
-    <h3 className="text-sm text-white font-semibold">{title}</h3>
+  <div className="space-y-1.5 py-3">
+    <h3 className="px-3 pb-1 text-xs font-semibold text-zinc-500">{title}</h3>
     {items.map((item) => (
       <NavItem key={item.href} to={item.href}>
         {item.label}
