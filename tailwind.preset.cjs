@@ -19,13 +19,21 @@ module.exports = {
           "on-primary": "oklch(0.98 0.005 255 / <alpha-value>)",
         },
       },
+      backgroundImage: {
+        "sherick-glass":
+          "linear-gradient(135deg, rgba(255,255,255,0.055) 0%, rgba(255,255,255,0.018) 32%, rgba(112,156,255,0.022) 72%, rgba(255,255,255,0.01) 100%)",
+        "sherick-glass-dense":
+          "linear-gradient(135deg, rgba(255,255,255,0.045) 0%, rgba(255,255,255,0.012) 38%, rgba(112,156,255,0.018) 78%, rgba(255,255,255,0.008) 100%)",
+      },
       borderRadius: {
         "4xl": "2rem",
       },
       boxShadow: {
         "sherick-soft": "0 14px 36px -24px rgba(5, 8, 14, 0.42)",
         "sherick-float":
-          "0 30px 84px -34px rgba(5, 8, 14, 0.62), inset 0 1px 0 rgba(255, 255, 255, 0.05)",
+          "0 28px 72px -34px rgba(5, 8, 14, 0.5), inset 0 1px 0 rgba(255,255,255,0.09), inset 0 -1px 0 rgba(0,0,0,0.11)",
+        "sherick-glass":
+          "0 22px 64px -34px rgba(5, 8, 14, 0.46), inset 1px 1px 0 rgba(255,255,255,0.085), inset -1px -1px 0 rgba(0,0,0,0.10)",
         "sherick-primary": "0 12px 30px -22px rgba(82, 139, 255, 0.34)",
       },
       animation: {
