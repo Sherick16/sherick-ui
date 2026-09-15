@@ -3,7 +3,10 @@ import { readdir, readFile } from "node:fs/promises";
 import { extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { renderToStaticMarkup } from "react-dom/server";
+import postcss from "postcss";
 import React from "react";
+import tailwindcss from "tailwindcss";
+import sherickPreset from "../tailwind.preset.cjs";
 
 const library = await import("../dist/index.esm.js");
 const esm = await readFile(new URL("../dist/index.esm.js", import.meta.url), "utf8");
@@ -41,6 +44,26 @@ assert.match(themeCss, /prefers-color-scheme:\s*dark/);
 assert.match(themeCss, /--sui-canvas:/);
 assert.match(themeCss, /--sui-glass-gradient:/);
 assert.match(themeCss, /--sui-code-text:/);
+
+const tailwindResult = await postcss([
+  tailwindcss({
+    presets: [sherickPreset],
+    content: [
+      {
+        raw: '<div class="bg-sherick-canvas text-sherick-ink text-sherick-on-warning outline-sherick-focus bg-sherick-glass shadow-sherick-glass"></div>',
+        extension: "html",
+      },
+    ],
+    corePlugins: { preflight: false },
+  }),
+]).process("@tailwind utilities;", { from: undefined });
+
+assert.match(tailwindResult.css, /var\(--sui-canvas/);
+assert.match(tailwindResult.css, /var\(--sui-ink/);
+assert.match(tailwindResult.css, /var\(--sui-on-warning/);
+assert.match(tailwindResult.css, /var\(--sui-focus/);
+assert.match(tailwindResult.css, /var\(--sui-glass-gradient/);
+assert.match(tailwindResult.css, /var\(--sui-shadow-glass/);
 
 const buttonMarkup = renderToStaticMarkup(
   React.createElement(library.ActionButton, { loading: true }, "Save")
