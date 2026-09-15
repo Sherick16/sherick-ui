@@ -1,9 +1,10 @@
-import React, { ReactNode, useState } from "react";
+"use client";
+
+import React, { type ReactNode, useState } from "react";
+import { AlertCircle, CheckCircle, Info, X, XCircle } from "lucide-react";
 import { cn } from "@/libs/utils";
-import { styleMap } from "./ui.common";
+import { focusRing, styleMap } from "./ui.common";
 import { Variant } from "./ui.types";
-import { AlertCircle, CheckCircle, Info, XCircle } from "lucide-react";
-import { X } from "lucide-react";
 
 const iconMap = {
   primary: Info,
@@ -25,12 +26,13 @@ export const Alert = ({
   closeable?: boolean;
 }) => {
   const [isVisible, setIsVisible] = useState(true);
-  const Icon = iconMap?.[variant];
+  const Icon = iconMap[variant];
 
   if (!isVisible) return null;
 
   return (
     <div
+      role={variant === "danger" || variant === "warning" ? "alert" : "status"}
       className={cn(
         "p-4 rounded-4xl bg-opacity-20 flex items-center justify-between hover:bg-opacity-20",
         styleMap[variant],
@@ -38,12 +40,17 @@ export const Alert = ({
       )}
     >
       <div className="flex items-center">
-        <Icon className="w-5 h-5 mr-3" />
+        <Icon aria-hidden="true" className="w-5 h-5 mr-3" />
         <div>{children}</div>
       </div>
       {closeable && (
-        <button onClick={() => setIsVisible(false)} className="ml-3 p-1">
-          <X className="w-4 h-4" />
+        <button
+          type="button"
+          aria-label="Dismiss alert"
+          onClick={() => setIsVisible(false)}
+          className={cn("ml-3 p-1 rounded-lg", focusRing)}
+        >
+          <X aria-hidden="true" className="w-4 h-4" />
         </button>
       )}
     </div>

@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+"use client";
+
+import React, { useEffect, useRef, useState, type ReactNode } from "react";
+import { Check, Copy } from "lucide-react";
 import { Highlight } from "prism-react-renderer";
 import Prism from "prismjs";
-
-// import every language
 import "prismjs/components/prism-jsx";
 import "prismjs/components/prism-typescript";
 import "prismjs/components/prism-bash";
@@ -20,82 +21,86 @@ import "prismjs/components/prism-markup";
 import "prismjs/components/prism-python";
 import "prismjs/components/prism-sql";
 import "prismjs/components/prism-yaml";
-import "prismjs/themes/prism-tomorrow.css";
-import { Copy, Check } from "lucide-react";
 import { cn } from "@/libs/utils";
+import { focusRing } from "./ui.common";
 import theme from "./prism-theme";
 
-interface Props {
-  inline?: any;
-  className?: any;
-  children: any;
-  language: string;
+export interface CodeBlockProps {
+  inline?: boolean;
+  className?: string;
+  children?: ReactNode;
+  language?: string;
 }
 
-const CodeBlock: React.FC<Props> = ({
-  inline,
+const CodeBlock = ({
+  inline = false,
   className,
-  language,
+  language = "text",
   children,
-  ...rest
-}) => {
+}: CodeBlockProps) => {
   const [copied, setCopied] = useState(false);
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const code = String(children ?? "").trim();
 
-  const onCopy = () => {
+  useEffect(() => {
+    return () => {
+      if (resetTimer.current) clearTimeout(resetTimer.current);
+    };
+  }, []);
+
+  const onCopy = async () => {
+    if (!navigator.clipboard) return;
+
+    await navigator.clipboard.writeText(code);
     setCopied(true);
-    const timeout = setTimeout(() => {
-      setCopied(false);
-    }, 2000);
 
-    return () => clearTimeout(timeout);
+    if (resetTimer.current) clearTimeout(resetTimer.current);
+    resetTimer.current = setTimeout(() => setCopied(false), 2000);
   };
 
   if (inline) {
-    return (
-      // Small inline code block, that should be used in a sentence
-      <code className="bg-stone-800 text-white p-1 rounded" {...rest}>
-        {children}
-      </code>
-    );
+    return <code className={cn("bg-stone-800 text-white p-1 rounded", className)}>{children}</code>;
   }
 
   return (
     <div className="group relative mt-4">
       <div className="absolute right-4 top-4 z-10">
         <button
-          onClick={onCopy}
+          type="button"
+          onClick={() => void onCopy()}
           className={cn(
             "flex items-center space-x-1 rounded-md px-2 py-1 text-xs",
             "bg-gray-700/50 text-gray-300 transition-colors",
-            "hover:bg-gray-600/50 hover:text-gray-200"
+            "hover:bg-gray-600/50 hover:text-gray-200",
+            focusRing
           )}
         >
           {copied ? (
             <>
-              <Check className="h-3 w-3" />
+              <Check className="h-3 w-3" aria-hidden="true" />
               <span>Copied!</span>
             </>
           ) : (
             <>
-              <Copy className="h-3 w-3" />
+              <Copy className="h-3 w-3" aria-hidden="true" />
               <span>Copy</span>
             </>
           )}
         </button>
       </div>
       <Highlight
-        code={children.trim()}
+        code={code}
         language={language === "tsx" ? "jsx" : language}
         theme={theme}
-        prism={Prism as any}
+        prism={Prism as typeof Prism}
       >
-        {({ className, style, tokens, getLineProps, getTokenProps }) => (
+        {({ className: highlightClassName, style, tokens, getLineProps, getTokenProps }) => (
           <pre
             className={cn(
               "overflow-x-auto rounded-3xl p-4 text-sm leading-6",
               "bg-gray-800/80 backdrop-blur-xl",
               "border border-gray-700/50",
-              className
+              highlightClassName
             )}
             style={style}
           >

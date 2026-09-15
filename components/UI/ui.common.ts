@@ -1,3 +1,6 @@
+export const focusRing =
+  "focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-400 focus-visible:ring-offset-2 focus-visible:ring-offset-zinc-900";
+
 export const styleMap: Record<string, string> = {
   primary: "bg-blue-400 text-blue-300 hover:bg-blue-500 border-blue-400",
   secondary: "bg-gray-400 text-gray-300 hover:bg-gray-500 border-gray-400",
