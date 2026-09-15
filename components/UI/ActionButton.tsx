@@ -68,7 +68,7 @@ const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
           appearance !== "text" && !isDisabled && toneHoverMap[variant],
           appearance !== "text" && !isDisabled && toneActiveMap[variant],
           appearance === "text" && toneTextMap[variant],
-          appearance === "text" && !isDisabled && "hover:bg-white/[0.055] active:bg-white/[0.1]",
+          appearance === "text" && !isDisabled && "hover:bg-sherick-ink/[0.055] active:bg-sherick-ink/[0.1]",
           isDisabled ? "cursor-not-allowed opacity-45 shadow-none" : "cursor-pointer",
           className
         )}
