@@ -1,7 +1,13 @@
-import React, { ReactNode } from "react";
+import React, { type HTMLAttributes, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { styleMap } from "./ui.common";
+import { shape, toneSoftMap } from "./ui.common";
 import { Variant } from "./ui.types";
+
+export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
+  children: ReactNode;
+  variant?: Variant;
+  icon?: ReactNode;
+}
 
 const Badge = ({
   children,
@@ -9,24 +15,20 @@ const Badge = ({
   icon,
   className,
   ...props
-}: {
-  children: ReactNode;
-  variant?: Variant;
-  icon?: ReactNode;
-  className?: string;
-}) => {
+}: BadgeProps) => {
   return (
-    <div
+    <span
       {...props}
       className={cn(
-        "px-2 py-2 rounded-4xl bg-opacity-20 hover:bg-opacity-40 transition-all flex items-center justify-center text-xs font-semibold",
-        className,
-        styleMap?.[variant] || styleMap["primary"]
+        "inline-flex min-h-7 items-center justify-center gap-1.5 px-3 py-1 text-xs font-semibold",
+        shape.pill,
+        toneSoftMap[variant],
+        className
       )}
     >
-      {icon && <span className="mr-2 inline-block align-middle">{icon}</span>}
+      {icon && <span className="inline-flex items-center" aria-hidden="true">{icon}</span>}
       {children}
-    </div>
+    </span>
   );
 };
 
