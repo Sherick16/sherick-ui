@@ -13,7 +13,6 @@ import { Check, ChevronDown } from "lucide-react";
 import { cn } from "@/libs/utils";
 import {
   focusRing,
-  focusRingInset,
   motionComponent,
   motionState,
   pressable,
@@ -168,7 +167,7 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
             surface.control,
             motionState,
             focusRing,
-            isOpen && "bg-sherick-surface-high shadow-sherick-soft",
+            isOpen && "bg-sherick-surface-high/[0.88]",
             !disabled && pressable,
             disabled && "cursor-not-allowed opacity-45"
           )}
@@ -179,8 +178,7 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
           <ChevronDown
             aria-hidden="true"
             className={cn(
-              "ml-3 h-5 w-5 shrink-0",
-              toneTextMap[variant],
+              "ml-3 h-5 w-5 shrink-0 text-sherick-ink",
               motionComponent,
               isOpen && "rotate-180"
             )}
@@ -216,13 +214,12 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
                   onKeyDown={(event) => handleOptionKeyDown(event, index)}
                   onClick={() => selectOption(index)}
                   className={cn(
-                    "flex cursor-pointer items-center justify-between gap-4 rounded-xl px-4 py-3 text-left text-sm text-sherick-ink/[0.92]",
+                    "flex cursor-pointer items-center justify-between gap-4 rounded-xl px-4 py-3 text-left text-sm text-sherick-ink outline-none",
                     motionState,
-                    focusRingInset,
                     isSelected && toneSelectedMap[variant],
-                    !isSelected && isActive && "bg-white/[0.075]",
+                    !isSelected && isActive && "bg-white/[0.07]",
                     !isSelected && "hover:bg-white/[0.05]",
-                    "active:bg-white/[0.11]"
+                    "focus-visible:bg-white/[0.08] active:bg-white/[0.1]"
                   )}
                 >
                   <span className={cn(isSelected && "font-medium")}>{option.label}</span>
