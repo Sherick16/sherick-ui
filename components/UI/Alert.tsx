@@ -3,7 +3,7 @@
 import React, { type ReactNode, useState } from "react";
 import { AlertCircle, CheckCircle, Info, X, XCircle } from "lucide-react";
 import { cn } from "@/libs/utils";
-import { styleMap } from "./ui.common";
+import { focusRing, styleMap } from "./ui.common";
 import { Variant } from "./ui.types";
 
 const iconMap = {
@@ -48,7 +48,7 @@ export const Alert = ({
           type="button"
           aria-label="Dismiss alert"
           onClick={() => setIsVisible(false)}
-          className="ml-3 p-1"
+          className={cn("ml-3 p-1 rounded-lg", focusRing)}
         >
           <X aria-hidden="true" className="w-4 h-4" />
         </button>
