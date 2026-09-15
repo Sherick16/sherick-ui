@@ -25,11 +25,13 @@ const config = [
         format: 'cjs',
         sourcemap: false,
         exports: 'named',
+        banner: '"use client";',
       },
       {
         file: pkg.module,
         format: 'esm',
         sourcemap: false,
+        banner: '"use client";',
       },
     ],
     plugins: [
