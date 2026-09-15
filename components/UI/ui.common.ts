@@ -25,12 +25,12 @@ export const shape = {
 
 export const surface = {
   control:
-    "bg-zinc-700/55 text-zinc-100 placeholder:text-zinc-400 hover:bg-zinc-700/75",
+    "bg-zinc-700/50 text-zinc-100 placeholder:text-zinc-400 hover:bg-zinc-700/70",
   controlError:
-    "bg-red-500/15 text-red-200 placeholder:text-red-300/60 hover:bg-red-500/20",
-  passive: "bg-zinc-800/55 text-zinc-100",
+    "bg-red-500/20 text-red-200 placeholder:text-red-300/60 hover:bg-red-500/30",
+  passive: "bg-zinc-800/50 text-zinc-100",
   raised:
-    "bg-zinc-800/92 text-zinc-100 shadow-2xl shadow-black/30 backdrop-blur-xl",
+    "bg-zinc-800/90 text-zinc-100 shadow-2xl shadow-black/30 backdrop-blur-xl",
   tooltip:
     "bg-zinc-700/90 text-zinc-100 shadow-lg shadow-black/25 backdrop-blur-lg",
 } as const;
@@ -76,11 +76,11 @@ export const toneStrongMap: Record<Variant, string> = {
 };
 
 export const toneSoftMap: Record<Variant, string> = {
-  primary: "bg-blue-400/14 text-blue-200",
-  secondary: "bg-zinc-500/14 text-zinc-200",
-  danger: "bg-red-400/14 text-red-200",
-  warning: "bg-amber-400/14 text-amber-200",
-  success: "bg-emerald-400/14 text-emerald-200",
+  primary: "bg-blue-400/20 text-blue-200",
+  secondary: "bg-zinc-500/20 text-zinc-200",
+  danger: "bg-red-400/20 text-red-200",
+  warning: "bg-amber-400/20 text-amber-200",
+  success: "bg-emerald-400/20 text-emerald-200",
 };
 
 // Backwards-compatible internal aliases. New components should use the focused maps above.
