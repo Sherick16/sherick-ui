@@ -1,7 +1,17 @@
 "use client";
 
-import { useState } from "react";
-import { Bell, Check, Download, Heart, Search as SearchIcon, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import {
+  Bell,
+  Check,
+  Download,
+  Heart,
+  Monitor,
+  Moon,
+  Search as SearchIcon,
+  Sun,
+  Trash2,
+} from "lucide-react";
 import ActionButton from "@/components/UI/ActionButton";
 import Dropdown from "@/components/UI/Dropdown";
 import Search from "@/components/UI/Search";
@@ -29,20 +39,50 @@ const selectOptions = [
   { label: "Marketing site", value: "marketing" },
 ];
 
+type ThemeMode = "system" | "light" | "dark";
+
+const isThemeMode = (value: string | null): value is ThemeMode =>
+  value === "system" || value === "light" || value === "dark";
+
+const applyTheme = (theme: ThemeMode) => {
+  if (theme === "system") {
+    document.documentElement.removeAttribute("data-sherick-theme");
+  } else {
+    document.documentElement.dataset.sherickTheme = theme;
+  }
+};
+
 export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);
   const [switchOn, setSwitchOn] = useState(true);
   const [selection, setSelection] = useState("design");
+  const [theme, setTheme] = useState<ThemeMode>("system");
+
+  useEffect(() => {
+    const stored = localStorage.getItem("sherick-ui-theme");
+    const nextTheme = isThemeMode(stored) ? stored : "system";
+    setTheme(nextTheme);
+    applyTheme(nextTheme);
+  }, []);
+
+  const changeTheme = (nextTheme: ThemeMode) => {
+    setTheme(nextTheme);
+    localStorage.setItem("sherick-ui-theme", nextTheme);
+    applyTheme(nextTheme);
+  };
 
   return (
     <main className="min-h-screen bg-sherick-canvas text-sherick-ink">
       <div className="mx-auto w-full max-w-[1320px] px-5 py-10 sm:px-8 lg:px-10 lg:py-14">
-        <div className="mb-14 max-w-3xl">
-          <Badge variant="primary">Sherick UI · development workbench</Badge>
-          <h1 className="mt-5 text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">Design system showcase</h1>
-          <p className="mt-3 max-w-2xl text-base leading-7 text-sherick-ink-muted">
-            Soft tonal hierarchy, expressive interaction, and richer smoked-glass depth only when UI floats or matters.
-          </p>
+        <div className="mb-14 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <div className="max-w-3xl">
+            <Badge variant="primary">Sherick UI · development workbench</Badge>
+            <h1 className="mt-5 text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">Design system showcase</h1>
+            <p className="mt-3 max-w-2xl text-base leading-7 text-sherick-ink-muted">
+              Soft tonal hierarchy, expressive interaction, runtime light and dark themes, and richer smoked-glass depth only when UI floats or matters.
+            </p>
+          </div>
+          <ThemePicker theme={theme} onChange={changeTheme} />
         </div>
 
         <div className="space-y-16">
@@ -103,7 +143,7 @@ export default function Home() {
                 <div className="flex flex-wrap items-center gap-3">
                   <ActionButton loading>Saving</ActionButton>
                   <ActionButton disabled>Disabled</ActionButton>
-                  <ActionButton className="ring-2 ring-sherick-primary ring-offset-2 ring-offset-sherick-canvas">Focus-visible</ActionButton>
+                  <ActionButton className="outline outline-2 outline-sherick-focus outline-offset-[3px]">Focus-visible</ActionButton>
                 </div>
               </Specimen>
 
@@ -133,7 +173,7 @@ export default function Home() {
                 <div className="space-y-4">
                   <Input label="Project name" placeholder="Sherick UI" />
                   <Input label="Invalid" placeholder="Required value" error />
-                  <Input label="Focus-visible" placeholder="Keyboard focus" inputClassName="ring-2 ring-sherick-primary ring-offset-2 ring-offset-sherick-canvas bg-sherick-surface-high/[0.9]" />
+                  <Input label="Focus-visible" placeholder="Keyboard focus" inputClassName="outline outline-2 outline-sherick-focus outline-offset-[3px] bg-sherick-surface-high/[0.9]" />
                   <Input label="Disabled" placeholder="Unavailable" disabled />
                 </div>
               </Specimen>
@@ -284,9 +324,44 @@ export default function Home() {
   );
 }
 
+function ThemePicker({ theme, onChange }: { theme: ThemeMode; onChange: (theme: ThemeMode) => void }) {
+  const choices: Array<{ value: ThemeMode; label: string; icon: typeof Sun }> = [
+    { value: "system", label: "System", icon: Monitor },
+    { value: "light", label: "Light", icon: Sun },
+    { value: "dark", label: "Dark", icon: Moon },
+  ];
+
+  return (
+    <div className="shrink-0">
+      <div className="mb-2 text-xs font-medium text-sherick-ink-muted">Theme</div>
+      <div className="inline-flex rounded-full bg-sherick-surface/[0.72] p-1 shadow-inner">
+        {choices.map(({ value, label, icon: Icon }) => {
+          const selected = theme === value;
+          return (
+            <button
+              key={value}
+              type="button"
+              aria-pressed={selected}
+              onClick={() => onChange(value)}
+              className={`inline-flex min-h-9 items-center gap-1.5 rounded-full px-3 text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-sherick-focus focus-visible:outline-offset-2 ${
+                selected
+                  ? "bg-sherick-primary/[0.16] text-sherick-ink shadow-sherick-soft"
+                  : "text-sherick-ink-muted hover:bg-sherick-ink/[0.05] hover:text-sherick-ink"
+              }`}
+            >
+              <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+              {label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function SectionHeading({ title, description }: { title: string; description: string }) {
   return (
-    <div className="border-b border-white/[0.035] pb-5">
+    <div className="border-b border-sherick-ink/[0.06] pb-5">
       <h2 className="text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{title}</h2>
       <p className="mt-2 text-base leading-7 text-sherick-ink-muted">{description}</p>
     </div>
