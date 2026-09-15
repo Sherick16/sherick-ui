@@ -8,7 +8,6 @@ import {
   pressable,
   shape,
   toneSelectedMap,
-  toneTextMap,
 } from "./ui.common";
 import { Variant } from "./ui.types";
 
@@ -72,7 +71,7 @@ export const TabGroup = ({
         role="tablist"
         aria-label="Tabs"
         className={cn(
-          "relative flex min-w-max bg-sherick-surface/[0.92] p-1.5 shadow-inner",
+          "relative flex min-w-max bg-sherick-surface/[0.72] p-1.5 shadow-inner",
           shape.pill
         )}
       >
@@ -116,7 +115,7 @@ export const TabGroup = ({
                 focusRing,
                 pressable,
                 selected
-                  ? toneTextMap[variant]
+                  ? "text-sherick-ink"
                   : "text-sherick-ink-muted hover:bg-white/[0.045] hover:text-sherick-ink active:bg-white/[0.085]"
               )}
             >
