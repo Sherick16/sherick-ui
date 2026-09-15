@@ -87,7 +87,7 @@ pnpm install
 pnpm verify
 ```
 
-`pnpm verify` runs TypeScript checking, builds both ESM/CJS plus declarations, and runs a consumer-oriented smoke check against the built package. Pull requests run the same verification in GitHub Actions.
+`pnpm verify` runs TypeScript checking, builds both ESM/CJS plus declarations, and runs consumer-oriented smoke verification against the built package. It also rejects unsupported numeric Tailwind opacity modifiers that Tailwind 3 would otherwise silently omit; custom opacity values must use arbitrary syntax such as `/[0.78]`. Pull requests run the same verification in GitHub Actions.
 
 The Next.js app in this repository is a development/showcase surface only; the published component runtime does not depend on Next.js.
 
