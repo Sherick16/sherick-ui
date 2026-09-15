@@ -89,7 +89,7 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
             "outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-400",
             motionState,
             toneTextMap[variant],
-            !isDisabled && "hover:bg-white/8 active:bg-white/12",
+            !isDisabled && "hover:bg-white/10 active:bg-white/20",
             !isDisabled && pressable,
             isDisabled ? "cursor-not-allowed" : "cursor-pointer"
           )}
