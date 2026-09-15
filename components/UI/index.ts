@@ -27,7 +27,7 @@ export type { BadgeProps } from "./Badge";
 export type { CardProps } from "./Card";
 export type { CodeBlockProps } from "./CodeBlock";
 export type { DropdownOption, DropdownProps } from "./Dropdown";
-export type { IconButtonProps } from "./IconButton";
+export type { IconButtonAppearance, IconButtonProps } from "./IconButton";
 export type { InputProps } from "./Input";
 export type { ModalProps } from "./Modal";
 export type { SearchProps } from "./Search";
