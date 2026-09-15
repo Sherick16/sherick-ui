@@ -41,7 +41,7 @@ export default function Home() {
           <Badge variant="primary">Sherick UI · development workbench</Badge>
           <h1 className="mt-5 text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">Design system showcase</h1>
           <p className="mt-3 max-w-2xl text-base leading-7 text-sherick-ink-muted">
-            Soft tonal hierarchy, expressive interaction, and richer frosted depth only when UI floats or matters.
+            Soft tonal hierarchy, expressive interaction, and richer smoked-glass depth only when UI floats or matters.
           </p>
         </div>
 
@@ -60,15 +60,17 @@ export default function Home() {
                 </div>
               </Specimen>
 
-              <Specimen title="Surface hierarchy" description="Grounded UI stays matte; floating UI can become frosted.">
+              <Specimen title="Surface hierarchy" description="Grounded UI stays matte; floating UI becomes smoked liquid glass.">
                 <div className="space-y-3">
                   <div className="rounded-[1.25rem] bg-sherick-surface p-4 text-sm">Matte surface</div>
                   <div className="rounded-[1.5rem] bg-sherick-surface-high p-4 text-sm shadow-sherick-soft">Elevated tonal surface</div>
-                  <div className="relative overflow-hidden rounded-[1.5rem] bg-sherick-canvas/[0.65] p-4">
-                    <div className="absolute -left-4 top-2 h-16 w-24 rounded-full bg-sherick-primary/[0.24] blur-2xl" />
-                    <div className="absolute right-3 top-5 text-[10px] text-sherick-ink-muted">content behind</div>
-                    <div className="relative rounded-[1.25rem] bg-sherick-surface-float/[0.62] p-4 text-sm shadow-sherick-float ring-1 ring-inset ring-white/[0.04] backdrop-blur-2xl backdrop-saturate-150">
-                      Floating acrylic
+                  <div className="relative overflow-hidden rounded-[1.5rem] bg-sherick-canvas/[0.55] p-4">
+                    <div className="absolute -left-8 -top-4 h-24 w-36 rounded-full bg-sherick-primary/[0.30] blur-[28px]" />
+                    <div className="absolute bottom-1 right-1 h-20 w-28 rounded-full bg-sherick-accent/[0.22] blur-[26px]" />
+                    <div className="absolute left-7 top-6 text-[10px] font-medium tracking-wide text-sherick-ink/[0.42]">CONTENT BEHIND</div>
+                    <div className="absolute right-8 top-11 h-2 w-24 rounded-full bg-sherick-ink/[0.13]" />
+                    <div className="relative rounded-[1.25rem] bg-sherick-surface-float/[0.60] bg-sherick-glass p-4 text-sm shadow-sherick-glass backdrop-blur-[32px] backdrop-saturate-[1.45] backdrop-brightness-[1.04]">
+                      Floating liquid glass
                     </div>
                   </div>
                 </div>
@@ -150,7 +152,7 @@ export default function Home() {
                 </div>
               </Specimen>
 
-              <Specimen title="Dropdown" description="Matte trigger, frosted floating listbox, clear selection.">
+              <Specimen title="Dropdown" description="Matte trigger, smoked-glass floating listbox, clear selection.">
                 <div className="space-y-4">
                   <Dropdown options={selectOptions} selected={selection} onSelect={setSelection} aria-label="Project type" className="w-full" />
                   <Dropdown options={selectOptions} disabled aria-label="Disabled project type" className="w-full" />
@@ -212,7 +214,7 @@ export default function Home() {
           </section>
 
           <section>
-            <SectionHeading title="Surfaces & overlays" description="Cards stay matte; menus, tooltips and modals may use richer acrylic depth." />
+            <SectionHeading title="Surfaces & overlays" description="Cards stay matte; floating UI may use restrained smoked liquid-glass depth." />
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
               <Specimen title="Cards & badges" description="Passive content surfaces and compact semantic labels.">
                 <div className="grid gap-3 sm:grid-cols-2">
@@ -228,15 +230,15 @@ export default function Home() {
                 </div>
               </Specimen>
 
-              <Specimen title="Avatar & tooltip" description="Compact identity and denser floating material.">
+              <Specimen title="Avatar & tooltip" description="Compact identity and denser floating glass material.">
                 <div className="flex items-center gap-5">
                   <Avatar src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg" alt="Example avatar" size="sm" />
                   <Avatar src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg" alt="Example rounded avatar" size="md" shape="rounded" />
-                  <Tooltip content="Frosted tooltip material"><ActionButton appearance="tonal" variant="secondary">Hover or focus</ActionButton></Tooltip>
+                  <Tooltip content="Smoked liquid-glass tooltip"><ActionButton appearance="tonal" variant="secondary">Hover or focus</ActionButton></Tooltip>
                 </div>
               </Specimen>
 
-              <Specimen title="Modal" description="Highest elevation: focused, frosted and visually separated.">
+              <Specimen title="Modal" description="Highest elevation: focused, translucent and visually separated.">
                 <ActionButton appearance="tonal" variant="secondary" onClick={() => setModalOpen(true)}>Open modal</ActionButton>
               </Specimen>
             </div>
@@ -271,7 +273,7 @@ export default function Home() {
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <Modal.Header>Modal specimen</Modal.Header>
         <Modal.Content>
-          This is the highest elevation layer in the system: focused, frosted and deliberately separated from the page beneath it.
+          This is the highest elevation layer in the system: focused, translucent and deliberately separated from the page beneath it.
         </Modal.Content>
         <Modal.Footer>
           <ActionButton appearance="text" variant="secondary" onClick={() => setModalOpen(false)}>Cancel</ActionButton>
