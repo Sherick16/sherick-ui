@@ -107,6 +107,7 @@ for (const token of [
   "--sui-elevation-raised",
   "--sui-elevation-floating",
   "--sui-elevation-control",
+  "--sui-elevation-recessed",
   "--sui-elevation-pressed",
   "--sui-shadow-focus",
   "--sui-shadow-primary",
@@ -134,13 +135,22 @@ for (const token of [
 
 // Every depth cue derives from the two light-model colors, so a theme that drops one
 // silently loses its edge lighting rather than failing loudly.
-for (const shadow of ["raised", "floating", "control", "pressed"]) {
+for (const shadow of ["raised", "floating", "control", "recessed"]) {
   const value = lightVariables[`--sui-elevation-${shadow}`];
   assert.match(value, /var\(--sui-light-bottom\)/, `light --sui-elevation-${shadow} must use the shade token`);
 }
 assert.match(lightVariables["--sui-elevation-floating"], /var\(--sui-light-top\)/);
 assert.match(lightVariables["--sui-elevation-control"], /var\(--sui-light-top\)/);
-assert.match(darkVariables["--sui-elevation-pressed"], /var\(--sui-light-top\)/);
+assert.match(darkVariables["--sui-elevation-recessed"], /var\(--sui-light-top\)/);
+
+// `pressed` is published, so it has to keep resolving — as the same recessed depth.
+for (const variables of [lightVariables, darkVariables, systemDarkVariables]) {
+  assert.equal(
+    variables["--sui-elevation-pressed"],
+    "var(--sui-elevation-recessed)",
+    "the pressed alias must resolve to the canonical recessed depth"
+  );
+}
 
 assert.deepEqual(
   normalizeVariables(systemDarkVariables),
@@ -153,7 +163,7 @@ const tailwindResult = await postcss([
     presets: [sherickPreset],
     content: [
       {
-        raw: '<div class="bg-sherick-canvas text-sherick-ink/90 text-sherick-ink-faint bg-sherick-surface-high/[0.66] bg-sherick-primary/[0.12] text-sherick-on-warning outline-sherick-focus ring-1 ring-inset ring-sherick-edge/[0.09] bg-sherick-glass bg-sherick-glass-dense shadow-sherick-flat shadow-sherick-grounded shadow-sherick-raised shadow-sherick-focus shadow-sherick-primary shadow-sherick-floating shadow-sherick-control active:shadow-sherick-pressed duration-press duration-release ease-press ease-release animate-sherick-overlay-in animate-sherick-overlay-out animate-sherick-scrim-in animate-sherick-scrim-out backdrop-blur-[var(--sui-glass-blur,32px)] backdrop-saturate-[var(--sui-glass-saturation,1.45)] backdrop-brightness-[var(--sui-glass-brightness,1.04)]"></div>',
+        raw: '<div class="bg-sherick-canvas text-sherick-ink/90 text-sherick-ink-faint bg-sherick-surface-high/[0.66] bg-sherick-primary/[0.12] text-sherick-on-warning outline-sherick-focus ring-1 ring-inset ring-sherick-edge/[0.09] bg-sherick-glass bg-sherick-glass-dense shadow-sherick-flat shadow-sherick-grounded shadow-sherick-raised shadow-sherick-focus shadow-sherick-primary shadow-sherick-floating shadow-sherick-control shadow-sherick-recessed active:shadow-sherick-pressed duration-press duration-release ease-press ease-release animate-sherick-overlay-in animate-sherick-overlay-out animate-sherick-scrim-in animate-sherick-scrim-out backdrop-blur-[var(--sui-glass-blur,32px)] backdrop-saturate-[var(--sui-glass-saturation,1.45)] backdrop-brightness-[var(--sui-glass-brightness,1.04)]"></div>',
         extension: "html",
       },
     ],
@@ -179,6 +189,7 @@ assert.match(tailwindResult.css, /var\(--sui-shadow-primary/);
 assert.match(tailwindResult.css, /var\(--sui-elevation-raised/);
 assert.match(tailwindResult.css, /var\(--sui-elevation-floating/);
 assert.match(tailwindResult.css, /var\(--sui-elevation-control/);
+assert.match(tailwindResult.css, /var\(--sui-elevation-recessed/);
 assert.match(tailwindResult.css, /var\(--sui-elevation-pressed/);
 assert.match(tailwindResult.css, /var\(--sui-glass-blur/);
 assert.match(tailwindResult.css, /var\(--sui-glass-saturation/);

@@ -67,8 +67,9 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
       <div
         className={cn(
           /* A composite field: the outer surface owns the whole field language — the
-             same hover and focus steps as a single input — while the input inside stays
-             borderless and carries the text cursor. */
+             same hover and focus steps as a single input — and the disabled opacity, so
+             the field dims as one thing rather than three overlapping steps. The inner
+             input and action carry the disabled cursor and semantics only. */
           "relative inline-flex min-w-64 items-center",
           density.normal,
           shape.control,
@@ -89,7 +90,7 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
             "w-full bg-transparent py-3 pl-5 pr-12 text-inherit outline-none placeholder:text-sherick-ink-muted",
             density.normal,
             shape.control,
-            isDisabled ? state.disabled : state.text,
+            isDisabled ? state.disabledDescendant : state.text,
             inputClassName
           )}
           placeholder={placeholder}
@@ -110,7 +111,7 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
             tone.text[variant],
             !isDisabled && stateLayer.quiet,
             !isDisabled && state.press,
-            isDisabled ? state.disabled : state.enabled,
+            isDisabled ? state.disabledDescendant : state.enabled,
             /* `stateLayer` supplies a containing block for its overlay, so an
                absolutely positioned control declares its position after the layer and
                becomes its own containing block. */

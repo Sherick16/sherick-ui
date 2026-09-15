@@ -2,7 +2,7 @@
 
 import React, { useId, useState, type ReactElement, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { elevation, material, motion, shape, text } from "./ui.common";
+import { motion, overlay, text } from "./ui.common";
 import { useOverlayPresence } from "./useOverlayPresence";
 
 export interface TooltipProps {
@@ -53,9 +53,7 @@ const Tooltip = ({ children, content, className, position = "bottom" }: TooltipP
           onAnimationEnd={onExitEnd}
           className={cn(
             "absolute z-40 w-max max-w-64 whitespace-normal px-3 py-2 text-xs leading-5",
-            shape.prominent,
-            material.acrylicDense,
-            elevation.floating,
+            overlay.tooltip,
             text.high,
             positionClass[position],
             closing ? cn(motion.overlayOut, "pointer-events-none") : motion.overlayIn

@@ -99,7 +99,8 @@ Depth is token-driven, and the ladder is the only source of shadow in the librar
 | `shadow-sherick-raised` | `--sui-elevation-raised` | raised matte surfaces and tactile tonal controls |
 | `shadow-sherick-floating` | `--sui-elevation-floating` | acrylic surfaces above the application |
 | `shadow-sherick-control` | `--sui-elevation-control` | matte controls at rest, a hair above their own track |
-| `shadow-sherick-pressed` | `--sui-elevation-pressed` | those controls pressed or selected, recessed into the track |
+| `shadow-sherick-recessed` | `--sui-elevation-recessed` | grooves, tracks and wells — and the depth a held control presses to |
+| `shadow-sherick-pressed` | `--sui-elevation-pressed` | the published alias of that same recessed depth |
 
 The tactile pair (`control`/`pressed`) stays shallower and geometry-neutral: it is a restrained echo of neumorphism on matte controls, not a neumorphic surface.
 
@@ -163,8 +164,8 @@ Every component is assembled from one small set of primitives (internal module `
 | Primitive | Values |
 | --- | --- |
 | material | `canvas`, `matteQuiet`, `matte`, `matteHigh`, `control` (`controlError`), `acrylic`, `acrylicDense`, `acrylicHero` |
-| elevation | `flat`, `raised`, `floating`, `control`, `pressed` |
-| shape | `control` 1.25rem, `prominent` 1.5rem, `surface` 1.75rem, `expressive` 2.25rem, `pill`, `circle` |
+| elevation | `flat`, `raised`, `floating`, `control`, `recessed` (alias `pressed`) |
+| shape | `control` 1.25rem, `prominent` 1.5rem, `surface` 1.75rem, `expressive` 2rem, `pill`, `circle` |
 | edge | `row`, `header`, `rule` — the structural hairlines between stacked parts |
 | tone | `text`, `soft`, `tonal`, `selected`, `strong` — each per semantic variant |
 | state | `press`, `recess`, `groupPress`, `disabled`, `enabled`, `text`, `rowHover`, `field.*` |
@@ -180,10 +181,12 @@ A material is a fill. Tone separates matte surfaces from the canvas, and a compo
 - **flat** by default — every passive matte surface separates by tone alone
 - **raised** on a manipulated control, which presses back into its own track
 - **control** for a part the user moves — a switch thumb, a selected segment
-- **pressed** while a control is physically held, and for tracks and grooves
+- **recessed** for a groove, a track or a well, and the depth a held control lands at
 - **floating** only for surfaces that sit above the application
 
-Acrylic is reserved for genuinely floating UI: menus, tooltips and dialogs. `acrylicHero` is the large-overlay sheet — markedly more opaque and calmer than the smaller recipes, because a surface that owns the viewport has to read first as a physical surface and only secondarily as glass. Its tone sits above the floating level in every theme, so it separates in dark mode without leaning on its shadow; the scrim behind it does the separating, and its blur only defocuses the page. A 1px inset ring that traces a filled object is still a drawn border, so matte controls carry no rim: light does the separating, and a hairline (`edge.row`, `edge.header`, `edge.rule`) is reserved for where two parts of one surface actually meet.
+Which one a control takes is decided by its anatomy, not by its state: a segmented control's thumb is raised because it sits in a groove, a menu row stays flat because it is a row, and nothing gains depth merely to announce that it is hovered, selected or disabled.
+
+Acrylic is reserved for genuinely floating UI: menus, tooltips and dialogs. `acrylicHero` is the large-overlay sheet — markedly more opaque and calmer than the smaller recipes, because a surface that owns the viewport has to read first as a physical surface and only secondarily as glass. Its tone sits a clear step above the canvas in every theme — in dark mode that step is a subtle one (0.236 over a 0.205 canvas) rather than a light grey panel — so it separates without leaning on its shadow; the scrim behind it does the separating, and its blur only defocuses the page. `--sui-overlay-fill` decides how much of the sheet is its own tone rather than the defocused page. A 1px inset ring that traces a filled object is still a drawn border, so matte controls carry no rim: light does the separating, and a hairline (`edge.row`, `edge.header`, `edge.rule`) is reserved for where two parts of one surface actually meet.
 
 ### Interaction states
 

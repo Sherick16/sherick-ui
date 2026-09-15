@@ -13,10 +13,10 @@ import { Check, ChevronDown } from "lucide-react";
 import { cn } from "@/libs/utils";
 import {
   density,
-  elevation,
   focusRing,
   material,
   motion,
+  overlay,
   shape,
   state,
   stateLayer,
@@ -168,7 +168,7 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
             "flex w-full min-w-64 items-center justify-between gap-3 px-5 py-3 text-left",
             shape.control,
             material.control,
-            motion.press,
+            motion.release,
             focusRing,
             !disabled && state.field.hover,
             !disabled && state.field.focus,
@@ -184,7 +184,7 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
           </span>
           <ChevronDown
             aria-hidden="true"
-            className={cn("size-5 shrink-0", text.high, motion.press, isOpen && "rotate-180")}
+            className={cn("size-5 shrink-0", text.high, motion.release, isOpen && "rotate-180")}
           />
         </button>
 
@@ -195,15 +195,14 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
             aria-labelledby={triggerId}
             aria-hidden={closing || undefined}
             onAnimationEnd={onExitEnd}
+            /* A closing overlay keeps its node for the exit step, so it must stop
+               responding to pointers and to the keyboard while it leaves. */
+            inert={closing || undefined}
             className={cn(
               /* A hairline gap keeps the rounded option fills from touching, so hover and
                  selection read as separate rows instead of one merged highlight. */
               "absolute z-30 mt-2 w-full min-w-max space-y-1 p-2",
-              "[--sui-overlay-from-scale:0.985] [--sui-overlay-from-lift:-4px]",
-              "origin-top",
-              shape.surface,
-              material.acrylic,
-              elevation.floating,
+              overlay.menu,
               closing ? cn(motion.overlayOut, "pointer-events-none") : motion.overlayIn
             )}
           >

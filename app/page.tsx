@@ -132,13 +132,13 @@ export default function Home() {
 
               <Specimen
                 title="Elevation"
-                description="Flat matte by default. Depth is added by anatomy, never by the material: tactile on manipulated controls, recessed while pressed and for tracks, floating only for surfaces that genuinely sit above the page."
+                description="Flat matte by default, and depth is chosen by anatomy rather than by state: tactile on manipulated controls, recessed for tracks, grooves and wells, floating only for surfaces that genuinely sit above the page. No control gains depth merely to announce a hover, a selection or a disabled state."
               >
                 <div className="grid gap-4 sm:grid-cols-2">
                   <Tile label="Flat" note="Default — every passive matte surface" className={cn(material.matteHigh, elevation.flat)}>flat</Tile>
                   <Tile label="Raised" note="A manipulated control, resting" className={cn(material.matteHigh, elevation.raised)}>raised</Tile>
                   <Tile label="Control" note="A part the user moves: a thumb, a selected segment" className={cn(material.matteHigh, elevation.control)}>control</Tile>
-                  <Tile label="Pressed" note="While pressed, and for tracks and grooves" className={cn(material.matteHigh, elevation.pressed)}>pressed</Tile>
+                  <Tile label="Recessed" note="Tracks, grooves, wells — and the depth a held control lands at" className={cn(material.matteHigh, elevation.recessed)}>recessed</Tile>
                   <Tile label="Floating" note="Acrylic above the application" className={cn(material.matteHigh, elevation.floating)}>floating</Tile>
                   <div className="flex flex-col items-start justify-center gap-2 text-xs leading-5">
                     <span className={text.medium}>Light from above:</span>
@@ -157,7 +157,7 @@ export default function Home() {
                   <Tile label="Control" note="Ordinary controls" className={cn(material.matteHigh, shape.control)}>1.25rem</Tile>
                   <Tile label="Prominent" note="Prominent controls" className={cn(material.matteHigh, shape.prominent)}>1.5rem</Tile>
                   <Tile label="Surface" note="Large surfaces" className={cn(material.matteHigh, shape.surface)}>1.75rem</Tile>
-                  <Tile label="Expressive" note="Hero overlays" className={cn(material.matteHigh, shape.expressive)}>2.25rem</Tile>
+                  <Tile label="Expressive" note="The large overlay sheet" className={cn(material.matteHigh, shape.expressive)}>2rem</Tile>
                   <Tile label="Pill" note="Content-driven width" className={cn(tone.tonal.primary, shape.pill, text.high)}>pill</Tile>
                   <Tile label="Circle" note="Square targets" className={cn(tone.tonal.primary, shape.circle, text.high, "aspect-square w-24 self-center")}>circle</Tile>
                 </div>
@@ -236,7 +236,7 @@ export default function Home() {
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                   <StateTile label="Rest" className={cn(material.control, text.high)}>Rest</StateTile>
                   <StateTile label="Hover" className={cn(material.control, "bg-sherick-surface-high/[0.82]", text.high)}>Hover</StateTile>
-                  <StateTile label="Pressed" className={cn(material.control, "bg-sherick-surface-high/[0.9]", elevation.pressed, text.high)}>Pressed</StateTile>
+                  <StateTile label="Pressed" className={cn(material.control, "bg-sherick-surface-high/[0.9]", elevation.recessed, text.high)}>Pressed</StateTile>
                   <StateTile label="Selected" className={cn(shape.control, tone.selected.primary)}>Selected</StateTile>
                   <StateTile label="Disabled" className={cn(material.control, state.disabled)}>Disabled</StateTile>
                   <StateTile label="Focus-visible" className={cn(material.control, text.high, "outline outline-2 outline-sherick-focus outline-offset-[3px]")}>Focus</StateTile>
@@ -466,7 +466,7 @@ export default function Home() {
                 <CodeBlock language="tsx">{'<ActionButton appearance="filled">Save</ActionButton>'}</CodeBlock>
               </Specimen>
               <Specimen title="Markdown" description="Headings, links, lists, quotes and inline code share a readable rhythm.">
-                <Markdown>{`## Example\nSherick UI keeps **dense information quiet** and gives floating UI more depth.\n\n- Predictable controls\n- Soft hierarchy\n- [Accessible interactions](#)\n\n> Expression should clarify hierarchy, not decorate every surface.\n\nUse \`ActionButton\` for primary actions, and reach for a fenced block when the code carries its own hierarchy:\n\n\`\`\`ts\nconst surface = material.matteRaised;\nconst action = shape.pill;\n\`\`\``}</Markdown>
+                <Markdown>{`## Example\nSherick UI keeps **dense information quiet** and gives floating UI more depth.\n\n- Predictable controls\n- Soft hierarchy\n- [Accessible interactions](#)\n\n> Expression should clarify hierarchy, not decorate every surface.\n\nUse \`ActionButton\` for primary actions, and reach for a fenced block when the code carries its own hierarchy:\n\n\`\`\`ts\nconst surface = material.matte;\nconst action = shape.pill;\n\`\`\``}</Markdown>
               </Specimen>
             </div>
           </section>

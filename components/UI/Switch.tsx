@@ -50,7 +50,7 @@ export const Switch = ({
              the segmented control. */
           "relative block h-8 w-[3.25rem] shrink-0",
           shape.pill,
-          elevation.pressed,
+          elevation.recessed,
           motion.release,
           "group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-sherick-focus group-focus-visible:outline-offset-[3px]",
           checked ? tone.strong[variant] : cn(tone.strong.secondary, text.medium),

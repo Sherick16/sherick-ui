@@ -44,10 +44,13 @@ export const focusRingInset =
 /* Motion — three families. A component picks a family, never a duration:
    - press:   a tonality change with no physical travel: hover, focus, an engaged
               field. Fast and decisive in both directions.
-   - release: a tactile control. It takes the press timing while it is held
-              (`active:`), so the press lands immediately, and the release timing
-              while it settles, so letting go is expressive. Also carries the
-              transform and size a selection or a thumb travels with.
+   - release: a tactile control. It carries every property a tactile control can
+              animate — colour, shadow, transform and the size a selection or a thumb
+              travels with — and it takes the press timing while it is held (`active:`),
+              so the press lands immediately, while the release timing carries the
+              settle, so letting go is expressive.
+   A control whose transform changes must use `release`; `press` is for pure tonality
+   and colour transitions that never move or resize anything.
    - overlay: the entrance and exit of anything that floats above the page, with a
               matching scrim family for the plane behind it.
    Every family is neutralised under `prefers-reduced-motion`; the overlay family
@@ -58,7 +61,7 @@ export const motion = {
   press:
     "transition-[background-color,color,box-shadow,opacity] duration-press ease-press motion-reduce:transition-none",
   release:
-    "transition-[background-color,color,box-shadow,transform,opacity] duration-release ease-release active:duration-press active:ease-press motion-reduce:transition-none motion-reduce:transform-none",
+    "transition-[background-color,color,box-shadow,transform,opacity,width,height] duration-release ease-release active:duration-press active:ease-press motion-reduce:transition-none motion-reduce:transform-none",
   overlayIn: "animate-sherick-overlay-in motion-reduce:animate-none",
   overlayOut: "animate-sherick-overlay-out motion-reduce:animate-none",
   scrimIn: "animate-sherick-scrim-in motion-reduce:animate-none",
@@ -73,14 +76,21 @@ export const motion = {
    - floating: a surface that genuinely sits above the application.
    - control:  the resting half of the tactile pair, for a part the user moves —
                a switch thumb, a selected segment.
-   - pressed:  the recessed half. Used while a control is physically pressed, and
-               for tracks and grooves, which are recessed by definition.
+   - recessed: the other half of that pair: a groove, a track or a well, which is
+               recessed by definition, and an actively pressed control, which lands at
+               the same depth. `pressed` is the published alias for that depth; prefer
+               `recessed` whenever the surface is simply sunk rather than being held.
    A passive surface never takes any of these. */
 export const elevation = {
   flat: "shadow-sherick-flat",
   raised: "shadow-sherick-raised",
   floating: "shadow-sherick-floating",
   control: "shadow-sherick-control",
+  recessed: "shadow-sherick-recessed",
+  /* The same physical depth, named for the moment a control reaches it by being held
+     down. Kept because it is published: a control that is actively pressed and a
+     passive groove resolve to one recessed depth, so neither name describes a
+     different height. */
   pressed: "shadow-sherick-pressed",
 } as const;
 
@@ -134,9 +144,14 @@ export const state = {
   press: "active:scale-[0.98] motion-reduce:active:scale-100",
   /* The same compression, driven by the wrapping button instead of the track. */
   groupPress: "group-active:scale-[0.98] motion-reduce:group-active:scale-100",
-  /* A raised matte control presses back into the track beneath it. */
-  recess: "active:shadow-sherick-pressed",
+  /* A raised matte control presses back into the track beneath it — the same physical
+     depth a groove or a well sits at. */
+  recess: "active:shadow-sherick-recessed",
   disabled: "cursor-not-allowed opacity-45",
+  /* A control nested inside a disabled composite. The composite already applied the
+     opacity step, and a second one would dim the field unevenly; this carries only the
+     disabled cursor and semantics. */
+  disabledDescendant: "cursor-not-allowed",
   /* A control with a hit area of its own. */
   enabled: "cursor-pointer",
   /* A text field: the normal text cursor, never a pointer. */
@@ -213,7 +228,8 @@ export const stateLayer = {
                   scrim behind it does the separating, the blur only defocuses, and the
                   gradient is a restrained top-to-bottom light rather than a frosted
                   haze. Its tone sits above the floating level in every theme, which is
-                  how it separates in dark mode without leaning on its shadow, and
+                  how it separates in dark mode without leaning on its shadow — the dark
+                  tone is a subtle step above the canvas, not a light grey sheet — and
                   `--sui-overlay-fill` tunes how much of the sheet is its own tone rather
                   than the defocused page — a large overlay leans on that, not on blur. */
 export const material = {
@@ -244,6 +260,24 @@ export const density = {
   prominent: "min-h-14 text-lg",
   /* Minimum interactive target for an icon-only control. */
   target: "min-h-11 min-w-11",
+} as const;
+
+/* Floating overlay shells.
+   These recipes only exist while an overlay is open, so no closed-state render can
+   reach them: they live here, once, and every overlay composes them. Each entry is the
+   surface of one overlay — its corner role, its material, its elevation and the
+   geometry its entrance grows from — while the entrance/exit selection and the pointer
+   and focus suppression stay in the component, because only the component knows whether
+   it is opening or closing. `motion.overlayIn`/`overlayOut` are the family every entry
+   animates with. */
+export const overlay = {
+  /* A menu grows out of its trigger. */
+  menu: `origin-top [--sui-overlay-from-scale:0.985] [--sui-overlay-from-lift:-4px] ${shape.surface} ${material.acrylic} ${elevation.floating}`,
+  /* A tooltip grows out of the edge it is anchored to, so its geometry is per position
+     and is applied with the position in the component. */
+  tooltip: `${shape.prominent} ${material.acrylicDense} ${elevation.floating}`,
+  /* A dialog rises further than a menu, from its own scale. */
+  dialog: `[--sui-overlay-from-scale:0.985] [--sui-overlay-from-lift:8px] ${shape.expressive} ${material.acrylicHero} ${elevation.floating}`,
 } as const;
 
 /* Text hierarchy — three steps, no more. High emphasis carries labels and values,

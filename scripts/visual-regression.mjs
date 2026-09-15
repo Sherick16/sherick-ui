@@ -21,10 +21,16 @@
  `document.body`); its shell is covered by the browser pass in the PR that introduced
  this gate, and its `Header`/`Content`/`Footer` parts are covered here.
 
+ The open overlay recipes (menu, tooltip, dialog) only exist while an overlay is open,
+ so no closed-state render can reach them and a portal cannot be server-rendered. They
+ are owned once, as data, by `overlay` in the primitives module, and pinned here from
+ source — which is why this script runs under Bun (it can import the TypeScript module
+ directly) and why those recipes are snapshotted as data rather than as markup.
+
  Usage:
-   node scripts/visual-regression.mjs            check against the baseline
-   node scripts/visual-regression.mjs --update   rewrite the baseline
-   node scripts/visual-regression.mjs --preview   also write .visual/preview.html
+   bun scripts/visual-regression.mjs             check against the baseline
+   bun scripts/visual-regression.mjs --update    rewrite the baseline
+   bun scripts/visual-regression.mjs --preview   also write .visual/preview.html
 */
 
 import { mkdir, readFile, writeFile } from "node:fs/promises";
@@ -35,6 +41,9 @@ import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import tailwindcss from "tailwindcss";
 import preset from "../tailwind.preset.cjs";
+/* Source import: the primitives module is TypeScript and is not part of the published
+   entry point, and these recipes are internal data rather than public API. */
+import { motion, overlay } from "../components/UI/ui.common.ts";
 
 const library = await import("../dist/index.esm.js");
 
@@ -145,7 +154,17 @@ const rendered = Object.fromEntries(
   Object.entries(specimens).map(([id, element]) => [id, normalizeMarkup(renderToStaticMarkup(element))])
 );
 
-const markup = Object.values(rendered).join("\n");
+const overlayRecipes = {
+  menu: overlay.menu,
+  tooltip: overlay.tooltip,
+  dialog: overlay.dialog,
+  "motion.in": motion.overlayIn,
+  "motion.out": motion.overlayOut,
+  "motion.scrimIn": motion.scrimIn,
+  "motion.scrimOut": motion.scrimOut,
+};
+
+const markup = [Object.values(rendered).join("\n"), ...Object.values(overlayRecipes)].join("\n");
 
 const utilityCss = (
   await postcss([
@@ -192,7 +211,7 @@ themeRoot.each((node) => {
 
 /* Group a few decorative token families so a diff says what changed rather than
    dumping the whole palette. */
-const snapshot = { tokens, utilities, specimens: rendered };
+const snapshot = { tokens, utilities, specimens: rendered, overlays: overlayRecipes };
 
 const flatten = (value, prefix = "", out = {}) => {
   if (value !== null && typeof value === "object") {
@@ -205,7 +224,17 @@ const flatten = (value, prefix = "", out = {}) => {
 
 const baselineRaw = await readFile(baselinePath, "utf8").catch(() => null);
 
-if (update || baselineRaw === null) {
+if (baselineRaw === null && !update) {
+  console.error(`Visual regression: no baseline at ${baselinePath.replace(`${root}/`, "")}.
+
+The gate compares the library against a recorded baseline; without one it cannot tell a
+deliberate change from a silent restyle. Create it with:
+  bun run visual --update
+and review the diff before committing it.`);
+  process.exit(1);
+}
+
+if (update) {
   await mkdir(join(root, "scripts", "visual-baselines"), { recursive: true });
   await writeFile(baselinePath, `${JSON.stringify(snapshot, null, 2)}\n`);
   console.log(`Visual baseline written (${Object.keys(rendered).length} specimens).`);
@@ -229,7 +258,7 @@ if (update || baselineRaw === null) {
     process.exit(1);
   }
 
-  console.log(`Visual regression passed (${Object.keys(rendered).length} specimens, ${Object.keys(utilities).length} utilities, ${Object.keys(tokens).length} token blocks).`);
+  console.log(`Visual regression passed (${Object.keys(rendered).length} specimens, ${Object.keys(overlayRecipes).length} overlay recipes, ${Object.keys(utilities).length} utilities, ${Object.keys(tokens).length} token blocks).`);
 }
 
 if (preview) {

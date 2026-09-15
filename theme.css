@@ -95,7 +95,8 @@
      shallower than the tonal ladder and geometry-neutral — a restrained echo of
      neumorphism, never a neumorphic surface. */
   --sui-elevation-control: 0 1px 2px oklch(var(--sui-light-bottom) / 0.19), inset 0 1px 0 oklch(var(--sui-light-top) / 0.55);
-  --sui-elevation-pressed: inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.22), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.50);
+  --sui-elevation-recessed: inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.22), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.50);
+  --sui-elevation-pressed: var(--sui-elevation-recessed);
 
   /* Compatibility aliases. `grounded` was the published name of the flat step, and
      both glow tokens shipped in 1.0.x; a consumer may still reference the variable
@@ -211,7 +212,8 @@
   --sui-elevation-raised: 0 1px 2px oklch(var(--sui-light-bottom) / 0.26), 0 4px 12px oklch(var(--sui-light-bottom) / 0.15);
   --sui-elevation-floating: 0 18px 44px oklch(var(--sui-light-bottom) / 0.38), inset 0 1px 0 oklch(var(--sui-light-top) / 0.05);
   --sui-elevation-control: 0 1px 2px oklch(var(--sui-light-bottom) / 0.30), inset 0 1px 0 oklch(var(--sui-light-top) / 0.08);
-  --sui-elevation-pressed: inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.38), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.06);
+  --sui-elevation-recessed: inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.38), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.06);
+  --sui-elevation-pressed: var(--sui-elevation-recessed);
   --sui-elevation-grounded: var(--sui-elevation-flat);
   --sui-shadow-focus: 0 10px 28px -22px rgb(90 145 255 / 0.42);
   --sui-shadow-primary: 0 12px 30px -22px rgb(82 139 255 / 0.34);
@@ -298,7 +300,8 @@
     --sui-elevation-raised: 0 1px 2px oklch(var(--sui-light-bottom) / 0.26), 0 4px 12px oklch(var(--sui-light-bottom) / 0.15);
     --sui-elevation-floating: 0 18px 44px oklch(var(--sui-light-bottom) / 0.38), inset 0 1px 0 oklch(var(--sui-light-top) / 0.05);
     --sui-elevation-control: 0 1px 2px oklch(var(--sui-light-bottom) / 0.30), inset 0 1px 0 oklch(var(--sui-light-top) / 0.08);
-    --sui-elevation-pressed: inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.38), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.06);
+    --sui-elevation-recessed: inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.38), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.06);
+    --sui-elevation-pressed: var(--sui-elevation-recessed);
     --sui-elevation-grounded: var(--sui-elevation-flat);
     --sui-shadow-focus: 0 10px 28px -22px rgb(90 145 255 / 0.42);
     --sui-shadow-primary: 0 12px 30px -22px rgb(82 139 255 / 0.34);

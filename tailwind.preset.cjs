@@ -67,8 +67,12 @@ module.exports = {
           "var(--sui-elevation-floating, 0 18px 44px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.05))",
         "sherick-control":
           "var(--sui-elevation-control, 0 1px 2px rgba(0, 0, 0, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.08))",
+        "sherick-recessed":
+          "var(--sui-elevation-recessed, inset 0 1px 3px rgba(0, 0, 0, 0.38), inset 0 -1px 0 rgba(255, 255, 255, 0.06))",
+        /* The published alias of the same depth: a control being held and a passive
+           groove resolve to one recessed step. */
         "sherick-pressed":
-          "var(--sui-elevation-pressed, inset 0 1px 3px rgba(0, 0, 0, 0.38), inset 0 -1px 0 rgba(255, 255, 255, 0.06))",
+          "var(--sui-elevation-pressed, var(--sui-elevation-recessed, inset 0 1px 3px rgba(0, 0, 0, 0.38), inset 0 -1px 0 rgba(255, 255, 255, 0.06)))",
         "sherick-focus":
           "var(--sui-shadow-focus, 0 10px 28px -22px rgba(90, 145, 255, 0.42))",
         "sherick-primary":

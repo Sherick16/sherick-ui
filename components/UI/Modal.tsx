@@ -6,10 +6,9 @@ import { X } from "lucide-react";
 import { cn } from "@/libs/utils";
 import {
   density,
-  elevation,
   focusRing,
-  material,
   motion,
+  overlay,
   shape,
   state,
   stateLayer,
@@ -98,6 +97,9 @@ export default function Modal({ children, open, onClose, className }: ModalProps
 
   return createPortal(
     <div
+      /* A closing dialog keeps its node for the exit step, so it must stop responding to
+         pointers and stop holding focusable descendants while it leaves. */
+      inert={closing || undefined}
       className={cn("fixed inset-0 z-50", closing && "pointer-events-none")}
       role="dialog"
       aria-modal="true"
@@ -128,13 +130,8 @@ export default function Modal({ children, open, onClose, className }: ModalProps
             tabIndex={-1}
             onAnimationEnd={onExitEnd}
             className={cn(
-              /* A dialog rises further than a menu, from its own scale, on the same
-                 overlay timing. */
               "relative w-full max-w-lg outline-none",
-              "[--sui-overlay-from-scale:0.985] [--sui-overlay-from-lift:8px]",
-              shape.expressive,
-              material.acrylicHero,
-              elevation.floating,
+              overlay.dialog,
               closing ? motion.overlayOut : motion.overlayIn,
               className
             )}

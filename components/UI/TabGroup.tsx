@@ -78,7 +78,7 @@ export const TabGroup = ({
              above it. The same groove-and-thumb model as the switch. */
           "relative flex min-w-max bg-sherick-surface/[0.72] p-1.5",
           shape.pill,
-          elevation.pressed
+          elevation.recessed
         )}
       >
         <div
