@@ -22,6 +22,7 @@ import "prismjs/components/prism-python";
 import "prismjs/components/prism-sql";
 import "prismjs/components/prism-yaml";
 import { cn } from "@/libs/utils";
+import { focusRing } from "./ui.common";
 import theme from "./prism-theme";
 
 export interface CodeBlockProps {
@@ -70,7 +71,8 @@ const CodeBlock = ({
           className={cn(
             "flex items-center space-x-1 rounded-md px-2 py-1 text-xs",
             "bg-gray-700/50 text-gray-300 transition-colors",
-            "hover:bg-gray-600/50 hover:text-gray-200"
+            "hover:bg-gray-600/50 hover:text-gray-200",
+            focusRing
           )}
         >
           {copied ? (
