@@ -2,6 +2,7 @@
 
 import React, { forwardRef, useId, type TextareaHTMLAttributes } from "react";
 import { cn } from "@/libs/utils";
+import { focusRing } from "./ui.common";
 
 export interface TextareaProps
   extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "onChange"> {
@@ -39,10 +40,11 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           required={required}
           aria-invalid={error || undefined}
           className={cn(
-            "px-4 py-4 rounded-lg bg-opacity-20 hover:bg-opacity-40 transition-all min-w-64 min-h-16 w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20",
+            "px-4 py-4 rounded-lg bg-opacity-20 hover:bg-opacity-40 transition-all min-w-64 min-h-16 w-full",
+            focusRing,
             !error
               ? "bg-gray-400 text-gray-300 hover:bg-gray-500"
-              : "text-red-300 bg-red-500 bg-opacity-15 hover:bg-opacity-25 hover:bg-red-500 focus-visible:ring-red-400/30",
+              : "text-red-300 bg-red-500 bg-opacity-15 hover:bg-opacity-25 hover:bg-red-500",
             textareaClassName
           )}
           onChange={(event) => onChange?.(event.target.value)}
