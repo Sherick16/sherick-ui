@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import {
+  ArrowUpRight,
   Bell,
   Check,
   Download,
@@ -12,7 +13,7 @@ import {
   Sun,
   Trash2,
 } from "lucide-react";
-import ActionButton, { type ButtonSize } from "@/components/UI/ActionButton";
+import ActionButton from "@/components/UI/ActionButton";
 import Dropdown from "@/components/UI/Dropdown";
 import Search from "@/components/UI/Search";
 import Input from "@/components/UI/Input";
@@ -23,6 +24,7 @@ import Modal from "@/components/UI/Modal";
 import Badge from "@/components/UI/Badge";
 import IconButton from "@/components/UI/IconButton";
 import CodeBlock from "@/components/UI/CodeBlock";
+import Divider from "@/components/UI/Divider";
 import Markdown from "@/components/UI/Markdown";
 import NavGroup from "@/components/UI/NavGroup";
 import { Spinner } from "@/components/UI/Spinner";
@@ -41,6 +43,7 @@ import {
   motion,
   shape,
   state,
+  stateLayer,
   text,
   tone,
 } from "@/components/UI/ui.common";
@@ -68,6 +71,7 @@ const applyTheme = (theme: ThemeMode) => {
 export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);
   const [switchOn, setSwitchOn] = useState(true);
+  const [motionSwitch, setMotionSwitch] = useState(false);
   const [selection, setSelection] = useState("design");
   const [theme, setTheme] = useState<ThemeMode>("system");
 
@@ -92,110 +96,67 @@ export default function Home() {
             <Badge variant="primary">Sherick UI · development workbench</Badge>
             <h1 className="mt-5 text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">Design system showcase</h1>
             <p className={cn("mt-3 max-w-2xl text-base leading-7", text.medium)}>
-              One set of primitives — material, elevation, shape, edge, tone, state, density and motion — used by every component and comparable side by side below.
+              Every component and primitive, side by side, in every theme.
             </p>
+            <a
+              href="https://github.com/Sherick16/sherick-ui/blob/main/docs/DESIGN_LANGUAGE.md"
+              className={cn("mt-4 inline-flex items-center gap-1.5 text-sm", text.medium, motion.press, `${focusRing} focus-visible:outline-offset-2`, "hover:text-sherick-ink")}
+            >
+              Design language
+              <ArrowUpRight className="size-3.5" aria-hidden="true" />
+            </a>
           </div>
           <ThemePicker theme={theme} onChange={changeTheme} />
         </div>
 
         <div className="space-y-16">
           <section>
-            <SectionHeading
-              title="Design language"
-              description="The primitives a new component chooses from. Every variant below is the same token the library itself applies, so what is compared here is what ships."
-            />
+            <SectionHeading title="Design language" />
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
-              <Specimen
-                title="Material"
-                description="A material is a fill, nothing else. Tone separates matte surfaces from the canvas, and acrylic is reserved for what floats above the page — no material carries a shadow or a rim."
-              >
-                <div className={cn("grid gap-4 p-5 sm:grid-cols-2", shape.control, material.canvas)}>
-                  <Tile label="Canvas" note="The page itself" className={cn(material.canvas, "outline outline-1 outline-dashed outline-sherick-edge/[0.25]")}>canvas</Tile>
-                  <Tile label="Matte quiet" note="Dense data regions and wells" className={material.matteQuiet}>matte quiet</Tile>
-                  <Tile label="Matte" note="Cards and panels, flat on the canvas" className={material.matte}>matte</Tile>
-                  <Tile label="Matte high" note="Nesting inside another matte surface" className={material.matteHigh}>matte high</Tile>
-                  <Tile label="Matte control" note="The fill every text control shares" className={material.control}>matte control</Tile>
-                  <Tile label="Matte control, invalid" note="The same fill, carrying danger tone" className={material.controlError}>invalid field</Tile>
+              <Specimen title="Material">
+                <div className={cn("grid grid-cols-2 gap-4 p-5 sm:grid-cols-3", shape.control, material.canvas)}>
+                  <Tile label="Canvas" className={cn(material.canvas, "outline outline-1 outline-dashed outline-sherick-edge/[0.25]")} />
+                  <Tile label="Matte quiet" className={material.matteQuiet} />
+                  <Tile label="Matte" className={material.matte} />
+                  <Tile label="Matte high" className={material.matteHigh} />
+                  <Tile label="Matte control" className={material.control} />
+                  <Tile label="Invalid" className={material.controlError} />
                 </div>
-                <div className={cn("relative mt-4 overflow-hidden p-5 bg-sherick-canvas/[0.55]", shape.prominent)}>
+                <div className={cn("relative mt-4 overflow-hidden p-5", shape.prominent, "bg-sherick-canvas/[0.55]")}>
                   <div className="pointer-events-none absolute inset-0" aria-hidden="true">
                     <div className="absolute -left-6 -top-4 h-24 w-36 rounded-full bg-sherick-primary/[0.30] blur-[28px]" />
                     <div className="absolute -bottom-2 right-2 h-20 w-28 rounded-full bg-sherick-accent/[0.22] blur-[26px]" />
                   </div>
-                  <div className="relative grid gap-4 sm:grid-cols-3">
-                    <Tile label="Acrylic" note="Menus and popups" className={material.acrylic}>acrylic</Tile>
-                    <Tile label="Acrylic dense" note="Small floating surfaces" className={material.acrylicDense}>dense</Tile>
-                    <Tile label="Acrylic hero" note="A surface that owns the viewport" className={material.acrylicHero}>hero</Tile>
+                  <div className="relative grid grid-cols-1 gap-4 sm:grid-cols-3">
+                    <Tile label="Acrylic" className={material.acrylic} />
+                    <Tile label="Dense" className={material.acrylicDense} />
+                    <Tile label="Hero" className={material.acrylicHero} />
                   </div>
                 </div>
               </Specimen>
 
-              <Specimen
-                title="Elevation"
-                description="Flat matte by default, and depth is chosen by anatomy rather than by state: tactile on manipulated controls, recessed for tracks, grooves and wells, floating only for surfaces that genuinely sit above the page. No control gains depth merely to announce a hover, a selection or a disabled state."
-              >
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <Tile label="Flat" note="Default — every passive matte surface" className={cn(material.matteHigh, elevation.flat)}>flat</Tile>
-                  <Tile label="Raised" note="A manipulated control, resting" className={cn(material.matteHigh, elevation.raised)}>raised</Tile>
-                  <Tile label="Control" note="A part the user moves: a thumb, a selected segment" className={cn(material.matteHigh, elevation.control)}>control</Tile>
-                  <Tile label="Recessed" note="Tracks, grooves, wells — and the depth a held control lands at" className={cn(material.matteHigh, elevation.recessed)}>recessed</Tile>
-                  <Tile label="Floating" note="Acrylic above the application" className={cn(material.matteHigh, elevation.floating)}>floating</Tile>
-                  <div className="flex flex-col items-start justify-center gap-2 text-xs leading-5">
-                    <span className={text.medium}>Light from above:</span>
-                    <span className={text.high}>inset 0 1px 0 · highlight</span>
-                    <span className={text.high}>0 Ypx · lower shadow</span>
-                    <span className={text.high}>inset 0 -1px 0 · bounce</span>
-                  </div>
-                </div>
-              </Specimen>
-
-              <Specimen
-                title="Shape"
-                description="Six corner roles. Softness grows with size and emphasis, and nothing picks a radius of its own."
-              >
+              <Specimen title="Elevation">
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                  <Tile label="Control" note="Ordinary controls" className={cn(material.matteHigh, shape.control)}>1.25rem</Tile>
-                  <Tile label="Prominent" note="Prominent controls" className={cn(material.matteHigh, shape.prominent)}>1.5rem</Tile>
-                  <Tile label="Surface" note="Large surfaces" className={cn(material.matteHigh, shape.surface)}>1.75rem</Tile>
-                  <Tile label="Expressive" note="The large overlay sheet" className={cn(material.matteHigh, shape.expressive)}>2rem</Tile>
-                  <Tile label="Pill" note="Content-driven width" className={cn(tone.tonal.primary, shape.pill, text.high)}>pill</Tile>
-                  <Tile label="Circle" note="Square targets" className={cn(tone.tonal.primary, shape.circle, text.high, "aspect-square w-24 self-center")}>circle</Tile>
+                  <Tile label="Flat" className={cn(material.matteHigh, elevation.flat)} />
+                  <Tile label="Raised" className={cn(material.matteHigh, elevation.raised)} />
+                  <Tile label="Control" className={cn(material.matteHigh, elevation.control)} />
+                  <Tile label="Recessed" className={cn(material.matteHigh, elevation.recessed)} />
+                  <Tile label="Floating" className={cn(material.matteHigh, elevation.floating)} />
                 </div>
               </Specimen>
 
-              <Specimen
-                title="Structural lines"
-                description="A 1px ring that traces a filled object is still a border, so matte controls carry none: they are separated by tone and by light. A hairline is reserved for where two parts of one surface actually meet."
-              >
-                <div className={cn("overflow-hidden", shape.control, material.matte)}>
-                  <div className={cn("flex items-center justify-between px-4 py-3 text-sm font-medium", edge.header, text.medium)}>
-                    <span>Component</span>
-                    <span>Line</span>
-                  </div>
-                  <div className={cn("flex items-center justify-between px-4 py-3 text-sm", edge.row, text.high)}>
-                    <span>Table rows</span>
-                    <span className={text.low}>edge.row</span>
-                  </div>
-                  <div className={cn("flex items-center justify-between px-4 py-3 text-sm", edge.row, text.high)}>
-                    <span>Column header</span>
-                    <span className={text.low}>edge.header</span>
-                  </div>
-                  <div className="flex items-center justify-between px-4 py-3 text-sm">
-                    <span className={text.high}>Rules and dividers</span>
-                    <span className={text.low}>edge.rule</span>
-                  </div>
-                </div>
-                <div className={cn("mt-4 border-t pt-4", edge.rule)}>
-                  <p className={cn("text-xs leading-5", text.medium)}>
-                    One tone serves every line, so table rows, dividers, code sections and quotes agree. Fields add no line at all: their state is tonality.
-                  </p>
+              <Specimen title="Shape">
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                  <Tile label="1.25rem" caption="Control" className={cn(material.matteHigh, shape.control)} />
+                  <Tile label="1.5rem" caption="Prominent" className={cn(material.matteHigh, shape.prominent)} />
+                  <Tile label="1.75rem" caption="Surface" className={cn(material.matteHigh, shape.surface)} />
+                  <Tile label="2rem" caption="Expressive" className={cn(material.matteHigh, shape.expressive)} />
+                  <Tile label="pill" caption="Pill" className={cn(tone.tonal.primary, shape.pill, text.high)} />
+                  <Tile label="circle" caption="Circle" className={cn(tone.tonal.primary, shape.circle, text.high, "aspect-square w-24 max-w-full self-center")} />
                 </div>
               </Specimen>
 
-              <Specimen
-                title="Tonality"
-                description="Canvas and surface levels, the three-step text hierarchy, accent hierarchy and semantic states — every color a component is allowed to use."
-              >
+              <Specimen title="Tonality">
                 <div className="space-y-5">
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                     <Swatch label="Canvas" className={material.canvas} />
@@ -215,9 +176,9 @@ export default function Home() {
                     <Swatch label="Success" className="bg-sherick-success" />
                   </div>
                   <div className="space-y-2">
-                    <p className={cn("text-sm", text.high)}>High emphasis — labels and values</p>
-                    <p className={cn("text-sm", text.medium)}>Medium emphasis — supporting copy</p>
-                    <p className={cn("text-sm", text.low)}>Low emphasis — gutters and hints</p>
+                    <p className={cn("text-sm", text.high)}>High emphasis</p>
+                    <p className={cn("text-sm", text.medium)}>Medium emphasis</p>
+                    <p className={cn("text-sm", text.low)}>Low emphasis</p>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <Badge variant="primary">Soft primary</Badge>
@@ -229,70 +190,72 @@ export default function Home() {
                 </div>
               </Specimen>
 
-              <Specimen
-                title="Interaction states"
-                description="One language: tonality carries hover, a recess carries pressed, a tone carries selection, opacity carries disabled, and one ring carries focus. Depth is never added just to show a state."
-              >
+              <Specimen title="Interaction states">
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                  <StateTile label="Rest" className={cn(material.control, text.high)}>Rest</StateTile>
-                  <StateTile label="Hover" className={cn(material.control, "bg-sherick-surface-high/[0.82]", text.high)}>Hover</StateTile>
-                  <StateTile label="Pressed" className={cn(material.control, "bg-sherick-surface-high/[0.9]", elevation.recessed, text.high)}>Pressed</StateTile>
-                  <StateTile label="Selected" className={cn(shape.control, tone.selected.primary)}>Selected</StateTile>
-                  <StateTile label="Disabled" className={cn(material.control, state.disabled)}>Disabled</StateTile>
-                  <StateTile label="Focus-visible" className={cn(material.control, text.high, "outline outline-2 outline-sherick-focus outline-offset-[3px]")}>Focus</StateTile>
+                  <Tile label="Rest" className={cn(material.control, text.high)} />
+                  <Tile label="Hover" className={cn(material.control, "bg-sherick-surface-high/[0.82]", text.high)} />
+                  <Tile label="Pressed" className={cn(material.control, text.high, stateLayer.tonal, "before:opacity-[0.15]")} />
+                  <Tile label="Selected" className={cn(shape.control, tone.selected.primary)} />
+                  <Tile label="Disabled" className={cn(material.control, state.disabled)} />
+                  <Tile label="Focus" className={cn(material.control, text.high, "outline outline-2 outline-sherick-focus outline-offset-[3px]")} />
                 </div>
-                <p className={cn("mt-4 text-xs leading-5", text.medium)}>
-                  Selected is a tone, not a depth: a segment inside a groove is raised, a row in a list stays flat. The static tiles above show hover, pressed and focus applied for comparison; use any real control below to see the press and release timings.
-                </p>
               </Specimen>
 
-              <Specimen
-                title="Density"
-                description="Density owns height and the type step, so controls of one density share a rhythm. Anatomy owns padding: a button is gripped at its ends, a field holds text, and neither derives from the other."
-              >
-                <div className="space-y-5">
-                  <DensityRow label="Compact" role={density.compact} buttonPadding="px-4 py-2" size="sm" />
-                  <DensityRow label="Normal" role={density.normal} buttonPadding="px-6 py-3" size="md" />
-                  <DensityRow label="Prominent" role={density.prominent} buttonPadding="px-8 py-4" size="lg" />
-                  <div className="flex flex-wrap items-center gap-3">
-                    <span className={cn("w-24 shrink-0 text-xs font-medium", text.medium)}>Anatomy</span>
-                    <span className={cn(density.normal, shape.control, material.control, text.high, "inline-flex min-h-12 items-center gap-2 px-6 py-3")}>Button</span>
-                    <span className={cn(density.normal, shape.control, material.control, text.high, "inline-flex min-h-12 items-center gap-2 px-5 py-3")}>Field</span>
-                    <span className={cn("text-xs", text.medium)}>One density, two paddings</span>
+              <Specimen title="Motion">
+                <div className="space-y-4">
+                  <div className="flex flex-wrap items-center gap-4">
+                    <span className={cn("w-20 text-xs font-medium", text.high)}>Press</span>
+                    <Input placeholder="Hover, focus or type" className="w-56" />
                   </div>
-                  <div className="flex items-center gap-3">
-                    <span className={cn("w-24 shrink-0 text-xs font-medium", text.medium)}>Target</span>
-                    <span className={cn(density.target, shape.circle, material.matteHigh, "inline-flex items-center justify-center")}>
-                      <Heart className="size-5" aria-hidden="true" />
-                    </span>
-                    <span className={cn("text-xs", text.medium)}>{density.target} — the hit target floor for icon-only controls</span>
+                  <div className="flex flex-wrap items-center gap-4">
+                    <span className={cn("w-20 text-xs font-medium", text.high)}>Release</span>
+                    <Switch checked={motionSwitch} onChange={setMotionSwitch} />
+                  </div>
+                  <div className="flex flex-wrap items-center gap-4">
+                    <span className={cn("w-20 text-xs font-medium", text.high)}>Overlay</span>
+                    <Tooltip content="Overlay">
+                      <IconButton variant="secondary" icon={<Bell />} aria-label="Overlay" />
+                    </Tooltip>
                   </div>
                 </div>
               </Specimen>
 
-              <Specimen
-                title="Motion"
-                description="Three families, no exceptions. Each is a token pair of duration and easing, and each collapses under prefers-reduced-motion."
-              >
-                <div className="space-y-3">
-                  <MotionRow label="Press" note="A tonality change with no travel: hover, focus, an engaged field" tokens="--sui-duration-press · --sui-ease-press" />
-                  <MotionRow label="Release" note="A tactile control: press timing while held, release timing as it settles, and the travel of a thumb or segment" tokens="--sui-duration-release · --sui-ease-release" />
-                  <MotionRow label="Overlay" note="Entrance and exit for anything that floats, at its own geometry but one timing" tokens="--sui-duration-overlay · --sui-duration-overlay-exit" />
+              <Specimen title="Density">
+                <div className="flex flex-wrap items-center gap-4">
+                  <ActionButton appearance="tonal" variant="secondary" size="sm">Compact</ActionButton>
+                  <ActionButton appearance="tonal" variant="secondary" size="md">Normal</ActionButton>
+                  <ActionButton appearance="tonal" variant="secondary" size="lg">Prominent</ActionButton>
                 </div>
-                <div className="mt-5 flex flex-wrap items-center gap-3">
-                  <ActionButton appearance="filled">Press me</ActionButton>
-                  <Tooltip content="Overlay entrance, exit and scrim from one family">
-                    <ActionButton appearance="tonal" variant="secondary">Hover for an overlay</ActionButton>
-                  </Tooltip>
+                <div className="mt-5 flex items-center gap-3">
+                  <span className={cn("text-xs font-medium", text.high)}>Target</span>
+                  <span className={cn(density.target, shape.circle, material.matteHigh, "inline-flex items-center justify-center")}>
+                    <Heart className="size-5" aria-hidden="true" />
+                  </span>
+                </div>
+              </Specimen>
+
+              <Specimen title="Structural lines">
+                <div className={cn("overflow-hidden", shape.control, material.matte)}>
+                  <div className={cn("px-4 py-3 text-sm font-medium", edge.header, text.medium)}>Column header</div>
+                  <div className={cn("px-4 py-3 text-sm", edge.row, text.high)}>Table rows</div>
+                  <div className="flex items-center gap-4 px-4 py-4">
+                    <span className={cn("w-24 shrink-0 text-sm", text.high)}>Divider</span>
+                    <Divider className="flex-1" />
+                  </div>
+                  <div className="flex h-9 items-center gap-4 px-4">
+                    <span className={cn("w-24 shrink-0 text-sm", text.high)}>Vertical</span>
+                    <Divider orientation="vertical" />
+                    <span className={cn("text-sm", text.high)}>Divider</span>
+                  </div>
                 </div>
               </Specimen>
             </div>
           </section>
 
           <section>
-            <SectionHeading title="Buttons" description="Appearance, size and state are separate parts of the API." />
+            <SectionHeading title="Buttons" />
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
-              <Specimen title="Appearances" description="Filled for priority, tonal for normal actions, text for quiet actions. Only tonal controls carry a raised matte step, and pressing one recesses it.">
+              <Specimen title="Appearances">
                 <div className="flex flex-wrap items-center gap-3">
                   <ActionButton appearance="filled">Filled</ActionButton>
                   <ActionButton appearance="tonal" variant="secondary">Tonal</ActionButton>
@@ -302,7 +265,7 @@ export default function Home() {
                 </div>
               </Specimen>
 
-              <Specimen title="States" description="Loading, disabled and keyboard focus remain visually distinct.">
+              <Specimen title="States">
                 <div className="flex flex-wrap items-center gap-3">
                   <ActionButton loading>Saving</ActionButton>
                   <ActionButton disabled>Disabled</ActionButton>
@@ -310,7 +273,7 @@ export default function Home() {
                 </div>
               </Specimen>
 
-              <Specimen title="Sizes" description="Scale is density: the same three steps every other control uses.">
+              <Specimen title="Sizes">
                 <div className="flex flex-wrap items-center gap-3">
                   <ActionButton appearance="filled" size="sm">Small</ActionButton>
                   <ActionButton appearance="filled" size="md">Medium</ActionButton>
@@ -318,7 +281,7 @@ export default function Home() {
                 </div>
               </Specimen>
 
-              <Specimen title="Icon buttons" description="Tonal, ghost and acrylic treatments share one hit target and one state language.">
+              <Specimen title="Icon buttons">
                 <div className="flex flex-wrap items-center gap-3">
                   <Tooltip content="Notifications"><IconButton icon={<Bell />} aria-label="Notifications" /></Tooltip>
                   <Tooltip content="Search"><IconButton appearance="ghost" variant="secondary" icon={<SearchIcon />} aria-label="Search" /></Tooltip>
@@ -330,9 +293,9 @@ export default function Home() {
           </section>
 
           <section>
-            <SectionHeading title="Fields" description="One borderless field language across text input, textarea, search and select." />
+            <SectionHeading title="Fields" />
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
-              <Specimen title="Text input" description="Default, error, focus-visible and disabled states.">
+              <Specimen title="Text input">
                 <div className="space-y-4">
                   <Input label="Project name" placeholder="Sherick UI" />
                   <Input label="Invalid" placeholder="Required value" error />
@@ -341,21 +304,21 @@ export default function Home() {
                 </div>
               </Specimen>
 
-              <Specimen title="Textarea" description="Same surface and focus language at a larger content size.">
+              <Specimen title="Textarea">
                 <div className="space-y-4">
                   <Textarea label="Notes" placeholder="Describe what you want to build…" />
                   <Textarea label="Invalid notes" placeholder="Add more detail" error />
                 </div>
               </Specimen>
 
-              <Specimen title="Search" description="Composite field uses one outer focus surface.">
+              <Specimen title="Search">
                 <div className="space-y-4">
                   <Search onSearch={() => undefined} placeholder="Search components" className="w-full" />
                   <Search onSearch={() => undefined} placeholder="Loading search" loading className="w-full" />
                 </div>
               </Specimen>
 
-              <Specimen title="Dropdown" description="Matte trigger that holds the engaged step while open, acrylic listbox, clear selection.">
+              <Specimen title="Dropdown">
                 <div className="space-y-4">
                   <Dropdown options={selectOptions} selected={selection} onSelect={setSelection} aria-label="Project type" className="w-full" />
                   <Dropdown options={selectOptions} disabled aria-label="Disabled project type" className="w-full" />
@@ -365,9 +328,9 @@ export default function Home() {
           </section>
 
           <section>
-            <SectionHeading title="Selection & navigation" description="A selection is a matte control resting in a groove: the track recedes, the thumb stays raised." />
+            <SectionHeading title="Selection & navigation" />
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
-              <Specimen title="Switch" description="Large hit target, compact visual track.">
+              <Specimen title="Switch">
                 <div className="flex flex-wrap items-center gap-6">
                   <StateLabel label="On"><Switch checked={switchOn} onChange={setSwitchOn} /></StateLabel>
                   <StateLabel label="Off"><Switch checked={false} onChange={() => undefined} /></StateLabel>
@@ -375,15 +338,15 @@ export default function Home() {
                 </div>
               </Specimen>
 
-              <Specimen title="Tabs" description="The same groove and thumb at a wider scale.">
-                <TabGroup tabs={[
+              <Specimen title="Tabs">
+                <TabGroup className="overflow-x-auto" tabs={[
                   { id: "one", label: "Overview", content: <p className={cn("text-sm", text.medium)}>Overview content</p> },
                   { id: "two", label: "Motion", content: <p className={cn("text-sm", text.medium)}>Motion content</p> },
                   { id: "three", label: "Density", content: <p className={cn("text-sm", text.medium)}>Density content</p> },
                 ]} />
               </Specimen>
 
-              <Specimen title="Navigation groups" description="The current destination holds the selected tone and the accent foreground; a row in a list stays flat.">
+              <Specimen title="Navigation groups">
                 <div className={cn("max-w-xs p-2", shape.control, material.matte)}>
                   <NavGroup title="Components" activeHref="#fields" items={[
                     { label: "Buttons", href: "#buttons" },
@@ -396,9 +359,9 @@ export default function Home() {
           </section>
 
           <section>
-            <SectionHeading title="Feedback" description="Semantic color marks meaning on the surface and the icon; the copy stays at full emphasis." />
+            <SectionHeading title="Feedback" />
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
-              <Specimen title="Alerts" description="Passive surfaces do not react to hover.">
+              <Specimen title="Alerts">
                 <div className="space-y-3">
                   <Alert variant="primary">A useful piece of information.</Alert>
                   <Alert variant="success">Changes were saved successfully.</Alert>
@@ -407,7 +370,7 @@ export default function Home() {
                 </div>
               </Specimen>
 
-              <Specimen title="Loading & skeleton" description="Loading inherits foreground; skeletons remain neutral.">
+              <Specimen title="Loading & skeleton">
                 <div className="space-y-7">
                   <div className={cn("flex items-center gap-4", text.medium)}><Spinner size="small" /><Spinner size="medium" /><Spinner size="large" /></div>
                   <div className="space-y-3"><Skeleton className="h-4 w-3/4" /><Skeleton className="h-4 w-1/2" /><Skeleton className="h-20 w-full" /></div>
@@ -417,12 +380,12 @@ export default function Home() {
           </section>
 
           <section>
-            <SectionHeading title="Surfaces & overlays" description="Cards stay matte; only what floats above the page uses acrylic." />
+            <SectionHeading title="Surfaces & overlays" />
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
-              <Specimen title="Cards & badges" description="Passive content surfaces and compact semantic labels.">
+              <Specimen title="Cards & badges">
                 <div className="grid gap-3 sm:grid-cols-2">
-                  <Card variant="secondary"><div className="font-medium">Neutral card</div><p className={cn("mt-2 text-sm leading-6", text.medium)}>Normal information stays matte and grounded.</p></Card>
-                  <Card variant="primary"><div className="font-medium">Tonal card</div><p className={cn("mt-2 text-sm leading-6", text.medium)}>Use stronger tone only when it adds meaning.</p></Card>
+                  <Card variant="secondary"><div className="font-medium">Neutral card</div><p className={cn("mt-2 text-sm leading-6", text.medium)}>Body copy goes here.</p></Card>
+                  <Card variant="primary"><div className="font-medium">Tonal card</div><p className={cn("mt-2 text-sm leading-6", text.medium)}>Body copy goes here.</p></Card>
                 </div>
                 <div className="mt-4 flex flex-wrap gap-2">
                   <Badge variant="primary">Primary</Badge>
@@ -433,23 +396,23 @@ export default function Home() {
                 </div>
               </Specimen>
 
-              <Specimen title="Avatar & tooltip" description="Compact identity, and the denser acrylic recipe for small floating surfaces.">
+              <Specimen title="Avatar & tooltip">
                 <div className="flex items-center gap-5">
                   <Avatar src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg" alt="Example avatar" size="sm" />
                   <Avatar src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg" alt="Example rounded avatar" size="md" shape="rounded" />
-                  <Tooltip content="Acrylic tooltip: same entrance and exit family as every overlay"><ActionButton appearance="tonal" variant="secondary">Hover or focus</ActionButton></Tooltip>
+                  <Tooltip content="Acrylic tooltip"><ActionButton appearance="tonal" variant="secondary">Hover or focus</ActionButton></Tooltip>
                 </div>
               </Specimen>
 
-              <Specimen title="Modal" description="The signature floating surface: opaquer acrylic hero sheet, tightened expressive geometry, a defocused scrim and a ghost close action.">
+              <Specimen title="Modal">
                 <ActionButton appearance="tonal" variant="secondary" onClick={() => setModalOpen(true)}>Open modal</ActionButton>
               </Specimen>
             </div>
           </section>
 
           <section>
-            <SectionHeading title="Data display" description="Dense information stays quiet, compact and easy to scan." />
-            <Specimen title="Table" description="One hairline tone for every line; semantic color belongs inside cells, not across the whole table." className="mt-6">
+            <SectionHeading title="Data display" />
+            <Specimen title="Table" className="mt-6">
               <Table headers={["Component", "Role", "Status"]} rows={[
                 ["Dropdown", "Custom selection", <Badge key="dropdown" variant="success">Ready</Badge>],
                 ["Modal", "Focused overlay", <Badge key="modal" variant="success">Ready</Badge>],
@@ -460,12 +423,12 @@ export default function Home() {
           </section>
 
           <section className="pb-12">
-            <SectionHeading title="Content" description="Code and Markdown primitives for documentation and rich text surfaces." />
+            <SectionHeading title="Content" />
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
-              <Specimen title="Code block" description="A quiet contained well: matte and recessed, with its actions outside the code flow.">
+              <Specimen title="Code block">
                 <CodeBlock language="tsx">{'<ActionButton appearance="filled">Save</ActionButton>'}</CodeBlock>
               </Specimen>
-              <Specimen title="Markdown" description="Headings, links, lists, quotes and inline code share a readable rhythm.">
+              <Specimen title="Markdown">
                 <Markdown>{`## Example\nSherick UI keeps **dense information quiet** and gives floating UI more depth.\n\n- Predictable controls\n- Soft hierarchy\n- [Accessible interactions](#)\n\n> Expression should clarify hierarchy, not decorate every surface.\n\nUse \`ActionButton\` for primary actions, and reach for a fenced block when the code carries its own hierarchy:\n\n\`\`\`ts\nconst surface = material.matte;\nconst action = shape.pill;\n\`\`\``}</Markdown>
               </Specimen>
             </div>
@@ -476,7 +439,7 @@ export default function Home() {
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <Modal.Header>Modal specimen</Modal.Header>
         <Modal.Content>
-          This is the highest elevation layer in the system: focused, translucent and deliberately separated from the page beneath it. It leaves through the same overlay family it arrived on.
+          Overlay specimen content.
         </Modal.Content>
         <Modal.Footer>
           <ActionButton appearance="text" variant="secondary" onClick={() => setModalOpen(false)}>Cancel</ActionButton>
@@ -497,7 +460,7 @@ function ThemePicker({ theme, onChange }: { theme: ThemeMode; onChange: (theme: 
   return (
     <div className="shrink-0">
       <div className={cn("mb-2 text-xs font-medium", text.medium)}>Theme</div>
-      <div className={cn("inline-flex bg-sherick-surface/[0.72] p-1", shape.pill, elevation.pressed)}>
+      <div className={cn("inline-flex bg-sherick-surface/[0.72] p-1", shape.pill, elevation.recessed)}>
         {choices.map(({ value, label, icon: Icon }) => {
           const selected = theme === value;
           return (
@@ -526,65 +489,28 @@ function ThemePicker({ theme, onChange }: { theme: ThemeMode; onChange: (theme: 
   );
 }
 
-function SectionHeading({ title, description }: { title: string; description: string }) {
+function SectionHeading({ title }: { title: string }) {
   return (
     <div className={cn("border-b pb-5", edge.rule)}>
       <h2 className="text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{title}</h2>
-      <p className={cn("mt-2 text-base leading-7", text.medium)}>{description}</p>
     </div>
   );
 }
 
-function Specimen({ title, description, children, className = "" }: { title: string; description: string; children: React.ReactNode; className?: string }) {
+function Specimen({ title, className = "", children }: { title: string; className?: string; children: React.ReactNode }) {
   return (
-    <div className={cn(shape.surface, material.matte, "p-6", className)}>
-      <div className="mb-5">
-        <h3 className="font-medium tracking-[-0.01em]">{title}</h3>
-        <p className={cn("mt-1 text-sm leading-6", text.medium)}>{description}</p>
-      </div>
+    <div className={cn(shape.surface, material.matte, "min-w-0 p-6", className)}>
+      <h3 className="mb-5 font-medium tracking-[-0.01em]">{title}</h3>
       {children}
     </div>
   );
 }
 
-function Tile({ label, note, className, children }: { label: string; note: string; className?: string; children: React.ReactNode }) {
+function Tile({ label, caption, className }: { label?: string; caption?: string; className?: string }) {
   return (
     <div className="flex flex-col gap-2">
-      <div className={cn("flex min-h-20 items-center justify-center px-4 py-5 text-sm", shape.control, className)}>{children}</div>
-      <div>
-        <div className={cn("text-xs font-medium", text.high)}>{label}</div>
-        <div className={cn("mt-0.5 text-xs leading-5", text.medium)}>{note}</div>
-      </div>
-    </div>
-  );
-}
-
-function StateTile({ label, className, children }: { label: string; className: string; children: React.ReactNode }) {
-  return (
-    <div className="flex flex-col items-center gap-2">
-      <div className={cn("flex min-h-16 w-full items-center justify-center px-4 py-3 text-sm", shape.control, className)}>{children}</div>
-      <span className={cn("text-xs font-medium", text.medium)}>{label}</span>
-    </div>
-  );
-}
-
-function DensityRow({ label, role, buttonPadding, size }: { label: string; role: string; buttonPadding: string; size: ButtonSize }) {
-  return (
-    <div className="flex flex-wrap items-center gap-3">
-      <span className={cn("w-24 shrink-0 text-xs font-medium", text.medium)}>{label}</span>
-      <ActionButton appearance="tonal" variant="secondary" size={size}>{label}</ActionButton>
-      <span className={cn("font-mono text-[11px]", text.low)}>{role}</span>
-      <span className={cn("font-mono text-[11px]", text.low)}>{buttonPadding}</span>
-    </div>
-  );
-}
-
-function MotionRow({ label, note, tokens }: { label: string; note: string; tokens: string }) {
-  return (
-    <div className={cn("flex flex-col gap-1 px-4 py-3 sm:flex-row sm:items-baseline sm:gap-4", shape.control, material.matteHigh)}>
-      <span className={cn("w-20 shrink-0 text-sm font-medium", text.high)}>{label}</span>
-      <span className={cn("flex-1 text-xs leading-5", text.medium)}>{note}</span>
-      <span className={cn("font-mono text-[11px]", text.low)}>{tokens}</span>
+      <div className={cn("flex min-h-20 items-center justify-center px-4 text-sm", shape.control, className)}>{label}</div>
+      {caption ? <div className={cn("text-xs font-medium", text.high)}>{caption}</div> : null}
     </div>
   );
 }

@@ -1,0 +1,56 @@
+# Sherick UI — agent instructions
+
+## Design language (mandatory)
+
+Before any work that creates, changes or reviews reusable UI — a component, a variant, a
+state, or any class that ships — read [`docs/DESIGN_LANGUAGE.md`](docs/DESIGN_LANGUAGE.md)
+in full. It is the canonical source of truth for Sherick UI's visual language;
+`components/UI/ui.common.ts` (recipes) and `theme.css` (tokens) implement it.
+
+### Never invent a system-level visual rule locally
+
+These belong to the design language. Use the named primitive, or extend the language
+first — never write the rule into a component:
+
+- **colors and tone roles** — no one-off colors, literal color values, or a tint that is
+  not a `tone` role
+- **material recipes** — no hand-written fills, gradients, blur or saturation
+- **elevation and shadows** — nothing outside the elevation ladder
+- **shape** — no literal radii in place of a `shape` role
+- **structural edges and rims** — no borders or rings tracing a filled control; hairlines
+  come from `edge`, and a public divider comes from `Divider`
+- **state treatments** — hover, pressed, selected and disabled come from `state` and
+  `stateLayer`, not from a locally written color or depth change
+- **focus treatment** — `focusRing` or `focusRingInset`, never a bespoke ring
+- **motion** — no literal durations or easings, and no `transition-*` list that is not a
+  motion family
+
+### Component-local anatomy is yours to decide
+
+Do not promote ordinary anatomy into global primitives. Decide these inside the
+component, in its own file:
+
+- layout and element arrangement
+- spacing between a component's own parts
+- component-specific padding (a button is gripped at its ends; a field holds text)
+- intrinsic dimensions and aspect of the component itself
+- responsive arrangement and breakpoints
+- content typography for copy the component renders
+
+### If a genuinely new visual rule is required
+
+Extend the canonical language first:
+
+1. add the rule to `docs/DESIGN_LANGUAGE.md` with its role and its when-to-use /
+   when-not-to-use examples;
+2. add the primitive to `components/UI/ui.common.ts` and its tokens to `theme.css`;
+3. then consume the primitive in the component.
+
+Never implement the rule in the component that needs it. A local rule cannot be reused by
+the next component, retinted by the next theme, or caught by verification.
+
+### The showcase
+
+The development showcase (`app/page.tsx`) demonstrates the system and never explains it.
+It holds specimens, labels and interactive states only; every piece of information appears
+once, and design rationale belongs in `docs/DESIGN_LANGUAGE.md`.

@@ -133,7 +133,7 @@ for (const token of [
   assert.ok(!darkVariables[token], `${token} must not be duplicated per theme`);
 }
 
-// Every depth cue derives from the two light-model colors, so a theme that drops one
+// Every elevation step derives from the two light-model colors, so a theme that drops one
 // silently loses its edge lighting rather than failing loudly.
 for (const shadow of ["raised", "floating", "control", "recessed"]) {
   const value = lightVariables[`--sui-elevation-${shadow}`];
