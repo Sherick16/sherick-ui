@@ -78,8 +78,8 @@
   --sui-warning: 0.82 0.12 80;
   --sui-success: 0.75 0.10 160;
 
-  --sui-on-primary: 0.98 0.005 255;
-  --sui-on-danger: 0.98 0.005 255;
+  --sui-on-primary: 0.205 0.012 260;
+  --sui-on-danger: 0.205 0.012 260;
   --sui-on-warning: 0.205 0.012 260;
   --sui-on-success: 0.205 0.012 260;
 
@@ -134,8 +134,8 @@
     --sui-danger: 0.72 0.13 25;
     --sui-warning: 0.82 0.12 80;
     --sui-success: 0.75 0.10 160;
-    --sui-on-primary: 0.98 0.005 255;
-    --sui-on-danger: 0.98 0.005 255;
+    --sui-on-primary: 0.205 0.012 260;
+    --sui-on-danger: 0.205 0.012 260;
     --sui-on-warning: 0.205 0.012 260;
     --sui-on-success: 0.205 0.012 260;
     --sui-focus: 0.72 0.15 255;
