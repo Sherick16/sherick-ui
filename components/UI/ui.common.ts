@@ -7,10 +7,10 @@ export const focusRingInset =
   "focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-primary";
 
 export const motionState =
-  "transition-[background-color,color,box-shadow,transform,opacity] duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none";
+  "transition-[background-color,color,box-shadow,transform,opacity,filter] duration-150 ease-out motion-reduce:transition-none motion-reduce:transform-none";
 
 export const motionComponent =
-  "transition-[background-color,color,box-shadow,transform,opacity] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none motion-reduce:transform-none";
+  "transition-[background-color,color,box-shadow,transform,opacity,filter] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none motion-reduce:transform-none";
 
 export const pressable =
   "active:scale-[0.98] motion-reduce:active:scale-100";
