@@ -141,16 +141,21 @@
   --sui-glass-hero-brightness: 1.0;
   --sui-glass-hero-gradient: linear-gradient(
     180deg,
-    rgb(255 255 255 / 0.52) 0%,
-    rgb(255 255 255 / 0.16) 24%,
-    rgb(112 156 224 / 0.02) 66%,
-    rgb(38 46 62 / 0.045) 100%
+    rgb(255 255 255 / 0.42) 0%,
+    rgb(255 255 255 / 0.12) 14%,
+    rgb(255 255 255 / 0) 46%,
+    rgb(38 46 62 / 0.05) 100%
   );
 
   /* The tone the overlay sheet is made of. It sits above the floating surface level
      in every theme, which is how a dialog separates from the page in dark mode
      without leaning on its shadow. */
   --sui-surface-overlay: 0.993 0.005 258;
+
+  /* How much of the sheet is its own tone rather than the defocused page behind it.
+     A large overlay leans on this rather than on blur: the higher it is, the more the
+     dialog reads as a solid surface and the less the backdrop can wash it out. */
+  --sui-overlay-fill: 0.9;
 
   /* Backdrop defocus. The scrim carries the separation; this only softens the page
      behind a large overlay so it stops competing with the surface above it. */
@@ -233,20 +238,22 @@
     rgb(0 0 0 / 0.08) 100%
   );
 
-  --sui-glass-hero-blur: 16px;
-  --sui-glass-hero-saturation: 1.1;
+  --sui-glass-hero-blur: 10px;
+  --sui-glass-hero-saturation: 1.03;
   --sui-glass-hero-brightness: 1.0;
   --sui-glass-hero-gradient: linear-gradient(
     180deg,
-    rgb(255 255 255 / 0.075) 0%,
-    rgb(255 255 255 / 0.022) 26%,
-    rgb(112 156 255 / 0.012) 68%,
-    rgb(0 0 0 / 0.12) 100%
+    rgb(255 255 255 / 0.035) 0%,
+    rgb(255 255 255 / 0.012) 12%,
+    rgb(255 255 255 / 0) 44%,
+    rgb(0 0 0 / 0.14) 100%
   );
 
   /* A clear tonal step above the canvas, so the sheet separates in its own right
-     rather than almost entirely through its shadow. */
-  --sui-surface-overlay: 0.315 0.016 260;
+     rather than almost entirely through its shadow — but a step, not a jump: a light
+     grey sheet over a near-black page is what reads as fog. */
+  --sui-surface-overlay: 0.295 0.014 260;
+  --sui-overlay-fill: 0.965;
 
   --sui-scrim-blur: 6px;
 
@@ -303,11 +310,12 @@
     --sui-glass-dense-brightness: 1.035;
     --sui-glass-gradient: linear-gradient(180deg, rgb(255 255 255 / 0.075) 0%, rgb(255 255 255 / 0.028) 30%, rgb(112 156 255 / 0.02) 70%, rgb(0 0 0 / 0.10) 100%);
     --sui-glass-gradient-dense: linear-gradient(180deg, rgb(255 255 255 / 0.06) 0%, rgb(255 255 255 / 0.018) 36%, rgb(112 156 255 / 0.016) 76%, rgb(0 0 0 / 0.08) 100%);
-    --sui-glass-hero-blur: 16px;
-    --sui-glass-hero-saturation: 1.1;
+    --sui-glass-hero-blur: 10px;
+    --sui-glass-hero-saturation: 1.03;
     --sui-glass-hero-brightness: 1.0;
-    --sui-glass-hero-gradient: linear-gradient(180deg, rgb(255 255 255 / 0.075) 0%, rgb(255 255 255 / 0.022) 26%, rgb(112 156 255 / 0.012) 68%, rgb(0 0 0 / 0.12) 100%);
-    --sui-surface-overlay: 0.315 0.016 260;
+    --sui-glass-hero-gradient: linear-gradient(180deg, rgb(255 255 255 / 0.035) 0%, rgb(255 255 255 / 0.012) 12%, rgb(255 255 255 / 0) 44%, rgb(0 0 0 / 0.14) 100%);
+    --sui-surface-overlay: 0.295 0.014 260;
+    --sui-overlay-fill: 0.965;
     --sui-scrim-blur: 6px;
     --sui-code-text: #e2e8f0;
     --sui-code-comment: #64748b;

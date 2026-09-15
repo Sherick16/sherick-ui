@@ -9,7 +9,7 @@ const DARK = {
   surface: "0.245 0.014 260",
   "surface-high": "0.295 0.016 260",
   "surface-float": "0.27 0.018 260",
-  "surface-overlay": "0.315 0.016 260",
+  "surface-overlay": "0.295 0.014 260",
   ink: "0.94 0.008 255",
   "ink-muted": "0.76 0.014 255",
   "ink-faint": "0.60 0.014 256",
@@ -46,7 +46,7 @@ module.exports = {
         "sherick-glass-dense":
           "var(--sui-glass-gradient-dense, linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.018) 36%, rgba(112,156,255,0.016) 76%, rgba(0,0,0,0.08) 100%))",
         "sherick-glass-hero":
-          "var(--sui-glass-hero-gradient, linear-gradient(180deg, rgba(255,255,255,0.075) 0%, rgba(255,255,255,0.022) 26%, rgba(112,156,255,0.012) 68%, rgba(0,0,0,0.12) 100%))",
+          "var(--sui-glass-hero-gradient, linear-gradient(180deg, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0.012) 12%, rgba(255,255,255,0) 44%, rgba(0,0,0,0.14) 100%))",
       },
       /* Elevation ladder — the only sanctioned source of depth, and the only place a
          shadow is defined. Shadow is a function of how far a surface sits above the

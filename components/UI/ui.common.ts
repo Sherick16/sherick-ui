@@ -213,7 +213,9 @@ export const stateLayer = {
                   scrim behind it does the separating, the blur only defocuses, and the
                   gradient is a restrained top-to-bottom light rather than a frosted
                   haze. Its tone sits above the floating level in every theme, which is
-                  how it separates in dark mode without leaning on its shadow. */
+                  how it separates in dark mode without leaning on its shadow, and
+                  `--sui-overlay-fill` tunes how much of the sheet is its own tone rather
+                  than the defocused page — a large overlay leans on that, not on blur. */
 export const material = {
   canvas: "bg-sherick-canvas text-sherick-ink",
   matteQuiet: "bg-sherick-surface/[0.42] text-sherick-ink",
@@ -226,7 +228,7 @@ export const material = {
   acrylicDense:
     "bg-sherick-surface-float/[0.72] bg-[image:var(--sui-glass-gradient-dense)] text-sherick-ink backdrop-blur-[var(--sui-glass-dense-blur,26px)] backdrop-saturate-[var(--sui-glass-dense-saturation,1.38)] backdrop-brightness-[var(--sui-glass-dense-brightness,1.035)]",
   acrylicHero:
-    "bg-sherick-surface-overlay/[0.88] bg-[image:var(--sui-glass-hero-gradient)] text-sherick-ink backdrop-blur-[var(--sui-glass-hero-blur,14px)] backdrop-saturate-[var(--sui-glass-hero-saturation,1.06)] backdrop-brightness-[var(--sui-glass-hero-brightness,1)]",
+    "bg-sherick-surface-overlay/[var(--sui-overlay-fill,0.9)] bg-[image:var(--sui-glass-hero-gradient)] text-sherick-ink backdrop-blur-[var(--sui-glass-hero-blur,14px)] backdrop-saturate-[var(--sui-glass-hero-saturation,1.06)] backdrop-brightness-[var(--sui-glass-hero-brightness,1)]",
 } as const;
 
 /* Density — three control steps plus the accessible hit target.
