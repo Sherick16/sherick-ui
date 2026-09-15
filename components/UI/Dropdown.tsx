@@ -19,7 +19,7 @@ import {
   pressable,
   shape,
   surface,
-  toneSoftMap,
+  toneSelectedMap,
   toneTextMap,
 } from "./ui.common";
 import { Variant } from "./ui.types";
@@ -163,16 +163,17 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
           }}
           onKeyDown={handleTriggerKeyDown}
           className={cn(
-            "flex min-h-12 w-full min-w-64 items-center justify-between px-5 py-3 text-left",
+            "flex min-h-12 w-full min-w-64 items-center justify-between px-5 py-3 text-left text-[0.95rem]",
             shape.control,
             surface.control,
             motionState,
             focusRing,
+            isOpen && "bg-sherick-surface-high shadow-sherick-soft",
             !disabled && pressable,
             disabled && "cursor-not-allowed opacity-45"
           )}
         >
-          <span className={cn("truncate", !selectedOption && "text-zinc-400")}>
+          <span className={cn("truncate", !selectedOption && "text-sherick-ink-muted")}>
             {selectedOption?.label ?? placeholder}
           </span>
           <ChevronDown
@@ -194,8 +195,8 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
             className={cn(
               "absolute z-30 mt-2 w-full min-w-max p-2",
               shape.surface,
-              surface.raised,
-              "origin-top animate-slide-up motion-reduce:animate-none"
+              surface.acrylic,
+              "origin-top animate-menu motion-reduce:animate-none"
             )}
           >
             {options.map((option, index) => {
@@ -215,18 +216,21 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
                   onKeyDown={(event) => handleOptionKeyDown(event, index)}
                   onClick={() => selectOption(index)}
                   className={cn(
-                    "flex cursor-pointer items-center justify-between gap-4 rounded-xl px-4 py-3 text-left text-sm text-zinc-200",
+                    "flex cursor-pointer items-center justify-between gap-4 rounded-xl px-4 py-3 text-left text-sm text-sherick-ink/92",
                     motionState,
                     focusRingInset,
-                    isSelected && toneSoftMap[variant],
-                    !isSelected && isActive && "bg-white/10",
-                    !isSelected && "hover:bg-white/5",
-                    "active:bg-white/10"
+                    isSelected && toneSelectedMap[variant],
+                    !isSelected && isActive && "bg-white/[0.075]",
+                    !isSelected && "hover:bg-white/[0.05]",
+                    "active:bg-white/[0.11]"
                   )}
                 >
                   <span className={cn(isSelected && "font-medium")}>{option.label}</span>
                   {isSelected && (
-                    <Check aria-hidden="true" className={cn("h-4 w-4", toneTextMap[variant])} />
+                    <Check
+                      aria-hidden="true"
+                      className={cn("h-4 w-4 animate-fade motion-reduce:animate-none", toneTextMap[variant])}
+                    />
                   )}
                 </div>
               );
