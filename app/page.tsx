@@ -125,7 +125,7 @@ export default function Home() {
                   <div className="relative grid gap-4 sm:grid-cols-3">
                     <Tile label="Acrylic" note="Menus and popups" className={material.acrylic}>acrylic</Tile>
                     <Tile label="Acrylic dense" note="Small floating surfaces" className={material.acrylicDense}>dense</Tile>
-                    <Tile label="Acrylic modal" note="Dialogs, which carry more text" className={material.acrylicModal}>modal</Tile>
+                    <Tile label="Acrylic hero" note="A surface that owns the viewport" className={material.acrylicHero}>hero</Tile>
                   </div>
                 </div>
               </Specimen>
@@ -441,7 +441,7 @@ export default function Home() {
                 </div>
               </Specimen>
 
-              <Specimen title="Modal" description="Highest elevation: acrylic, expressive shape, entrance and exit from the overlay family.">
+              <Specimen title="Modal" description="The signature floating surface: opaquer acrylic hero sheet, tightened expressive geometry, a defocused scrim and a ghost close action.">
                 <ActionButton appearance="tonal" variant="secondary" onClick={() => setModalOpen(true)}>Open modal</ActionButton>
               </Specimen>
             </div>

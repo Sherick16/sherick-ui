@@ -11,7 +11,7 @@ export const ModalContent = ({ children, className }: ModalContentProps) => {
   return (
     <div
       id="modal-description"
-      className={cn("px-6 py-3 text-sm leading-7 sm:px-7", text.medium, className)}
+      className={cn("px-6 pt-2 pb-5 text-sm leading-7 sm:px-7", text.medium, className)}
     >
       {children}
     </div>

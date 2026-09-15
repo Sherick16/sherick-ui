@@ -131,6 +131,31 @@
     rgb(38 46 62 / 0.045) 100%
   );
 
+  /* Large overlay sheet. A viewport-dominating surface has to read first as a
+     physical surface and only secondarily as glass, so this recipe is calmer and
+     far more opaque than the menu and tooltip sheets: the scrim behind it does the
+     separating, the blur only defocuses, and the gradient is a restrained top-to-
+     bottom light rather than a frosted haze. */
+  --sui-glass-hero-blur: 14px;
+  --sui-glass-hero-saturation: 1.06;
+  --sui-glass-hero-brightness: 1.0;
+  --sui-glass-hero-gradient: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 0.52) 0%,
+    rgb(255 255 255 / 0.16) 24%,
+    rgb(112 156 224 / 0.02) 66%,
+    rgb(38 46 62 / 0.045) 100%
+  );
+
+  /* The tone the overlay sheet is made of. It sits above the floating surface level
+     in every theme, which is how a dialog separates from the page in dark mode
+     without leaning on its shadow. */
+  --sui-surface-overlay: 0.993 0.005 258;
+
+  /* Backdrop defocus. The scrim carries the separation; this only softens the page
+     behind a large overlay so it stops competing with the surface above it. */
+  --sui-scrim-blur: 6px;
+
   --sui-code-text: oklch(0.30 0.018 260);
   --sui-code-comment: oklch(0.56 0.015 255);
   --sui-code-string: oklch(0.48 0.11 235);
@@ -208,6 +233,23 @@
     rgb(0 0 0 / 0.08) 100%
   );
 
+  --sui-glass-hero-blur: 16px;
+  --sui-glass-hero-saturation: 1.1;
+  --sui-glass-hero-brightness: 1.0;
+  --sui-glass-hero-gradient: linear-gradient(
+    180deg,
+    rgb(255 255 255 / 0.075) 0%,
+    rgb(255 255 255 / 0.022) 26%,
+    rgb(112 156 255 / 0.012) 68%,
+    rgb(0 0 0 / 0.12) 100%
+  );
+
+  /* A clear tonal step above the canvas, so the sheet separates in its own right
+     rather than almost entirely through its shadow. */
+  --sui-surface-overlay: 0.315 0.016 260;
+
+  --sui-scrim-blur: 6px;
+
   --sui-code-text: #e2e8f0;
   --sui-code-comment: #64748b;
   --sui-code-string: #a5d6ff;
@@ -261,6 +303,12 @@
     --sui-glass-dense-brightness: 1.035;
     --sui-glass-gradient: linear-gradient(180deg, rgb(255 255 255 / 0.075) 0%, rgb(255 255 255 / 0.028) 30%, rgb(112 156 255 / 0.02) 70%, rgb(0 0 0 / 0.10) 100%);
     --sui-glass-gradient-dense: linear-gradient(180deg, rgb(255 255 255 / 0.06) 0%, rgb(255 255 255 / 0.018) 36%, rgb(112 156 255 / 0.016) 76%, rgb(0 0 0 / 0.08) 100%);
+    --sui-glass-hero-blur: 16px;
+    --sui-glass-hero-saturation: 1.1;
+    --sui-glass-hero-brightness: 1.0;
+    --sui-glass-hero-gradient: linear-gradient(180deg, rgb(255 255 255 / 0.075) 0%, rgb(255 255 255 / 0.022) 26%, rgb(112 156 255 / 0.012) 68%, rgb(0 0 0 / 0.12) 100%);
+    --sui-surface-overlay: 0.315 0.016 260;
+    --sui-scrim-blur: 6px;
     --sui-code-text: #e2e8f0;
     --sui-code-comment: #64748b;
     --sui-code-string: #a5d6ff;

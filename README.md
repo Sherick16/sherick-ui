@@ -162,7 +162,7 @@ Every component is assembled from one small set of primitives (internal module `
 
 | Primitive | Values |
 | --- | --- |
-| material | `canvas`, `matteQuiet`, `matte`, `matteHigh`, `control` (`controlError`), `acrylic`, `acrylicDense`, `acrylicModal` |
+| material | `canvas`, `matteQuiet`, `matte`, `matteHigh`, `control` (`controlError`), `acrylic`, `acrylicDense`, `acrylicHero` |
 | elevation | `flat`, `raised`, `floating`, `control`, `pressed` |
 | shape | `control` 1.25rem, `prominent` 1.5rem, `surface` 1.75rem, `expressive` 2.25rem, `pill`, `circle` |
 | edge | `row`, `header`, `rule` — the structural hairlines between stacked parts |
@@ -183,7 +183,7 @@ A material is a fill. Tone separates matte surfaces from the canvas, and a compo
 - **pressed** while a control is physically held, and for tracks and grooves
 - **floating** only for surfaces that sit above the application
 
-Acrylic is reserved for genuinely floating UI: menus, tooltips and dialogs. A 1px inset ring that traces a filled object is still a drawn border, so matte controls carry no rim: light does the separating, and a hairline (`edge.row`, `edge.header`, `edge.rule`) is reserved for where two parts of one surface actually meet.
+Acrylic is reserved for genuinely floating UI: menus, tooltips and dialogs. `acrylicHero` is the large-overlay sheet — markedly more opaque and calmer than the smaller recipes, because a surface that owns the viewport has to read first as a physical surface and only secondarily as glass. Its tone sits above the floating level in every theme, so it separates in dark mode without leaning on its shadow; the scrim behind it does the separating, and its blur only defocuses the page. A 1px inset ring that traces a filled object is still a drawn border, so matte controls carry no rim: light does the separating, and a hairline (`edge.row`, `edge.header`, `edge.rule`) is reserved for where two parts of one surface actually meet.
 
 ### Interaction states
 

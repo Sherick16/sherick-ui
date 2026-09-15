@@ -90,14 +90,16 @@ export const elevation = {
                   chips, tables.
    - prominent:   prominent controls and compact floating surfaces.
    - surface:     large surfaces — cards, menus, panels.
-   - expressive:  expressive surfaces that own the viewport — hero overlays.
+   - expressive:  an expressive surface that owns the viewport — the large overlay
+                  sheet, tightened so it reads as a focused surface rather than a
+                  pillowy one.
    - pill:        fully rounded controls whose width follows their content.
    - circle:      fully rounded square targets. */
 export const shape = {
   control: "rounded-[1.25rem]",
   prominent: "rounded-[1.5rem]",
   surface: "rounded-[1.75rem]",
-  expressive: "rounded-[2.25rem]",
+  expressive: "rounded-[2rem]",
   pill: "rounded-full",
   circle: "rounded-full",
 } as const;
@@ -196,11 +198,22 @@ export const stateLayer = {
    - matteHigh:   the second matte step, for nesting inside another matte surface.
    - control:     the fill every text control shares, plus its placeholder tone.
    - acrylic:     a translucent sheet lit from above, for surfaces that float above
-                  the application. The gradient, blur and saturation are part of the
-                  material. `acrylicDense` is the same sheet at higher opacity for
-                  small floating surfaces that must stay legible, and `acrylicModal`
-                  is the regular recipe at a denser fill, because a dialog carries
-                  more text than a menu. */
+                  the application. The gradient, fill, blur and saturation are part of
+                  the material. A gradient arrives as a typed image arbitrary value
+                  rather than through the colour scale, because `tailwind-merge`
+                  collapses two background utilities into one and would silently drop
+                  either the fill or the gradient. Each one is written out literally, so
+                  the class scanner never meets a half-built name. The fill stays an
+                  ordinary background colour, so a caller can retone a sheet without
+                  touching its lighting. `acrylicDense` is the same sheet at higher opacity for
+                  small floating surfaces that must stay legible.
+   - acrylicHero: the large-overlay sheet, for a surface that owns the viewport. It is
+                  markedly more opaque and calmer than the smaller sheets: it has to
+                  read first as a physical surface and only secondarily as glass, so the
+                  scrim behind it does the separating, the blur only defocuses, and the
+                  gradient is a restrained top-to-bottom light rather than a frosted
+                  haze. Its tone sits above the floating level in every theme, which is
+                  how it separates in dark mode without leaning on its shadow. */
 export const material = {
   canvas: "bg-sherick-canvas text-sherick-ink",
   matteQuiet: "bg-sherick-surface/[0.42] text-sherick-ink",
@@ -208,9 +221,12 @@ export const material = {
   matteHigh: "bg-sherick-surface-high/[0.72] text-sherick-ink",
   control: "bg-sherick-surface-high/[0.66] text-sherick-ink placeholder:text-sherick-ink-muted",
   controlError: "bg-sherick-danger/[0.075] text-sherick-ink placeholder:text-sherick-danger/[0.72]",
-  acrylic: `bg-sherick-surface-float/[0.60] bg-sherick-glass text-sherick-ink backdrop-blur-[var(--sui-glass-blur,32px)] backdrop-saturate-[var(--sui-glass-saturation,1.45)] backdrop-brightness-[var(--sui-glass-brightness,1.04)]`,
-  acrylicDense: `bg-sherick-surface-float/[0.72] bg-sherick-glass-dense text-sherick-ink backdrop-blur-[var(--sui-glass-dense-blur,26px)] backdrop-saturate-[var(--sui-glass-dense-saturation,1.38)] backdrop-brightness-[var(--sui-glass-dense-brightness,1.035)]`,
-  acrylicModal: `bg-sherick-surface-float/[0.68] bg-sherick-glass text-sherick-ink backdrop-blur-[var(--sui-glass-blur,32px)] backdrop-saturate-[var(--sui-glass-saturation,1.45)] backdrop-brightness-[var(--sui-glass-brightness,1.04)]`,
+  acrylic:
+    "bg-sherick-surface-float/[0.60] bg-[image:var(--sui-glass-gradient)] text-sherick-ink backdrop-blur-[var(--sui-glass-blur,32px)] backdrop-saturate-[var(--sui-glass-saturation,1.45)] backdrop-brightness-[var(--sui-glass-brightness,1.04)]",
+  acrylicDense:
+    "bg-sherick-surface-float/[0.72] bg-[image:var(--sui-glass-gradient-dense)] text-sherick-ink backdrop-blur-[var(--sui-glass-dense-blur,26px)] backdrop-saturate-[var(--sui-glass-dense-saturation,1.38)] backdrop-brightness-[var(--sui-glass-dense-brightness,1.035)]",
+  acrylicHero:
+    "bg-sherick-surface-overlay/[0.88] bg-[image:var(--sui-glass-hero-gradient)] text-sherick-ink backdrop-blur-[var(--sui-glass-hero-blur,14px)] backdrop-saturate-[var(--sui-glass-hero-saturation,1.06)] backdrop-brightness-[var(--sui-glass-hero-brightness,1)]",
 } as const;
 
 /* Density — three control steps plus the accessible hit target.

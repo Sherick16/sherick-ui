@@ -81,10 +81,11 @@ export default function Modal({ children, open, onClose, className }: ModalProps
     };
 
     document.addEventListener("keydown", handleKeyDown);
-    requestAnimationFrame(() => {
-      const first = focusables()[0];
-      (first ?? modalRef.current)?.focus();
-    });
+    /* Focus the dialog itself rather than its first control: the surface opens quiet
+       (no ring drawn on an action the user has not chosen), screen readers announce the
+       dialog with its title, and the trap already handles the container as the
+       pre-first position for both Tab directions. */
+    requestAnimationFrame(() => modalRef.current?.focus());
 
     return () => {
       document.removeEventListener("keydown", handleKeyDown);
@@ -106,7 +107,9 @@ export default function Modal({ children, open, onClose, className }: ModalProps
     >
       <div
         className={cn(
-          "absolute inset-0 bg-sherick-scrim/[0.32] backdrop-blur-lg",
+          /* The scrim carries the separation; the blur only defocuses the page far
+             enough that it stops competing with the surface above it. */
+          "absolute inset-0 bg-sherick-scrim/[0.38] backdrop-blur-[var(--sui-scrim-blur,6px)]",
           closing ? motion.scrimOut : motion.scrimIn
         )}
         onAnimationEnd={onExitEnd}
@@ -130,7 +133,7 @@ export default function Modal({ children, open, onClose, className }: ModalProps
               "relative w-full max-w-lg outline-none",
               "[--sui-overlay-from-scale:0.985] [--sui-overlay-from-lift:8px]",
               shape.expressive,
-              material.acrylicModal,
+              material.acrylicHero,
               elevation.floating,
               closing ? motion.overlayOut : motion.overlayIn,
               className
@@ -141,9 +144,10 @@ export default function Modal({ children, open, onClose, className }: ModalProps
               aria-label="Close dialog"
               onClick={onClose}
               className={cn(
+                /* A quiet ghost at rest: the dialog reads as one surface, and the
+                   action only claims its own tone on hover, press or focus. */
                 density.target,
                 shape.circle,
-                material.matteHigh,
                 text.medium,
                 "hover:text-sherick-ink",
                 motion.release,
