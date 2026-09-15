@@ -47,7 +47,7 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test": "node scripts/smoke-package.mjs",
-    "verify": "pnpm typecheck && pnpm build && pnpm test",
+    "verify": "pnpm typecheck && pnpm build && pnpm next:build && pnpm test",
     "clean": "rimraf dist"
   },
   "peerDependencies": {
