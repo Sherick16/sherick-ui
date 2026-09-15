@@ -195,7 +195,7 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
               "absolute z-30 mt-2 w-full min-w-max p-2",
               shape.surface,
               surface.raised,
-              "origin-top animate-fade motion-reduce:animate-none"
+              "origin-top animate-slide-up motion-reduce:animate-none"
             )}
           >
             {options.map((option, index) => {
@@ -219,9 +219,9 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
                     motionState,
                     focusRingInset,
                     isSelected && toneSoftMap[variant],
-                    !isSelected && isActive && "bg-white/8",
-                    !isSelected && "hover:bg-white/6",
-                    "active:bg-white/12"
+                    !isSelected && isActive && "bg-white/10",
+                    !isSelected && "hover:bg-white/5",
+                    "active:bg-white/10"
                   )}
                 >
                   <span className={cn(isSelected && "font-medium")}>{option.label}</span>
