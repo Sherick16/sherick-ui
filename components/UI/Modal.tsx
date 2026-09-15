@@ -1,9 +1,9 @@
 "use client";
 
-import React, { ReactNode, useEffect, useRef } from "react";
+import React, { type ReactNode, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
-import { cn } from "@/libs/utils";
 import { X } from "lucide-react";
+import { cn } from "@/libs/utils";
 import { ModalContent } from "./ModalContent";
 import { ModalFooter } from "./ModalFooter";
 import { ModalHeader } from "./ModalHeader";
@@ -15,35 +15,69 @@ export interface ModalProps {
   className?: string;
 }
 
-export default function Modal({
-  children,
-  open,
-  onClose,
-  className,
-}: ModalProps) {
+const FOCUSABLE_SELECTOR = [
+  "a[href]",
+  "button:not([disabled])",
+  "input:not([disabled])",
+  "select:not([disabled])",
+  "textarea:not([disabled])",
+  "[tabindex]:not([tabindex='-1'])",
+].join(",");
+
+export default function Modal({ children, open, onClose, className }: ModalProps) {
   const modalRef = useRef<HTMLDivElement>(null);
   const previouslyFocusedElement = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
-    if (open) {
-      previouslyFocusedElement.current = document.activeElement as HTMLElement;
-      document.body.style.overflow = "hidden";
+    if (!open) return;
 
-      const handleKeyDown = (event: KeyboardEvent) => {
-        if (event.key === "Escape") {
-          onClose();
-        }
-      };
+    previouslyFocusedElement.current = document.activeElement as HTMLElement | null;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
 
-      document.addEventListener("keydown", handleKeyDown);
-      modalRef.current?.focus(); // Ensure the modal gets focus.
+    const focusables = () =>
+      Array.from(modalRef.current?.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR) ?? []);
 
-      return () => {
-        document.removeEventListener("keydown", handleKeyDown);
-        document.body.style.overflow = "unset";
-        previouslyFocusedElement.current?.focus(); // Restore focus.
-      };
-    }
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose();
+        return;
+      }
+
+      if (event.key !== "Tab") return;
+
+      const elements = focusables();
+      if (elements.length === 0) {
+        event.preventDefault();
+        modalRef.current?.focus();
+        return;
+      }
+
+      const first = elements[0];
+      const last = elements[elements.length - 1];
+      const active = document.activeElement;
+
+      if (event.shiftKey && (active === first || active === modalRef.current)) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && active === last) {
+        event.preventDefault();
+        first.focus();
+      }
+    };
+
+    document.addEventListener("keydown", handleKeyDown);
+    requestAnimationFrame(() => {
+      const first = focusables()[0];
+      (first ?? modalRef.current)?.focus();
+    });
+
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+      previouslyFocusedElement.current?.focus();
+    };
   }, [open, onClose]);
 
   if (!open) return null;
@@ -55,28 +89,27 @@ export default function Modal({
       aria-modal="true"
       aria-labelledby="modal-title"
       aria-describedby="modal-description"
-      onClick={onClose}
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) onClose();
+      }}
     >
-      {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/50" />
+      <div className="absolute inset-0 bg-black/50" aria-hidden="true" />
 
-      {/* Modal */}
       <div className="absolute inset-0 overflow-y-auto">
         <div className="min-h-full flex items-center justify-center p-4">
           <div
             ref={modalRef}
-            tabIndex={-1} // Make the modal focusable.
+            tabIndex={-1}
             className={cn(
               "relative w-full max-w-xl bg-zinc-800/80 backdrop-blur-xl",
               "rounded-3xl shadow-xl border border-gray-700/50",
-              "transform transition-all duration-200",
-              "animate-in fade-in zoom-in-95",
+              "animate-fade",
               className
             )}
-            onClick={(e) => e.stopPropagation()}
           >
-            {/* Close button */}
             <button
+              type="button"
+              aria-label="Close dialog"
               onClick={onClose}
               className={cn(
                 "absolute right-4 top-4 p-2 rounded-full",
@@ -85,8 +118,7 @@ export default function Modal({
                 "transition-colors"
               )}
             >
-              <X className="w-4 h-4" />
-              <span className="sr-only">Close</span>
+              <X className="w-4 h-4" aria-hidden="true" />
             </button>
 
             {children}
