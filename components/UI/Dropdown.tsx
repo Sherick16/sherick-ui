@@ -38,6 +38,7 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
     className,
     disabled,
     id,
+    onClick,
     onKeyDown,
     ...props
   }, forwardedRef) => {
@@ -45,11 +46,18 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
     const triggerId = id ?? `${generatedId}-trigger`;
     const listboxId = `${generatedId}-listbox`;
     const rootRef = useRef<HTMLDivElement>(null);
+    const triggerRef = useRef<HTMLButtonElement | null>(null);
     const optionRefs = useRef<Array<HTMLDivElement | null>>([]);
     const [isOpen, setIsOpen] = useState(false);
     const selectedIndex = options.findIndex((option) => option.value === selected);
     const [activeIndex, setActiveIndex] = useState(selectedIndex >= 0 ? selectedIndex : 0);
     const selectedOption = selectedIndex >= 0 ? options[selectedIndex] : undefined;
+
+    const setTriggerRefs = (node: HTMLButtonElement | null) => {
+      triggerRef.current = node;
+      if (typeof forwardedRef === "function") forwardedRef(node);
+      else if (forwardedRef) forwardedRef.current = node;
+    };
 
     useEffect(() => {
       if (!isOpen) return;
@@ -69,12 +77,14 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
       requestAnimationFrame(() => optionRefs.current[nextIndex]?.focus());
     }, [isOpen, selectedIndex]);
 
+    const focusTrigger = () => requestAnimationFrame(() => triggerRef.current?.focus());
+
     const selectOption = (index: number) => {
       const option = options[index];
       if (!option) return;
       onSelect?.(option.value);
       setIsOpen(false);
-      requestAnimationFrame(() => rootRef.current?.querySelector<HTMLButtonElement>(`#${CSS.escape(triggerId)}`)?.focus());
+      focusTrigger();
     };
 
     const moveActive = (nextIndex: number) => {
@@ -114,7 +124,7 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
       } else if (event.key === "Escape") {
         event.preventDefault();
         setIsOpen(false);
-        requestAnimationFrame(() => rootRef.current?.querySelector<HTMLButtonElement>(`#${CSS.escape(triggerId)}`)?.focus());
+        focusTrigger();
       } else if (event.key === "Tab") {
         setIsOpen(false);
       }
@@ -123,21 +133,24 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
     return (
       <div ref={rootRef} className={cn("relative inline-block min-w-64", className)}>
         <button
-          ref={forwardedRef}
+          {...props}
+          ref={setTriggerRefs}
           id={triggerId}
           type="button"
           disabled={disabled}
           aria-haspopup="listbox"
           aria-expanded={isOpen}
           aria-controls={listboxId}
-          onClick={() => setIsOpen((open) => !open)}
+          onClick={(event) => {
+            onClick?.(event);
+            if (!event.defaultPrevented) setIsOpen((open) => !open);
+          }}
           onKeyDown={handleTriggerKeyDown}
           className={cn(
             "flex w-full min-w-64 items-center justify-between rounded-4xl px-6 py-4 bg-opacity-20 hover:bg-opacity-40 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20",
             styleMap[variant] || styleMap.primary,
             disabled && "cursor-not-allowed opacity-60"
           )}
-          {...props}
         >
           <span className={cn(!selectedOption && "text-opacity-70")}>{selectedOption?.label ?? placeholder}</span>
           <ChevronDown
@@ -152,7 +165,7 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
             role="listbox"
             aria-labelledby={triggerId}
             className={cn(
-              "absolute z-30 mt-2 w-full overflow-hidden rounded-3xl bg-opacity-95 p-2 shadow-xl backdrop-blur-xl",
+              "absolute z-30 mt-2 w-full overflow-hidden rounded-3xl bg-opacity-20 p-2 shadow-xl backdrop-blur-xl",
               bgMap[variant] || bgMap.primary
             )}
           >
@@ -175,7 +188,7 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
                   className={cn(
                     "cursor-pointer rounded-2xl px-6 py-3 text-left transition-colors outline-none",
                     rowStyleMap[variant] || rowStyleMap.primary,
-                    isActive && "bg-opacity-20",
+                    isActive && cn(bgMap[variant] || bgMap.primary, "bg-opacity-20"),
                     isSelected && "font-semibold"
                   )}
                 >
