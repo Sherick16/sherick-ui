@@ -29,7 +29,7 @@ export const Switch = ({
       onClick={() => onChange?.(!checked)}
       className={cn(
         "group inline-flex min-h-12 min-w-14 items-center justify-center rounded-full outline-none",
-        disabled ? "cursor-not-allowed opacity-45" : "cursor-pointer",
+        disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer",
         className
       )}
       {...props}
@@ -41,6 +41,8 @@ export const Switch = ({
           motionComponent,
           "group-focus-visible:ring-2 group-focus-visible:ring-sherick-primary group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-sherick-canvas",
           checked ? toneStrongMap[variant] : "bg-sherick-surface-high text-sherick-ink-muted",
+          disabled && checked && "bg-sherick-primary-soft/[0.55] text-sherick-ink-muted saturate-50",
+          disabled && !checked && "bg-sherick-surface-high/[0.62] text-sherick-ink-muted/70",
           !disabled && "group-hover:brightness-110 group-active:scale-[0.985]",
           "motion-reduce:group-active:scale-100"
         )}
@@ -51,7 +53,8 @@ export const Switch = ({
             "transition-[width,height,transform,background-color] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
             checked
               ? "h-6 w-6 translate-x-5 text-sherick-on-primary"
-              : "h-5 w-5 translate-x-0 text-sherick-ink-muted"
+              : "h-5 w-5 translate-x-0 text-sherick-ink-muted",
+            disabled && "text-sherick-ink-muted/80"
           )}
         />
       </span>
