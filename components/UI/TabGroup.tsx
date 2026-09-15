@@ -3,6 +3,7 @@
 import React, { type KeyboardEvent, type ReactNode, useId, useRef, useState } from "react";
 import { cn } from "@/libs/utils";
 import {
+  elevation,
   focusRing,
   motionComponent,
   pressable,
@@ -78,7 +79,9 @@ export const TabGroup = ({
         <div
           aria-hidden="true"
           className={cn(
-            "absolute inset-y-1.5 left-1.5 shadow-sherick-soft",
+            "absolute inset-y-1.5 left-1.5",
+            /* The selected segment reads as the resting form of a pressed control. */
+            elevation.pressed,
             shape.pill,
             toneSelectedMap[variant],
             "transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
@@ -116,7 +119,7 @@ export const TabGroup = ({
                 pressable,
                 selected
                   ? "text-sherick-ink"
-                  : "text-sherick-ink-muted hover:bg-white/[0.045] hover:text-sherick-ink active:bg-white/[0.085]"
+                  : "text-sherick-ink-muted hover:bg-sherick-ink/[0.045] hover:text-sherick-ink active:bg-sherick-ink/[0.085]"
               )}
             >
               {tab.label}

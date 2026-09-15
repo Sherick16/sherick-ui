@@ -1,7 +1,17 @@
 "use client";
 
-import { useState } from "react";
-import { Bell, Check, Download, Heart, Search as SearchIcon, Trash2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import {
+  Bell,
+  Check,
+  Download,
+  Heart,
+  Monitor,
+  Moon,
+  Search as SearchIcon,
+  Sun,
+  Trash2,
+} from "lucide-react";
 import ActionButton from "@/components/UI/ActionButton";
 import Dropdown from "@/components/UI/Dropdown";
 import Search from "@/components/UI/Search";
@@ -29,25 +39,55 @@ const selectOptions = [
   { label: "Marketing site", value: "marketing" },
 ];
 
+type ThemeMode = "system" | "light" | "dark";
+
+const isThemeMode = (value: string | null): value is ThemeMode =>
+  value === "system" || value === "light" || value === "dark";
+
+const applyTheme = (theme: ThemeMode) => {
+  if (theme === "system") {
+    document.documentElement.removeAttribute("data-sherick-theme");
+  } else {
+    document.documentElement.dataset.sherickTheme = theme;
+  }
+};
+
 export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);
   const [switchOn, setSwitchOn] = useState(true);
   const [selection, setSelection] = useState("design");
+  const [theme, setTheme] = useState<ThemeMode>("system");
+
+  useEffect(() => {
+    const stored = localStorage.getItem("sherick-ui-theme");
+    const nextTheme = isThemeMode(stored) ? stored : "system";
+    setTheme(nextTheme);
+    applyTheme(nextTheme);
+  }, []);
+
+  const changeTheme = (nextTheme: ThemeMode) => {
+    setTheme(nextTheme);
+    localStorage.setItem("sherick-ui-theme", nextTheme);
+    applyTheme(nextTheme);
+  };
 
   return (
     <main className="min-h-screen bg-sherick-canvas text-sherick-ink">
       <div className="mx-auto w-full max-w-[1320px] px-5 py-10 sm:px-8 lg:px-10 lg:py-14">
-        <div className="mb-14 max-w-3xl">
-          <Badge variant="primary">Sherick UI · development workbench</Badge>
-          <h1 className="mt-5 text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">Design system showcase</h1>
-          <p className="mt-3 max-w-2xl text-base leading-7 text-sherick-ink-muted">
-            Soft tonal hierarchy, expressive interaction, and richer smoked-glass depth only when UI floats or matters.
-          </p>
+        <div className="mb-14 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
+          <div className="max-w-3xl">
+            <Badge variant="primary">Sherick UI · development workbench</Badge>
+            <h1 className="mt-5 text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">Design system showcase</h1>
+            <p className="mt-3 max-w-2xl text-base leading-7 text-sherick-ink-muted">
+              Soft tonal hierarchy, expressive interaction, runtime light and dark themes, and richer smoked-glass depth only when UI floats or matters.
+            </p>
+          </div>
+          <ThemePicker theme={theme} onChange={changeTheme} />
         </div>
 
         <div className="space-y-16">
           <section>
-            <SectionHeading title="Foundations" description="Core palette, shape and material language used by every component." />
+            <SectionHeading title="Foundations" description="Core palette, shape, material and elevation language used by every component." />
             <div className="mt-6 grid gap-4 xl:grid-cols-3">
               <Specimen title="Color roles" description="Primary, semantic and neutral roles—not raw component colors.">
                 <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -60,16 +100,20 @@ export default function Home() {
                 </div>
               </Specimen>
 
-              <Specimen title="Surface hierarchy" description="Grounded UI stays matte; floating UI becomes smoked liquid glass.">
-                <div className="space-y-3">
-                  <div className="rounded-[1.25rem] bg-sherick-surface p-4 text-sm">Matte surface</div>
-                  <div className="rounded-[1.5rem] bg-sherick-surface-high p-4 text-sm shadow-sherick-soft">Elevated tonal surface</div>
-                  <div className="relative overflow-hidden rounded-[1.5rem] bg-sherick-canvas/[0.55] p-4">
-                    <div className="absolute -left-8 -top-4 h-24 w-36 rounded-full bg-sherick-primary/[0.30] blur-[28px]" />
-                    <div className="absolute bottom-1 right-1 h-20 w-28 rounded-full bg-sherick-accent/[0.22] blur-[26px]" />
-                    <div className="absolute left-7 top-6 text-[10px] font-medium tracking-wide text-sherick-ink/[0.42]">CONTENT BEHIND</div>
-                    <div className="absolute right-8 top-11 h-2 w-24 rounded-full bg-sherick-ink/[0.13]" />
-                    <div className="relative rounded-[1.25rem] bg-sherick-surface-float/[0.60] bg-sherick-glass p-4 text-sm shadow-sherick-glass backdrop-blur-[32px] backdrop-saturate-[1.45] backdrop-brightness-[1.04]">
+              <Specimen
+                title="Surface & elevation"
+                description="Shadow is tied to elevation, not decoration: matte surfaces separate by color, raised surfaces lift slightly, floating glass lifts decisively above the page."
+              >
+                <div className="space-y-5">
+                  <div className="rounded-[1.25rem] bg-sherick-surface p-4 text-sm shadow-sherick-grounded">Matte surface</div>
+                  <div className="rounded-[1.5rem] bg-sherick-surface-high p-4 text-sm shadow-sherick-raised">Elevated tonal surface</div>
+
+                  <div className="relative rounded-[1.5rem] bg-sherick-canvas/[0.55] p-5">
+                    <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[1.5rem]">
+                      <div className="absolute -left-8 -top-4 h-24 w-36 rounded-full bg-sherick-primary/[0.30] blur-[28px]" />
+                      <div className="absolute bottom-1 right-1 h-20 w-28 rounded-full bg-sherick-accent/[0.22] blur-[26px]" />
+                    </div>
+                    <div className="relative rounded-[1.25rem] bg-sherick-surface-float/[0.60] bg-sherick-glass p-4 text-sm shadow-sherick-floating backdrop-blur-[32px] backdrop-saturate-[1.45] backdrop-brightness-[1.04]">
                       Floating liquid glass
                     </div>
                   </div>
@@ -90,12 +134,13 @@ export default function Home() {
           <section>
             <SectionHeading title="Buttons" description="Appearance, size and state are separate parts of the API." />
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
-              <Specimen title="Appearances" description="Filled for priority, tonal for normal actions, text for quiet actions.">
+              <Specimen title="Appearances" description="Filled for priority, tonal for normal actions, text for quiet actions. Only tonal controls carry the raised elevation step, and pressing one recesses it.">
                 <div className="flex flex-wrap items-center gap-3">
                   <ActionButton appearance="filled">Filled</ActionButton>
                   <ActionButton appearance="tonal" variant="secondary">Tonal</ActionButton>
                   <ActionButton appearance="text" variant="secondary">Text</ActionButton>
                   <ActionButton appearance="tonal" variant="danger" icon={<Trash2 />}>Delete</ActionButton>
+                  <IconButton appearance="tonal" variant="secondary" icon={<Bell />} aria-label="Tonal icon button" />
                 </div>
               </Specimen>
 
@@ -103,7 +148,7 @@ export default function Home() {
                 <div className="flex flex-wrap items-center gap-3">
                   <ActionButton loading>Saving</ActionButton>
                   <ActionButton disabled>Disabled</ActionButton>
-                  <ActionButton className="ring-2 ring-sherick-primary ring-offset-2 ring-offset-sherick-canvas">Focus-visible</ActionButton>
+                  <ActionButton className="outline outline-2 outline-sherick-focus outline-offset-[3px]">Focus-visible</ActionButton>
                 </div>
               </Specimen>
 
@@ -133,7 +178,7 @@ export default function Home() {
                 <div className="space-y-4">
                   <Input label="Project name" placeholder="Sherick UI" />
                   <Input label="Invalid" placeholder="Required value" error />
-                  <Input label="Focus-visible" placeholder="Keyboard focus" inputClassName="ring-2 ring-sherick-primary ring-offset-2 ring-offset-sherick-canvas bg-sherick-surface-high/[0.9]" />
+                  <Input label="Focus-visible" placeholder="Keyboard focus" inputClassName="outline outline-2 outline-sherick-focus outline-offset-[3px] bg-sherick-surface-high/[0.9]" />
                   <Input label="Disabled" placeholder="Unavailable" disabled />
                 </div>
               </Specimen>
@@ -172,7 +217,7 @@ export default function Home() {
                 </div>
               </Specimen>
 
-              <Specimen title="Tabs" description="Matte track with a softly elevated sliding selection.">
+              <Specimen title="Tabs" description="Matte track; the selected segment presses into it like a held control.">
                 <TabGroup tabs={[
                   { id: "one", label: "Overview", content: <p className="text-sm text-sherick-ink-muted">Overview content</p> },
                   { id: "two", label: "Motion", content: <p className="text-sm text-sherick-ink-muted">Motion content</p> },
@@ -284,9 +329,44 @@ export default function Home() {
   );
 }
 
+function ThemePicker({ theme, onChange }: { theme: ThemeMode; onChange: (theme: ThemeMode) => void }) {
+  const choices: Array<{ value: ThemeMode; label: string; icon: typeof Sun }> = [
+    { value: "system", label: "System", icon: Monitor },
+    { value: "light", label: "Light", icon: Sun },
+    { value: "dark", label: "Dark", icon: Moon },
+  ];
+
+  return (
+    <div className="shrink-0">
+      <div className="mb-2 text-xs font-medium text-sherick-ink-muted">Theme</div>
+      <div className="inline-flex rounded-full bg-sherick-surface/[0.72] p-1 shadow-inner">
+        {choices.map(({ value, label, icon: Icon }) => {
+          const selected = theme === value;
+          return (
+            <button
+              key={value}
+              type="button"
+              aria-pressed={selected}
+              onClick={() => onChange(value)}
+              className={`inline-flex min-h-9 items-center gap-1.5 rounded-full px-3 text-xs font-medium transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-sherick-focus focus-visible:outline-offset-2 ${
+                selected
+                  ? "bg-sherick-primary/[0.16] text-sherick-ink shadow-sherick-pressed"
+                  : "text-sherick-ink-muted hover:bg-sherick-ink/[0.05] hover:text-sherick-ink"
+              }`}
+            >
+              <Icon className="h-3.5 w-3.5" aria-hidden="true" />
+              {label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function SectionHeading({ title, description }: { title: string; description: string }) {
   return (
-    <div className="border-b border-white/[0.035] pb-5">
+    <div className="border-b border-sherick-ink/[0.06] pb-5">
       <h2 className="text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{title}</h2>
       <p className="mt-2 text-base leading-7 text-sherick-ink-muted">{description}</p>
     </div>

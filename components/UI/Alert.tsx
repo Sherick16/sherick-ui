@@ -49,7 +49,7 @@ export const Alert = ({
           onClick={() => setIsVisible(false)}
           className={cn(
             "ml-1 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-current",
-            "hover:bg-white/[0.08] active:bg-white/[0.13]",
+            "hover:bg-sherick-ink/[0.08] active:bg-sherick-ink/[0.13]",
             motionState,
             focusRingInset
           )}

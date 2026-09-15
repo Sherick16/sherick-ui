@@ -19,7 +19,7 @@ const Markdown = ({ children }: { children: string }) => {
         ol: ({ className, ...props }: any) => <ol className={cn("my-4 list-decimal space-y-2 pl-6 text-sherick-ink/[0.84]", className)} {...props} />,
         li: ({ className, ...props }: any) => <li className={cn("pl-1 leading-7 marker:text-sherick-primary", className)} {...props} />,
         blockquote: ({ className, ...props }: any) => <blockquote className={cn("my-5 rounded-r-2xl border-l-2 border-sherick-primary/[0.45] bg-sherick-primary/[0.07] px-4 py-2 text-sherick-ink-muted", className)} {...props} />,
-        hr: ({ className, ...props }: any) => <hr className={cn("my-7 border-0 border-t border-white/[0.06]", className)} {...props} />,
+        hr: ({ className, ...props }: any) => <hr className={cn("my-7 border-0 border-t border-sherick-ink/[0.06]", className)} {...props} />,
         strong: ({ className, ...props }: any) => <strong className={cn("font-semibold text-sherick-ink", className)} {...props} />,
         code({ node, inline, className, children, ...props }: any) {
           const match = /language-(\w+)/.exec(className || "");

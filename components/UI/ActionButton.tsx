@@ -3,12 +3,12 @@
 import React, { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import {
+  elevation,
   focusRing,
   motionComponent,
   pressable,
   shape,
-  toneActiveMap,
-  toneHoverMap,
+  stateLayer,
   toneStrongMap,
   toneSurfaceMap,
   toneTextMap,
@@ -62,13 +62,14 @@ const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
           focusRing,
           !isDisabled && pressable,
           appearance === "filled" && toneStrongMap[variant],
-          appearance === "filled" && variant === "primary" && "hover:brightness-105",
           appearance === "tonal" && toneSurfaceMap[variant],
+          appearance === "tonal" && !isDisabled && elevation.raised,
+          appearance === "tonal" && !isDisabled && "active:shadow-sherick-pressed",
           appearance === "tonal" && toneTextMap[variant],
-          appearance !== "text" && !isDisabled && toneHoverMap[variant],
-          appearance !== "text" && !isDisabled && toneActiveMap[variant],
+          appearance === "filled" && !isDisabled && stateLayer.filled,
+          appearance === "tonal" && !isDisabled && stateLayer.tonal,
           appearance === "text" && toneTextMap[variant],
-          appearance === "text" && !isDisabled && "hover:bg-white/[0.055] active:bg-white/[0.1]",
+          appearance === "text" && !isDisabled && "hover:bg-sherick-ink/[0.055] active:bg-sherick-ink/[0.1]",
           isDisabled ? "cursor-not-allowed opacity-45 shadow-none" : "cursor-pointer",
           className
         )}
