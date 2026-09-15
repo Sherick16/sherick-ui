@@ -12,7 +12,7 @@ const Divider = ({
     aria-hidden="true"
     className={cn(
       orientation === "horizontal" ? "h-px w-full" : "h-full w-px",
-      "bg-white/10",
+      "bg-sherick-ink/[0.075]",
       className
     )}
   />
