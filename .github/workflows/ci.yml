@@ -6,15 +6,13 @@ on:
     branches: [main]
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   verify:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.head_ref || github.ref_name }}
       - uses: actions/setup-node@v4
         with:
           node-version: 20
@@ -22,18 +20,7 @@ jobs:
         run: |
           corepack enable
           corepack prepare pnpm@9.15.4 --activate
-      - name: Refresh lockfile
-        run: pnpm install --no-frozen-lockfile --ignore-scripts
-      - name: Commit refreshed lockfile
-        if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
-        run: |
-          if git diff --quiet -- pnpm-lock.yaml; then
-            exit 0
-          fi
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add pnpm-lock.yaml
-          git commit -m "refresh pnpm lockfile"
-          git push origin HEAD:${{ github.head_ref }}
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
       - name: Verify package
         run: pnpm verify
