@@ -9,9 +9,19 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { ChevronDown } from "lucide-react";
+import { Check, ChevronDown } from "lucide-react";
 import { cn } from "@/libs/utils";
-import { bgMap, focusRing, rowStyleMap, styleMap } from "./ui.common";
+import {
+  focusRing,
+  focusRingInset,
+  motionComponent,
+  motionState,
+  pressable,
+  shape,
+  surface,
+  toneSoftMap,
+  toneTextMap,
+} from "./ui.common";
 import { Variant } from "./ui.types";
 
 export interface DropdownOption {
@@ -31,7 +41,7 @@ export interface DropdownProps
 const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
   ({
     options,
-    variant = "secondary",
+    variant = "primary",
     onSelect,
     selected,
     placeholder = "Select an option",
@@ -88,6 +98,7 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
     };
 
     const moveActive = (nextIndex: number) => {
+      if (options.length === 0) return;
       const normalized = (nextIndex + options.length) % options.length;
       setActiveIndex(normalized);
       optionRefs.current[normalized]?.focus();
@@ -97,8 +108,13 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
       onKeyDown?.(event);
       if (event.defaultPrevented || disabled || options.length === 0) return;
 
-      if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      if (event.key === "ArrowDown") {
         event.preventDefault();
+        setActiveIndex(selectedIndex >= 0 ? selectedIndex : 0);
+        setIsOpen(true);
+      } else if (event.key === "ArrowUp") {
+        event.preventDefault();
+        setActiveIndex(selectedIndex >= 0 ? selectedIndex : options.length - 1);
         setIsOpen(true);
       } else if (event.key === "Escape") {
         setIsOpen(false);
@@ -147,16 +163,26 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
           }}
           onKeyDown={handleTriggerKeyDown}
           className={cn(
-            "flex w-full min-w-64 items-center justify-between rounded-4xl px-6 py-4 bg-opacity-20 hover:bg-opacity-40 transition-all",
+            "flex min-h-12 w-full min-w-64 items-center justify-between px-5 py-3 text-left",
+            shape.control,
+            surface.control,
+            motionState,
             focusRing,
-            styleMap[variant] || styleMap.primary,
-            disabled && "cursor-not-allowed opacity-60"
+            !disabled && pressable,
+            disabled && "cursor-not-allowed opacity-45"
           )}
         >
-          <span className={cn(!selectedOption && "text-opacity-70")}>{selectedOption?.label ?? placeholder}</span>
+          <span className={cn("truncate", !selectedOption && "text-zinc-400")}>
+            {selectedOption?.label ?? placeholder}
+          </span>
           <ChevronDown
             aria-hidden="true"
-            className={cn("ml-3 h-5 w-5 shrink-0 transition-transform", isOpen && "rotate-180")}
+            className={cn(
+              "ml-3 h-5 w-5 shrink-0",
+              toneTextMap[variant],
+              motionComponent,
+              isOpen && "rotate-180"
+            )}
           />
         </button>
 
@@ -166,8 +192,10 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
             role="listbox"
             aria-labelledby={triggerId}
             className={cn(
-              "absolute z-30 mt-2 w-full overflow-hidden rounded-3xl bg-opacity-20 p-2 shadow-xl backdrop-blur-xl",
-              bgMap[variant] || bgMap.primary
+              "absolute z-30 mt-2 w-full min-w-max p-2",
+              shape.surface,
+              surface.raised,
+              "origin-top animate-fade motion-reduce:animate-none"
             )}
           >
             {options.map((option, index) => {
@@ -187,14 +215,19 @@ const Dropdown = forwardRef<HTMLButtonElement, DropdownProps>(
                   onKeyDown={(event) => handleOptionKeyDown(event, index)}
                   onClick={() => selectOption(index)}
                   className={cn(
-                    "cursor-pointer rounded-2xl px-6 py-3 text-left transition-colors",
-                    focusRing,
-                    rowStyleMap[variant] || rowStyleMap.primary,
-                    isActive && cn(bgMap[variant] || bgMap.primary, "bg-opacity-20"),
-                    isSelected && "font-semibold"
+                    "flex cursor-pointer items-center justify-between gap-4 rounded-xl px-4 py-3 text-left text-sm text-zinc-200",
+                    motionState,
+                    focusRingInset,
+                    isSelected && toneSoftMap[variant],
+                    !isSelected && isActive && "bg-white/8",
+                    !isSelected && "hover:bg-white/6",
+                    "active:bg-white/12"
                   )}
                 >
-                  {option.label}
+                  <span className={cn(isSelected && "font-medium")}>{option.label}</span>
+                  {isSelected && (
+                    <Check aria-hidden="true" className={cn("h-4 w-4", toneTextMap[variant])} />
+                  )}
                 </div>
               );
             })}
