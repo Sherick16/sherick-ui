@@ -28,6 +28,13 @@
   --sui-outline: 0.50 0.018 260;
   --sui-scrim: 0.16 0.01 260;
 
+  --sui-glass-blur: 28px;
+  --sui-glass-saturation: 1.18;
+  --sui-glass-brightness: 1.012;
+  --sui-glass-dense-blur: 22px;
+  --sui-glass-dense-saturation: 1.12;
+  --sui-glass-dense-brightness: 1.008;
+
   --sui-glass-gradient: linear-gradient(
     135deg,
     rgb(255 255 255 / 0.78) 0%,
@@ -87,6 +94,13 @@
   --sui-outline: 0.76 0.014 255;
   --sui-scrim: 0.08 0.01 260;
 
+  --sui-glass-blur: 32px;
+  --sui-glass-saturation: 1.45;
+  --sui-glass-brightness: 1.04;
+  --sui-glass-dense-blur: 26px;
+  --sui-glass-dense-saturation: 1.38;
+  --sui-glass-dense-brightness: 1.035;
+
   --sui-glass-gradient: linear-gradient(
     135deg,
     rgb(255 255 255 / 0.055) 0%,
@@ -141,6 +155,12 @@
     --sui-focus: 0.72 0.15 255;
     --sui-outline: 0.76 0.014 255;
     --sui-scrim: 0.08 0.01 260;
+    --sui-glass-blur: 32px;
+    --sui-glass-saturation: 1.45;
+    --sui-glass-brightness: 1.04;
+    --sui-glass-dense-blur: 26px;
+    --sui-glass-dense-saturation: 1.38;
+    --sui-glass-dense-brightness: 1.035;
     --sui-glass-gradient: linear-gradient(135deg, rgb(255 255 255 / 0.055) 0%, rgb(255 255 255 / 0.018) 32%, rgb(112 156 255 / 0.022) 72%, rgb(255 255 255 / 0.01) 100%);
     --sui-glass-gradient-dense: linear-gradient(135deg, rgb(255 255 255 / 0.045) 0%, rgb(255 255 255 / 0.012) 38%, rgb(112 156 255 / 0.018) 78%, rgb(255 255 255 / 0.008) 100%);
     --sui-shadow-soft: 0 14px 36px -24px rgb(5 8 14 / 0.42);
