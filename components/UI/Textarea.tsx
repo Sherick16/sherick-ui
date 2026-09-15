@@ -29,9 +29,9 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     return (
       <div className={cn("flex w-full flex-col", className)}>
         {label && (
-          <label htmlFor={textareaId} className="mb-2 text-sm font-medium text-zinc-200">
+          <label htmlFor={textareaId} className="mb-2 text-sm font-medium text-sherick-ink/88">
             {label}
-            {required && <span className="ml-1 text-red-300" aria-hidden="true">*</span>}
+            {required && <span className="ml-1 text-sherick-danger" aria-hidden="true">*</span>}
           </label>
         )}
         <textarea
@@ -40,12 +40,12 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           required={required}
           aria-invalid={error || undefined}
           className={cn(
-            "min-h-28 min-w-64 w-full resize-y px-5 py-4",
+            "min-h-28 min-w-64 w-full resize-y px-5 py-4 text-[0.95rem]",
             shape.control,
             motionState,
             focusRing,
             error ? surface.controlError : surface.control,
-            "disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-zinc-700/55",
+            "disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-sherick-surface-high/78",
             textareaClassName
           )}
           onChange={(event) => onChange?.(event.target.value)}
