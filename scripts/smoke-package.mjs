@@ -163,6 +163,7 @@ const sourceRoot = fileURLToPath(new URL("..", import.meta.url));
 const invalidOpacityModifiers = [];
 const rawNeutralUtilities = [];
 const rawLiteralColors = [];
+const unsafeFocusUtilities = [];
 
 async function scanDirectory(directory, { enforceThemeTokens = false } = {}) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
@@ -195,6 +196,11 @@ async function scanDirectory(directory, { enforceThemeTokens = false } = {}) {
           rawLiteralColors.push(`${path.replace(`${sourceRoot}/`, "")}: ${match[0]}`);
         }
       }
+
+      const unsafeFocusPattern = /((?:group-)?focus(?:-visible|-within)?:(?:ring|outline)-sherick-primary|(?:group-)?focus(?:-visible|-within)?:ring-offset-sherick-canvas)/g;
+      for (const match of source.matchAll(unsafeFocusPattern)) {
+        unsafeFocusUtilities.push(`${path.replace(`${sourceRoot}/`, "")}: ${match[1]}`);
+      }
     }
   }
 }
@@ -215,6 +221,11 @@ assert.deepEqual(
   rawLiteralColors,
   [],
   `raw literal colors found in reusable UI:\n${rawLiteralColors.join("\n")}`
+);
+assert.deepEqual(
+  unsafeFocusUtilities,
+  [],
+  `theme-unsafe focus utilities found in reusable UI:\n${unsafeFocusUtilities.join("\n")}`
 );
 
 console.log("Package smoke verification passed.");
