@@ -19,7 +19,7 @@ export const shape = {
   pill: "rounded-full",
   control: "rounded-[1.25rem]",
   surface: "rounded-[1.75rem]",
-  hero: "rounded-[3rem]",
+  hero: "rounded-[2.25rem]",
   circle: "rounded-full",
 } as const;
 
@@ -33,13 +33,13 @@ export const surface = {
   raised:
     "bg-sherick-surface-float/[0.82] text-sherick-ink shadow-sherick-soft",
   acrylic:
-    "bg-sherick-surface-float/[0.66] text-sherick-ink shadow-sherick-float backdrop-blur-2xl backdrop-saturate-150 ring-1 ring-inset ring-white/[0.045]",
+    "bg-sherick-surface-float/[0.76] text-sherick-ink shadow-sherick-float backdrop-blur-2xl backdrop-saturate-125",
   acrylicDense:
-    "bg-sherick-surface-float/[0.80] text-sherick-ink shadow-sherick-soft backdrop-blur-xl backdrop-saturate-150 ring-1 ring-inset ring-white/[0.04]",
+    "bg-sherick-surface-float/[0.86] text-sherick-ink shadow-sherick-soft backdrop-blur-xl backdrop-saturate-125",
   modal:
-    "bg-sherick-surface-float/[0.70] text-sherick-ink shadow-sherick-float backdrop-blur-2xl backdrop-saturate-150 ring-1 ring-inset ring-white/[0.045]",
+    "bg-sherick-surface-float/[0.90] text-sherick-ink shadow-sherick-float backdrop-blur-2xl backdrop-saturate-125",
   tooltip:
-    "bg-sherick-surface-float/[0.84] text-sherick-ink shadow-sherick-soft backdrop-blur-xl backdrop-saturate-150 ring-1 ring-inset ring-white/[0.04]",
+    "bg-sherick-surface-float/[0.92] text-sherick-ink shadow-sherick-soft backdrop-blur-xl backdrop-saturate-125",
 } as const;
 
 export const toneTextMap: Record<Variant, string> = {
@@ -59,11 +59,11 @@ export const toneSurfaceMap: Record<Variant, string> = {
 };
 
 export const toneSelectedMap: Record<Variant, string> = {
-  primary: "bg-sherick-primary/[0.18] text-sherick-primary",
+  primary: "bg-sherick-primary/[0.22] text-sherick-ink",
   secondary: "bg-sherick-surface-high/[0.82] text-sherick-ink",
-  danger: "bg-sherick-danger/[0.16] text-sherick-danger",
-  warning: "bg-sherick-warning/[0.16] text-sherick-warning",
-  success: "bg-sherick-success/[0.16] text-sherick-success",
+  danger: "bg-sherick-danger/[0.16] text-sherick-ink",
+  warning: "bg-sherick-warning/[0.16] text-sherick-ink",
+  success: "bg-sherick-success/[0.16] text-sherick-ink",
 };
 
 export const toneHoverMap: Record<Variant, string> = {
