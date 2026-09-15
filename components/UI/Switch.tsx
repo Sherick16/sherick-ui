@@ -2,7 +2,7 @@
 
 import React, { type ButtonHTMLAttributes } from "react";
 import { cn } from "@/libs/utils";
-import { focusRing, motionComponent, pressable, toneStrongMap } from "./ui.common";
+import { motionComponent, toneStrongMap } from "./ui.common";
 import { Variant } from "./ui.types";
 
 export interface SwitchProps
@@ -28,11 +28,7 @@ export const Switch = ({
       disabled={disabled}
       onClick={() => onChange?.(!checked)}
       className={cn(
-        "relative inline-flex min-h-11 min-w-14 items-center rounded-full p-1.5",
-        motionComponent,
-        focusRing,
-        !disabled && pressable,
-        checked ? toneStrongMap[variant] : "bg-zinc-600/50 text-zinc-100",
+        "group inline-flex min-h-12 min-w-14 items-center justify-center rounded-full outline-none",
         disabled ? "cursor-not-allowed opacity-45" : "cursor-pointer",
         className
       )}
@@ -41,10 +37,24 @@ export const Switch = ({
       <span
         aria-hidden="true"
         className={cn(
-          "block h-5 w-5 rounded-full bg-current shadow-sm transition-transform duration-200 ease-out motion-reduce:transition-none",
-          checked ? "translate-x-5" : "translate-x-0"
+          "relative block h-8 w-[3.25rem] shrink-0 rounded-full shadow-inner",
+          motionComponent,
+          "group-focus-visible:ring-2 group-focus-visible:ring-sherick-primary group-focus-visible:ring-offset-2 group-focus-visible:ring-offset-sherick-canvas",
+          checked ? toneStrongMap[variant] : "bg-sherick-surface-high text-sherick-ink-muted",
+          !disabled && "group-hover:brightness-110 group-active:scale-[0.985]",
+          "motion-reduce:group-active:scale-100"
         )}
-      />
+      >
+        <span
+          className={cn(
+            "absolute left-1 top-1/2 -translate-y-1/2 rounded-full bg-current shadow-sm",
+            "transition-[width,height,transform,background-color] duration-200 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none",
+            checked
+              ? "h-6 w-6 translate-x-5 text-sherick-on-primary"
+              : "h-5 w-5 translate-x-0 text-sherick-ink-muted"
+          )}
+        />
+      </span>
     </button>
   );
 };
