@@ -1,7 +1,7 @@
 {
   "name": "sherick-ui",
   "version": "1.0.5",
-  "description": "A collection of reusable React UI components inspired by Material Design.",
+  "description": "A reusable React component library inspired by Material 3 Expressive.",
   "keywords": [
     "react",
     "ui",
@@ -15,21 +15,26 @@
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
+  "style": "theme.css",
   "type": "module",
   "author": "Sherick Eksteen",
   "files": [
     "dist",
-    "tailwind.preset.cjs"
+    "tailwind.preset.cjs",
+    "theme.css"
   ],
   "license": "MIT",
-  "sideEffects": false,
+  "sideEffects": [
+    "./theme.css"
+  ],
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.esm.js",
       "require": "./dist/index.cjs.js"
     },
-    "./tailwind-preset": "./tailwind.preset.cjs"
+    "./tailwind-preset": "./tailwind.preset.cjs",
+    "./theme.css": "./theme.css"
   },
   "scripts": {
     "dev": "next dev",
