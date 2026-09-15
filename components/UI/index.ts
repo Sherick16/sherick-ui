@@ -30,6 +30,8 @@ export type { DropdownOption, DropdownProps } from "./Dropdown";
 export type { IconButtonAppearance, IconButtonProps } from "./IconButton";
 export type { InputProps } from "./Input";
 export type { ModalProps } from "./Modal";
+export type { NavGroupItem, NavGroupProps } from "./NavGroup";
+export type { NavItemProps } from "./NavItem";
 export type { SearchProps } from "./Search";
 export type { SwitchProps } from "./Switch";
 export type { Tab, TabGroupProps } from "./TabGroup";
