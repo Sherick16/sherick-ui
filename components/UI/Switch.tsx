@@ -32,7 +32,7 @@ export const Switch = ({
         motionComponent,
         focusRing,
         !disabled && pressable,
-        checked ? toneStrongMap[variant] : "bg-zinc-600/55 text-zinc-100",
+        checked ? toneStrongMap[variant] : "bg-zinc-600/50 text-zinc-100",
         disabled ? "cursor-not-allowed opacity-45" : "cursor-pointer",
         className
       )}
