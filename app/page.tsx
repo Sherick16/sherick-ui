@@ -24,6 +24,7 @@ import Modal from "@/components/UI/Modal";
 import Badge from "@/components/UI/Badge";
 import IconButton from "@/components/UI/IconButton";
 import CodeBlock from "@/components/UI/CodeBlock";
+import Divider from "@/components/UI/Divider";
 import Markdown from "@/components/UI/Markdown";
 import NavGroup from "@/components/UI/NavGroup";
 import { Spinner } from "@/components/UI/Spinner";
@@ -42,6 +43,7 @@ import {
   motion,
   shape,
   state,
+  stateLayer,
   text,
   tone,
 } from "@/components/UI/ui.common";
@@ -112,7 +114,7 @@ export default function Home() {
             <SectionHeading title="Design language" />
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
               <Specimen title="Material">
-                <div className={cn("grid grid-cols-3 gap-4 p-5", shape.control, material.canvas)}>
+                <div className={cn("grid grid-cols-2 gap-4 p-5 sm:grid-cols-3", shape.control, material.canvas)}>
                   <Tile label="Canvas" className={cn(material.canvas, "outline outline-1 outline-dashed outline-sherick-edge/[0.25]")} />
                   <Tile label="Matte quiet" className={material.matteQuiet} />
                   <Tile label="Matte" className={material.matte} />
@@ -125,7 +127,7 @@ export default function Home() {
                     <div className="absolute -left-6 -top-4 h-24 w-36 rounded-full bg-sherick-primary/[0.30] blur-[28px]" />
                     <div className="absolute -bottom-2 right-2 h-20 w-28 rounded-full bg-sherick-accent/[0.22] blur-[26px]" />
                   </div>
-                  <div className="relative grid grid-cols-3 gap-4">
+                  <div className="relative grid grid-cols-1 gap-4 sm:grid-cols-3">
                     <Tile label="Acrylic" className={material.acrylic} />
                     <Tile label="Dense" className={material.acrylicDense} />
                     <Tile label="Hero" className={material.acrylicHero} />
@@ -134,7 +136,7 @@ export default function Home() {
               </Specimen>
 
               <Specimen title="Elevation">
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                   <Tile label="Flat" className={cn(material.matteHigh, elevation.flat)} />
                   <Tile label="Raised" className={cn(material.matteHigh, elevation.raised)} />
                   <Tile label="Control" className={cn(material.matteHigh, elevation.control)} />
@@ -144,13 +146,13 @@ export default function Home() {
               </Specimen>
 
               <Specimen title="Shape">
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                   <Tile label="1.25rem" caption="Control" className={cn(material.matteHigh, shape.control)} />
                   <Tile label="1.5rem" caption="Prominent" className={cn(material.matteHigh, shape.prominent)} />
                   <Tile label="1.75rem" caption="Surface" className={cn(material.matteHigh, shape.surface)} />
                   <Tile label="2rem" caption="Expressive" className={cn(material.matteHigh, shape.expressive)} />
                   <Tile label="pill" caption="Pill" className={cn(tone.tonal.primary, shape.pill, text.high)} />
-                  <Tile label="circle" caption="Circle" className={cn(tone.tonal.primary, shape.circle, text.high, "aspect-square w-24 self-center")} />
+                  <Tile label="circle" caption="Circle" className={cn(tone.tonal.primary, shape.circle, text.high, "aspect-square w-24 max-w-full self-center")} />
                 </div>
               </Specimen>
 
@@ -192,7 +194,7 @@ export default function Home() {
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                   <Tile label="Rest" className={cn(material.control, text.high)} />
                   <Tile label="Hover" className={cn(material.control, "bg-sherick-surface-high/[0.82]", text.high)} />
-                  <Tile label="Pressed" className={cn(material.control, "bg-sherick-surface-high/[0.9]", elevation.recessed, text.high)} />
+                  <Tile label="Pressed" className={cn(material.control, text.high, stateLayer.tonal, "before:opacity-[0.15]")} />
                   <Tile label="Selected" className={cn(shape.control, tone.selected.primary)} />
                   <Tile label="Disabled" className={cn(material.control, state.disabled)} />
                   <Tile label="Focus" className={cn(material.control, text.high, "outline outline-2 outline-sherick-focus outline-offset-[3px]")} />
@@ -236,7 +238,15 @@ export default function Home() {
                 <div className={cn("overflow-hidden", shape.control, material.matte)}>
                   <div className={cn("px-4 py-3 text-sm font-medium", edge.header, text.medium)}>Column header</div>
                   <div className={cn("px-4 py-3 text-sm", edge.row, text.high)}>Table rows</div>
-                  <div className={cn("border-t px-4 py-3 text-sm", edge.rule, text.high)}>Rules and dividers</div>
+                  <div className="flex items-center gap-4 px-4 py-4">
+                    <span className={cn("w-24 shrink-0 text-sm", text.high)}>Divider</span>
+                    <Divider className="flex-1" />
+                  </div>
+                  <div className="flex h-9 items-center gap-4 px-4">
+                    <span className={cn("w-24 shrink-0 text-sm", text.high)}>Vertical</span>
+                    <Divider orientation="vertical" />
+                    <span className={cn("text-sm", text.high)}>Divider</span>
+                  </div>
                 </div>
               </Specimen>
             </div>
@@ -329,7 +339,7 @@ export default function Home() {
               </Specimen>
 
               <Specimen title="Tabs">
-                <TabGroup tabs={[
+                <TabGroup className="overflow-x-auto" tabs={[
                   { id: "one", label: "Overview", content: <p className={cn("text-sm", text.medium)}>Overview content</p> },
                   { id: "two", label: "Motion", content: <p className={cn("text-sm", text.medium)}>Motion content</p> },
                   { id: "three", label: "Density", content: <p className={cn("text-sm", text.medium)}>Density content</p> },
@@ -450,7 +460,7 @@ function ThemePicker({ theme, onChange }: { theme: ThemeMode; onChange: (theme: 
   return (
     <div className="shrink-0">
       <div className={cn("mb-2 text-xs font-medium", text.medium)}>Theme</div>
-      <div className={cn("inline-flex bg-sherick-surface/[0.72] p-1", shape.pill, elevation.pressed)}>
+      <div className={cn("inline-flex bg-sherick-surface/[0.72] p-1", shape.pill, elevation.recessed)}>
         {choices.map(({ value, label, icon: Icon }) => {
           const selected = theme === value;
           return (
@@ -489,7 +499,7 @@ function SectionHeading({ title }: { title: string }) {
 
 function Specimen({ title, className = "", children }: { title: string; className?: string; children: React.ReactNode }) {
   return (
-    <div className={cn(shape.surface, material.matte, "p-6", className)}>
+    <div className={cn(shape.surface, material.matte, "min-w-0 p-6", className)}>
       <h3 className="mb-5 font-medium tracking-[-0.01em]">{title}</h3>
       {children}
     </div>

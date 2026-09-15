@@ -4,16 +4,26 @@ import type { Variant } from "./ui.types";
    ==========================================================================
    One module owns every visual rule in the library. A component composes these
    primitives; it does not write a color, shadow, radius, duration or hairline of
-   its own. The system has seven parts:
+   its own. The system has these parts:
 
      material   what a surface is made of          (canvas, matte, control, acrylic)
-     elevation  how far it sits off the page       (flat, raised, floating, control, pressed)
+     elevation  how far it sits off the page       (flat, raised, floating, control, recessed)
      shape      its corner role                    (control, prominent, surface, expressive, pill, circle)
      edge       the hairline between stacked parts (row, header, rule)
      state      how it responds                    (rest, hover, pressed, selected, disabled, focus)
+     stateLayer the composited hover/press overlay (quiet, tonal, filled, track, activeRow)
      tone       its color role                     (text, soft, tonal, selected, strong)
+     text       the three-step emphasis ladder     (high, medium, low)
      density    how tightly it is packed           (compact, normal, prominent, target)
      motion     how it moves                       (press, release, overlay)
+     overlay    floating shells                    (menu, tooltip, dialog)
+     focusRing  the one focus language             (focusRing, focusRingInset)
+
+   The canonical statement of these rules — and of what is deliberately left to a
+   component's own anatomy, such as layout, spacing, padding, intrinsic size,
+   responsive arrangement and content typography — is `docs/DESIGN_LANGUAGE.md`.
+   Extend that document and this module together; never implement a visual rule in
+   a component.
 
    material, elevation and edge are orthogonal, and that is the point:
    a material is a fill, an elevation is a distance, and an edge is a structural
@@ -23,12 +33,16 @@ import type { Variant } from "./ui.types";
    The physical language, in order:
      flat matte by default
        -> tactile depth on manipulated controls
-       -> recessed depth while pressed, and for tracks and grooves
+       -> recessed depth for tracks, grooves and wells, and for a raised control
+          while it is held
        -> acrylic only for surfaces that genuinely float above the page
 
-   Elevation, edge tone and acrylic all derive from the single light model in
-   `theme.css` (light above the surface plane), so a highlight, a shadow, a
-   floating sheet's gradient and a pressed inset stay physically related. */
+   Elevation composites from the light values in `theme.css` (light above the
+   surface plane). The structural edge tone is its own token, and the acrylic
+   recipes are tokenized separately and calibrated per theme, but both follow the
+   same model: light above, shade below. So a highlight, a shadow, a floating
+   sheet's gradient and a pressed inset stay physically related without sharing
+   one set of numbers. */
 
 /* Focus visibility — one language for every interactive element.
    `focusRing` draws the ring outside the shape, for a control that stands alone.
@@ -77,10 +91,12 @@ export const motion = {
    - control:  the resting half of the tactile pair, for a part the user moves —
                a switch thumb, a selected segment.
    - recessed: the other half of that pair: a groove, a track or a well, which is
-               recessed by definition, and an actively pressed control, which lands at
-               the same depth. `pressed` is the published alias for that depth; prefer
-               `recessed` whenever the surface is simply sunk rather than being held.
-   A passive surface never takes any of these. */
+               recessed by definition, and a raised control while it is held, which
+               lands at the same depth. `pressed` is the published alias for that depth;
+               prefer `recessed` whenever the surface is simply sunk rather than held.
+   A passive surface is flat unless its anatomy is sunk by design: a well, a groove and
+   a code well are `recessed` while they sit there, and `flat` is the default for
+   everything else passive. A flat control never gains depth by being pressed. */
 export const elevation = {
   flat: "shadow-sherick-flat",
   raised: "shadow-sherick-raised",
@@ -119,8 +135,10 @@ export const shape = {
    ring that traces a filled object is still a drawn border, so filled controls
    are separated by tone, not by a line. Light does the rest: a raised control
    carries a lower shadow, and the elevation steps add the upper highlight.
-   One tone serves every line, so table rows, dividers, code sections and quotes
-   agree with each other. */
+   One tone serves every line, so table rows, dividers, the `Divider` component and
+   code sections agree with each other. A Markdown blockquote is not one of these: it
+   takes a primary accent, because a quote is content-level emphasis rather than a
+   structural join between two parts. */
 export const edge = {
   /* Rows of a stacked list or table. */
   row: "border-b border-sherick-edge/[0.06] last:border-b-0",
@@ -134,13 +152,15 @@ export const edge = {
 /* Interaction states:
      rest       the material, at whatever elevation its anatomy calls for
      hover      one tonality step, never a change in depth or a new border
-     pressed    recessed into its own track, plus a slight compression
+     pressed    a raised control returning to the recessed depth of its own track, plus
+                a slight compression; a flat control stays flat and a floating one keeps
+                its elevation
      selected   a selected tone; depth comes from the component's anatomy — a
                 segment inside a groove is raised, a row in a list is not
      disabled   45% opacity, no pointer affordance, no interactive state at all
      focus      the shared outer focus ring, visible on keyboard focus */
 export const state = {
-  /* Tactile compression — matte controls only, never wide surfaces. */
+  /* Tactile compression — controls only, never wide surfaces. */
   press: "active:scale-[0.98] motion-reduce:active:scale-100",
   /* The same compression, driven by the wrapping button instead of the track. */
   groupPress: "group-active:scale-[0.98] motion-reduce:group-active:scale-100",
@@ -197,8 +217,9 @@ export const stateLayer = {
   /* Opaque fills: `current` is the fill's own on-color — the color furthest from it in
      either theme — so one step reads on a saturated blue and a neutral gray alike. */
   filled: `relative ${stateLayerBase} before:rounded-[inherit] before:bg-current hover:before:opacity-[0.18] active:before:opacity-[0.26]`,
-  /* Tracks: the same layer, but hover arrives from the wrapping button rather than
-     the track itself. */
+  /* A switch track: the same layer, but hover and press arrive from the wrapping button
+     rather than the track itself. A segmented track is recessed for the same static
+     reason but does not compose this layer. */
   track: `${stateLayerBase} before:rounded-[inherit] before:bg-current group-hover:before:opacity-[0.18] group-active:before:opacity-[0.26] group-active:before:duration-press group-active:before:ease-press`,
   /* A menu row highlighted by keyboard navigation rather than a pointer. */
   activeRow: "data-[active=true]:before:opacity-[0.06]",
@@ -227,9 +248,9 @@ export const stateLayer = {
                   read first as a physical surface and only secondarily as glass, so the
                   scrim behind it does the separating, the blur only defocuses, and the
                   gradient is a restrained top-to-bottom light rather than a frosted
-                  haze. Its tone sits above the floating level in every theme, which is
-                  how it separates in dark mode without leaning on its shadow — the dark
-                  tone is a subtle step above the canvas, not a light grey sheet — and
+                  haze. Its tone is a subtle step above the canvas in every theme —
+                  in dark mode a small step above the canvas rather than a light grey
+                  sheet — which is how it separates without leaning on its shadow, and
                   `--sui-overlay-fill` tunes how much of the sheet is its own tone rather
                   than the defocused page — a large overlay leans on that, not on blur. */
 export const material = {

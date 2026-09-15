@@ -32,7 +32,8 @@ The physical language, in order:
 ```
 flat matte by default
   -> tactile depth on manipulated controls
-    -> recessed depth for tracks, grooves and wells, and while pressed
+    -> recessed depth for tracks, grooves and wells, and for a raised control while
+       it is held
       -> acrylic only for surfaces that genuinely float above the page
 ```
 
@@ -54,8 +55,9 @@ Because nothing is baked in, the same matte fill appears flat in a card, lifted 
 button and recessed in a groove. A component adds elevation only where its anatomy is
 genuinely lifted, and a hairline only where two parts actually meet.
 
-**Do:** combine freely — `material.matteHigh` + `elevation.control` + `shape.control`
-on a switch thumb.
+**Do:** combine freely — the dialog shell is `shape.expressive` + `material.acrylicHero` +
+`elevation.floating`, and the switch thumb is `elevation.control` + `shape.circle` over its
+own `bg-current` fill.
 **Do not:** expect a material to carry a shadow, a radius or a border, or use an edge
 to express a state.
 
@@ -75,9 +77,14 @@ pressed insets stay physically related.
 | a structural edge is drawn | `--sui-edge`, a shade-tinted hairline |
 
 `--sui-light-top` (the highlight color) and `--sui-light-bottom` (the shade color) are
-the only two lighting values in the system. The elevation ladder, the pressed states and
-the acrylic gradients all composite from them, so re-tuning those two values re-lights
-the entire library.
+the two values the elevation ladder composites from: `raised`, `floating`, `control` and
+`recessed` are all built out of them, so re-tuning that pair re-lights every shadow,
+highlight and pressed inset at once.
+
+The acrylic recipes are a **separate** token family (`--sui-glass-*`), calibrated per
+theme rather than composited from those two values. They follow the same directional
+model — a brighter top, a shaded lower edge — so a sheet still reads as lit by the same
+overhead source, but `--sui-light-*` is not the switch that retunes it.
 
 In dark mode `--sui-edge` rims with light instead of shade: the same hairline role at
 the opposite end of the same model. There is no second lighting system.
@@ -100,7 +107,7 @@ A material is a fill. Tone separates matte surfaces from each other; nothing els
 | `canvas` | the page itself | the root application surface | anything nested inside another surface |
 | `matteQuiet` | the quietest matte step | dense data regions and wells that must sit back | primary content surfaces that need to read |
 | `matte` | a matte surface separated by tone alone | cards, panels, grouped content | floating UI |
-| `matteHigh` | the second matte step | nesting inside another matte surface; the resting state of a control | a page background |
+| `matteHigh` | the second matte step | nesting inside another matte surface | a page background |
 | `control` | the fill every text control shares | text fields, textareas, search, select triggers | passive content surfaces |
 | `controlError` | the same fill carrying danger tone | an invalid field | any non-semantic state |
 | `acrylic` | a translucent sheet lit from above | menus, popovers and other surfaces floating above the app | anything grounded in the page |
@@ -123,7 +130,7 @@ Depth is chosen by **anatomy**, never by state.
 
 | Elevation | Role | Should be used for | Should not be used for |
 | --- | --- | --- | --- |
-| `flat` | at rest on the page | every passive matte surface; wider surfaces such as cards | — |
+| `flat` | at rest on the page | passive matte surfaces; wider surfaces such as cards | a well that is sunk by design — that is `recessed` |
 | `raised` | a manipulated control lifted a hair above its own track | tactile tonal controls (`ActionButton` tonal, `IconButton`) | passive surfaces, table rows, menu rows |
 | `control` | the resting half of the tactile pair | a part the user moves — a switch thumb, a selected segment | wide surfaces, or a whole segmented control |
 | `recessed` | the other half of the pair | grooves, tracks and wells, which are sunk by definition | raised or resting controls |
@@ -136,8 +143,9 @@ surface.
 
 **Do:** let a control press back into the track beneath it — `state.recess` on a raised
 control, which lands at the same depth a groove sits at.
-**Do not** add depth to show hover, selection or disabled. "No control gains depth
-merely to announce a state."
+**Do not** add depth *merely* to announce hover, selection or disabled: depth in this
+system comes from anatomy, so the selected segment of a segmented control is raised while
+the row it sits in a list stays flat.
 
 ---
 
@@ -150,13 +158,18 @@ tone rather than the defocused page behind it.
 - `acrylic` — menus and popups. Translucent, gradient-lit, blurred.
 - `acrylicDense` — small floating surfaces (tooltips). Same sheet, higher opacity,
   because a small surface has little room to stay legible.
-- `acrylicHero` — the large overlay sheet (dialogs). Markedly more opaque and calmer:
-  a surface that owns the viewport must read first as a physical surface and only
-  secondarily as glass. The scrim behind it does the separating, the blur only
-  defocuses, and the gradient is a restrained top-to-bottom light rather than a frosted
-  haze. Its tone sits above the floating surface level in every theme, which is how it
-  separates in dark mode without leaning on its shadow; `--sui-overlay-fill` tunes how
-  much of the sheet is its own tone.
+- `acrylicHero` — the large overlay sheet (dialogs; reachable through `overlay.dialog`).
+  Markedly more opaque and calmer: a surface that owns the viewport must read first as a
+  physical surface and only secondarily as glass. The scrim behind it does the
+  separating, the blur only defocuses, and the gradient is a restrained top-to-bottom
+  light rather than a frosted haze. Its tone is a **subtle step above the canvas** in
+  every theme — the invariant is enough separation from the canvas while staying
+  substantially darker than a grey, foggy sheet. In dark mode that is a step of roughly
+  0.03 in OKLCH lightness over the canvas (0.236 over 0.205), not a panel lighter than
+  the floating surface level; in light mode it is 0.993 over 0.965. Because the step is
+  small the sheet never leans on its shadow, and `--sui-overlay-fill` decides how much of
+  it is its own tone rather than the defocused page — which is what a large overlay
+  actually leans on, not blur.
 
 Two implementation constraints, both load-bearing:
 
@@ -172,13 +185,52 @@ and do not re-tune a sheet's blur to make it "pop".
 
 ---
 
-## 7. Edge — structural lines
+## 7. Floating shells — the overlay recipes
+
+Primitives: `overlay.menu`, `overlay.tooltip`, `overlay.dialog`.
+
+An overlay is a **composition**, not a new material. Each recipe bundles the floating
+shell's standard **material + elevation + shape + entrance geometry**, so every floating
+surface in the library resolves the same way and stays consistent with the material,
+elevation, acrylic and shape rules above.
+
+| Recipe | Shell | Composes | Entrance geometry |
+| --- | --- | --- | --- |
+| `overlay.menu` | a menu, listbox or popup that grows out of its trigger | `shape.surface` + `material.acrylic` + `elevation.floating` | grows from its trigger: origin at the top, a small scale-up and a −4px lift |
+| `overlay.tooltip` | a small anchored hint | `shape.prominent` + `material.acrylicDense` + `elevation.floating` | grows out of the edge it is anchored to, so its geometry is applied with its position |
+| `overlay.dialog` | the dialog that owns the viewport | `shape.expressive` + `material.acrylicHero` + `elevation.floating` | rises into place from its own scale, with a larger lift than a menu |
+
+The recipes are the closed-state surface plus the geometry the entrance grows from. The
+entrance/exit selection and the pointer and focus suppression stay in the component,
+because only the component knows whether it is opening or closing; the motion every entry
+animates with is `motion.overlayIn` / `overlayOut` plus its scrim family, and the exit
+window is `--sui-duration-overlay-exit`.
+
+Rules:
+
+- **a new menu, tooltip or dialog consumes one of these recipes** rather than
+  reconstructing floating-surface classes by hand: pick `overlay.menu`,
+  `overlay.tooltip` or `overlay.dialog`, and let the recipe own the material, the
+  elevation, the shape and the entrance geometry;
+- a shell that needs a different combination is a **new recipe** — add it to this
+  document and to `overlay` in `components/UI/ui.common.ts` before anything uses it;
+- these recipes only exist while an overlay is open, so no closed-state render can reach
+  them and every overlay composes them once instead of restating them.
+
+---
+
+## 8. Edge — structural lines
 
 Primitives: `row` (the faintest), `header` (the heaviest), `rule` (between the two).
 
 The hairline is reserved for **where two parts of one surface actually meet**: stacked
-table rows, the rule beneath a column header, a divider, a code section boundary, a
-quote. One tone serves every line, so those all agree with each other.
+table rows, the rule beneath a column header, a divider, a code section boundary. One
+tone serves every line, so those all agree with each other, and the public `Divider`
+component renders exactly this tone so consumers never reach for a hand-built border.
+
+A quote is **not** one of these. `Markdown` marks a blockquote with a primary accent,
+because a quote is content-level emphasis rather than a structural join between two
+parts, and `Markdown`'s `hr` takes `edge.rule` for the same reason a divider does.
 
 A 1px ring that traces a filled object is still a drawn border. Therefore:
 
@@ -193,7 +245,7 @@ interaction state with a border.
 
 ---
 
-## 8. Shape grammar
+## 9. Shape grammar
 
 Corner roles are semantic; nothing picks a radius of its own. Softness grows with the
 size of the object and the emphasis it carries.
@@ -213,7 +265,7 @@ control read as the same object at two scales.
 
 ---
 
-## 9. Tonal hierarchy
+## 10. Tonal hierarchy
 
 ### Surfaces and text
 
@@ -260,7 +312,7 @@ Light mode is a separately designed soft theme, not an inversion of the dark pal
 
 ---
 
-## 10. Interaction states
+## 11. Interaction states
 
 One language, applied the same way everywhere:
 
@@ -268,7 +320,7 @@ One language, applied the same way everywhere:
 | --- | --- | --- |
 | rest | the material at whatever elevation the anatomy calls for | — |
 | hover | one tonality step — a state layer over the fill, or a step up the surface ladder | depth, a new border, a size change |
-| pressed | recessed into the control's own track, plus a slight compression (`state.press`) | a color swap alone |
+| pressed | a raised control returning to the recessed depth of its own track (`state.recess`), plus a slight compression; a flat control stays flat and presses through the state layer's active step and the same compression | a color swap alone |
 | selected | a selected tone; depth comes from anatomy — a segment inside a groove is raised, a row in a list stays flat | depth alone |
 | disabled | 45% opacity, no pointer affordance, no interactive state at all | grey-on-grey colouring that breaks theme |
 | focus | the shared focus ring | any other indicator |
@@ -282,19 +334,50 @@ state, so it fades on the shared motion curve rather than snapping.
 | `quiet` | 0.05 / 0.09 | ghost controls, navigation rows, menu options |
 | `tonal` | 0.09 / 0.15 | tinted matte controls — tonal buttons, icon buttons, acrylic buttons |
 | `filled` | 0.18 / 0.26 | opaque accent fills |
-| `track` | 0.18 / 0.26 | tracks, where hover arrives from the wrapping button via `group-*` |
+| `track` | 0.18 / 0.26 | a switch track, where hover and press arrive from the wrapping button via `group-*` |
 | `activeRow` | data attribute | a menu row highlighted by keyboard navigation |
 
 Fields are a single borderless family: a matte `surface-high` fill that steps up once on
 hover and once more while engaged, no ring and no lift. `state.field.*` covers hover,
 focus, focus-within, engaged and their error counterparts.
 
-**Do:** let tonality carry hover and a recess carry pressed.
+Three further `state` entries carry the parts of a state that are not colour, and they are
+members of the system rather than local styling:
+
+| Entry | Carries |
+| --- | --- |
+| `enabled` / `text` | the pointer affordance — `cursor-pointer` for a control with a hit area of its own, `cursor-text` for a text field |
+| `rowHover` | the quiet scan feedback for a data row that is read rather than activated (`Table`): an ink tint, not a state layer, because a data row owns no fill to composite over |
+| `disabledDescendant` | the cursor-only variant of `disabled`, for a control nested in a composite that has already applied the 45% opacity step |
+
+**Do:** let tonality carry hover; let a raised control recess while it is held; let a
+flat or floating control press through the state layer's active step and `state.press`.
 **Do not** use opacity for anything except disabled, or add depth to show a state.
+
+### Pressed, precisely
+
+A press is never a single recipe, because a control's anatomy decides what it can do.
+The rule is:
+
+- a **raised / tactile** control (tonal `ActionButton`, tonal `IconButton`) returns to the
+  recessed depth while it is held, and comes back up on release;
+- a **flat** control (filled or text `ActionButton`, ghost `IconButton`, a menu option, a
+  table row) does not change depth at all: the press is the state layer's active step
+  plus `state.press`;
+- a **floating** control keeps its elevation while it is held — an acrylic `IconButton`
+  presses through its state layer, never by losing altitude;
+- a **groove** is recessed at rest because it is sunk by design, not because it is being
+  pressed: a switch track sits at the recessed depth permanently and takes
+  `stateLayer.track` with `state.groupPress`, so its hover and press arrive from the
+  wrapping button, while a segmented track is recessed for the same static reason and
+  takes each segment's own `state.press`, with its unselected segments adding the
+  `quiet` state layer, as its press feedback;
+- **selection** depth stays anatomy-dependent: the selected segment of a segmented
+  control is raised inside its recessed track, while a selected row in a list stays flat.
 
 ---
 
-## 11. Motion
+## 12. Motion
 
 Three families, no exceptions. A component picks a family, never a duration.
 
@@ -302,7 +385,7 @@ Three families, no exceptions. A component picks a family, never a duration.
 | --- | --- | --- | --- |
 | `press` | a tonality change with no physical travel, fast and decisive in both directions | `--sui-duration-press`, `--sui-ease-press` | hover, focus, an engaged field |
 | `release` | a tactile control: every property a tactile control can animate — colour, shadow, transform, and the size a selection or a thumb travels with | `--sui-duration-release`, `--sui-ease-release`, plus the press pair on `active:` | any control whose transform changes |
-| overlay | entrance and exit for anything that floats, plus a matching scrim family for the plane behind it | `--sui-duration-overlay`, `--sui-duration-overlay-exit`, `--sui-ease-release`, `--sui-ease-exit` | menus, tooltips, dialogs and their scrims |
+| overlay | entrance and exit for anything that floats, plus a matching scrim family (`scrimIn` / `scrimOut`) for the plane behind it | `--sui-duration-overlay`, `--sui-duration-overlay-exit`, `--sui-ease-release`, `--sui-ease-exit` | menus, tooltips, dialogs and their scrims |
 
 `release` takes the press timing while it is held (`active:`), so the press lands
 immediately, and the release timing carries the settle, so letting go is expressive.
@@ -327,7 +410,7 @@ animate a property no family covers.
 
 ---
 
-## 12. Density
+## 13. Density
 
 Three control steps, plus one accessible hit-target floor. Density owns **height and the
 type step**, so controls of one density share a rhythm.
@@ -354,7 +437,7 @@ inline padding from a field's.
 
 ---
 
-## 13. Accessibility and focus
+## 14. Accessibility and focus
 
 - One visible focus language everywhere: a 2px ring in `--sui-focus`.
 - `focusRing` draws the ring **outside** the shape, for a control that stands alone.
@@ -364,10 +447,13 @@ inline padding from a field's.
   never two.
 - Focus is visible on keyboard focus (`:focus-visible`), and never removed without a
   replacement indicator.
-- Every interactive state above is reachable by keyboard and by pointer; `disabled`
-  removes interactivity entirely rather than merely dimming it.
-- Icon-only controls carry a label (`aria-label` or a tooltip) and meet the `target`
-  hit-area floor.
+- Every action is keyboard operable, and keyboard interaction receives an equivalent
+  visible focus/state treatment — the same ring and the same tonality a pointer sees.
+  `disabled` removes interactivity entirely rather than merely dimming it.
+- An icon-only control requires an accessible name: visible text, `aria-label` or
+  `aria-labelledby`. **A tooltip is not an accessible name** — it may supplement the name
+  for sighted discoverability, but it never replaces it.
+- Icon-only controls meet the `target` hit-area floor.
 - `prefers-reduced-motion` is respected by every motion family.
 - The component runtime is font-agnostic; typography is the consumer's decision.
 - Color is never the only carrier of meaning: a semantic state also carries an icon, a
@@ -375,19 +461,24 @@ inline padding from a field's.
 
 ---
 
-## 14. Theming
+## 15. Theming
 
 Tokens are grouped as one small system in `theme.css`: tonality, lighting, elevation,
 material and motion. Theme selection is CSS-only — no attribute follows
 `prefers-color-scheme`, while `data-sherick-theme="light"` or `"dark"` force one.
 
 Consumers retune the library by overriding variables, not by forking component styles.
-Retinting `--sui-light-top` / `--sui-light-bottom` re-lights every shadow, pressed state,
-edge highlight and acrylic gradient at once.
+Retinting `--sui-light-top` / `--sui-light-bottom` re-lights every shadow, pressed state
+and edge highlight; the acrylic recipes are retuned through their own `--sui-glass-*`
+variables instead.
+
+Three compatibility aliases keep resolving for consumers that shipped against 1.0.x:
+`--sui-elevation-grounded` (the former name of the flat step), `--sui-shadow-focus` and
+`--sui-shadow-primary`. New code uses `--sui-elevation-flat` and the shared focus ring.
 
 ---
 
-## 15. Extending the language
+## 16. Extending the language
 
 The primitives above are the complete set of visual rules in the library. A component
 composes them; it does not write a color, shadow, radius, duration, material recipe or
@@ -401,6 +492,15 @@ If a genuinely new visual rule is required:
    `theme.css`;
 3. then consume the primitive in the component.
 
+Not every local decision is a visual rule. **Layout, spacing, component-specific
+padding, intrinsic dimensions, responsive arrangement and content typography are the
+component's own anatomy** — decide them inside the component, exactly as `ActionButton`'s
+size paddings are decided. They are not promoted into global primitives, and "could this
+be a primitive?" is not a reason to add one. The prohibition covers the visual system
+itself: color and tone roles, material recipes, elevation and shadows, semantic shape
+roles, structural edges and rims, state treatments, focus treatment, and motion timing,
+easing and families.
+
 Extending the language is the intended path. Implementing a rule locally — a one-off
 shadow, a literal color, an inline radius, a bespoke transition — is not. A local rule
 makes the language non-canonical: the next component cannot reuse the decision, the next
@@ -408,7 +508,7 @@ theme cannot retint it, and no verification can catch it.
 
 ---
 
-## 16. The showcase
+## 17. The showcase
 
 > **The development showcase demonstrates the system; it does not explain it. Design
 > rationale belongs in this document.**
@@ -416,3 +516,7 @@ theme cannot retint it, and no verification can catch it.
 The showcase exists for visual comparison, interaction and state testing, theme testing,
 component discovery and regression inspection. It shows specimens and their labels; it
 does not argue for them. Rules, rationale and explanation belong here.
+
+A foundation card isolates **one primitive at a time**: the depth ladder is shown against a
+single neutral fill, so a pairing inside a specimen card is not a recommendation to compose
+it, and a specimen may outline a fill that would otherwise be invisible against the card.

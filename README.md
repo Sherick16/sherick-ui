@@ -2,7 +2,7 @@
 
 Sherick UI is a small React component library inspired by Material 3 Expressive: soft tonal surfaces, deliberate shape contrast, strong hierarchy and restrained motion without cloning Google's component system. The published component package is framework-agnostic and supports React 18/19.
 
-The guiding rule is **quiet by default, expressive where it matters**. Every component draws on the same small design language — material, elevation, shape, edge, tone, state, density and motion — so a new one is designed by choosing existing primitives rather than inventing visual rules. That language is specified in [docs/DESIGN_LANGUAGE.md](docs/DESIGN_LANGUAGE.md), its canonical source of truth.
+The guiding rule is **quiet by default, expressive where it matters**. Every component draws on the same small design language — material, elevation, shape, edge, tone, state, density and motion — so a new one is designed by choosing existing primitives rather than inventing visual rules. That language is specified in [docs/DESIGN_LANGUAGE.md](https://github.com/Sherick16/sherick-ui/blob/main/docs/DESIGN_LANGUAGE.md), its canonical source of truth.
 
 ## Installation
 
@@ -80,7 +80,7 @@ Core variables include the canvas/surface levels, the three-step text hierarchy,
 
 ### One light source
 
-Every depth cue derives from a single light model: light comes from **directly above** the surface plane. `--sui-light-top` (the highlight color) and `--sui-light-bottom` (the shade color) are the only two lighting values, and the elevation ladder, the pressed states, the edge highlights and the acrylic gradients all composite from them — so re-tinting those two values re-lights the entire library. The model itself is specified in [docs/DESIGN_LANGUAGE.md](docs/DESIGN_LANGUAGE.md).
+Every depth cue derives from a single light model: light comes from **directly above** the surface plane. `--sui-light-top` (the highlight color) and `--sui-light-bottom` (the shade color) are the two values the elevation ladder composites from, so re-tinting that pair re-lights every shadow, edge highlight and pressed state at once. The acrylic recipes are a separate family (`--sui-glass-*`): calibrated per theme, following the same top-to-bottom model without compositing from those two values. The model itself is specified in [docs/DESIGN_LANGUAGE.md](https://github.com/Sherick16/sherick-ui/blob/main/docs/DESIGN_LANGUAGE.md).
 
 ### Elevation
 
@@ -91,7 +91,7 @@ Depth is token-driven, and the ladder is the only source of shadow in the librar
 | `shadow-sherick-flat` | `--sui-elevation-flat` | no shadow — matte surfaces separate by tone alone |
 | `shadow-sherick-raised` | `--sui-elevation-raised` | raised matte surfaces and tactile tonal controls |
 | `shadow-sherick-floating` | `--sui-elevation-floating` | acrylic surfaces above the application |
-| `shadow-sherick-control` | `--sui-elevation-control` | matte controls at rest, a hair above their own track |
+| `shadow-sherick-control` | `--sui-elevation-control` | tactile matte controls at rest, a hair above their own track |
 | `shadow-sherick-recessed` | `--sui-elevation-recessed` | grooves, tracks and wells — and the depth a held control presses to |
 | `shadow-sherick-pressed` | `--sui-elevation-pressed` | the published alias of that same recessed depth |
 
@@ -150,9 +150,9 @@ Public prop types and the shared `Variant` type are exported from the package ro
 
 ## Design language
 
-[`docs/DESIGN_LANGUAGE.md`](docs/DESIGN_LANGUAGE.md) is the canonical source of truth for Sherick UI's visual language: the material, elevation, edge, shape, tone, state, motion and density rules, the light model, the accessibility and focus requirements, and the examples of when each primitive should and should not be used.
+[`docs/DESIGN_LANGUAGE.md`](https://github.com/Sherick16/sherick-ui/blob/main/docs/DESIGN_LANGUAGE.md) is the canonical source of truth for Sherick UI's visual language: the material, elevation, edge, shape, tone, state, motion and density rules, the light model, the accessibility and focus requirements, and the examples of when each primitive should and should not be used.
 
-Components compose the primitives in `components/UI/ui.common.ts`; none of them writes a color, shadow, radius, duration, material recipe or structural rim of its own. A new component is designed by choosing primitives — and if a genuinely new visual rule is needed, the language is extended there first.
+Components compose the primitives in `components/UI/ui.common.ts`; none of them writes a color, tone role, material recipe, shadow, radius, duration, state treatment, structural rim or focus ring of its own. A new component is designed by choosing primitives — and if a genuinely new visual rule is needed, the language is extended there first. Ordinary anatomy — layout, spacing, component padding, intrinsic size, responsive arrangement and content typography — is decided inside the component.
 
 ## Development
 
@@ -162,7 +162,7 @@ bun run dev
 bun run verify
 ```
 
-The development workbench includes `System`, `Light` and `Dark` controls so every component and state can be reviewed against all supported themes.
+The development workbench includes `System`, `Light` and `Dark` controls so every component and state can be reviewed against all supported themes, and it links to the canonical design language from its heading.
 
 `bun run verify` lints, runs TypeScript checking, builds both ESM/CJS plus declarations, and runs consumer-oriented smoke verification against the built package. The smoke checks also protect the design language: they reject unsupported numeric Tailwind opacity modifiers that Tailwind 3 would otherwise silently omit, raw theme-specific neutral utilities and literal colors in reusable UI, theme-unsafe focus utilities, and any one-off shadow recipe outside the elevation ladder. Pull requests run the same verification in GitHub Actions.
 

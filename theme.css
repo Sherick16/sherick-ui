@@ -9,8 +9,9 @@
    1. Tonality      — canvas, surface levels, text hierarchy, accent hierarchy,
                       semantic states, structural edge.
    2. Lighting      — the single light model every depth cue derives from.
-   3. Elevation     — the depth ladder: flat, raised, floating, pressed plus the
-                      tactile control step matte controls hold at rest.
+   3. Elevation     — the depth ladder: flat, raised, floating, recessed (published
+                      alias `pressed`) plus the tactile control step tactile matte
+                      controls hold at rest.
    4. Material      — the acrylic (floating) recipe: base fill, gradient, blur.
    5. Motion        — durations and easings for the three motion families.
 
@@ -31,9 +32,12 @@
                                         catches a faint bounce light
      - structural edges are drawn    -> `--sui-edge`, a shade-tinted hairline
 
-   `--sui-light-top` and `--sui-light-bottom` are the light and shade colors.
-   Elevation steps, pressed states and acrylic gradients all composite from
-   them, so re-tuning the two values re-lights the entire library. */
+   `--sui-light-top` and `--sui-light-bottom` are the light and shade colors. The
+   elevation steps — including the pressed inset — composite from them, so
+   re-tuning the two values re-lights every shadow, highlight and pressed state.
+   The acrylic recipes are a separate family: they are calibrated per theme and
+   follow the same top-to-bottom model rather than compositing from these two
+   values. */
 
 :root,
 [data-sherick-theme="light"] {
@@ -71,7 +75,7 @@
   --sui-outline: 0.50 0.018 260;
   --sui-scrim: 0.16 0.01 260;
 
-  /* Structural edge — the hairline that traces a matte control. Its strength is
+  /* Structural edge — the hairline where two parts of one surface meet. Its strength is
      the alpha ladder in `edge` (components/UI/ui.common.ts), not a second color:
      faint, structural and strong edges share this one shade tint. */
   --sui-edge: 0.42 0.02 258;
@@ -81,17 +85,19 @@
 
   /* Elevation ladder — the only sanctioned source of depth. Each step pairs a
      tight contact shadow with a wider ambient one, plus the upper edge highlight
-     the light model calls for. Grounded surfaces carry no shadow at all: surface
-     tone alone separates them from the canvas. Values are theme-calibrated; the
+     the light model calls for. A grounded surface carries no shadow unless its
+     anatomy is sunk by design: a well, a groove and a code well take the recessed
+     step, and surface tone alone separates everything else from the canvas. Values
+     are theme-calibrated; the
      dark ladder is the reference, and this one is a separately designed soft
      theme rather than an inversion. */
   --sui-elevation-flat: none;
   --sui-elevation-raised: 0 1px 2px oklch(var(--sui-light-bottom) / 0.16), 0 4px 13px oklch(var(--sui-light-bottom) / 0.09);
   --sui-elevation-floating: 0 16px 40px oklch(var(--sui-light-bottom) / 0.20), inset 0 1px 0 oklch(var(--sui-light-top) / 0.70);
 
-  /* Tactile control depth. Matte interactive controls rest a hair above their own
+  /* Tactile control depth. Tactile matte controls rest a hair above their own
      track and press into it: a soft contact shadow plus a microscopic upper
-     highlight at rest, a shallow inset once pressed or selected. Deliberately
+     highlight at rest, a shallow inset once held or selected. Deliberately
      shallower than the tonal ladder and geometry-neutral — a restrained echo of
      neumorphism, never a neumorphic surface. */
   --sui-elevation-control: 0 1px 2px oklch(var(--sui-light-bottom) / 0.19), inset 0 1px 0 oklch(var(--sui-light-top) / 0.55);
@@ -148,9 +154,9 @@
     rgb(38 46 62 / 0.05) 100%
   );
 
-  /* The tone the overlay sheet is made of. It sits above the floating surface level
-     in every theme, which is how a dialog separates from the page in dark mode
-     without leaning on its shadow. */
+  /* The tone the overlay sheet is made of. It is a subtle step above the canvas in
+     every theme — above the canvas without being a light grey sheet — so a dialog
+     separates from the page without leaning on its shadow. */
   --sui-surface-overlay: 0.993 0.005 258;
 
   /* How much of the sheet is its own tone rather than the defocused page behind it.
