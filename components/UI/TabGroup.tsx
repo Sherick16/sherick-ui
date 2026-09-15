@@ -1,8 +1,8 @@
 "use client";
 
-import React, { ReactNode, useState } from "react";
+import React, { type KeyboardEvent, type ReactNode, useId, useRef, useState } from "react";
 import { cn } from "@/libs/utils";
-import { styleMap, bgMap } from "./ui.common";
+import { bgMap, styleMap } from "./ui.common";
 import { Variant } from "./ui.types";
 
 export interface Tab {
@@ -11,63 +11,108 @@ export interface Tab {
   content: ReactNode;
 }
 
+export interface TabGroupProps {
+  tabs: Tab[];
+  variant?: Variant;
+  className?: string;
+  defaultTabId?: string;
+  onTabChange?: (tabId: string) => void;
+}
+
 export const TabGroup = ({
   tabs,
   variant = "primary",
   className,
-}: {
-  tabs: Tab[];
-  variant?: Variant;
-  className?: string;
-}) => {
-  const [activeTab, setActiveTab] = useState(tabs[0]?.id);
-  const longestTabLabel = Math.max(...tabs.map((tab) => tab.label.length));
+  defaultTabId,
+  onTabChange,
+}: TabGroupProps) => {
+  const groupId = useId();
+  const [activeTab, setActiveTab] = useState(defaultTabId ?? tabs[0]?.id);
+  const tabRefs = useRef<Array<HTMLButtonElement | null>>([]);
+
+  if (tabs.length === 0) return null;
+
+  const activeIndex = Math.max(0, tabs.findIndex((tab) => tab.id === activeTab));
+  const active = tabs[activeIndex];
+
+  const activate = (index: number) => {
+    const normalizedIndex = (index + tabs.length) % tabs.length;
+    const next = tabs[normalizedIndex];
+    setActiveTab(next.id);
+    onTabChange?.(next.id);
+    tabRefs.current[normalizedIndex]?.focus();
+  };
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      activate(index + 1);
+    } else if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      activate(index - 1);
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      activate(0);
+    } else if (event.key === "End") {
+      event.preventDefault();
+      activate(tabs.length - 1);
+    }
+  };
 
   return (
     <div className={cn("w-full", className)}>
-      <div className="relative flex bg-gray-500 bg-opacity-10 rounded-4xl">
-        {/* Background highlight for active tab */}
+      <div role="tablist" aria-label="Tabs" className="relative flex bg-gray-500 bg-opacity-10 rounded-4xl">
         <div
+          aria-hidden="true"
           className={cn(
             "absolute h-full top-0 transition-all duration-200 rounded-3xl bg-opacity-30",
             bgMap[variant]
           )}
           style={{
-            left: `${
-              (tabs.findIndex((tab) => tab.id === activeTab) * 100) /
-              tabs.length
-            }%`,
+            left: `${(activeIndex * 100) / tabs.length}%`,
             width: `${100 / tabs.length}%`,
           }}
         />
 
-        {/* Tab buttons */}
-        {tabs.map((tab, index) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={cn(
-              "relative flex-1 p-4 text-sm font-medium transition-colors duration-200 z-10 rounded-4xl",
-              activeTab === tab.id
-                ? cn(styleMap[variant], "bg-opacity-0 hover:bg-opacity-0")
-                : cn(
-                    styleMap[variant],
-                    "bg-opacity-0 hover:bg-opacity-10 text-opacity-80"
-                  )
-            )}
-            style={{
-              // Width in pixels based on the length of the longest tab label.
-              width: `${longestTabLabel * 20}px`,
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
+        {tabs.map((tab, index) => {
+          const selected = tab.id === active.id;
+          const tabId = `${groupId}-tab-${tab.id}`;
+          const panelId = `${groupId}-panel-${tab.id}`;
+
+          return (
+            <button
+              key={tab.id}
+              ref={(node) => {
+                tabRefs.current[index] = node;
+              }}
+              type="button"
+              role="tab"
+              id={tabId}
+              aria-selected={selected}
+              aria-controls={panelId}
+              tabIndex={selected ? 0 : -1}
+              onClick={() => activate(index)}
+              onKeyDown={(event) => handleKeyDown(event, index)}
+              className={cn(
+                "relative flex-1 p-4 text-sm font-medium transition-colors duration-200 z-10 rounded-4xl",
+                selected
+                  ? cn(styleMap[variant], "bg-opacity-0 hover:bg-opacity-0")
+                  : cn(styleMap[variant], "bg-opacity-0 hover:bg-opacity-10 text-opacity-80")
+              )}
+            >
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Tab content */}
-      <div className="mt-4">
-        {tabs.find((tab) => tab.id === activeTab)?.content}
+      <div
+        role="tabpanel"
+        id={`${groupId}-panel-${active.id}`}
+        aria-labelledby={`${groupId}-tab-${active.id}`}
+        className="mt-4"
+      >
+        {active.content}
       </div>
     </div>
   );
