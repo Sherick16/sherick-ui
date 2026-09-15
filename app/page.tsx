@@ -1,16 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import {
-  Bell,
-  Check,
-  Download,
-  Heart,
-  Layers3,
-  Search as SearchIcon,
-  Settings2,
-  Trash2,
-} from "lucide-react";
+import { Bell, Check, Download, Heart, Search as SearchIcon, Trash2 } from "lucide-react";
 import ActionButton from "@/components/UI/ActionButton";
 import Dropdown from "@/components/UI/Dropdown";
 import Search from "@/components/UI/Search";
@@ -21,7 +12,6 @@ import Tooltip from "@/components/UI/Tooltip";
 import Modal from "@/components/UI/Modal";
 import Badge from "@/components/UI/Badge";
 import IconButton from "@/components/UI/IconButton";
-import Divider from "@/components/UI/Divider";
 import CodeBlock from "@/components/UI/CodeBlock";
 import Markdown from "@/components/UI/Markdown";
 import NavGroup from "@/components/UI/NavGroup";
@@ -39,17 +29,6 @@ const selectOptions = [
   { label: "Marketing site", value: "marketing" },
 ];
 
-const nav = [
-  ["Foundations", "#foundations"],
-  ["Buttons", "#buttons"],
-  ["Fields", "#fields"],
-  ["Selection", "#selection"],
-  ["Feedback", "#feedback"],
-  ["Surfaces", "#surfaces"],
-  ["Data", "#data"],
-  ["Content", "#content"],
-] as const;
-
 export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);
   const [switchOn, setSwitchOn] = useState(true);
@@ -57,49 +36,17 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-sherick-canvas text-sherick-ink">
-      <header className="sticky top-0 z-40 border-b border-white/[0.045] bg-sherick-canvas/[0.88] backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1480px] items-center justify-between gap-4 px-5 py-4 sm:px-8 lg:px-10">
-          <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-[1rem] bg-sherick-primary-strong text-sherick-on-primary">
-              <Layers3 className="h-5 w-5" aria-hidden="true" />
-            </div>
-            <div>
-              <div className="font-semibold tracking-[-0.015em]">Sherick UI</div>
-              <div className="text-xs text-sherick-ink-muted">Design system workbench</div>
-            </div>
-          </div>
-          <div className="hidden items-center gap-2 sm:flex">
-            <Badge variant="primary">Development</Badge>
-            <Tooltip content="Component settings">
-              <IconButton appearance="acrylic" variant="secondary" icon={<Settings2 />} aria-label="Component settings" />
-            </Tooltip>
-          </div>
+      <div className="mx-auto w-full max-w-[1320px] px-5 py-10 sm:px-8 lg:px-10 lg:py-14">
+        <div className="mb-14 max-w-3xl">
+          <Badge variant="primary">Sherick UI · development workbench</Badge>
+          <h1 className="mt-5 text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">Design system showcase</h1>
+          <p className="mt-3 max-w-2xl text-base leading-7 text-sherick-ink-muted">
+            Soft tonal hierarchy, expressive interaction, and richer frosted depth only when UI floats or matters.
+          </p>
         </div>
-      </header>
 
-      <div className="mx-auto grid w-full max-w-[1480px] gap-10 px-5 py-8 sm:px-8 lg:grid-cols-[220px_minmax(0,1fr)] lg:px-10 lg:py-10">
-        <aside className="hidden lg:block">
-          <div className="sticky top-28 space-y-6">
-            <div>
-              <div className="text-xs font-semibold uppercase tracking-[0.12em] text-sherick-ink-muted">Library</div>
-              <nav className="mt-3 space-y-1">
-                {nav.map(([label, href]) => (
-                  <a key={href} href={href} className="block rounded-xl px-3 py-2 text-sm text-sherick-ink-muted transition-colors hover:bg-white/[0.045] hover:text-sherick-ink">
-                    {label}
-                  </a>
-                ))}
-              </nav>
-            </div>
-            <Divider />
-            <div className="space-y-2 text-xs leading-5 text-sherick-ink-muted">
-              <div className="font-medium text-sherick-ink">Design rule</div>
-              <p>Matte at rest. Richer depth only when UI floats, activates or matters.</p>
-            </div>
-          </div>
-        </aside>
-
-        <div className="min-w-0 space-y-16">
-          <section id="foundations" className="scroll-mt-28">
+        <div className="space-y-16">
+          <section>
             <SectionHeading title="Foundations" description="Core palette, shape and material language used by every component." />
             <div className="mt-6 grid gap-4 xl:grid-cols-3">
               <Specimen title="Color roles" description="Primary, semantic and neutral roles—not raw component colors.">
@@ -117,10 +64,10 @@ export default function Home() {
                 <div className="space-y-3">
                   <div className="rounded-[1.25rem] bg-sherick-surface p-4 text-sm">Matte surface</div>
                   <div className="rounded-[1.5rem] bg-sherick-surface-high p-4 text-sm shadow-sherick-soft">Elevated tonal surface</div>
-                  <div className="relative overflow-hidden rounded-[1.5rem] bg-sherick-canvas p-4">
-                    <div className="absolute -left-4 top-2 h-16 w-24 rounded-full bg-sherick-primary/[0.28] blur-2xl" />
+                  <div className="relative overflow-hidden rounded-[1.5rem] bg-sherick-canvas/[0.65] p-4">
+                    <div className="absolute -left-4 top-2 h-16 w-24 rounded-full bg-sherick-primary/[0.24] blur-2xl" />
                     <div className="absolute right-3 top-5 text-[10px] text-sherick-ink-muted">content behind</div>
-                    <div className="relative rounded-[1.25rem] bg-sherick-surface-float/[0.72] p-4 text-sm shadow-sherick-float ring-1 ring-inset ring-white/[0.055] backdrop-blur-2xl backdrop-saturate-150">
+                    <div className="relative rounded-[1.25rem] bg-sherick-surface-float/[0.62] p-4 text-sm shadow-sherick-float ring-1 ring-inset ring-white/[0.04] backdrop-blur-2xl backdrop-saturate-150">
                       Floating acrylic
                     </div>
                   </div>
@@ -129,16 +76,16 @@ export default function Home() {
 
               <Specimen title="Shape roles" description="Softness increases with elevation and emphasis.">
                 <div className="grid grid-cols-2 gap-3 text-center text-xs text-sherick-ink-muted">
-                  <div className="rounded-[1.25rem] bg-sherick-surface-high p-5">Control</div>
-                  <div className="rounded-full bg-sherick-primary/[0.16] p-5 text-sherick-primary">Pill</div>
-                  <div className="rounded-[1.75rem] bg-sherick-surface p-5">Surface</div>
-                  <div className="rounded-[3rem] bg-sherick-surface-high p-5">Hero</div>
+                  <div className="rounded-[1.25rem] bg-sherick-surface-high/[0.72] p-5">Control</div>
+                  <div className="rounded-full bg-sherick-primary/[0.12] p-5 text-sherick-primary">Pill</div>
+                  <div className="rounded-[1.75rem] bg-sherick-surface/[0.8] p-5">Surface</div>
+                  <div className="rounded-[3rem] bg-sherick-surface-high/[0.72] p-5">Hero</div>
                 </div>
               </Specimen>
             </div>
           </section>
 
-          <section id="buttons" className="scroll-mt-28">
+          <section>
             <SectionHeading title="Buttons" description="Appearance, size and state are separate parts of the API." />
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
               <Specimen title="Appearances" description="Filled for priority, tonal for normal actions, text for quiet actions.">
@@ -150,7 +97,7 @@ export default function Home() {
                 </div>
               </Specimen>
 
-              <Specimen title="States" description="Loading and disabled suppress press and hover behavior.">
+              <Specimen title="States" description="Loading, disabled and keyboard focus remain visually distinct.">
                 <div className="flex flex-wrap items-center gap-3">
                   <ActionButton loading>Saving</ActionButton>
                   <ActionButton disabled>Disabled</ActionButton>
@@ -177,14 +124,14 @@ export default function Home() {
             </div>
           </section>
 
-          <section id="fields" className="scroll-mt-28">
+          <section>
             <SectionHeading title="Fields" description="One borderless field language across text input, textarea, search and select." />
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
               <Specimen title="Text input" description="Default, error, focus-visible and disabled states.">
                 <div className="space-y-4">
                   <Input label="Project name" placeholder="Sherick UI" />
                   <Input label="Invalid" placeholder="Required value" error />
-                  <Input label="Focus-visible" placeholder="Keyboard focus" inputClassName="ring-2 ring-sherick-primary ring-offset-2 ring-offset-sherick-canvas bg-sherick-surface-high" />
+                  <Input label="Focus-visible" placeholder="Keyboard focus" inputClassName="ring-2 ring-sherick-primary ring-offset-2 ring-offset-sherick-canvas bg-sherick-surface-high/[0.9]" />
                   <Input label="Disabled" placeholder="Unavailable" disabled />
                 </div>
               </Specimen>
@@ -212,10 +159,10 @@ export default function Home() {
             </div>
           </section>
 
-          <section id="selection" className="scroll-mt-28">
-            <SectionHeading title="Selection & navigation" description="Persistent state can carry stronger shape and tone than surrounding UI." />
+          <section>
+            <SectionHeading title="Selection & navigation" description="Persistent state may carry a stronger shape and tone than surrounding UI." />
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
-              <Specimen title="Switch" description="Large hit target, compact 52×32 visual track.">
+              <Specimen title="Switch" description="Large hit target, compact visual track.">
                 <div className="flex flex-wrap items-center gap-6">
                   <StateLabel label="On"><Switch checked={switchOn} onChange={setSwitchOn} /></StateLabel>
                   <StateLabel label="Off"><Switch checked={false} onChange={() => undefined} /></StateLabel>
@@ -232,7 +179,7 @@ export default function Home() {
               </Specimen>
 
               <Specimen title="Navigation groups" description="Current navigation gets a persistent tonal selection.">
-                <div className="max-w-xs rounded-[1.25rem] bg-sherick-surface/[0.45] p-2">
+                <div className="max-w-xs rounded-[1.25rem] bg-sherick-surface/[0.5] p-2">
                   <NavGroup title="Components" activeHref="#fields" items={[
                     { label: "Buttons", href: "#buttons" },
                     { label: "Fields", href: "#fields" },
@@ -243,8 +190,8 @@ export default function Home() {
             </div>
           </section>
 
-          <section id="feedback" className="scroll-mt-28">
-            <SectionHeading title="Feedback" description="Semantic color communicates actual state and remains restrained by default." />
+          <section>
+            <SectionHeading title="Feedback" description="Semantic color communicates actual state and stays restrained by default." />
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
               <Specimen title="Alerts" description="Passive surfaces do not react to hover.">
                 <div className="space-y-3">
@@ -264,7 +211,7 @@ export default function Home() {
             </div>
           </section>
 
-          <section id="surfaces" className="scroll-mt-28">
+          <section>
             <SectionHeading title="Surfaces & overlays" description="Cards stay matte; menus, tooltips and modals may use richer acrylic depth." />
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
               <Specimen title="Cards & badges" description="Passive content surfaces and compact semantic labels.">
@@ -272,46 +219,49 @@ export default function Home() {
                   <Card variant="secondary"><div className="font-medium">Neutral card</div><p className="mt-2 text-sm leading-6 text-sherick-ink-muted">Normal information stays matte and grounded.</p></Card>
                   <Card variant="primary"><div className="font-medium">Tonal card</div><p className="mt-2 text-sm leading-6 text-sherick-ink-muted">Use stronger tone only when it adds meaning.</p></Card>
                 </div>
-                <div className="mt-4 flex flex-wrap gap-2"><Badge variant="primary">Primary</Badge><Badge variant="success" icon={<Check className="h-3.5 w-3.5" />}>Ready</Badge><Badge variant="warning">Warning</Badge><Badge variant="danger">Danger</Badge><Badge variant="secondary">Neutral</Badge></div>
-              </Specimen>
-
-              <Specimen title="Avatar & tooltip" description="Compact identity and denser floating material.">
-                <div className="relative overflow-hidden rounded-[1.5rem] bg-sherick-canvas p-5">
-                  <div className="absolute -right-6 top-0 h-24 w-28 rounded-full bg-sherick-accent/[0.18] blur-3xl" />
-                  <div className="relative flex items-center gap-5">
-                    <Avatar src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg" alt="Example avatar" size="sm" />
-                    <Avatar src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg" alt="Example rounded avatar" size="md" shape="rounded" />
-                    <Tooltip content="Frosted tooltip material"><ActionButton appearance="tonal" variant="secondary">Hover or focus</ActionButton></Tooltip>
-                  </div>
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <Badge variant="primary">Primary</Badge>
+                  <Badge variant="success" icon={<Check className="h-3.5 w-3.5" />}>Ready</Badge>
+                  <Badge variant="warning">Warning</Badge>
+                  <Badge variant="danger">Danger</Badge>
+                  <Badge variant="secondary">Neutral</Badge>
                 </div>
               </Specimen>
 
-              <Specimen title="Modal" description="Highest elevation uses the strongest acrylic treatment.">
-                <ActionButton appearance="tonal" onClick={() => setModalOpen(true)}>Open modal</ActionButton>
+              <Specimen title="Avatar & tooltip" description="Compact identity and denser floating material.">
+                <div className="flex items-center gap-5">
+                  <Avatar src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg" alt="Example avatar" size="sm" />
+                  <Avatar src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg" alt="Example rounded avatar" size="md" shape="rounded" />
+                  <Tooltip content="Frosted tooltip material"><ActionButton appearance="tonal" variant="secondary">Hover or focus</ActionButton></Tooltip>
+                </div>
+              </Specimen>
+
+              <Specimen title="Modal" description="Highest elevation: focused, frosted and visually separated.">
+                <ActionButton appearance="tonal" variant="secondary" onClick={() => setModalOpen(true)}>Open modal</ActionButton>
               </Specimen>
             </div>
           </section>
 
-          <section id="data" className="scroll-mt-28">
-            <SectionHeading title="Data display" description="Dense information remains quiet, compact and easy to scan." />
-            <Specimen className="mt-6" title="Table" description="Semantic color belongs inside cells, not across the whole table.">
+          <section>
+            <SectionHeading title="Data display" description="Dense information stays quiet, compact and easy to scan." />
+            <Specimen title="Table" description="Semantic color belongs inside cells, not across the whole table." className="mt-6">
               <Table headers={["Component", "Role", "Status"]} rows={[
-                ["Dropdown", "Custom selection", <Badge key="d" variant="success">Ready</Badge>],
-                ["Modal", "Focused overlay", <Badge key="m" variant="success">Ready</Badge>],
-                ["Table", "Dense information", <Badge key="t" variant="secondary">Quiet</Badge>],
-                ["Input", "Form control", <Badge key="i" variant="primary">Core</Badge>],
+                ["Dropdown", "Custom selection", <Badge key="dropdown" variant="success">Ready</Badge>],
+                ["Modal", "Focused overlay", <Badge key="modal" variant="success">Ready</Badge>],
+                ["Table", "Dense information", <Badge key="table" variant="secondary">Quiet</Badge>],
+                ["Input", "Form control", <Badge key="input" variant="primary">Core</Badge>],
               ]} />
             </Specimen>
           </section>
 
-          <section id="content" className="scroll-mt-28 pb-12">
+          <section className="pb-12">
             <SectionHeading title="Content" description="Code and Markdown primitives for documentation and rich text surfaces." />
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
-              <Specimen title="Code block" description="Actions live outside the code viewport and never obscure content.">
+              <Specimen title="Code block" description="Copyable syntax-highlighted code with actions outside the code flow.">
                 <CodeBlock language="tsx">{'<ActionButton appearance="filled">Save</ActionButton>'}</CodeBlock>
               </Specimen>
-              <Specimen title="Markdown" description="Readable defaults for rich text without imposing a documentation theme.">
-                <Markdown>{`## Example\nSherick UI keeps **dense information quiet** and lets [floating UI](#surfaces) carry more depth.\n\n- Clear hierarchy\n- Inline \`code\`\n- Restrained semantic color\n\n> Floating material should signal elevation, not decorate everything.`}</Markdown>
+              <Specimen title="Markdown" description="Headings, links, lists, quotes and inline code share a readable rhythm.">
+                <Markdown>{`## Example\nSherick UI keeps **dense information quiet** and gives floating UI more depth.\n\n- Predictable controls\n- Soft hierarchy\n- [Accessible interactions](#)\n\n> Expression should clarify hierarchy, not decorate every surface.\n\nUse \`ActionButton\` for primary actions.`}</Markdown>
               </Specimen>
             </div>
           </section>
@@ -320,7 +270,9 @@ export default function Home() {
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
         <Modal.Header>Modal specimen</Modal.Header>
-        <Modal.Content>This is the highest elevation layer in the system: focused, frosted and deliberately separated from the page beneath it.</Modal.Content>
+        <Modal.Content>
+          This is the highest elevation layer in the system: focused, frosted and deliberately separated from the page beneath it.
+        </Modal.Content>
         <Modal.Footer>
           <ActionButton appearance="text" variant="secondary" onClick={() => setModalOpen(false)}>Cancel</ActionButton>
           <ActionButton appearance="filled" onClick={() => setModalOpen(false)}>Confirm</ActionButton>
@@ -331,11 +283,24 @@ export default function Home() {
 }
 
 function SectionHeading({ title, description }: { title: string; description: string }) {
-  return <div className="border-b border-white/[0.045] pb-5"><h2 className="text-3xl font-semibold tracking-[-0.03em] sm:text-4xl">{title}</h2><p className="mt-2 text-base leading-7 text-sherick-ink-muted">{description}</p></div>;
+  return (
+    <div className="border-b border-white/[0.035] pb-5">
+      <h2 className="text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{title}</h2>
+      <p className="mt-2 text-base leading-7 text-sherick-ink-muted">{description}</p>
+    </div>
+  );
 }
 
 function Specimen({ title, description, children, className = "" }: { title: string; description: string; children: React.ReactNode; className?: string }) {
-  return <div className={`rounded-[1.75rem] bg-sherick-surface/[0.72] p-5 sm:p-6 ${className}`}><div className="mb-5"><h3 className="font-medium tracking-[-0.01em]">{title}</h3><p className="mt-1 text-sm leading-6 text-sherick-ink-muted">{description}</p></div>{children}</div>;
+  return (
+    <div className={`rounded-[1.75rem] bg-sherick-surface/[0.72] p-6 ${className}`}>
+      <div className="mb-5">
+        <h3 className="font-medium tracking-[-0.01em]">{title}</h3>
+        <p className="mt-1 text-sm leading-6 text-sherick-ink-muted">{description}</p>
+      </div>
+      {children}
+    </div>
+  );
 }
 
 function Swatch({ label, className }: { label: string; className: string }) {
