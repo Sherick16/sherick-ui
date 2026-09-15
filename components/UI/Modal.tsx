@@ -92,26 +92,22 @@ export default function Modal({ children, open, onClose, className }: ModalProps
       aria-describedby="modal-description"
     >
       <div
-        className="absolute inset-0 bg-sherick-canvas/[0.72] backdrop-blur-md animate-fade motion-reduce:animate-none"
+        className="absolute inset-0 bg-sherick-canvas/[0.58] backdrop-blur-lg animate-fade motion-reduce:animate-none"
         aria-hidden="true"
       />
 
       <div className="absolute inset-0 overflow-y-auto">
         <div
-          className="relative flex min-h-full items-center justify-center p-4 sm:p-8"
+          className="flex min-h-full items-center justify-center p-4 sm:p-8"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) onClose();
           }}
         >
           <div
-            aria-hidden="true"
-            className="pointer-events-none absolute h-72 w-[28rem] max-w-[80vw] rounded-full bg-sherick-primary/10 blur-[110px]"
-          />
-          <div
             ref={modalRef}
             tabIndex={-1}
             className={cn(
-              "relative w-full max-w-xl outline-none",
+              "relative w-full max-w-lg outline-none",
               shape.hero,
               surface.modal,
               "animate-overlay motion-reduce:animate-none",
@@ -123,8 +119,8 @@ export default function Modal({ children, open, onClose, className }: ModalProps
               aria-label="Close dialog"
               onClick={onClose}
               className={cn(
-                "absolute right-4 top-4 inline-flex min-h-11 min-w-11 items-center justify-center rounded-full",
-                "bg-white/[0.055] text-sherick-ink-muted hover:bg-white/[0.1] hover:text-sherick-ink active:bg-white/[0.16]",
+                "absolute right-4 top-4 inline-flex h-10 w-10 items-center justify-center rounded-full",
+                "bg-sherick-surface-high/[0.72] text-sherick-ink-muted hover:bg-sherick-surface-high hover:text-sherick-ink active:bg-sherick-surface-high/[0.9]",
                 motionState,
                 focusRing,
                 pressable
