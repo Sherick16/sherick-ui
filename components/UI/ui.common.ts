@@ -33,13 +33,13 @@ export const surface = {
   raised:
     "bg-sherick-surface-float/[0.82] text-sherick-ink shadow-sherick-soft",
   acrylic:
-    "bg-sherick-surface-float/[0.60] bg-sherick-glass text-sherick-ink shadow-sherick-glass backdrop-blur-[32px] backdrop-saturate-[1.45] backdrop-brightness-[1.04]",
+    "bg-sherick-surface-float/[0.60] bg-sherick-glass text-sherick-ink shadow-sherick-glass backdrop-blur-[var(--sui-glass-blur,32px)] backdrop-saturate-[var(--sui-glass-saturation,1.45)] backdrop-brightness-[var(--sui-glass-brightness,1.04)]",
   acrylicDense:
-    "bg-sherick-surface-float/[0.72] bg-sherick-glass-dense text-sherick-ink shadow-sherick-glass backdrop-blur-[26px] backdrop-saturate-[1.38] backdrop-brightness-[1.035]",
+    "bg-sherick-surface-float/[0.72] bg-sherick-glass-dense text-sherick-ink shadow-sherick-glass backdrop-blur-[var(--sui-glass-dense-blur,26px)] backdrop-saturate-[var(--sui-glass-dense-saturation,1.38)] backdrop-brightness-[var(--sui-glass-dense-brightness,1.035)]",
   modal:
-    "bg-sherick-surface-float/[0.68] bg-sherick-glass text-sherick-ink shadow-sherick-float backdrop-blur-[34px] backdrop-saturate-[1.42] backdrop-brightness-[1.035]",
+    "bg-sherick-surface-float/[0.68] bg-sherick-glass text-sherick-ink shadow-sherick-float backdrop-blur-[var(--sui-glass-blur,32px)] backdrop-saturate-[var(--sui-glass-saturation,1.45)] backdrop-brightness-[var(--sui-glass-brightness,1.04)]",
   tooltip:
-    "bg-sherick-surface-float/[0.78] bg-sherick-glass-dense text-sherick-ink shadow-sherick-soft backdrop-blur-[24px] backdrop-saturate-[1.35] backdrop-brightness-[1.025]",
+    "bg-sherick-surface-float/[0.78] bg-sherick-glass-dense text-sherick-ink shadow-sherick-soft backdrop-blur-[var(--sui-glass-dense-blur,26px)] backdrop-saturate-[var(--sui-glass-dense-saturation,1.38)] backdrop-brightness-[var(--sui-glass-dense-brightness,1.035)]",
 } as const;
 
 export const toneTextMap: Record<Variant, string> = {
