@@ -22,7 +22,11 @@ jobs:
           corepack prepare pnpm@9.15.4 --activate
       - name: Install dependencies
         run: pnpm install --no-frozen-lockfile --ignore-scripts
-      - name: Show lockfile refresh
-        run: git diff -- pnpm-lock.yaml
+      - name: Capture generated lockfile
+        uses: actions/upload-artifact@v4
+        with:
+          name: generated-lockfile
+          path: pnpm-lock.yaml
+          if-no-files-found: error
       - name: Verify package
         run: pnpm verify
