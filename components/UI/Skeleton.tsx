@@ -6,7 +6,7 @@ export const Skeleton = ({ className, ...props }: { className?: string }) => {
   return (
     <div
       className={cn(
-        "animate-pulse bg-zinc-700/50 motion-reduce:animate-none",
+        "animate-pulse bg-sherick-surface-high/60 motion-reduce:animate-none",
         shape.control,
         className
       )}
