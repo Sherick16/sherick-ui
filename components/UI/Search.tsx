@@ -61,8 +61,8 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
           shape.control,
           surface.control,
           motionState,
-          "focus-within:outline-none focus-within:ring-2 focus-within:ring-blue-400 focus-within:ring-offset-2 focus-within:ring-offset-zinc-950",
-          isDisabled && "cursor-not-allowed opacity-45",
+          "focus-within:outline-none focus-within:ring-2 focus-within:ring-sherick-primary focus-within:ring-offset-2 focus-within:ring-offset-sherick-canvas focus-within:bg-sherick-surface-high",
+          isDisabled && "cursor-not-allowed opacity-45 hover:bg-sherick-surface-high/78",
           className
         )}
       >
@@ -71,7 +71,7 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
           disabled={isDisabled}
           aria-busy={loading || undefined}
           className={cn(
-            "min-h-12 w-full bg-transparent px-5 py-3 pr-12 text-inherit placeholder:text-zinc-400 outline-none",
+            "min-h-12 w-full bg-transparent px-5 py-3 pr-12 text-[0.95rem] text-inherit placeholder:text-sherick-ink-muted outline-none",
             shape.control,
             inputClassName
           )}
@@ -86,10 +86,10 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
           onClick={() => onSearch(inputRef.current?.value || "")}
           className={cn(
             "absolute right-1.5 inline-flex min-h-9 min-w-9 items-center justify-center rounded-full",
-            "outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-blue-400",
+            "outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-primary",
             motionState,
             toneTextMap[variant],
-            !isDisabled && "hover:bg-white/10 active:bg-white/20",
+            !isDisabled && "hover:bg-sherick-primary/10 active:bg-sherick-primary/18",
             !isDisabled && pressable,
             isDisabled ? "cursor-not-allowed" : "cursor-pointer"
           )}
