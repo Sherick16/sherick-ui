@@ -41,10 +41,10 @@ const Tooltip = ({ children, content, className, position = "bottom" }: TooltipP
           id={tooltipId}
           role="tooltip"
           className={cn(
-            "absolute z-40 max-w-64 whitespace-normal px-3 py-2 text-xs leading-5",
+            "absolute z-40 max-w-64 whitespace-normal px-3 py-2 text-xs leading-5 text-sherick-ink/92",
             shape.control,
-            surface.tooltip,
-            "animate-fade motion-reduce:animate-none",
+            surface.acrylicDense,
+            "animate-menu motion-reduce:animate-none",
             positionClass[position]
           )}
         >
