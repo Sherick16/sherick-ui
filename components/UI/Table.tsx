@@ -1,28 +1,29 @@
-import React, { ReactNode } from "react";
+import React, { type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { rowStyleMap } from "./ui.common";
 import { Variant } from "./ui.types";
+
+export interface TableProps {
+  headers: string[];
+  rows: ReactNode[][];
+  /** Retained for backwards compatibility. Tables intentionally use a neutral visual treatment. */
+  variant?: Variant;
+  className?: string;
+}
 
 export const Table = ({
   headers,
   rows,
-  variant = "primary",
   className,
-}: {
-  headers: string[];
-  rows: ReactNode[][];
-  variant?: Variant;
-  className?: string;
-}) => {
+}: TableProps) => {
   return (
-    <div className={cn("w-full overflow-auto", className)}>
+    <div className={cn("w-full overflow-auto rounded-2xl bg-zinc-900/30", className)}>
       <table className="w-full border-collapse">
         <thead>
-          <tr className="border-b border-gray-500 border-opacity-20">
-            {headers?.map((header, i) => (
+          <tr className="border-b border-white/8">
+            {headers.map((header) => (
               <th
-                key={i}
-                className="px-4 py-3 text-left text-sm font-medium text-gray-300"
+                key={header}
+                className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-zinc-400"
               >
                 {header}
               </th>
@@ -30,16 +31,13 @@ export const Table = ({
           </tr>
         </thead>
         <tbody>
-          {rows?.map((row, i) => (
+          {rows.map((row, i) => (
             <tr
               key={i}
-              className={cn(
-                "border-b border-gray-500 border-opacity-20 transition-colors hover:bg-opacity-10",
-                rowStyleMap[variant]
-              )}
+              className="border-b border-white/6 transition-colors duration-150 last:border-b-0 hover:bg-white/4"
             >
-              {row?.map((cell, j) => (
-                <td key={j} className="px-4 py-3 text-sm text-gray-100">
+              {row.map((cell, j) => (
+                <td key={j} className="px-4 py-3 text-sm text-zinc-200">
                   {cell}
                 </td>
               ))}
