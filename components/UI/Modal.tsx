@@ -4,7 +4,7 @@ import React, { type ReactNode, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { cn } from "@/libs/utils";
-import { focusRing } from "./ui.common";
+import { focusRing, motionState, pressable, shape, surface } from "./ui.common";
 import { ModalContent } from "./ModalContent";
 import { ModalFooter } from "./ModalFooter";
 import { ModalHeader } from "./ModalHeader";
@@ -92,13 +92,13 @@ export default function Modal({ children, open, onClose, className }: ModalProps
       aria-describedby="modal-description"
     >
       <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/45 backdrop-blur-md animate-fade motion-reduce:animate-none"
         aria-hidden="true"
       />
 
       <div className="absolute inset-0 overflow-y-auto">
         <div
-          className="min-h-full flex items-center justify-center p-4"
+          className="flex min-h-full items-center justify-center p-4 sm:p-8"
           onMouseDown={(event) => {
             if (event.target === event.currentTarget) onClose();
           }}
@@ -107,9 +107,10 @@ export default function Modal({ children, open, onClose, className }: ModalProps
             ref={modalRef}
             tabIndex={-1}
             className={cn(
-              "relative w-full max-w-xl bg-zinc-800/80 backdrop-blur-xl outline-none",
-              "rounded-3xl shadow-xl border border-gray-700/50",
-              "animate-fade",
+              "relative w-full max-w-xl outline-none",
+              shape.hero,
+              surface.raised,
+              "animate-fade motion-reduce:animate-none",
               className
             )}
           >
@@ -118,14 +119,14 @@ export default function Modal({ children, open, onClose, className }: ModalProps
               aria-label="Close dialog"
               onClick={onClose}
               className={cn(
-                "absolute right-4 top-4 p-2 rounded-full",
-                "text-gray-400 hover:text-gray-200",
-                "bg-gray-700/50 hover:bg-gray-600/50",
-                "transition-colors",
-                focusRing
+                "absolute right-4 top-4 inline-flex min-h-11 min-w-11 items-center justify-center rounded-full",
+                "bg-white/6 text-zinc-300 hover:bg-white/10 hover:text-white active:bg-white/14",
+                motionState,
+                focusRing,
+                pressable
               )}
             >
-              <X className="w-4 h-4" aria-hidden="true" />
+              <X className="h-5 w-5" aria-hidden="true" />
             </button>
 
             {children}
