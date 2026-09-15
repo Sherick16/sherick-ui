@@ -41,16 +41,67 @@ assert.ok(packageJson.sideEffects.includes("./theme.css"), "theme stylesheet mus
 assert.match(themeCss, /\[data-sherick-theme="light"\]/);
 assert.match(themeCss, /\[data-sherick-theme="dark"\]/);
 assert.match(themeCss, /prefers-color-scheme:\s*dark/);
-assert.match(themeCss, /--sui-canvas:/);
-assert.match(themeCss, /--sui-glass-gradient:/);
-assert.match(themeCss, /--sui-code-text:/);
+
+const themeRoot = postcss.parse(themeCss);
+const variablesFor = (predicate) => {
+  const variables = {};
+  themeRoot.walkRules((rule) => {
+    if (!predicate(rule)) return;
+    rule.walkDecls(/^--sui-/, (declaration) => {
+      variables[declaration.prop] = declaration.value;
+    });
+  });
+  return variables;
+};
+
+const lightVariables = variablesFor(
+  (rule) => rule.parent === themeRoot && rule.selector.includes('[data-sherick-theme="light"]')
+);
+const darkVariables = variablesFor(
+  (rule) => rule.parent === themeRoot && rule.selector.trim() === '[data-sherick-theme="dark"]'
+);
+const systemDarkVariables = variablesFor(
+  (rule) => rule.selector.includes(':root:not([data-sherick-theme])')
+);
+
+for (const token of [
+  "--sui-canvas",
+  "--sui-surface",
+  "--sui-surface-high",
+  "--sui-surface-float",
+  "--sui-ink",
+  "--sui-ink-muted",
+  "--sui-primary",
+  "--sui-on-primary",
+  "--sui-on-danger",
+  "--sui-on-warning",
+  "--sui-on-success",
+  "--sui-focus",
+  "--sui-scrim",
+  "--sui-glass-blur",
+  "--sui-glass-saturation",
+  "--sui-glass-brightness",
+  "--sui-glass-gradient",
+  "--sui-shadow-glass",
+  "--sui-code-text",
+]) {
+  assert.ok(lightVariables[token], `light theme missing ${token}`);
+  assert.ok(darkVariables[token], `dark theme missing ${token}`);
+  assert.ok(systemDarkVariables[token], `system dark theme missing ${token}`);
+}
+
+assert.deepEqual(
+  systemDarkVariables,
+  darkVariables,
+  "forced dark and prefers-color-scheme dark tokens must stay identical"
+);
 
 const tailwindResult = await postcss([
   tailwindcss({
     presets: [sherickPreset],
     content: [
       {
-        raw: '<div class="bg-sherick-canvas text-sherick-ink text-sherick-on-warning outline-sherick-focus bg-sherick-glass shadow-sherick-glass"></div>',
+        raw: '<div class="bg-sherick-canvas text-sherick-ink/90 bg-sherick-surface-high/[0.66] bg-sherick-primary/[0.12] text-sherick-on-warning outline-sherick-focus bg-sherick-glass shadow-sherick-glass backdrop-blur-[var(--sui-glass-blur,32px)] backdrop-saturate-[var(--sui-glass-saturation,1.45)] backdrop-brightness-[var(--sui-glass-brightness,1.04)]"></div>',
         extension: "html",
       },
     ],
@@ -60,10 +111,15 @@ const tailwindResult = await postcss([
 
 assert.match(tailwindResult.css, /var\(--sui-canvas/);
 assert.match(tailwindResult.css, /var\(--sui-ink/);
+assert.match(tailwindResult.css, /var\(--sui-surface-high/);
+assert.match(tailwindResult.css, /var\(--sui-primary/);
 assert.match(tailwindResult.css, /var\(--sui-on-warning/);
 assert.match(tailwindResult.css, /var\(--sui-focus/);
 assert.match(tailwindResult.css, /var\(--sui-glass-gradient/);
 assert.match(tailwindResult.css, /var\(--sui-shadow-glass/);
+assert.match(tailwindResult.css, /var\(--sui-glass-blur/);
+assert.match(tailwindResult.css, /var\(--sui-glass-saturation/);
+assert.match(tailwindResult.css, /var\(--sui-glass-brightness/);
 
 const buttonMarkup = renderToStaticMarkup(
   React.createElement(library.ActionButton, { loading: true }, "Save")
@@ -106,6 +162,7 @@ const validOpacityModifiers = new Set([
 const sourceRoot = fileURLToPath(new URL("..", import.meta.url));
 const invalidOpacityModifiers = [];
 const rawNeutralUtilities = [];
+const rawLiteralColors = [];
 
 async function scanDirectory(directory, { enforceThemeTokens = false } = {}) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
@@ -131,6 +188,13 @@ async function scanDirectory(directory, { enforceThemeTokens = false } = {}) {
       for (const match of source.matchAll(rawNeutralPattern)) {
         rawNeutralUtilities.push(`${path.replace(`${sourceRoot}/`, "")}: ${match[1]}`);
       }
+
+      if (entry.name !== "prism-theme.ts") {
+        const literalColorPattern = /(?:#[0-9a-fA-F]{3,8}\b|(?:rgba?|hsla?|hsl|oklab|oklch)\()/g;
+        for (const match of source.matchAll(literalColorPattern)) {
+          rawLiteralColors.push(`${path.replace(`${sourceRoot}/`, "")}: ${match[0]}`);
+        }
+      }
     }
   }
 }
@@ -146,6 +210,11 @@ assert.deepEqual(
   rawNeutralUtilities,
   [],
   `raw theme-specific neutral utilities found in reusable UI:\n${rawNeutralUtilities.join("\n")}`
+);
+assert.deepEqual(
+  rawLiteralColors,
+  [],
+  `raw literal colors found in reusable UI:\n${rawLiteralColors.join("\n")}`
 );
 
 console.log("Package smoke verification passed.");
