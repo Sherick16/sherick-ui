@@ -28,9 +28,9 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     return (
       <div className={cn("flex flex-col", className)}>
         {label && (
-          <label htmlFor={inputId} className="mb-2 text-sm font-medium text-zinc-200">
+          <label htmlFor={inputId} className="mb-2 text-sm font-medium text-sherick-ink/88">
             {label}
-            {required && <span className="ml-1 text-red-300" aria-hidden="true">*</span>}
+            {required && <span className="ml-1 text-sherick-danger" aria-hidden="true">*</span>}
           </label>
         )}
         <input
@@ -39,12 +39,12 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           required={required}
           aria-invalid={error || undefined}
           className={cn(
-            "min-h-12 min-w-64 px-5 py-3",
+            "min-h-12 min-w-64 px-5 py-3 text-[0.95rem]",
             shape.control,
             motionState,
             focusRing,
             error ? surface.controlError : surface.control,
-            "disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-zinc-700/55",
+            "disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-sherick-surface-high/78",
             inputClassName
           )}
           onChange={(event) => onChange?.(event.target.value)}
