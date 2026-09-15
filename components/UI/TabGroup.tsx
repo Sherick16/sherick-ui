@@ -61,16 +61,20 @@ export const TabGroup = ({
 
   return (
     <div className={cn("w-full", className)}>
-      <div role="tablist" aria-label="Tabs" className="relative flex bg-gray-500 bg-opacity-10 rounded-4xl">
+      <div
+        role="tablist"
+        aria-label="Tabs"
+        className="relative flex min-w-max rounded-4xl bg-gray-500 bg-opacity-10"
+      >
         <div
           aria-hidden="true"
           className={cn(
-            "absolute h-full top-0 transition-all duration-200 rounded-3xl bg-opacity-30",
+            "absolute inset-y-0 left-0 transition-transform duration-200 rounded-3xl bg-opacity-30",
             bgMap[variant]
           )}
           style={{
-            left: `${(activeIndex * 100) / tabs.length}%`,
             width: `${100 / tabs.length}%`,
+            transform: `translateX(${activeIndex * 100}%)`,
           }}
         />
 
@@ -94,7 +98,7 @@ export const TabGroup = ({
               onClick={() => activate(index)}
               onKeyDown={(event) => handleKeyDown(event, index)}
               className={cn(
-                "relative flex-1 p-4 text-sm font-medium transition-colors duration-200 z-10 rounded-4xl",
+                "relative z-10 min-w-28 flex-1 whitespace-nowrap px-8 py-5 text-sm font-medium transition-colors duration-200 rounded-4xl",
                 selected
                   ? cn(styleMap[variant], "bg-opacity-0 hover:bg-opacity-0")
                   : cn(styleMap[variant], "bg-opacity-0 hover:bg-opacity-10 text-opacity-80")
