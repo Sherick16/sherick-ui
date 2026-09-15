@@ -8,7 +8,7 @@ import React, {
 } from "react";
 import { Search as SearchIcon } from "lucide-react";
 import { cn } from "@/libs/utils";
-import { styleMap } from "./ui.common";
+import { focusRing, styleMap } from "./ui.common";
 import { Variant } from "./ui.types";
 import { Spinner } from "./Spinner";
 
@@ -61,7 +61,8 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
           disabled={isDisabled}
           aria-busy={loading || undefined}
           className={cn(
-            "px-6 py-4 pr-14 rounded-4xl bg-opacity-20 hover:bg-opacity-40 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20",
+            "px-6 py-4 pr-14 rounded-4xl bg-opacity-20 hover:bg-opacity-40 transition-all",
+            focusRing,
             styleMap[variant] || styleMap.primary,
             isDisabled && "cursor-not-allowed opacity-60",
             inputClassName
@@ -77,6 +78,7 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
           onClick={() => onSearch(inputRef.current?.value || "")}
           className={cn(
             "absolute right-0 top-0 px-4 py-4 rounded-4xl bg-gray-400 bg-opacity-0 hover:bg-opacity-10 transition-all",
+            focusRing,
             isDisabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"
           )}
         >
