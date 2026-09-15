@@ -11,22 +11,22 @@
 }
 
 html {
-  background: oklch(0.145 0.014 262);
+  background: oklch(0.205 0.012 260);
 }
 
 body {
   min-height: 100dvh;
   margin: 0;
-  color: oklch(0.965 0.01 255);
+  color: oklch(0.94 0.008 255);
   background:
-    radial-gradient(circle at 16% 7%, oklch(0.69 0.185 255 / 0.075), transparent 32rem),
-    radial-gradient(circle at 90% 16%, oklch(0.79 0.105 215 / 0.045), transparent 28rem),
-    oklch(0.145 0.014 262);
+    radial-gradient(circle at 12% 4%, oklch(0.72 0.15 255 / 0.055), transparent 34rem),
+    radial-gradient(circle at 92% 18%, oklch(0.80 0.08 215 / 0.035), transparent 30rem),
+    oklch(0.205 0.012 260);
 }
 
 ::selection {
-  color: oklch(0.985 0.006 255);
-  background: oklch(0.69 0.185 255 / 0.42);
+  color: oklch(0.98 0.005 255);
+  background: oklch(0.72 0.15 255 / 0.34);
 }
 
 @layer utilities {
