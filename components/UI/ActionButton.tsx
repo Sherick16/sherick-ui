@@ -2,7 +2,7 @@
 
 import React, { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { styleMap } from "./ui.common";
+import { focusRing, styleMap } from "./ui.common";
 import { Variant } from "./ui.types";
 import { Spinner } from "./Spinner";
 
@@ -33,6 +33,7 @@ const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
         aria-busy={loading || undefined}
         className={cn(
           "px-6 py-4 rounded-4xl bg-opacity-20 hover:bg-opacity-40 transition-all flex items-center justify-center",
+          focusRing,
           styleMap[variant] || styleMap.primary,
           isDisabled ? "cursor-not-allowed opacity-60" : "cursor-pointer",
           className
