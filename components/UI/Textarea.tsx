@@ -2,7 +2,7 @@
 
 import React, { forwardRef, useId, type TextareaHTMLAttributes } from "react";
 import { cn } from "@/libs/utils";
-import { focusRing } from "./ui.common";
+import { focusRing, motionState, shape, surface } from "./ui.common";
 
 export interface TextareaProps
   extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "onChange"> {
@@ -27,11 +27,11 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     const textareaId = id ?? generatedId;
 
     return (
-      <div className={cn("flex flex-col w-full", className)}>
+      <div className={cn("flex w-full flex-col", className)}>
         {label && (
-          <label htmlFor={textareaId} className="mb-2 font-semibold">
+          <label htmlFor={textareaId} className="mb-2 text-sm font-medium text-zinc-200">
             {label}
-            {required && <span className="ml-1 text-red-500" aria-hidden="true">*</span>}
+            {required && <span className="ml-1 text-red-300" aria-hidden="true">*</span>}
           </label>
         )}
         <textarea
@@ -40,11 +40,12 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           required={required}
           aria-invalid={error || undefined}
           className={cn(
-            "px-4 py-4 rounded-lg bg-opacity-20 hover:bg-opacity-40 transition-all min-w-64 min-h-16 w-full",
+            "min-h-28 min-w-64 w-full resize-y px-5 py-4",
+            shape.control,
+            motionState,
             focusRing,
-            !error
-              ? "bg-gray-400 text-gray-300 hover:bg-gray-500"
-              : "text-red-300 bg-red-500 bg-opacity-15 hover:bg-opacity-25 hover:bg-red-500",
+            error ? surface.controlError : surface.control,
+            "disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:bg-zinc-700/55",
             textareaClassName
           )}
           onChange={(event) => onChange?.(event.target.value)}
