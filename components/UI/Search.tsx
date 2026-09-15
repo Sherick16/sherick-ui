@@ -61,7 +61,7 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
           disabled={isDisabled}
           aria-busy={loading || undefined}
           className={cn(
-            "px-6 py-4 pr-14 rounded-4xl bg-opacity-20 hover:bg-opacity-40 border transition-all border-opacity-20 focus:outline-none focus:border-opacity-50",
+            "px-6 py-4 pr-14 rounded-4xl bg-opacity-20 hover:bg-opacity-40 transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20",
             styleMap[variant] || styleMap.primary,
             isDisabled && "cursor-not-allowed opacity-60",
             inputClassName
