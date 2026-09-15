@@ -332,15 +332,18 @@ animate a property no family covers.
 Three control steps, plus one accessible hit-target floor. Density owns **height and the
 type step**, so controls of one density share a rhythm.
 
-| Step | Role |
-| --- | --- |
-| `compact` | dense desktop UI |
-| `normal` | the default rhythm |
-| `prominent` | the largest step, still compact by consumer-app standards |
-| `target` | the minimum interactive target for an icon-only control |
+| Step | Min height | Type step | Role |
+| --- | --- | --- | --- |
+| `compact` | 2.5rem | 0.875rem | dense desktop UI |
+| `normal` | 3rem | 0.95rem | the default rhythm |
+| `prominent` | 3.5rem | 1.125rem | the largest step, still compact by consumer-app standards |
+| `target` | 2.75rem square | inherits | the minimum interactive target for an icon-only control |
 
 Anatomy owns **padding**, not density: a button is gripped at its ends, a field holds
-text, and neither is derived from the other — one density can carry two paddings.
+text, and neither is derived from the other — one density can carry two paddings, so
+padding is written with the component rather than in these tokens. `ActionButton` is the
+worked example: its `sm` / `md` / `lg` sizes are `density.compact` + `px-4 py-2`,
+`density.normal` + `px-6 py-3` and `density.prominent` + `px-8 py-4`.
 
 The library targets dense desktop and product UI, so even the prominent step stays
 compact. Body copy, headings and labels are content rather than controls and set their
