@@ -16,7 +16,7 @@ export const Table = ({
   className,
 }: TableProps) => {
   return (
-    <div className={cn("w-full overflow-auto rounded-2xl bg-sherick-surface/42", className)}>
+    <div className={cn("w-full overflow-auto rounded-2xl bg-sherick-surface/[0.42]", className)}>
       <table className="w-full border-collapse">
         <thead>
           <tr className="border-b border-sherick-ink/[0.08]">
