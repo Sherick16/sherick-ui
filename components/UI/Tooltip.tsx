@@ -1,50 +1,42 @@
-import React, { ReactNode, useState, useEffect, useId } from "react";
+"use client";
+
+import React, { useId, useState, type ReactElement, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 
-const Tooltip = ({
-  children,
-  content,
-  className,
-  ...props
-}: {
-  children: ReactNode;
+export interface TooltipProps {
+  children: ReactElement;
   content: ReactNode;
   className?: string;
-  [key: string]: any;
-}) => {
+}
+
+const Tooltip = ({ children, content, className }: TooltipProps) => {
   const id = useId();
   const [show, setShow] = useState(false);
+  const tooltipId = `tooltip-${id}`;
 
-  useEffect(() => {
-    const handleMouseEnter = () => setShow(true);
-    const handleMouseLeave = () => setShow(false);
-
-    const element = document.getElementById(`tooltip-${id}`) as HTMLElement;
-    element.addEventListener("mouseenter", handleMouseEnter);
-    element.addEventListener("mouseleave", handleMouseLeave);
-
-    return () => {
-      element.removeEventListener("mouseenter", handleMouseEnter);
-      element.removeEventListener("mouseleave", handleMouseLeave);
-    };
-  }, []);
+  const trigger = React.cloneElement(children, {
+    "aria-describedby": show ? tooltipId : undefined,
+  } as React.HTMLAttributes<HTMLElement>);
 
   return (
-    <div
-      id={`tooltip-${id}`}
+    <span
       className={cn("relative inline-block", className)}
-      {...props}
+      onMouseEnter={() => setShow(true)}
+      onMouseLeave={() => setShow(false)}
+      onFocusCapture={() => setShow(true)}
+      onBlurCapture={() => setShow(false)}
     >
-      {children}
+      {trigger}
       {show && (
-        <div
+        <span
+          id={tooltipId}
           role="tooltip"
           className="absolute z-10 p-2 mt-2 origin-top-right rounded-lg backdrop-blur-lg min-w-32 w-full bg-gray-600 bg-opacity-50 shadow-lg text-sm animate-fade"
         >
           {content}
-        </div>
+        </span>
       )}
-    </div>
+    </span>
   );
 };
 
