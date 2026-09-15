@@ -50,7 +50,7 @@ export const Alert = ({
           aria-label="Dismiss alert"
           onClick={() => setIsVisible(false)}
           className={cn(
-            "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full hover:bg-black/10 active:bg-black/15",
+            "inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full hover:bg-black/10 active:bg-black/[0.15]",
             motionState,
             focusRingInset
           )}
