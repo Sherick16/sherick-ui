@@ -38,10 +38,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           required={required}
           aria-invalid={error || undefined}
           className={cn(
-            "px-6 py-4 rounded-4xl bg-opacity-20 hover:bg-opacity-40 border transition-all min-w-64 border-opacity-20 focus:outline-none focus:border-opacity-50",
+            "px-6 py-4 rounded-4xl bg-opacity-20 hover:bg-opacity-40 transition-all min-w-64 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/20",
             !error
-              ? "border-gray-400 bg-gray-400 text-gray-300 hover:bg-gray-500"
-              : "border-red-500 border-opacity-40 focus:border-opacity-100 text-red-400 bg-red-500 bg-opacity-10 hover:bg-opacity-20 hover:bg-red-500",
+              ? "bg-gray-400 text-gray-300 hover:bg-gray-500"
+              : "text-red-300 bg-red-500 bg-opacity-15 hover:bg-opacity-25 hover:bg-red-500 focus-visible:ring-red-400/30",
             inputClassName
           )}
           onChange={(event) => onChange?.(event.target.value)}
