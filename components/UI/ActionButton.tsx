@@ -4,7 +4,7 @@ import React, { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "re
 import { cn } from "@/libs/utils";
 import {
   focusRing,
-  motionState,
+  motionComponent,
   pressable,
   shape,
   toneActiveMap,
@@ -30,8 +30,8 @@ export interface ActionButtonProps extends ButtonHTMLAttributes<HTMLButtonElemen
 
 const sizeMap: Record<ButtonSize, string> = {
   sm: "min-h-10 px-4 py-2 text-sm",
-  md: "min-h-12 px-6 py-3",
-  lg: "min-h-14 px-8 py-4 text-lg font-medium",
+  md: "min-h-12 px-6 py-3 text-[0.95rem]",
+  lg: "min-h-14 px-8 py-4 text-lg",
 };
 
 const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
@@ -55,27 +55,28 @@ const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
         disabled={isDisabled}
         aria-busy={loading || undefined}
         className={cn(
-          "inline-flex items-center justify-center gap-2 font-medium",
+          "inline-flex items-center justify-center gap-2 font-medium tracking-[-0.01em]",
           shape.pill,
           sizeMap[size],
-          motionState,
+          motionComponent,
           focusRing,
           !isDisabled && pressable,
           appearance === "filled" && toneStrongMap[variant],
+          appearance === "filled" && variant === "primary" && "shadow-sherick-primary hover:brightness-105",
           appearance === "tonal" && toneSurfaceMap[variant],
           appearance === "tonal" && toneTextMap[variant],
           appearance !== "text" && !isDisabled && toneHoverMap[variant],
           appearance !== "text" && !isDisabled && toneActiveMap[variant],
           appearance === "text" && toneTextMap[variant],
-          appearance === "text" && !isDisabled && "hover:bg-white/5 active:bg-white/10",
-          isDisabled ? "cursor-not-allowed opacity-45" : "cursor-pointer",
+          appearance === "text" && !isDisabled && "hover:bg-white/[0.055] active:bg-white/[0.1]",
+          isDisabled ? "cursor-not-allowed opacity-45 shadow-none" : "cursor-pointer",
           className
         )}
       >
         {loading ? (
           <Spinner size="small" />
         ) : icon ? (
-          <span className="inline-flex shrink-0 items-center" aria-hidden="true">
+          <span className="inline-flex shrink-0 items-center [&>svg]:size-5" aria-hidden="true">
             {icon}
           </span>
         ) : null}
