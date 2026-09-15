@@ -7,7 +7,7 @@ import {
   motionComponent,
   pressable,
   shape,
-  toneStrongMap,
+  toneSelectedMap,
   toneTextMap,
 } from "./ui.common";
 import { Variant } from "./ui.types";
@@ -72,17 +72,17 @@ export const TabGroup = ({
         role="tablist"
         aria-label="Tabs"
         className={cn(
-          "relative flex min-w-max bg-zinc-800/70 p-1.5",
+          "relative flex min-w-max bg-sherick-surface/92 p-1.5 shadow-inner",
           shape.pill
         )}
       >
         <div
           aria-hidden="true"
           className={cn(
-            "absolute inset-y-1.5 left-1.5 shadow-sm",
+            "absolute inset-y-1.5 left-1.5 shadow-sherick-soft",
             shape.pill,
-            motionComponent,
-            toneStrongMap[variant]
+            toneSelectedMap[variant],
+            "transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)] motion-reduce:transition-none"
           )}
           style={{
             width: `calc(${100 / tabs.length}% - ${12 / tabs.length}px)`,
@@ -115,7 +115,9 @@ export const TabGroup = ({
                 motionComponent,
                 focusRing,
                 pressable,
-                selected ? "text-current" : cn("text-zinc-300 hover:bg-white/5 active:bg-white/10", toneTextMap[variant])
+                selected
+                  ? toneTextMap[variant]
+                  : "text-sherick-ink-muted hover:bg-white/[0.045] hover:text-sherick-ink active:bg-white/[0.085]"
               )}
             >
               {tab.label}
