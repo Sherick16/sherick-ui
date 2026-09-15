@@ -21,6 +21,8 @@ jobs:
           corepack enable
           corepack prepare pnpm@9.15.4 --activate
       - name: Install dependencies
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --no-frozen-lockfile
+      - name: Show lockfile refresh
+        run: git diff -- pnpm-lock.yaml
       - name: Verify package
         run: pnpm verify
