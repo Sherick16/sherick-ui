@@ -67,7 +67,7 @@ const CodeBlock = ({ inline = false, className, language = "text", children }: C
           type="button"
           onClick={() => void onCopy()}
           className={cn(
-            "inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-sherick-ink-muted hover:bg-white/[0.055] hover:text-sherick-ink",
+            "inline-flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-sherick-ink-muted hover:bg-sherick-ink/[0.055] hover:text-sherick-ink",
             motionState,
             focusRing
           )}
@@ -86,7 +86,7 @@ const CodeBlock = ({ inline = false, className, language = "text", children }: C
         {({ className: highlightClassName, style, tokens, getLineProps, getTokenProps }) => (
           <pre
             className={cn(
-              "overflow-x-auto border-t border-white/[0.045] px-4 py-4 text-sm leading-6",
+              "overflow-x-auto border-t border-sherick-ink/[0.045] px-4 py-4 text-sm leading-6",
               "bg-sherick-canvas/[0.28]",
               highlightClassName
             )}
