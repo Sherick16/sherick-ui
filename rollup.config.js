@@ -52,7 +52,13 @@ const config = [
         tsconfig: './tsconfig.json',
         declaration: true,
         declarationDir: 'dist',
-        exclude: ['**/*.test.tsx', '**/*.test.ts', '**/*.stories.tsx'],
+        exclude: [
+          '**/*.test.tsx',
+          '**/*.test.ts',
+          '**/*.stories.tsx',
+          'app/verification/**',
+          'tests/**',
+        ],
         // `allowJs` comes from the shared tsconfig for Next. The library build is TS-only,
         // and @rollup/plugin-typescript redirects emit to a temp `outDir` when `allowJs`
         // is on without an `outDir`, then rejects that path as outside the bundle output.
