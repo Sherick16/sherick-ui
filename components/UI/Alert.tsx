@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@base-ui/react/button";
 import React, { type ReactNode, useState } from "react";
 import { AlertCircle, CheckCircle, Info, X, XCircle } from "lucide-react";
 import { cn } from "@/libs/utils";
@@ -23,8 +24,6 @@ const iconMap = {
   success: CheckCircle,
 };
 
-/* An alert is a tinted matte surface: the tone marks its meaning on the surface and
-   the icon, while the copy stays at full text emphasis so it never fights the color. */
 export const Alert = ({
   children,
   variant = "primary",
@@ -55,7 +54,7 @@ export const Alert = ({
       <Icon aria-hidden="true" className={cn("size-5 shrink-0", tone.text[variant])} />
       <div className="min-w-0 flex-1 text-sm leading-6">{children}</div>
       {closeable && (
-        <button
+        <Button
           type="button"
           aria-label="Dismiss alert"
           onClick={() => setIsVisible(false)}
@@ -71,7 +70,7 @@ export const Alert = ({
           )}
         >
           <X aria-hidden="true" className="size-4" />
-        </button>
+        </Button>
       )}
     </div>
   );
