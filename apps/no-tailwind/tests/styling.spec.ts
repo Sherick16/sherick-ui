@@ -9,33 +9,42 @@ const runtimeErrors = (page: Page) => {
   return errors;
 };
 
-test.beforeEach(async ({ page }) => {
-  await page.goto("/");
-  await expect(page.getByTestId("no-tailwind-ready")).toBeVisible();
-});
-
-test("package CSS styles Sherick components but does not leak generic utilities", async ({ page }) => {
-  const errors = runtimeErrors(page);
-
-  const sentinel = page.getByTestId("css-leak-sentinel");
-  const sentinelStyle = await sentinel.evaluate((element) => {
+const genericUtilityStyle = async (locator: ReturnType<Page["getByTestId"]>) =>
+  locator.evaluate((element) => {
     const style = getComputedStyle(element);
     return {
       display: style.display,
       position: style.position,
       paddingLeft: style.paddingLeft,
       borderRadius: style.borderRadius,
-      fontSize: style.fontSize,
     };
   });
 
-  expect(sentinelStyle).toEqual({
+test.beforeEach(async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByTestId("no-tailwind-ready")).toBeVisible();
+});
+
+test("package CSS styles Sherick components but never generic consumer descendants", async ({ page }) => {
+  const errors = runtimeErrors(page);
+
+  const siblingSentinel = await genericUtilityStyle(page.getByTestId("css-leak-sentinel"));
+  expect(siblingSentinel).toEqual({
     display: "block",
     position: "static",
     paddingLeft: "0px",
     borderRadius: "0px",
-    fontSize: "16px",
   });
+
+  for (const testId of ["button-child-leak-sentinel", "card-child-leak-sentinel"]) {
+    const style = await genericUtilityStyle(page.getByTestId(testId));
+    expect(style, `${testId} inherited a Sherick generic utility`).toEqual({
+      display: "inline",
+      position: "static",
+      paddingLeft: "0px",
+      borderRadius: "0px",
+    });
+  }
 
   const button = page.getByRole("button", { name: "Primary" });
   const buttonStyle = await button.evaluate((element) => {
