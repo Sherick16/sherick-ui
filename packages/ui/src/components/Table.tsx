@@ -21,9 +21,9 @@ export const Table = ({
 }: TableProps) => {
   return (
     <div className={cn("w-full overflow-auto", shape.control, material.matteQuiet, className)}>
-      <table className="w-full border-collapse">
+      <table className={cn("w-full border-collapse")}>
         <thead>
-          <tr className={edge.header}>
+          <tr className={cn(edge.header)}>
             {headers.map((header) => (
               <th
                 key={header}
