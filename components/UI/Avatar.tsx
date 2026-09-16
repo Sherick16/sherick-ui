@@ -1,3 +1,6 @@
+"use client";
+
+import { Avatar as BaseAvatar } from "@base-ui/react/avatar";
 import React, { type ImgHTMLAttributes } from "react";
 import { cn } from "@/libs/utils";
 import { material, shape } from "./ui.common";
@@ -16,8 +19,6 @@ export interface AvatarProps
   shape?: "circle" | "rounded";
 }
 
-/* A passive identity surface: a matte fill behind the image while it loads, no rim and
-   no depth. */
 const Avatar = ({
   src,
   alt,
@@ -27,9 +28,13 @@ const Avatar = ({
   ...props
 }: AvatarProps) => {
   const dimensions = sizeMap[size] || sizeMap.md;
+  const isDecorative = alt.length === 0;
 
   return (
-    <div
+    <BaseAvatar.Root
+      role={isDecorative ? undefined : "img"}
+      aria-label={isDecorative ? undefined : alt}
+      aria-hidden={isDecorative || undefined}
       className={cn(
         "overflow-hidden",
         dimensions.styles,
@@ -38,16 +43,17 @@ const Avatar = ({
         className
       )}
     >
-      <img
+      <BaseAvatar.Image
+        keepMounted
         src={src}
         alt={alt}
         width={dimensions.element}
         height={dimensions.element}
         loading="lazy"
-        className="h-full w-full object-cover"
+        className="h-full w-full object-cover data-[error]:invisible data-[loading]:invisible"
         {...props}
       />
-    </div>
+    </BaseAvatar.Root>
   );
 };
 

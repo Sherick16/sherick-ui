@@ -1,5 +1,6 @@
 "use client";
 
+import { Switch as BaseSwitch } from "@base-ui/react/switch";
 import React, { type ButtonHTMLAttributes } from "react";
 import { cn } from "@/libs/utils";
 import {
@@ -14,10 +15,13 @@ import {
 import { Variant } from "./ui.types";
 
 export interface SwitchProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onChange"> {
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onChange" | "value"> {
   checked?: boolean;
   onChange?: (checked: boolean) => void;
   variant?: Variant;
+  value?: string;
+  readOnly?: boolean;
+  required?: boolean;
 }
 
 export const Switch = ({
@@ -26,28 +30,35 @@ export const Switch = ({
   variant = "primary",
   className,
   disabled,
-  ...props
+  name,
+  form,
+  value,
+  readOnly,
+  required,
+  type: _type,
+  ...buttonProps
 }: SwitchProps) => {
   return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
+    <BaseSwitch.Root
+      nativeButton
+      render={<button {...buttonProps} type="button" />}
+      checked={checked}
       disabled={disabled}
-      onClick={() => onChange?.(!checked)}
+      name={name}
+      form={form}
+      value={value}
+      readOnly={readOnly}
+      required={required}
+      onCheckedChange={(nextChecked) => onChange?.(nextChecked)}
       className={cn(
         "group inline-flex min-h-12 min-w-14 items-center justify-center rounded-full outline-none",
         disabled ? state.disabled : state.enabled,
         className
       )}
-      {...props}
     >
       <span
         aria-hidden="true"
         className={cn(
-          /* The track is a groove in the surface it sits on, so it takes the recessed
-             step; the thumb is a matte control resting above it. Same physical model as
-             the segmented control. */
           "relative block h-8 w-[3.25rem] shrink-0",
           shape.pill,
           elevation.recessed,
@@ -58,18 +69,16 @@ export const Switch = ({
           !disabled && state.groupPress
         )}
       >
-        <span
+        <BaseSwitch.Thumb
           className={cn(
             "absolute left-1 top-1/2 -translate-y-1/2 bg-current",
             shape.circle,
             elevation.control,
             motion.release,
-            checked
-              ? "h-6 w-6 translate-x-5 text-sherick-on-primary"
-              : "h-5 w-5 text-sherick-ink-muted"
+            checked ? "h-6 w-6 translate-x-5" : "h-5 w-5 text-sherick-ink-muted"
           )}
         />
       </span>
-    </button>
+    </BaseSwitch.Root>
   );
 };

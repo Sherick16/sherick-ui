@@ -13,6 +13,14 @@ Two files implement it and neither invents a rule of its own:
 If this document and any other file disagree — a README paragraph, a showcase caption,
 a code comment — this document wins and the other file is corrected.
 
+Sherick UI deliberately keeps **visual design** separate from **widget mechanics**.
+`@base-ui/react` is the behavioral and accessibility substrate wherever it provides the
+primitive: keyboard navigation, focus management, semantic relationships, form
+participation, portals, dismissal, popup positioning and primitive state belong to Base
+UI. This document remains authoritative for what those primitives look and feel like —
+material, elevation, edge, shape, tone, state treatment, density, focus appearance and
+motion. Base UI never defines Sherick's visual language.
+
 > **The development showcase demonstrates the system; it does not explain it. Design
 > rationale belongs in this document.**
 
@@ -200,11 +208,11 @@ elevation, acrylic and shape rules above.
 | `overlay.tooltip` | a small anchored hint | `shape.prominent` + `material.acrylicDense` + `elevation.floating` | grows out of the edge it is anchored to, so its geometry is applied with its position |
 | `overlay.dialog` | the dialog that owns the viewport | `shape.expressive` + `material.acrylicHero` + `elevation.floating` | rises into place from its own scale, with a larger lift than a menu |
 
-The recipes are the closed-state surface plus the geometry the entrance grows from. The
-entrance/exit selection and the pointer and focus suppression stay in the component,
-because only the component knows whether it is opening or closing; the motion every entry
-animates with is `motion.overlayIn` / `overlayOut` plus its scrim family, and the exit
-window is `--sui-duration-overlay-exit`.
+The recipes own only the **visual shell** and the geometry its motion grows from. Base UI
+owns popup presence, portals, focus management, pointer/focus suppression while closing,
+outside interaction, Escape dismissal and anchored positioning. A Base-backed component
+selects `motion.overlayIn` / `motion.overlayOut` (and the matching scrim family) from the
+primitive's open/closing state; Sherick UI does not maintain a second overlay lifecycle.
 
 Rules:
 
@@ -214,8 +222,8 @@ Rules:
   elevation, the shape and the entrance geometry;
 - a shell that needs a different combination is a **new recipe** — add it to this
   document and to `overlay` in `components/UI/ui.common.ts` before anything uses it;
-- these recipes only exist while an overlay is open, so no closed-state render can reach
-  them and every overlay composes them once instead of restating them.
+- behavior remains the Base primitive's responsibility; do not add Sherick-specific
+  portal, focus-trap, dismissal, positioning or presence infrastructure around it.
 
 ---
 
@@ -335,7 +343,7 @@ state, so it fades on the shared motion curve rather than snapping.
 | `tonal` | 0.09 / 0.15 | tinted matte controls — tonal buttons, icon buttons, acrylic buttons |
 | `filled` | 0.18 / 0.26 | opaque accent fills |
 | `track` | 0.18 / 0.26 | a switch track, where hover and press arrive from the wrapping button via `group-*` |
-| `activeRow` | data attribute | a menu row highlighted by keyboard navigation |
+| `activeRow` | `data-active` / `data-highlighted` | a collection row highlighted by keyboard navigation; Base UI collection primitives use `data-highlighted` |
 
 Fields are a single borderless family: a matte `surface-high` fill that steps up once on
 hover and once more while engaged, no ring and no lift. `state.field.*` covers hover,
@@ -394,12 +402,13 @@ Rules:
 
 - a control whose transform changes **must** use `release`; `press` is for pure tonality
   and colour transitions that never move or resize anything;
-- floating overlays share one entrance and one exit through `useOverlayPresence` while
-  each keeps its own geometry — a menu grows from its trigger, a tooltip grows out of the
-  edge it is anchored to, a dialog rises into place;
-- the overlay exit window is read from `--sui-duration-overlay-exit` rather than copied
-  beside it, is released on `animationend`, and is skipped entirely under
-  `prefers-reduced-motion`, so a closing overlay never lingers;
+- floating overlays share the Sherick overlay motion family while **Base UI owns their
+  presence and lifecycle**. A menu grows from its trigger, a tooltip grows out of the
+  anchored edge and a dialog rises from its own center; Sherick consumes Base's state and
+  positioning variables rather than maintaining mount/closing state itself;
+- there is no Sherick timer tied to `--sui-duration-overlay-exit`: Base UI keeps closing
+  primitives present for their CSS exit animation and removes them when the transition is
+  complete. `prefers-reduced-motion` still neutralises Sherick's animation classes;
 - every family is neutralised under `prefers-reduced-motion`, and `release` additionally
   drops its transform;
 - loading feedback (`animate-spin`, `animate-pulse`) sits outside these families: it
@@ -445,6 +454,10 @@ inline padding from a field's.
   outer ring would collide with the parent's edge.
 - Fields use the outer ring only. No inner rim is added, so focus reads as one ring,
   never two.
+- Where Base UI provides the widget primitive, Base UI owns roles, ARIA relationships,
+  generated IDs, keyboard navigation, focus placement/restoration and composite-control
+  form participation. Sherick UI owns the visible focus/state treatment layered onto
+  that behavior. Do not duplicate Base's semantic machinery locally.
 - Focus is visible on keyboard focus (`:focus-visible`), and never removed without a
   replacement indicator.
 - Every action is keyboard operable, and keyboard interaction receives an equivalent
@@ -505,6 +518,11 @@ Extending the language is the intended path. Implementing a rule locally — a o
 shadow, a literal color, an inline radius, a bespoke transition — is not. A local rule
 makes the language non-canonical: the next component cannot reuse the decision, the next
 theme cannot retint it, and no verification can catch it.
+
+A new **behavioral** requirement is different: if Base UI provides that behavior, consume
+its primitive directly. Do not extend the visual primitive module with focus managers,
+portal helpers, controllable-state hooks or accessibility machinery. If Base UI lacks a
+required widget behavior, document that gap before introducing local infrastructure.
 
 ---
 

@@ -4,6 +4,8 @@ Sherick UI is a small React component library inspired by Material 3 Expressive:
 
 The guiding rule is **quiet by default, expressive where it matters**. Every component draws on the same small design language — material, elevation, shape, edge, tone, state, density and motion — so a new one is designed by choosing existing primitives rather than inventing visual rules. That language is specified in [docs/DESIGN_LANGUAGE.md](https://github.com/Sherick16/sherick-ui/blob/main/docs/DESIGN_LANGUAGE.md), its canonical source of truth.
 
+Interactive behavior is deliberately separate from visual design. Sherick UI uses [Base UI](https://base-ui.com/) as its unstyled behavioral and accessibility substrate wherever Base UI provides the primitive. Base UI owns generic mechanics such as keyboard navigation, focus management, ARIA relationships, form participation, portals, dismissal and popup positioning; Sherick UI owns the component anatomy, public design API and every visual decision.
+
 ## Installation
 
 ```bash
@@ -62,7 +64,7 @@ If a persisted user choice is applied client-side, set the attribute before firs
 </script>
 ```
 
-Use the attribute on `document.documentElement` for application-wide themes. Sherick overlays such as `Modal` portal to `document.body`, so a root-level theme naturally applies to portaled UI as well.
+Use the attribute on `document.documentElement` for application-wide themes. Sherick overlays portal to `document.body`, so a root-level theme naturally applies to portaled UI as well.
 
 ### Custom themes
 
@@ -105,20 +107,26 @@ Motion is three families, each a token pair. Retiming the library is a token edi
 | release | `--sui-duration-release` | `--sui-ease-release` | a tactile control: press timing while held (`active:`), release timing as it settles, and the travel of a thumb or segment |
 | overlay | `--sui-duration-overlay`, `--sui-duration-overlay-exit` | `--sui-ease-release`, `--sui-ease-exit` | the entrance and exit of anything that floats |
 
-Floating overlays (menus, tooltips, dialogs) share one entrance and one exit through `useOverlayPresence`, including a matching scrim family, while each keeps its own geometry. The exit window is read from `--sui-duration-overlay-exit` and skipped entirely under `prefers-reduced-motion`, so a closing overlay never lingers.
+Base UI owns whether a floating primitive is mounted, opening or closing, plus its focus, dismissal, portal and positioning mechanics. Sherick UI applies the shared overlay material/elevation/shape recipes and motion tokens to those states; no Sherick-specific overlay lifecycle hook is required.
 
 ## Usage
 
 ```tsx
-import { ActionButton, Input, Modal } from "sherick-ui";
+import { ActionButton, Input, Dialog, Select } from "sherick-ui";
 import "sherick-ui/theme.css";
 
 export function Example() {
   return (
     <>
       <Input label="Email" name="email" type="email" required />
+      <Select
+        options={[
+          { label: "Design system", value: "design" },
+          { label: "Dashboard", value: "dashboard" },
+        ]}
+        defaultValue="design"
+      />
       <ActionButton appearance="filled">Save</ActionButton>
-      <ActionButton appearance="text" variant="secondary">Cancel</ActionButton>
     </>
   );
 }
@@ -126,7 +134,7 @@ export function Example() {
 
 `ActionButton` supports `filled`, `tonal` and `text` appearances plus `sm`, `md` and `lg` sizes. `IconButton` supports `tonal`, `ghost` and `acrylic` appearances. Semantic variants remain available for meaningful states such as danger or success rather than requiring every component to be chromatically loud.
 
-Components expose their relevant native HTML props and refs where appropriate. Loading buttons are disabled automatically, form labels are associated with their controls, and interactive primitives include keyboard/ARIA behavior and a consistent visible focus language.
+Components expose their relevant native HTML props and refs where appropriate. Base-backed interactive primitives delegate their generic widget semantics and accessibility mechanics to Base UI while retaining Sherick's visual language and focus treatment.
 
 ## Components
 
@@ -136,9 +144,9 @@ The public package exports:
 - Alert, Avatar, Badge and Card
 - CodeBlock and Markdown
 - Divider
-- Dropdown
+- Select (`Dropdown` remains as a deprecated compatibility alias)
 - Input, Search and Textarea
-- Modal with `Modal.Header`, `Modal.Content` and `Modal.Footer`
+- Dialog (`Modal` remains as a compatibility name, with `Header`, `Content` and `Footer` composition)
 - NavGroup and NavItem
 - Skeleton and Spinner
 - Switch
@@ -147,6 +155,14 @@ The public package exports:
 - Tooltip
 
 Public prop types and the shared `Variant` type are exported from the package root as well.
+
+## Behavioral foundation
+
+`@base-ui/react` is a direct Sherick UI runtime dependency. Components import the relevant Base primitive directly from public subpaths such as `@base-ui/react/dialog` or `@base-ui/react/select`; Sherick UI does not maintain a parallel generic headless layer.
+
+When Base UI provides the primitive, it owns keyboard navigation, roving focus, focus trapping/restoration, generated accessibility relationships, composite-control form participation, portals, anchored positioning/collision handling, outside interaction/Escape dismissal and popup lifecycle. Passive semantics such as cards, badges, navigation links and tables remain native HTML rather than being forced through a headless abstraction.
+
+This boundary is intentional: upgrading behavior should normally mean upgrading Base UI and validating Sherick's integration tests, while changing Sherick's appearance should remain confined to its design language, recipes and tokens.
 
 ## Design language
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@base-ui/react/button";
 import React, { useEffect, useRef, useState, type ReactNode } from "react";
 import { Check, Copy } from "lucide-react";
 import { Highlight } from "prism-react-renderer";
@@ -61,7 +62,6 @@ const CodeBlock = ({ inline = false, className, language = "text", children }: C
   };
 
   if (inline) {
-    /* Inline code is a chip, like a badge: same shape role, matte material. */
     return (
       <code className={cn("px-1.5 py-0.5 font-mono text-[0.9em]", material.matteHigh, shape.pill, tone.text.primary, className)}>
         {children}
@@ -75,7 +75,7 @@ const CodeBlock = ({ inline = false, className, language = "text", children }: C
         <span className={cn("font-mono text-[11px] uppercase tracking-[0.08em]", text.medium)}>
           {language}
         </span>
-        <button
+        <Button
           type="button"
           onClick={() => void onCopy()}
           className={cn(
@@ -92,7 +92,7 @@ const CodeBlock = ({ inline = false, className, language = "text", children }: C
         >
           {copied ? <Check className="size-3.5" aria-hidden="true" /> : <Copy className="size-3.5" aria-hidden="true" />}
           <span>{copied ? "Copied" : "Copy"}</span>
-        </button>
+        </Button>
       </div>
 
       <Highlight

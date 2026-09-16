@@ -1,6 +1,7 @@
 "use client";
 
-import React, { forwardRef, useId, type TextareaHTMLAttributes } from "react";
+import { Field } from "@base-ui/react/field";
+import React, { forwardRef, type TextareaHTMLAttributes } from "react";
 import { cn } from "@/libs/utils";
 import {
   density,
@@ -28,31 +29,37 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     required,
     error = false,
     id,
+    name,
     disabled,
     onChange,
-    ...props
+    value,
+    defaultValue,
+    ...textareaProps
   }, ref) => {
-    const generatedId = useId();
-    const textareaId = id ?? generatedId;
-
     return (
-      <div className={cn("flex w-full flex-col", className)}>
+      <Field.Root
+        className={cn("flex w-full flex-col", className)}
+        name={name}
+        disabled={disabled}
+        invalid={error}
+      >
         {label && (
-          <label htmlFor={textareaId} className={cn("mb-2 text-sm font-medium", text.high)}>
+          <Field.Label className={cn("mb-2 text-sm font-medium", text.high)}>
             {label}
             {required && <span className="ml-1 text-sherick-danger" aria-hidden="true">*</span>}
-          </label>
+          </Field.Label>
         )}
-        <textarea
-          ref={ref}
-          id={textareaId}
+        <Field.Control
+          render={<textarea {...textareaProps} ref={ref} />}
+          id={id}
+          name={name}
           required={required}
           disabled={disabled}
-          aria-invalid={error || undefined}
+          value={value}
+          defaultValue={defaultValue}
+          onValueChange={(nextValue) => onChange?.(String(nextValue))}
           className={cn(
             "w-full resize-y",
-            /* Density owns the type step and the control floor; the anatomy sets how
-               tall the field actually is. Order matters: the later utility wins. */
             density.normal,
             "min-h-28 min-w-64 px-5 py-4",
             shape.control,
@@ -64,10 +71,8 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             disabled ? state.disabled : state.text,
             textareaClassName
           )}
-          onChange={(event) => onChange?.(event.target.value)}
-          {...props}
         />
-      </div>
+      </Field.Root>
     );
   }
 );
