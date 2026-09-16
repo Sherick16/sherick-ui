@@ -62,6 +62,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
 
     return (
       <BaseSelect.Root
+        items={options}
         value={controlledValue}
         defaultValue={defaultValue ?? null}
         onValueChange={(nextValue) => {
