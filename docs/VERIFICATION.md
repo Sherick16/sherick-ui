@@ -4,60 +4,107 @@ Sherick UI uses complementary verification layers. Each layer has a deliberately
 
 ## Static repository checks
 
-`bun run lint` and `bun run typecheck` protect source-level correctness, repository conventions and TypeScript compatibility. They do not prove that the package consumers install is correctly assembled.
+`bun run lint` and workspace typechecks protect source-level correctness, repository conventions and TypeScript compatibility. They do not prove that the package consumers install is correctly assembled or styled.
 
 ## Library build
 
-`bun run build` produces the published ESM, CommonJS and declaration artifacts. A successful Rollup build proves that source can be emitted, but not that Node/package export resolution works after publication.
+`bun --filter sherick-ui build` produces:
 
-## Showcase production build
+- preserved ESM and CommonJS modules;
+- declaration bundles;
+- generated `dist/theme.css` from the canonical token source;
+- generated scoped `dist/styles.css` containing the complete component styling contract;
+- KaTeX CSS/font assets required by Markdown math.
 
-`bun run next:build` verifies that the development showcase and the dedicated browser fixtures compile and prerender in production Next.js. The verification routes intentionally import `sherick-ui` through the public package export after the library build, rather than importing component source directly.
+The CSS build uses Tailwind privately as an authoring compiler, then scopes component rules so generic utility selectors cannot leak into consumer applications. Tailwind preflight is disabled.
+
+## Consumer production builds
+
+Two independent consumers build in verification:
+
+- `apps/showcase` — the full Next.js workbench. It imports `sherick-ui/styles.css` and deliberately does **not** scan Sherick package output through Tailwind.
+- `apps/no-tailwind` — a small Vite application with no Tailwind dependency or configuration. It proves the published styling contract is genuinely self-contained.
+
+Both consume `sherick-ui` through package exports after the library build.
 
 ## Fast package smoke checks
 
-`bun run test` exercises the local built artifact and protects deterministic design-system invariants such as token availability, Tailwind utility generation and prohibited one-off visual rules. It remains intentionally fast and repository-local.
+`bun run test` exercises the local built artifact and protects deterministic architecture invariants, including:
+
+- complete light/dark/system token output;
+- system dark and explicit dark generated from the same canonical values;
+- public `styles.css` / `theme.css` exports;
+- absence of the old Tailwind preset/peer contract;
+- no Tailwind preflight/global element reset;
+- no `!important` in published package CSS;
+- no component/accessibility selector escaping the private Sherick scope;
+- retained server/client module boundaries;
+- design-rule checks such as no raw neutral palette or arbitrary shadow system in components.
 
 ## Packed-package consumer checks
 
 `bun run test:packed` is the publication contract gate. It runs `npm pack`, installs the resulting tarball into a clean temporary consumer and verifies:
 
 - ESM package import;
-- CommonJS `require()` through the advertised `require` export;
-- TypeScript declaration resolution under NodeNext;
-- public `theme.css` and Tailwind preset exports;
-- canonical and compatibility component APIs;
-- Phase 2 field, value, checked, tabs and dialog prop contracts from the packed declarations;
-- server rendering of initially-open and initially-closed Dialog states;
-- representative Prism language registration/highlighting from the published dependency graph.
+- CommonJS `require()`;
+- NodeNext TypeScript declaration resolution;
+- `sherick-ui/styles.css` and `sherick-ui/theme.css` resolution;
+- no published Tailwind preset and no Tailwind peer dependency;
+- server rendering of Dialog states;
+- representative Prism language highlighting;
+- KaTeX font assets present in the tarball;
+- a real Vite production build that imports `sherick-ui/styles.css` with no Tailwind installation/configuration.
 
-This layer exists specifically to catch problems that direct `dist` imports can hide, such as invalid file extensions, undeclared runtime dependencies or broken export maps.
+This layer exists specifically to catch publication problems that direct workspace imports can hide.
 
 ## Deterministic style-contract snapshots
 
-`bun run visual` snapshots tokens, generated utilities, component recipe markup and overlay recipes. Despite its historical script name, this is a deterministic **style-contract** regression gate, not a pixel/browser visual test. It is useful for reviewing semantic markup and class-recipe changes without browser rendering noise.
+`bun run visual` snapshots the actual generated/published styling artifacts rather than recompiling an alternate styling path. It records:
+
+- generated theme-token blocks from `dist/theme.css`;
+- scoped rules from `dist/styles.css`;
+- server-rendered component specimen markup;
+- shared overlay recipes.
+
+This is a deterministic **style-contract** regression gate, not a pixel/browser visual test.
 
 ## Browser integration and visual regression
 
-`bun run test:browser` runs Playwright against the production-built Next app in Chromium. The browser suite has two responsibilities.
+`bun run test:browser` runs two browser suites.
 
-The visual fixtures retain reviewed light/dark screenshots for:
+### Next showcase
 
-- a representative core-control composition;
-- an initially-open Dialog/overlay composition.
+The existing reviewed Chromium snapshots remain the visual baseline for:
 
-The interaction fixture verifies cross-component contracts through the public `sherick-ui` package API:
+- representative core controls in light mode;
+- representative core controls in dark mode;
+- initially-open Dialog overlays in light mode;
+- initially-open Dialog overlays in dark mode.
 
-- Base-owned Field label, description, invalid and error relationships;
-- controlled Search values while asynchronous/loading work is in progress;
-- controlled Tabs and disabled-tab behavior;
-- Base-owned Select and Switch native form submission;
-- explicit Dialog descriptions;
-- nested Select/Tooltip/Dialog composition, including child-overlay Escape handling before parent dismissal.
+Phase 3 treats those screenshots as immutable: a difference is a styling-distribution defect unless explicitly proven otherwise.
 
-All browser tests fail on uncaught page errors or browser console errors, so hydration and runtime warnings are regressions rather than ignored noise. The closed visual fixture also asserts that a closed Dialog remains absent after hydration.
+The showcase browser suite also verifies:
 
-Browser snapshots are generated on Linux/Chromium in CI and committed with the test. Update them only after reviewing the visual change against `docs/DESIGN_LANGUAGE.md`.
+- field description/error relationships;
+- loading Search behavior;
+- controlled Tabs;
+- Select/Switch form participation;
+- Dialog description semantics;
+- nested overlay Escape ordering;
+- hostile custom theme roles, including portaled content;
+- forced-colors focus/state/boundary fallbacks.
+
+### No-Tailwind consumer
+
+The Vite fixture verifies:
+
+- representative components render with package CSS alone;
+- Dialog, Select and Tooltip remain styled through portals;
+- rich-content/KaTeX styling and fonts are present;
+- theme variables load;
+- a deliberately Tailwind-looking consumer element (`flex absolute rounded-full px-6 text-sm`) remains untouched, proving generic package utilities do not leak globally.
+
+All browser tests fail on page errors or error-level console output.
 
 ## CI order
 
@@ -65,8 +112,8 @@ The normal immutable CI path is:
 
 ```bash
 bun install --frozen-lockfile
-cd apps/showcase && bunx playwright install --with-deps chromium
-cd ../.. && bun run verify
+bunx playwright install --with-deps chromium
+bun run verify
 ```
 
-`bun run verify` executes lint, typecheck, the library build, the production Next build, fast package smoke checks, packed-package verification, deterministic style-contract snapshots and browser verification.
+`bun run verify` executes source checks, library/CSS generation, both consumer typechecks/builds, local package smoke checks, packed-package verification, deterministic style-contract snapshots and both browser suites.
