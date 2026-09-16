@@ -38,13 +38,17 @@ The package publishes:
 
 `styles.css` is generated without Tailwind preflight/reset and contains no unscoped generic utility selectors. Component rules are scoped with the private `.sui-scope` marker through zero-specificity `:where(...)` selectors. The marker exists only to isolate package CSS and is not a supported consumer styling hook.
 
+Because Sherick compiles Tailwind utilities ahead of time without shipping preflight, `styles.css` also initializes Tailwind's shadow/ring/transform/filter plumbing variables inside the private scope. These are implementation variables, not visual tokens, and never escape into consumer DOM.
+
 Every independently portaled styled subtree must establish the same scope. Dialog, Select and Tooltip therefore remain styled when Base UI portals them outside trigger ancestry. New portaled components follow the same rule.
 
 Cascade ownership is deliberate:
 
 - theme defaults live in the low-priority `sherick-ui-theme` cascade layer so ordinary consumer CSS variables can override them cleanly;
 - component, motion, accessibility and rich-content rules are **unlayered but scoped**. Do not put them in a named cascade layer: unlayered host resets/preflight would outrank every layered package rule before specificity is considered, which can erase Sherick backgrounds, shadows, border colors and Tailwind state variables;
-- the scope contributes zero specificity, so a Sherick utility still has normal class-level specificity. Import `sherick-ui/styles.css` before application styles; later consumer utility/classes of equal specificity can intentionally override a component through `className` without `!important`.
+- host/framework/Tailwind CSS loads first, then `sherick-ui/styles.css`. This order is load-bearing. A consumer Tailwind build can emit a generic class such as `.px-6` because the application uses it elsewhere; if that host rule loaded after Sherick, it could override Sherick's responsive `.sm:px-7` on a component that legitimately carries both classes. Loading the package after host CSS preserves the component's internally compiled Tailwind ordering;
+- consumer `className` overrides still work for Tailwind utility conflicts because the shared `cn()` uses `tailwind-merge`, which removes the conflicting Sherick utility from the rendered element. Application-specific override CSS that is not expressed through `className` should be loaded after `sherick-ui/styles.css` in a separate override stylesheet;
+- no `!important` is used to enforce the package contract.
 
 ## Theme contract
 
