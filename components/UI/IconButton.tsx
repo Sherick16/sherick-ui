@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@base-ui/react/button";
 import React, { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import {
@@ -33,6 +34,7 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
     className,
     loading = false,
     disabled,
+    type = "button",
     ...props
   }, ref) => {
     const isDisabled = disabled || loading;
@@ -40,9 +42,10 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
     const isAcrylic = appearance === "acrylic";
 
     return (
-      <button
-        ref={ref}
+      <Button
         {...props}
+        render={<button ref={ref} />}
+        type={type}
         disabled={isDisabled}
         aria-busy={loading || undefined}
         className={cn(
@@ -53,12 +56,9 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
           focusRing,
           tone.text[variant],
           isTonal && tone.tonal[variant],
-          /* Tonal and acrylic share one interaction language: only the material behind
-             the button changes, so both take the same state layer. */
           (isTonal || isAcrylic) && !isDisabled && stateLayer.tonal,
           appearance === "ghost" && "bg-transparent",
           appearance === "ghost" && !isDisabled && stateLayer.quiet,
-          /* Tactile pair for a matte control; the acrylic button floats instead. */
           isTonal && !isDisabled && elevation.raised,
           isTonal && !isDisabled && state.recess,
           isAcrylic && material.acrylicDense,
@@ -69,7 +69,7 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
         )}
       >
         {loading ? <Spinner size="small" /> : icon ?? null}
-      </button>
+      </Button>
     );
   }
 );
