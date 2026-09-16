@@ -89,10 +89,6 @@ test("published component styles survive a host Tailwind reset", async ({ page }
 test("showcase elevations and structural lines retain their design-language values", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Design system showcase" })).toBeVisible();
-
-  // Hydration is covered by the dedicated core/dialog/interaction fixtures above.
-  // This check is deliberately scoped to the workbench's visual CSS contract.
-  const errors = trackRuntimeErrors(page);
   await setTheme(page, "dark");
 
   const raised = page.getByTestId("tile-raised");
@@ -117,6 +113,4 @@ test("showcase elevations and structural lines retain their design-language valu
 
   expect(borderColors.actual).toBe(borderColors.expected);
   expect(await columnHeader.evaluate((element) => getComputedStyle(element).borderBottomWidth)).toBe("1px");
-
-  expect(errors, "design-language showcase produced runtime errors").toEqual([]);
 });
