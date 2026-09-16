@@ -1,7 +1,9 @@
 import { readdir, readFile, writeFile } from "node:fs/promises";
+import { createRequire } from "node:module";
 import { join } from "node:path";
-import ts from "typescript";
 
+const requireFromUi = createRequire(new URL("../packages/ui/package.json", import.meta.url));
+const ts = requireFromUi("typescript");
 const componentsDir = "packages/ui/src/components";
 
 const isCnCall = (expression) =>
