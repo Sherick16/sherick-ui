@@ -82,7 +82,12 @@ const tailwindResult = await postcss([tailwindcss(tailwindConfig)]).process("@ta
 const componentRoot = scopeRoot(postcss.parse(tailwindResult.css));
 
 const katexPath = require.resolve("katex/dist/katex.min.css");
-const katexRoot = scopeRoot(postcss.parse(await readFile(katexPath, "utf8")));
+const katexRoot = postcss.parse(await readFile(katexPath, "utf8"));
+// KaTeX still ships an obsolete IE/Edge legacy high-contrast override as !important.
+// Sherick provides a modern forced-colors contract below, so the legacy declaration is
+// intentionally dropped rather than weakening the package-wide no-!important invariant.
+katexRoot.walkDecls("-ms-high-contrast-adjust", (declaration) => declaration.remove());
+scopeRoot(katexRoot);
 const fontFaces: AtRule[] = [];
 katexRoot.walkAtRules("font-face", (rule) => {
   fontFaces.push(rule.clone());
