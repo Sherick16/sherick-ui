@@ -71,12 +71,14 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(({
         <BaseDialog.Backdrop
           className={({ open: isOpen }) =>
             cn(
-              "fixed inset-0 z-50 bg-sherick-scrim/[0.38] backdrop-blur-[var(--sui-scrim-blur,6px)]",
+              "fixed inset-0 z-50 bg-sherick-scrim/[0.38] backdrop-blur-[var(--sui-scrim-blur)]",
               isOpen ? motion.scrimIn : motion.scrimOut
             )
           }
         />
-        <BaseDialog.Viewport className="fixed inset-0 z-50 flex min-h-full items-center justify-center overflow-y-auto p-4 sm:p-8">
+        <BaseDialog.Viewport
+          className={cn("fixed inset-0 z-50 flex min-h-full items-center justify-center overflow-y-auto p-4 sm:p-8")}
+        >
           <BaseDialog.Popup
             ref={setPopupRef}
             initialFocus={popupRef}
