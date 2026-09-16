@@ -28,9 +28,13 @@ const Avatar = ({
   ...props
 }: AvatarProps) => {
   const dimensions = sizeMap[size] || sizeMap.md;
+  const isDecorative = alt.length === 0;
 
   return (
     <BaseAvatar.Root
+      role={isDecorative ? undefined : "img"}
+      aria-label={isDecorative ? undefined : alt}
+      aria-hidden={isDecorative || undefined}
       className={cn(
         "overflow-hidden",
         dimensions.styles,
@@ -42,7 +46,7 @@ const Avatar = ({
       <BaseAvatar.Image
         keepMounted
         src={src}
-        alt={alt}
+        alt=""
         width={dimensions.element}
         height={dimensions.element}
         loading="lazy"
