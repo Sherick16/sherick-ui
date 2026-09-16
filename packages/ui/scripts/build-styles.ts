@@ -87,6 +87,11 @@ const katexRoot = postcss.parse(await readFile(katexPath, "utf8"));
 // Sherick provides a modern forced-colors contract below, so the legacy declaration is
 // intentionally dropped rather than weakening the package-wide no-!important invariant.
 katexRoot.walkDecls("-ms-high-contrast-adjust", (declaration) => declaration.remove());
+// KaTeX also resets its equation counters on `body`. Package CSS may not mutate the
+// consumer document globally, so make that reset local to each Sherick-owned subtree.
+katexRoot.walkRules((rule) => {
+  if (rule.selector === "body") rule.selector = `.${SUI_SCOPE_CLASS}`;
+});
 scopeRoot(katexRoot);
 const fontFaces: AtRule[] = [];
 katexRoot.walkAtRules("font-face", (rule) => {
