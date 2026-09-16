@@ -39,6 +39,13 @@ jobs:
         run: bunx playwright install --with-deps chromium
       - name: Verify hard cutover
         run: bun run verify
+      - name: Capture browser diff artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: phase3-browser-diffs
+          path: apps/showcase/test-results
+          if-no-files-found: ignore
       - name: Commit deterministic migration output
         run: |
           git add bun.lock docs/DESIGN_LANGUAGE.md packages/ui/src/components/ui.common.ts packages/ui/scripts/visual-baselines/visual-regression.json
