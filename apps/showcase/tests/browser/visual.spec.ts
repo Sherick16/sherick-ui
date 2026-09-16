@@ -92,9 +92,9 @@ test("showcase elevations and structural lines retain their design-language valu
   await page.goto("/");
   await setTheme(page, "dark");
 
-  const raised = page.getByText("Raised", { exact: true }).locator("..");
-  const recessed = page.getByText("Recessed", { exact: true }).locator("..");
-  const floating = page.getByText("Floating", { exact: true }).locator("..");
+  const raised = page.getByTestId("tile-raised");
+  const recessed = page.getByTestId("tile-recessed");
+  const floating = page.getByTestId("tile-floating");
   const columnHeader = page.getByText("Column header", { exact: true });
 
   for (const surface of [raised, recessed, floating]) {
