@@ -452,6 +452,9 @@ inline padding from a field's.
 - `focusRing` draws the ring **outside** the shape, for a control that stands alone.
 - `focusRingInset` draws it **inside**, for a control nested in another surface where an
   outer ring would collide with the parent's edge.
+- `focusRingWithin` draws the outer ring from the composite that owns the focus, for a
+  composite control whose inner input stays borderless.
+- `groupFocusRing` draws it from the wrapping control instead of the track it contains.
 - Fields use the outer ring only. No inner rim is added, so focus reads as one ring,
   never two.
 - Where Base UI provides the widget primitive, Base UI owns roles, ARIA relationships,

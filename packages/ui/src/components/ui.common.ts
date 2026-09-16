@@ -17,7 +17,7 @@ import type { Variant } from "./ui.types";
      density    how tightly it is packed           (compact, normal, prominent, target)
      motion     how it moves                       (press, release, overlay)
      overlay    floating shells                    (menu, tooltip, dialog)
-     focusRing  the one focus language             (focusRing, focusRingInset)
+    focusRing  the one focus language             (focusRing, focusRingInset, focusRingWithin, groupFocusRing)
 
    The canonical statement of these rules — and of what is deliberately left to a
    component's own anatomy, such as layout, spacing, padding, intrinsic size,
@@ -48,12 +48,21 @@ import type { Variant } from "./ui.types";
    `focusRing` draws the ring outside the shape, for a control that stands alone.
    `focusRingInset` draws it inside, for a control nested within another surface
    where an outer ring would collide with the parent's edge. Fields use the outer
-   ring only: no inner rim is added, so focus reads as one ring, never two. */
+   ring only: no inner rim is added, so focus reads as one ring, never two.
+   `focusRingWithin` draws the outer ring from the composite that owns the focus,
+   for a composite control whose inner input stays borderless. `groupFocusRing`
+   draws it from the wrapping control instead of the track it contains. */
 export const focusRing =
   "focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-sherick-focus focus-visible:outline-offset-[3px]";
 
 export const focusRingInset =
   "focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-focus";
+
+export const focusRingWithin =
+  "focus-within:outline focus-within:outline-2 focus-within:outline-sherick-focus focus-within:outline-offset-[3px]";
+
+export const groupFocusRing =
+  "group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-sherick-focus group-focus-visible:outline-offset-[3px]";
 
 /* Motion — three families. A component picks a family, never a duration:
    - press:   a tonality change with no physical travel: hover, focus, an engaged

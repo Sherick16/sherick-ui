@@ -140,10 +140,10 @@ export default function Home() {
               <Specimen title="Elevation">
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                   <Tile label="Flat" className={cn(material.matteHigh, elevation.flat)} />
-                  <Tile label="Raised" className={cn(material.matteHigh, elevation.raised)} />
+                  <Tile label="Raised" testId="tile-raised" className={cn(material.matteHigh, elevation.raised)} />
                   <Tile label="Control" className={cn(material.matteHigh, elevation.control)} />
-                  <Tile label="Recessed" className={cn(material.matteHigh, elevation.recessed)} />
-                  <Tile label="Floating" className={cn(material.matteHigh, elevation.floating)} />
+                  <Tile label="Recessed" testId="tile-recessed" className={cn(material.matteHigh, elevation.recessed)} />
+                  <Tile label="Floating" testId="tile-floating" className={cn(material.matteHigh, elevation.floating)} />
                 </div>
               </Specimen>
 
@@ -508,10 +508,10 @@ function Specimen({ title, className = "", children }: { title: string; classNam
   );
 }
 
-function Tile({ label, caption, className }: { label?: string; caption?: string; className?: string }) {
+function Tile({ label, caption, className, testId }: { label?: string; caption?: string; className?: string; testId?: string }) {
   return (
     <div className="flex flex-col gap-2">
-      <div className={cn("flex min-h-20 items-center justify-center px-4 text-sm", shape.control, className)}>{label}</div>
+      <div data-testid={testId} className={cn("flex min-h-20 items-center justify-center px-4 text-sm", shape.control, className)}>{label}</div>
       {caption ? <div className={cn("text-xs font-medium", text.high)}>{caption}</div> : null}
     </div>
   );
