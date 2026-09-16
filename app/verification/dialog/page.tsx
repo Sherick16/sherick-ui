@@ -1,6 +1,6 @@
 "use client";
 
-import { Button, Dialog } from "@/components/UI";
+import { Button, Dialog } from "sherick-ui";
 
 const noop = () => undefined;
 
