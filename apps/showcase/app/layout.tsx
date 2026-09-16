@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "sherick-ui/theme.css";
+import "sherick-ui/styles.css";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
