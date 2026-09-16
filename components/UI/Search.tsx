@@ -1,5 +1,8 @@
 "use client";
 
+import { Button } from "@base-ui/react/button";
+import { Field } from "@base-ui/react/field";
+import { Input as BaseInput } from "@base-ui/react/input";
 import React, {
   forwardRef,
   useEffect,
@@ -40,6 +43,7 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
     disabled,
     debounceMs = 300,
     placeholder = "Search...",
+    name,
     ...props
   }, forwardedRef) => {
     const inputRef = useRef<HTMLInputElement | null>(null);
@@ -63,13 +67,19 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
       timerRef.current = setTimeout(() => onSearch(value), debounceMs);
     };
 
+    const submitSearch = () => {
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+      onSearch(inputRef.current?.value || "");
+    };
+
     return (
-      <div
+      <Field.Root
+        name={name}
+        disabled={isDisabled}
         className={cn(
-          /* A composite field: the outer surface owns the whole field language — the
-             same hover and focus steps as a single input — and the disabled opacity, so
-             the field dims as one thing rather than three overlapping steps. The inner
-             input and action carry the disabled cursor and semantics only. */
           "relative inline-flex min-w-64 items-center",
           density.normal,
           shape.control,
@@ -82,8 +92,10 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
           className
         )}
       >
-        <input
-          ref={setRefs}
+        <BaseInput
+          {...props}
+          render={<input ref={setRefs} />}
+          name={name}
           disabled={isDisabled}
           aria-busy={loading || undefined}
           className={cn(
@@ -94,37 +106,32 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
             inputClassName
           )}
           placeholder={placeholder}
-          onChange={(event) => scheduleSearch(event.target.value)}
-          {...props}
+          onValueChange={scheduleSearch}
         />
-        <button
+        <Button
           type="button"
           aria-label="Submit search"
           disabled={isDisabled}
-          onClick={() => onSearch(inputRef.current?.value || "")}
+          onClick={submitSearch}
           className={cn(
             density.target,
             shape.circle,
             focusRingInset,
             motion.release,
-            /* The action inherits the requested tone rather than imposing its own. */
             tone.text[variant],
             !isDisabled && stateLayer.quiet,
             !isDisabled && state.press,
             isDisabled ? state.disabledDescendant : state.enabled,
-            /* `stateLayer` supplies a containing block for its overlay, so an
-               absolutely positioned control declares its position after the layer and
-               becomes its own containing block. */
             "absolute right-1.5 inline-flex items-center justify-center"
           )}
         >
           {loading ? (
             <Spinner className="size-5" size="small" />
           ) : (
-            <SearchIcon className="size-5" />
+            <SearchIcon className="size-5" aria-hidden="true" />
           )}
-        </button>
-      </div>
+        </Button>
+      </Field.Root>
     );
   }
 );
