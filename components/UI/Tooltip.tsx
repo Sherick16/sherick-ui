@@ -12,12 +12,11 @@ export interface TooltipProps {
   position?: "top" | "right" | "bottom" | "left";
 }
 
-const liftBySide = {
-  top: "[--sui-overlay-from-lift:4px]",
-  right: "[--sui-overlay-from-lift:0px]",
-  bottom: "[--sui-overlay-from-lift:-4px]",
-  left: "[--sui-overlay-from-lift:0px]",
-} as const;
+const liftForSide = (side: string) => {
+  if (side === "top") return "[--sui-overlay-from-lift:4px]";
+  if (side === "bottom") return "[--sui-overlay-from-lift:-4px]";
+  return "[--sui-overlay-from-lift:0px]";
+};
 
 const Tooltip = ({ children, content, className, position = "bottom" }: TooltipProps) => {
   return (
@@ -33,7 +32,7 @@ const Tooltip = ({ children, content, className, position = "bottom" }: TooltipP
                 "w-max max-w-64 whitespace-normal px-3 py-2 text-xs leading-5 [transform-origin:var(--transform-origin)]",
                 overlay.tooltip,
                 text.high,
-                liftBySide[side],
+                liftForSide(side),
                 open ? motion.overlayIn : motion.overlayOut
               )
             }
