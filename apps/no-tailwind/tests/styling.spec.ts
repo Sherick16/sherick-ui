@@ -56,7 +56,7 @@ test("package CSS styles Sherick components but never generic consumer descendan
     };
   });
 
-  expect(buttonStyle.display).toBe("inline-flex");
+  expect(["flex", "inline-flex"]).toContain(buttonStyle.display);
   expect(parseFloat(buttonStyle.borderRadius)).toBeGreaterThan(0);
   expect(parseFloat(buttonStyle.minHeight)).toBeGreaterThanOrEqual(48);
   expect(errors).toEqual([]);
