@@ -104,6 +104,16 @@ output.append(
     outline: 2px solid Highlight;
     outline-offset: 2px;
   }
+
+  :where(.${SUI_SCOPE_CLASS}, .${SUI_SCOPE_CLASS} *)[role="dialog"] {
+    border: 1px solid CanvasText;
+  }
+
+  :where(.${SUI_SCOPE_CLASS}, .${SUI_SCOPE_CLASS} *)[role="switch"][aria-checked="true"],
+  :where(.${SUI_SCOPE_CLASS}, .${SUI_SCOPE_CLASS} *)[role="tab"][aria-selected="true"] {
+    outline: 1px solid Highlight;
+    outline-offset: -2px;
+  }
 }`).nodes
 );
 
