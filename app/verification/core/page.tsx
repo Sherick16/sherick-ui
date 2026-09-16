@@ -7,7 +7,7 @@ import {
   Select,
   Switch,
   Tabs,
-} from "@/components/UI";
+} from "sherick-ui";
 
 const noop = () => undefined;
 
