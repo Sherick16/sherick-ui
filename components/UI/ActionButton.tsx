@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "@base-ui/react/button";
 import React, { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import {
@@ -27,8 +28,6 @@ export interface ActionButtonProps extends ButtonHTMLAttributes<HTMLButtonElemen
   loading?: boolean;
 }
 
-/* Density owns height and type; the button's anatomy owns its padding, because a
-   button is gripped at its ends and a field is not. */
 const sizeMap: Record<ButtonSize, string> = {
   sm: `${density.compact} px-4 py-2`,
   md: `${density.normal} px-6 py-3`,
@@ -45,18 +44,17 @@ const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
     className,
     loading = false,
     disabled,
+    type = "button",
     ...props
   }, ref) => {
     const isDisabled = disabled || loading;
-    /* A tonal button is matte and tactile: it rests a hair above its own track and
-       presses back into it. No rim — a filled control is separated by tone and by
-       that lift, and an outline would only draw a border around it. */
     const isTactile = appearance === "tonal" && !isDisabled;
 
     return (
-      <button
-        ref={ref}
+      <Button
         {...props}
+        render={<button ref={ref} />}
+        type={type}
         disabled={isDisabled}
         aria-busy={loading || undefined}
         className={cn(
@@ -87,7 +85,7 @@ const ActionButton = forwardRef<HTMLButtonElement, ActionButtonProps>(
           </span>
         ) : null}
         <span>{children}</span>
-      </button>
+      </Button>
     );
   }
 );
