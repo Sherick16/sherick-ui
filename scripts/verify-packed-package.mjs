@@ -63,10 +63,10 @@ import { access } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import Prism from "prismjs";
 import {
   ActionButton,
   Button,
+  CodeBlock,
   Dialog,
   Select,
 } from "sherick-ui";
@@ -95,9 +95,14 @@ for (const [language, sample] of [
   ["sql", "select * from answers where value = 42"],
   ["yaml", "answer: 42"],
 ]) {
-  assert.ok(Prism.languages[language], \`Prism grammar was not registered: \${language}\`);
-  const highlighted = Prism.highlight(sample, Prism.languages[language], language);
-  assert.match(highlighted, /token/, \`Prism did not tokenize \${language}\`);
+  const highlighted = renderToStaticMarkup(
+    React.createElement(CodeBlock, { language }, sample)
+  );
+  assert.match(
+    highlighted,
+    /class="[^"]*token [^"]+"/,
+    \`published CodeBlock did not tokenize \${language}\`
+  );
 }
 
 const themePath = fileURLToPath(import.meta.resolve("sherick-ui/theme.css"));
