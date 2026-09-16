@@ -5,7 +5,7 @@ const trackRuntimeErrors = (page: Page) => {
 
   page.on("pageerror", (error) => errors.push(`pageerror: ${error.message}`));
   page.on("console", (message) => {
-    if (message.type() === "error") errors.push(`console: ${message.text()}`);
+    if (message.type() === "error") errors.push(`console: ${message.text()}`));
   });
 
   return errors;
@@ -87,9 +87,12 @@ test("published component styles survive a host Tailwind reset", async ({ page }
 });
 
 test("showcase elevations and structural lines retain their design-language values", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
-
   await page.goto("/");
+  await expect(page.getByRole("heading", { name: "Design system showcase" })).toBeVisible();
+
+  // Hydration is covered by the dedicated core/dialog/interaction fixtures above.
+  // This check is deliberately scoped to the workbench's visual CSS contract.
+  const errors = trackRuntimeErrors(page);
   await setTheme(page, "dark");
 
   const raised = page.getByTestId("tile-raised");
