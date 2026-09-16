@@ -8,15 +8,18 @@ Sherick UI is a React component library with a soft, expressive design language 
 bun add sherick-ui
 ```
 
-Import the complete stylesheet once near your application root:
+Import the complete stylesheet once near your application root. Load framework/Tailwind/reset CSS first, then Sherick UI:
 
 ```tsx
+import "./app.css";
 import "sherick-ui/styles.css";
 ```
 
+The order matters when the host also uses Tailwind: Sherick ships a precompiled internal utility graph, so loading it after host CSS prevents duplicate host utility definitions from changing Sherick component anatomy. A dedicated application override stylesheet may be loaded after `sherick-ui/styles.css` when selector-level overrides are required; ordinary Tailwind `className` conflicts are already resolved by Sherick's `cn()`/tailwind-merge composition.
+
 That is the full styling integration. Consumers do not need Tailwind, a Sherick preset, package content scanning, or any other Sherick-specific CSS build configuration.
 
-Tailwind is private authoring/build infrastructure inside the Sherick UI repository. The published package ships finished, scoped CSS.
+Tailwind is private authoring/build infrastructure inside the Sherick UI repository. The published package ships finished, scoped CSS and initializes the Tailwind runtime custom properties it needs inside that private scope, so shadows, rings, transforms and backdrop filters work even when the consumer has no Tailwind preflight.
 
 ## Themes
 
@@ -43,18 +46,18 @@ Custom themes override the documented `--sui-*` CSS variables at document/root l
 }
 ```
 
-A token-only stylesheet is also available as `sherick-ui/theme.css` when component styling is not required.
+`styles.css` includes both component styling and the generated light/dark/system token defaults. `theme.css` is also exported separately for token-only consumers.
 
 ## Usage
 
 ```tsx
-import { Button, Input, Select } from "sherick-ui";
+import { Button, Input, Dialog, Select } from "sherick-ui";
 import "sherick-ui/styles.css";
 
 export function Example() {
   return (
     <>
-      <Input label="Email" name="email" type="email" />
+      <Input label="Email" name="email" type="email" required />
       <Select
         options={[
           { label: "Design system", value: "design" },
@@ -63,25 +66,20 @@ export function Example() {
         defaultValue="design"
       />
       <Button appearance="filled">Save</Button>
+      <Dialog defaultOpen>
+        <Dialog.Header>Example dialog</Dialog.Header>
+        <Dialog.Description>Base UI owns the dialog mechanics.</Dialog.Description>
+        <Dialog.Content>Styled by Sherick UI.</Dialog.Content>
+      </Dialog>
     </>
   );
 }
 ```
 
-The public package includes Button/IconButton, Alert, Avatar, Badge, Card, CodeBlock, Markdown, Divider, Select, Input/Search/Textarea, Dialog, navigation primitives, Skeleton, Spinner, Switch, Tabs, Table and Tooltip.
-
-`ActionButton`, `Dropdown`, `Modal` and `TabGroup` remain naming compatibility aliases for their canonical Button, Select, Dialog and Tabs APIs.
-
 ## Architecture
 
-- Base UI owns generic interaction/accessibility mechanics.
-- Sherick UI owns anatomy, public design APIs and the visual language.
-- `src/styles/tokens.ts` is the authored runtime token source.
-- `scripts/build-styles.ts` privately compiles and scopes component CSS into `dist/styles.css`.
-- The published stylesheet contains no Tailwind preflight/reset and does not leak generic utility selectors into consumer applications.
+Base UI owns generic interaction and accessibility mechanics when it provides the primitive: keyboard navigation, focus management, semantic relationships, form participation, portals, dismissal and popup positioning. Sherick UI owns anatomy, its public design API and the visual language.
 
-The canonical design specification and full architecture documentation live in the repository:
+Tailwind is not a runtime integration surface. Component CSS is generated inside this package and scoped internally; `.sui-scope` is private implementation detail, not a consumer class or theming hook.
 
-- [Design language](https://github.com/Sherick16/sherick-ui/blob/main/docs/DESIGN_LANGUAGE.md)
-- [Architecture](https://github.com/Sherick16/sherick-ui/blob/main/docs/ARCHITECTURE.md)
-- [Verification](https://github.com/Sherick16/sherick-ui/blob/main/docs/VERIFICATION.md)
+The design language remains canonical in the repository-level `docs/DESIGN_LANGUAGE.md`. Reusable recipes live in `src/components/ui.common.ts`; authored theme values live in `src/styles/tokens.ts` and compile to the published CSS artifacts.
