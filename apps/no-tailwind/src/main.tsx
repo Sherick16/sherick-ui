@@ -22,8 +22,8 @@ import {
   Textarea,
   Tooltip,
 } from "sherick-ui";
-import "sherick-ui/styles.css";
 import "./app.css";
+import "sherick-ui/styles.css";
 
 const options = [
   { label: "Design system", value: "design" },
@@ -54,6 +54,14 @@ function App() {
         <div className="row">
           <Button appearance="filled">Primary</Button>
           <Button variant="danger">Danger</Button>
+          <Button appearance="text" aria-label="Nested button leak host">
+            <span
+              data-testid="button-child-leak-sentinel"
+              className="absolute flex rounded-full px-6"
+            >
+              Consumer child
+            </span>
+          </Button>
           <IconButton aria-label="Add" icon={<span>+</span>} />
           <Spinner size="small">Loading</Spinner>
           <Avatar
@@ -92,6 +100,12 @@ function App() {
         <Card>
           <h2>Surface</h2>
           <p>Card styling comes from the package stylesheet.</p>
+          <span
+            data-testid="card-child-leak-sentinel"
+            className="absolute flex rounded-full px-6"
+          >
+            Consumer card child
+          </span>
           <Divider />
           <Tooltip content="Portaled tooltip">
             <Button appearance="text">Tooltip trigger</Button>
