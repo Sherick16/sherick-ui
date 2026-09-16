@@ -1,7 +1,11 @@
 "use client";
 
 import { Switch as BaseSwitch } from "@base-ui/react/switch";
-import React, { type ButtonHTMLAttributes } from "react";
+import React, {
+  forwardRef,
+  type ButtonHTMLAttributes,
+  type Ref,
+} from "react";
 import { cn } from "@/libs/utils";
 import {
   elevation,
@@ -17,15 +21,20 @@ import { Variant } from "./ui.types";
 export interface SwitchProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onChange" | "value"> {
   checked?: boolean;
+  onCheckedChange?: (checked: boolean) => void;
+  /** @deprecated Use `onCheckedChange` instead. */
   onChange?: (checked: boolean) => void;
   variant?: Variant;
   value?: string;
+  uncheckedValue?: string;
   readOnly?: boolean;
   required?: boolean;
+  inputRef?: Ref<HTMLInputElement>;
 }
 
-export const Switch = ({
+export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(({
   checked = false,
+  onCheckedChange,
   onChange,
   variant = "primary",
   className,
@@ -33,22 +42,29 @@ export const Switch = ({
   name,
   form,
   value,
+  uncheckedValue,
   readOnly,
   required,
+  inputRef,
   ...buttonProps
-}: SwitchProps) => {
+}, ref) => {
   return (
     <BaseSwitch.Root
       nativeButton
-      render={<button {...buttonProps} type="button" />}
+      render={<button {...buttonProps} ref={ref} type="button" />}
       checked={checked}
       disabled={disabled}
       name={name}
       form={form}
       value={value}
+      uncheckedValue={uncheckedValue}
       readOnly={readOnly}
       required={required}
-      onCheckedChange={(nextChecked) => onChange?.(nextChecked)}
+      inputRef={inputRef}
+      onCheckedChange={(nextChecked) => {
+        onCheckedChange?.(nextChecked);
+        onChange?.(nextChecked);
+      }}
       className={cn(
         "group inline-flex min-h-12 min-w-14 items-center justify-center rounded-full outline-none",
         disabled ? state.disabled : state.enabled,
@@ -80,4 +96,6 @@ export const Switch = ({
       </span>
     </BaseSwitch.Root>
   );
-};
+});
+
+Switch.displayName = "Switch";

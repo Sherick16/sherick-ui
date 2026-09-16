@@ -26,7 +26,8 @@ Sherick UI uses complementary verification layers. Each layer has a deliberately
 - CommonJS `require()` through the advertised `require` export;
 - TypeScript declaration resolution under NodeNext;
 - public `theme.css` and Tailwind preset exports;
-- canonical `Button` plus the deprecated `ActionButton` compatibility alias;
+- canonical and compatibility component APIs;
+- Phase 2 field, value, checked, tabs and dialog prop contracts from the packed declarations;
 - server rendering of initially-open and initially-closed Dialog states;
 - representative Prism language registration/highlighting from the published dependency graph.
 
@@ -38,12 +39,23 @@ This layer exists specifically to catch problems that direct `dist` imports can 
 
 ## Browser integration and visual regression
 
-`bun run test:browser` runs Playwright against the production-built Next app in Chromium. It verifies real hydration/runtime behavior and captures reviewed light/dark screenshots for:
+`bun run test:browser` runs Playwright against the production-built Next app in Chromium. The browser suite has two responsibilities.
+
+The visual fixtures retain reviewed light/dark screenshots for:
 
 - a representative core-control composition;
 - an initially-open Dialog/overlay composition.
 
-The test fails on uncaught page errors or browser console errors, so hydration warnings are regressions rather than ignored noise. The closed fixture also asserts that a closed Dialog remains absent after hydration.
+The interaction fixture verifies cross-component contracts through the public `sherick-ui` package API:
+
+- Base-owned Field label, description, invalid and error relationships;
+- controlled Search values while asynchronous/loading work is in progress;
+- controlled Tabs and disabled-tab behavior;
+- Base-owned Select and Switch native form submission;
+- explicit Dialog descriptions;
+- nested Select/Tooltip/Dialog composition, including child-overlay Escape handling before parent dismissal.
+
+All browser tests fail on uncaught page errors or browser console errors, so hydration and runtime warnings are regressions rather than ignored noise. The closed visual fixture also asserts that a closed Dialog remains absent after hydration.
 
 Browser snapshots are generated on Linux/Chromium in CI and committed with the test. Update them only after reviewing the visual change against `docs/DESIGN_LANGUAGE.md`.
 
@@ -53,8 +65,8 @@ The normal immutable CI path is:
 
 ```bash
 bun install --frozen-lockfile
-bunx playwright install chromium
-bun run verify
+cd apps/showcase && bunx playwright install --with-deps chromium
+cd ../.. && bun run verify
 ```
 
 `bun run verify` executes lint, typecheck, the library build, the production Next build, fast package smoke checks, packed-package verification, deterministic style-contract snapshots and browser verification.

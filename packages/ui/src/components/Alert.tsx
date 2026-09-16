@@ -24,17 +24,21 @@ const iconMap = {
   success: CheckCircle,
 };
 
+export interface AlertProps {
+  children: ReactNode;
+  variant?: Variant;
+  className?: string;
+  closeable?: boolean;
+  onDismiss?: () => void;
+}
+
 export const Alert = ({
   children,
   variant = "primary",
   className,
   closeable = false,
-}: {
-  children: ReactNode;
-  variant?: Variant;
-  className?: string;
-  closeable?: boolean;
-}) => {
+  onDismiss,
+}: AlertProps) => {
   const [isVisible, setIsVisible] = useState(true);
   const Icon = iconMap[variant];
 
@@ -57,7 +61,10 @@ export const Alert = ({
         <Button
           type="button"
           aria-label="Dismiss alert"
-          onClick={() => setIsVisible(false)}
+          onClick={() => {
+            onDismiss?.();
+            setIsVisible(false);
+          }}
           className={cn(
             "ml-1 inline-flex shrink-0 items-center justify-center",
             density.target,

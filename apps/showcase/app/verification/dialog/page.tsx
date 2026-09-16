@@ -17,11 +17,11 @@ export default function VerificationDialogPage() {
         </p>
       </div>
 
-      <Dialog open onClose={noop}>
+      <Dialog open onOpenChange={noop}>
         <Dialog.Header>Published package dialog</Dialog.Header>
-        <Dialog.Content>
+        <Dialog.Description className="pb-5">
           This surface verifies initially-open SSR, hydration, focus management and the floating material.
-        </Dialog.Content>
+        </Dialog.Description>
         <Dialog.Footer>
           <Button appearance="filled">Confirm</Button>
         </Dialog.Footer>

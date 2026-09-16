@@ -39,7 +39,11 @@ const components: Components = {
   },
 };
 
-const Markdown = ({ children }: { children: string }) => {
+export interface MarkdownProps {
+  children: string;
+}
+
+const Markdown = ({ children }: MarkdownProps) => {
   return (
     <ReactMarkdown
       components={components}

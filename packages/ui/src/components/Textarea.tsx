@@ -1,7 +1,11 @@
 "use client";
 
 import { Field } from "@base-ui/react/field";
-import React, { forwardRef, type TextareaHTMLAttributes } from "react";
+import React, {
+  forwardRef,
+  type ReactNode,
+  type TextareaHTMLAttributes,
+} from "react";
 import { cn } from "@/libs/utils";
 import {
   density,
@@ -15,27 +19,40 @@ import {
 
 export interface TextareaProps
   extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "onChange"> {
-  label?: string;
+  label?: ReactNode;
+  description?: ReactNode;
   error?: boolean;
+  errorMessage?: ReactNode;
   textareaClassName?: string;
+  onValueChange?: (value: string) => void;
+  /** @deprecated Use `onValueChange` instead. */
   onChange?: (value: string) => void;
 }
 
 const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({
     label,
+    description,
     className,
     textareaClassName,
     required,
     error = false,
+    errorMessage,
     id,
     name,
     disabled,
+    onValueChange,
     onChange,
     value,
     defaultValue,
     ...textareaProps
   }, ref) => {
+    const handleValueChange = (nextValue: unknown) => {
+      const normalized = String(nextValue);
+      onValueChange?.(normalized);
+      onChange?.(normalized);
+    };
+
     return (
       <Field.Root
         className={cn("flex w-full flex-col", className)}
@@ -57,7 +74,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           disabled={disabled}
           value={value}
           defaultValue={defaultValue}
-          onValueChange={(nextValue) => onChange?.(String(nextValue))}
+          onValueChange={handleValueChange}
           className={cn(
             "w-full resize-y",
             density.normal,
@@ -72,6 +89,19 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             textareaClassName
           )}
         />
+        {description && (
+          <Field.Description className={cn("mt-2 text-xs leading-5", text.medium)}>
+            {description}
+          </Field.Description>
+        )}
+        {errorMessage && (
+          <Field.Error
+            match={error}
+            className="mt-2 text-xs leading-5 text-sherick-danger"
+          >
+            {errorMessage}
+          </Field.Error>
+        )}
       </Field.Root>
     );
   }

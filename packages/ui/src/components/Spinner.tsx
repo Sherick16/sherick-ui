@@ -28,14 +28,17 @@ const loaderVariants = cva("animate-spin text-current motion-reduce:animate-none
   },
 });
 
-export interface SpinnerContentProps
+export interface SpinnerProps
   extends VariantProps<typeof spinnerVariants>,
     VariantProps<typeof loaderVariants> {
   className?: string;
   children?: React.ReactNode;
 }
 
-export function Spinner({ size, show, children, className }: SpinnerContentProps) {
+/** @deprecated Use `SpinnerProps` instead. */
+export type SpinnerContentProps = SpinnerProps;
+
+export function Spinner({ size, show, children, className }: SpinnerProps) {
   return (
     <span className={spinnerVariants({ show })} role="status" aria-live="polite">
       <Loader2 aria-hidden="true" className={cn(loaderVariants({ size }), className)} />

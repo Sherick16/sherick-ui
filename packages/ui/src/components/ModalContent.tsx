@@ -1,22 +1,18 @@
 "use client";
 
-import { Dialog as BaseDialog } from "@base-ui/react/dialog";
-import React, { type ReactNode } from "react";
+import React, { type HTMLAttributes } from "react";
 import { cn } from "@/libs/utils";
 import { text } from "./ui.common";
 
-export interface ModalContentProps {
-  children: ReactNode;
-  className?: string;
-}
+export type ModalContentProps = HTMLAttributes<HTMLDivElement>;
 
-export const ModalContent = ({ children, className }: ModalContentProps) => {
+export const ModalContent = ({ children, className, ...props }: ModalContentProps) => {
   return (
-    <BaseDialog.Description
-      render={<div />}
+    <div
       className={cn("px-6 pt-2 pb-5 text-sm leading-7 sm:px-7", text.medium, className)}
+      {...props}
     >
       {children}
-    </BaseDialog.Description>
+    </div>
   );
 };
