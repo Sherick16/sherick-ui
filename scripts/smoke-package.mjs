@@ -19,10 +19,12 @@ const packageJson = JSON.parse(
 for (const exportName of [
   "ActionButton",
   "Avatar",
+  "Dialog",
   "Dropdown",
   "Input",
   "Modal",
   "Search",
+  "Select",
   "Switch",
   "TabGroup",
   "Tooltip",
@@ -34,6 +36,7 @@ assert.ok(!esm.includes("next/image"), "bundle must not depend on next/image");
 assert.ok(!esm.includes("next/link"), "bundle must not depend on next/link");
 assert.ok(!esm.includes("@/"), "bundle must not contain unresolved source aliases");
 assert.ok(declarations.includes("ActionButtonProps"), "declarations should expose public component props");
+assert.ok(declarations.includes("SelectProps"), "declarations should expose Select props");
 
 assert.equal(packageJson.exports["./theme.css"], "./theme.css", "theme stylesheet must be exported");
 assert.ok(packageJson.files.includes("theme.css"), "theme stylesheet must be published");
@@ -211,7 +214,7 @@ assert.match(buttonMarkup, /aria-busy="true"/);
 const inputMarkup = renderToStaticMarkup(
   React.createElement(library.Input, { label: "Email", required: true, name: "email" })
 );
-assert.match(inputMarkup, /<label for=/);
+assert.match(inputMarkup, /<label[^>]*\sfor=/);
 assert.match(inputMarkup, /required=""/);
 assert.match(inputMarkup, /name="email"/);
 
