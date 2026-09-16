@@ -123,7 +123,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
             side="bottom"
             align="start"
             sideOffset={8}
-            className="z-30"
+            className={cn("z-30")}
           >
             <BaseSelect.Popup
               className={({ open }) =>
