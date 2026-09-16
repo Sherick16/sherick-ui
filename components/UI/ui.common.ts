@@ -221,8 +221,11 @@ export const stateLayer = {
      rather than the track itself. A segmented track is recessed for the same static
      reason but does not compose this layer. */
   track: `${stateLayerBase} before:rounded-[inherit] before:bg-current group-hover:before:opacity-[0.18] group-active:before:opacity-[0.26] group-active:before:duration-press group-active:before:ease-press`,
-  /* A menu row highlighted by keyboard navigation rather than a pointer. */
-  activeRow: "data-[active=true]:before:opacity-[0.06]",
+  /* A row highlighted by keyboard navigation. Legacy Sherick rows expose `data-active`;
+     Base UI collection primitives expose `data-highlighted`, and both consume this one
+     canonical visual treatment. */
+  activeRow:
+    "data-[active=true]:before:opacity-[0.06] data-[highlighted]:before:opacity-[0.06]",
 } as const;
 
 /* Material — fill only. No material carries elevation or a rim: the same matte
@@ -284,13 +287,10 @@ export const density = {
 } as const;
 
 /* Floating overlay shells.
-   These recipes only exist while an overlay is open, so no closed-state render can
-   reach them: they live here, once, and every overlay composes them. Each entry is the
-   surface of one overlay — its corner role, its material, its elevation and the
-   geometry its entrance grows from — while the entrance/exit selection and the pointer
-   and focus suppression stay in the component, because only the component knows whether
-   it is opening or closing. `motion.overlayIn`/`overlayOut` are the family every entry
-   animates with. */
+   Base UI owns popup presence, focus, dismissal, portals and anchored positioning.
+   Sherick UI owns only the visual shell: material, elevation, shape and the geometry
+   that its shared overlay motion grows from. A Base-backed overlay composes one recipe
+   here and selects `motion.overlayIn` / `motion.overlayOut` from Base's open state. */
 export const overlay = {
   /* A menu grows out of its trigger. */
   menu: `origin-top [--sui-overlay-from-scale:0.985] [--sui-overlay-from-lift:-4px] ${shape.surface} ${material.acrylic} ${elevation.floating}`,
