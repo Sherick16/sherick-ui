@@ -22,6 +22,9 @@ const externalPackages = [
 const external = (id) =>
   externalPackages.some((dependency) => id === dependency || id.startsWith(`${dependency}/`));
 
+const hasModuleSideEffects = (id) =>
+  id.startsWith('prismjs/components/') || id.includes('/prismjs/components/');
+
 const config = [
   {
     input: 'app/index.ts',
@@ -67,7 +70,9 @@ const config = [
     ],
     external,
     treeshake: {
-      moduleSideEffects: false,
+      // Prism language modules register themselves by side effect. The previous blanket
+      // `false` allowed Rollup to erase those empty external imports from the package.
+      moduleSideEffects: hasModuleSideEffects,
       propertyReadSideEffects: false,
       tryCatchDeoptimization: false,
     },
