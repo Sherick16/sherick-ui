@@ -7,22 +7,22 @@
 }
 
 html {
-  background: oklch(var(--sui-canvas, 0.205 0.012 260));
+  background: oklch(var(--sui-canvas));
 }
 
 body {
   min-height: 100dvh;
   margin: 0;
-  color: oklch(var(--sui-ink, 0.94 0.008 255));
+  color: oklch(var(--sui-ink));
   background:
-    radial-gradient(circle at 12% 4%, oklch(var(--sui-primary, 0.72 0.15 255) / 0.055), transparent 34rem),
-    radial-gradient(circle at 92% 18%, oklch(var(--sui-accent, 0.80 0.08 215) / 0.035), transparent 30rem),
-    oklch(var(--sui-canvas, 0.205 0.012 260));
+    radial-gradient(circle at 12% 4%, oklch(var(--sui-primary) / 0.055), transparent 34rem),
+    radial-gradient(circle at 92% 18%, oklch(var(--sui-accent) / 0.035), transparent 30rem),
+    oklch(var(--sui-canvas));
 }
 
 ::selection {
-  color: oklch(var(--sui-on-primary, 0.98 0.005 255));
-  background: oklch(var(--sui-primary, 0.72 0.15 255) / 0.34);
+  color: oklch(var(--sui-on-primary));
+  background: oklch(var(--sui-primary) / 0.34);
 }
 
 @layer utilities {
