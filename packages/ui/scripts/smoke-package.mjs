@@ -167,6 +167,27 @@ stylesRoot.walkRules((rule) => {
   );
 });
 
+for (const criticalUtility of [
+  "shadow-sherick-raised",
+  "shadow-sherick-floating",
+  "shadow-sherick-control",
+  "shadow-sherick-recessed",
+  "border-sherick-edge",
+]) {
+  const rules = [];
+  stylesRoot.walkRules((rule) => {
+    if (rule.selector.includes(criticalUtility)) rules.push(rule);
+  });
+  assert.ok(rules.length > 0, `published CSS is missing critical visual utility: ${criticalUtility}`);
+  for (const rule of rules) {
+    assert.equal(
+      layerFor(rule),
+      null,
+      `${criticalUtility} must remain unlayered so host CSS cannot erase its visual role`
+    );
+  }
+}
+
 for (const forbidden of [
   /(^|})\s*\*\s*\{/,
   /(^|})\s*button\s*\{/,
