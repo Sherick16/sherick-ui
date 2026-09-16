@@ -4,7 +4,7 @@ const runtimeErrors = (page: Page) => {
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(`pageerror: ${error.message}`));
   page.on("console", (message) => {
-    if (message.type() === "error") errors.push(`console: ${message.text()}`);
+    if (message.type() === "error") errors.push(`console: ${message.text()}`));
   });
   return errors;
 };
@@ -50,6 +50,40 @@ test("package CSS styles Sherick components but does not leak generic utilities"
   expect(buttonStyle.display).toBe("inline-flex");
   expect(parseFloat(buttonStyle.borderRadius)).toBeGreaterThan(0);
   expect(parseFloat(buttonStyle.minHeight)).toBeGreaterThanOrEqual(48);
+  expect(errors).toEqual([]);
+});
+
+test("shadow, ring and backdrop plumbing works without Tailwind preflight", async ({ page }) => {
+  const errors = runtimeErrors(page);
+
+  const switchControl = page.getByRole("switch", { name: "Enabled" });
+  const switchTrack = switchControl.locator(".shadow-sherick-recessed").first();
+  const switchThumb = switchControl.locator(".shadow-sherick-control").first();
+
+  const [trackShadow, thumbShadow] = await Promise.all([
+    switchTrack.evaluate((element) => getComputedStyle(element).boxShadow),
+    switchThumb.evaluate((element) => getComputedStyle(element).boxShadow),
+  ]);
+
+  expect(trackShadow).not.toBe("none");
+  expect(trackShadow).toContain("inset");
+  expect(thumbShadow).not.toBe("none");
+
+  await page.getByRole("button", { name: "Open dialog" }).click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  const dialogVisuals = await dialog.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      boxShadow: style.boxShadow,
+      backdropFilter: style.backdropFilter,
+    };
+  });
+
+  expect(dialogVisuals.boxShadow).not.toBe("none");
+  expect(dialogVisuals.backdropFilter).not.toBe("none");
+  expect(dialogVisuals.backdropFilter).toContain("blur");
+
   expect(errors).toEqual([]);
 });
 
