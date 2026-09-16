@@ -25,7 +25,7 @@ const Tooltip = ({ children, content, className, position = "bottom" }: TooltipP
         <BaseTooltip.Trigger render={children} delay={0} closeDelay={0} />
       </span>
       <BaseTooltip.Portal>
-        <BaseTooltip.Positioner side={position} sideOffset={8} className="z-40">
+        <BaseTooltip.Positioner side={position} sideOffset={8} className={cn("z-40")}>
           <BaseTooltip.Popup
             className={({ open, side }) =>
               cn(
