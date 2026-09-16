@@ -46,7 +46,7 @@ const Avatar = ({
       <BaseAvatar.Image
         keepMounted
         src={src}
-        alt=""
+        alt={alt}
         width={dimensions.element}
         height={dimensions.element}
         loading="lazy"
