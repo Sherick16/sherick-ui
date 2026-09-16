@@ -1,3 +1,5 @@
+export { default as Button } from "./Button";
+/** @deprecated Use `Button` instead. */
 export { default as ActionButton } from "./ActionButton";
 export { Alert } from "./Alert";
 export { default as Avatar } from "./Avatar";
@@ -23,7 +25,9 @@ export { Table } from "./Table";
 export { default as Textarea } from "./Textarea";
 export { default as Tooltip } from "./Tooltip";
 
-export type { ActionButtonProps, ButtonAppearance, ButtonSize } from "./ActionButton";
+export type { ButtonProps, ButtonAppearance, ButtonSize } from "./Button";
+/** @deprecated Use `ButtonProps` instead. */
+export type { ActionButtonProps } from "./ActionButton";
 export type { AvatarProps } from "./Avatar";
 export type { BadgeProps } from "./Badge";
 export type { CardProps } from "./Card";
