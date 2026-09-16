@@ -49,6 +49,36 @@ Extend the canonical language first:
 Never implement the rule in the component that needs it. A local rule cannot be reused by
 the next component, retinted by the next theme, or caught by verification.
 
+## Behavioral foundation (mandatory)
+
+Base UI (`@base-ui/react`) is Sherick UI's behavioral and accessibility substrate. Sherick
+UI owns the visual language, component anatomy and its opinionated public API; Base UI owns
+generic interaction mechanics wherever it provides the primitive.
+
+Use Base UI directly from its public subpath (`@base-ui/react/dialog`,
+`@base-ui/react/select`, etc.). Do not build a second internal wrapper layer around Base
+UI before the Sherick component.
+
+When Base UI provides the behavior, do **not** implement these locally:
+
+- keyboard navigation or roving tab index
+- focus trapping, initial focus or focus restoration
+- popup portals, anchoring, collision handling or viewport positioning
+- outside-interaction detection or Escape-key dismissal
+- ARIA role/relationship plumbing or generated accessibility IDs
+- hidden form inputs or form participation for composite controls
+- controlled/uncontrolled primitive state helpers
+- popup mount/unmount lifecycle or animation-completion timers
+
+A component may still own product-neutral convenience behavior that Base UI does not model
+(for example copying code to the clipboard), but generic widget behavior belongs to Base
+UI. If Base UI lacks a required behavior, document the gap before adding local
+infrastructure.
+
+Native HTML remains the right foundation for passive semantics that need no headless
+primitive: cards, badges, tables, navigation links and similar content should not be
+forced through Base UI just for consistency.
+
 ### The showcase
 
 The development showcase (`app/page.tsx`) demonstrates the system and never explains it.
