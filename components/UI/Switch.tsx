@@ -15,10 +15,13 @@ import {
 import { Variant } from "./ui.types";
 
 export interface SwitchProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onChange"> {
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onChange" | "value"> {
   checked?: boolean;
   onChange?: (checked: boolean) => void;
   variant?: Variant;
+  value?: string;
+  readOnly?: boolean;
+  required?: boolean;
 }
 
 export const Switch = ({
@@ -27,16 +30,25 @@ export const Switch = ({
   variant = "primary",
   className,
   disabled,
+  name,
+  form,
+  value,
+  readOnly,
+  required,
   type: _type,
-  ...props
+  ...buttonProps
 }: SwitchProps) => {
   return (
     <BaseSwitch.Root
-      {...props}
       nativeButton
-      render={<button type="button" />}
+      render={<button {...buttonProps} type="button" />}
       checked={checked}
       disabled={disabled}
+      name={name}
+      form={form}
+      value={value}
+      readOnly={readOnly}
+      required={required}
       onCheckedChange={(nextChecked) => onChange?.(nextChecked)}
       className={cn(
         "group inline-flex min-h-12 min-w-14 items-center justify-center rounded-full outline-none",
