@@ -17,9 +17,10 @@
  hover, pressed, selected, disabled and focus without a browser, which keeps the gate
  deterministic across machines and free of pixel anti-aliasing flake.
 
- `Modal` is the one public component that cannot be server-rendered (it portals into
- `document.body`); its shell is covered by the browser pass in the PR that introduced
- this gate, and its `Header`/`Content`/`Footer` parts are covered here.
+ `Modal` portals its open shell in the browser, so this deterministic pass snapshots its
+ Header/Content/Footer parts inside the Base Dialog root context they require. The actual
+ portal, focus and popup lifecycle remain browser concerns rather than being simulated by
+ this source-level gate.
 
  The open overlay recipes (menu, tooltip, dialog) only exist while an overlay is open,
  so no closed-state render can reach them and a portal cannot be server-rendered. They
@@ -33,6 +34,7 @@
    bun scripts/visual-regression.mjs --preview   also write .visual/preview.html
 */
 
+import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -79,6 +81,7 @@ const preview = process.argv.includes("--preview");
 
 const h = React.createElement;
 const noop = () => undefined;
+const inDialogContext = (child) => h(BaseDialog.Root, { open: true }, child);
 
 /* One specimen per visual decision a component makes. Variants and sizes stand in for
    the API surface; states are carried by the recipes themselves. */
@@ -119,9 +122,9 @@ const specimens = {
   "input.error": h(Input, { label: "Invalid", error: true, placeholder: "Required value" }),
   "input.disabled": h(Input, { label: "Disabled", disabled: true, placeholder: "Unavailable" }),
   "markdown.document": h(Markdown, {}, "## Example\n\nBody copy with `inline` code.\n\n> A quote.\n\n```ts\nconst a = 1;\n```\n"),
-  "modal.header": h(ModalHeader, {}, "Modal specimen"),
-  "modal.content": h(ModalContent, {}, "Focused, translucent and separated from the page beneath it."),
-  "modal.footer": h(ModalFooter, {}, h(ActionButton, { appearance: "filled" }, "Confirm")),
+  "modal.header": inDialogContext(h(ModalHeader, {}, "Modal specimen")),
+  "modal.content": inDialogContext(h(ModalContent, {}, "Focused, translucent and separated from the page beneath it.")),
+  "modal.footer": inDialogContext(h(ModalFooter, {}, h(ActionButton, { appearance: "filled" }, "Confirm"))),
   "nav-group": h(NavGroup, { title: "Components", activeHref: "#fields", items: [{ label: "Buttons", href: "#buttons" }, { label: "Fields", href: "#fields" }] }),
   "search.default": h(Search, { onSearch: noop, placeholder: "Search components" }),
   "search.loading": h(Search, { onSearch: noop, loading: true }),
