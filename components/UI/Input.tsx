@@ -1,6 +1,8 @@
 "use client";
 
-import React, { forwardRef, useId, type InputHTMLAttributes } from "react";
+import { Field } from "@base-ui/react/field";
+import { Input as BaseInput } from "@base-ui/react/input";
+import React, { forwardRef, type InputHTMLAttributes } from "react";
 import { cn } from "@/libs/utils";
 import {
   density,
@@ -19,9 +21,6 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   onChange?: (value: string) => void;
 }
 
-/* A field is flat matte and borderless: it rests on its surface-high fill and steps
-   that fill up on hover and focus. No ring, no lift — a border that appears on focus
-   is still a border, and the keyboard ring belongs outside the shape. */
 const Input = forwardRef<HTMLInputElement, InputProps>(
   ({
     label,
@@ -30,31 +29,34 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     required,
     error = false,
     id,
+    name,
     disabled,
     onChange,
     ...props
   }, ref) => {
-    const generatedId = useId();
-    const inputId = id ?? generatedId;
-
     return (
-      <div className={cn("flex flex-col", className)}>
+      <Field.Root
+        className={cn("flex flex-col", className)}
+        name={name}
+        disabled={disabled}
+        invalid={error}
+      >
         {label && (
-          <label htmlFor={inputId} className={cn("mb-2 text-sm font-medium", text.high)}>
+          <Field.Label className={cn("mb-2 text-sm font-medium", text.high)}>
             {label}
             {required && <span className="ml-1 text-sherick-danger" aria-hidden="true">*</span>}
-          </label>
+          </Field.Label>
         )}
-        <input
-          ref={ref}
-          id={inputId}
+        <BaseInput
+          {...props}
+          render={<input ref={ref} />}
+          id={id}
+          name={name}
           required={required}
           disabled={disabled}
-          aria-invalid={error || undefined}
+          onValueChange={(value) => onChange?.(value)}
           className={cn(
             density.normal,
-            /* Density owns the type step and the control floor; the anatomy sets the
-               padding a field holds its text in. */
             "min-w-64 px-5 py-3",
             shape.control,
             motion.press,
@@ -65,10 +67,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             disabled ? state.disabled : state.text,
             inputClassName
           )}
-          onChange={(event) => onChange?.(event.target.value)}
-          {...props}
         />
-      </div>
+      </Field.Root>
     );
   }
 );
