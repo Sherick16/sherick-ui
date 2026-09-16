@@ -64,12 +64,21 @@ scan requirement, or instructions that ask consumers to compile Sherick componen
 The supported component styling integration is:
 
 ```ts
+import "./app-or-framework.css";
 import "sherick-ui/styles.css";
 ```
 
+Host/framework/reset/Tailwind CSS loads first; Sherick UI loads second. A dedicated app
+override stylesheet may load after Sherick when selector-level overrides are required.
+Do not reverse the host/Sherick order casually: a host Tailwind build can independently
+emit a generic class such as `.px-6`; if that copy loads after Sherick it can override a
+responsive internal utility such as `.sm:px-7` on the same component and silently change
+layout. `className` Tailwind overrides remain supported because `cn()`/tailwind-merge
+removes the conflicting internal class from the rendered element.
+
 `styles.css` must remain self-contained, scoped and reset-free.
 
-### Private style scope
+### Private style scope and cascade
 
 The shared `cn()` helper adds the internal `.sui-scope` marker used by generated CSS to
 prevent generic authoring utilities from leaking into consumer applications.
@@ -81,7 +90,15 @@ Rules:
   that root, although `cn()` is preferred when composing recipes;
 - every independently portaled styled subtree must establish its own scope through `cn()`;
 - never ask consumers to add or target `.sui-scope`; it is private implementation detail;
-- do not create global utility selectors, resets/preflight, or package `!important` rules.
+- do not create global utility selectors, resets/preflight, or package `!important` rules;
+- theme defaults may live in the low-priority `sherick-ui-theme` cascade layer;
+- component, motion, accessibility and rich-content rules must remain **unlayered but
+  scoped**. Do not wrap them in a named cascade layer: ordinary unlayered host rules would
+  outrank them before specificity is considered and can erase backgrounds, border alpha,
+  elevation shadows and Tailwind state variables;
+- because Sherick does not ship Tailwind preflight, `build-styles.ts` owns the scoped
+  initialization of Tailwind runtime plumbing variables required by shadows, rings,
+  transforms and filters. Do not rely on a consumer Tailwind installation to provide them.
 
 Base-backed portal primitives such as Dialog, Select and Tooltip are the reference pattern
 for independent portal scope ownership.
