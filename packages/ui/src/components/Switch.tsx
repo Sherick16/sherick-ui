@@ -35,7 +35,6 @@ export const Switch = ({
   value,
   readOnly,
   required,
-  type: _type,
   ...buttonProps
 }: SwitchProps) => {
   return (

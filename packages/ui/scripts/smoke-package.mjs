@@ -8,9 +8,9 @@ import React from "react";
 import tailwindcss from "tailwindcss";
 import sherickPreset from "../tailwind.preset.cjs";
 
-const library = await import("../dist/index.esm.js");
-const esm = await readFile(new URL("../dist/index.esm.js", import.meta.url), "utf8");
-const declarations = await readFile(new URL("../dist/index.d.ts", import.meta.url), "utf8");
+const library = await import("../dist/esm/index.js");
+const esm = await readFile(new URL("../dist/esm/index.js", import.meta.url), "utf8");
+const declarations = await readFile(new URL("../dist/types/index.d.ts", import.meta.url), "utf8");
 const themeCss = await readFile(new URL("../theme.css", import.meta.url), "utf8");
 const packageJson = JSON.parse(
   await readFile(new URL("../package.json", import.meta.url), "utf8")
@@ -37,6 +37,12 @@ assert.ok(!esm.includes("next/link"), "bundle must not depend on next/link");
 assert.ok(!esm.includes("@/"), "bundle must not contain unresolved source aliases");
 assert.ok(declarations.includes("ActionButtonProps"), "declarations should expose public component props");
 assert.ok(declarations.includes("SelectProps"), "declarations should expose Select props");
+
+const buttonModule = await readFile(new URL("../dist/esm/components/Button.js", import.meta.url), "utf8");
+const cardModule = await readFile(new URL("../dist/esm/components/Card.js", import.meta.url), "utf8");
+assert.match(buttonModule, /^\s*["']use client["'];/, "interactive modules must preserve their client boundary");
+assert.doesNotMatch(cardModule, /^\s*["']use client["'];/, "passive modules must not become client-only");
+assert.doesNotMatch(esm, /^\s*["']use client["'];/, "the package barrel must not blanket the whole package as client-only");
 
 assert.equal(packageJson.exports["./theme.css"], "./theme.css", "theme stylesheet must be exported");
 assert.ok(packageJson.files.includes("theme.css"), "theme stylesheet must be published");
@@ -297,8 +303,7 @@ async function scanDirectory(directory, { enforceThemeTokens = false } = {}) {
   }
 }
 
-await scanDirectory(join(sourceRoot, "app"));
-await scanDirectory(join(sourceRoot, "components", "UI"), { enforceThemeTokens: true });
+await scanDirectory(join(sourceRoot, "src", "components"), { enforceThemeTokens: true });
 assert.deepEqual(
   invalidOpacityModifiers,
   [],

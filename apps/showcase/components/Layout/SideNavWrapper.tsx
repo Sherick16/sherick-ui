@@ -1,10 +1,9 @@
 'use client';
 import { useState } from "react";
-import { cn } from "@/libs/utils";
+import { cn } from "sherick-ui/dev";
 import { PanelRightClose } from "lucide-react";
 import SideNav from "./SideNav";
-import Tooltip from "../UI/Tooltip";
-import IconButton from "../UI/IconButton";
+import { IconButton, Tooltip } from "sherick-ui";
 
 const SideNavWrapper = ({
   className,

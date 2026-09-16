@@ -71,6 +71,10 @@ import {
   Select,
 } from "sherick-ui";
 
+const dev = await import("sherick-ui/dev");
+assert.equal(typeof dev.cn, "function");
+assert.ok(dev.material, "dev recipe export should resolve");
+
 assert.equal(typeof Button, "object");
 assert.equal(ActionButton, Button, "ActionButton should remain a compatibility alias for Button");
 assert.equal(typeof Dialog, "function");
@@ -181,9 +185,9 @@ export const fixture = (
   const installedPackage = JSON.parse(
     await readFile(join(consumerDir, "node_modules", "sherick-ui", "package.json"), "utf8")
   );
-  assert.equal(installedPackage.main, "dist/index.cjs");
-  assert.equal(installedPackage.exports["."].require, "./dist/index.cjs");
-  await access(join(consumerDir, "node_modules", "sherick-ui", "dist", "index.cjs"));
+  assert.equal(installedPackage.main, "dist/cjs/index.cjs");
+  assert.equal(installedPackage.exports["."].require, "./dist/cjs/index.cjs");
+  await access(join(consumerDir, "node_modules", "sherick-ui", "dist", "cjs", "index.cjs"));
 
   console.log(`Packed package verification passed: ${packed[0].filename}`);
 } finally {

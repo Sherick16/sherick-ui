@@ -13,28 +13,31 @@ import {
   Sun,
   Trash2,
 } from "lucide-react";
-import ActionButton from "@/components/UI/ActionButton";
-import Dropdown from "@/components/UI/Dropdown";
-import Search from "@/components/UI/Search";
-import Input from "@/components/UI/Input";
-import Avatar from "@/components/UI/Avatar";
-import Textarea from "@/components/UI/Textarea";
-import Tooltip from "@/components/UI/Tooltip";
-import Modal from "@/components/UI/Modal";
-import Badge from "@/components/UI/Badge";
-import IconButton from "@/components/UI/IconButton";
-import CodeBlock from "@/components/UI/CodeBlock";
-import Divider from "@/components/UI/Divider";
-import Markdown from "@/components/UI/Markdown";
-import NavGroup from "@/components/UI/NavGroup";
-import { Spinner } from "@/components/UI/Spinner";
-import { Alert } from "@/components/UI/Alert";
-import { Card } from "@/components/UI/Card";
-import { Skeleton } from "@/components/UI/Skeleton";
-import { Switch } from "@/components/UI/Switch";
-import { TabGroup } from "@/components/UI/TabGroup";
-import { Table } from "@/components/UI/Table";
 import {
+  Button,
+  Alert,
+  Avatar,
+  Badge,
+  Card,
+  CodeBlock,
+  Divider,
+  Dropdown,
+  IconButton,
+  Input,
+  Markdown,
+  Modal,
+  NavGroup,
+  Search,
+  Skeleton,
+  Spinner,
+  Switch,
+  TabGroup,
+  Table,
+  Textarea,
+  Tooltip,
+} from "sherick-ui";
+import {
+  cn,
   density,
   edge,
   elevation,
@@ -46,8 +49,7 @@ import {
   stateLayer,
   text,
   tone,
-} from "@/components/UI/ui.common";
-import { cn } from "@/libs/utils";
+} from "sherick-ui/dev";
 
 const selectOptions = [
   { label: "Design system", value: "design" },
@@ -222,9 +224,9 @@ export default function Home() {
 
               <Specimen title="Density">
                 <div className="flex flex-wrap items-center gap-4">
-                  <ActionButton appearance="tonal" variant="secondary" size="sm">Compact</ActionButton>
-                  <ActionButton appearance="tonal" variant="secondary" size="md">Normal</ActionButton>
-                  <ActionButton appearance="tonal" variant="secondary" size="lg">Prominent</ActionButton>
+                  <Button appearance="tonal" variant="secondary" size="sm">Compact</Button>
+                  <Button appearance="tonal" variant="secondary" size="md">Normal</Button>
+                  <Button appearance="tonal" variant="secondary" size="lg">Prominent</Button>
                 </div>
                 <div className="mt-5 flex items-center gap-3">
                   <span className={cn("text-xs font-medium", text.high)}>Target</span>
@@ -257,27 +259,27 @@ export default function Home() {
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
               <Specimen title="Appearances">
                 <div className="flex flex-wrap items-center gap-3">
-                  <ActionButton appearance="filled">Filled</ActionButton>
-                  <ActionButton appearance="tonal" variant="secondary">Tonal</ActionButton>
-                  <ActionButton appearance="text" variant="secondary">Text</ActionButton>
-                  <ActionButton appearance="tonal" variant="danger" icon={<Trash2 />}>Delete</ActionButton>
+                  <Button appearance="filled">Filled</Button>
+                  <Button appearance="tonal" variant="secondary">Tonal</Button>
+                  <Button appearance="text" variant="secondary">Text</Button>
+                  <Button appearance="tonal" variant="danger" icon={<Trash2 />}>Delete</Button>
                   <IconButton appearance="tonal" variant="secondary" icon={<Bell />} aria-label="Tonal icon button" />
                 </div>
               </Specimen>
 
               <Specimen title="States">
                 <div className="flex flex-wrap items-center gap-3">
-                  <ActionButton loading>Saving</ActionButton>
-                  <ActionButton disabled>Disabled</ActionButton>
-                  <ActionButton className="outline outline-2 outline-sherick-focus outline-offset-[3px]">Focus-visible</ActionButton>
+                  <Button loading>Saving</Button>
+                  <Button disabled>Disabled</Button>
+                  <Button className="outline outline-2 outline-sherick-focus outline-offset-[3px]">Focus-visible</Button>
                 </div>
               </Specimen>
 
               <Specimen title="Sizes">
                 <div className="flex flex-wrap items-center gap-3">
-                  <ActionButton appearance="filled" size="sm">Small</ActionButton>
-                  <ActionButton appearance="filled" size="md">Medium</ActionButton>
-                  <ActionButton appearance="filled" size="lg">Large</ActionButton>
+                  <Button appearance="filled" size="sm">Small</Button>
+                  <Button appearance="filled" size="md">Medium</Button>
+                  <Button appearance="filled" size="lg">Large</Button>
                 </div>
               </Specimen>
 
@@ -400,12 +402,12 @@ export default function Home() {
                 <div className="flex items-center gap-5">
                   <Avatar src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg" alt="Example avatar" size="sm" />
                   <Avatar src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg" alt="Example rounded avatar" size="md" shape="rounded" />
-                  <Tooltip content="Acrylic tooltip"><ActionButton appearance="tonal" variant="secondary">Hover or focus</ActionButton></Tooltip>
+                  <Tooltip content="Acrylic tooltip"><Button appearance="tonal" variant="secondary">Hover or focus</Button></Tooltip>
                 </div>
               </Specimen>
 
               <Specimen title="Modal">
-                <ActionButton appearance="tonal" variant="secondary" onClick={() => setModalOpen(true)}>Open modal</ActionButton>
+                <Button appearance="tonal" variant="secondary" onClick={() => setModalOpen(true)}>Open modal</Button>
               </Specimen>
             </div>
           </section>
@@ -426,10 +428,10 @@ export default function Home() {
             <SectionHeading title="Content" />
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
               <Specimen title="Code block">
-                <CodeBlock language="tsx">{'<ActionButton appearance="filled">Save</ActionButton>'}</CodeBlock>
+                <CodeBlock language="tsx">{'<Button appearance="filled">Save</Button>'}</CodeBlock>
               </Specimen>
               <Specimen title="Markdown">
-                <Markdown>{`## Example\nSherick UI keeps **dense information quiet** and gives floating UI more depth.\n\n- Predictable controls\n- Soft hierarchy\n- [Accessible interactions](#)\n\n> Expression should clarify hierarchy, not decorate every surface.\n\nUse \`ActionButton\` for primary actions, and reach for a fenced block when the code carries its own hierarchy:\n\n\`\`\`ts\nconst surface = material.matte;\nconst action = shape.pill;\n\`\`\``}</Markdown>
+                <Markdown>{`## Example\nSherick UI keeps **dense information quiet** and gives floating UI more depth.\n\n- Predictable controls\n- Soft hierarchy\n- [Accessible interactions](#)\n\n> Expression should clarify hierarchy, not decorate every surface.\n\nUse \`Button\` for primary actions, and reach for a fenced block when the code carries its own hierarchy:\n\n\`\`\`ts\nconst surface = material.matte;\nconst action = shape.pill;\n\`\`\``}</Markdown>
               </Specimen>
             </div>
           </section>
@@ -442,8 +444,8 @@ export default function Home() {
           Overlay specimen content.
         </Modal.Content>
         <Modal.Footer>
-          <ActionButton appearance="text" variant="secondary" onClick={() => setModalOpen(false)}>Cancel</ActionButton>
-          <ActionButton appearance="filled" onClick={() => setModalOpen(false)}>Confirm</ActionButton>
+          <Button appearance="text" variant="secondary" onClick={() => setModalOpen(false)}>Cancel</Button>
+          <Button appearance="filled" onClick={() => setModalOpen(false)}>Confirm</Button>
         </Modal.Footer>
       </Modal>
     </main>

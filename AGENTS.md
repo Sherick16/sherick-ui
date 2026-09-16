@@ -5,7 +5,7 @@
 Before any work that creates, changes or reviews reusable UI — a component, a variant, a
 state, or any class that ships — read [`docs/DESIGN_LANGUAGE.md`](docs/DESIGN_LANGUAGE.md)
 in full. It is the canonical source of truth for Sherick UI's visual language;
-`components/UI/ui.common.ts` (recipes) and `theme.css` (tokens) implement it.
+`packages/ui/src/components/ui.common.ts` (recipes) and `packages/ui/theme.css` (tokens) implement it.
 
 ### Never invent a system-level visual rule locally
 
@@ -43,7 +43,7 @@ Extend the canonical language first:
 
 1. add the rule to `docs/DESIGN_LANGUAGE.md` with its role and its when-to-use /
    when-not-to-use examples;
-2. add the primitive to `components/UI/ui.common.ts` and its tokens to `theme.css`;
+2. add the primitive to `packages/ui/src/components/ui.common.ts` and its tokens to `packages/ui/theme.css`;
 3. then consume the primitive in the component.
 
 Never implement the rule in the component that needs it. A local rule cannot be reused by
@@ -81,6 +81,6 @@ forced through Base UI just for consistency.
 
 ### The showcase
 
-The development showcase (`app/page.tsx`) demonstrates the system and never explains it.
+The development showcase (`apps/showcase/app/page.tsx`) demonstrates the system and never explains it.
 It holds specimens, labels and interactive states only; every piece of information appears
 once, and design rationale belongs in `docs/DESIGN_LANGUAGE.md`.

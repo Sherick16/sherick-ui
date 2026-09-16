@@ -1,20 +1,23 @@
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
-/node_modules
-/.pnp
-.pnp.js
-.yarn/install-state.gz
+**/node_modules/
+**/.pnp
+**/.pnp.js
+**/.yarn/install-state.gz
 
 # testing
-/coverage
+**/coverage/
+**/test-results/
+**/playwright-report/
 
 # next.js
-/.next/
-/out/
+**/.next/
+**/out/
 
 # production
-/build
+**/build/
+**/dist/
 
 # misc
 .DS_Store
@@ -29,16 +32,15 @@ yarn-error.log*
 .env*.local
 
 # vercel
-.vercel
+**/.vercel/
 
 # typescript
 *.tsbuildinfo
-next-env.d.ts
+**/next-env.d.ts
 
 # rollup
-dist
-.rollup.cache
-bundle-analysis.html
+**/.rollup.cache/
+**/bundle-analysis.html
 
 # Visual regression preview output (scripts/visual-regression.mjs --preview)
-/.visual/
+**/.visual/
