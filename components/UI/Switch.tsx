@@ -1,5 +1,6 @@
 "use client";
 
+import { Switch as BaseSwitch } from "@base-ui/react/switch";
 import React, { type ButtonHTMLAttributes } from "react";
 import { cn } from "@/libs/utils";
 import {
@@ -26,28 +27,26 @@ export const Switch = ({
   variant = "primary",
   className,
   disabled,
+  type: _type,
   ...props
 }: SwitchProps) => {
   return (
-    <button
-      type="button"
-      role="switch"
-      aria-checked={checked}
+    <BaseSwitch.Root
+      {...props}
+      nativeButton
+      render={<button type="button" />}
+      checked={checked}
       disabled={disabled}
-      onClick={() => onChange?.(!checked)}
+      onCheckedChange={(nextChecked) => onChange?.(nextChecked)}
       className={cn(
         "group inline-flex min-h-12 min-w-14 items-center justify-center rounded-full outline-none",
         disabled ? state.disabled : state.enabled,
         className
       )}
-      {...props}
     >
       <span
         aria-hidden="true"
         className={cn(
-          /* The track is a groove in the surface it sits on, so it takes the recessed
-             step; the thumb is a matte control resting above it. Same physical model as
-             the segmented control. */
           "relative block h-8 w-[3.25rem] shrink-0",
           shape.pill,
           elevation.recessed,
@@ -58,7 +57,7 @@ export const Switch = ({
           !disabled && state.groupPress
         )}
       >
-        <span
+        <BaseSwitch.Thumb
           className={cn(
             "absolute left-1 top-1/2 -translate-y-1/2 bg-current",
             shape.circle,
@@ -70,6 +69,6 @@ export const Switch = ({
           )}
         />
       </span>
-    </button>
+    </BaseSwitch.Root>
   );
 };
