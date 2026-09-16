@@ -75,9 +75,7 @@ export const Switch = ({
             shape.circle,
             elevation.control,
             motion.release,
-            checked
-              ? "h-6 w-6 translate-x-5 text-sherick-on-primary"
-              : "h-5 w-5 text-sherick-ink-muted"
+            checked ? "h-6 w-6 translate-x-5" : "h-5 w-5 text-sherick-ink-muted"
           )}
         />
       </span>
