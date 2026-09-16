@@ -19,13 +19,20 @@ export interface Tab {
   id: string;
   label: string;
   content: ReactNode;
+  disabled?: boolean;
 }
 
 export interface TabGroupProps {
   tabs: Tab[];
   variant?: Variant;
   className?: string;
+  value?: string;
+  defaultValue?: string;
+  onValueChange?: (tabId: string) => void;
+  ariaLabel?: string;
+  /** @deprecated Use `defaultValue` instead. */
   defaultTabId?: string;
+  /** @deprecated Use `onValueChange` instead. */
   onTabChange?: (tabId: string) => void;
 }
 
@@ -33,20 +40,31 @@ export const TabGroup = ({
   tabs,
   variant = "primary",
   className,
+  value,
+  defaultValue,
+  onValueChange,
+  ariaLabel = "Tabs",
   defaultTabId,
   onTabChange,
 }: TabGroupProps) => {
   if (tabs.length === 0) return null;
 
+  const fallbackValue = tabs.find((tab) => !tab.disabled)?.id ?? tabs[0].id;
+  const uncontrolledDefault = defaultValue ?? defaultTabId ?? fallbackValue;
+
   return (
     <Tabs.Root
-      defaultValue={defaultTabId ?? tabs[0].id}
-      onValueChange={(value) => {
-        if (typeof value === "string") onTabChange?.(value);
+      value={value}
+      defaultValue={value === undefined ? uncontrolledDefault : undefined}
+      onValueChange={(nextValue) => {
+        if (typeof nextValue !== "string") return;
+        onValueChange?.(nextValue);
+        onTabChange?.(nextValue);
       }}
       className={cn("w-full", className)}
     >
       <Tabs.List
+        aria-label={ariaLabel}
         className={cn(
           "relative flex min-w-max bg-sherick-surface/[0.72] p-1.5",
           shape.pill,
@@ -67,16 +85,18 @@ export const TabGroup = ({
           <Tabs.Tab
             key={tab.id}
             value={tab.id}
-            className={({ active }) =>
+            disabled={tab.disabled}
+            className={({ active, disabled }) =>
               cn(
                 "relative z-10 min-h-12 min-w-28 flex-1 whitespace-nowrap px-7 py-3 text-sm font-medium",
                 shape.pill,
                 motion.release,
                 focusRing,
-                state.press,
+                !disabled && state.press,
                 active
                   ? text.high
-                  : cn(text.medium, "hover:text-sherick-ink", stateLayer.quiet)
+                  : cn(text.medium, !disabled && "hover:text-sherick-ink", !disabled && stateLayer.quiet),
+                disabled && state.disabled
               )
             }
           >

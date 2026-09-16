@@ -24,9 +24,9 @@ import {
 import { Variant } from "./ui.types";
 import { Spinner } from "./Spinner";
 
-export interface SearchProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
+export interface SearchProps extends InputHTMLAttributes<HTMLInputElement> {
   onSearch: (value: string) => void;
+  onValueChange?: (value: string) => void;
   variant?: Variant;
   loading?: boolean;
   debounceMs?: number;
@@ -36,6 +36,7 @@ export interface SearchProps
 const Search = forwardRef<HTMLInputElement, SearchProps>(
   ({
     onSearch,
+    onValueChange,
     variant = "secondary",
     className,
     inputClassName,
@@ -48,7 +49,7 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
   }, forwardedRef) => {
     const inputRef = useRef<HTMLInputElement | null>(null);
     const timerRef = useRef<TimerHandle | null>(null);
-    const isDisabled = disabled || loading;
+    const submitDisabled = disabled || loading;
 
     useEffect(() => {
       return () => {
@@ -64,7 +65,22 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
 
     const scheduleSearch = (value: string) => {
       if (timerRef.current) clearTimeout(timerRef.current);
-      timerRef.current = setTimeout(() => onSearch(value), debounceMs);
+
+      if (debounceMs <= 0) {
+        timerRef.current = null;
+        onSearch(value);
+        return;
+      }
+
+      timerRef.current = setTimeout(() => {
+        timerRef.current = null;
+        onSearch(value);
+      }, debounceMs);
+    };
+
+    const handleValueChange = (value: string) => {
+      onValueChange?.(value);
+      scheduleSearch(value);
     };
 
     const submitSearch = () => {
@@ -78,7 +94,7 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
     return (
       <Field.Root
         name={name}
-        disabled={isDisabled}
+        disabled={disabled}
         className={cn(
           "relative inline-flex min-w-64 items-center",
           density.normal,
@@ -86,9 +102,9 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
           material.control,
           motion.press,
           "focus-within:outline focus-within:outline-2 focus-within:outline-sherick-focus focus-within:outline-offset-[3px]",
-          !isDisabled && state.field.hover,
-          !isDisabled && state.field.focusWithin,
-          isDisabled && state.disabled,
+          !disabled && state.field.hover,
+          !disabled && state.field.focusWithin,
+          disabled && state.disabled,
           className
         )}
       >
@@ -96,22 +112,22 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
           {...props}
           render={<input ref={setRefs} />}
           name={name}
-          disabled={isDisabled}
+          disabled={disabled}
           aria-busy={loading || undefined}
           className={cn(
             "w-full bg-transparent py-3 pl-5 pr-12 text-inherit outline-none placeholder:text-sherick-ink-muted",
             density.normal,
             shape.control,
-            isDisabled ? state.disabledDescendant : state.text,
+            disabled ? state.disabledDescendant : state.text,
             inputClassName
           )}
           placeholder={placeholder}
-          onValueChange={scheduleSearch}
+          onValueChange={handleValueChange}
         />
         <Button
           type="button"
           aria-label="Submit search"
-          disabled={isDisabled}
+          disabled={submitDisabled}
           onClick={submitSearch}
           className={cn(
             density.target,
@@ -119,9 +135,9 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
             focusRingInset,
             motion.release,
             tone.text[variant],
-            !isDisabled && stateLayer.quiet,
-            !isDisabled && state.press,
-            isDisabled ? state.disabledDescendant : state.enabled,
+            !submitDisabled && stateLayer.quiet,
+            !submitDisabled && state.press,
+            submitDisabled ? state.disabledDescendant : state.enabled,
             "absolute right-1.5 inline-flex items-center justify-center"
           )}
         >

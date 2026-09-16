@@ -77,7 +77,9 @@ assert.ok(dev.material, "dev recipe export should resolve");
 
 assert.equal(typeof Button, "object");
 assert.equal(ActionButton, Button, "ActionButton should remain a compatibility alias for Button");
-assert.equal(typeof Dialog, "function");
+assert.equal(typeof Dialog, "object");
+assert.equal(typeof Dialog.Header, "function");
+assert.equal(typeof Dialog.Content, "function");
 assert.equal(typeof Select, "object");
 
 for (const open of [false, true]) {
@@ -85,7 +87,7 @@ for (const open of [false, true]) {
     renderToStaticMarkup(
       React.createElement(
         Dialog,
-        { open, onClose() {} },
+        { open, onOpenChange() {} },
         React.createElement(Dialog.Header, null, "Package dialog"),
         React.createElement(Dialog.Content, null, "SSR package fixture")
       )
@@ -134,10 +136,21 @@ import {
   ActionButton,
   Button,
   Dialog,
+  Input,
+  Search,
   Select,
+  Switch,
+  Tabs,
   type ActionButtonProps,
+  type AlertProps,
   type ButtonProps,
+  type InputProps,
+  type SearchProps,
   type SelectProps,
+  type SkeletonProps,
+  type SpinnerProps,
+  type SwitchProps,
+  type TabsProps,
 } from "sherick-ui";
 
 const buttonProps: ButtonProps = { children: "Save", appearance: "filled" };
@@ -146,13 +159,45 @@ const selectProps: SelectProps = {
   options: [{ label: "Design", value: "design" }],
   defaultValue: "design",
 };
+const inputProps: InputProps = {
+  label: "Name",
+  description: "Helper",
+  error: true,
+  errorMessage: "Invalid",
+  onValueChange() {},
+};
+const searchProps: SearchProps = {
+  onSearch() {},
+  onValueChange() {},
+};
+const switchProps: SwitchProps = {
+  checked: true,
+  onCheckedChange() {},
+  name: "enabled",
+  value: "yes",
+};
+const tabsProps: TabsProps = {
+  value: "one",
+  onValueChange() {},
+  tabs: [{ id: "one", label: "One", content: "Panel" }],
+};
+const alertProps: AlertProps = { children: "Notice", onDismiss() {} };
+const skeletonProps: SkeletonProps = { "aria-label": "Loading" };
+const spinnerProps: SpinnerProps = { size: "small" };
+void alertProps;
+void skeletonProps;
+void spinnerProps;
 
 export const fixture = (
   <>
     <Button {...buttonProps} />
     <ActionButton {...legacyButtonProps} />
+    <Input {...inputProps} />
+    <Search {...searchProps} />
     <Select {...selectProps} />
-    <Dialog open={false} onClose={() => undefined}>
+    <Switch {...switchProps} />
+    <Tabs {...tabsProps} />
+    <Dialog defaultOpen onOpenChange={() => undefined}>
       <Dialog.Header>Title</Dialog.Header>
       <Dialog.Content>Body</Dialog.Content>
     </Dialog>

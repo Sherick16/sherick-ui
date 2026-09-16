@@ -1,7 +1,13 @@
 "use client";
 
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
-import React, { type ReactNode, useRef } from "react";
+import React, {
+  forwardRef,
+  type ForwardRefExoticComponent,
+  type ReactNode,
+  type RefAttributes,
+  useRef,
+} from "react";
 import { X } from "lucide-react";
 import { cn } from "@/libs/utils";
 import {
@@ -15,24 +21,50 @@ import {
   text,
 } from "./ui.common";
 import { ModalContent } from "./ModalContent";
+import { ModalDescription } from "./ModalDescription";
 import { ModalFooter } from "./ModalFooter";
 import { ModalHeader } from "./ModalHeader";
 
 export interface ModalProps {
   children: ReactNode;
-  open: boolean;
-  onClose: () => void;
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  /** @deprecated Use `onOpenChange` instead. */
+  onClose?: () => void;
   className?: string;
 }
 
-const Modal = ({ children, open, onClose, className }: ModalProps) => {
-  const popupRef = useRef<HTMLDivElement>(null);
+type ModalComponent = ForwardRefExoticComponent<ModalProps & RefAttributes<HTMLDivElement>> & {
+  Header: typeof ModalHeader;
+  Description: typeof ModalDescription;
+  Content: typeof ModalContent;
+  Footer: typeof ModalFooter;
+};
+
+const Modal = forwardRef<HTMLDivElement, ModalProps>(({
+  children,
+  open,
+  defaultOpen,
+  onOpenChange,
+  onClose,
+  className,
+}, forwardedRef) => {
+  const popupRef = useRef<HTMLDivElement | null>(null);
+
+  const setPopupRef = (node: HTMLDivElement | null) => {
+    popupRef.current = node;
+    if (typeof forwardedRef === "function") forwardedRef(node);
+    else if (forwardedRef) forwardedRef.current = node;
+  };
 
   return (
     <BaseDialog.Root
       open={open}
+      defaultOpen={defaultOpen}
       onOpenChange={(nextOpen) => {
-        if (!nextOpen) onClose();
+        onOpenChange?.(nextOpen);
+        if (!nextOpen) onClose?.();
       }}
     >
       <BaseDialog.Portal>
@@ -46,7 +78,7 @@ const Modal = ({ children, open, onClose, className }: ModalProps) => {
         />
         <BaseDialog.Viewport className="fixed inset-0 z-50 flex min-h-full items-center justify-center overflow-y-auto p-4 sm:p-8">
           <BaseDialog.Popup
-            ref={popupRef}
+            ref={setPopupRef}
             initialFocus={popupRef}
             tabIndex={-1}
             className={({ open: isOpen }) =>
@@ -82,9 +114,11 @@ const Modal = ({ children, open, onClose, className }: ModalProps) => {
       </BaseDialog.Portal>
     </BaseDialog.Root>
   );
-};
+}) as ModalComponent;
 
+Modal.displayName = "Modal";
 Modal.Header = ModalHeader;
+Modal.Description = ModalDescription;
 Modal.Content = ModalContent;
 Modal.Footer = ModalFooter;
 
