@@ -40,7 +40,11 @@ The package publishes:
 
 Every independently portaled styled subtree must establish the same scope. Dialog, Select and Tooltip therefore remain styled when Base UI portals them outside trigger ancestry. New portaled components follow the same rule.
 
-The package stylesheet lives in named cascade layers. Normal unlayered application CSS can override package styles without `!important` or specificity escalation. Consumers should import `sherick-ui/styles.css` before their own application override stylesheet.
+Cascade ownership is deliberate:
+
+- theme defaults live in the low-priority `sherick-ui-theme` cascade layer so ordinary consumer CSS variables can override them cleanly;
+- component, motion, accessibility and rich-content rules are **unlayered but scoped**. Do not put them in a named cascade layer: unlayered host resets/preflight would outrank every layered package rule before specificity is considered, which can erase Sherick backgrounds, shadows, border colors and Tailwind state variables;
+- the scope contributes zero specificity, so a Sherick utility still has normal class-level specificity. Import `sherick-ui/styles.css` before application styles; later consumer utility/classes of equal specificity can intentionally override a component through `className` without `!important`.
 
 ## Theme contract
 
