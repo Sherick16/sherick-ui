@@ -32,7 +32,9 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     name,
     disabled,
     onChange,
-    ...props
+    value,
+    defaultValue,
+    ...textareaProps
   }, ref) => {
     return (
       <Field.Root
@@ -48,13 +50,14 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           </Field.Label>
         )}
         <Field.Control
-          {...props}
-          render={<textarea ref={ref} />}
+          render={<textarea {...textareaProps} ref={ref} />}
           id={id}
           name={name}
           required={required}
           disabled={disabled}
-          onValueChange={(value) => onChange?.(String(value))}
+          value={value}
+          defaultValue={defaultValue}
+          onValueChange={(nextValue) => onChange?.(String(nextValue))}
           className={cn(
             "w-full resize-y",
             density.normal,
