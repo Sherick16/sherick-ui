@@ -13,10 +13,11 @@ import peerDepsExternal from 'rollup-plugin-peer-deps-external';
 const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'));
 
 const extensions = ['.js', '.jsx', '.ts', '.tsx'];
+// Only dependencies consumers actually receive may remain as runtime externals.
+// Development dependencies must never silently leak into the published bundle graph.
 const externalPackages = [
   ...Object.keys(pkg.dependencies || {}),
   ...Object.keys(pkg.peerDependencies || {}),
-  ...Object.keys(pkg.devDependencies || {}),
 ];
 
 const external = (id) =>
