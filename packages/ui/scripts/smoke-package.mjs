@@ -120,7 +120,7 @@ for (const token of [
 }
 
 assert.doesNotMatch(themeCss, /--sui-elevation-grounded|--sui-shadow-focus|--sui-shadow-primary/, "pre-alpha compatibility token aliases should be gone");
-assert.match(stylesCss, /@layer sherick-ui-theme, sherick-ui/);
+assert.match(stylesCss, /@layer sherick-ui-theme/);
 assert.match(stylesCss, /\.sui-scope/);
 assert.match(stylesCss, /@font-face/);
 assert.match(stylesCss, /KaTeX_Main-Regular/);
@@ -144,8 +144,16 @@ const layerFor = (rule) => {
   return null;
 };
 
+stylesRoot.walkAtRules("layer", (rule) => {
+  assert.notEqual(
+    rule.params.trim(),
+    "sherick-ui",
+    "component CSS must stay unlayered so host resets/preflight cannot outrank it"
+  );
+});
+
 stylesRoot.walkDecls((declaration) => {
-  assert.equal(declaration.important, false, `published CSS may not use !important: ${declaration.toString()}`);
+  assert.ok(!declaration.important, `published CSS may not use !important: ${declaration.toString()}`);
 });
 
 stylesRoot.walkRules((rule) => {
