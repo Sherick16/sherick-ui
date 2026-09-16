@@ -45,9 +45,9 @@ import tailwindcss from "tailwindcss";
 import preset from "../tailwind.preset.cjs";
 /* Source import: the primitives module is TypeScript and is not part of the published
    entry point, and these recipes are internal data rather than public API. */
-import { motion, overlay } from "../components/UI/ui.common.ts";
+import { motion, overlay } from "../src/components/ui.common.ts";
 
-const library = await import("../dist/index.esm.js");
+const library = await import("../dist/esm/index.js");
 
 const {
   ActionButton,

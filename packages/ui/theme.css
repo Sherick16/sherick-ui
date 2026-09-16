@@ -76,7 +76,7 @@
   --sui-scrim: 0.16 0.01 260;
 
   /* Structural edge — the hairline where two parts of one surface meet. Its strength is
-     the alpha ladder in `edge` (components/UI/ui.common.ts), not a second color:
+     the alpha ladder in `edge` (packages/ui/src/components/ui.common.ts), not a second color:
      faint, structural and strong edges share this one shade tint. */
   --sui-edge: 0.42 0.02 258;
 
@@ -348,7 +348,7 @@
 
    `--sui-ease-release` is the expressive settle; `--sui-ease-exit` leaves the
    way it came. Components reference these through `motion` in
-   components/UI/ui.common.ts rather than writing a duration of their own. */
+   packages/ui/src/components/ui.common.ts rather than writing a duration of their own. */
 :root {
   --sui-duration-press: 150ms;
   --sui-duration-release: 200ms;

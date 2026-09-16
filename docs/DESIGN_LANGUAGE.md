@@ -7,8 +7,8 @@ Two files implement it and neither invents a rule of its own:
 
 | Layer | File | Contains |
 | --- | --- | --- |
-| Recipes | `components/UI/ui.common.ts` | the named primitives a component composes |
-| Tokens | `theme.css` | the values those primitives resolve to, per theme |
+| Recipes | `packages/ui/src/components/ui.common.ts` | the named primitives a component composes |
+| Tokens | `packages/ui/theme.css` | the values those primitives resolve to, per theme |
 
 If this document and any other file disagree — a README paragraph, a showcase caption,
 a code comment — this document wins and the other file is corrected.
@@ -221,7 +221,7 @@ Rules:
   `overlay.tooltip` or `overlay.dialog`, and let the recipe own the material, the
   elevation, the shape and the entrance geometry;
 - a shell that needs a different combination is a **new recipe** — add it to this
-  document and to `overlay` in `components/UI/ui.common.ts` before anything uses it;
+  document and to `overlay` in `packages/ui/src/components/ui.common.ts` before anything uses it;
 - behavior remains the Base primitive's responsibility; do not add Sherick-specific
   portal, focus-trap, dismissal, positioning or presence infrastructure around it.
 
@@ -476,7 +476,7 @@ inline padding from a field's.
 
 ## 15. Theming
 
-Tokens are grouped as one small system in `theme.css`: tonality, lighting, elevation,
+Tokens are grouped as one small system in `packages/ui/theme.css`: tonality, lighting, elevation,
 material and motion. Theme selection is CSS-only — no attribute follows
 `prefers-color-scheme`, while `data-sherick-theme="light"` or `"dark"` force one.
 
@@ -501,8 +501,8 @@ If a genuinely new visual rule is required:
 
 1. add it to this document first, with its role and its when-to-use / when-not-to-use
    examples;
-2. add it as a named primitive in `components/UI/ui.common.ts`, and its tokens to
-   `theme.css`;
+2. add it as a named primitive in `packages/ui/src/components/ui.common.ts`, and its tokens to
+   `packages/ui/theme.css`;
 3. then consume the primitive in the component.
 
 Not every local decision is a visual rule. **Layout, spacing, component-specific

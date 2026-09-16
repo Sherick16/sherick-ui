@@ -1,9 +1,5 @@
 "use client";
-import ActionButton from "../UI/ActionButton";
-import IconButton from "../UI/IconButton";
-import Tooltip from "../UI/Tooltip";
-import Divider from "../UI/Divider";
-import NavGroup from "../UI/NavGroup";
+import { Button, Divider, IconButton, NavGroup, Tooltip } from "sherick-ui";
 import { SquarePen, PanelLeftClose, Download } from "lucide-react";
 
 const SideNav = ({
@@ -31,13 +27,13 @@ const SideNav = ({
           />
         </Tooltip>
       </div>
-      <ActionButton
+      <Button
         icon={<SquarePen className="w-4 h-4" />}
         className="w-full mb-4"
         variant="primary"
       >
         Create chat
-      </ActionButton>
+      </Button>
       <Divider className="mb-4 mt-8" />
       {/* Middle */}
       <div className="overflow-y-auto">
