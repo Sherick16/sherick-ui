@@ -25,14 +25,14 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.3.14
+      - name: Regenerate dependency lock
+        run: bun install
       - name: Apply one-time Phase 3 canonicalization
         run: |
           node scripts/phase3-source-codemod.mjs
           node scripts/phase3-docs-codemod.mjs
           node scripts/phase3-ownership-codemod.mjs
           node scripts/phase3-review-codemod.mjs
-      - name: Regenerate dependency lock
-        run: bun install
       - name: Generate reviewed deterministic style baseline
         run: |
           bun --filter sherick-ui build
