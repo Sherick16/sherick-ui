@@ -54,21 +54,26 @@ assert.ok(packageJson.sideEffects.includes("./dist/styles.css"));
 assert.ok(packageJson.sideEffects.includes("./dist/theme.css"));
 
 const themeRoot = postcss.parse(themeCss);
-const variablesForSelector = (selector) => {
+const collectVariables = (matches) => {
   const variables = {};
   themeRoot.walkRules((rule) => {
-    if (rule.selector !== selector) return;
+    if (!matches(rule)) return;
     rule.walkDecls(/^--sui-/, (declaration) => {
       variables[declaration.prop] = declaration.value.replace(/\s+/g, " ").trim();
     });
   });
   return variables;
 };
+const selectorParts = (rule) => rule.selector.split(",").map((selector) => selector.trim());
+const variablesForSelector = (selector) =>
+  collectVariables((rule) => selectorParts(rule).includes(selector));
+const variablesForExactSelector = (selector) =>
+  collectVariables((rule) => rule.selector.trim() === selector);
 
 const lightVariables = variablesForSelector('[data-sherick-theme="light"]');
-const darkVariables = variablesForSelector('[data-sherick-theme="dark"]');
-const systemDarkVariables = variablesForSelector(':root:not([data-sherick-theme])');
-const sharedVariables = variablesForSelector(":root");
+const darkVariables = variablesForExactSelector('[data-sherick-theme="dark"]');
+const systemDarkVariables = variablesForExactSelector(':root:not([data-sherick-theme])');
+const sharedVariables = variablesForExactSelector(":root");
 
 for (const token of [
   "--sui-canvas",
