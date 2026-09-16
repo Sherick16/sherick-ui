@@ -12,11 +12,14 @@ Interactive behavior is deliberately separate from visual design. Sherick UI use
 bun add sherick-ui
 ```
 
-Import the complete stylesheet once near your application root:
+Import the complete stylesheet once near your application root. If the application has a framework stylesheet, Tailwind build or reset, load that first and Sherick UI second:
 
 ```tsx
+import "./app.css";
 import "sherick-ui/styles.css";
 ```
+
+That order is intentional. Sherick UI ships its already-compiled internal utility graph; loading it after a host Tailwind/reset prevents the host from accidentally redefining one of the same generic utility class names and changing component anatomy. If you maintain a dedicated application override stylesheet for Sherick components, load that override after `sherick-ui/styles.css`.
 
 That is the entire styling integration. Sherick UI compiles its own component CSS; consumers do not need Tailwind, a Sherick preset, package content scanning, or any other styling build configuration.
 
@@ -88,25 +91,25 @@ Every depth cue derives from a single light model: light comes from **directly a
 
 Depth is token-driven, and the ladder is the only source of shadow in the library:
 
-| Token | Role |
-| --- | --- |
-| `--sui-elevation-flat` | no shadow — matte surfaces separate by tone alone |
-| `--sui-elevation-raised` | raised matte surfaces |
-| `--sui-elevation-floating` | acrylic surfaces above the application |
-| `--sui-elevation-control` | tactile controls at rest, a hair above their track |
-| `--sui-elevation-recessed` | grooves, tracks and wells — and the depth a held control presses to |
+| Role | Token | Use |
+| --- | --- | --- |
+| Flat | `--sui-elevation-flat` | passive surfaces |
+| Raised | `--sui-elevation-raised` | tactile tonal controls |
+| Floating | `--sui-elevation-floating` | acrylic overlays |
+| Control | `--sui-elevation-control` | movable control parts at rest |
+| Recessed | `--sui-elevation-recessed` | grooves, tracks, wells and held controls |
 
 ### Motion
 
-Motion is three families, each driven by shared tokens:
+Motion is three families, each tokenized rather than hard-coded per component:
 
-| Family | Durations | Easings | Used for |
-| --- | --- | --- | --- |
-| press | `--sui-duration-press` | `--sui-ease-press` | hover/focus/engaged tonality changes |
-| release | `--sui-duration-release` | `--sui-ease-release` | tactile controls settling and selection travel |
-| overlay | `--sui-duration-overlay`, `--sui-duration-overlay-exit` | `--sui-ease-release`, `--sui-ease-exit` | floating surface entry and exit |
+| Family | Tokens | Used for |
+| --- | --- | --- |
+| Press | `--sui-duration-press`, `--sui-ease-press` | hover/focus/engaged tonality |
+| Release | `--sui-duration-release`, `--sui-ease-release` | tactile controls and physical travel |
+| Overlay | `--sui-duration-overlay`, `--sui-duration-overlay-exit`, `--sui-ease-release`, `--sui-ease-exit` | floating surfaces and scrims |
 
-Base UI owns whether a floating primitive is mounted, opening or closing, plus its focus, dismissal, portal and positioning mechanics. Sherick UI applies the shared visual recipes and motion tokens to those states.
+Base UI owns whether a floating primitive is mounted, opening or closing, plus its focus, dismissal, portal and positioning mechanics. Sherick UI applies the shared overlay material/elevation/shape recipes and motion tokens to those states; no Sherick-specific overlay lifecycle hook is required.
 
 ## Usage
 
@@ -131,32 +134,25 @@ export function Example() {
 }
 ```
 
-Import Sherick's stylesheet before your application override stylesheet when you want normal application CSS to win naturally:
+`Button` supports `filled`, `tonal` and `text` appearances plus `sm`, `md` and `lg` sizes. `ActionButton` remains as a deprecated compatibility alias. `IconButton` supports `tonal`, `ghost` and `acrylic` appearances. Semantic variants remain available for meaningful states such as danger or success rather than requiring every component to be chromatically loud.
 
-```ts
-import "sherick-ui/styles.css";
-import "./app.css";
-```
-
-`Button` supports `filled`, `tonal` and `text` appearances plus `sm`, `md` and `lg` sizes. `ActionButton` remains as a deprecated naming alias. `IconButton` supports `tonal`, `ghost` and `acrylic` appearances. Semantic variants remain available for meaningful states such as danger or success rather than requiring every component to be chromatically loud.
-
-Components expose relevant native HTML props and refs where appropriate. Base-backed interactive primitives delegate their generic widget semantics and accessibility mechanics to Base UI while retaining Sherick's visual language and focus treatment.
+Components expose their relevant native HTML props and refs where appropriate. Base-backed interactive primitives delegate their generic widget semantics and accessibility mechanics to Base UI while retaining Sherick's visual language and focus treatment.
 
 ## Components
 
 The public package exports:
 
-- Button and IconButton (`ActionButton` is a deprecated naming alias)
+- Button and IconButton (`ActionButton` remains as a deprecated compatibility alias)
 - Alert, Avatar, Badge and Card
 - CodeBlock and Markdown
 - Divider
-- Select (`Dropdown` is a deprecated naming alias)
+- Select (`Dropdown` remains as a deprecated compatibility alias)
 - Input, Search and Textarea
-- Dialog (`Modal` is a compatibility name, with `Header`, `Description`, `Content` and `Footer` composition)
+- Dialog (`Modal` remains as a compatibility name, with `Header`, `Content` and `Footer` composition)
 - NavGroup and NavItem
 - Skeleton and Spinner
 - Switch
-- Tabs (`TabGroup` is a compatibility name)
+- Tabs (`TabGroup` remains as a compatibility name)
 - Table
 - Tooltip
 
@@ -168,19 +164,13 @@ Public prop types and the shared `Variant` type are exported from the package ro
 
 When Base UI provides the primitive, it owns keyboard navigation, roving focus, focus trapping/restoration, generated accessibility relationships, composite-control form participation, portals, anchored positioning/collision handling, outside interaction/Escape dismissal and popup lifecycle. Passive semantics such as cards, badges, navigation links and tables remain native HTML rather than being forced through a headless abstraction.
 
-## Styling architecture
-
-`packages/ui/src/styles/tokens.ts` is the canonical runtime token source. The package build generates `dist/theme.css`, privately compiles the utility recipes used by Sherick components, scopes those rules to Sherick-owned DOM, includes rich-content CSS/assets, and assembles `dist/styles.css`.
-
-The internal `.sui-scope` marker exists only to prevent generic authoring utilities from leaking into consumer applications. It is not a supported consumer selector and should not be targeted by application code.
-
-The published stylesheet contains no Tailwind preflight/reset and no global utility selectors. Independently portaled styled subtrees establish the same internal scope so Dialog, Select and Tooltip render correctly outside their trigger ancestry.
+This boundary is intentional: upgrading behavior should normally mean upgrading Base UI and validating Sherick's integration tests, while changing Sherick's appearance should remain confined to its design language, recipes and tokens.
 
 ## Design language
 
-[`docs/DESIGN_LANGUAGE.md`](docs/DESIGN_LANGUAGE.md) is the canonical source of truth for Sherick UI's visual language: material, elevation, edge, shape, tone, state, motion and density rules, the light model, accessibility/focus requirements, and examples of when each primitive should and should not be used.
+[`docs/DESIGN_LANGUAGE.md`](docs/DESIGN_LANGUAGE.md) is the canonical source of truth for Sherick UI's visual language: the material, elevation, edge, shape, tone, state, motion and density rules, the light model, the accessibility and focus requirements, and the examples of when each primitive should and should not be used.
 
-Components compose the primitives in `packages/ui/src/components/ui.common.ts`; none of them should invent a color, tone role, material recipe, shadow, radius, duration, state treatment, structural rim or focus treatment locally. Ordinary anatomy — layout, spacing, component padding, intrinsic size, responsive arrangement and content typography — remains component-owned.
+Components compose the primitives in `packages/ui/src/components/ui.common.ts`; none of them writes a color, tone role, material recipe, shadow, radius, duration, state treatment, structural rim or focus ring of its own. A new component is designed by choosing primitives — and if a genuinely new visual rule is needed, the language is extended there first. Ordinary anatomy — layout, spacing, component padding, intrinsic size, responsive arrangement and content typography — is decided inside the component.
 
 ## Development
 
@@ -190,11 +180,11 @@ bun run dev
 bun run verify
 ```
 
-The private `apps/showcase` workbench reviews the complete system. The separate `apps/no-tailwind` fixture exists specifically to prove that the published package renders correctly without Tailwind or any consumer-side Sherick styling configuration.
+The private `apps/showcase` workbench includes `System`, `Light` and `Dark` controls so every component and state can be reviewed against all supported themes, and it links to the canonical design language from its heading.
 
-`bun run verify` covers source checks, ESM/CommonJS/declaration builds, generated/scoped CSS invariants, production Next and no-Tailwind Vite consumers, a clean `npm pack` consumer install, deterministic style-contract snapshots, interaction/accessibility checks, and Chromium visual regression. See [`docs/VERIFICATION.md`](docs/VERIFICATION.md).
+`bun run verify` covers source checks, ESM/CommonJS/declaration builds, the production Next showcase, a Tailwind-free Vite consumer, local styling-contract checks, a clean `npm pack` consumer install, Chromium interaction tests and browser visual regression. See [`docs/VERIFICATION.md`](docs/VERIFICATION.md) for the contract of each layer.
 
-The application workspaces are development/verification surfaces only; the published component runtime does not depend on Next.js, Vite or Tailwind.
+The Next.js app in `apps/showcase` is a development/showcase surface only; the published component runtime does not depend on Next.js.
 
 ## License
 
