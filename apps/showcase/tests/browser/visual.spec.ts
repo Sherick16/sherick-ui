@@ -85,3 +85,35 @@ test("published component styles survive a host Tailwind reset", async ({ page }
 
   expect(errors, "host Tailwind compatibility fixture produced runtime errors").toEqual([]);
 });
+
+test("showcase elevations and structural lines retain their design-language values", async ({ page }) => {
+  const errors = trackRuntimeErrors(page);
+
+  await page.goto("/");
+  await setTheme(page, "dark");
+
+  const raised = page.getByText("Raised", { exact: true }).locator("..");
+  const recessed = page.getByText("Recessed", { exact: true }).locator("..");
+  const floating = page.getByText("Floating", { exact: true }).locator("..");
+  const columnHeader = page.getByText("Column header", { exact: true });
+
+  for (const surface of [raised, recessed, floating]) {
+    await expect(surface).toBeVisible();
+    expect(await surface.evaluate((element) => getComputedStyle(element).boxShadow)).not.toBe("none");
+  }
+
+  const borderColors = await columnHeader.evaluate((element) => {
+    const actual = getComputedStyle(element).borderBottomColor;
+    const probe = document.createElement("div");
+    probe.style.borderBottom = "1px solid oklch(var(--sui-edge) / 0.10)";
+    document.body.appendChild(probe);
+    const expected = getComputedStyle(probe).borderBottomColor;
+    probe.remove();
+    return { actual, expected };
+  });
+
+  expect(borderColors.actual).toBe(borderColors.expected);
+  expect(await columnHeader.evaluate((element) => getComputedStyle(element).borderBottomWidth)).toBe("1px");
+
+  expect(errors, "design-language showcase produced runtime errors").toEqual([]);
+});
