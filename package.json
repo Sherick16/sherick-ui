@@ -12,7 +12,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "main": "dist/index.cjs.js",
+  "main": "dist/index.cjs",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
   "style": "theme.css",
@@ -35,7 +35,7 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.esm.js",
-      "require": "./dist/index.cjs.js"
+      "require": "./dist/index.cjs"
     },
     "./tailwind-preset": "./tailwind.preset.cjs",
     "./theme.css": "./theme.css"
@@ -51,7 +51,8 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "node scripts/smoke-package.mjs",
-    "verify": "bun run lint && bun run typecheck && bun run build && bun run next:build && bun run test && bun run visual",
+    "test:packed": "node scripts/verify-packed-package.mjs",
+    "verify": "bun run lint && bun run typecheck && bun run build && bun run next:build && bun run test && bun run test:packed && bun run visual",
     "clean": "rimraf dist",
     "visual": "bun scripts/visual-regression.mjs"
   },
@@ -106,7 +107,7 @@
   },
   "size-limit": [
     {
-      "path": "dist/index.cjs.js",
+      "path": "dist/index.cjs",
       "limit": "10 KB"
     },
     {
