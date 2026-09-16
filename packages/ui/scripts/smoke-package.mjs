@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import postcss from "postcss";
+import ts from "typescript";
 
 const packageRoot = fileURLToPath(new URL("..", import.meta.url));
 const library = await import("../dist/esm/index.js");
@@ -125,6 +126,8 @@ assert.match(stylesCss, /\.sui-scope/);
 assert.match(stylesCss, /@font-face/);
 assert.match(stylesCss, /KaTeX_Main-Regular/);
 assert.match(stylesCss, /@media \(forced-colors: active\)/);
+assert.match(stylesCss, /:where\(\.sui-scope\)\s*\{/,
+  "Tailwind runtime plumbing must initialize only explicitly owned nodes");
 
 const stylesRoot = postcss.parse(stylesCss);
 const isInKeyframes = (rule) => {
@@ -162,10 +165,41 @@ stylesRoot.walkRules((rule) => {
   if (layer === "sherick-ui-theme") return;
   assert.match(
     rule.selector,
-    /:where\(\.sui-scope,\s*\.sui-scope \*\)/,
+    /:where\(\.sui-scope(?:,\s*\.sui-scope \*)?\)/,
     `component/accessibility selector escaped Sherick scope: ${rule.selector}`
   );
 });
+
+// Generic Tailwind utilities may never use descendant ownership. Consumer children can
+// legally sit inside Button/Card/etc. and must not become styled merely by ancestry.
+for (const dangerousUtility of [
+  "absolute",
+  "relative",
+  "flex",
+  "text-sm",
+  "px-6",
+  "rounded-full",
+  "shadow-sherick-raised",
+  "shadow-sherick-recessed",
+]) {
+  const rules = [];
+  stylesRoot.walkRules((rule) => {
+    if (rule.selector.includes(dangerousUtility)) rules.push(rule);
+  });
+  assert.ok(rules.length > 0, `published CSS is missing ownership sentinel utility: ${dangerousUtility}`);
+  for (const rule of rules) {
+    assert.doesNotMatch(
+      rule.selector,
+      /:where\(\.sui-scope,\s*\.sui-scope \*\)/,
+      `generic utility may not style unowned descendants: ${rule.selector}`
+    );
+    assert.match(
+      rule.selector,
+      /:where\(\.sui-scope\)/,
+      `generic utility must require explicit ownership: ${rule.selector}`
+    );
+  }
+}
 
 for (const criticalUtility of [
   "shadow-sherick-raised",
@@ -211,6 +245,48 @@ assert.match(inputMarkup, /required=""/);
 const rawNeutralUtilities = [];
 const rawLiteralColors = [];
 const rawShadowUtilities = [];
+const unownedClassNames = [];
+
+const expressionUsesCn = (expression) => {
+  if (!expression) return false;
+  if (
+    ts.isCallExpression(expression) &&
+    ts.isIdentifier(expression.expression) &&
+    expression.expression.text === "cn"
+  ) return true;
+
+  if (ts.isArrowFunction(expression) || ts.isFunctionExpression(expression)) {
+    if (!ts.isBlock(expression.body)) return expressionUsesCn(expression.body);
+    const returns = [];
+    const visitReturn = (node) => {
+      if (ts.isReturnStatement(node) && node.expression) returns.push(node.expression);
+      ts.forEachChild(node, visitReturn);
+    };
+    ts.forEachChild(expression.body, visitReturn);
+    return returns.length > 0 && returns.every(expressionUsesCn);
+  }
+
+  return false;
+};
+
+const verifyClassOwnership = (path, source) => {
+  const sourceFile = ts.createSourceFile(path, source, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX);
+  const visit = (node) => {
+    if (ts.isJsxAttribute(node) && node.name.text === "className" && node.initializer) {
+      if (ts.isStringLiteral(node.initializer)) {
+        unownedClassNames.push(`${path}:${sourceFile.getLineAndCharacterOfPosition(node.getStart()).line + 1}`);
+      } else if (
+        ts.isJsxExpression(node.initializer) &&
+        node.initializer.expression &&
+        !expressionUsesCn(node.initializer.expression)
+      ) {
+        unownedClassNames.push(`${path}:${sourceFile.getLineAndCharacterOfPosition(node.getStart()).line + 1}`);
+      }
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(sourceFile);
+};
 
 async function scanDirectory(directory) {
   for (const entry of await readdir(directory, { withFileTypes: true })) {
@@ -224,11 +300,13 @@ async function scanDirectory(directory) {
     if (/\b(?:bg|text|border|ring)-(?:slate|gray|zinc|neutral|stone)-/.test(source)) rawNeutralUtilities.push(path);
     if (/(?:#[0-9a-fA-F]{3,8}\b|\brgb\(|\bhsl\()/g.test(source) && !path.endsWith("prism-theme.ts")) rawLiteralColors.push(path);
     if (/\bshadow-(?!sherick-)(?:sm|md|lg|xl|2xl|inner|\[)/.test(source)) rawShadowUtilities.push(path);
+    if (path.endsWith(".tsx")) verifyClassOwnership(path, source);
   }
 }
 await scanDirectory(join(packageRoot, "src", "components"));
 assert.deepEqual(rawNeutralUtilities, [], `raw neutral utilities found: ${rawNeutralUtilities.join(", ")}`);
 assert.deepEqual(rawLiteralColors, [], `literal colors found outside prism theme: ${rawLiteralColors.join(", ")}`);
 assert.deepEqual(rawShadowUtilities, [], `raw Tailwind shadows found: ${rawShadowUtilities.join(", ")}`);
+assert.deepEqual(unownedClassNames, [], `Sherick-styled JSX must route className through cn(): ${unownedClassNames.join(", ")}`);
 
-console.log("Package and scoped styling verification passed.");
+console.log("Package and explicit style ownership verification passed.");
