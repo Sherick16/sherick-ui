@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { execFileSync } from "node:child_process";
 import { access, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
@@ -66,11 +66,13 @@ import { renderToStaticMarkup } from "react-dom/server";
 import Prism from "prismjs";
 import {
   ActionButton,
+  Button,
   Dialog,
   Select,
 } from "sherick-ui";
 
-assert.equal(typeof ActionButton, "object");
+assert.equal(typeof Button, "object");
+assert.equal(ActionButton, Button, "ActionButton should remain a compatibility alias for Button");
 assert.equal(typeof Dialog, "function");
 assert.equal(typeof Select, "object");
 
@@ -108,7 +110,8 @@ const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const ui = require("sherick-ui");
 
-assert.ok(ui.ActionButton, "CommonJS export missing ActionButton");
+assert.ok(ui.Button, "CommonJS export missing Button");
+assert.strictEqual(ui.ActionButton, ui.Button, "ActionButton should alias Button in CommonJS");
 assert.ok(ui.Dialog, "CommonJS export missing Dialog");
 assert.ok(ui.Select, "CommonJS export missing Select");
 assert.ok(fs.existsSync(require.resolve("sherick-ui/theme.css")), "theme.css export must resolve");
@@ -120,13 +123,16 @@ console.log("Packed CommonJS verification passed.");
 import * as React from "react";
 import {
   ActionButton,
+  Button,
   Dialog,
   Select,
   type ActionButtonProps,
+  type ButtonProps,
   type SelectProps,
 } from "sherick-ui";
 
-const buttonProps: ActionButtonProps = { children: "Save", appearance: "filled" };
+const buttonProps: ButtonProps = { children: "Save", appearance: "filled" };
+const legacyButtonProps: ActionButtonProps = buttonProps;
 const selectProps: SelectProps = {
   options: [{ label: "Design", value: "design" }],
   defaultValue: "design",
@@ -134,7 +140,8 @@ const selectProps: SelectProps = {
 
 export const fixture = (
   <>
-    <ActionButton {...buttonProps} />
+    <Button {...buttonProps} />
+    <ActionButton {...legacyButtonProps} />
     <Select {...selectProps} />
     <Dialog open={false} onClose={() => undefined}>
       <Dialog.Header>Title</Dialog.Header>
