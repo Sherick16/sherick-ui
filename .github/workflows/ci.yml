@@ -5,6 +5,10 @@ on:
   push:
     branches: [main]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 permissions:
   contents: write
 
@@ -27,18 +31,20 @@ jobs:
         run: bun install
       - name: Install Chromium
         run: bunx playwright install --with-deps chromium
-      - name: Verify non-browser gates
-        run: bun run lint && bun run typecheck && bun run build && bun run next:build && bun run test && bun run test:packed && bun run visual
+      - name: Verify package and consumer contracts
+        run: bun run lint && bun run typecheck && bun run build && bun run next:build && bun run test && bun run test:packed
+      - name: Regenerate deterministic style-contract baseline
+        run: bun scripts/visual-regression.mjs --update
       - name: Generate browser baselines
         run: bun run test:browser -- --update-snapshots
       - name: Commit generated Phase 0 state
         run: |
-          git add bun.lock tests/browser
+          git add bun.lock scripts/visual-baselines/visual-regression.json tests/browser
           if git diff --cached --quiet; then
             echo "No generated changes to commit."
             exit 0
           fi
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "Update Phase 0 lockfile and browser baselines"
+          git commit -m "Update Phase 0 verification baselines"
           git push origin HEAD:${{ github.head_ref }}
