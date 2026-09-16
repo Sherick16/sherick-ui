@@ -12,7 +12,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "main": "dist/index.cjs.js",
+  "main": "dist/index.cjs",
   "module": "dist/index.esm.js",
   "types": "dist/index.d.ts",
   "style": "theme.css",
@@ -35,7 +35,7 @@
     ".": {
       "types": "./dist/index.d.ts",
       "import": "./dist/index.esm.js",
-      "require": "./dist/index.cjs.js"
+      "require": "./dist/index.cjs"
     },
     "./tailwind-preset": "./tailwind.preset.cjs",
     "./theme.css": "./theme.css"
@@ -51,7 +51,9 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "node scripts/smoke-package.mjs",
-    "verify": "bun run lint && bun run typecheck && bun run build && bun run next:build && bun run test && bun run visual",
+    "test:packed": "node scripts/verify-packed-package.mjs",
+    "test:browser": "playwright test",
+    "verify": "bun run lint && bun run typecheck && bun run build && bun run next:build && bun run test && bun run test:packed && bun run visual && bun run test:browser",
     "clean": "rimraf dist",
     "visual": "bun scripts/visual-regression.mjs"
   },
@@ -71,7 +73,8 @@
     "rehype-katex": "^7.0.1",
     "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",
-    "tailwind-merge": "^2.6.1"
+    "tailwind-merge": "^2.6.1",
+    "tslib": "^2.8.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.29.7",
@@ -79,6 +82,7 @@
     "@babel/preset-env": "^7.29.7",
     "@babel/preset-react": "^7.29.7",
     "@babel/preset-typescript": "^7.29.7",
+    "@playwright/test": "^1.59.1",
     "@rollup/plugin-babel": "^7.1.0",
     "@rollup/plugin-commonjs": "^29.0.3",
     "@rollup/plugin-node-resolve": "^16.0.3",
@@ -101,12 +105,11 @@
     "rollup-plugin-postcss": "^4.0.2",
     "rollup-plugin-visualizer": "^5.13.1",
     "tailwindcss": "^3.4.19",
-    "tslib": "^2.8.1",
     "typescript": "^5.9.3"
   },
   "size-limit": [
     {
-      "path": "dist/index.cjs.js",
+      "path": "dist/index.cjs",
       "limit": "10 KB"
     },
     {

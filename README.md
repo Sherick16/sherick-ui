@@ -112,7 +112,7 @@ Base UI owns whether a floating primitive is mounted, opening or closing, plus i
 ## Usage
 
 ```tsx
-import { ActionButton, Input, Dialog, Select } from "sherick-ui";
+import { Button, Input, Dialog, Select } from "sherick-ui";
 import "sherick-ui/theme.css";
 
 export function Example() {
@@ -126,13 +126,13 @@ export function Example() {
         ]}
         defaultValue="design"
       />
-      <ActionButton appearance="filled">Save</ActionButton>
+      <Button appearance="filled">Save</Button>
     </>
   );
 }
 ```
 
-`ActionButton` supports `filled`, `tonal` and `text` appearances plus `sm`, `md` and `lg` sizes. `IconButton` supports `tonal`, `ghost` and `acrylic` appearances. Semantic variants remain available for meaningful states such as danger or success rather than requiring every component to be chromatically loud.
+`Button` supports `filled`, `tonal` and `text` appearances plus `sm`, `md` and `lg` sizes. `ActionButton` remains as a deprecated compatibility alias. `IconButton` supports `tonal`, `ghost` and `acrylic` appearances. Semantic variants remain available for meaningful states such as danger or success rather than requiring every component to be chromatically loud.
 
 Components expose their relevant native HTML props and refs where appropriate. Base-backed interactive primitives delegate their generic widget semantics and accessibility mechanics to Base UI while retaining Sherick's visual language and focus treatment.
 
@@ -140,7 +140,7 @@ Components expose their relevant native HTML props and refs where appropriate. B
 
 The public package exports:
 
-- ActionButton and IconButton
+- Button and IconButton (`ActionButton` remains as a deprecated compatibility alias)
 - Alert, Avatar, Badge and Card
 - CodeBlock and Markdown
 - Divider
@@ -150,7 +150,7 @@ The public package exports:
 - NavGroup and NavItem
 - Skeleton and Spinner
 - Switch
-- TabGroup
+- Tabs (`TabGroup` remains as a compatibility name)
 - Table
 - Tooltip
 
@@ -180,7 +180,7 @@ bun run verify
 
 The development workbench includes `System`, `Light` and `Dark` controls so every component and state can be reviewed against all supported themes, and it links to the canonical design language from its heading.
 
-`bun run verify` lints, runs TypeScript checking, builds both ESM/CJS plus declarations, and runs consumer-oriented smoke verification against the built package. The smoke checks also protect the design language: they reject unsupported numeric Tailwind opacity modifiers that Tailwind 3 would otherwise silently omit, raw theme-specific neutral utilities and literal colors in reusable UI, theme-unsafe focus utilities, and any one-off shadow recipe outside the elevation ladder. Pull requests run the same verification in GitHub Actions.
+`bun run verify` now covers source checks, the ESM/CommonJS/declaration build, the production Next showcase, local smoke checks, a clean `npm pack` consumer install, deterministic style-contract snapshots, and Chromium hydration/visual regression. See [`docs/VERIFICATION.md`](docs/VERIFICATION.md) for the contract of each layer.
 
 The Next.js app in this repository is a development/showcase surface only; the published component runtime does not depend on Next.js.
 

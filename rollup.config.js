@@ -13,14 +13,18 @@ import peerDepsExternal from 'rollup-plugin-peer-deps-external';
 const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'));
 
 const extensions = ['.js', '.jsx', '.ts', '.tsx'];
+// Only dependencies consumers actually receive may remain as runtime externals.
+// Development dependencies must never silently leak into the published bundle graph.
 const externalPackages = [
   ...Object.keys(pkg.dependencies || {}),
   ...Object.keys(pkg.peerDependencies || {}),
-  ...Object.keys(pkg.devDependencies || {}),
 ];
 
 const external = (id) =>
   externalPackages.some((dependency) => id === dependency || id.startsWith(`${dependency}/`));
+
+const hasModuleSideEffects = (id) =>
+  id.startsWith('prismjs/components/') || id.includes('/prismjs/components/');
 
 const config = [
   {
@@ -48,7 +52,13 @@ const config = [
         tsconfig: './tsconfig.json',
         declaration: true,
         declarationDir: 'dist',
-        exclude: ['**/*.test.tsx', '**/*.test.ts', '**/*.stories.tsx'],
+        exclude: [
+          '**/*.test.tsx',
+          '**/*.test.ts',
+          '**/*.stories.tsx',
+          'app/verification/**',
+          'tests/**',
+        ],
         // `allowJs` comes from the shared tsconfig for Next. The library build is TS-only,
         // and @rollup/plugin-typescript redirects emit to a temp `outDir` when `allowJs`
         // is on without an `outDir`, then rejects that path as outside the bundle output.
@@ -67,7 +77,9 @@ const config = [
     ],
     external,
     treeshake: {
-      moduleSideEffects: false,
+      // Prism language modules register themselves by side effect. The previous blanket
+      // `false` allowed Rollup to erase those empty external imports from the package.
+      moduleSideEffects: hasModuleSideEffects,
       propertyReadSideEffects: false,
       tryCatchDeoptimization: false,
     },
