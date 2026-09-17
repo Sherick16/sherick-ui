@@ -1,16 +1,6 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./fixtures";
 
-const trackRuntimeErrors = (page: Page) => {
-  const errors: string[] = [];
-  page.on("pageerror", (error) => errors.push(`pageerror: ${error.message}`));
-  page.on("console", (message) => {
-    if (message.type() === "error") errors.push(`console: ${message.text()}`);
-  });
-  return errors;
-};
-
-test("hostile custom theme keeps semantic on-colors distinct across components and portals", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("hostile custom theme keeps semantic on-colors distinct across components and portals", async ({ page, errors }) => {
   await page.goto("/verification/theme-torture");
   await expect(page.getByTestId("theme-torture")).toBeVisible();
 
@@ -54,8 +44,7 @@ test("hostile custom theme keeps semantic on-colors distinct across components a
   expect(errors).toEqual([]);
 });
 
-test("forced-colors preserves canonical focus and important state boundaries", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("forced-colors preserves canonical focus and important state boundaries", async ({ page, errors }) => {
   await page.emulateMedia({ forcedColors: "active" });
   await page.goto("/verification/theme-torture");
 

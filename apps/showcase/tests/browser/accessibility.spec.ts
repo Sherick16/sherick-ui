@@ -1,18 +1,7 @@
 import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./fixtures";
 
 const WCAG_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
-
-const trackRuntimeErrors = (page: Page) => {
-  const errors: string[] = [];
-
-  page.on("pageerror", (error) => errors.push(`pageerror: ${error.message}`));
-  page.on("console", (message) => {
-    if (message.type() === "error") errors.push(`console: ${message.text()}`);
-  });
-
-  return errors;
-};
 
 /* Every other rule is enabled as normal, so a regression names both the broken rule and
    where it lives. */
@@ -40,8 +29,7 @@ const expectNoA11yViolations = async (page: Page) => {
   expect(results.violations, `axe violations:\n${summary}`).toEqual([]);
 };
 
-test("core verification fixture has no automatically detectable WCAG A/AA violations", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("core verification fixture has no automatically detectable WCAG A/AA violations", async ({ page, errors }) => {
 
   await page.goto("/verification/core");
   await expect(page.getByTestId("verification-core")).toBeVisible();
@@ -51,8 +39,7 @@ test("core verification fixture has no automatically detectable WCAG A/AA violat
   expect(errors).toEqual([]);
 });
 
-test("interactions verification fixture has no automatically detectable WCAG A/AA violations", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("interactions verification fixture has no automatically detectable WCAG A/AA violations", async ({ page, errors }) => {
 
   await page.goto("/verification/interactions");
   await expect(page.getByRole("textbox", { name: "Project name" })).toBeVisible();
@@ -62,8 +49,7 @@ test("interactions verification fixture has no automatically detectable WCAG A/A
   expect(errors).toEqual([]);
 });
 
-test("initially-open dialog has no automatically detectable WCAG A/AA violations", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("initially-open dialog has no automatically detectable WCAG A/AA violations", async ({ page, errors }) => {
 
   await page.goto("/verification/dialog");
   await expect(page.getByRole("dialog")).toBeVisible();
@@ -74,8 +60,7 @@ test("initially-open dialog has no automatically detectable WCAG A/AA violations
   expect(errors).toEqual([]);
 });
 
-test("Select opened inside a dialog has no automatically detectable WCAG A/AA violations", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("Select opened inside a dialog has no automatically detectable WCAG A/AA violations", async ({ page, errors }) => {
 
   await page.goto("/verification/interactions");
   await page.getByRole("button", { name: "Open dialog" }).click();
@@ -89,8 +74,7 @@ test("Select opened inside a dialog has no automatically detectable WCAG A/AA vi
   expect(errors).toEqual([]);
 });
 
-test("icon-only controls expose accessible names", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("icon-only controls expose accessible names", async ({ page, errors }) => {
 
   await page.goto("/verification/dialog");
   const closeButton = page.getByRole("button", { name: "Close dialog" });
@@ -105,8 +89,7 @@ test("icon-only controls expose accessible names", async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test("loading Search reports aria-busy without losing its accessible name", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("loading Search reports aria-busy without losing its accessible name", async ({ page, errors }) => {
 
   await page.goto("/verification/interactions");
   const search = page.getByRole("textbox", { name: "Loading search" });
@@ -124,8 +107,7 @@ test("loading Search reports aria-busy without losing its accessible name", asyn
   expect(errors).toEqual([]);
 });
 
-test("keyboard focus is visible on a core control", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("keyboard focus is visible on a core control", async ({ page, errors }) => {
 
   await page.goto("/verification/core");
   const primary = page.getByRole("button", { name: "Primary" });

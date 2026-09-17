@@ -1,17 +1,6 @@
-import { expect, test, type Locator, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "./fixtures";
 
 const NARROW_VIEWPORT = { width: 320, height: 800 };
-
-const trackRuntimeErrors = (page: Page) => {
-  const errors: string[] = [];
-
-  page.on("pageerror", (error) => errors.push(`pageerror: ${error.message}`));
-  page.on("console", (message) => {
-    if (message.type() === "error") errors.push(`console: ${message.text()}`);
-  });
-
-  return errors;
-};
 
 /* The measured field controls: native inputs, the textarea, the Select trigger and the
    Wave A family. Each must be laid out within the narrow wrapper it sits in. */
@@ -64,8 +53,7 @@ const assertControlsFitNarrowContainer = async (page: Page, context: string) => 
   }
 };
 
-test("narrow controls fit without widening the page", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("narrow controls fit without widening the page", async ({ page, errors }) => {
 
   await openFixture(page);
   await assertNoPageOverflow(page, "default narrow layout");
@@ -74,8 +62,7 @@ test("narrow controls fit without widening the page", async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test("the dialog opens without widening the page at the narrow viewport", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("the dialog opens without widening the page at the narrow viewport", async ({ page, errors }) => {
 
   await openFixture(page);
   await page.getByRole("button", { name: "Open narrow dialog" }).click();
@@ -87,8 +74,7 @@ test("the dialog opens without widening the page at the narrow viewport", async 
   expect(errors).toEqual([]);
 });
 
-test("controls stay contained when the document direction is RTL", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("controls stay contained when the document direction is RTL", async ({ page, errors }) => {
 
   await openFixture(page);
   await page.evaluate(() => {

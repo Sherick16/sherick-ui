@@ -29,7 +29,7 @@ export interface RadioGroupProps
   label?: ReactNode;
   value?: string;
   defaultValue?: string;
-  onValueChange?: (value: string) => void;
+  onValueChange?: BaseRadioGroup.Props<string>["onValueChange"];
   name?: string;
   form?: string;
   required?: boolean;
@@ -83,7 +83,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
           ref={ref}
           value={value}
           defaultValue={defaultValue}
-          onValueChange={(nextValue) => onValueChange?.(nextValue as string)}
+          onValueChange={onValueChange}
           name={name}
           form={form}
           required={required}
@@ -92,53 +92,46 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
           inputRef={inputRef}
           className={cn("flex flex-col")}
         >
-          {options.map((option) => {
-            const optionDisabled = disabled || option.disabled;
-
-            return (
-              <Field.Item
-                key={option.value}
-                className={cn(
-                  "group flex items-stretch",
-                  density.normal,
-                  optionDisabled ? state.disabled : state.enabled
-                )}
-              >
-                {/* The row is the label, so the whole line an option occupies is its hit area,
-                    and the gap after the circle is measured from the circle itself. The circle
-                    keeps its own label scope: without a per-option scope, a group sitting inside
-                    a `Field` would hand every radio the group's own label. */}
-                <Field.Label className={cn("flex flex-1 items-center gap-3")}>
-                  <Radio.Root
-                    value={option.value}
-                    disabled={option.disabled}
+          {options.map((option) => (
+            <Field.Item
+              key={option.value}
+              className={cn(
+                "group flex items-stretch",
+                density.normal,
+                state.enabled,
+                state.effectiveDisabled,
+                state.disabledRow
+              )}
+            >
+              <Field.Label className={cn("flex flex-1 items-center gap-3")}>
+                <Radio.Root
+                  value={option.value}
+                  disabled={option.disabled}
+                  className={cn(
+                    "group relative flex size-6 shrink-0 items-center justify-center outline-none"
+                  )}
+                >
+                  <span
+                    aria-hidden="true"
                     className={cn(
-                      "group relative flex size-6 shrink-0 items-center justify-center outline-none"
+                      "flex size-6 items-center justify-center",
+                      shape.circle,
+                      selectable.surface,
+                      selectable.rest,
+                      selectable.selected,
+                      stateLayer.track,
+                      groupFocusRing
                     )}
                   >
-                    <span
-                      aria-hidden="true"
-                      className={cn(
-                        "flex size-6 items-center justify-center",
-                        shape.circle,
-                        selectable.surface,
-                        selectable.rest,
-                        selectable.selected,
-                        !optionDisabled && stateLayer.track,
-                        !optionDisabled && state.groupPressMark,
-                        groupFocusRing
-                      )}
-                    >
-                      <Radio.Indicator className={cn("flex items-center justify-center", selectable.mark)}>
-                        <span className={cn("block size-2.5", shape.circle, "bg-current")} />
-                      </Radio.Indicator>
-                    </span>
-                  </Radio.Root>
-                  <span className={cn(text.high)}>{option.label}</span>
-                </Field.Label>
-              </Field.Item>
-            );
-          })}
+                    <Radio.Indicator className={cn("flex items-center justify-center", selectable.mark)}>
+                      <span className={cn("block size-2.5", shape.circle, "bg-current")} />
+                    </Radio.Indicator>
+                  </span>
+                </Radio.Root>
+                <span className={cn(text.high)}>{option.label}</span>
+              </Field.Label>
+            </Field.Item>
+          ))}
         </BaseRadioGroup>
       </Field.Root>
     );

@@ -123,10 +123,36 @@ export default function VerificationInteractionsPage() {
         </Field>
 
         <div data-testid="seats-field">
-          <Field label="Seats" description="Between 1 and 10." error="Choose between 1 and 10 seats.">
-            <NumberField min={1} max={10} defaultValue={3} />
+          <Field label="Seats" description="Between 1 and 10." error="Choose between 1 and 10 seats." required>
+            <NumberField min={1} max={10} defaultValue={3} required />
           </Field>
         </div>
+
+        <Field
+          label="Priority"
+          description="A field can validate on its own, without a message prop."
+          validate={(fieldValue) => (Number(fieldValue) > 5 ? "Choose five or fewer" : null)}
+          validationMode="onChange"
+        >
+          <NumberField defaultValue={2} min={1} max={10} />
+        </Field>
+
+        <Field label="Locked by its field" disabled>
+          <Checkbox name="locked" value="yes" />
+        </Field>
+
+        <table className="w-64 border-collapse text-sm">
+          <tbody>
+            {["First row", "Second row", "Third row"].map((rowLabel) => (
+              <tr key={rowLabel} className="h-12">
+                <td className="pr-3">
+                  <Checkbox aria-label={rowLabel} name={rowLabel} value="yes" />
+                </td>
+                <td>{rowLabel}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
 
         <Checkbox indeterminate aria-label="Partial selection" />
 
@@ -138,7 +164,7 @@ export default function VerificationInteractionsPage() {
         <p data-testid="region-value">{region}</p>
 
         <Slider
-          aria-label="Budget"
+          label="Budget"
           value={budget}
           onValueChange={setBudget}
           min={0}

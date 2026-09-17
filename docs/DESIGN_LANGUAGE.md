@@ -334,18 +334,21 @@ One language, applied the same way everywhere:
 | disabled | 45% opacity, no pointer affordance, no interactive state at all | grey-on-grey colouring that breaks theme |
 | focus | the shared focus ring | any other indicator |
 
-Compression is a **distance, not a ratio**: a press travels roughly a pixel at the size of the ink
-it moves. That single rule produces the three steps.
+Compression is a **distance, not a ratio**: a press travels about a pixel at the size of the ink it
+moves, and that one rule produces the two steps.
 
 | Step | Moves | For |
 | --- | --- | --- |
-| `press` / `groupPress` | 2% | a control several times a mark's size, whose outline is what the user sees — a button, a track |
-| `pressMark` / `groupPressMark` | 4% | a compact mark whose outline *is* the control — a checkbox box, a radio circle; four percent of 24px is the same pixel a button travels at two percent of a pill |
-| `pressCompact` / `groupPressCompact` | 10% | a control whose ink is much smaller than the target it is aimed at — an icon inside a `density.target` stepper, where 2% would never register |
+| `press` / `groupPress` | 2% | a control whose outline is what the user sees — a button, a track, a selection mark |
+| `pressCompact` | 10% | a control whose ink is much smaller than the target it is aimed at — an icon inside a `density.target` stepper, where 2% would never register |
 
-Every step is a **centred zoom**: the part changes size in place and never translates. Ten percent
-of a mark's own outline reads as the control moving rather than as pressure, which is why the mark
-step exists at all — it is the same felt distance expressed at the size the mark actually is.
+Both are **centred zooms**: the part changes size in place, and a press never translates it.
+
+**A selection mark's boundary does not move.** A checkbox box or a radio circle takes the plain 2%
+step, not the compact one: ten percent of its own outline is a 2.4px change, and the eye reads that
+as the control jumping rather than as pressure. Expression belongs to the contents of that boundary
+— the mark arriving on the spring — while the press is carried by the state layer. This is the same
+division the slider does not follow, because there the handle moving *is* the interaction.
 
 State layers: replacing `background-color` on hover erases whatever fill a control owns,
 so states are composited by a `currentColor`-tinted overlay instead. Opacity carries the
@@ -538,10 +541,10 @@ inline padding from a field's.
   footprint with `hitArea`, a transparent pseudo-element extension. Layout, alignment and
   the gap between a control and its copy are therefore measured from the control the user
   can see, while the pointer still answers over the full target. The expansion is capped at
-  the `target` floor, so two compact controls placed at the density rhythm keep clearance
-  between their hit areas rather than overlapping; the one exception is a control that owns
-  a labelled row — a radio option — where the row itself is the label and no extension is
-  needed at all.
+  the `target` floor, but CSS cannot see neighbouring geometry: hit areas keep clearance only
+  while the rows around them are at least as tall as that floor, which the library's own
+  `density.normal` rhythm is and a 40px table row is not. A control that owns a labelled row —
+  a radio option — needs no extension at all, because the row itself is the label.
 - `prefers-reduced-motion` is respected by every motion family.
 - The component runtime is font-agnostic; typography is the consumer's decision.
 - Color is never the only carrier of meaning: a semantic state also carries an icon, a

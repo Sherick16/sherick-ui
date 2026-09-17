@@ -1,22 +1,10 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./fixtures";
 
-const trackRuntimeErrors = (page: Page) => {
-  const errors: string[] = [];
-
-  page.on("pageerror", (error) => errors.push(`pageerror: ${error.message}`));
-  page.on("console", (message) => {
-    if (message.type() === "error") errors.push(`console: ${message.text()}`);
-  });
-
-  return errors;
-};
-
-test.beforeEach(async ({ page }) => {
+test.beforeEach(async ({ page, errors }) => {
   await page.goto("/verification/interactions");
 });
 
-test("fields expose Base-owned description and error relationships", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("fields expose Base-owned description and error relationships", async ({ page, errors }) => {
   const input = page.getByRole("textbox", { name: "Project name" });
 
   await expect(input).toBeVisible();
@@ -27,8 +15,7 @@ test("fields expose Base-owned description and error relationships", async ({ pa
   expect(errors).toEqual([]);
 });
 
-test("Search remains editable while loading and keeps immediate and submitted values separate", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("Search remains editable while loading and keeps immediate and submitted values separate", async ({ page, errors }) => {
   const search = page.getByRole("textbox", { name: "Loading search" });
 
   await expect(search).toBeEnabled();
@@ -39,8 +26,7 @@ test("Search remains editable while loading and keeps immediate and submitted va
   expect(errors).toEqual([]);
 });
 
-test("controlled Tabs and Base form participation compose through the public API", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("controlled Tabs and Base form participation compose through the public API", async ({ page, errors }) => {
 
   await expect(page.getByRole("tab", { name: "Disabled" })).toBeDisabled();
   await page.getByRole("tab", { name: "Details" }).click();
@@ -56,8 +42,7 @@ test("controlled Tabs and Base form participation compose through the public API
   expect(errors).toEqual([]);
 });
 
-test("nested Select consumes Escape before Dialog", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("nested Select consumes Escape before Dialog", async ({ page, errors }) => {
 
   await page.getByRole("button", { name: "Open dialog" }).click();
   const dialog = page.getByRole("dialog");

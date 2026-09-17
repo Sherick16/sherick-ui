@@ -18,11 +18,13 @@ import {
 export interface NumberFieldProps
   extends Omit<
     ComponentProps<"input">,
-    "value" | "defaultValue" | "onChange" | "min" | "max" | "step" | "type" | "size"
+    "value" | "defaultValue" | "onChange" | "min" | "max" | "step" | "type" | "size" | "ref"
   > {
   value?: number | null;
   defaultValue?: number;
-  onValueChange?: (value: number | null) => void;
+  onValueChange?: BaseNumberField.Root.Props["onValueChange"];
+  /** Fires when a change is committed — a stepper released, a value blurred into place. */
+  onValueCommitted?: BaseNumberField.Root.Props["onValueCommitted"];
   min?: number;
   max?: number;
   step?: number;
@@ -34,16 +36,14 @@ export interface NumberFieldProps
   form?: string;
   /** A ref to the hidden `<input type="number">` that participates in the form. */
   inputRef?: Ref<HTMLInputElement>;
-  /** Styles the field's own container. */
+  /** Styles the field's own container. The text input is styled through `inputClassName`. */
   className?: string;
   inputClassName?: string;
 }
 
-/* Base UI names each stepper itself and keeps it out of the tab order, because the input
-   already steps from the keyboard. The steppers therefore carry no focus recipe: they are
-   never reachable by `:focus-visible`. They hold no fill at rest — they are the field's own
-   parts, not controls beside it — and answer hover and press one step louder than a ghost
-   control so the interaction still lands. */
+/* Base UI names each stepper itself and keeps it out of the tab order, because the input already
+   steps from the keyboard. The steppers never take a focus ring: they are not reachable by
+   `:focus-visible`. */
 const stepperClassName = cn(
   "inline-flex shrink-0 items-center justify-center",
   density.target,
@@ -52,13 +52,12 @@ const stepperClassName = cn(
   tone.text.secondary,
   stateLayer.tonal,
   state.pressCompact,
-  state.disabledAttribute
+  state.effectiveDisabled
 );
 
 /**
- * A number typed or stepped. Base UI owns parsing, stepping, clamping, spinbutton
- * semantics and locale formatting; the surface belongs to the text-field family, and the
- * two steppers are the field's own parts rather than nested `IconButton` components.
+ * A number typed or stepped. Base UI owns parsing, stepping, clamping, spinbutton semantics and
+ * locale formatting; the ref points at the input, and the hidden form input is `inputRef`.
  */
 export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
   (
@@ -66,6 +65,7 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
       value,
       defaultValue,
       onValueChange,
+      onValueCommitted,
       min,
       max,
       step,
@@ -86,6 +86,7 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
         value={value}
         defaultValue={defaultValue}
         onValueChange={onValueChange}
+        onValueCommitted={onValueCommitted}
         min={min}
         max={max}
         step={step}
@@ -105,12 +106,13 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
             motion.press,
             focusRingWithin,
             material.control,
-            !disabled && state.field.hover,
-            !disabled && state.field.focusWithin,
-            !disabled && state.field.invalid,
-            !disabled && state.field.invalidHover,
-            !disabled && state.field.invalidFocusWithin,
-            disabled ? state.disabled : state.text
+            state.effectiveDisabled,
+            state.field.hover,
+            state.field.focusWithin,
+            state.field.invalid,
+            state.field.invalidHover,
+            state.field.invalidFocusWithin,
+            state.text
           )}
         >
           <BaseNumberField.Decrement className={cn(stepperClassName)}>
@@ -123,7 +125,7 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
               "min-w-0 flex-1 bg-transparent py-2 text-center text-inherit outline-none",
               motion.spring,
               state.steppedValue,
-              disabled ? state.disabledDescendant : state.text,
+              state.text,
               inputClassName
             )}
           />

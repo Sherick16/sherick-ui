@@ -1,22 +1,10 @@
-import { expect, test, type Page } from "@playwright/test";
-
-const trackRuntimeErrors = (page: Page) => {
-  const errors: string[] = [];
-
-  page.on("pageerror", (error) => errors.push(`pageerror: ${error.message}`));
-  page.on("console", (message) => {
-    if (message.type() === "error") errors.push(`console: ${message.text()}`);
-  });
-
-  return errors;
-};
+import { expect, test } from "./fixtures";
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/verification/interactions");
 });
 
-test("Field gives one control its label, description and error", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("Field gives one control its label, description and error", async ({ page, errors }) => {
   const checkbox = page.getByRole("checkbox", { name: "Release channel" });
 
   await expect(checkbox).toBeVisible();
@@ -42,8 +30,65 @@ test("Field gives one control its label, description and error", async ({ page }
   expect(errors).toEqual([]);
 });
 
-test("Checkbox toggles from the keyboard and reproduces its state in the form", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("a required field puts the requirement on the control, not only on its label", async ({
+  page,
+  errors,
+}) => {
+  const input = page.getByTestId("seats-field").getByRole("textbox", { name: "Seats" });
+
+  await expect(input).toHaveAttribute("required", "");
+  await expect(input).toHaveAttribute("data-required", "");
+  await expect(page.getByTestId("seats-field").getByText("*")).toBeVisible();
+
+  expect(errors).toEqual([]);
+});
+
+test("a field renders Base's own validation message when it is not given one", async ({
+  page,
+  errors,
+}) => {
+  const field = page.getByText("Priority").locator("..");
+  const input = field.getByRole("textbox", { name: "Priority" });
+  const message = page.getByText("Choose five or fewer");
+
+  await expect(message).toHaveCount(0);
+
+  await input.fill("6");
+  await input.blur();
+
+  await expect(message).toBeVisible();
+  await expect(input).toHaveAttribute("aria-invalid", "true");
+  await expect(input).toHaveAccessibleDescription(/Choose five or fewer/);
+
+  await input.fill("4");
+  await input.blur();
+  await expect(message).toHaveCount(0);
+
+  expect(errors).toEqual([]);
+});
+
+test("a field's disabled state reaches the control's own styling", async ({ page, errors }) => {
+  const checkbox = page.getByRole("checkbox", { name: "Locked by its field" });
+
+  // Base disables the control through the field; Sherick must style it disabled without ever
+  // having received a `disabled` prop of its own.
+  await expect(checkbox).toBeDisabled();
+  await expect(checkbox).toHaveAttribute("data-disabled", "");
+
+  const styled = await checkbox.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { opacity: style.opacity, cursor: style.cursor };
+  });
+  expect(styled.opacity).toBe("0.45");
+  expect(styled.cursor).toBe("not-allowed");
+
+  expect(errors).toEqual([]);
+});
+
+test("Checkbox toggles from the keyboard and reproduces its state in the form", async ({
+  page,
+  errors,
+}) => {
   const notify = page.getByRole("checkbox", { name: "Form notifications" });
 
   await expect(notify).toHaveAttribute("aria-checked", "true");
@@ -61,8 +106,7 @@ test("Checkbox toggles from the keyboard and reproduces its state in the form", 
   expect(errors).toEqual([]);
 });
 
-test("an indeterminate checkbox is mixed, not ticked", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("an indeterminate checkbox is mixed, not ticked", async ({ page, errors }) => {
   const partial = page.getByRole("checkbox", { name: "Partial selection" });
 
   await expect(partial).toHaveAttribute("aria-checked", "mixed");
@@ -78,8 +122,7 @@ test("an indeterminate checkbox is mixed, not ticked", async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
-test("RadioGroup selects one value with the keyboard and submits it", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("RadioGroup selects one value with the keyboard and submits it", async ({ page, errors }) => {
   const group = page.getByRole("radiogroup", { name: "Region", exact: true });
 
   await group.getByRole("radio", { name: "Europe" }).focus();
@@ -104,8 +147,7 @@ test("RadioGroup selects one value with the keyboard and submits it", async ({ p
   expect(errors).toEqual([]);
 });
 
-test("Slider adjusts and reports its value from the keyboard", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("Slider adjusts and reports its value from the keyboard", async ({ page, errors }) => {
   const slider = page.getByRole("slider", { name: "Budget", exact: true });
 
   await expect(slider).toHaveAttribute("aria-valuenow", "30");
@@ -124,8 +166,7 @@ test("Slider adjusts and reports its value from the keyboard", async ({ page }) 
   expect(errors).toEqual([]);
 });
 
-test("the selection family holds one accent token in both themes", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("the selection family holds one accent token in both themes", async ({ page, errors }) => {
   const checkboxFill = page
     .getByRole("checkbox", { name: "Form notifications" })
     .locator("span")
@@ -162,8 +203,8 @@ test("the selection family holds one accent token in both themes", async ({ page
 
 test("a compact selection control keeps a compact layout box with a comfortable hit area", async ({
   page,
+  errors,
 }) => {
-  const errors = trackRuntimeErrors(page);
   const checkbox = page.getByRole("checkbox", { name: "Form notifications" });
 
   // The visible mark is the layout footprint, so a table column or a row gap is measured from
@@ -195,17 +236,51 @@ test("a compact selection control keeps a compact layout box with a comfortable 
   expect(Math.round(rowBox?.height ?? 0)).toBeGreaterThanOrEqual(44);
   const hitAtRowEnd = await row.evaluate((element) => {
     const rect = element.getBoundingClientRect();
-    return (
-      document.elementFromPoint(rect.right - 4, rect.top + 4)?.closest("label") === element
-    );
+    return document.elementFromPoint(rect.right - 4, rect.top + 4)?.closest("label") === element;
   });
   expect(hitAtRowEnd).toBe(true);
 
   expect(errors).toEqual([]);
 });
 
-test("a checkbox neither moves nor drifts off its line when its mark arrives", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("expanded hit areas stay separate in rows at the library's own rhythm", async ({
+  page,
+  errors,
+}) => {
+  const first = page.getByRole("checkbox", { name: "First row" });
+  const second = page.getByRole("checkbox", { name: "Second row" });
+
+  await first.scrollIntoViewIfNeeded();
+  const [firstBox, secondBox] = await Promise.all([first.boundingBox(), second.boundingBox()]);
+  expect(firstBox).not.toBeNull();
+  expect(secondBox).not.toBeNull();
+
+  // Between two 24px marks in 48px rows the 44px targets cannot meet: the point in the gap
+  // belongs to neither control, so a click aimed at one row can never land on its neighbour.
+  const gapY = ((firstBox?.y ?? 0) + (firstBox?.height ?? 0) + (secondBox?.y ?? 0)) / 2;
+  const gapHits = await page.evaluate(
+    ({ x, y }) => {
+      const element = document.elementFromPoint(x, y);
+      return element?.closest('[role="checkbox"]') !== null;
+    },
+    { x: (firstBox?.x ?? 0) + (firstBox?.width ?? 0) / 2, y: gapY }
+  );
+  expect(gapHits).toBe(false);
+
+  // And each control still answers across its own row's height.
+  const rowHeight = (secondBox?.y ?? 0) - (firstBox?.y ?? 0);
+  expect(rowHeight).toBeGreaterThanOrEqual(44);
+  await first.click({ position: { x: 12, y: 12 } });
+  await expect(first).toHaveAttribute("aria-checked", "true");
+  await expect(second).toHaveAttribute("aria-checked", "false");
+
+  expect(errors).toEqual([]);
+});
+
+test("a checkbox neither moves nor drifts off its line when its mark arrives", async ({
+  page,
+  errors,
+}) => {
   const inline = page.getByRole("checkbox", { name: "Inline terms" });
 
   // The reported defect: the control sat on its text baseline, so its own mark changed the line
@@ -216,7 +291,6 @@ test("a checkbox neither moves nor drifts off its line when its mark arrives", a
       const line = element.parentElement?.getBoundingClientRect();
       const box = element.getBoundingClientRect();
       return {
-        lineTop: +(line?.top ?? 0).toFixed(2),
         lineHeight: +(line?.height ?? 0).toFixed(2),
         boxTop: +box.top.toFixed(2),
         boxCenter: +(box.top + box.height / 2).toFixed(2),
@@ -239,8 +313,38 @@ test("a checkbox neither moves nor drifts off its line when its mark arrives", a
   expect(errors).toEqual([]);
 });
 
-test("a radio row keeps its circle on the text line in either state", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("a selection mark's boundary does not move while it is pressed", async ({ page, errors }) => {
+  // Measured during the press, which is the interval the earlier tests could not see: a zoom on a
+  // control whose outline *is* the mark reads as the mark jumping.
+  const measurePress = async (locator: ReturnType<typeof page.getByRole>) => {
+    const well = locator.locator("span").first();
+    await locator.scrollIntoViewIfNeeded();
+    const before = await well.boundingBox();
+
+    await locator.hover();
+    await page.mouse.down();
+    const pressed = await well.boundingBox();
+    await page.mouse.up();
+
+    return { before, pressed };
+  };
+
+  const radio = page
+    .getByRole("radiogroup", { name: "Region", exact: true })
+    .getByRole("radio", { name: "United States" });
+  const radioWell = await measurePress(radio);
+  expect(radioWell.pressed?.y).toBe(radioWell.before?.y);
+  expect(radioWell.pressed?.height).toBe(radioWell.before?.height);
+
+  const checkbox = page.getByRole("checkbox", { name: "Partial selection" });
+  const checkboxWell = await measurePress(checkbox);
+  expect(checkboxWell.pressed?.y).toBe(checkboxWell.before?.y);
+  expect(checkboxWell.pressed?.height).toBe(checkboxWell.before?.height);
+
+  expect(errors).toEqual([]);
+});
+
+test("a radio row keeps its circle on the text line in either state", async ({ page, errors }) => {
   const group = page.getByRole("radiogroup", { name: "Region", exact: true });
 
   const read = () =>
@@ -271,7 +375,6 @@ test("a radio row keeps its circle on the text line in either state", async ({ p
   const before = await read();
   expect(before.length).toBeGreaterThan(1);
 
-  // Selecting another option must not move any row, and every circle sits on its own text line.
   await group.getByRole("radio", { name: "United States" }).click();
   const after = await read();
 
@@ -286,8 +389,7 @@ test("a radio row keeps its circle on the text line in either state", async ({ p
   expect(errors).toEqual([]);
 });
 
-test("NumberField types, steps and stops at its bounds", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("NumberField types, steps and stops at its bounds", async ({ page, errors }) => {
   const field = page.getByTestId("seats-field");
   const input = field.getByRole("textbox", { name: "Seats" });
   const increase = field.getByRole("button", { name: "Increase" });
@@ -307,6 +409,13 @@ test("NumberField types, steps and stops at its bounds", async ({ page }) => {
   await expect(input).toHaveValue("10");
   await expect(increase).toBeDisabled();
   await expect(decrease).toBeEnabled();
+
+  // A stepper that disabled itself at a bound must not keep a hover affordance.
+  await increase.hover();
+  const restingLayerOpacity = await increase.evaluate(
+    (element) => getComputedStyle(element, "::before").opacity
+  );
+  expect(Number(restingLayerOpacity)).toBe(0);
 
   expect(errors).toEqual([]);
 });

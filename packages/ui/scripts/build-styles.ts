@@ -223,10 +223,10 @@ output.append(
     outline-offset: -2px;
   }
 
-  /* A slider conveys its value through the fill of its groove and the depth of its thumb,
-     and forced colors flattens both. The thumb keeps a boundary; Base UI exposes the
-     data-index attribute on it, and the groove carries no hook of its own. */
-  :where(.${SUI_SCOPE_CLASS})[data-index] {
+  /* A slider conveys its value through the fill of its groove and the depth of its handle, and
+     forced colors flattens both. The handle carries a Sherick-owned marker, because Base's
+     collection attributes are not component identity. */
+  :where(.${SUI_SCOPE_CLASS})[data-sui-slider-thumb] {
     border: 1px solid CanvasText;
   }
 }`).nodes

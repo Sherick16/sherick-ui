@@ -1,7 +1,7 @@
 "use client";
 
 import { Checkbox as BaseCheckbox } from "@base-ui/react/checkbox";
-import { Check, Minus } from "lucide-react";
+import { Check as CheckIcon, Minus } from "lucide-react";
 import React, { forwardRef, type ButtonHTMLAttributes, type Ref } from "react";
 import { cn } from "@/libs/utils";
 import { groupFocusRing, hitArea, selectable, shape, state, stateLayer } from "./ui.common";
@@ -10,7 +10,7 @@ export interface CheckboxProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "value" | "type"> {
   checked?: boolean;
   defaultChecked?: boolean;
-  onCheckedChange?: (checked: boolean) => void;
+  onCheckedChange?: BaseCheckbox.Root.Props["onCheckedChange"];
   /** Neither ticked nor unticked. Base UI reports it as `mixed`, not as a ticked box. */
   indeterminate?: boolean;
   value?: string;
@@ -23,8 +23,8 @@ export interface CheckboxProps
 }
 
 /**
- * A ticked, unticked or mixed choice. The ref points at the visible button; the form
- * input Base UI keeps beside it is reached through `inputRef`.
+ * A ticked, unticked or mixed choice. The ref points at the visible button; the form input Base
+ * UI keeps beside it is reached through `inputRef`.
  */
 export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(
   (
@@ -63,12 +63,13 @@ export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(
         inputRef={inputRef}
         onCheckedChange={onCheckedChange}
         className={cn(
-          // `align-middle` rather than the default baseline: an inline-level box whose baseline is
-          // derived from its own children moves by a couple of pixels the moment its mark appears
-          // or leaves, which is exactly what a checkbox does. Its centre is a stable anchor.
+          // `align-middle` rather than the default baseline: an inline-level box whose baseline comes
+          // from its own children shifts the moment its mark appears or leaves, which is exactly what
+          // a checkbox does.
           "group inline-flex w-fit align-middle",
           hitArea,
-          disabled ? state.disabled : state.enabled,
+          state.enabled,
+          state.effectiveDisabled,
           className
         )}
       >
@@ -81,8 +82,7 @@ export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(
             selectable.rest,
             selectable.selected,
             selectable.indeterminate,
-            !disabled && stateLayer.track,
-            !disabled && state.groupPressMark,
+            stateLayer.track,
             groupFocusRing
           )}
         >
@@ -90,7 +90,7 @@ export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(
             {indeterminate ? (
               <Minus className={cn("size-4")} />
             ) : (
-              <Check className={cn("size-4")} />
+              <CheckIcon className={cn("size-4")} />
             )}
           </BaseCheckbox.Indicator>
         </span>

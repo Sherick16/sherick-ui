@@ -12,14 +12,15 @@ export interface FieldProps
   /** Supporting copy beneath the control. */
   description?: ReactNode;
   /**
-   * The message shown while the field is invalid. Its presence is what makes the field
-   * invalid, so an error can never be rendered without the state that explains it.
+   * The message shown while the field is invalid. Its presence is what makes the field invalid,
+   * so an error can never be rendered without the state that explains it. Omit it and Base UI's
+   * own validation message is shown instead.
    */
   error?: ReactNode;
   /**
-   * Renders the required mark beside the label. The control inside is what carries the
-   * requirement: pass `required` to it as well, because only the control can report it
-   * to a form or to assistive technology.
+   * Renders the required mark beside the label. This is presentational only: the requirement
+   * itself can only be declared by the control, so pass `required` to the control as well —
+   * every example, fixture and test in this repository does.
    */
   required?: boolean;
   /** Styles the field's own column. The control inside styles itself. */
@@ -65,11 +66,14 @@ export const Field = forwardRef<HTMLDivElement, FieldProps>(
             {description}
           </BaseField.Description>
         )}
-        {error && (
-          <BaseField.Error match className={cn("mt-2 text-xs leading-5 text-sherick-danger")}>
-            {error}
-          </BaseField.Error>
-        )}
+        {/* Mounted whether or not a message was passed: without `match` this part renders whatever
+            Base's own validation reports, so `validate`/`validationMode` are usable on their own,
+            and `match` pins a caller-supplied message in its place. */}
+        <BaseField.Error
+          match={error ? true : undefined}
+          className={cn("mt-2 text-xs leading-5 text-sherick-danger")}
+          {...(error ? { children: error } : {})}
+        />
       </BaseField.Root>
     );
   }

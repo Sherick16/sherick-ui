@@ -1,34 +1,14 @@
-import { expect, test, type Page } from "@playwright/test";
-
-const trackRuntimeErrors = (page: Page) => {
-  const errors: string[] = [];
-
-  page.on("pageerror", (error) => errors.push(`pageerror: ${error.message}`));
-  page.on("console", (message) => {
-    if (message.type() === "error") errors.push(`console: ${message.text()}`);
-  });
-
-  return errors;
-};
+import { expect, test, type Page } from "./fixtures";
 
 const setTheme = async (page: Page, theme: "light" | "dark") => {
   await page.evaluate((nextTheme) => {
     localStorage.setItem("sherick-ui-theme", nextTheme);
     document.documentElement.dataset.sherickTheme = nextTheme;
   }, theme);
-  // A theme switch re-resolves every token at once. Let that restyle land before anything is
-  // measured, so a computed style is never compared while the page is still repainting.
-  await page.evaluate(
-    () =>
-      new Promise<void>((resolve) => {
-        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
-      })
-  );
 };
 
 for (const theme of ["light", "dark"] as const) {
-  test(`core controls hydrate and match the ${theme} browser baseline`, async ({ page }) => {
-    const errors = trackRuntimeErrors(page);
+  test(`core controls hydrate and match the ${theme} browser baseline`, async ({ page, errors }) => {
 
     await page.goto("/verification/core");
     await expect(page.getByTestId("verification-core")).toBeVisible();
@@ -41,8 +21,7 @@ for (const theme of ["light", "dark"] as const) {
     expect(errors, `browser/runtime errors on the core ${theme} fixture`).toEqual([]);
   });
 
-  test(`initially-open dialog hydrates and matches the ${theme} browser baseline`, async ({ page }) => {
-    const errors = trackRuntimeErrors(page);
+  test(`initially-open dialog hydrates and matches the ${theme} browser baseline`, async ({ page, errors }) => {
 
     await page.goto("/verification/dialog");
     const dialog = page.getByRole("dialog");
@@ -57,8 +36,7 @@ for (const theme of ["light", "dark"] as const) {
   });
 }
 
-test("published component styles survive a host Tailwind reset", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("published component styles survive a host Tailwind reset", async ({ page, errors }) => {
 
   await page.goto("/verification/core");
   await setTheme(page, "dark");
@@ -94,7 +72,7 @@ test("published component styles survive a host Tailwind reset", async ({ page }
   expect(errors, "host Tailwind compatibility fixture produced runtime errors").toEqual([]);
 });
 
-test("showcase elevations and structural lines retain their design-language values", async ({ page }) => {
+test("showcase elevations and structural lines retain their design-language values", async ({ page, errors }) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Design system showcase" })).toBeVisible();
   await setTheme(page, "dark");
