@@ -1,11 +1,7 @@
 "use client";
 
 import { AlertDialog as BaseAlertDialog } from "@base-ui/react/alert-dialog";
-import React, {
-  forwardRef,
-  type ComponentProps,
-  type ReactNode,
-} from "react";
+import React, { forwardRef, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import Button from "./Button";
 import { DialogDescription } from "./DialogDescription";
@@ -14,8 +10,7 @@ import { DialogHeader } from "./DialogHeader";
 import { DialogSurface } from "./DialogSurface";
 import type { Variant } from "./ui.types";
 
-export interface AlertDialogProps
-  extends Omit<ComponentProps<typeof BaseAlertDialog.Root>, "children" | "modal" | "disablePointerDismissal"> {
+export interface AlertDialogProps {
   /** The question the dialog asks. Base makes it the surface's accessible name. */
   title: ReactNode;
   /** What the confirmation will do. Base makes it the surface's accessible description. */
@@ -24,7 +19,11 @@ export interface AlertDialogProps
   confirmLabel: string;
   /** The action the confirmation performs. It runs before the dialog closes. */
   onConfirm?: () => void;
-  /** The action the cancellation performs, when dismissing is itself a decision. */
+  /**
+   * Runs for every user cancellation — the cancel action and Escape alike — because a keyboard
+   * dismissal is the same decision as pressing the button. A dialog the application closes itself
+   * is not a cancellation and reports through `onOpenChange` only.
+   */
   onCancel?: () => void;
   /**
    * The tone of the confirm action. A confirmation that destroys something says so on the one
@@ -32,6 +31,9 @@ export interface AlertDialogProps
    */
   confirmVariant?: Variant;
   className?: string;
+  open?: boolean;
+  defaultOpen?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }
 
 /**
@@ -50,10 +52,20 @@ const AlertDialog = forwardRef<HTMLDivElement, AlertDialogProps>(({
   onCancel,
   confirmVariant = "danger",
   className,
+  onOpenChange,
   ...rootProps
 }, ref) => {
   return (
-    <BaseAlertDialog.Root {...rootProps}>
+    <BaseAlertDialog.Root
+      {...rootProps}
+      onOpenChange={(nextOpen, eventDetails) => {
+        /* Escape is a cancellation, and it is read from Base's own reason for the change rather
+           than from a key handler here: one place observes the closure, so a keyboard dismissal
+           and the cancel action report the same thing. */
+        if (!nextOpen && eventDetails.reason === "escape-key") onCancel?.();
+        onOpenChange?.(nextOpen);
+      }}
+    >
       <DialogSurface className={cn(className)} popupRef={ref}>
         <DialogHeader>{title}</DialogHeader>
         {description ? <DialogDescription>{description}</DialogDescription> : null}
@@ -79,5 +91,6 @@ const AlertDialog = forwardRef<HTMLDivElement, AlertDialogProps>(({
 });
 
 AlertDialog.displayName = "AlertDialog";
+
 
 export default AlertDialog;

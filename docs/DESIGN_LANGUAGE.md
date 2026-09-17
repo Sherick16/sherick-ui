@@ -229,9 +229,9 @@ rather than a material, a depth or a corner.
 | Recipe | Shell | Composes | Entrance geometry |
 | --- | --- | --- | --- |
 | `overlay.scrim` | the plane behind a surface that owns the viewport | a scrim fill plus a backdrop blur — no material, elevation or shape of its own | selects `motion.scrimIn` / `motion.scrimOut` instead of an entrance transform |
-| `overlay.popup` | an anchored surface with room to breathe: a selection list (`Select`, `Combobox`) or structured content (`Popover`) | `shape.surface` + `material.acrylic` + `elevation.floating` | grows from its trigger: origin at the top, a small scale-up and a −4px lift |
+| `overlay.popup` | an anchored surface with room to breathe: a selection list (`Select`, `Combobox`) or structured content (`Popover`) | `shape.surface` + `material.acrylic` + `elevation.floating` | grows from the edge it was anchored to, with a small scale-up and 4px of travel out of that edge |
 | `overlay.menu` | a compact list of commands (`Menu`) | `shape.control` + `material.acrylic` + `elevation.floating` | the same growth as `popup`, so a command list and a listbox arrive identically |
-| `overlay.tooltip` | a small anchored hint | `shape.prominent` + `material.acrylicDense` + `elevation.floating` | grows out of the edge it is anchored to, so its geometry is applied with its position |
+| `overlay.tooltip` | a small anchored hint | `shape.prominent` + `material.acrylicDense` + `elevation.floating` | grows from the edge it was anchored to, like the other anchored shells |
 | `overlay.dialog` | the dialog that owns the viewport | `shape.expressive` + `material.acrylicHero` + `elevation.floating` | rises into place from its own scale, with a larger lift than a popup |
 The recipes own only the **visual shell** and the geometry its motion grows from. Base UI
 owns popup presence, portals, focus management, pointer/focus suppression while closing,
@@ -250,6 +250,25 @@ Rules:
   document and to `overlay` in `packages/ui/src/components/ui.common.ts` before anything uses it;
 - behavior remains the Base primitive's responsibility; do not add Sherick-specific
   portal, focus-trap, dismissal, positioning or presence infrastructure around it.
+
+### The entrance follows the placement
+
+An anchored shell does **not** assume it is below its trigger. It reads both halves of its
+geometry from the primitive at the moment it is placed:
+
+- the **origin** is `--transform-origin`, which Base publishes on the positioner: the anchor
+  edge, resolved after collision handling. A surface above its trigger therefore grows out of
+  its own *bottom* edge, and one beside it grows out of its side;
+- the **travel** is 4px *into* that edge, selected from the popup's own `data-side`: down into
+  place from above, up into place from below, sideways when it is anchored to a side.
+  `overlay.dialog` is anchored to the viewport rather than to a control, so it has no side and
+  rises from a larger lift of its own.
+
+**Do:** expose a `side` and let the recipe place the entrance — every anchored shell in the
+library shares one policy, including a popup Base flips above its trigger to keep it on screen.
+**Do not** write `origin-top` or a fixed lift into a shell, and do not add per-component
+motion for an anchored surface: a surface that animates as if it were below its trigger when it
+is not is a surface that looks like it moved the wrong way.
 
 ### Stacking
 
@@ -407,11 +426,11 @@ state, so it fades on the shared motion curve rather than snapping.
 
 | Layer | Hover / active opacity | Applies to |
 | --- | --- | --- |
-| `quiet` | 0.05 / 0.09 | ghost controls, navigation rows, and every collection row. Hover is gated on the primitive's own disabled marker as well as the native attribute, so a row disabled by a list is a row that does not tint |
+| `quiet` | 0.05 / 0.09 | ghost controls, navigation rows, and every collection row. Both interactive steps are gated on the primitive's own disabled marker as well as the native attribute, so a row disabled by a list neither tints under the pointer nor presses |
 | `tonal` | 0.09 / 0.15 | tinted matte controls — tonal buttons, icon buttons, acrylic buttons |
 | `filled` | 0.18 / 0.26 | opaque accent fills |
 | `track` | 0.18 / 0.26 | a switch track, where hover and press arrive from the wrapping button via `group-*` |
-| `activeRow` | `data-active` / `data-highlighted` | a collection row highlighted by keyboard or pointer navigation; Base UI collection primitives use `data-highlighted`. It pairs with `quiet` on the same row, so highlight and hover are the same tone at the same strength |
+| `activeRow` | 0.05 | a collection row highlighted by keyboard or pointer navigation, from Base UI's `data-highlighted`. It pairs with `quiet` on the same row, so highlight and hover are the same tone at the same strength — asserted on the rendered layer in the browser suite. It is deliberately *not* gated on the disabled marker: a disabled row stays navigable and has to show where the navigation is |
 
 Fields are a single borderless family: a matte `surface-high` fill that steps up once on
 hover and once more while engaged, no ring and no lift. `state.field.*` covers hover,
@@ -477,7 +496,7 @@ object appears at two densities and has to behave identically at both:
 | --- | --- |
 | `list.option` | a row in a selection list: full width, one line, chosen rather than performed |
 | `list.command` | the same row at the density a list of short actions wants — a command is scanned, not read |
-| `list.sheet` | the sheet a list of rows sits in: it never exceeds what the viewport leaves it, and scrolls inside itself rather than growing. The width is the list's own decision — a control's list matches the control it came from, a command list is as wide as its commands and no narrower than a short list of actions needs |
+| `list.sheet` | the sheet a list of rows sits in: it never exceeds what the viewport leaves it, and scrolls inside itself rather than growing. The width is the list's own decision — a control's list is never narrower than the control it came from and grows to fit its own content until the viewport clamp, and a command list only ever grows to its commands and no narrower than a short list of actions needs |
 
 The two rows differ only in **density and the corner their own extent allows** — an option row
 is a field-sized object and takes `control`, a command row is an object smaller than a field and
@@ -492,9 +511,13 @@ Everything else is shared, and that sharing is the point:
 - **a destructive command wears its tone on its own label**, and its hover and highlight are
   then a restrained tint of that same tone. A menu never paints a whole row — or its sheet —
   in danger to announce that one item in it destroys something;
-- **a row that cannot be used composes none of it.** The list's own `data-disabled` marker
-  gates the hover step, so a disabled row carries no interactive state at all and the muted
-  tone is the only thing saying so.
+- **a row that cannot be used takes no hover and no press.** The primitive's own `data-disabled`
+  marker gates both interactive steps — a row is a `div`, so `:active` matches it while the
+  pointer is down on it and `:disabled` never does — and the muted tone is the rest of what says
+  so. It **keeps the navigation highlight**: a disabled option or command stays reachable by
+  keyboard so it can be discovered and announced as unavailable, and a reader still has to see
+  which row the navigation is on when it arrives there. Disabled means "cannot be chosen or
+  performed", never "cannot be found", so `activeRow` is deliberately *not* gated on the marker.
 
 A row is **flat**: depth never announces hover, highlight or selection, because the row sits in
 a list rather than on the page.
@@ -578,7 +601,8 @@ type step**, so controls of one density share a rhythm.
 | `compact` | 2.5rem | 0.875rem | dense desktop UI |
 | `normal` | 3rem | 0.95rem | the default rhythm |
 | `prominent` | 3.5rem | 1.125rem | the largest step, still compact by consumer-app standards |
-| `target` | 2.75rem square | inherits | the minimum interactive target for an icon-only control |
+| `target` | 2.75rem square | inherits | the minimum interactive target for an icon-only control that stands on its own |
+| `part` | 2.75rem tall, 2.25rem wide | inherits | one control **inside** a composite field — the trailing controls a `Combobox` owns |
 
 Anatomy owns **padding**, not density: a button is gripped at its ends, a field holds
 text, and neither is derived from the other — one density can carry two paddings, so
@@ -586,12 +610,21 @@ padding is written with the component rather than in these tokens. `Button` is t
 worked example: its `sm` / `md` / `lg` sizes are `density.compact` + `px-4 py-2`,
 `density.normal` + `px-6 py-3` and `density.prominent` + `px-8 py-4`.
 
+**`part` is the one step below the floor, and it is not a loose target.** A composite field
+is the target: the pointer is already in it, and the two controls at its trailing edge are
+gripped as one cluster rather than as two buttons beside a field — at the full width each one
+reads as a separate control. So a part keeps the floor's *height*, because it has to sit in
+the field's row, and takes only the width its own glyph needs. It still clears the 24px
+pointer-target minimum WCAG AA asks for.
+
 The library targets dense desktop and product UI, so even the prominent step stays
 compact. Body copy, headings and labels are content rather than controls and set their
 own type.
 
-**Do not** invent a fourth size step, scale a control by transform, or derive a button's
-inline padding from a field's.
+**Do:** use `target` for a control that is the whole target of its own action, and `part`
+only for a control that is one part of a composite field.
+**Do not** invent a fourth size step, scale a control by transform, derive a button's
+inline padding from a field's, or reach for `part` to make a standalone control denser.
 
 ---
 

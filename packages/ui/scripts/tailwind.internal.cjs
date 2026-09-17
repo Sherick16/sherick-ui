@@ -73,7 +73,7 @@ module.exports = {
           from: {
             opacity: "0",
             scale: "var(--sui-overlay-from-scale, 0.98)",
-            translate: "0 var(--sui-overlay-from-lift, 0px)",
+            translate: "var(--sui-overlay-from-shift-x, 0px) var(--sui-overlay-from-shift-y, 0px)",
           },
           to: { opacity: "1", scale: "1", translate: "0 0" },
         },
@@ -82,7 +82,7 @@ module.exports = {
           to: {
             opacity: "0",
             scale: "var(--sui-overlay-from-scale, 0.98)",
-            translate: "0 var(--sui-overlay-from-lift, 0px)",
+            translate: "var(--sui-overlay-from-shift-x, 0px) var(--sui-overlay-from-shift-y, 0px)",
           },
         },
         "sherick-scrim-in": {

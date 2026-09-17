@@ -1,5 +1,8 @@
 import { expect, isTopmost, test, type Locator, type Page } from "./fixtures";
 
+const layerOf = (locator: Locator) =>
+  locator.evaluate((element) => getComputedStyle(element, "::before").opacity);
+
 /* Every floating surface on this fixture is portaled, so the shell classes are what the browser
    can be asked about. `.sui-scope` proves the portaled subtree established the private style
    scope; the elevation, shape and acrylic classes prove it composed the shared overlay recipe
@@ -89,14 +92,71 @@ test.describe("Popover", () => {
 
     expect(errors).toEqual([]);
   });
+
+  test("anchors its entrance to the resolved side, not to a default one", async ({ page, errors }) => {
+    await openFixture(page);
+
+    await page.getByRole("button", { name: "Open top popover" }).click();
+    const shell = floatingShell(page);
+    await expect(shell).toBeVisible();
+    await expect(shell).toHaveAttribute("data-side", "top");
+
+    const geometry = await shell.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return {
+        shiftY: style.getPropertyValue("--sui-overlay-from-shift-y").trim(),
+        shiftX: style.getPropertyValue("--sui-overlay-from-shift-x").trim(),
+      };
+    });
+
+    /* The origin is the anchor edge Base resolved: a surface above its trigger grows out of its
+       *bottom* edge, where `origin-top` — the edge the recipe used to hard-code — grew it out of
+       the top edge it is not attached to. Measured inside the popup's own box, so it holds
+       whichever way the browser reports the value. */
+    const originY = (shell: Locator) =>
+      shell.evaluate((element) => {
+        const { height } = element.getBoundingClientRect();
+        const vertical = getComputedStyle(element).transformOrigin.split(" ").slice(1).join(" ");
+        const percent = /([\d.]+)%/.exec(vertical);
+        return {
+          y: percent ? (Number(percent[1]) / 100) * height : Number.parseFloat(vertical),
+          half: height / 2,
+        };
+      });
+
+    const above = await originY(shell);
+    expect(above.y).toBeGreaterThan(above.half);
+
+    /* And it settles *down* into place, which is the opposite of the below-trigger default. */
+    expect(geometry.shiftY).toBe("4px");
+    expect(geometry.shiftX).toBe("");
+
+    /* The same surface anchored below its trigger resolves the other edge from the same recipe. */
+    await page.keyboard.press("Escape");
+    await expect(shell).toHaveCount(0);
+    await page.getByRole("button", { name: "Open popover" }).click();
+    const below = page.locator('.sui-scope.shadow-sherick-floating[data-side="bottom"]');
+    await expect(below).toBeVisible();
+    const underneath = await originY(below);
+    expect(underneath.y).toBeLessThan(underneath.half);
+    expect(await below.evaluate((element) => getComputedStyle(element).getPropertyValue("--sui-overlay-from-shift-y").trim())).toBe("-4px");
+
+    expect(errors).toEqual([]);
+  });
 });
 
 test.describe("Menu", () => {
   const item = (page: Page, name: string | RegExp) => page.getByRole("menuitem", { name });
+  const menu = (page: Page) => page.getByRole("menu");
 
+  /* Opening a menu has two steps, and the keyboard only reaches the menu after the second: Base
+     focuses the popup once it has positioned it, so a key sent while the trigger still owns focus
+     goes to the trigger and moves nothing. The wait is for the state a key needs, not for the row
+     to be painted — `toBeVisible` is satisfied by the first step alone. */
   const openMenu = async (page: Page) => {
     await page.getByRole("button", { name: "Open menu" }).click();
     await expect(item(page, "Rename")).toBeVisible();
+    await expect(menu(page)).toBeFocused();
   };
 
   test("navigates with the keyboard and refuses to activate a disabled action", async ({ page, errors }) => {
@@ -155,6 +215,54 @@ test.describe("Menu", () => {
 
     expect(errors).toEqual([]);
   });
+
+  test("gives a disabled action no pointer state but keeps it navigable", async ({ page, errors }) => {
+    await openFixture(page);
+    await openMenu(page);
+
+    const disabled = item(page, "Duplicate");
+    const enabled = item(page, "Rename");
+    await expect(disabled).toHaveAttribute("data-disabled", "");
+    /* Navigation still reaches the disabled row, and that highlight is what tells a reader which
+       row it is on before hearing that the row cannot be used. Done before any pointer press: a
+       press on an action that *can* run closes the menu, which is Base's contract. */
+    await page.mouse.move(0, 0);
+    await page.keyboard.press("Home");
+    await page.keyboard.press("ArrowDown");
+    await expect(disabled).toHaveAttribute("data-highlighted", "");
+    expect(Number(await layerOf(disabled))).toBeGreaterThan(0);
+
+    /* A row is a `div`: `:active` matches it while the pointer is down on it and `:disabled` never
+       does, so the primitive's own marker is the only thing that can withhold the press step.
+       Measured while the press is held, because the tint is gone again by the time the pointer
+       comes back up. */
+    const press = async (locator: Locator) => {
+      const box = await locator.boundingBox();
+      if (!box) throw new Error("the row has no box");
+      await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+      const hovered = await layerOf(locator);
+      await page.mouse.down();
+      const pressed = await locator.evaluate((element) => ({
+        layer: getComputedStyle(element, "::before").opacity,
+        transform: getComputedStyle(element).transform,
+      }));
+      await page.mouse.up();
+      return { hovered, ...pressed };
+    };
+
+    const disabledPress = await press(disabled);
+    expect(disabledPress.layer).toBe(disabledPress.hovered);
+    /* A row does not travel at all — the sheet around it is the surface, and the row only tints —
+       so there is no compression to withhold in the first place. */
+    expect(disabledPress.transform).toBe("none");
+
+    /* The press step is still there for a row that can act, which is what makes the equality
+       above a statement about the marker and not about the measurement. */
+    const enabledPress = await press(enabled);
+    expect(Number(enabledPress.layer)).toBeGreaterThan(Number(enabledPress.hovered));
+    expect(errors).toEqual([]);
+  });
+
 
   test("consumes Escape, disposes of the popup and restores focus", async ({ page, errors }) => {
     await openFixture(page);
@@ -324,8 +432,50 @@ test.describe("Combobox", () => {
   test("is disabled by its own prop and by the field around it", async ({ page, errors }) => {
     await openFixture(page);
 
-    await expect(combobox(page, "Disabled combobox")).toBeDisabled();
-    await expect(combobox(page, "Locked combobox")).toBeDisabled();
+    /* Both paths have to reach the parts, not just the input: the trailing controls learn their
+       state from the primitive's own markers, so a control disabled by the field around it takes
+       the same unavailable cursor as one disabled by its own prop. A disabled button is also
+       outside the accessibility tree, so the parts are addressed by their own label. */
+    for (const name of ["Disabled combobox", "Locked combobox"]) {
+      const control = combobox(page, name);
+      await expect(control).toBeDisabled();
+      const group = control.locator("xpath=..");
+      await expect(group).toHaveAttribute("data-disabled", "");
+      for (const label of ["Clear selection", "Show options"]) {
+        const part = group.locator(`button[aria-label="${label}"]`);
+        await expect(part).toHaveAttribute("data-disabled", "");
+        await expect(part).toHaveCSS("cursor", "not-allowed");
+      }
+    }
+
+    expect(errors).toEqual([]);
+  });
+
+  test("stays browsable while read-only and gives up only its clear control", async ({ page, errors }) => {
+    await openFixture(page);
+
+    const control = combobox(page, "Read-only combobox");
+    const group = control.locator("xpath=..");
+    await expect(group).toHaveAttribute("data-readonly", "");
+    await expect(control).not.toBeDisabled();
+
+    /* Read-only is not disabled. The trigger keeps its affordance because the list still opens,
+       and the only part that goes away is the one that would change the value. */
+    const trigger = group.locator('button[aria-label="Show options"]');
+    await expect(trigger).not.toHaveAttribute("data-disabled", "");
+    await expect(trigger).toHaveCSS("cursor", "pointer");
+
+    const clear = group.locator('button[aria-label="Clear selection"]');
+    await expect(clear).toHaveAttribute("data-disabled", "");
+    await expect(clear).toHaveCSS("cursor", "not-allowed");
+
+    await trigger.click();
+    const option = page.getByRole("option", { name: "Dashboard" });
+    await expect(option).toBeVisible();
+
+    /* Browsing is allowed; changing the value is what read-only refuses. */
+    await option.click();
+    await expect(control).toHaveValue("Design system");
 
     expect(errors).toEqual([]);
   });
@@ -424,7 +574,9 @@ test.describe("AlertDialog", () => {
 
     await page.keyboard.press("Escape");
     await expect(surface(page)).toHaveCount(0);
-    await expect(page.getByTestId("alert-outcome")).toHaveText("");
+    /* Escape is a cancellation, so the application is told about it: the keyboard and the cancel
+       button report the same decision rather than one of them silently differing. */
+    await expect(page.getByTestId("alert-outcome")).toHaveText("cancelled");
     await expect(trigger(page)).toBeFocused();
 
     expect(errors).toEqual([]);

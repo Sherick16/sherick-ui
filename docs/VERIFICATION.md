@@ -134,8 +134,15 @@ The showcase browser suite also verifies:
 - controlled Tabs;
 - Select/Switch form participation;
 - Dialog description semantics;
-- nested overlay Escape ordering, including a Combobox inside a Dialog, and that a popup or tooltip
   opened from inside a modal actually hit-tests above it (visibility alone cannot see occlusion);
+- a disabled collection row: navigation still reaches it and it still shows the highlight, while a
+  held pointer press leaves its state layer exactly where hovering had left it — measured on the
+  rendered `::before`, against an enabled row whose press does add a step;
+- a Combobox that is read-only (browsable, clear unavailable) and one disabled both by its own prop
+  and by the `Field` around it (both trailing parts marked and unavailable), since those parts
+  style themselves from the primitive's own markers;
+- an anchored surface placed on each side of its trigger, asserting the resolved origin and the
+  direction of its travel rather than only that it appeared;
 - Wave B surface semantics under the torture theme and in forced colors;
 - hostile custom theme roles, including portaled content;
 - forced-colors focus/state/boundary fallbacks.
@@ -157,19 +164,29 @@ The same spec adds direct assertions axe cannot make: accessible names on icon-o
 `aria-busy` on the loading Search, and a visible keyboard focus ring on the core `Primary`
 button (`outline-style` other than `none`, `outline-width` at least `2px`).
 
-Every scan waits for Base UI's client-side ARIA wiring before it runs. That wiring is generated
-on the client, so the server-rendered shell of a field is briefly a control with a `<label for>`
-and no `aria-labelledby`; a scan that races hydration reports unnamed fields rather than a
-defect. The wait is the wiring itself, not a timeout.
+Every scan waits for hydration before it runs. Base UI generates its ARIA wiring in effects, so
+the server-rendered shell of a field is briefly a control with a `<label for>` and no
+`aria-labelledby`; a scan that races hydration reports unnamed fields rather than a defect. The
+wait is for hydration itself — the `data-hydrated` marker the root layout sets once the whole
+tree below it has run its effects, which React flushes parent-last — and not for a page-wide
+selector such as `[aria-labelledby]`, which any unrelated component on the page can satisfy while
+the component under test is still bare. The wait is the state, not a timeout.
 
-**One combination is asserted directly instead of scanned.** With a Combobox listbox open, Base
-UI's combobox focus manager marks the document around the popup `aria-hidden` without `inert`, and
-axe reports `aria-hidden-focus` against that page content. The markup is Base's, not Sherick's, and
-Sherick does not patch a base primitive's ARIA. That state is therefore verified with direct
-assertions — `role="listbox"`, `role="option"`, `aria-selected`, `aria-disabled` and the input's
-`aria-activedescendant` — while the closed fixture still runs the full axe scan over the same
-control, its `Field` label, description and error relationships. A modal Menu, an open AlertDialog
-and the closed Combobox are all scanned normally.
+**One combination is asserted directly instead of scanned, and it is tracked as an upstream
+risk.** With a Combobox listbox open, Base UI's combobox focus manager marks the document around
+the popup `aria-hidden` without `inert`, and axe reports `aria-hidden-focus` against that page
+content. The markup is Base's, not Sherick's, and Sherick does not patch a base primitive's ARIA.
+That state is therefore verified with direct assertions — `role="listbox"`, `role="option"`,
+`aria-selected`, `aria-disabled` and the input's `aria-activedescendant` — while the closed
+fixture still runs the full axe scan over the same control, its `Field` label, description and
+error relationships. A modal Menu, an open AlertDialog and the closed Combobox are all scanned
+normally.
+
+Those assertions are **not** equivalent to scanning the open state, and they are not recorded as
+if they were: the behavior comes from Base's shared modal/focus infrastructure and has been
+reported against Base itself. It is a dependency risk to settle before the stable `2.0.0` — an
+upstream fix, or an explicit decision that an open listbox may hide the rest of the page from
+assistive technology.
 
 **One rule is excluded, deliberately and for a recorded reason.** `color-contrast` is
 disabled for this run because the authored default palette does not meet WCAG AA text

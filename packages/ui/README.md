@@ -106,7 +106,20 @@ The package publishes these subpaths:
 
 The names above are canonical. There are no compatibility aliases: `ActionButton`, `Dropdown`, `Modal`, `TabGroup` and their prop types are gone, as are the deprecated `Select.selected`, `Select.onSelect`, `Tabs.defaultTabId`, `Tabs.onTabChange`, `Dialog.onClose` and `Table.variant` props. The `onChange` props on `Input`, `Textarea` and `Switch` are no longer Sherick callbacks — `Input` and `Textarea` pass through native `onChange`, and boolean state goes through `Switch.onCheckedChange`.
 
-Two floating-surface families exist and they differ in what they own. `Dialog` composes as `Dialog.Header`, `Dialog.Description`, `Dialog.Content` and `Dialog.Footer`; `AlertDialog` is the destructive confirmation, with `title`, `description`, `confirmLabel` and `onConfirm`, and it is always modal and never dismisses on an outside press. `Popover`, `Menu` and `Combobox` anchor to the element that opened them: `Popover.Trigger`/`Popover.Content`, `Menu.Trigger`/`Menu.Content`/`Menu.Item`/`Menu.Separator`, and a `Combobox` that takes `options` and a `value` the way `Select` does. Label a `Combobox` with `Field`, and drop it into `Select`'s place when the list needs to be searchable.
+Two floating-surface families exist and they differ in what they own. `Dialog` composes as
+`Dialog.Header`, `Dialog.Description`, `Dialog.Content` and `Dialog.Footer`; `AlertDialog` is the
+destructive confirmation, with `title`, `description`, `confirmLabel`, `onConfirm` and `onCancel`
+— `onCancel` runs for every user cancellation, the cancel action and Escape alike — and it is
+always modal and never dismisses on an outside press. `Popover`, `Menu` and `Combobox` anchor to
+the element that opened them: `Popover.Trigger`/`Popover.Content`,
+`Menu.Trigger`/`Menu.Content`/`Menu.Item`/`Menu.Separator`, and a `Combobox` that takes `options`
+and a `value` the way `Select` does. Label a `Combobox` with `Field`, and drop it into `Select`'s
+place when the list needs to be searchable; a `readOnly` Combobox still opens and browses, it just
+cannot change its value.
+
+These components compose Base UI primitives, and Base UI stays internal: the parts above accept the
+capabilities this package documents rather than the primitive's complete prop set, so a Base
+upgrade is not a Sherick breaking change.
 
 ## Rich content
 

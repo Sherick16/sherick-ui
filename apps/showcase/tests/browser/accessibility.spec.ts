@@ -8,9 +8,10 @@ const WCAG_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
 const expectNoA11yViolations = async (page: Page) => {
   /* Base UI wires every generated ARIA relationship on the client: the server-rendered shell
      carries none of them, so a field that is named a moment later looks unnamed to a scan that
-     races hydration. Waiting for that wiring is the wait for an interactive page — expressed as
-     the wiring itself, because a timer would only make the race shorter. */
-  await page.waitForFunction(() => document.querySelectorAll("[aria-labelledby]").length > 0);
+     races hydration. The wait is for hydration itself — the marker the root layout sets once the
+     whole tree below it has run its effects — rather than for any one attribute, which some other
+     component on the page could satisfy while the component under test is still bare. */
+  await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
 
   const results = await new AxeBuilder({ page })
     .withTags(WCAG_TAGS)

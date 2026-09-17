@@ -1,7 +1,7 @@
 "use client";
 
 import { Combobox as BaseCombobox } from "@base-ui/react/combobox";
-import React, { forwardRef, type ComponentProps, type ReactNode } from "react";
+import React, { forwardRef, type ReactNode } from "react";
 import { Check, ChevronDown, X } from "lucide-react";
 import { cn } from "@/libs/utils";
 import {
@@ -26,13 +26,10 @@ export interface ComboboxOption {
   disabled?: boolean;
 }
 
-/* Base's own root props are the source for every pass-through below. They are listed one by one
-   rather than inherited wholesale because Base's combobox root renders no element of its own and
-   ignores props it does not destructure: inheriting its type would accept `aria-label` and then
-   silently drop it, leaving an unlabeled field. Naming is the `Field`'s job — or a native
-   `<label htmlFor>` against this control's `id`. */
-type BaseComboboxRoot = ComponentProps<typeof BaseCombobox.Root>;
-
+/* Every pass-through is declared here rather than inherited wholesale. Base's combobox root
+   renders no element of its own and ignores props it does not destructure: inheriting its type
+   would accept `aria-label` and then silently drop it, leaving an unlabeled field. Naming is the
+   `Field`'s job — or a native `<label htmlFor>` against this control's `id`. */
 export interface ComboboxProps {
   options: ComboboxOption[];
   /** The selected option's value, or `null` for no selection. */
@@ -48,29 +45,32 @@ export interface ComboboxProps {
   filter?: ((option: ComboboxOption, query: string) => boolean) | null;
   open?: boolean;
   defaultOpen?: boolean;
-  onOpenChange?: BaseComboboxRoot["onOpenChange"];
+  onOpenChange?: (open: boolean) => void;
   /** The query, when the application controls it. */
-  inputValue?: BaseComboboxRoot["inputValue"];
-  defaultInputValue?: BaseComboboxRoot["defaultInputValue"];
-  onInputValueChange?: BaseComboboxRoot["onInputValueChange"];
-  autoHighlight?: BaseComboboxRoot["autoHighlight"];
+  inputValue?: string;
+  defaultInputValue?: string;
+  onInputValueChange?: (value: string) => void;
+  /** Highlights the first match as the query narrows, so `Enter` chooses it. */
+  autoHighlight?: boolean;
   /** Identifies the field when a form is submitted. */
-  name?: BaseComboboxRoot["name"];
+  name?: string;
   /** The form that owns the control, when it renders outside it. */
-  form?: BaseComboboxRoot["form"];
-  id?: BaseComboboxRoot["id"];
-  required?: BaseComboboxRoot["required"];
-  readOnly?: BaseComboboxRoot["readOnly"];
-  disabled?: BaseComboboxRoot["disabled"];
+  form?: string;
+  required?: boolean;
+  readOnly?: boolean;
+  disabled?: boolean;
 }
 
 /* The composite field's own controls are not standalone `IconButton`s: the field owns their
-   focus treatment, and Base disables them with the control itself. They take the target floor
-   for their height and only the width their glyph needs: they sit beside a field-wide input and
-   have to read as one cluster at the field's trailing edge rather than as two separate targets,
-   so the floor's width step is dropped. */
-const partClassName = (partsDisabled: boolean) =>
-  `inline-flex shrink-0 items-center justify-center ${density.target} ${shape.circle} ${text.medium} min-w-9 [&>svg]:size-5 ${motion.press} ${stateLayer.quiet} ${partsDisabled ? state.disabledDescendant : state.enabled} hover:text-sherick-ink`;
+   focus treatment, and they are one cluster at the field's trailing edge rather than two targets
+   beside it, so they take `density.part` instead of the standalone target floor.
+   They style themselves from Base's own part state and nothing else. Base marks each part it
+   disables (`data-disabled`, plus the native `disabled` attribute), including a part disabled by
+   the `Field` around it, and it leaves the trigger operable while the control is read-only —
+   a read-only combobox still opens and browses, only its value is fixed. The clear control is
+   handed its own `disabled` for that case because Base itself refuses to clear a read-only
+   control; nothing here has to be derived from Sherick's props. */
+const partClassName = `inline-flex shrink-0 items-center justify-center ${density.part} ${shape.circle} ${text.medium} [&>svg]:size-5 ${motion.press} ${stateLayer.quiet} ${state.enabled} ${state.effectiveDisabled} [&:not([data-disabled]):not(:disabled)]:hover:text-sherick-ink`;
 
 /**
  * A text field that filters a list of options and selects one of them. It is the searchable
@@ -95,9 +95,6 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(({
   filter,
   ...rootProps
 }, ref) => {
-  /* Base disables the clear and trigger parts with the control itself, so their cursor is read
-     from the same two props the field passes down rather than from a second source of truth. */
-  const partsDisabled = Boolean(disabled || readOnly);
   const selectedOption = (next: string | null | undefined) =>
     next == null ? null : options.find((option) => option.value === next) ?? null;
 
@@ -144,10 +141,16 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(({
             "min-w-0 flex-1 bg-transparent outline-none placeholder:text-sherick-ink-muted disabled:cursor-not-allowed"
           )}
         />
-        <BaseCombobox.Clear aria-label="Clear selection" className={cn(partClassName(partsDisabled))}>
+        <BaseCombobox.Clear
+          aria-label="Clear selection"
+          // Clearing changes the value, so a read-only control cannot offer it — which is Base's own
+          // reading of the same state, since its clear control refuses the press.
+          disabled={disabled || readOnly}
+          className={cn(partClassName)}
+        >
           <X aria-hidden="true" />
         </BaseCombobox.Clear>
-        <BaseCombobox.Trigger aria-label="Show options" className={cn(partClassName(partsDisabled))}>
+        <BaseCombobox.Trigger aria-label="Show options" className={cn(partClassName)}>
           <ChevronDown aria-hidden="true" />
         </BaseCombobox.Trigger>
       </BaseCombobox.InputGroup>

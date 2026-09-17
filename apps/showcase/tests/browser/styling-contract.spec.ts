@@ -38,6 +38,35 @@ test("interactive surfaces tint on hover and stay inert while disabled", async (
   expect(errors).toEqual([]);
 });
 
+test("a hovered row and a keyboard-navigated row carry the same tone", async ({ page, errors }) => {
+  await page.goto("/verification/interactions");
+  const item = (name: string) => page.getByRole("menuitem", { name });
+
+  await page.getByRole("button", { name: "Open menu" }).click();
+  const row = item("Rename");
+  await expect(row).toBeVisible();
+
+  /* Keyboard first, with the pointer parked away from the list, so that measurement is the
+     highlight step on its own. */
+  await page.mouse.move(0, 0);
+  await page.getByRole("menu").press("Home");
+  await expect(row).toHaveAttribute("data-highlighted", "");
+  const byKeyboard = await layerOpacity(row);
+
+  /* Then the pointer on the same row: if the two steps ever diverged, adding the hover to the
+     highlight would change what is rendered. */
+  await row.hover();
+  const byPointer = await layerOpacity(row);
+
+  /* One strength for one state. The two steps are written separately in the recipe because a class
+     name has to be literal to be compiled, so the equality is asserted where it is rendered
+     rather than assumed from the source. */
+  expect(Number(byKeyboard)).toBeGreaterThan(0);
+  expect(byPointer).toBe(byKeyboard);
+
+  expect(errors).toEqual([]);
+});
+
 
 test("hostile custom theme keeps semantic on-colors distinct across components and portals", async ({ page, errors }) => {
   await page.goto("/verification/theme-torture");

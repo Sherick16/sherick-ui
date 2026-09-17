@@ -61,4 +61,4 @@ export type { Tab, TabsProps } from "./Tabs";
 export type { TableProps } from "./Table";
 export type { TextareaProps } from "./Textarea";
 export type { TooltipProps } from "./Tooltip";
-export type { Variant } from "./ui.types";
+export type { OverlayAlign, OverlaySide, Variant } from "./ui.types";

@@ -12,12 +12,6 @@ export interface TooltipProps {
   position?: "top" | "right" | "bottom" | "left";
 }
 
-const liftForSide = (side: string) => {
-  if (side === "top") return "[--sui-overlay-from-lift:4px]";
-  if (side === "bottom") return "[--sui-overlay-from-lift:-4px]";
-  return "[--sui-overlay-from-lift:0px]";
-};
-
 const Tooltip = ({ children, content, className, position = "bottom" }: TooltipProps) => {
   return (
     <BaseTooltip.Provider delay={0} closeDelay={0}>
@@ -28,12 +22,11 @@ const Tooltip = ({ children, content, className, position = "bottom" }: TooltipP
         <BaseTooltip.Portal>
           <BaseTooltip.Positioner side={position} sideOffset={8} className={cn(stacking.float)}>
             <BaseTooltip.Popup
-              className={({ open, side }) =>
+              className={({ open }) =>
                 cn(
-                  "w-max max-w-64 whitespace-normal px-3 py-2 text-xs leading-5 [transform-origin:var(--transform-origin)]",
+                  "w-max max-w-64 whitespace-normal px-3 py-2 text-xs leading-5",
                   overlay.tooltip,
                   text.high,
-                  liftForSide(side),
                   open ? motion.overlayIn : motion.overlayOut
                 )
               }

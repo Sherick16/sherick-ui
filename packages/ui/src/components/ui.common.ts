@@ -243,47 +243,55 @@ export const state = {
    and it takes the press timing while the control is held.
    One step per fill strength: a quiet surface tints lightly, an opaque accent fill
    takes the heaviest step.
-   The hover step is gated on the primitive's own disabled markers, so an effectively
-   disabled control never tints — whether it was disabled by a prop, by its group or by
-   the field around it. A disabled element cannot be `:active`, so the press step needs
-   no gate. */
+   Both interactive steps are gated on the primitive's own disabled markers, so an effectively
+   disabled control neither tints nor presses — whether it was disabled by a prop, by its group or
+   by the field around it. `:disabled` alone cannot gate a press: a row in a collection is a
+   `div`, so `:active` matches it while the pointer is down on it and the marker is the only gate
+   there is. */
 const stateLayerBase =
   "before:pointer-events-none before:absolute before:inset-0 before:content-[''] before:opacity-0 before:transition-opacity before:duration-release before:ease-release active:before:duration-press active:before:ease-press motion-reduce:before:transition-none";
 
-/* A part is hoverable only while it is interactive. A native control carries `disabled`, and a
-   collection primitive marks its rows with `data-disabled` instead — a listbox option or a menu
-   command is a `div`, so `:disabled` never matches it and the marker is the only gate there is.
-   One rule covers both, so a disabled row never tints. The group form is the same rule for a
-   part whose hover arrives from the wrapping control.
+/* A part answers the pointer only while it is interactive. A native control carries `disabled`, and
+   a collection primitive marks its rows with `data-disabled` instead. One rule covers both, in the
+   same shape for hover and for press, and the group form is that rule for a part whose pointer
+   arrives from the wrapping control.
 
-   Each hover step is written out as a whole class name rather than assembled from a variant
-   fragment and a suffix, because the stylesheet compiler reads class names as literal text: a
-   name that only exists once the recipe is evaluated compiles to no rule at all, and the layer
-   silently never tints. Interpolating one of these consts is safe — the name is still written
-   here in full. */
+   Each step is written out as a whole class name rather than assembled from a variant fragment and
+   a suffix, because the stylesheet compiler reads class names as literal text: a name that only
+   exists once the recipe is evaluated compiles to no rule at all, and the step silently disappears.
+   Interpolating one of these consts is safe — the name is still written here in full. */
 const hoverQuiet = "[&:not([data-disabled]):not(:disabled)]:hover:before:opacity-[0.05]";
 const hoverTonal = "[&:not([data-disabled]):not(:disabled)]:hover:before:opacity-[0.09]";
 const hoverFilled = "[&:not([data-disabled]):not(:disabled)]:hover:before:opacity-[0.18]";
 const hoverTrack = "group-[:not([data-disabled]):not(:disabled)]:hover:before:opacity-[0.18]";
+const pressQuiet = "[&:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.09]";
+const pressTonal = "[&:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.15]";
+const pressFilled = "[&:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.26]";
+const pressTrack = "group-[:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.26]";
 
 export const stateLayer = {
   /* Quiet surfaces — ghost controls, navigation rows, menu options. */
-  quiet: `relative ${stateLayerBase} before:rounded-[inherit] before:bg-current ${hoverQuiet} active:before:opacity-[0.09]`,
+  quiet: `relative ${stateLayerBase} before:rounded-[inherit] before:bg-current ${hoverQuiet} ${pressQuiet}`,
   /* Tinted containers: the fill is nearly page color already, so the container's own
      on-color (`current`) carries the state at a light step. Shared by every matte
      control with a fill — tonal buttons, icon buttons, acrylic buttons. */
-  tonal: `relative ${stateLayerBase} before:rounded-[inherit] before:bg-current ${hoverTonal} active:before:opacity-[0.15]`,
+  tonal: `relative ${stateLayerBase} before:rounded-[inherit] before:bg-current ${hoverTonal} ${pressTonal}`,
   /* Opaque fills: `current` is the fill's own on-color — the color furthest from it in
      either theme — so one step reads on a saturated blue and a neutral gray alike. */
-  filled: `relative ${stateLayerBase} before:rounded-[inherit] before:bg-current ${hoverFilled} active:before:opacity-[0.26]`,
+  filled: `relative ${stateLayerBase} before:rounded-[inherit] before:bg-current ${hoverFilled} ${pressFilled}`,
   /* A switch track or a selection well: the same layer, but hover and press arrive from the
      wrapping control rather than from the surface itself. */
-  track: `${stateLayerBase} before:rounded-[inherit] before:bg-current ${hoverTrack} group-active:before:opacity-[0.26] group-active:before:duration-press group-active:before:ease-press`,
+  track: `${stateLayerBase} before:rounded-[inherit] before:bg-current ${hoverTrack} ${pressTrack} group-active:before:duration-press group-active:before:ease-press`,
   /* A row highlighted by keyboard or pointer navigation. Base UI collection primitives expose
-     `data-highlighted`; this is the one canonical visual treatment for it, and it pairs with
-     a row's own `quiet` layer — the row carries both, so a highlighted row and a hovered row
-     are the same tone at the same strength. */
-  activeRow: "data-[highlighted]:before:opacity-[0.06]",
+     `data-highlighted`; this is the one canonical visual treatment for it, and it pairs with a
+     row's own `quiet` layer — the row carries both, so a highlighted row and a hovered row are the
+     same tone at the same strength. That strength is written twice because a class name has to be
+     literal to be compiled; that the two rendered layers agree is asserted in the browser suite
+     rather than left to these lines to stay in step.
+     It is deliberately not gated on the disabled markers: a disabled command stays reachable by
+     keyboard so it can be discovered and announced as unavailable, and a reader still has to see
+     which row the navigation is on when it lands there. */
+  activeRow: "data-[highlighted]:before:opacity-[0.05]",
 } as const;
 
 /* Hit area — the interactive region of a control whose visible mark is smaller than a comfortable
@@ -357,8 +365,16 @@ export const density = {
   compact: "min-h-10 text-sm",
   normal: "min-h-12 text-[0.95rem]",
   prominent: "min-h-14 text-lg",
-  /* Minimum interactive target for an icon-only control. */
+  /* Minimum interactive target for an icon-only control that stands on its own. */
   target: "min-h-11 min-w-11",
+  /* A control that is one part of a composite field — the trailing controls a Combobox owns. It
+     keeps the floor's height, because it has to sit in the field's row, and takes only the width
+     its glyph needs: the two of them are gripped as one cluster at the field's edge, and two full
+     squares there read as two controls beside a field rather than as parts of it.
+     The narrower step still clears the 24px pointer-target minimum WCAG AA asks for. It is below
+     this system's own 44px floor on purpose: that floor belongs to a control that is the whole
+     target of its own action, and this one is a part of a field the pointer is already in. */
+  part: "min-h-11 min-w-9",
 } as const;
 
 /* Stacking level — where anything that floats sits relative to the application.
@@ -375,6 +391,24 @@ export const density = {
 export const stacking = {
   float: "z-50",
 } as const;
+
+/* The geometry an anchored surface grows from, read from the primitive instead of assumed.
+   Base publishes the resolved anchor edge as `--transform-origin` on the positioner, and the
+   popup's own `data-side` says which edge that is — after collision handling, not before it.
+   So the surface scales out of the edge it is actually attached to, and travels four pixels in
+   from its own side: a surface below its trigger rises into place, one above it settles down
+   into it, one beside it slides in from that side. A popup flipped above its trigger by a
+   collision therefore animates the way it is placed, and neither the component nor the caller
+   has to know which way that turned out. */
+const anchoredGeometry = [
+  "[transform-origin:var(--transform-origin)]",
+  "[--sui-overlay-from-shift-y:-4px]",
+  "data-[side=top]:[--sui-overlay-from-shift-y:4px]",
+  "data-[side=left]:[--sui-overlay-from-shift-y:0px] data-[side=left]:[--sui-overlay-from-shift-x:4px]",
+  "data-[side=right]:[--sui-overlay-from-shift-y:0px] data-[side=right]:[--sui-overlay-from-shift-x:-4px]",
+  "data-[side=inline-start]:[--sui-overlay-from-shift-y:0px] data-[side=inline-start]:[--sui-overlay-from-shift-x:4px]",
+  "data-[side=inline-end]:[--sui-overlay-from-shift-y:0px] data-[side=inline-end]:[--sui-overlay-from-shift-x:-4px]",
+].join(" ");
 
 /* Floating overlay shells.
    Base UI owns popup presence, focus, dismissal, portals and anchored positioning.
@@ -393,18 +427,18 @@ export const overlay = {
      surface corner, because what it holds is read rather than scanned.
      When not to use it: a short list of commands wants `menu`, and a hint wants
      `tooltip`. */
-  popup: `origin-top [--sui-overlay-from-scale:0.985] [--sui-overlay-from-lift:-4px] ${shape.surface} ${material.acrylic} ${elevation.floating}`,
+  popup: `[--sui-overlay-from-scale:0.985] ${anchoredGeometry} ${shape.surface} ${material.acrylic} ${elevation.floating}`,
   /* A compact list of commands. The same sheet, the same entrance and the same lighting as
      `popup`, tightened in shape so a handful of short actions reads as a list rather than a
      page: a command list should feel like one more control on the surface it came from.
      When not to use it: a list of options that are chosen rather than performed, or a
      surface holding structured content, wants `popup`. */
-  menu: `origin-top [--sui-overlay-from-scale:0.985] [--sui-overlay-from-lift:-4px] ${shape.control} ${material.acrylic} ${elevation.floating}`,
-  /* A tooltip grows out of the edge it is anchored to, so its geometry is per position
-     and is applied with the position in the component. */
-  tooltip: `${shape.prominent} ${material.acrylicDense} ${elevation.floating}`,
-  /* A dialog rises further than a menu, from its own scale. */
-  dialog: `[--sui-overlay-from-scale:0.985] [--sui-overlay-from-lift:8px] ${shape.expressive} ${material.acrylicHero} ${elevation.floating}`,
+  menu: `[--sui-overlay-from-scale:0.985] ${anchoredGeometry} ${shape.control} ${material.acrylic} ${elevation.floating}`,
+  /* A tooltip is anchored like the others, and reads its edge the same way. */
+  tooltip: `${anchoredGeometry} ${shape.prominent} ${material.acrylicDense} ${elevation.floating}`,
+  /* A dialog rises further than a menu, from its own scale. It is anchored to the viewport, so it
+     has no side to grow from. */
+  dialog: `[--sui-overlay-from-scale:0.985] [--sui-overlay-from-shift-y:8px] ${shape.expressive} ${material.acrylicHero} ${elevation.floating}`,
 } as const;
 
 /* Text hierarchy — three steps, no more. High emphasis carries labels and values,
@@ -421,15 +455,21 @@ export const text = {
    object at two densities instead of three independent designs.
 
    The sheet never exceeds what the viewport leaves it, and scrolls inside itself rather than
-   growing. Its width is the list's own decision: a control's list matches the control it came
-   from, and a command list is as wide as the commands in it. A row is flat — depth never announces a state —
+   growing. Its width is the list's own decision: a control's list is never narrower than the
+   control it came from and grows to fit its own content until the viewport clamp, and a command
+   list only ever grows to its content. A row is flat — depth never announces a state —
    and one row step of `stateLayer.quiet` plus `stateLayer.activeRow` carries both its hover and
    its keyboard highlight, so an option and a command are highlighted by the same tone at the
    same strength. That highlight *is* the row's focus indicator — Base gives the active row real
-   DOM focus, so the row suppresses the user agent's own ring and shows the highlight instead. Selection is a tint of the sheet through `tone.selected` and never the opaque
+   DOM focus, so the row suppresses the user agent's own ring and shows the highlight instead.
+   Selection is a tint of the sheet through `tone.selected` and never the opaque
    accent, which belongs to the one primary action in the view rather than to a row that happens
-   to be chosen. A row that cannot be used composes none of it: the tone step alone says so.
- */
+   to be chosen.
+   A row that cannot be used takes no hover and no press, and its tone step says so on its own —
+   but it keeps the navigation highlight. A disabled option or command stays reachable by
+   keyboard so it can be discovered and announced as unavailable, and a reader still has to see
+   which row the navigation is on when it arrives there. Disabled means "cannot be chosen or
+   performed", never "cannot be found". */
 export const list = {
   sheet: "max-w-[var(--available-width)] max-h-[var(--available-height)] overflow-y-auto",
   /* A row in a selection list: one line, read one at a time and chosen. */

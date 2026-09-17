@@ -241,6 +241,23 @@ export default function VerificationInteractionsPage() {
           <span data-testid="popover-owner">{popoverOwner}</span>
         </div>
 
+        {/* Anchored above its trigger, so the entrance geometry has a resolved side that is not
+            the default one. */}
+        <div className="flex flex-wrap items-center gap-4">
+          <Popover>
+            <Popover.Trigger
+              render={
+                <Button appearance="tonal" variant="secondary">
+                  Open top popover
+                </Button>
+              }
+            />
+            <Popover.Content side="top">
+              <p className="text-sm">Anchored above the control that opened it.</p>
+            </Popover.Content>
+          </Popover>
+        </div>
+
         <div className="flex flex-wrap items-center gap-4">
           <Menu>
             <Menu.Trigger
@@ -285,6 +302,12 @@ export default function VerificationInteractionsPage() {
 
         <Field label="Locked combobox" disabled>
           <Combobox options={projectOptions} defaultValue="design" />
+        </Field>
+
+        {/* Read-only is not disabled: the value cannot change, but the list still opens and
+            browses — only clearing is unavailable. */}
+        <Field label="Read-only combobox">
+          <Combobox options={projectOptions} defaultValue="design" readOnly />
         </Field>
 
         <form
