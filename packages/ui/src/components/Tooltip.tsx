@@ -3,7 +3,7 @@
 import { Tooltip as BaseTooltip } from "@base-ui/react/tooltip";
 import React, { type ReactElement, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { motion, overlay, text } from "./ui.common";
+import { motion, overlay, stacking, text } from "./ui.common";
 
 export interface TooltipProps {
   children: ReactElement;
@@ -26,7 +26,7 @@ const Tooltip = ({ children, content, className, position = "bottom" }: TooltipP
           <BaseTooltip.Trigger render={children} />
         </span>
         <BaseTooltip.Portal>
-          <BaseTooltip.Positioner side={position} sideOffset={8} className={cn("z-40")}>
+          <BaseTooltip.Positioner side={position} sideOffset={8} className={cn(stacking.float)}>
             <BaseTooltip.Popup
               className={({ open, side }) =>
                 cn(

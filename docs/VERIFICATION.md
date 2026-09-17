@@ -40,7 +40,11 @@ Both consume `sherick-ui` through package exports after the library build.
 - no `!important` in published package CSS;
 - no component/accessibility selector escaping the private Sherick scope;
 - retained server/client module boundaries;
-- design-rule checks such as no raw neutral palette or arbitrary shadow system in components.
+- design-rule checks such as no raw neutral palette or arbitrary shadow system in components;
+- every class name an authored recipe renders has a rule in the published `styles.css`. The
+  stylesheet compiler reads class names as literal text, so a name assembled when the recipe is
+  evaluated compiles to nothing and that step of the recipe silently disappears — which is how every
+  state layer once shipped without its hover rule.
 
 ## Packed-package consumer checks
 
@@ -130,7 +134,9 @@ The showcase browser suite also verifies:
 - controlled Tabs;
 - Select/Switch form participation;
 - Dialog description semantics;
-- nested overlay Escape ordering;
+- nested overlay Escape ordering, including a Combobox inside a Dialog, and that a popup or tooltip
+  opened from inside a modal actually hit-tests above it (visibility alone cannot see occlusion);
+- Wave B surface semantics under the torture theme and in forced colors;
 - hostile custom theme roles, including portaled content;
 - forced-colors focus/state/boundary fallbacks.
 
@@ -150,6 +156,20 @@ the workbench indiscriminately:
 The same spec adds direct assertions axe cannot make: accessible names on icon-only controls,
 `aria-busy` on the loading Search, and a visible keyboard focus ring on the core `Primary`
 button (`outline-style` other than `none`, `outline-width` at least `2px`).
+
+Every scan waits for Base UI's client-side ARIA wiring before it runs. That wiring is generated
+on the client, so the server-rendered shell of a field is briefly a control with a `<label for>`
+and no `aria-labelledby`; a scan that races hydration reports unnamed fields rather than a
+defect. The wait is the wiring itself, not a timeout.
+
+**One combination is asserted directly instead of scanned.** With a Combobox listbox open, Base
+UI's combobox focus manager marks the document around the popup `aria-hidden` without `inert`, and
+axe reports `aria-hidden-focus` against that page content. The markup is Base's, not Sherick's, and
+Sherick does not patch a base primitive's ARIA. That state is therefore verified with direct
+assertions — `role="listbox"`, `role="option"`, `aria-selected`, `aria-disabled` and the input's
+`aria-activedescendant` — while the closed fixture still runs the full axe scan over the same
+control, its `Field` label, description and error relationships. A modal Menu, an open AlertDialog
+and the closed Combobox are all scanned normally.
 
 **One rule is excluded, deliberately and for a recorded reason.** `color-contrast` is
 disabled for this run because the authored default palette does not meet WCAG AA text
@@ -194,7 +214,7 @@ styling change cannot silently satisfy them by shifting pixels.
 The Vite fixture verifies:
 
 - representative components render with package CSS alone;
-- Dialog, Select and Tooltip remain styled through portals;
+- Dialog, Select, Tooltip, Popover, Menu, Combobox and AlertDialog remain styled through portals;
 - rich-content/KaTeX styling and fonts are present;
 - theme variables load;
 - a deliberately Tailwind-looking consumer element (`flex absolute rounded-full px-6 text-sm`) remains untouched, proving generic package utilities do not leak globally.

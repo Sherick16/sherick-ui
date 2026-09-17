@@ -53,7 +53,7 @@ Custom themes override the documented `--sui-*` CSS variables at document/root l
 ## Usage
 
 ```tsx
-import { Button, Input, Dialog, Select } from "sherick-ui";
+import { Button, Combobox, Dialog, Field, Input, Menu, Select } from "sherick-ui";
 import "sherick-ui/styles.css";
 
 export function Example() {
@@ -67,6 +67,22 @@ export function Example() {
         ]}
         defaultValue="design"
       />
+      <Field label="Project">
+        <Combobox
+          options={[
+            { label: "Design system", value: "design" },
+            { label: "Dashboard", value: "dashboard" },
+          ]}
+          defaultValue="design"
+        />
+      </Field>
+      <Menu>
+        <Menu.Trigger render={<Button appearance="tonal">Actions</Button>} />
+        <Menu.Content>
+          <Menu.Item>Rename</Menu.Item>
+          <Menu.Item variant="danger">Delete</Menu.Item>
+        </Menu.Content>
+      </Menu>
       <Button appearance="filled">Save</Button>
       <Dialog defaultOpen>
         <Dialog.Header>Example dialog</Dialog.Header>
@@ -82,13 +98,15 @@ export function Example() {
 
 The package publishes these subpaths:
 
-- `sherick-ui` — the core component barrel: `Button`, `IconButton`, `Alert`, `Avatar`, `Badge`, `Card`, `Divider`, `Input`, `Textarea`, `Search`, `Select`, `Switch`, `Dialog`, `Tabs`, `Table`, `NavGroup`, `NavItem`, `Skeleton`, `Spinner`, `Tooltip`, plus their prop types and the shared `Variant` type.
+- `sherick-ui` — the core component barrel: `Alert`, `AlertDialog`, `Avatar`, `Badge`, `Button`, `Card`, `Checkbox`, `Combobox`, `Dialog`, `Divider`, `Field`, `IconButton`, `Input`, `Menu`, `NavGroup`, `NavItem`, `NumberField`, `Popover`, `RadioGroup`, `Search`, `Select`, `Skeleton`, `Slider`, `Spinner`, `Switch`, `Table`, `Tabs`, `Textarea`, `Tooltip`, plus their prop types and the shared `Variant` type.
 - `sherick-ui/content` — the rich-content boundary, **ESM only**: `Markdown`, `CodeBlock` and their prop types.
 - `sherick-ui/styles.css` — the complete component stylesheet.
 - `sherick-ui/theme.css` — token-only theme output.
 - `sherick-ui/dev` — development-only recipes for this repository's workbench. Unstable and unsupported; do not depend on it.
 
-The names above are canonical. There are no compatibility aliases: `ActionButton`, `Dropdown`, `Modal`, `TabGroup` and their prop types are gone, as are the deprecated `Select.selected`, `Select.onSelect`, `Tabs.defaultTabId`, `Tabs.onTabChange`, `Dialog.onClose` and `Table.variant` props. The `onChange` props on `Input`, `Textarea` and `Switch` are no longer Sherick callbacks — `Input` and `Textarea` pass through native `onChange`, and boolean state goes through `Switch.onCheckedChange`. `Dialog` composes as `Dialog.Header`, `Dialog.Description`, `Dialog.Content` and `Dialog.Footer`.
+The names above are canonical. There are no compatibility aliases: `ActionButton`, `Dropdown`, `Modal`, `TabGroup` and their prop types are gone, as are the deprecated `Select.selected`, `Select.onSelect`, `Tabs.defaultTabId`, `Tabs.onTabChange`, `Dialog.onClose` and `Table.variant` props. The `onChange` props on `Input`, `Textarea` and `Switch` are no longer Sherick callbacks — `Input` and `Textarea` pass through native `onChange`, and boolean state goes through `Switch.onCheckedChange`.
+
+Two floating-surface families exist and they differ in what they own. `Dialog` composes as `Dialog.Header`, `Dialog.Description`, `Dialog.Content` and `Dialog.Footer`; `AlertDialog` is the destructive confirmation, with `title`, `description`, `confirmLabel` and `onConfirm`, and it is always modal and never dismisses on an outside press. `Popover`, `Menu` and `Combobox` anchor to the element that opened them: `Popover.Trigger`/`Popover.Content`, `Menu.Trigger`/`Menu.Content`/`Menu.Item`/`Menu.Separator`, and a `Combobox` that takes `options` and a `value` the way `Select` does. Label a `Combobox` with `Field`, and drop it into `Select`'s place when the list needs to be searchable.
 
 ## Rich content
 
