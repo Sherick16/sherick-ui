@@ -106,7 +106,7 @@ and breaks the relationship between every other depth cue.
 
 ## 4. Material — what a surface is made of
 
-Primitives: `canvas`, `matteQuiet`, `matte`, `matteHigh`, `control`, `controlError`,
+Primitives: `canvas`, `matteQuiet`, `matte`, `matteHigh`, `control`, `controlError`, `handle`,
 `acrylic`, `acrylicDense`, `acrylicHero`.
 
 A material is a fill. Tone separates matte surfaces from each other; nothing else does.
@@ -119,6 +119,7 @@ A material is a fill. Tone separates matte surfaces from each other; nothing els
 | `matteHigh` | the second matte step | nesting inside another matte surface | a page background |
 | `control` | the fill every text control shares | text fields, textareas, search, select triggers | passive content surfaces |
 | `controlError` | the same fill carrying danger tone | an invalid field | any non-semantic state |
+| `handle` | the one matte fill that separates from the surfaces around it in both themes | a small part the user has to find — a value control's handle | anything large: a surface this loud stops being quiet |
 | `acrylic` | a translucent sheet lit from above | menus, popovers and other surfaces floating above the app | anything grounded in the page |
 | `acrylicDense` | the same sheet at higher opacity | small floating surfaces that must stay legible, such as tooltips | large sheets — use `acrylicHero` |
 | `acrylicHero` | the large-overlay recipe | a surface that owns the viewport, such as a dialog | menus and tooltips |
@@ -375,10 +376,15 @@ selected**, and it arrives under `motion.spring` from the middle of the surface 
 than appearing, so a made selection lands.
 
 A value control's handle follows the same economy: the accent belongs to the **range**, so
-the handle sits on it as the opaque matte step above the groove and takes the accent itself
-only while the pointer is on it (`state.engaged`). A handle filled with the same accent as
-the range it terminates reads as one continuous shape, which is why the two are separated by
-tone rather than by a drawn edge.
+the handle sits on it as the `handle` matte fill and takes the accent itself only while the
+pointer is on it (`state.engaged`). A handle filled with the same accent as the range it
+terminates reads as one continuous shape, which is why the two are separated by tone rather
+than by a drawn edge. It is also why the handle is the one matte part that is *not* a
+surface step: every surface in a theme sits within a few percent of its neighbours, so a
+handle drawn from that ladder is only about 1.2:1 against its own groove — findable when
+the slider is fresh and lost as soon as the control is dimmed. The `handle` fill (5.7–7.7:1
+enabled, 1.9–2.7:1 at 45% disabled, against a surface step's 1.2:1) is what keeps it legible
+when the slider is disabled, where a stronger accent would be the wrong answer.
 
 Six further `state` entries carry the parts of a state that are not colour, and they are
 members of the system rather than local styling:

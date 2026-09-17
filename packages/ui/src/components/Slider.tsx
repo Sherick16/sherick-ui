@@ -76,10 +76,10 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
             <BaseSlider.Indicator
               className={cn(shape.pill, tone.strong.primary, motion.travel)}
             />
-            {/* A compact matte puck rather than a filled disc: the accent belongs to the range,
-                and the handle takes it only while the pointer is on it. The fill is the opaque
-                matte step, because a translucent one composites with whatever it happens to be
-                sitting on — accent or groove — and the handle has to read over both. */}
+            {/* A compact matte cap rather than a filled disc: the accent belongs to the range,
+                and the handle takes it only while the pointer is on it. Its fill is the one that
+                separates from both the groove it travels and the page behind it, which is what
+                keeps it findable — at rest, and while the slider is disabled. */}
             <BaseSlider.Thumb
               {...thumbProps}
               ref={ref}
@@ -88,7 +88,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
                 shape.circle,
                 motion.travel,
                 elevation.control,
-                tone.strong.secondary,
+                material.handle,
                 state.engaged,
                 focusRingWithin
               )}

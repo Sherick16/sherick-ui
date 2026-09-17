@@ -302,6 +302,11 @@ export const hitArea =
    - matte:       a matte surface that separates from the canvas by tone alone.
    - matteHigh:   the second matte step, for nesting inside another matte surface.
    - control:     the fill every text control shares, plus its placeholder tone.
+   - handle:      the fill of a part the user has to find — the one small matte surface that
+                  must separate from the groove and the page it sits between. Every surface
+                  step in the palette sits within a few percent of its neighbours in each
+                  theme, so this role takes the mid-emphasis tone instead, which inverts with
+                  the theme and separates in both.
    - acrylic:     a translucent sheet lit from above, for surfaces that float above
                   the application. The gradient, fill, blur and saturation are part of
                   the material. A gradient arrives as a typed image arbitrary value
@@ -329,6 +334,7 @@ export const material = {
   matteHigh: "bg-sherick-surface-high/[0.72] text-sherick-ink",
   control: "bg-sherick-surface-high/[0.66] text-sherick-ink placeholder:text-sherick-ink-muted",
   controlError: "bg-sherick-danger/[0.075] text-sherick-ink placeholder:text-sherick-danger/[0.72]",
+  handle: "bg-sherick-ink-muted text-sherick-canvas",
   acrylic:
     "bg-sherick-surface-float/[0.60] bg-[image:var(--sui-glass-gradient)] text-sherick-ink backdrop-blur-[var(--sui-glass-blur)] backdrop-saturate-[var(--sui-glass-saturation)] backdrop-brightness-[var(--sui-glass-brightness)]",
   acrylicDense:
