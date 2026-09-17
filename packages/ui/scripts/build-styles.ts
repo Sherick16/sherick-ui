@@ -215,9 +215,19 @@ output.append(
   }
 
   :where(.${SUI_SCOPE_CLASS})[role="switch"][aria-checked="true"],
-  :where(.${SUI_SCOPE_CLASS})[role="tab"][aria-selected="true"] {
+  :where(.${SUI_SCOPE_CLASS})[role="tab"][aria-selected="true"],
+  :where(.${SUI_SCOPE_CLASS})[role="checkbox"][aria-checked="true"],
+  :where(.${SUI_SCOPE_CLASS})[role="checkbox"][aria-checked="mixed"],
+  :where(.${SUI_SCOPE_CLASS})[role="radio"][aria-checked="true"] {
     outline: 1px solid Highlight;
     outline-offset: -2px;
+  }
+
+  /* A slider conveys its value through the fill of its groove and the depth of its handle, and
+     forced colors flattens both. The handle carries a Sherick-owned marker, because Base's
+     collection attributes are not component identity. */
+  :where(.${SUI_SCOPE_CLASS})[data-sui-slider-thumb] {
+    border: 1px solid CanvasText;
   }
 }`).nodes
 );

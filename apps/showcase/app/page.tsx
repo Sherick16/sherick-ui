@@ -19,14 +19,19 @@ import {
   Badge,
   Button,
   Card,
+  Checkbox,
   Dialog,
   Divider,
+  Field,
   IconButton,
   Input,
   NavGroup,
+  NumberField,
+  RadioGroup,
   Search,
   Select,
   Skeleton,
+  Slider,
   Spinner,
   Switch,
   Table,
@@ -325,12 +330,66 @@ export default function Home() {
                   <Select options={selectOptions} disabled aria-label="Disabled project type" />
                 </div>
               </Specimen>
+
+              <Specimen title="Field">
+                <div className="space-y-6">
+                  <Field label="Notifications" description="Sent for every production deployment.">
+                    <Checkbox defaultChecked />
+                  </Field>
+                  <Field label="Seats" description="Between 1 and 10." required error="Choose between 1 and 10 seats.">
+                    <NumberField min={1} max={10} defaultValue={4} />
+                  </Field>
+                </div>
+              </Specimen>
+
+              <Specimen title="Number field">
+                <div className="space-y-4">
+                  <Field label="Quantity">
+                    <NumberField placeholder="0" />
+                  </Field>
+                  <Field label="Constrained">
+                    <NumberField min={1} max={10} step={1} defaultValue={4} />
+                  </Field>
+                </div>
+              </Specimen>
+
+              <Specimen title="Slider">
+                <div className="space-y-6">
+                  <Field label="Budget">
+                    <Slider defaultValue={40} />
+                  </Field>
+                  <Field label="Disabled budget">
+                    <Slider defaultValue={65} disabled />
+                  </Field>
+                </div>
+              </Specimen>
             </div>
           </section>
 
           <section>
             <SectionHeading title="Selection & navigation" />
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
+              <Specimen title="Checkbox">
+                <div className="flex flex-wrap items-center gap-6">
+                  <StateLabel label="Checked"><Checkbox defaultChecked aria-label="Checked" /></StateLabel>
+                  <StateLabel label="Unchecked"><Checkbox aria-label="Unchecked" /></StateLabel>
+                  <StateLabel label="Mixed"><Checkbox indeterminate aria-label="Mixed" /></StateLabel>
+                  <StateLabel label="Disabled"><Checkbox defaultChecked disabled aria-label="Disabled" /></StateLabel>
+                </div>
+              </Specimen>
+
+              <Specimen title="Radio group">
+                <RadioGroup
+                  label="Deployment target"
+                  defaultValue="preview"
+                  options={[
+                    { value: "production", label: "Production" },
+                    { value: "preview", label: "Preview" },
+                    { value: "cluster", label: "Shared cluster", disabled: true },
+                  ]}
+                />
+              </Specimen>
+
               <Specimen title="Switch">
                 <div className="flex flex-wrap items-center gap-6">
                   <StateLabel label="On"><Switch checked={switchOn} onCheckedChange={setSwitchOn} aria-label="On" /></StateLabel>

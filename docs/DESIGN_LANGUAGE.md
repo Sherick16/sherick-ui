@@ -106,7 +106,7 @@ and breaks the relationship between every other depth cue.
 
 ## 4. Material — what a surface is made of
 
-Primitives: `canvas`, `matteQuiet`, `matte`, `matteHigh`, `control`, `controlError`,
+Primitives: `canvas`, `matteQuiet`, `matte`, `matteHigh`, `control`, `controlError`, `handle`,
 `acrylic`, `acrylicDense`, `acrylicHero`.
 
 A material is a fill. Tone separates matte surfaces from each other; nothing else does.
@@ -119,6 +119,7 @@ A material is a fill. Tone separates matte surfaces from each other; nothing els
 | `matteHigh` | the second matte step | nesting inside another matte surface | a page background |
 | `control` | the fill every text control shares | text fields, textareas, search, select triggers | passive content surfaces |
 | `controlError` | the same fill carrying danger tone | an invalid field | any non-semantic state |
+| `handle` | the one matte fill that separates from the surfaces around it in both themes | a small part the user has to find — a value control's handle | anything large: a surface this loud stops being quiet |
 | `acrylic` | a translucent sheet lit from above | menus, popovers and other surfaces floating above the app | anything grounded in the page |
 | `acrylicDense` | the same sheet at higher opacity | small floating surfaces that must stay legible, such as tooltips | large sheets — use `acrylicHero` |
 | `acrylicHero` | the large-overlay recipe | a surface that owns the viewport, such as a dialog | menus and tooltips |
@@ -260,10 +261,11 @@ size of the object and the emphasis it carries.
 | Shape | Radius | Role | Should not be used for |
 | --- | --- | --- | --- |
 | `control` | 1.25rem | ordinary controls, dense data regions — fields, rows, options, chips, tables | large surfaces |
+| `mark` | 0.625rem | a compact square selection mark — the `Checkbox` box | anything larger than a compact square, which wants `control`; a round mark, which is `circle` |
 | `prominent` | 1.5rem | prominent controls, compact floating surfaces | small inline controls |
 | `surface` | 1.75rem | large surfaces — cards, menus, panels | buttons |
 | `expressive` | 2rem | an expressive surface that owns the viewport — the large overlay sheet, tightened so it reads as a focused surface rather than a pillowy one | anything smaller than a dialog |
-| `pill` | full | fully rounded controls whose width follows their content | a wide button with a fixed width |
+| `pill` | full | fully rounded controls whose width follows their content, and the fully rounded form of a compact part at either ratio — a value control's capsule handle | a wide button with a fixed width |
 | `circle` | full | fully rounded square targets | non-square targets |
 
 **Do:** hold one role across a whole component family, so a switch and a segmented
@@ -332,6 +334,22 @@ One language, applied the same way everywhere:
 | disabled | 45% opacity, no pointer affordance, no interactive state at all | grey-on-grey colouring that breaks theme |
 | focus | the shared focus ring | any other indicator |
 
+Compression is a **distance, not a ratio**: a press travels about a pixel at the size of the ink it
+moves, and that one rule produces the two steps.
+
+| Step | Moves | For |
+| --- | --- | --- |
+| `press` / `groupPress` | 2% | a control whose outline is what the user sees — a button, a track, a selection mark |
+| `pressCompact` | 10% | a control whose ink is much smaller than the target it is aimed at — an icon inside a `density.target` stepper, where 2% would never register |
+
+Both are **centred zooms**: the part changes size in place, and a press never translates it.
+
+**A selection mark's boundary does not move.** A checkbox box or a radio circle takes the plain 2%
+step, not the compact one: ten percent of its own outline is a 2.4px change, and the eye reads that
+as the control jumping rather than as pressure. Expression belongs to the contents of that boundary
+— the mark arriving on the spring — while the press is carried by the state layer. This is the same
+division the slider does not follow, because there the handle moving *is* the interaction.
+
 State layers: replacing `background-color` on hover erases whatever fill a control owns,
 so states are composited by a `currentColor`-tinted overlay instead. Opacity carries the
 state, so it fades on the shared motion curve rather than snapping.
@@ -346,16 +364,53 @@ state, so it fades on the shared motion curve rather than snapping.
 
 Fields are a single borderless family: a matte `surface-high` fill that steps up once on
 hover and once more while engaged, no ring and no lift. `state.field.*` covers hover,
-focus, focus-within, engaged and their error counterparts.
+focus, focus-within, engaged and their error counterparts. A control that reads its
+validity from the field it sits in rather than from a prop takes the same error ladder
+through `state.field.invalid*`, which is one tonality keyed on the field's own
+`data-invalid` attribute and deliberately outranks the prop-keyed step it overlaps.
 
-Three further `state` entries carry the parts of a state that are not colour, and they are
+**Selection is a recessed surface that fills.** A switch track, a checkbox box, a radio
+circle and a slider groove are one object at four sizes: `selectable.surface` gives them
+the recessed depth of a groove and the tactile motion family, `selectable.rest` is the
+neutral matte step they hold until they are selected, and `selectable.selected` /
+`selectable.indeterminate` are the accent they take once they are — keyed on the
+primitive's own selection attribute, so an uncontrolled control is styled from the same
+source of truth as a controlled one. Selection never changes their depth: tone carries it,
+exactly as it carries hover. Each of them states hover and press through the wrapping
+control's state layer, because whether those layers apply while the control is disabled is
+decided where the disabled state is known.
+
+The mark inside that surface — a tick, a dash, a dot — exists **only while the control is
+selected**, and it arrives under `motion.spring` from the middle of the surface rather
+than appearing, so a made selection lands.
+
+A value control's handle follows the same economy: the accent belongs to the **range**, so
+the handle sits on it as the `handle` matte fill and takes the accent itself only while the
+pointer is on it (`state.engaged`). The range also **reserves the handle's own half-width plus
+a hair of air on its end**, so the fill stops short of the handle and the surface shows
+through between them: a handle butted against the end of its own range reads as one
+continuous shape, and the gap is what makes it a handle. The reservation is geometry — a
+transparent logical end border with a padding-box clip — not a drawn edge, and it leaves the
+range's end square where the gap is, the way a cut rail ends. A handle filled with the same
+accent as the range it terminates is why the two are separated by tone rather than by a drawn
+edge. It is also why the handle is the one matte part that is *not* a surface step: every
+surface in a theme sits within a few percent of its neighbours, so a handle drawn from that
+ladder is only about 1.2:1 against its own groove — findable when the slider is fresh and lost
+as soon as the control is dimmed. The `handle` fill (5.7–7.7:1 enabled, 1.9–2.7:1 at 45%
+disabled, against a surface step's 1.2:1) is what keeps it legible when the slider is disabled,
+where a stronger accent would be the wrong answer.
+
+Six further `state` entries carry the parts of a state that are not colour, and they are
 members of the system rather than local styling:
 
 | Entry | Carries |
 | --- | --- |
 | `enabled` / `text` | the pointer affordance — `cursor-pointer` for a control with a hit area of its own, `cursor-text` for a text field |
 | `rowHover` | the quiet scan feedback for a data row that is read rather than activated (`Table`): an ink tint, not a state layer, because a data row owns no fill to composite over |
-| `disabledDescendant` | the cursor-only variant of `disabled`, for a control nested in a composite that has already applied the 45% opacity step |
+| `disabled` / `disabledDescendant` | the disabled step, and its cursor-only variant for a control nested in a composite that has already applied the 45% opacity |
+| `disabledAttribute` | the same disabled step keyed on the native attribute, for a control that decides its own disabled state — a number field's stepper at its bound |
+| `engaged` | a part the pointer is on sits matte and settles back from it: a value control's handle takes its accent and a little size while hovered or dragged, so the accent marks the range and the pointer marks the handle |
+| `steppedValue` | a part that is not being pressed but answers the control that is — the value a stepper drives, which leans into the press and settles back |
 
 **Do:** let tonality carry hover; let a raised control recess while it is held; let a
 flat or floating control press through the state layer's active step and `state.press`.
@@ -386,21 +441,33 @@ The rule is:
 
 ## 12. Motion
 
-Three families, no exceptions. A component picks a family, never a duration.
+Five families, no exceptions. A component picks a family, never a duration.
 
 | Family | Role | Tokens | Should be used for |
 | --- | --- | --- | --- |
 | `press` | a tonality change with no physical travel, fast and decisive in both directions | `--sui-duration-press`, `--sui-ease-press` | hover, focus, an engaged field |
 | `release` | a tactile control: every property a tactile control can animate — colour, shadow, transform, and the size a selection or a thumb travels with | `--sui-duration-release`, `--sui-ease-release`, plus the press pair on `active:` | any control whose transform changes |
+| `spring` | the one family that overshoots: the part travels a little past where it lands and settles back | `--sui-duration-release`, `--sui-ease-spring`, plus the press pair on `active:` / `group-active:` | a selection mark arriving, the surface it is made in, the value a stepper drives |
+| `travel` | geometry the user is aiming — a slider's thumb and the fill it carries | `--sui-duration-release`, `--sui-ease-release`, plus the press pair on `active:` | a value control's moving parts |
 | overlay | entrance and exit for anything that floats, plus a matching scrim family (`scrimIn` / `scrimOut`) for the plane behind it | `--sui-duration-overlay`, `--sui-duration-overlay-exit`, `--sui-ease-release`, `--sui-ease-exit` | menus, tooltips, dialogs and their scrims |
 
-`release` takes the press timing while it is held (`active:`), so the press lands
+`release` and `spring` take the press timing while they are held (`active:`, or
+`group-active:` when the press arrives from the wrapping control), so the press lands
 immediately, and the release timing carries the settle, so letting go is expressive.
+`travel` suspends its own position property while the control is dragged: the pointer
+already carries that position, and interpolating it would make the fill and the handle
+disagree with the finger.
+
+`--sui-ease-spring` is the **only** overshooting curve in the system, and it is reserved
+for the parts that say something by arriving: a tick that lands, a value that leans into
+the press that changed it, a surface that rebounds. A part that is merely relocating —
+a slider handle under a keyboard step, a travelling fill — settles without overshoot,
+because a value that passes its own value and comes back reads as a defect.
 
 Rules:
 
-- a control whose transform changes **must** use `release`; `press` is for pure tonality
-  and colour transitions that never move or resize anything;
+- a control whose transform changes **must** use `release`, `spring` or `travel`; `press`
+  is for pure tonality and colour transitions that never move or resize anything;
 - floating overlays share the Sherick overlay motion family while **Base UI owns their
   presence and lifecycle**. A menu grows from its trigger, a tooltip grows out of the
   anchored edge and a dialog rises from its own center; Sherick consumes Base's state and
@@ -408,8 +475,8 @@ Rules:
 - there is no Sherick timer tied to `--sui-duration-overlay-exit`: Base UI keeps closing
   primitives present for their CSS exit animation and removes them when the transition is
   complete. `prefers-reduced-motion` still neutralises Sherick's animation classes;
-- every family is neutralised under `prefers-reduced-motion`, and `release` additionally
-  drops its transform;
+- every family is neutralised under `prefers-reduced-motion`, and `release`, `spring` and
+  `travel` additionally drop their transform;
 - loading feedback (`animate-spin`, `animate-pulse`) sits outside these families: it
   reports progress rather than responding to interaction.
 
@@ -469,6 +536,15 @@ inline padding from a field's.
   `aria-labelledby`. **A tooltip is not an accessible name** — it may supplement the name
   for sighted discoverability, but it never replaces it.
 - Icon-only controls meet the `target` hit-area floor.
+- A control whose **visible mark is smaller than the target** — a checkbox box, a radio
+  circle — keeps that mark as its layout footprint and expands its hit area *outside* that
+  footprint with `hitArea`, a transparent pseudo-element extension. Layout, alignment and
+  the gap between a control and its copy are therefore measured from the control the user
+  can see, while the pointer still answers over the full target. The expansion is capped at
+  the `target` floor, but CSS cannot see neighbouring geometry: hit areas keep clearance only
+  while the rows around them are at least as tall as that floor, which the library's own
+  `density.normal` rhythm is and a 40px table row is not. A control that owns a labelled row —
+  a radio option — needs no extension at all, because the row itself is the label.
 - `prefers-reduced-motion` is respected by every motion family.
 - The component runtime is font-agnostic; typography is the consumer's decision.
 - Color is never the only carrier of meaning: a semantic state also carries an icon, a

@@ -3,10 +3,15 @@
 import { useState } from "react";
 import {
   Button,
+  Checkbox,
   Dialog,
+  Field,
   Input,
+  NumberField,
+  RadioGroup,
   Search,
   Select,
+  Slider,
   Switch,
   Tabs,
   Tooltip,
@@ -17,6 +22,12 @@ const projectOptions = [
   { label: "Dashboard", value: "dashboard" },
 ];
 
+const regionOptions = [
+  { value: "eu", label: "Europe" },
+  { value: "us", label: "United States" },
+  { value: "apac", label: "Asia Pacific", disabled: true },
+];
+
 export default function VerificationInteractionsPage() {
   const [query, setQuery] = useState("initial");
   const [lastSearch, setLastSearch] = useState("");
@@ -25,6 +36,9 @@ export default function VerificationInteractionsPage() {
   const [project, setProject] = useState<string | null>("design");
   const [formResult, setFormResult] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [region, setRegion] = useState("eu");
+  const [budget, setBudget] = useState(30);
+  const [fieldsResult, setFieldsResult] = useState("");
 
   return (
     <main className="min-h-screen bg-sherick-canvas px-10 py-12 text-sherick-ink">
@@ -99,6 +113,86 @@ export default function VerificationInteractionsPage() {
           <Button type="submit">Submit form</Button>
         </form>
         <p data-testid="form-result">{formResult}</p>
+
+        <Field
+          label="Release channel"
+          description="Visible to everyone in the workspace."
+          error="Pick a release channel."
+        >
+          <Checkbox name="release" value="stable" defaultChecked />
+        </Field>
+
+        <div data-testid="seats-field">
+          <Field label="Seats" description="Between 1 and 10." error="Choose between 1 and 10 seats." required>
+            <NumberField min={1} max={10} defaultValue={3} required />
+          </Field>
+        </div>
+
+        <Field
+          label="Priority"
+          description="A field can validate on its own, without a message prop."
+          validate={(fieldValue) => (Number(fieldValue) > 5 ? "Choose five or fewer" : null)}
+          validationMode="onChange"
+        >
+          <NumberField defaultValue={2} min={1} max={10} />
+        </Field>
+
+        <Field label="Locked by its field" disabled>
+          <Checkbox name="locked" value="yes" />
+        </Field>
+
+        <table className="w-64 border-collapse text-sm">
+          <tbody>
+            {["First row", "Second row", "Third row"].map((rowLabel) => (
+              <tr key={rowLabel} className="h-12">
+                <td className="pr-3">
+                  <Checkbox aria-label={rowLabel} name={rowLabel} value="yes" />
+                </td>
+                <td>{rowLabel}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        <Checkbox indeterminate aria-label="Partial selection" />
+
+        <p className="text-sm">
+          I agree to the <Checkbox aria-label="Inline terms" defaultChecked /> deployment terms.
+        </p>
+
+        <RadioGroup label="Region" value={region} onValueChange={setRegion} options={regionOptions} />
+        <p data-testid="region-value">{region}</p>
+
+        <Slider
+          label="Budget"
+          value={budget}
+          onValueChange={setBudget}
+          min={0}
+          max={100}
+          step={10}
+        />
+        <p data-testid="budget-value">{budget}</p>
+
+        <form
+          className="flex flex-wrap items-end gap-4"
+          onSubmit={(event) => {
+            event.preventDefault();
+            const data = new FormData(event.currentTarget);
+            setFieldsResult(
+              [...data.entries()]
+                .map(([key, value]) => `${key}=${String(value)}`)
+                .sort()
+                .join("&")
+            );
+          }}
+        >
+          <Checkbox aria-label="Form notifications" name="notify" value="yes" defaultChecked />
+          <RadioGroup aria-label="Form region" name="formRegion" defaultValue="eu" options={regionOptions} />
+          <Slider aria-label="Form budget" name="formBudget" defaultValue={40} />
+          <NumberField aria-label="Form seats" name="formSeats" defaultValue={2} min={1} max={10} />
+          <Button type="submit">Submit fields</Button>
+        </form>
+        <p data-testid="fields-result">{fieldsResult}</p>
 
         <div className="flex items-center gap-4">
           <Button appearance="filled" onClick={() => setDialogOpen(true)}>

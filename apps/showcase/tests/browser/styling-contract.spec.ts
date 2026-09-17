@@ -1,16 +1,6 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Page } from "./fixtures";
 
-const trackRuntimeErrors = (page: Page) => {
-  const errors: string[] = [];
-  page.on("pageerror", (error) => errors.push(`pageerror: ${error.message}`));
-  page.on("console", (message) => {
-    if (message.type() === "error") errors.push(`console: ${message.text()}`);
-  });
-  return errors;
-};
-
-test("hostile custom theme keeps semantic on-colors distinct across components and portals", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("hostile custom theme keeps semantic on-colors distinct across components and portals", async ({ page, errors }) => {
   await page.goto("/verification/theme-torture");
   await expect(page.getByTestId("theme-torture")).toBeVisible();
 
@@ -32,6 +22,15 @@ test("hostile custom theme keeps semantic on-colors distinct across components a
   expect(styles[0].color).not.toBe(styles[1].color);
   expect(styles[2].color).not.toBe(styles[3].color);
 
+  // A selected surface in the family holds the same accent as the primary action, so the
+  // custom theme reaches it through the token rather than through a local color.
+  const selectedSurface = await page
+    .getByRole("checkbox", { name: "Torture checkbox" })
+    .locator("span")
+    .first()
+    .evaluate((element) => getComputedStyle(element).backgroundColor);
+  expect(selectedSurface).toBe(styles[0].background);
+
   await page.getByRole("combobox", { name: "Torture select" }).click();
   await expect(page.getByRole("option", { name: "Alpha" })).toBeVisible();
   await page.keyboard.press("Escape");
@@ -45,8 +44,7 @@ test("hostile custom theme keeps semantic on-colors distinct across components a
   expect(errors).toEqual([]);
 });
 
-test("forced-colors preserves canonical focus and important state boundaries", async ({ page }) => {
-  const errors = trackRuntimeErrors(page);
+test("forced-colors preserves canonical focus and important state boundaries", async ({ page, errors }) => {
   await page.emulateMedia({ forcedColors: "active" });
   await page.goto("/verification/theme-torture");
 
@@ -66,6 +64,19 @@ test("forced-colors preserves canonical focus and important state boundaries", a
   const checkedSwitch = page.getByRole("switch", { name: "Success switch" });
   await expect(checkedSwitch).toHaveAttribute("aria-checked", "true");
   expect(await checkedSwitch.evaluate((element) => getComputedStyle(element).outlineStyle)).not.toBe("none");
+
+  // A selected checkbox, a selected radio and a slider thumb all carry their meaning in
+  // tone or depth alone, both of which forced colors removes.
+  for (const selected of [
+    page.getByRole("checkbox", { name: "Torture checkbox" }),
+    page.getByRole("radio", { name: "Alpha" }),
+  ]) {
+    await expect(selected).toHaveAttribute("aria-checked", "true");
+    expect(await selected.evaluate((element) => getComputedStyle(element).outlineStyle)).not.toBe("none");
+  }
+
+  const thumb = page.getByRole("slider", { name: "Torture slider" }).locator("..");
+  expect(await thumb.evaluate((element) => getComputedStyle(element).borderStyle)).not.toBe("none");
 
   await page.getByRole("button", { name: "Open torture dialog" }).click();
   const dialog = page.getByRole("dialog");

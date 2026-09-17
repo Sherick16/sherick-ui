@@ -75,7 +75,19 @@ Base UI owns generic widget mechanics; Sherick UI exposes a small opinionated AP
 - native form ownership (`name`, `form`, `required`, submitted value) remains delegated to Base UI rather than mirrored by Sherick state;
 - internal and public callbacks are composed; adding a Sherick convenience callback must not prevent Base UI from processing the same interaction;
 - fields use Base `Field` parts for label, description, error and generated ARIA relationships rather than hand-written IDs;
-- `className` styles the component root. Multi-part controls use a specifically named class prop such as `inputClassName` only when consumers need to style the inner interactive element separately.
+- `className` styles the component root. Multi-part controls use a specifically named class prop such as `inputClassName` only when consumers need to style the inner interactive element separately;
+- value, checked and open callbacks keep Base UI's own signature, event details included, and are derived from Base's prop types rather than restated by hand;
+- where Base UI marks a state on the primitive — disabled, invalid, checked, dragging — the styling reads that marker. A control disabled by the `Field` around it is styled disabled without ever receiving a `disabled` prop of its own;
+- props that behave as a group by their nature — `RadioGroup`, `Slider` — own their label, while `Field` labels a single control. `Field.required` renders a mark only; the requirement itself is declared by the control.
+
+**Two field APIs, one intended end state.** `Input`, `Textarea` and `Search` compose `Field.Root`
+internally, so they take `label` / `description` / `error` as props; the selection and value
+controls (`Checkbox`, `Slider`, `NumberField`) compose through the exported `Field` instead, because
+they are one control among several in a form and label themselves the same way everything else
+does. Both paths render the same Base parts and produce the same ARIA relationships. The intended
+end state is the exported `Field` as the only label/error/required API, with the text controls
+migrating to it in a later change; until then the two coexist deliberately and this paragraph is the
+record of which one is leaving.
 
 Do not add generic controlled-state hooks, focus helpers, form mirrors or event-composition utilities to Sherick UI when Base UI already supplies the behavior.
 

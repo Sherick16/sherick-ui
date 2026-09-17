@@ -116,6 +116,10 @@ export const sharedTokens = {
   "ease-press": "cubic-bezier(0.4, 0, 0.2, 1)",
   "ease-release": "cubic-bezier(0.16, 1, 0.3, 1)",
   "ease-exit": "cubic-bezier(0.4, 0, 1, 1)",
+  /* The one overshooting curve in the system: a part that travels a little past where it lands
+     and settles back. It is what makes a selection feel made and a released press feel answered,
+     and it is deliberately reserved for the parts that carry that meaning. */
+  "ease-spring": "cubic-bezier(0.34, 1.56, 0.64, 1)",
 } as const satisfies Record<string, string>;
 
 export const themes = {
