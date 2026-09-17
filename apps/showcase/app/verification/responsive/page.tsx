@@ -1,11 +1,30 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Dialog, Input, Search, Select, Table, Tabs, Textarea } from "sherick-ui";
+import {
+  Button,
+  Checkbox,
+  Dialog,
+  Field,
+  Input,
+  NumberField,
+  RadioGroup,
+  Search,
+  Select,
+  Slider,
+  Table,
+  Tabs,
+  Textarea,
+} from "sherick-ui";
 
 const projectOptions = [
   { label: "Design system", value: "design" },
   { label: "Dashboard", value: "dashboard" },
+];
+
+const regionOptions = [
+  { value: "eu", label: "Europe" },
+  { value: "us", label: "United States" },
 ];
 
 const tableRows = [
@@ -52,6 +71,16 @@ export default function VerificationResponsivePage() {
             options={projectOptions}
             defaultValue="design"
           />
+
+          <Field label="Narrow notifications">
+            <Checkbox defaultChecked />
+          </Field>
+
+          <RadioGroup aria-label="Narrow region" options={regionOptions} defaultValue="eu" />
+
+          <Slider aria-label="Narrow budget" defaultValue={40} />
+
+          <NumberField aria-label="Narrow seats" defaultValue={3} min={1} max={10} />
 
           <div className="overflow-x-auto">
             <Tabs

@@ -72,10 +72,20 @@ export const groupFocusRing =
               travels with — and it takes the press timing while it is held (`active:`),
               so the press lands immediately, while the release timing carries the
               settle, so letting go is expressive.
-   A control whose transform changes must use `release`; `press` is for pure tonality
-   and colour transitions that never move or resize anything.
+   - travel:  the part a value control moves — a slider's thumb and the fill it carries.
+              It animates geometry the user is aiming, so a drag is never interpolated:
+              while the control is dragged the position lands immediately and only the
+              tactile properties keep their curve, while a keyboard or programmatic step
+              glides.
+   - spring:  a part that arrives, compresses or rebounds — a selection mark, the
+              surface it is made in, the value a stepper drives. It is the one family
+              that overshoots: the part travels a little past where it lands and settles
+              back, which is what makes a made selection feel made and a released press
+              feel answered. It arrives under the press timing while the part is held.
    - overlay: the entrance and exit of anything that floats above the page, with a
               matching scrim family for the plane behind it.
+   A control whose transform changes must use `release` or `spring`; `press` is for pure
+   tonality and colour transitions that never move or resize anything.
    Every family is neutralised under `prefers-reduced-motion`; the overlay family
    additionally drops its exit window entirely, so nothing lingers.
    Loading feedback (`animate-spin`, `animate-pulse`) sits outside these families:
@@ -85,6 +95,19 @@ export const motion = {
     "transition-[background-color,color,box-shadow,opacity] duration-press ease-press motion-reduce:transition-none",
   release:
     "transition-[background-color,color,box-shadow,transform,opacity,width,height] duration-release ease-release active:duration-press active:ease-press motion-reduce:transition-none motion-reduce:transform-none",
+  /* travel: the part a value control moves — a slider's thumb and the fill it carries. It is the
+     one family that animates geometry the user is aiming, so the pointer's own drag is never
+     interpolated: while the control is being dragged the position lands immediately and only the
+     tactile properties keep their curve, while a keyboard or programmatic step glides. */
+  travel:
+    "transition-[inset-inline-start,width,height,background-color,color,box-shadow,transform,opacity] duration-release ease-release active:duration-press active:ease-press data-[dragging]:transition-[background-color,color,box-shadow,transform,opacity] motion-reduce:transition-none motion-reduce:transform-none",
+  /* spring: a part that arrives, compresses or rebounds — a selection mark, the surface it is
+     made in, the value a stepper drives. It is the one family that overshoots: the part travels a
+     little past where it lands and settles back, which is what makes a made selection feel made
+     and a released press feel answered. Arriving is immediate under the pointer, because it takes
+     the press timing while the part is held. */
+  spring:
+    "transition-[background-color,color,box-shadow,transform,opacity] duration-release ease-spring active:duration-press active:ease-press group-active:duration-press group-active:ease-press motion-reduce:transition-none motion-reduce:transform-none",
   overlayIn: "animate-sherick-overlay-in motion-reduce:animate-none",
   overlayOut: "animate-sherick-overlay-out motion-reduce:animate-none",
   scrimIn: "animate-sherick-scrim-in motion-reduce:animate-none",
@@ -117,6 +140,10 @@ export const elevation = {
    the size of the object and the emphasis it carries:
    - control:     ordinary controls and dense data regions — fields, rows, options,
                   chips, tables.
+   - mark:        a compact square selection mark — the Checkbox box. `control` is a
+                  role for objects the size of a field; applied to a 2rem square its
+                  radius exceeds the half-extent and the square degenerates into a
+                  circle, so a small square mark needs its own role.
    - prominent:   prominent controls and compact floating surfaces.
    - surface:     large surfaces — cards, menus, panels.
    - expressive:  an expressive surface that owns the viewport — the large overlay
@@ -126,6 +153,7 @@ export const elevation = {
    - circle:      fully rounded square targets. */
 export const shape = {
   control: "rounded-[1.25rem]",
+  mark: "rounded-[0.625rem]",
   prominent: "rounded-[1.5rem]",
   surface: "rounded-[1.75rem]",
   expressive: "rounded-[2rem]",
@@ -167,14 +195,35 @@ export const state = {
   press: "active:scale-[0.98] motion-reduce:active:scale-100",
   /* The same compression, driven by the wrapping button instead of the track. */
   groupPress: "group-active:scale-[0.98] motion-reduce:group-active:scale-100",
+  /* A compact control presses further. Two percent is legible on a button the size of a hand and
+     imperceptible on a mark the size of a fingernail, so the same physical idea is scaled to
+     object it happens to: the press has to travel to register at all. */
+  pressCompact: "active:scale-90 motion-reduce:active:scale-100",
+  groupPressCompact: "group-active:scale-90 motion-reduce:group-active:scale-100",
   /* A raised matte control presses back into the track beneath it — the same physical
      depth a groove or a well sits at. */
   recess: "active:shadow-sherick-recessed",
   disabled: "cursor-not-allowed opacity-45",
+  /* The same step, keyed on the native `disabled` attribute, for a control whose disabled
+     state belongs to the primitive rather than to a prop — a stepper that disables itself
+     at its own bound, where the component never learns the boundary from a prop. */
+  disabledAttribute: "disabled:cursor-not-allowed disabled:opacity-45",
   /* A control nested inside a disabled composite. The composite already applied the
      opacity step, and a second one would dim the field unevenly; this carries only the
      disabled cursor and semantics. */
   disabledDescendant: "cursor-not-allowed",
+  /* A part the pointer is engaging — the handle of a value control. It sits matte and settled at
+     rest, and takes its accent and a little size while the pointer is on it, then settles back.
+     Hover and drag are the same state, so the handle answers a pointer that is merely over the
+     slider as well as one that is moving it; the drag attribute covers the case where the pointer
+     has been captured and left the control. */
+  engaged:
+    "group-hover:scale-110 group-hover:bg-sherick-primary-strong group-hover:text-sherick-on-primary data-[dragging]:scale-110 data-[dragging]:bg-sherick-primary-strong data-[dragging]:text-sherick-on-primary",
+  /* A part that is not the element being pressed but answers it — the value a stepper drives.
+     It sits beside the button being held and leans into the press immediately, then settles
+     back with the spring. */
+  steppedValue:
+    "group-has-[button:active]:scale-[1.06] group-has-[button:active]:duration-press group-has-[button:active]:ease-press",
   /* A control with a hit area of its own. */
   enabled: "cursor-pointer",
   /* A text field: the normal text cursor, never a pointer. */
@@ -194,6 +243,13 @@ export const state = {
     errorHover: "hover:bg-sherick-danger/[0.10]",
     errorFocus: "focus:bg-sherick-danger/[0.13]",
     errorEngaged: "bg-sherick-danger/[0.13]",
+    /* The error ladder again, keyed on Base UI's own validity attribute instead of on a
+       prop, for a part that learns its validity from the field context it sits in rather
+       than from Sherick state. Two variants outrank the single-variant ladder above, so the
+       error step wins while the field is invalid without either ladder being conditional. */
+    invalid: "data-[invalid]:bg-sherick-danger/[0.075]",
+    invalidHover: "data-[invalid]:hover:bg-sherick-danger/[0.10]",
+    invalidFocusWithin: "data-[invalid]:focus-within:bg-sherick-danger/[0.13]",
   },
 } as const;
 
@@ -228,6 +284,15 @@ export const stateLayer = {
      `data-highlighted`; this is the one canonical visual treatment for it. */
   activeRow: "data-[highlighted]:before:opacity-[0.06]",
 } as const;
+
+/* Hit area — the interactive region of a control whose visible mark is smaller than a
+   comfortable target. It is drawn outside the layout box, so a table column, a list row and the
+   gap between a control and its copy are all measured from the control the user can see, while
+   the pointer still answers over the full target. The expansion is capped at the accessible
+   target floor: two compact controls placed at the density rhythm keep clearance between their
+   hit areas instead of overlapping. */
+export const hitArea =
+  "relative after:pointer-events-auto after:absolute after:-inset-2.5 after:content-['']";
 
 /* Material — fill only. No material carries elevation or a rim: the same matte
    fill appears flat in a card, lifted on a button and recessed in a groove.
@@ -357,3 +422,30 @@ export const tone = {
     success: "bg-sherick-success text-sherick-on-success",
   },
 } satisfies Record<string, Record<Variant, string>>;
+
+/* Selectable surface — the recessed surface of a control that fills once it is selected:
+   a switch track, a checkbox box, a radio circle, a slider groove. It is sunk by anatomy
+   rather than by state, so its depth never changes, and selection is carried by tone
+   alone. `rest` is the neutral matte step it holds until then; `selected` is the accent
+   it takes, keyed on the primitive's own `data-checked` / `data-indeterminate` state
+   rather than on a prop, so an uncontrolled control is styled from the same source of
+   truth as a controlled one. A mixed box is selected but is not ticked, which is why the
+   second attribute stands beside the first.
+   The hover and press layers are not part of the recipe: whether they apply while the
+   control is disabled is decided where the disabled state is known. */
+export const selectable = {
+  surface: `relative ${elevation.recessed} ${motion.spring}`,
+  /* A translucent matte step rather than an opaque fill: a groove this small reads as sunk
+     because the surface beneath it still shows through the fill and the recessed lip has
+     something to shade. */
+  rest: `${material.matteHigh} ${text.medium}`,
+  selected:
+    "group-data-[checked]:bg-sherick-primary-strong group-data-[checked]:text-sherick-on-primary",
+  indeterminate:
+    "group-data-[indeterminate]:bg-sherick-primary-strong group-data-[indeterminate]:text-sherick-on-primary",
+  /* The mark inside the surface. It exists only while the control is selected — an unchecked box
+     or radio carries nothing at rest — and it arrives crisply: it grows out of the middle of the
+     surface with the spring, so the tick or the dot lands rather than fades. Leaving is softer
+     than arriving, because a mark on its way out has nothing left to say. */
+  mark: `${motion.spring} data-[starting-style]:scale-50 data-[ending-style]:scale-50 data-[ending-style]:opacity-0`,
+} as const;

@@ -1,7 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { Alert, Badge, Button, Dialog, Select, Switch, Tabs, Tooltip } from "sherick-ui";
+import {
+  Alert,
+  Badge,
+  Button,
+  Checkbox,
+  Dialog,
+  Field,
+  NumberField,
+  RadioGroup,
+  Select,
+  Slider,
+  Switch,
+  Tabs,
+  Tooltip,
+} from "sherick-ui";
 
 const options = [
   { label: "Alpha", value: "alpha" },
@@ -50,6 +64,25 @@ export default function ThemeTorturePage() {
         <Alert variant="success">Success alert</Alert>
 
         <Switch checked onCheckedChange={() => undefined} variant="success" aria-label="Success switch" />
+
+        <Checkbox defaultChecked aria-label="Torture checkbox" />
+
+        <RadioGroup
+          aria-label="Torture radio"
+          defaultValue="alpha"
+          options={[
+            { value: "alpha", label: "Alpha" },
+            { value: "beta", label: "Beta" },
+          ]}
+        />
+
+        <Field label="Torture slider">
+          <Slider defaultValue={45} />
+        </Field>
+
+        <Field label="Torture number" error="Out of range.">
+          <NumberField defaultValue={2} min={1} max={10} />
+        </Field>
 
         <Tabs
           defaultValue="one"

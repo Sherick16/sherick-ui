@@ -16,6 +16,14 @@ const setTheme = async (page: Page, theme: "light" | "dark") => {
     localStorage.setItem("sherick-ui-theme", nextTheme);
     document.documentElement.dataset.sherickTheme = nextTheme;
   }, theme);
+  // A theme switch re-resolves every token at once. Let that restyle land before anything is
+  // measured, so a computed style is never compared while the page is still repainting.
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) => {
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve()));
+      })
+  );
 };
 
 for (const theme of ["light", "dark"] as const) {
@@ -101,16 +109,18 @@ test("showcase elevations and structural lines retain their design-language valu
     expect(await surface.evaluate((element) => getComputedStyle(element).boxShadow)).not.toBe("none");
   }
 
-  const borderColors = await columnHeader.evaluate((element) => {
-    const actual = getComputedStyle(element).borderBottomColor;
+  // The expected value is read from the token itself, and asserted with an auto-retrying matcher:
+  // a theme switch re-resolves every token at once, so a one-shot comparison can catch the
+  // element mid-repaint and report a colour the page has already left behind.
+  const expectedEdge = await page.evaluate(() => {
     const probe = document.createElement("div");
     probe.style.borderBottom = "1px solid oklch(var(--sui-edge) / 0.10)";
     document.body.appendChild(probe);
-    const expected = getComputedStyle(probe).borderBottomColor;
+    const value = getComputedStyle(probe).borderBottomColor;
     probe.remove();
-    return { actual, expected };
+    return value;
   });
 
-  expect(borderColors.actual).toBe(borderColors.expected);
-  expect(await columnHeader.evaluate((element) => getComputedStyle(element).borderBottomWidth)).toBe("1px");
+  await expect(columnHeader).toHaveCSS("border-bottom-color", expectedEdge);
+  await expect(columnHeader).toHaveCSS("border-bottom-width", "1px");
 });

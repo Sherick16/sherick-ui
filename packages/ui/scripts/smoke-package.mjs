@@ -23,15 +23,20 @@ for (const exportName of [
   "Badge",
   "Button",
   "Card",
+  "Checkbox",
   "Dialog",
   "Divider",
+  "Field",
   "IconButton",
   "Input",
   "NavGroup",
   "NavItem",
+  "NumberField",
+  "RadioGroup",
   "Search",
   "Select",
   "Skeleton",
+  "Slider",
   "Spinner",
   "Switch",
   "Table",
@@ -63,6 +68,16 @@ assert.ok(!esm.includes("next/link"), "bundle must not depend on next/link");
 assert.ok(!esm.includes("@/"), "bundle must not contain unresolved source aliases");
 assert.ok(declarations.includes("ButtonProps"), "declarations should expose Button props");
 assert.ok(declarations.includes("SelectProps"), "declarations should expose Select props");
+for (const propType of [
+  "FieldProps",
+  "CheckboxProps",
+  "RadioGroupProps",
+  "RadioGroupOption",
+  "SliderProps",
+  "NumberFieldProps",
+]) {
+  assert.ok(declarations.includes(propType), `declarations should expose ${propType}`);
+}
 
 const buttonModule = await readFile(new URL("../dist/esm/components/Button.js", import.meta.url), "utf8");
 const cardModule = await readFile(new URL("../dist/esm/components/Card.js", import.meta.url), "utf8");

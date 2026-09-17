@@ -215,9 +215,19 @@ output.append(
   }
 
   :where(.${SUI_SCOPE_CLASS})[role="switch"][aria-checked="true"],
-  :where(.${SUI_SCOPE_CLASS})[role="tab"][aria-selected="true"] {
+  :where(.${SUI_SCOPE_CLASS})[role="tab"][aria-selected="true"],
+  :where(.${SUI_SCOPE_CLASS})[role="checkbox"][aria-checked="true"],
+  :where(.${SUI_SCOPE_CLASS})[role="checkbox"][aria-checked="mixed"],
+  :where(.${SUI_SCOPE_CLASS})[role="radio"][aria-checked="true"] {
     outline: 1px solid Highlight;
     outline-offset: -2px;
+  }
+
+  /* A slider conveys its value through the fill of its groove and the depth of its thumb,
+     and forced colors flattens both. The thumb keeps a boundary; Base UI exposes the
+     data-index attribute on it, and the groove carries no hook of its own. */
+  :where(.${SUI_SCOPE_CLASS})[data-index] {
+    border: 1px solid CanvasText;
   }
 }`).nodes
 );

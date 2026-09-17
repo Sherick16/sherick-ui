@@ -5,44 +5,44 @@
   "budgets": {
     "button": {
       "definition": "Button alone through the root export. Guards against the root barrel pulling optional feature code.",
-      "raw": 39939,
-      "gzip": 13775,
-      "brotli": 12349
+      "raw": 41009,
+      "gzip": 14023,
+      "brotli": 12487
     },
     "form": {
-      "definition": "Representative form composition: Button, Input, Select, Switch.",
-      "raw": 177874,
-      "gzip": 62259,
-      "brotli": 54684
+      "definition": "Representative form composition: Button, Checkbox, Field, Input, NumberField, RadioGroup, Select, Slider, Switch.",
+      "raw": 235449,
+      "gzip": 82916,
+      "brotli": 71755
     },
     "overlay": {
       "definition": "Representative overlay composition: Dialog, Select, Tooltip.",
-      "raw": 211236,
-      "gzip": 71624,
-      "brotli": 62433
+      "raw": 212222,
+      "gzip": 72078,
+      "brotli": 62714
     },
     "barrel": {
       "definition": "The complete core root barrel with nothing tree-shaken beyond unused exports.",
-      "raw": 259232,
-      "gzip": 88206,
-      "brotli": 75715
+      "raw": 310374,
+      "gzip": 106970,
+      "brotli": 90878
     },
     "content": {
       "definition": "The optional rich-content subpath: Markdown, CodeBlock and their full dependency stack.",
-      "raw": 625066,
-      "gzip": 190335,
-      "brotli": 151468
+      "raw": 626052,
+      "gzip": 190341,
+      "brotli": 151638
     },
     "stylesCss": {
       "definition": "Published component stylesheet.",
-      "raw": 86300,
-      "gzip": 10189,
-      "brotli": 8505
+      "raw": 90382,
+      "gzip": 10667,
+      "brotli": 8839
     },
     "themeCss": {
       "definition": "Published token-only theme stylesheet.",
       "raw": 8105,
-      "gzip": 1361,
+      "gzip": 1370,
       "brotli": 1103
     }
   }

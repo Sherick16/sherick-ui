@@ -50,7 +50,7 @@ const expectedRichContent = [
 
 const fixtures = {
   button: `import { Button } from "sherick-ui";\nexport default Button;\n`,
-  form: `import { Button, Input, Select, Switch } from "sherick-ui";\nexport default [Button, Input, Select, Switch];\n`,
+  form: `import { Button, Checkbox, Field, Input, NumberField, RadioGroup, Select, Slider, Switch } from "sherick-ui";\nexport default [Button, Checkbox, Field, Input, NumberField, RadioGroup, Select, Slider, Switch];\n`,
   overlay: `import { Dialog, Select, Tooltip } from "sherick-ui";\nexport default [Dialog, Select, Tooltip];\n`,
   barrel: `export * from "sherick-ui";\n`,
   content: `import { Markdown, CodeBlock } from "sherick-ui/content";\nexport const a = [Markdown, CodeBlock];\nexport * from "sherick-ui/content";\n`,
@@ -124,7 +124,7 @@ if (update) {
   const definitions = {
     button:
       "Button alone through the root export. Guards against the root barrel pulling optional feature code.",
-    form: "Representative form composition: Button, Input, Select, Switch.",
+    form: "Representative form composition: Button, Checkbox, Field, Input, NumberField, RadioGroup, Select, Slider, Switch.",
     overlay: "Representative overlay composition: Dialog, Select, Tooltip.",
     barrel: "The complete core root barrel with nothing tree-shaken beyond unused exports.",
     content: "The optional rich-content subpath: Markdown, CodeBlock and their full dependency stack.",

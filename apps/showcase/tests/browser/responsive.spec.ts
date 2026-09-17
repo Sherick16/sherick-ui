@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "@playwright/test";
+import { expect, test, type Locator, type Page } from "@playwright/test";
 
 const NARROW_VIEWPORT = { width: 320, height: 800 };
 
@@ -13,13 +13,18 @@ const trackRuntimeErrors = (page: Page) => {
   return errors;
 };
 
-/* The measured field controls: native inputs, the textarea and the Select trigger.
-   Each must be laid out within the narrow wrapper it sits in. */
-const fieldControls = (page: Page) => [
-  page.getByRole("textbox", { name: "Narrow project name" }),
-  page.getByRole("textbox", { name: "Narrow notes" }),
-  page.getByRole("textbox", { name: "Narrow search" }),
-  page.getByRole("combobox", { name: "Narrow project type" }),
+/* The measured field controls: native inputs, the textarea, the Select trigger and the
+   Wave A family. Each must be laid out within the narrow wrapper it sits in. */
+const fieldControls = (page: Page): Array<[string, Locator]> => [
+  ["narrow project name", page.getByRole("textbox", { name: "Narrow project name" })],
+  ["narrow notes", page.getByRole("textbox", { name: "Narrow notes" })],
+  ["narrow search", page.getByRole("textbox", { name: "Narrow search" })],
+  ["narrow project type", page.getByRole("combobox", { name: "Narrow project type" })],
+  ["narrow notifications", page.getByRole("checkbox", { name: "Narrow notifications" })],
+  ["narrow region", page.getByRole("radiogroup", { name: "Narrow region" })],
+  ["narrow budget", page.getByRole("slider", { name: "Narrow budget" })],
+  ["narrow seats", page.getByRole("textbox", { name: "Narrow seats" })],
+  ["narrow seats stepper", page.getByRole("button", { name: "Increase" })],
 ];
 
 const openFixture = async (page: Page) => {
@@ -51,9 +56,8 @@ const assertControlsFitNarrowContainer = async (page: Page, context: string) => 
     `${context}: narrow container scrollWidth ${narrow.scrollWidth} exceeds clientWidth ${narrow.clientWidth}`
   ).toBeLessThanOrEqual(narrow.clientWidth + 1);
 
-  for (const control of fieldControls(page)) {
-    const name = await control.getAttribute("aria-label");
-    const width = await control.evaluate((element) => element.getBoundingClientRect().width);
+  for (const [name, control] of fieldControls(page)) {
+    const width = await control.first().evaluate((element) => element.getBoundingClientRect().width);
     expect(width, `${context}: "${name}" is ${width}px wide inside a ${narrow.clientWidth}px container`).toBeLessThanOrEqual(
       narrow.clientWidth
     );

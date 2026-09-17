@@ -56,6 +56,7 @@ module.exports = {
         press: "var(--sui-ease-press)",
         release: "var(--sui-ease-release)",
         exit: "var(--sui-ease-exit)",
+        spring: "var(--sui-ease-spring)",
       },
       animation: {
         "sherick-overlay-in":
