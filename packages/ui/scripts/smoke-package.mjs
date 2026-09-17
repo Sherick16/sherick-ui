@@ -9,29 +9,54 @@ import ts from "typescript";
 
 const packageRoot = fileURLToPath(new URL("..", import.meta.url));
 const library = await import("../dist/esm/index.js");
+const content = await import("../dist/esm/content.js");
 const esm = await readFile(new URL("../dist/esm/index.js", import.meta.url), "utf8");
 const declarations = await readFile(new URL("../dist/types/index.d.ts", import.meta.url), "utf8");
+const contentDeclarations = await readFile(new URL("../dist/types/content.d.ts", import.meta.url), "utf8");
 const stylesCss = await readFile(new URL("../dist/styles.css", import.meta.url), "utf8");
 const themeCss = await readFile(new URL("../dist/theme.css", import.meta.url), "utf8");
 const packageJson = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
 
 for (const exportName of [
-  "ActionButton",
+  "Alert",
   "Avatar",
+  "Badge",
   "Button",
+  "Card",
   "Dialog",
-  "Dropdown",
+  "Divider",
+  "IconButton",
   "Input",
-  "Modal",
+  "NavGroup",
+  "NavItem",
   "Search",
   "Select",
+  "Skeleton",
+  "Spinner",
   "Switch",
+  "Table",
   "Tabs",
-  "TabGroup",
+  "Textarea",
   "Tooltip",
 ]) {
   assert.ok(library[exportName], `missing public export: ${exportName}`);
 }
+
+for (const removed of [
+  "ActionButton",
+  "Dropdown",
+  "Modal",
+  "TabGroup",
+  "Markdown",
+  "CodeBlock",
+]) {
+  assert.equal(library[removed], undefined, `${removed} must not remain on the root barrel`);
+}
+
+for (const exportName of ["Markdown", "CodeBlock"]) {
+  assert.ok(content[exportName], `missing content export: ${exportName}`);
+}
+assert.ok(contentDeclarations.includes("MarkdownProps"), "content declarations should expose Markdown props");
 
 assert.ok(!esm.includes("next/image"), "bundle must not depend on next/image");
 assert.ok(!esm.includes("next/link"), "bundle must not depend on next/link");
@@ -48,6 +73,13 @@ assert.doesNotMatch(esm, /^\s*["']use client["'];/, "the package barrel must not
 assert.equal(packageJson.style, "dist/styles.css");
 assert.equal(packageJson.exports["./styles.css"], "./dist/styles.css");
 assert.equal(packageJson.exports["./theme.css"], "./dist/theme.css");
+assert.equal(packageJson.exports["./content"].import, "./dist/esm/content.js");
+assert.equal(packageJson.exports["./content"].types, "./dist/types/content.d.ts");
+assert.equal(
+  packageJson.exports["./content"].require,
+  undefined,
+  "the ESM-only content subpath must not advertise a require entry"
+);
 assert.equal(packageJson.exports["./tailwind-preset"], undefined, "Tailwind preset must not remain public");
 assert.equal(packageJson.peerDependencies.tailwindcss, undefined, "Tailwind must not remain a consumer peer");
 assert.deepEqual(packageJson.files, ["dist"], "the package should publish only finished artifacts");

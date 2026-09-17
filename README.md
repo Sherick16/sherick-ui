@@ -6,6 +6,22 @@ The guiding rule is **quiet by default, expressive where it matters**. Every com
 
 Interactive behavior is deliberately separate from visual design. Sherick UI uses [Base UI](https://base-ui.com/) as its unstyled behavioral and accessibility substrate wherever Base UI provides the primitive. Base UI owns generic mechanics such as keyboard navigation, focus management, ARIA relationships, form participation, portals, dismissal and popup positioning; Sherick UI owns the component anatomy, public design API and every visual decision.
 
+## Release status / compatibility
+
+The published stable line is `1.0.x`, and it is frozen: it receives no further releases. New
+work ships as `2.0.0-alpha.N` under the `alpha` dist-tag, so `npm install sherick-ui` keeps
+resolving to the last stable `1.x` release and only `npm install sherick-ui@alpha` opts in.
+API compatibility starts being promised at `2.0.0`; until then every prerelease may break,
+and a prerelease bump is not a compatibility signal.
+
+This is a semver consequence, not a disclaimer: `^1.0.5` means `>=1.0.5 <2.0.0` to npm, so the
+unstable work cannot live on the `1.x` line without promising compatibility it does not have.
+
+The full contract lives in [`docs/RELEASE.md`](docs/RELEASE.md): what counts as a breaking
+change, the public export subpaths, the styling import order and theme contracts, the
+supported React, browser and Node baselines, the internal-infrastructure boundaries (Base UI,
+Tailwind) and the size-budget policy.
+
 ## Installation
 
 ```bash
@@ -134,7 +150,7 @@ export function Example() {
 }
 ```
 
-`Button` supports `filled`, `tonal` and `text` appearances plus `sm`, `md` and `lg` sizes. `ActionButton` remains as a deprecated compatibility alias. `IconButton` supports `tonal`, `ghost` and `acrylic` appearances. Semantic variants remain available for meaningful states such as danger or success rather than requiring every component to be chromatically loud.
+`Button` supports `filled`, `tonal` and `text` appearances plus `sm`, `md` and `lg` sizes. `IconButton` supports `tonal`, `ghost` and `acrylic` appearances. Semantic variants remain available for meaningful states such as danger or success rather than requiring every component to be chromatically loud.
 
 Components expose their relevant native HTML props and refs where appropriate. Base-backed interactive primitives delegate their generic widget semantics and accessibility mechanics to Base UI while retaining Sherick's visual language and focus treatment.
 
@@ -142,21 +158,55 @@ Components expose their relevant native HTML props and refs where appropriate. B
 
 The public package exports:
 
-- Button and IconButton (`ActionButton` remains as a deprecated compatibility alias)
+- Button and IconButton
 - Alert, Avatar, Badge and Card
-- CodeBlock and Markdown
 - Divider
-- Select (`Dropdown` remains as a deprecated compatibility alias)
+- Select
 - Input, Search and Textarea
-- Dialog (`Modal` remains as a compatibility name, with `Header`, `Content` and `Footer` composition)
+- Dialog (with `Dialog.Header`, `Dialog.Description`, `Dialog.Content` and `Dialog.Footer`)
 - NavGroup and NavItem
 - Skeleton and Spinner
 - Switch
-- Tabs (`TabGroup` remains as a compatibility name)
+- Tabs
 - Table
 - Tooltip
 
-Public prop types and the shared `Variant` type are exported from the package root as well.
+Public prop types and the shared `Variant` type are exported from the package root as well. The names above are the canonical ones — there are no compatibility aliases.
+
+### Rich content: `sherick-ui/content`
+
+`Markdown` and `CodeBlock` live on a separate subpath, not on the root export:
+
+```tsx
+import { Markdown, CodeBlock } from "sherick-ui/content";
+import "sherick-ui/styles.css";
+
+export function Docs() {
+  return (
+    <>
+      <Markdown>{`# Heading
+
+Some **markdown** with \`code\` and math: $E = mc^2$.`}</Markdown>
+      <CodeBlock language="tsx">{`<Button appearance="filled">Save</Button>`}</CodeBlock>
+    </>
+  );
+}
+```
+
+The rich-content stack — Prism, remark/rehype and KaTeX — is deliberately separate, so a
+build that only uses core components never **bundles** a syntax highlighter or a Markdown
+pipeline. Importing `Button` from `sherick-ui` does not reach `sherick-ui/content`.
+
+That separation is a bundle boundary, not an install boundary: the rich stack is an ordinary
+dependency, so installing `sherick-ui` installs it whether or not the subpath is imported.
+Bundlers drop it for consumers who never import `sherick-ui/content`; package managers do not.
+
+`sherick-ui/content` is ESM only — `react-markdown` and remark/rehype publish no CommonJS
+build — so it has no `require` entry. From CommonJS, use dynamic import:
+
+```js
+const { Markdown } = await import("sherick-ui/content");
+```
 
 ## Behavioral foundation
 
@@ -165,6 +215,8 @@ Public prop types and the shared `Variant` type are exported from the package ro
 When Base UI provides the primitive, it owns keyboard navigation, roving focus, focus trapping/restoration, generated accessibility relationships, composite-control form participation, portals, anchored positioning/collision handling, outside interaction/Escape dismissal and popup lifecycle. Passive semantics such as cards, badges, navigation links and tables remain native HTML rather than being forced through a headless abstraction.
 
 This boundary is intentional: upgrading behavior should normally mean upgrading Base UI and validating Sherick's integration tests, while changing Sherick's appearance should remain confined to its design language, recipes and tokens.
+
+Base UI is **internal infrastructure**. Consumers never import it to use Sherick UI, and Base UI's own props, DOM structure and generated IDs are not part of this package's compatibility promise.
 
 ## Design language
 
@@ -182,7 +234,7 @@ bun run verify
 
 The private `apps/showcase` workbench includes `System`, `Light` and `Dark` controls so every component and state can be reviewed against all supported themes, and it links to the canonical design language from its heading.
 
-`bun run verify` covers source checks, ESM/CommonJS/declaration builds, the production Next showcase, a Tailwind-free Vite consumer, local styling-contract checks, a clean `npm pack` consumer install, Chromium interaction tests and browser visual regression. See [`docs/VERIFICATION.md`](docs/VERIFICATION.md) for the contract of each layer.
+`bun run verify` covers source checks, ESM/CommonJS/declaration builds, the production Next showcase, a Tailwind-free Vite consumer, local styling-contract checks, a `npm pack` consumer install, size/tree-shaking budgets, deterministic style-contract snapshots and the Chromium browser suites (interaction, accessibility, responsive and visual regression). See [`docs/VERIFICATION.md`](docs/VERIFICATION.md) for the contract of each layer.
 
 The Next.js app in `apps/showcase` is a development/showcase surface only; the published component runtime does not depend on Next.js.
 

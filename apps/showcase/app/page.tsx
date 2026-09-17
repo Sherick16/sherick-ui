@@ -14,28 +14,27 @@ import {
   Trash2,
 } from "lucide-react";
 import {
-  Button,
   Alert,
   Avatar,
   Badge,
+  Button,
   Card,
-  CodeBlock,
+  Dialog,
   Divider,
-  Dropdown,
   IconButton,
   Input,
-  Markdown,
-  Modal,
   NavGroup,
   Search,
+  Select,
   Skeleton,
   Spinner,
   Switch,
-  TabGroup,
   Table,
+  Tabs,
   Textarea,
   Tooltip,
 } from "sherick-ui";
+import { CodeBlock, Markdown } from "sherick-ui/content";
 import {
   cn,
   density,
@@ -71,7 +70,7 @@ const applyTheme = (theme: ThemeMode) => {
 };
 
 export default function Home() {
-  const [modalOpen, setModalOpen] = useState(false);
+  const [dialogOpen, setDialogOpen] = useState(false);
   const [switchOn, setSwitchOn] = useState(true);
   const [motionSwitch, setMotionSwitch] = useState(false);
   const [selection, setSelection] = useState("design");
@@ -211,7 +210,7 @@ export default function Home() {
                   </div>
                   <div className="flex flex-wrap items-center gap-4">
                     <span className={cn("w-20 text-xs font-medium", text.high)}>Release</span>
-                    <Switch checked={motionSwitch} onChange={setMotionSwitch} />
+                    <Switch checked={motionSwitch} onCheckedChange={setMotionSwitch} aria-label="Release motion" />
                   </div>
                   <div className="flex flex-wrap items-center gap-4">
                     <span className={cn("w-20 text-xs font-medium", text.high)}>Overlay</span>
@@ -320,10 +319,10 @@ export default function Home() {
                 </div>
               </Specimen>
 
-              <Specimen title="Dropdown">
+              <Specimen title="Select">
                 <div className="space-y-4">
-                  <Dropdown options={selectOptions} selected={selection} onSelect={setSelection} aria-label="Project type" className="w-full" />
-                  <Dropdown options={selectOptions} disabled aria-label="Disabled project type" className="w-full" />
+                  <Select options={selectOptions} value={selection} onValueChange={(next) => setSelection(next ?? "")} aria-label="Project type" />
+                  <Select options={selectOptions} disabled aria-label="Disabled project type" />
                 </div>
               </Specimen>
             </div>
@@ -334,14 +333,14 @@ export default function Home() {
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
               <Specimen title="Switch">
                 <div className="flex flex-wrap items-center gap-6">
-                  <StateLabel label="On"><Switch checked={switchOn} onChange={setSwitchOn} /></StateLabel>
-                  <StateLabel label="Off"><Switch checked={false} onChange={() => undefined} /></StateLabel>
-                  <StateLabel label="Disabled"><Switch checked disabled /></StateLabel>
+                  <StateLabel label="On"><Switch checked={switchOn} onCheckedChange={setSwitchOn} aria-label="On" /></StateLabel>
+                  <StateLabel label="Off"><Switch checked={false} onCheckedChange={() => undefined} aria-label="Off" /></StateLabel>
+                  <StateLabel label="Disabled"><Switch checked disabled aria-label="Disabled" /></StateLabel>
                 </div>
               </Specimen>
 
               <Specimen title="Tabs">
-                <TabGroup className="overflow-x-auto" tabs={[
+                <Tabs className="overflow-x-auto" tabs={[
                   { id: "one", label: "Overview", content: <p className={cn("text-sm", text.medium)}>Overview content</p> },
                   { id: "two", label: "Motion", content: <p className={cn("text-sm", text.medium)}>Motion content</p> },
                   { id: "three", label: "Density", content: <p className={cn("text-sm", text.medium)}>Density content</p> },
@@ -406,8 +405,8 @@ export default function Home() {
                 </div>
               </Specimen>
 
-              <Specimen title="Modal">
-                <Button appearance="tonal" variant="secondary" onClick={() => setModalOpen(true)}>Open modal</Button>
+              <Specimen title="Dialog">
+                <Button appearance="tonal" variant="secondary" onClick={() => setDialogOpen(true)}>Open dialog</Button>
               </Specimen>
             </div>
           </section>
@@ -416,8 +415,8 @@ export default function Home() {
             <SectionHeading title="Data display" />
             <Specimen title="Table" className="mt-6">
               <Table headers={["Component", "Role", "Status"]} rows={[
-                ["Dropdown", "Custom selection", <Badge key="dropdown" variant="success">Ready</Badge>],
-                ["Modal", "Focused overlay", <Badge key="modal" variant="success">Ready</Badge>],
+                ["Select", "Custom selection", <Badge key="select" variant="success">Ready</Badge>],
+                ["Dialog", "Focused overlay", <Badge key="dialog" variant="success">Ready</Badge>],
                 ["Table", "Dense information", <Badge key="table" variant="secondary">Quiet</Badge>],
                 ["Input", "Form control", <Badge key="input" variant="primary">Core</Badge>],
               ]} />
@@ -438,16 +437,16 @@ export default function Home() {
         </div>
       </div>
 
-      <Modal open={modalOpen} onClose={() => setModalOpen(false)}>
-        <Modal.Header>Modal specimen</Modal.Header>
-        <Modal.Content>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+        <Dialog.Header>Dialog specimen</Dialog.Header>
+        <Dialog.Content>
           Overlay specimen content.
-        </Modal.Content>
-        <Modal.Footer>
-          <Button appearance="text" variant="secondary" onClick={() => setModalOpen(false)}>Cancel</Button>
-          <Button appearance="filled" onClick={() => setModalOpen(false)}>Confirm</Button>
-        </Modal.Footer>
-      </Modal>
+        </Dialog.Content>
+        <Dialog.Footer>
+          <Button appearance="text" variant="secondary" onClick={() => setDialogOpen(false)}>Cancel</Button>
+          <Button appearance="filled" onClick={() => setDialogOpen(false)}>Confirm</Button>
+        </Dialog.Footer>
+      </Dialog>
     </main>
   );
 }

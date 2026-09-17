@@ -24,16 +24,12 @@ export interface SelectOption {
 }
 
 export interface SelectProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onSelect" | "value" | "defaultValue"> {
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "value" | "defaultValue"> {
   options: SelectOption[];
   variant?: Variant;
   value?: string | null;
   defaultValue?: string | null;
   onValueChange?: (value: string | null) => void;
-  /** @deprecated Use `value` instead. */
-  selected?: string;
-  /** @deprecated Use `onValueChange` instead. */
-  onSelect?: (value: string) => void;
   placeholder?: string;
   readOnly?: boolean;
   required?: boolean;
@@ -46,8 +42,6 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
     value,
     defaultValue,
     onValueChange,
-    selected,
-    onSelect,
     placeholder = "Select an option",
     className,
     disabled,
@@ -58,17 +52,13 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
     id,
     ...triggerProps
   }, ref) => {
-    const controlledValue = value !== undefined ? value : selected;
-
     return (
       <BaseSelect.Root
         items={options}
-        value={controlledValue}
+        value={value}
         defaultValue={defaultValue ?? null}
         onValueChange={(nextValue) => {
-          const normalized = typeof nextValue === "string" ? nextValue : null;
-          onValueChange?.(normalized);
-          if (normalized !== null) onSelect?.(normalized);
+          onValueChange?.(typeof nextValue === "string" ? nextValue : null);
         }}
         disabled={disabled}
         readOnly={readOnly}
@@ -76,14 +66,14 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
         name={name}
         form={form}
       >
-        <div className={cn("relative inline-block min-w-64", className)}>
+        <div className={cn("relative block w-full", className)}>
           <BaseSelect.Trigger
             {...triggerProps}
             ref={ref}
             id={id}
             className={({ open }) =>
               cn(
-                "group flex w-full min-w-64 items-center justify-between gap-3 px-5 py-3 text-left",
+                "group flex w-full items-center justify-between gap-3 px-5 py-3 text-left",
                 density.normal,
                 shape.control,
                 "bg-sherick-surface-high/[0.66] text-sherick-ink placeholder:text-sherick-ink-muted",

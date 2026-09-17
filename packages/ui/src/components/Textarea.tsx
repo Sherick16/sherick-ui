@@ -18,15 +18,13 @@ import {
 } from "./ui.common";
 
 export interface TextareaProps
-  extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "onChange"> {
+  extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: ReactNode;
   description?: ReactNode;
   error?: boolean;
   errorMessage?: ReactNode;
   textareaClassName?: string;
   onValueChange?: (value: string) => void;
-  /** @deprecated Use `onValueChange` instead. */
-  onChange?: (value: string) => void;
 }
 
 const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
@@ -42,17 +40,10 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     name,
     disabled,
     onValueChange,
-    onChange,
     value,
     defaultValue,
     ...textareaProps
   }, ref) => {
-    const handleValueChange = (nextValue: unknown) => {
-      const normalized = String(nextValue);
-      onValueChange?.(normalized);
-      onChange?.(normalized);
-    };
-
     return (
       <Field.Root
         className={cn("flex w-full flex-col", className)}
@@ -74,11 +65,11 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           disabled={disabled}
           value={value}
           defaultValue={defaultValue}
-          onValueChange={handleValueChange}
+          onValueChange={onValueChange}
           className={cn(
             "w-full resize-y",
             density.normal,
-            "min-h-28 min-w-64 px-5 py-4",
+            "min-h-28 px-5 py-4",
             shape.control,
             motion.press,
             focusRing,

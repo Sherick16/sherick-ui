@@ -1,13 +1,13 @@
 import React, { type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 
-export interface ModalFooterProps {
+export interface DialogFooterProps {
   children: ReactNode;
   className?: string;
 }
 
 /* Actions stay on the dialog's own surface: no divider, no second layer. */
-export const ModalFooter = ({ children, className }: ModalFooterProps) => {
+export const DialogFooter = ({ children, className }: DialogFooterProps) => {
   return (
     <div
       className={cn(

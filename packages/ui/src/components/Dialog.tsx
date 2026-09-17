@@ -20,34 +20,31 @@ import {
   stateLayer,
   text,
 } from "./ui.common";
-import { ModalContent } from "./ModalContent";
-import { ModalDescription } from "./ModalDescription";
-import { ModalFooter } from "./ModalFooter";
-import { ModalHeader } from "./ModalHeader";
+import { DialogContent } from "./DialogContent";
+import { DialogDescription } from "./DialogDescription";
+import { DialogFooter } from "./DialogFooter";
+import { DialogHeader } from "./DialogHeader";
 
-export interface ModalProps {
+export interface DialogProps {
   children: ReactNode;
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
-  /** @deprecated Use `onOpenChange` instead. */
-  onClose?: () => void;
   className?: string;
 }
 
-type ModalComponent = ForwardRefExoticComponent<ModalProps & RefAttributes<HTMLDivElement>> & {
-  Header: typeof ModalHeader;
-  Description: typeof ModalDescription;
-  Content: typeof ModalContent;
-  Footer: typeof ModalFooter;
+type DialogComponent = ForwardRefExoticComponent<DialogProps & RefAttributes<HTMLDivElement>> & {
+  Header: typeof DialogHeader;
+  Description: typeof DialogDescription;
+  Content: typeof DialogContent;
+  Footer: typeof DialogFooter;
 };
 
-const Modal = forwardRef<HTMLDivElement, ModalProps>(({
+const Dialog = forwardRef<HTMLDivElement, DialogProps>(({
   children,
   open,
   defaultOpen,
   onOpenChange,
-  onClose,
   className,
 }, forwardedRef) => {
   const popupRef = useRef<HTMLDivElement | null>(null);
@@ -64,7 +61,6 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(({
       defaultOpen={defaultOpen}
       onOpenChange={(nextOpen) => {
         onOpenChange?.(nextOpen);
-        if (!nextOpen) onClose?.();
       }}
     >
       <BaseDialog.Portal>
@@ -116,12 +112,12 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(({
       </BaseDialog.Portal>
     </BaseDialog.Root>
   );
-}) as ModalComponent;
+}) as DialogComponent;
 
-Modal.displayName = "Modal";
-Modal.Header = ModalHeader;
-Modal.Description = ModalDescription;
-Modal.Content = ModalContent;
-Modal.Footer = ModalFooter;
+Dialog.displayName = "Dialog";
+Dialog.Header = DialogHeader;
+Dialog.Description = DialogDescription;
+Dialog.Content = DialogContent;
+Dialog.Footer = DialogFooter;
 
-export default Modal;
+export default Dialog;

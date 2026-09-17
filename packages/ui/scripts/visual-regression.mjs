@@ -23,31 +23,32 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { motion, overlay } from "../src/components/ui.common.ts";
 
 const library = await import("../dist/esm/index.js");
+const content = await import("../dist/esm/content.js");
 
 const {
-  ActionButton,
   Alert,
   Avatar,
   Badge,
+  Button,
   Card,
-  CodeBlock,
   Divider,
-  Dropdown,
   IconButton,
   Input,
-  Markdown,
   NavGroup,
   Search,
+  Select,
   Skeleton,
   Spinner,
   Switch,
-  TabGroup,
+  Tabs,
   Table,
   Textarea,
   Tooltip,
 } = library;
 
-const { Header: ModalHeader, Content: ModalContent, Footer: ModalFooter } = library.Modal;
+const { CodeBlock, Markdown } = content;
+
+const { Header: DialogHeader, Content: DialogContent, Footer: DialogFooter } = library.Dialog;
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const baselinePath = join(root, "scripts", "visual-baselines", "visual-regression.json");
@@ -59,17 +60,17 @@ const noop = () => undefined;
 const inDialogContext = (child) => h(BaseDialog.Root, { open: true }, child);
 
 const specimens = {
-  "action-button.filled": h(ActionButton, { appearance: "filled" }, "Save"),
-  "action-button.filled.danger": h(ActionButton, { appearance: "filled", variant: "danger" }, "Delete"),
-  "action-button.tonal": h(ActionButton, { appearance: "tonal", variant: "secondary" }, "Cancel"),
-  "action-button.tonal.primary": h(ActionButton, {}, "Continue"),
-  "action-button.text": h(ActionButton, { appearance: "text", variant: "secondary" }, "Skip"),
-  "action-button.icon": h(ActionButton, { icon: h(Spinner, { size: "small" }) }, "Sync"),
-  "action-button.size.sm": h(ActionButton, { size: "sm" }, "Small"),
-  "action-button.size.md": h(ActionButton, { size: "md" }, "Medium"),
-  "action-button.size.lg": h(ActionButton, { size: "lg" }, "Large"),
-  "action-button.disabled": h(ActionButton, { disabled: true }, "Disabled"),
-  "action-button.loading": h(ActionButton, { loading: true }, "Saving"),
+  "button.filled": h(Button, { appearance: "filled" }, "Save"),
+  "button.filled.danger": h(Button, { appearance: "filled", variant: "danger" }, "Delete"),
+  "button.tonal": h(Button, { appearance: "tonal", variant: "secondary" }, "Cancel"),
+  "button.tonal.primary": h(Button, {}, "Continue"),
+  "button.text": h(Button, { appearance: "text", variant: "secondary" }, "Skip"),
+  "button.icon": h(Button, { icon: h(Spinner, { size: "small" }) }, "Sync"),
+  "button.size.sm": h(Button, { size: "sm" }, "Small"),
+  "button.size.md": h(Button, { size: "md" }, "Medium"),
+  "button.size.lg": h(Button, { size: "lg" }, "Large"),
+  "button.disabled": h(Button, { disabled: true }, "Disabled"),
+  "button.loading": h(Button, { loading: true }, "Saving"),
   "alert.primary": h(Alert, {}, "A useful piece of information."),
   "alert.danger.closeable": h(Alert, { variant: "danger", closeable: true }, "Something needs your attention."),
   "alert.success": h(Alert, { variant: "success" }, "Changes were saved."),
@@ -80,12 +81,12 @@ const specimens = {
   "badge.success.icon": h(Badge, { variant: "success", icon: h("span", null, "·") }, "Ready"),
   "card.secondary": h(Card, {}, "Neutral card"),
   "card.primary": h(Card, { variant: "primary" }, "Tonal card"),
-  "code-block.block": h(CodeBlock, { language: "tsx" }, '<ActionButton appearance="filled">Save</ActionButton>'),
-  "code-block.inline": h(CodeBlock, { inline: true }, "ActionButton"),
+  "code-block.block": h(CodeBlock, { language: "tsx" }, '<Button appearance="filled">Save</Button>'),
+  "code-block.inline": h(CodeBlock, { inline: true }, "Button"),
   "divider.horizontal": h(Divider, {}),
   "divider.vertical": h(Divider, { orientation: "vertical" }),
-  "dropdown.trigger": h(Dropdown, { options: [{ label: "Design system", value: "design" }], selected: "design", onSelect: noop }),
-  "dropdown.disabled": h(Dropdown, { options: [{ label: "Design system", value: "design" }], disabled: true }),
+  "select.trigger": h(Select, { options: [{ label: "Design system", value: "design" }], value: "design", onValueChange: noop }),
+  "select.disabled": h(Select, { options: [{ label: "Design system", value: "design" }], disabled: true }),
   "icon-button.tonal": h(IconButton, { icon: h("span", null, "·"), "aria-label": "Notifications" }),
   "icon-button.ghost": h(IconButton, { appearance: "ghost", variant: "secondary", icon: h("span", null, "·"), "aria-label": "Search" }),
   "icon-button.acrylic": h(IconButton, { appearance: "acrylic", variant: "secondary", icon: h("span", null, "·"), "aria-label": "Download" }),
@@ -95,28 +96,28 @@ const specimens = {
   "input.error": h(Input, { label: "Invalid", error: true, placeholder: "Required value" }),
   "input.disabled": h(Input, { label: "Disabled", disabled: true, placeholder: "Unavailable" }),
   "markdown.document": h(Markdown, {}, "## Example\n\nBody copy with `inline` code.\n\n> A quote.\n\n```ts\nconst a = 1;\n```\n"),
-  "modal.header": inDialogContext(h(ModalHeader, {}, "Modal specimen")),
-  "modal.content": inDialogContext(h(ModalContent, {}, "Focused, translucent and separated from the page beneath it.")),
-  "modal.footer": inDialogContext(h(ModalFooter, {}, h(ActionButton, { appearance: "filled" }, "Confirm"))),
+  "dialog.header": inDialogContext(h(DialogHeader, {}, "Dialog specimen")),
+  "dialog.content": inDialogContext(h(DialogContent, {}, "Focused, translucent and separated from the page beneath it.")),
+  "dialog.footer": inDialogContext(h(DialogFooter, {}, h(Button, { appearance: "filled" }, "Confirm"))),
   "nav-group": h(NavGroup, { title: "Components", activeHref: "#fields", items: [{ label: "Buttons", href: "#buttons" }, { label: "Fields", href: "#fields" }] }),
   "search.default": h(Search, { onSearch: noop, placeholder: "Search components" }),
   "search.loading": h(Search, { onSearch: noop, loading: true }),
   "search.variant.primary": h(Search, { onSearch: noop, variant: "primary" }),
   "skeleton": h(Skeleton, { className: "h-4 w-3/4" }),
   "spinner.small": h(Spinner, { size: "small" }),
-  "switch.on": h(Switch, { checked: true, onChange: noop }),
-  "switch.off": h(Switch, { checked: false, onChange: noop }),
+  "switch.on": h(Switch, { checked: true, onCheckedChange: noop }),
+  "switch.off": h(Switch, { checked: false, onCheckedChange: noop }),
   "switch.disabled": h(Switch, { checked: true, disabled: true }),
-  "tab-group": h(TabGroup, {
+  "tabs": h(Tabs, {
     tabs: [
       { id: "one", label: "Overview", content: "Overview" },
       { id: "two", label: "Motion", content: "Motion" },
     ],
   }),
-  "table": h(Table, { headers: ["Component", "Role"], rows: [["Dropdown", "Selection"], ["Table", "Data"]] }),
+  "table": h(Table, { headers: ["Component", "Role"], rows: [["Select", "Selection"], ["Table", "Data"]] }),
   "textarea.default": h(Textarea, { label: "Notes", placeholder: "Describe what you want to build…" }),
   "textarea.error": h(Textarea, { label: "Invalid notes", error: true }),
-  "tooltip.trigger": h(Tooltip, { content: "Hint" }, h(ActionButton, { appearance: "tonal" }, "Hover")),
+  "tooltip.trigger": h(Tooltip, { content: "Hint" }, h(Button, { appearance: "tonal" }, "Hover")),
 };
 
 const normalizeMarkup = (html) =>

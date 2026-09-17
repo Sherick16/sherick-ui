@@ -64,20 +64,19 @@ import { access, readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import {
-  ActionButton,
-  Button,
-  CodeBlock,
-  Dialog,
-  Select,
-} from "sherick-ui";
+import { Button, Dialog, Select } from "sherick-ui";
+import * as root from "sherick-ui";
+import { CodeBlock } from "sherick-ui/content";
 
 const dev = await import("sherick-ui/dev");
 assert.equal(typeof dev.cn, "function");
 assert.ok(dev.material, "dev recipe export should resolve");
 
+for (const removed of ["ActionButton", "Dropdown", "Modal", "TabGroup", "Markdown", "CodeBlock"]) {
+  assert.equal(root[removed], undefined, \`\${removed} must not be exported from the root barrel\`);
+}
+
 assert.equal(typeof Button, "object");
-assert.equal(ActionButton, Button, "ActionButton should remain a compatibility alias for Button");
 assert.equal(typeof Dialog, "object");
 assert.equal(typeof Dialog.Header, "function");
 assert.equal(typeof Dialog.Content, "function");
@@ -96,6 +95,25 @@ for (const open of [false, true]) {
   );
 }
 
+/* A Switch with no checked prop is uncontrolled, and defaultChecked must be honored: the
+   rendered ARIA state is the consumer-visible proof. */
+const { Switch } = root;
+assert.match(
+  renderToStaticMarkup(React.createElement(Switch, { "aria-label": "Off" })),
+  /aria-checked="false"/
+);
+assert.match(
+  renderToStaticMarkup(React.createElement(Switch, { "aria-label": "On", defaultChecked: true })),
+  /aria-checked="true"/
+);
+assert.match(
+  renderToStaticMarkup(React.createElement(Switch, { "aria-label": "Controlled", checked: false })),
+  /aria-checked="false"/
+);
+
+/* Language-specific grammars are registered by bare side-effect imports inside the
+   published content entry. A language outside core Prism (yaml, python, sql, docker)
+   only produces token spans when those imports survived publication. */
 for (const [language, sample] of [
   ["typescript", "const answer: number = 42"],
   ["python", "def answer():\\n    return 42"],
@@ -111,6 +129,16 @@ for (const [language, sample] of [
     \`published CodeBlock did not tokenize \${language}\`
   );
 }
+
+/* Math needs both halves of the pipeline: remark-math turns \`$…$\` into a math node and
+   rehype-katex renders it. Asserting the rendered equation keeps either one from being
+   dropped without anyone noticing. */
+const { Markdown } = await import("sherick-ui/content");
+const equation = renderToStaticMarkup(
+  React.createElement(Markdown, null, "Inline math: $E = mc^2$\\n\\n$$\\\\int_0^1 x\\\\,dx$$")
+);
+assert.match(equation, /class="[^"]*katex/, "published Markdown did not render KaTeX markup");
+assert.match(equation, /<math|katex-html/, "published Markdown did not produce a rendered equation");
 
 const stylesPath = fileURLToPath(import.meta.resolve("sherick-ui/styles.css"));
 const themePath = fileURLToPath(import.meta.resolve("sherick-ui/theme.css"));
@@ -128,18 +156,38 @@ const fs = require("node:fs");
 const ui = require("sherick-ui");
 
 assert.ok(ui.Button, "CommonJS export missing Button");
-assert.strictEqual(ui.ActionButton, ui.Button, "ActionButton should alias Button in CommonJS");
 assert.ok(ui.Dialog, "CommonJS export missing Dialog");
 assert.ok(ui.Select, "CommonJS export missing Select");
+assert.ok(ui.Tabs, "CommonJS export missing Tabs");
+assert.equal(ui.ActionButton, undefined, "removed aliases must not survive in CommonJS");
+assert.equal(ui.Markdown, undefined, "rich content must not be reachable from the CommonJS root");
 assert.ok(fs.existsSync(require.resolve("sherick-ui/styles.css")), "styles.css export must resolve");
 assert.ok(fs.existsSync(require.resolve("sherick-ui/theme.css")), "theme.css export must resolve");
-console.log("Packed CommonJS verification passed.");
+
+/* The rich-content stack is ESM-only (react-markdown, remark/rehype), so the package
+   intentionally publishes no require() entry for the subpath instead of shipping an
+   artifact that fails on runtimes without require(esm). A CommonJS consumer uses dynamic
+   import(), which is the same thing react-markdown itself requires of them. */
+assert.throws(
+  () => require("sherick-ui/content"),
+  (error) => error.code === "ERR_PACKAGE_PATH_NOT_EXPORTED",
+  "require('sherick-ui/content') must not be advertised, because its dependency graph is ESM-only"
+);
+
+(async () => {
+  const content = await import("sherick-ui/content");
+  assert.ok(content.Markdown, "dynamic import must resolve Markdown from CommonJS");
+  assert.ok(content.CodeBlock, "dynamic import must resolve CodeBlock from CommonJS");
+  console.log("Packed CommonJS verification passed.");
+})().catch((error) => {
+  console.error(error);
+  process.exit(1);
+});
 `;
 
   const typeFixture = `
 import * as React from "react";
 import {
-  ActionButton,
   Button,
   Dialog,
   Input,
@@ -147,9 +195,10 @@ import {
   Select,
   Switch,
   Tabs,
-  type ActionButtonProps,
+  Textarea,
   type AlertProps,
   type ButtonProps,
+  type DialogProps,
   type InputProps,
   type SearchProps,
   type SelectProps,
@@ -158,9 +207,9 @@ import {
   type SwitchProps,
   type TabsProps,
 } from "sherick-ui";
+import { CodeBlock, Markdown, type CodeBlockProps, type MarkdownProps } from "sherick-ui/content";
 
 const buttonProps: ButtonProps = { children: "Save", appearance: "filled" };
-const legacyButtonProps: ActionButtonProps = buttonProps;
 const selectProps: SelectProps = {
   options: [{ label: "Design", value: "design" }],
   defaultValue: "design",
@@ -182,11 +231,17 @@ const switchProps: SwitchProps = {
   name: "enabled",
   value: "yes",
 };
+/* An uncontrolled Switch is part of the public contract: omitting the checked prop must
+   leave the control uncontrolled, and defaultChecked must be honored. */
+const uncontrolledSwitchProps: SwitchProps = { defaultChecked: true, onCheckedChange() {} };
 const tabsProps: TabsProps = {
   value: "one",
   onValueChange() {},
   tabs: [{ id: "one", label: "One", content: "Panel" }],
 };
+const dialogProps: DialogProps = { defaultOpen: true, onOpenChange() {}, children: null };
+const markdownProps: MarkdownProps = { children: "# Title" };
+const codeBlockProps: CodeBlockProps = { language: "ts", children: "const a = 1;" };
 const alertProps: AlertProps = { children: "Notice", onDismiss() {} };
 const skeletonProps: SkeletonProps = { "aria-label": "Loading" };
 const spinnerProps: SpinnerProps = { size: "small" };
@@ -197,16 +252,20 @@ void spinnerProps;
 export const fixture = (
   <>
     <Button {...buttonProps} />
-    <ActionButton {...legacyButtonProps} />
-    <Input {...inputProps} />
+    <Input {...inputProps} onChange={(event) => void event.currentTarget.value} />
+    <Textarea label="Body" onChange={(event) => void event.currentTarget.value} />
     <Search {...searchProps} />
     <Select {...selectProps} />
     <Switch {...switchProps} />
+    <Switch {...uncontrolledSwitchProps} aria-label="Uncontrolled" />
     <Tabs {...tabsProps} />
-    <Dialog defaultOpen onOpenChange={() => undefined}>
+    <Dialog {...dialogProps}>
       <Dialog.Header>Title</Dialog.Header>
       <Dialog.Content>Body</Dialog.Content>
+      <Dialog.Footer>Actions</Dialog.Footer>
     </Dialog>
+    <Markdown {...markdownProps} />
+    <CodeBlock {...codeBlockProps} />
   </>
 );
 `;
@@ -236,7 +295,14 @@ export const fixture = (
   );
   await writeFile(
     join(consumerDir, "src", "main.jsx"),
-    'import React from "react"; import { createRoot } from "react-dom/client"; import { Button } from "sherick-ui"; import "sherick-ui/styles.css"; createRoot(document.getElementById("root")).render(React.createElement(Button, null, "Packed"));'
+    'import React from "react"; import { createRoot } from "react-dom/client"; import { Button } from "sherick-ui"; import { Markdown } from "sherick-ui/content"; import "sherick-ui/styles.css"; createRoot(document.getElementById("root")).render(React.createElement("div", null, React.createElement(Button, null, "Packed"), React.createElement(Markdown, null, "# Packed")));'
+  );
+  /* This consumer deliberately imports the optional rich-content subpath, so its single
+     chunk is legitimately large. The warning limit is raised instead of code-splitting a
+     fixture whose only job is to prove both entries build with no Tailwind present. */
+  await writeFile(
+    join(consumerDir, "vite.config.mjs"),
+    'export default { build: { chunkSizeWarningLimit: 1024 } };\n'
   );
 
   run(process.execPath, ["esm.mjs"], consumerDir);
@@ -250,13 +316,61 @@ export const fixture = (
   assert.equal(installedPackage.main, "dist/cjs/index.cjs");
   assert.equal(installedPackage.style, "dist/styles.css");
   assert.equal(installedPackage.exports["."].require, "./dist/cjs/index.cjs");
+  assert.equal(installedPackage.exports["./content"].import, "./dist/esm/content.js");
+  assert.equal(
+    installedPackage.exports["./content"].require,
+    undefined,
+    "the ESM-only content subpath must not advertise a require entry"
+  );
   assert.equal(installedPackage.exports["./styles.css"], "./dist/styles.css");
   assert.equal(installedPackage.exports["./theme.css"], "./dist/theme.css");
   assert.equal(installedPackage.exports["./tailwind-preset"], undefined);
   assert.equal(installedPackage.peerDependencies.tailwindcss, undefined);
-  await access(join(consumerDir, "node_modules", "sherick-ui", "dist", "cjs", "index.cjs"));
-  await access(join(consumerDir, "node_modules", "sherick-ui", "dist", "styles.css"));
-  await access(join(consumerDir, "node_modules", "sherick-ui", "dist", "theme.css"));
+
+  /* A prerelease must never publish under `latest`, and a stable version must — otherwise
+     `npm install sherick-ui` either silently hands consumers an unstable API or hides a
+     stable release behind a tag nobody installs. */
+  const distTag = installedPackage.publishConfig?.tag ?? "latest";
+  const isPrerelease = installedPackage.version.includes("-");
+  assert.equal(
+    isPrerelease,
+    distTag !== "latest",
+    isPrerelease
+      ? `prerelease ${installedPackage.version} must not publish under the latest dist-tag`
+      : `stable ${installedPackage.version} must publish under the latest dist-tag`
+  );
+
+  /* Only intentional publication artifacts may reach the registry: the built package
+     plus npm's own metadata files. A stray source tree, Tailwind config, lint config or
+     test artifact here means `files` or the build layout regressed. */
+  const publishedPaths = packed[0].files.map((file) => file.path);
+  const unexpected = publishedPaths.filter(
+    (path) => !/^dist\//.test(path) && !["package.json", "README.md", "LICENSE"].includes(path)
+  );
+  assert.deepEqual(unexpected, [], `unexpected file published in the tarball: ${unexpected.join(", ")}`);
+  assert.ok(
+    publishedPaths.some((path) => path === "dist/esm/content.js"),
+    "the packed tarball must include the content subpath build"
+  );
+  assert.ok(
+    !publishedPaths.some((path) => /^dist\/cjs\/(content|components\/(Markdown|CodeBlock|prism-theme))\.cjs$/.test(path)),
+    "the CommonJS build must not publish the ESM-only rich-content modules"
+  );
+  assert.ok(
+    !publishedPaths.some((path) => /\.(ts|tsx)$/.test(path) && !path.endsWith(".d.ts")),
+    "the packed tarball must not include TypeScript sources"
+  );
+
+  for (const artifact of [
+    "dist/cjs/index.cjs",
+    "dist/esm/content.js",
+    "dist/types/index.d.ts",
+    "dist/types/content.d.ts",
+    "dist/styles.css",
+    "dist/theme.css",
+  ]) {
+    await access(join(consumerDir, "node_modules", "sherick-ui", artifact));
+  }
   await access(join(consumerDir, "node_modules", "sherick-ui", "dist", "fonts", "KaTeX_Main-Regular.woff2"));
 
   console.log(`Packed package verification passed: ${packed[0].filename}`);

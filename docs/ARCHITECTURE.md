@@ -13,11 +13,11 @@ Sherick UI is a small workspace repository by design:
 
 Application workspaces consume `sherick-ui`; library source must never import Next.js, Vite, showcase code or application aliases. Internal library modules import sibling/private modules rather than the package's public barrel.
 
-The showcase consumes `sherick-ui` through package exports. Its only privileged surface is `sherick-ui/dev`, an explicitly unstable development-only export for the workbench's design-language specimens. Production consumers should not depend on that subpath.
+The showcase consumes `sherick-ui` through package exports. Its only privileged surface is `sherick-ui/dev`, an explicitly unstable development-only export that hands the workbench the shared visual recipes (`ui.common.ts`) and the `cn()` helper; production consumers must not depend on that subpath.
 
 ## Build and client boundaries
 
-The library build starts at `packages/ui/src/index.ts` plus the development-only `src/dev.ts` and emits preserved ESM/CJS modules. Rollup does not add a package-wide `"use client"` banner. Source modules that genuinely require a client boundary retain their own directive; passive components remain server-usable.
+The library build starts at `packages/ui/src/index.ts` plus the `src/content.ts` rich-content boundary and the development-only `src/dev.ts`, and emits preserved ESM/CJS modules. Rollup does not add a package-wide `"use client"` banner. Source modules that genuinely require a client boundary retain their own directive; passive components remain server-usable.
 
 The library TypeScript configs contain no Next plugin or generated `.next` types. Application workspaces own their framework-specific TypeScript configuration.
 
@@ -79,9 +79,51 @@ Base UI owns generic widget mechanics; Sherick UI exposes a small opinionated AP
 
 Do not add generic controlled-state hooks, focus helpers, form mirrors or event-composition utilities to Sherick UI when Base UI already supplies the behavior.
 
+## Public naming surface
+
+The public naming surface is canonical. `Button`, `Select`, `Dialog` and `Tabs` are the
+names a consumer depends on, and there are **no compatibility aliases** for any export:
+`ActionButton`, `Dropdown`, `Modal` and `TabGroup` are gone, as are the deprecated props
+`Select.selected`, `Select.onSelect`, `Tabs.defaultTabId`, `Tabs.onTabChange`,
+`Dialog.onClose` and `Table.variant`. The `onChange` props on `Input`, `Textarea` and
+`Switch` are no longer Sherick callbacks with their own signature — `Input` and `Textarea`
+pass through native `onChange`, and boolean state goes through `Switch.onCheckedChange`.
+`Switch` is genuinely controlled-or-uncontrolled: omitting `checked` leaves it uncontrolled.
+
+A rename ships as a clean cutover — canonical name in, old name deleted, every caller
+migrated — not as a deprecated alias. Pre-alpha compatibility aliases are not a supported
+pattern and must not be reintroduced. See [`RELEASE.md`](RELEASE.md) for the compatibility
+contract.
+
+## Package exports
+
+The package `exports` map is settled:
+
+- `sherick-ui` — the core barrel (`src/index.ts`);
+- `sherick-ui/content` — the rich-content boundary (`src/content.ts`), **ESM only**: its
+  dependency stack has no CommonJS build, so it declares no `require` entry;
+- `sherick-ui/dev` — the development-only workbench surface (`src/dev.ts`), unstable and
+  unsupported for consumers;
+- `sherick-ui/styles.css` — the complete published component stylesheet;
+- `sherick-ui/theme.css` — token-only theme output for consumers that need the variables
+  without component styling.
+
+## Rich-content boundary
+
+Rich content (`Markdown`, `CodeBlock`, Prism, remark/rehype, KaTeX) lives behind its own
+`exports` subpath, `sherick-ui/content`. It MUST NOT become reachable from the root barrel: a
+consumer importing `Button` must never bundle a syntax highlighter or a Markdown pipeline.
+
+The boundary is a **bundle** boundary, not an install boundary. The rich stack stays in
+`dependencies` so the subpath works out of the box, which means installing `sherick-ui`
+installs that dependency graph whether or not `sherick-ui/content` is ever imported. Bundlers
+drop it for consumers who do not import the subpath; package managers do not. The rich-content stack is the only part of the package that carries those
+runtime dependencies; the published `styles.css` and the packed tarball still include its
+CSS and font assets, because the stylesheet is published as one complete artifact.
+
 ## Adding components
 
-Reusable components belong under `packages/ui/src/components` and are exported from the package's public barrel. Application-only layout/specimens remain in app workspaces.
+Reusable components belong under `packages/ui/src/components` and are exported from the package's public barrel — unless they pull a heavyweight dependency stack that most consumers should not bundle, in which case they belong on their own subpath the way rich content belongs to `sherick-ui/content`. Application-only layout/specimens remain in app workspaces.
 
 For styling, a new component should only need to:
 
@@ -93,6 +135,34 @@ For styling, a new component should only need to:
 
 A new component must not require consumer Tailwind configuration, new focus/elevation systems, or a new CSS delivery mechanism.
 
+## Frozen architecture and extension rules
+
+The following are **settled** and must not be reopened by a component, a fixture or a
+verification convenience:
+
+- the package boundary (one publishable package, one core barrel, one rich-content subpath);
+- the Base UI behavior boundary (Base UI owns generic widget mechanics; Sherick owns anatomy,
+  visual language and the opinionated public API — no second wrapper layer, no locally
+  re-implemented keyboard, focus, portal, dismissal or ARIA machinery);
+- the styling distribution (precompiled, scoped, reset-free `styles.css`; no consumer
+  Tailwind, preset or content scanning);
+- theme/token ownership (`tokens.ts` as the single authored source; `--sui-*` at document
+  root; no nested theme islands);
+- public API naming (canonical names only, no aliases);
+- the rich-content boundary (subpath-only, never on the root barrel, ESM-only, and a bundle boundary rather than an install boundary);
+- the package `exports` map;
+- the verification layers and the size budgets.
+
+> New components should extend existing primitives, recipes, package exports and verification infrastructure. Do not introduce a new architectural layer unless an existing invariant cannot support the requirement.
+
+Extending the language is still expected — new recipes, new tokens, new components, new
+verification fixtures. What is closed is adding a new *layer*: a second component wrapper
+over Base UI, a parallel styling delivery mechanism, an alternative theme system, a second
+rich-content entry point, a duplicate compatibility name, or a second place that records size
+budgets. If an existing invariant genuinely cannot support a requirement, that is an
+architecture decision, documented here and in [`RELEASE.md`](RELEASE.md) — not a local
+workaround inside one component.
+
 ## Verification
 
-The root `bun run verify` proves both publication and integration boundaries. The packed-package test remains the publication boundary: workspace resolution alone is never accepted as evidence that npm consumers can install the package. Browser verification includes the existing reviewed visual baselines, the no-Tailwind consumer, CSS leakage checks, custom-theme torture coverage, forced-colors fallbacks and cross-component interaction composition. See `docs/VERIFICATION.md`.
+The root `bun run verify` proves both publication and integration boundaries. The packed-package test remains the publication boundary: workspace resolution alone is never accepted as evidence that npm consumers can install the package. Browser verification includes the existing reviewed visual baselines, the no-Tailwind consumer, CSS leakage checks, custom-theme torture coverage, forced-colors fallbacks, axe accessibility checks, narrow-viewport and RTL coverage and cross-component interaction composition. Size and tree-shaking budgets are enforced separately by `bun run test:bundle`. See `docs/VERIFICATION.md`.

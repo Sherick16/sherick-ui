@@ -97,7 +97,7 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
         name={name}
         disabled={disabled}
         className={cn(
-          "relative inline-flex min-w-64 items-center",
+          "relative flex w-full items-center",
           density.normal,
           shape.control,
           material.control,
