@@ -265,7 +265,7 @@ size of the object and the emphasis it carries.
 | `prominent` | 1.5rem | prominent controls, compact floating surfaces | small inline controls |
 | `surface` | 1.75rem | large surfaces — cards, menus, panels | buttons |
 | `expressive` | 2rem | an expressive surface that owns the viewport — the large overlay sheet, tightened so it reads as a focused surface rather than a pillowy one | anything smaller than a dialog |
-| `pill` | full | fully rounded controls whose width follows their content | a wide button with a fixed width |
+| `pill` | full | fully rounded controls whose width follows their content, and the fully rounded form of a compact part at either ratio — a value control's capsule handle | a wide button with a fixed width |
 | `circle` | full | fully rounded square targets | non-square targets |
 
 **Do:** hold one role across a whole component family, so a switch and a segmented
@@ -377,14 +377,19 @@ than appearing, so a made selection lands.
 
 A value control's handle follows the same economy: the accent belongs to the **range**, so
 the handle sits on it as the `handle` matte fill and takes the accent itself only while the
-pointer is on it (`state.engaged`). A handle filled with the same accent as the range it
-terminates reads as one continuous shape, which is why the two are separated by tone rather
-than by a drawn edge. It is also why the handle is the one matte part that is *not* a
-surface step: every surface in a theme sits within a few percent of its neighbours, so a
-handle drawn from that ladder is only about 1.2:1 against its own groove — findable when
-the slider is fresh and lost as soon as the control is dimmed. The `handle` fill (5.7–7.7:1
-enabled, 1.9–2.7:1 at 45% disabled, against a surface step's 1.2:1) is what keeps it legible
-when the slider is disabled, where a stronger accent would be the wrong answer.
+pointer is on it (`state.engaged`). The range also **reserves the handle's own half-width plus
+a hair of air on its end**, so the fill stops short of the handle and the surface shows
+through between them: a handle butted against the end of its own range reads as one
+continuous shape, and the gap is what makes it a handle. The reservation is geometry — a
+transparent logical end border with a padding-box clip — not a drawn edge, and it leaves the
+range's end square where the gap is, the way a cut rail ends. A handle filled with the same
+accent as the range it terminates is why the two are separated by tone rather than by a drawn
+edge. It is also why the handle is the one matte part that is *not* a surface step: every
+surface in a theme sits within a few percent of its neighbours, so a handle drawn from that
+ladder is only about 1.2:1 against its own groove — findable when the slider is fresh and lost
+as soon as the control is dimmed. The `handle` fill (5.7–7.7:1 enabled, 1.9–2.7:1 at 45%
+disabled, against a surface step's 1.2:1) is what keeps it legible when the slider is disabled,
+where a stronger accent would be the wrong answer.
 
 Six further `state` entries carry the parts of a state that are not colour, and they are
 members of the system rather than local styling:

@@ -70,22 +70,32 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
           <BaseSlider.Track
             className={cn("h-1.5 w-full", shape.pill, selectable.surface, material.matteQuiet)}
           >
-            {/* The range ends under the handle's centre, exactly where Base UI reports the value.
-                The handle's own matte tone is what makes the range visibly stop: an accent range
-                with an accent handle was one continuous shape. */}
+            {/* The range ends where the handle begins, not under it: it reserves the handle's own
+                half-width plus four pixels of air on its end, so the fill stops short and the
+                surface shows through between them. The reservation is a transparent end border
+                with a padding-box clip — geometry, not a drawn edge — and it is a logical edge,
+                so it follows the direction the slider runs in. The groove beyond the handle is
+                the track's own fill, which Base does not let a component cut. */}
             <BaseSlider.Indicator
-              className={cn(shape.pill, tone.strong.primary, motion.travel)}
+              className={cn(
+                "box-border border-e-[10px] border-e-transparent bg-clip-padding",
+                shape.pill,
+                tone.strong.primary,
+                motion.travel
+              )}
             />
-            {/* A compact matte cap rather than a filled disc: the accent belongs to the range,
-                and the handle takes it only while the pointer is on it. Its fill is the one that
-                separates from both the groove it travels and the page behind it, which is what
-                keeps it findable — at rest, and while the slider is disabled. */}
+            {/* A compact vertical capsule rather than a dot: taller than the groove it travels, so
+                it reads as a grip that was made for the hand, and narrow enough that the range's
+                tail lands behind it and the fill visibly ends where the handle begins. The accent
+                belongs to the range, and the handle takes it only while the pointer is on it. Its
+                fill is the one that separates from both the groove it travels and the page behind
+                it, which is what keeps it findable — at rest, and while the slider is disabled. */}
             <BaseSlider.Thumb
               {...thumbProps}
               ref={ref}
               className={cn(
-                "size-4",
-                shape.circle,
+                "h-5 w-3",
+                shape.pill,
                 motion.travel,
                 elevation.control,
                 material.handle,
