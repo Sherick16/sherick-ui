@@ -334,12 +334,18 @@ One language, applied the same way everywhere:
 | disabled | 45% opacity, no pointer affordance, no interactive state at all | grey-on-grey colouring that breaks theme |
 | focus | the shared focus ring | any other indicator |
 
-Compression is scaled to the object it happens to. `state.press` / `state.groupPress`
-move a control by 2%, which is legible on a button the size of a hand and invisible on a
-mark the size of a fingernail; `state.pressCompact` / `state.groupPressCompact` move a
-compact control — a selection mark, a field's stepper — by 10%, which is the same felt
-distance at that size. The ladder is about **how far a press travels**, never about how
-loud it is, so both steps stay the same quiet physical idea.
+Compression is a **distance, not a ratio**: a press travels roughly a pixel at the size of the ink
+it moves. That single rule produces the three steps.
+
+| Step | Moves | For |
+| --- | --- | --- |
+| `press` / `groupPress` | 2% | a control several times a mark's size, whose outline is what the user sees — a button, a track |
+| `pressMark` / `groupPressMark` | 4% | a compact mark whose outline *is* the control — a checkbox box, a radio circle; four percent of 24px is the same pixel a button travels at two percent of a pill |
+| `pressCompact` / `groupPressCompact` | 10% | a control whose ink is much smaller than the target it is aimed at — an icon inside a `density.target` stepper, where 2% would never register |
+
+Every step is a **centred zoom**: the part changes size in place and never translates. Ten percent
+of a mark's own outline reads as the control moving rather than as pressure, which is why the mark
+step exists at all — it is the same felt distance expressed at the size the mark actually is.
 
 State layers: replacing `background-color` on hover erases whatever fill a control owns,
 so states are composited by a `currentColor`-tinted overlay instead. Opacity carries the

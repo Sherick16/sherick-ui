@@ -195,9 +195,15 @@ export const state = {
   press: "active:scale-[0.98] motion-reduce:active:scale-100",
   /* The same compression, driven by the wrapping button instead of the track. */
   groupPress: "group-active:scale-[0.98] motion-reduce:group-active:scale-100",
-  /* A compact control presses further. Two percent is legible on a button the size of a hand and
-     imperceptible on a mark the size of a fingernail, so the same physical idea is scaled to
-     object it happens to: the press has to travel to register at all. */
+  /* A selection mark compresses by the same *distance*, not the same ratio: four percent of a 24px
+     mark is the one pixel a button travels at two percent of a pill several times its size. The
+     zoom is centred, so the mark grows and shrinks in place rather than appearing to move. */
+  pressMark: "active:scale-[0.96] motion-reduce:active:scale-100",
+  groupPressMark: "group-active:scale-[0.96] motion-reduce:group-active:scale-100",
+  /* A compact control presses further, but only when its ink is much smaller than the target it is
+     aimed at — an icon inside a 44px stepper, where two percent would never register. A mark whose
+     outline *is* the control takes the mark step above instead: ten percent of a 24px outline is a
+     2.4px change, which reads as the control moving rather than as pressure. */
   pressCompact: "active:scale-90 motion-reduce:active:scale-100",
   groupPressCompact: "group-active:scale-90 motion-reduce:group-active:scale-100",
   /* A raised matte control presses back into the track beneath it — the same physical

@@ -82,7 +82,7 @@ export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(
             selectable.selected,
             selectable.indeterminate,
             !disabled && stateLayer.track,
-            !disabled && state.groupPressCompact,
+            !disabled && state.groupPressMark,
             groupFocusRing
           )}
         >

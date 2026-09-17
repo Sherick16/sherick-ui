@@ -125,7 +125,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
                         selectable.rest,
                         selectable.selected,
                         !optionDisabled && stateLayer.track,
-                        !optionDisabled && state.groupPressCompact,
+                        !optionDisabled && state.groupPressMark,
                         groupFocusRing
                       )}
                     >
