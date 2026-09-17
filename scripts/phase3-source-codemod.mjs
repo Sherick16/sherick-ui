@@ -4,16 +4,21 @@ const path = "packages/ui/src/components/ui.common.ts";
 let source = await readFile(path, "utf8");
 
 const replaceOnce = (from, to, label) => {
+  if (source.includes(to)) return;
   if (!source.includes(from)) throw new Error(`Phase 3 codemod could not find ${label}`);
   source = source.replace(from, to);
 };
 
-replaceOnce(
-  `export const focusRingInset =\n  "focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-focus";`,
-  `export const focusRingInset =\n  "focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-focus";\n\n/* Composite controls use the same focus language, driven by their owning input/button. */\nexport const focusRingWithin =\n  "focus-within:outline focus-within:outline-2 focus-within:outline-sherick-focus focus-within:outline-offset-[3px]";\n\nexport const groupFocusRing =\n  "group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-sherick-focus group-focus-visible:outline-offset-[3px]";`,
-  "canonical composite focus recipes"
-);
+const focusInsert =
+  `export const focusRingInset =\n  "focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-focus";\n\n/* Composite controls use the same focus language, driven by their owning input/button. */\nexport const focusRingWithin =\n  "focus-within:outline focus-within:outline-2 focus-within:outline-sherick-focus focus-within:outline-offset-[3px]";\n\nexport const groupFocusRing =\n  "group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-sherick-focus group-focus-visible:outline-offset-[3px]";`;
 
+if (!source.includes("export const focusRingWithin =")) {
+  replaceOnce(
+    `export const focusRingInset =\n  "focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-focus";`,
+    focusInsert,
+    "canonical composite focus recipes"
+  );
+}
 source = source.replace(
   /\n  \/\* The same physical depth, named for the moment a control reaches it by being held[\s\S]*?\n  pressed: "shadow-sherick-pressed",/,
   ""
@@ -33,10 +38,10 @@ const fallbackReplacements = new Map([
 ]);
 
 for (const [from, to] of fallbackReplacements) {
+  if (source.includes(to) && !source.includes(from)) continue;
   if (!source.includes(from)) throw new Error(`Phase 3 codemod could not find ${from}`);
   source = source.replaceAll(from, to);
 }
-
 source = source
   .replace("floating, recessed (published alias `pressed`) plus the tactile control step tactile matte", "floating, recessed plus the tactile control step tactile matte")
   .replace("   - recessed: the other half of that pair: a groove, a track or a well, which is\n               recessed by definition, and a raised control while it is held, which\n               lands at the same depth. `pressed` is the published alias for that depth;\n               prefer `recessed` whenever the surface is simply sunk rather than held.\n", "   - recessed: the other half of that pair: a groove, a track or a well, which is\n               recessed by definition, and a raised control while it is held, which\n               lands at the same depth.\n");

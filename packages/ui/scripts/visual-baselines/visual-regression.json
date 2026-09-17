@@ -1,6 +1,6 @@
 {
   "tokens": {
-    ":root, [data-sherick-theme=\"light\"]": {
+    "@layer sherick-ui-theme | :root, [data-sherick-theme=\"light\"]": {
       "--sui-canvas": "0.965 0.008 255",
       "--sui-surface": "0.985 0.006 255",
       "--sui-surface-high": "0.925 0.014 255",
@@ -30,22 +30,18 @@
       "--sui-elevation-floating": "0 16px 40px oklch(var(--sui-light-bottom) / 0.20), inset 0 1px 0 oklch(var(--sui-light-top) / 0.70)",
       "--sui-elevation-control": "0 1px 2px oklch(var(--sui-light-bottom) / 0.19), inset 0 1px 0 oklch(var(--sui-light-top) / 0.55)",
       "--sui-elevation-recessed": "inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.22), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.50)",
-      "--sui-elevation-pressed": "var(--sui-elevation-recessed)",
-      "--sui-elevation-grounded": "var(--sui-elevation-flat)",
-      "--sui-shadow-focus": "0 10px 28px -22px rgb(65 112 220 / 0.30)",
-      "--sui-shadow-primary": "0 12px 30px -22px rgb(63 108 214 / 0.20)",
       "--sui-glass-blur": "28px",
       "--sui-glass-saturation": "1.18",
       "--sui-glass-brightness": "1.012",
       "--sui-glass-dense-blur": "22px",
       "--sui-glass-dense-saturation": "1.12",
       "--sui-glass-dense-brightness": "1.008",
-      "--sui-glass-gradient": "linear-gradient( 180deg, rgb(255 255 255 / 0.76) 0%, rgb(255 255 255 / 0.30) 30%, rgb(112 156 224 / 0.05) 70%, rgb(38 46 62 / 0.05) 100% )",
-      "--sui-glass-gradient-dense": "linear-gradient( 180deg, rgb(255 255 255 / 0.68) 0%, rgb(255 255 255 / 0.24) 36%, rgb(112 156 224 / 0.04) 76%, rgb(38 46 62 / 0.045) 100% )",
+      "--sui-glass-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.76) 0%, rgb(255 255 255 / 0.30) 30%, rgb(112 156 224 / 0.05) 70%, rgb(38 46 62 / 0.05) 100%)",
+      "--sui-glass-gradient-dense": "linear-gradient(180deg, rgb(255 255 255 / 0.68) 0%, rgb(255 255 255 / 0.24) 36%, rgb(112 156 224 / 0.04) 76%, rgb(38 46 62 / 0.045) 100%)",
       "--sui-glass-hero-blur": "14px",
       "--sui-glass-hero-saturation": "1.06",
       "--sui-glass-hero-brightness": "1.0",
-      "--sui-glass-hero-gradient": "linear-gradient( 180deg, rgb(255 255 255 / 0.42) 0%, rgb(255 255 255 / 0.12) 14%, rgb(255 255 255 / 0) 46%, rgb(38 46 62 / 0.05) 100% )",
+      "--sui-glass-hero-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.42) 0%, rgb(255 255 255 / 0.12) 14%, rgb(255 255 255 / 0) 46%, rgb(38 46 62 / 0.05) 100%)",
       "--sui-surface-overlay": "0.993 0.005 258",
       "--sui-overlay-fill": "0.9",
       "--sui-scrim-blur": "6px",
@@ -57,7 +53,7 @@
       "--sui-code-function": "oklch(0.50 0.15 25)",
       "--sui-code-tag": "oklch(0.48 0.12 220)"
     },
-    "[data-sherick-theme=\"dark\"]": {
+    "@layer sherick-ui-theme | [data-sherick-theme=\"dark\"]": {
       "--sui-canvas": "0.205 0.012 260",
       "--sui-surface": "0.245 0.014 260",
       "--sui-surface-high": "0.295 0.016 260",
@@ -87,67 +83,6 @@
       "--sui-elevation-floating": "0 18px 44px oklch(var(--sui-light-bottom) / 0.38), inset 0 1px 0 oklch(var(--sui-light-top) / 0.05)",
       "--sui-elevation-control": "0 1px 2px oklch(var(--sui-light-bottom) / 0.30), inset 0 1px 0 oklch(var(--sui-light-top) / 0.08)",
       "--sui-elevation-recessed": "inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.38), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.06)",
-      "--sui-elevation-pressed": "var(--sui-elevation-recessed)",
-      "--sui-elevation-grounded": "var(--sui-elevation-flat)",
-      "--sui-shadow-focus": "0 10px 28px -22px rgb(90 145 255 / 0.42)",
-      "--sui-shadow-primary": "0 12px 30px -22px rgb(82 139 255 / 0.34)",
-      "--sui-glass-blur": "32px",
-      "--sui-glass-saturation": "1.45",
-      "--sui-glass-brightness": "1.04",
-      "--sui-glass-dense-blur": "26px",
-      "--sui-glass-dense-saturation": "1.38",
-      "--sui-glass-dense-brightness": "1.035",
-      "--sui-glass-gradient": "linear-gradient( 180deg, rgb(255 255 255 / 0.075) 0%, rgb(255 255 255 / 0.028) 30%, rgb(112 156 255 / 0.02) 70%, rgb(0 0 0 / 0.10) 100% )",
-      "--sui-glass-gradient-dense": "linear-gradient( 180deg, rgb(255 255 255 / 0.06) 0%, rgb(255 255 255 / 0.018) 36%, rgb(112 156 255 / 0.016) 76%, rgb(0 0 0 / 0.08) 100% )",
-      "--sui-glass-hero-blur": "10px",
-      "--sui-glass-hero-saturation": "1.03",
-      "--sui-glass-hero-brightness": "1.0",
-      "--sui-glass-hero-gradient": "linear-gradient( 180deg, rgb(255 255 255 / 0.028) 0%, rgb(255 255 255 / 0.009) 12%, rgb(255 255 255 / 0) 44%, rgb(0 0 0 / 0.16) 100% )",
-      "--sui-surface-overlay": "0.236 0.012 260",
-      "--sui-overlay-fill": "0.965",
-      "--sui-scrim-blur": "6px",
-      "--sui-code-text": "#e2e8f0",
-      "--sui-code-comment": "#64748b",
-      "--sui-code-string": "#a5d6ff",
-      "--sui-code-number": "#f97316",
-      "--sui-code-keyword": "#c084fc",
-      "--sui-code-function": "#ff7b72",
-      "--sui-code-tag": "#7dd3fc"
-    },
-    "@media (prefers-color-scheme: dark) | :root:not([data-sherick-theme])": {
-      "--sui-canvas": "0.205 0.012 260",
-      "--sui-surface": "0.245 0.014 260",
-      "--sui-surface-high": "0.295 0.016 260",
-      "--sui-surface-float": "0.27 0.018 260",
-      "--sui-ink": "0.94 0.008 255",
-      "--sui-ink-muted": "0.76 0.014 255",
-      "--sui-ink-faint": "0.60 0.014 256",
-      "--sui-primary": "0.72 0.15 255",
-      "--sui-primary-strong": "0.66 0.18 257",
-      "--sui-primary-soft": "0.42 0.055 257",
-      "--sui-accent": "0.80 0.08 215",
-      "--sui-danger": "0.72 0.13 25",
-      "--sui-warning": "0.82 0.12 80",
-      "--sui-success": "0.75 0.10 160",
-      "--sui-on-primary": "0.205 0.012 260",
-      "--sui-on-danger": "0.205 0.012 260",
-      "--sui-on-warning": "0.205 0.012 260",
-      "--sui-on-success": "0.205 0.012 260",
-      "--sui-focus": "0.72 0.15 255",
-      "--sui-outline": "0.76 0.014 255",
-      "--sui-scrim": "0.08 0.01 260",
-      "--sui-edge": "0.92 0.01 256",
-      "--sui-light-top": "1 0 0",
-      "--sui-light-bottom": "0.12 0.012 260",
-      "--sui-elevation-flat": "none",
-      "--sui-elevation-raised": "0 1px 2px oklch(var(--sui-light-bottom) / 0.26), 0 4px 12px oklch(var(--sui-light-bottom) / 0.15)",
-      "--sui-elevation-floating": "0 18px 44px oklch(var(--sui-light-bottom) / 0.38), inset 0 1px 0 oklch(var(--sui-light-top) / 0.05)",
-      "--sui-elevation-control": "0 1px 2px oklch(var(--sui-light-bottom) / 0.30), inset 0 1px 0 oklch(var(--sui-light-top) / 0.08)",
-      "--sui-elevation-recessed": "inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.38), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.06)",
-      "--sui-elevation-pressed": "var(--sui-elevation-recessed)",
-      "--sui-elevation-grounded": "var(--sui-elevation-flat)",
-      "--sui-shadow-focus": "0 10px 28px -22px rgb(90 145 255 / 0.42)",
-      "--sui-shadow-primary": "0 12px 30px -22px rgb(82 139 255 / 0.34)",
       "--sui-glass-blur": "32px",
       "--sui-glass-saturation": "1.45",
       "--sui-glass-brightness": "1.04",
@@ -171,7 +106,60 @@
       "--sui-code-function": "#ff7b72",
       "--sui-code-tag": "#7dd3fc"
     },
-    ":root": {
+    "@layer sherick-ui-theme | @media (prefers-color-scheme: dark) | :root:not([data-sherick-theme])": {
+      "--sui-canvas": "0.205 0.012 260",
+      "--sui-surface": "0.245 0.014 260",
+      "--sui-surface-high": "0.295 0.016 260",
+      "--sui-surface-float": "0.27 0.018 260",
+      "--sui-ink": "0.94 0.008 255",
+      "--sui-ink-muted": "0.76 0.014 255",
+      "--sui-ink-faint": "0.60 0.014 256",
+      "--sui-primary": "0.72 0.15 255",
+      "--sui-primary-strong": "0.66 0.18 257",
+      "--sui-primary-soft": "0.42 0.055 257",
+      "--sui-accent": "0.80 0.08 215",
+      "--sui-danger": "0.72 0.13 25",
+      "--sui-warning": "0.82 0.12 80",
+      "--sui-success": "0.75 0.10 160",
+      "--sui-on-primary": "0.205 0.012 260",
+      "--sui-on-danger": "0.205 0.012 260",
+      "--sui-on-warning": "0.205 0.012 260",
+      "--sui-on-success": "0.205 0.012 260",
+      "--sui-focus": "0.72 0.15 255",
+      "--sui-outline": "0.76 0.014 255",
+      "--sui-scrim": "0.08 0.01 260",
+      "--sui-edge": "0.92 0.01 256",
+      "--sui-light-top": "1 0 0",
+      "--sui-light-bottom": "0.12 0.012 260",
+      "--sui-elevation-flat": "none",
+      "--sui-elevation-raised": "0 1px 2px oklch(var(--sui-light-bottom) / 0.26), 0 4px 12px oklch(var(--sui-light-bottom) / 0.15)",
+      "--sui-elevation-floating": "0 18px 44px oklch(var(--sui-light-bottom) / 0.38), inset 0 1px 0 oklch(var(--sui-light-top) / 0.05)",
+      "--sui-elevation-control": "0 1px 2px oklch(var(--sui-light-bottom) / 0.30), inset 0 1px 0 oklch(var(--sui-light-top) / 0.08)",
+      "--sui-elevation-recessed": "inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.38), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.06)",
+      "--sui-glass-blur": "32px",
+      "--sui-glass-saturation": "1.45",
+      "--sui-glass-brightness": "1.04",
+      "--sui-glass-dense-blur": "26px",
+      "--sui-glass-dense-saturation": "1.38",
+      "--sui-glass-dense-brightness": "1.035",
+      "--sui-glass-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.075) 0%, rgb(255 255 255 / 0.028) 30%, rgb(112 156 255 / 0.02) 70%, rgb(0 0 0 / 0.10) 100%)",
+      "--sui-glass-gradient-dense": "linear-gradient(180deg, rgb(255 255 255 / 0.06) 0%, rgb(255 255 255 / 0.018) 36%, rgb(112 156 255 / 0.016) 76%, rgb(0 0 0 / 0.08) 100%)",
+      "--sui-glass-hero-blur": "10px",
+      "--sui-glass-hero-saturation": "1.03",
+      "--sui-glass-hero-brightness": "1.0",
+      "--sui-glass-hero-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.028) 0%, rgb(255 255 255 / 0.009) 12%, rgb(255 255 255 / 0) 44%, rgb(0 0 0 / 0.16) 100%)",
+      "--sui-surface-overlay": "0.236 0.012 260",
+      "--sui-overlay-fill": "0.965",
+      "--sui-scrim-blur": "6px",
+      "--sui-code-text": "#e2e8f0",
+      "--sui-code-comment": "#64748b",
+      "--sui-code-string": "#a5d6ff",
+      "--sui-code-number": "#f97316",
+      "--sui-code-keyword": "#c084fc",
+      "--sui-code-function": "#ff7b72",
+      "--sui-code-tag": "#7dd3fc"
+    },
+    "@layer sherick-ui-theme | :root": {
       "--sui-duration-press": "150ms",
       "--sui-duration-release": "200ms",
       "--sui-duration-overlay": "240ms",
@@ -182,215 +170,326 @@
     }
   },
   "utilities": {
-    ".absolute": [
+    ":where(.sui-scope)": [
+      "--tw-backdrop-blur:  ",
+      "--tw-backdrop-brightness:  ",
+      "--tw-backdrop-contrast:  ",
+      "--tw-backdrop-grayscale:  ",
+      "--tw-backdrop-hue-rotate:  ",
+      "--tw-backdrop-invert:  ",
+      "--tw-backdrop-opacity:  ",
+      "--tw-backdrop-saturate:  ",
+      "--tw-backdrop-sepia:  ",
+      "--tw-blur:  ",
+      "--tw-brightness:  ",
+      "--tw-contrast:  ",
+      "--tw-drop-shadow:  ",
+      "--tw-grayscale:  ",
+      "--tw-hue-rotate:  ",
+      "--tw-invert:  ",
+      "--tw-ring-color: rgb(59 130 246 / 0.5)",
+      "--tw-ring-inset:  ",
+      "--tw-ring-offset-color: #fff",
+      "--tw-ring-offset-shadow: 0 0 #0000",
+      "--tw-ring-offset-width: 0px",
+      "--tw-ring-shadow: 0 0 #0000",
+      "--tw-rotate: 0",
+      "--tw-saturate:  ",
+      "--tw-scale-x: 1",
+      "--tw-scale-y: 1",
+      "--tw-sepia:  ",
+      "--tw-shadow-colored: 0 0 #0000",
+      "--tw-shadow: 0 0 #0000",
+      "--tw-skew-x: 0",
+      "--tw-skew-y: 0",
+      "--tw-translate-x: 0",
+      "--tw-translate-y: 0"
+    ],
+    ":where(.sui-scope).visible": [
+      "visibility: visible"
+    ],
+    ":where(.sui-scope).static": [
+      "position: static"
+    ],
+    ":where(.sui-scope).fixed": [
+      "position: fixed"
+    ],
+    ":where(.sui-scope).absolute": [
       "position: absolute"
     ],
-    ".relative": [
+    ":where(.sui-scope).relative": [
       "position: relative"
     ],
-    ".left-1": [
+    ":where(.sui-scope).inset-0": [
+      "inset: 0px"
+    ],
+    ":where(.sui-scope).left-1": [
       "left: 0.25rem"
     ],
-    ".left-\\[var\\(--active-tab-left\\)\\]": [
+    ":where(.sui-scope).left-\\[var\\(--active-tab-left\\)\\]": [
       "left: var(--active-tab-left)"
     ],
-    ".right-1\\.5": [
+    ":where(.sui-scope).right-1\\.5": [
       "right: 0.375rem"
     ],
-    ".top-1\\/2": [
+    ":where(.sui-scope).right-4": [
+      "right: 1rem"
+    ],
+    ":where(.sui-scope).top-1\\/2": [
       "top: 50%"
     ],
-    ".top-\\[var\\(--active-tab-top\\)\\]": [
+    ":where(.sui-scope).top-4": [
+      "top: 1rem"
+    ],
+    ":where(.sui-scope).top-\\[var\\(--active-tab-top\\)\\]": [
       "top: var(--active-tab-top)"
     ],
-    ".z-10": [
+    ":where(.sui-scope).z-10": [
       "z-index: 10"
     ],
-    ".my-3": [
+    ":where(.sui-scope).z-30": [
+      "z-index: 30"
+    ],
+    ":where(.sui-scope).z-40": [
+      "z-index: 40"
+    ],
+    ":where(.sui-scope).z-50": [
+      "z-index: 50"
+    ],
+    ":where(.sui-scope).my-3": [
       "margin-bottom: 0.75rem",
       "margin-top: 0.75rem"
     ],
-    ".my-5": [
+    ":where(.sui-scope).my-4": [
+      "margin-bottom: 1rem",
+      "margin-top: 1rem"
+    ],
+    ":where(.sui-scope).my-5": [
       "margin-bottom: 1.25rem",
       "margin-top: 1.25rem"
     ],
-    ".mb-2": [
-      "margin-bottom: 0.5rem"
-    ],
-    ".mb-3": [
-      "margin-bottom: 0.75rem"
-    ],
-    ".ml-1": [
-      "margin-left: 0.25rem"
-    ],
-    ".mr-4": [
-      "margin-right: 1rem"
-    ],
-    ".mt-4": [
-      "margin-top: 1rem"
-    ],
-    ".mt-5": [
-      "margin-top: 1.25rem"
-    ],
-    ".mt-7": [
+    ":where(.sui-scope).my-7": [
+      "margin-bottom: 1.75rem",
       "margin-top: 1.75rem"
     ],
-    ".mt-auto": [
+    ":where(.sui-scope).mb-2": [
+      "margin-bottom: 0.5rem"
+    ],
+    ":where(.sui-scope).mb-3": [
+      "margin-bottom: 0.75rem"
+    ],
+    ":where(.sui-scope).mb-4": [
+      "margin-bottom: 1rem"
+    ],
+    ":where(.sui-scope).ml-1": [
+      "margin-left: 0.25rem"
+    ],
+    ":where(.sui-scope).mr-4": [
+      "margin-right: 1rem"
+    ],
+    ":where(.sui-scope).mt-2": [
+      "margin-top: 0.5rem"
+    ],
+    ":where(.sui-scope).mt-4": [
+      "margin-top: 1rem"
+    ],
+    ":where(.sui-scope).mt-5": [
+      "margin-top: 1.25rem"
+    ],
+    ":where(.sui-scope).mt-6": [
+      "margin-top: 1.5rem"
+    ],
+    ":where(.sui-scope).mt-7": [
+      "margin-top: 1.75rem"
+    ],
+    ":where(.sui-scope).mt-8": [
+      "margin-top: 2rem"
+    ],
+    ":where(.sui-scope).mt-auto": [
       "margin-top: auto"
     ],
-    ".block": [
+    ":where(.sui-scope).block": [
       "display: block"
     ],
-    ".inline-block": [
+    ":where(.sui-scope).inline-block": [
       "display: inline-block"
     ],
-    ".inline": [
+    ":where(.sui-scope).inline": [
       "display: inline"
     ],
-    ".flex": [
+    ":where(.sui-scope).flex": [
       "display: flex"
     ],
-    ".inline-flex": [
+    ":where(.sui-scope).inline-flex": [
       "display: inline-flex"
     ],
-    ".table": [
+    ":where(.sui-scope).table": [
       "display: table"
     ],
-    ".hidden": [
+    ":where(.sui-scope).hidden": [
       "display: none"
     ],
-    ".size-3\\.5": [
+    ":where(.sui-scope).size-10": [
+      "height: 2.5rem",
+      "width: 2.5rem"
+    ],
+    ":where(.sui-scope).size-3\\.5": [
       "height: 0.875rem",
       "width: 0.875rem"
     ],
-    ".size-4": [
+    ":where(.sui-scope).size-4": [
       "height: 1rem",
       "width: 1rem"
     ],
-    ".size-5": [
+    ":where(.sui-scope).size-5": [
       "height: 1.25rem",
       "width: 1.25rem"
     ],
-    ".h-0": [
-      "height: 0px"
-    ],
-    ".h-16": [
-      "height: 4rem"
-    ],
-    ".h-4": [
-      "height: 1rem"
-    ],
-    ".h-5": [
-      "height: 1.25rem"
-    ],
-    ".h-6": [
-      "height: 1.5rem"
-    ],
-    ".h-8": [
-      "height: 2rem"
-    ],
-    ".h-\\[var\\(--active-tab-height\\)\\]": [
-      "height: var(--active-tab-height)"
-    ],
-    ".h-full": [
-      "height: 100%"
-    ],
-    ".min-h-10": [
-      "min-height: 2.5rem"
-    ],
-    ".min-h-11": [
-      "min-height: 2.75rem"
-    ],
-    ".min-h-12": [
-      "min-height: 3rem"
-    ],
-    ".min-h-14": [
-      "min-height: 3.5rem"
-    ],
-    ".min-h-28": [
-      "min-height: 7rem"
-    ],
-    ".min-h-7": [
-      "min-height: 1.75rem"
-    ],
-    ".w-0": [
-      "width: 0px"
-    ],
-    ".w-16": [
-      "width: 4rem"
-    ],
-    ".w-3\\/4": [
-      "width: 75%"
-    ],
-    ".w-4": [
-      "width: 1rem"
-    ],
-    ".w-5": [
-      "width: 1.25rem"
-    ],
-    ".w-6": [
-      "width: 1.5rem"
-    ],
-    ".w-8": [
+    ":where(.sui-scope).size-8": [
+      "height: 2rem",
       "width: 2rem"
     ],
-    ".w-\\[3\\.25rem\\]": [
+    ":where(.sui-scope).h-0": [
+      "height: 0px"
+    ],
+    ":where(.sui-scope).h-16": [
+      "height: 4rem"
+    ],
+    ":where(.sui-scope).h-32": [
+      "height: 8rem"
+    ],
+    ":where(.sui-scope).h-5": [
+      "height: 1.25rem"
+    ],
+    ":where(.sui-scope).h-6": [
+      "height: 1.5rem"
+    ],
+    ":where(.sui-scope).h-8": [
+      "height: 2rem"
+    ],
+    ":where(.sui-scope).h-\\[var\\(--active-tab-height\\)\\]": [
+      "height: var(--active-tab-height)"
+    ],
+    ":where(.sui-scope).h-full": [
+      "height: 100%"
+    ],
+    ":where(.sui-scope).max-h-\\[var\\(--available-height\\)\\]": [
+      "max-height: var(--available-height)"
+    ],
+    ":where(.sui-scope).min-h-10": [
+      "min-height: 2.5rem"
+    ],
+    ":where(.sui-scope).min-h-11": [
+      "min-height: 2.75rem"
+    ],
+    ":where(.sui-scope).min-h-12": [
+      "min-height: 3rem"
+    ],
+    ":where(.sui-scope).min-h-14": [
+      "min-height: 3.5rem"
+    ],
+    ":where(.sui-scope).min-h-28": [
+      "min-height: 7rem"
+    ],
+    ":where(.sui-scope).min-h-7": [
+      "min-height: 1.75rem"
+    ],
+    ":where(.sui-scope).min-h-full": [
+      "min-height: 100%"
+    ],
+    ":where(.sui-scope).w-0": [
+      "width: 0px"
+    ],
+    ":where(.sui-scope).w-16": [
+      "width: 4rem"
+    ],
+    ":where(.sui-scope).w-32": [
+      "width: 8rem"
+    ],
+    ":where(.sui-scope).w-4": [
+      "width: 1rem"
+    ],
+    ":where(.sui-scope).w-5": [
+      "width: 1.25rem"
+    ],
+    ":where(.sui-scope).w-6": [
+      "width: 1.5rem"
+    ],
+    ":where(.sui-scope).w-8": [
+      "width: 2rem"
+    ],
+    ":where(.sui-scope).w-\\[3\\.25rem\\]": [
       "width: 3.25rem"
     ],
-    ".w-\\[var\\(--active-tab-width\\)\\]": [
+    ":where(.sui-scope).w-\\[var\\(--active-tab-width\\)\\]": [
       "width: var(--active-tab-width)"
     ],
-    ".w-full": [
+    ":where(.sui-scope).w-\\[var\\(--anchor-width\\)\\]": [
+      "width: var(--anchor-width)"
+    ],
+    ":where(.sui-scope).w-full": [
       "width: 100%"
     ],
-    ".min-w-0": [
+    ":where(.sui-scope).w-max": [
+      "width: max-content"
+    ],
+    ":where(.sui-scope).min-w-0": [
       "min-width: 0px"
     ],
-    ".min-w-11": [
+    ":where(.sui-scope).min-w-11": [
       "min-width: 2.75rem"
     ],
-    ".min-w-14": [
+    ":where(.sui-scope).min-w-14": [
       "min-width: 3.5rem"
     ],
-    ".min-w-28": [
+    ":where(.sui-scope).min-w-28": [
       "min-width: 7rem"
     ],
-    ".min-w-64": [
+    ":where(.sui-scope).min-w-64": [
       "min-width: 16rem"
     ],
-    ".min-w-full": [
+    ":where(.sui-scope).min-w-full": [
       "min-width: 100%"
     ],
-    ".min-w-max": [
+    ":where(.sui-scope).min-w-max": [
       "min-width: max-content"
     ],
-    ".max-w-xs": [
+    ":where(.sui-scope).max-w-64": [
+      "max-width: 16rem"
+    ],
+    ":where(.sui-scope).max-w-lg": [
+      "max-width: 32rem"
+    ],
+    ":where(.sui-scope).max-w-xs": [
       "max-width: 20rem"
     ],
-    ".flex-1": [
+    ":where(.sui-scope).flex-1": [
       "flex: 1 1 0%"
     ],
-    ".shrink-0": [
+    ":where(.sui-scope).shrink-0": [
       "flex-shrink: 0"
     ],
-    ".border-collapse": [
+    ":where(.sui-scope).border-collapse": [
       "border-collapse: collapse"
     ],
-    ".origin-top": [
+    ":where(.sui-scope).origin-top": [
       "transform-origin: top"
     ],
-    ".-translate-y-1\\/2": [
+    ":where(.sui-scope).-translate-y-1\\/2": [
       "--tw-translate-y: -50%",
       "transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))"
     ],
-    ".translate-x-5": [
+    ":where(.sui-scope).translate-x-5": [
       "--tw-translate-x: 1.25rem",
+      "transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))"
+    ],
+    ":where(.sui-scope).transform": [
       "transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))"
     ],
     "@keyframes pulse | 50%": [
       "opacity: .5"
     ],
-    ".animate-pulse": [
+    ":where(.sui-scope).animate-pulse": [
       "animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite"
     ],
     "@keyframes sherick-overlay-in | from": [
@@ -403,8 +502,8 @@
       "scale: 1",
       "translate: 0 0"
     ],
-    ".animate-sherick-overlay-in": [
-      "animation: sherick-overlay-in var(--sui-duration-overlay, 240ms) var(--sui-ease-release, cubic-bezier(0.16, 1, 0.3, 1))"
+    ":where(.sui-scope).animate-sherick-overlay-in": [
+      "animation: sherick-overlay-in var(--sui-duration-overlay) var(--sui-ease-release)"
     ],
     "@keyframes sherick-overlay-out | from": [
       "opacity: 1",
@@ -416,8 +515,8 @@
       "scale: var(--sui-overlay-from-scale, 0.98)",
       "translate: 0 var(--sui-overlay-from-lift, 0px)"
     ],
-    ".animate-sherick-overlay-out": [
-      "animation: sherick-overlay-out var(--sui-duration-overlay-exit, 160ms) var(--sui-ease-exit, cubic-bezier(0.4, 0, 1, 1)) both"
+    ":where(.sui-scope).animate-sherick-overlay-out": [
+      "animation: sherick-overlay-out var(--sui-duration-overlay-exit) var(--sui-ease-exit) both"
     ],
     "@keyframes sherick-scrim-in | from": [
       "opacity: 0"
@@ -425,8 +524,8 @@
     "@keyframes sherick-scrim-in | to": [
       "opacity: 1"
     ],
-    ".animate-sherick-scrim-in": [
-      "animation: sherick-scrim-in var(--sui-duration-overlay, 240ms) var(--sui-ease-release, cubic-bezier(0.16, 1, 0.3, 1))"
+    ":where(.sui-scope).animate-sherick-scrim-in": [
+      "animation: sherick-scrim-in var(--sui-duration-overlay) var(--sui-ease-release)"
     ],
     "@keyframes sherick-scrim-out | from": [
       "opacity: 1"
@@ -434,798 +533,1001 @@
     "@keyframes sherick-scrim-out | to": [
       "opacity: 0"
     ],
-    ".animate-sherick-scrim-out": [
-      "animation: sherick-scrim-out var(--sui-duration-overlay-exit, 160ms) var(--sui-ease-exit, cubic-bezier(0.4, 0, 1, 1)) both"
+    ":where(.sui-scope).animate-sherick-scrim-out": [
+      "animation: sherick-scrim-out var(--sui-duration-overlay-exit) var(--sui-ease-exit) both"
     ],
     "@keyframes spin | to": [
       "transform: rotate(360deg)"
     ],
-    ".animate-spin": [
+    ":where(.sui-scope).animate-spin": [
       "animation: spin 1s linear infinite"
     ],
-    ".cursor-not-allowed": [
+    ":where(.sui-scope).cursor-not-allowed": [
       "cursor: not-allowed"
     ],
-    ".cursor-pointer": [
+    ":where(.sui-scope).cursor-pointer": [
       "cursor: pointer"
     ],
-    ".cursor-text": [
+    ":where(.sui-scope).cursor-text": [
       "cursor: text"
     ],
-    ".select-none": [
+    ":where(.sui-scope).select-none": [
       "user-select: none"
     ],
-    ".resize-y": [
+    ":where(.sui-scope).resize-y": [
       "resize: vertical"
     ],
-    ".flex-col": [
+    ":where(.sui-scope).resize": [
+      "resize: both"
+    ],
+    ":where(.sui-scope).list-decimal": [
+      "list-style-type: decimal"
+    ],
+    ":where(.sui-scope).list-disc": [
+      "list-style-type: disc"
+    ],
+    ":where(.sui-scope).flex-col": [
       "flex-direction: column"
     ],
-    ".items-center": [
+    ":where(.sui-scope).items-center": [
       "align-items: center"
     ],
-    ".justify-end": [
+    ":where(.sui-scope).justify-end": [
       "justify-content: flex-end"
     ],
-    ".justify-center": [
+    ":where(.sui-scope).justify-center": [
       "justify-content: center"
     ],
-    ".justify-between": [
+    ":where(.sui-scope).justify-between": [
       "justify-content: space-between"
     ],
-    ".gap-1\\.5": [
+    ":where(.sui-scope).gap-1\\.5": [
       "gap: 0.375rem"
     ],
-    ".gap-2": [
+    ":where(.sui-scope).gap-2": [
       "gap: 0.5rem"
     ],
-    ".gap-3": [
+    ":where(.sui-scope).gap-3": [
       "gap: 0.75rem"
     ],
-    ".gap-4": [
+    ":where(.sui-scope).gap-4": [
       "gap: 1rem"
     ],
-    ".space-y-1\\.5 > :not([hidden]) ~ :not([hidden])": [
+    ":where(.sui-scope).space-y-1 > :not([hidden]) ~ :not([hidden])": [
+      "--tw-space-y-reverse: 0",
+      "margin-bottom: calc(0.25rem * var(--tw-space-y-reverse))",
+      "margin-top: calc(0.25rem * calc(1 - var(--tw-space-y-reverse)))"
+    ],
+    ":where(.sui-scope).space-y-1\\.5 > :not([hidden]) ~ :not([hidden])": [
       "--tw-space-y-reverse: 0",
       "margin-bottom: calc(0.375rem * var(--tw-space-y-reverse))",
       "margin-top: calc(0.375rem * calc(1 - var(--tw-space-y-reverse)))"
     ],
-    ".overflow-auto": [
+    ":where(.sui-scope).space-y-2 > :not([hidden]) ~ :not([hidden])": [
+      "--tw-space-y-reverse: 0",
+      "margin-bottom: calc(0.5rem * var(--tw-space-y-reverse))",
+      "margin-top: calc(0.5rem * calc(1 - var(--tw-space-y-reverse)))"
+    ],
+    ":where(.sui-scope).overflow-auto": [
       "overflow: auto"
     ],
-    ".overflow-hidden": [
+    ":where(.sui-scope).overflow-hidden": [
       "overflow: hidden"
     ],
-    ".overflow-x-auto": [
+    ":where(.sui-scope).overflow-x-auto": [
       "overflow-x: auto"
     ],
-    ".truncate": [
+    ":where(.sui-scope).overflow-y-auto": [
+      "overflow-y: auto"
+    ],
+    ":where(.sui-scope).truncate": [
       "overflow: hidden",
       "text-overflow: ellipsis",
       "white-space: nowrap"
     ],
-    ".text-ellipsis": [
+    ":where(.sui-scope).text-ellipsis": [
       "text-overflow: ellipsis"
     ],
-    ".whitespace-nowrap": [
+    ":where(.sui-scope).whitespace-normal": [
+      "white-space: normal"
+    ],
+    ":where(.sui-scope).whitespace-nowrap": [
       "white-space: nowrap"
     ],
-    ".rounded-\\[1\\.25rem\\]": [
+    ":where(.sui-scope).rounded": [
+      "border-radius: 0.25rem"
+    ],
+    ":where(.sui-scope).rounded-\\[1\\.25rem\\]": [
       "border-radius: 1.25rem"
     ],
-    ".rounded-\\[1\\.5rem\\]": [
+    ":where(.sui-scope).rounded-\\[1\\.5rem\\]": [
       "border-radius: 1.5rem"
     ],
-    ".rounded-\\[1\\.75rem\\]": [
+    ":where(.sui-scope).rounded-\\[1\\.75rem\\]": [
       "border-radius: 1.75rem"
     ],
-    ".rounded-\\[2rem\\]": [
+    ":where(.sui-scope).rounded-\\[2rem\\]": [
       "border-radius: 2rem"
     ],
-    ".rounded-full": [
+    ":where(.sui-scope).rounded-full": [
       "border-radius: 9999px"
     ],
-    ".rounded-l-none": [
+    ":where(.sui-scope).rounded-l-none": [
       "border-bottom-left-radius: 0px",
       "border-top-left-radius: 0px"
     ],
-    ".border-b": [
+    ":where(.sui-scope).border": [
+      "border-width: 1px"
+    ],
+    ":where(.sui-scope).border-0": [
+      "border-width: 0px"
+    ],
+    ":where(.sui-scope).border-b": [
       "border-bottom-width: 1px"
     ],
-    ".border-l": [
+    ":where(.sui-scope).border-l": [
       "border-left-width: 1px"
     ],
-    ".border-l-2": [
+    ":where(.sui-scope).border-l-2": [
       "border-left-width: 2px"
     ],
-    ".border-t": [
+    ":where(.sui-scope).border-t": [
       "border-top-width: 1px"
     ],
-    ".border-sherick-edge\\/\\[0\\.06\\]": [
-      "border-color: oklch(var(--sui-edge, 0.92 0.01 256) / 0.06)"
+    ":where(.sui-scope).border-sherick-edge\\/\\[0\\.06\\]": [
+      "border-color: oklch(var(--sui-edge) / 0.06)"
     ],
-    ".border-sherick-edge\\/\\[0\\.075\\]": [
-      "border-color: oklch(var(--sui-edge, 0.92 0.01 256) / 0.075)"
+    ":where(.sui-scope).border-sherick-edge\\/\\[0\\.075\\]": [
+      "border-color: oklch(var(--sui-edge) / 0.075)"
     ],
-    ".border-sherick-edge\\/\\[0\\.10\\]": [
-      "border-color: oklch(var(--sui-edge, 0.92 0.01 256) / 0.10)"
+    ":where(.sui-scope).border-sherick-edge\\/\\[0\\.10\\]": [
+      "border-color: oklch(var(--sui-edge) / 0.10)"
     ],
-    ".border-sherick-primary\\/\\[0\\.45\\]": [
-      "border-color: oklch(var(--sui-primary, 0.72 0.15 255) / 0.45)"
+    ":where(.sui-scope).border-sherick-primary\\/\\[0\\.45\\]": [
+      "border-color: oklch(var(--sui-primary) / 0.45)"
     ],
-    ".bg-current": [
+    ":where(.sui-scope).bg-current": [
       "background-color: currentColor"
     ],
-    ".bg-sherick-canvas\\/\\[0\\.28\\]": [
-      "background-color: oklch(var(--sui-canvas, 0.205 0.012 260) / 0.28)"
-    ],
-    ".bg-sherick-danger": [
+    ":where(.sui-scope).bg-sherick-canvas": [
       "--tw-bg-opacity: 1",
-      "background-color: oklch(var(--sui-danger, 0.72 0.13 25) / var(--tw-bg-opacity, 1))"
+      "background-color: oklch(var(--sui-canvas) / var(--tw-bg-opacity, 1))"
     ],
-    ".bg-sherick-danger\\/\\[0\\.075\\]": [
-      "background-color: oklch(var(--sui-danger, 0.72 0.13 25) / 0.075)"
+    ":where(.sui-scope).bg-sherick-canvas\\/\\[0\\.28\\]": [
+      "background-color: oklch(var(--sui-canvas) / 0.28)"
     ],
-    ".bg-sherick-danger\\/\\[0\\.09\\]": [
-      "background-color: oklch(var(--sui-danger, 0.72 0.13 25) / 0.09)"
-    ],
-    ".bg-sherick-primary-strong": [
+    ":where(.sui-scope).bg-sherick-danger": [
       "--tw-bg-opacity: 1",
-      "background-color: oklch(var(--sui-primary-strong, 0.66 0.18 257) / var(--tw-bg-opacity, 1))"
+      "background-color: oklch(var(--sui-danger) / var(--tw-bg-opacity, 1))"
     ],
-    ".bg-sherick-primary\\/\\[0\\.12\\]": [
-      "background-color: oklch(var(--sui-primary, 0.72 0.15 255) / 0.12)"
+    ":where(.sui-scope).bg-sherick-danger\\/\\[0\\.075\\]": [
+      "background-color: oklch(var(--sui-danger) / 0.075)"
     ],
-    ".bg-sherick-primary\\/\\[0\\.22\\]": [
-      "background-color: oklch(var(--sui-primary, 0.72 0.15 255) / 0.22)"
+    ":where(.sui-scope).bg-sherick-danger\\/\\[0\\.09\\]": [
+      "background-color: oklch(var(--sui-danger) / 0.09)"
     ],
-    ".bg-sherick-success\\/\\[0\\.09\\]": [
-      "background-color: oklch(var(--sui-success, 0.75 0.10 160) / 0.09)"
+    ":where(.sui-scope).bg-sherick-danger\\/\\[0\\.13\\]": [
+      "background-color: oklch(var(--sui-danger) / 0.13)"
     ],
-    ".bg-sherick-surface-float\\/\\[0\\.60\\]": [
-      "background-color: oklch(var(--sui-surface-float, 0.27 0.018 260) / 0.60)"
+    ":where(.sui-scope).bg-sherick-danger\\/\\[0\\.16\\]": [
+      "background-color: oklch(var(--sui-danger) / 0.16)"
     ],
-    ".bg-sherick-surface-float\\/\\[0\\.72\\]": [
-      "background-color: oklch(var(--sui-surface-float, 0.27 0.018 260) / 0.72)"
-    ],
-    ".bg-sherick-surface-high": [
+    ":where(.sui-scope).bg-sherick-primary-strong": [
       "--tw-bg-opacity: 1",
-      "background-color: oklch(var(--sui-surface-high, 0.295 0.016 260) / var(--tw-bg-opacity, 1))"
+      "background-color: oklch(var(--sui-primary-strong) / var(--tw-bg-opacity, 1))"
     ],
-    ".bg-sherick-surface-high\\/\\[0\\.56\\]": [
-      "background-color: oklch(var(--sui-surface-high, 0.295 0.016 260) / 0.56)"
+    ":where(.sui-scope).bg-sherick-primary\\/\\[0\\.12\\]": [
+      "background-color: oklch(var(--sui-primary) / 0.12)"
     ],
-    ".bg-sherick-surface-high\\/\\[0\\.66\\]": [
-      "background-color: oklch(var(--sui-surface-high, 0.295 0.016 260) / 0.66)"
+    ":where(.sui-scope).bg-sherick-primary\\/\\[0\\.22\\]": [
+      "background-color: oklch(var(--sui-primary) / 0.22)"
     ],
-    ".bg-sherick-surface-high\\/\\[0\\.72\\]": [
-      "background-color: oklch(var(--sui-surface-high, 0.295 0.016 260) / 0.72)"
+    ":where(.sui-scope).bg-sherick-scrim\\/\\[0\\.38\\]": [
+      "background-color: oklch(var(--sui-scrim) / 0.38)"
     ],
-    ".bg-sherick-surface-overlay\\/\\[var\\(--sui-overlay-fill\\2c 0\\.9\\)\\]": [
-      "background-color: oklch(var(--sui-surface-overlay, 0.236 0.012 260) / var(--sui-overlay-fill,0.9))"
+    ":where(.sui-scope).bg-sherick-success": [
+      "--tw-bg-opacity: 1",
+      "background-color: oklch(var(--sui-success) / var(--tw-bg-opacity, 1))"
     ],
-    ".bg-sherick-surface\\/\\[0\\.42\\]": [
-      "background-color: oklch(var(--sui-surface, 0.245 0.014 260) / 0.42)"
+    ":where(.sui-scope).bg-sherick-success\\/\\[0\\.09\\]": [
+      "background-color: oklch(var(--sui-success) / 0.09)"
     ],
-    ".bg-sherick-surface\\/\\[0\\.72\\]": [
-      "background-color: oklch(var(--sui-surface, 0.245 0.014 260) / 0.72)"
+    ":where(.sui-scope).bg-sherick-success\\/\\[0\\.16\\]": [
+      "background-color: oklch(var(--sui-success) / 0.16)"
     ],
-    ".bg-sherick-surface\\/\\[0\\.78\\]": [
-      "background-color: oklch(var(--sui-surface, 0.245 0.014 260) / 0.78)"
+    ":where(.sui-scope).bg-sherick-surface-float\\/\\[0\\.60\\]": [
+      "background-color: oklch(var(--sui-surface-float) / 0.60)"
     ],
-    ".bg-transparent": [
+    ":where(.sui-scope).bg-sherick-surface-float\\/\\[0\\.72\\]": [
+      "background-color: oklch(var(--sui-surface-float) / 0.72)"
+    ],
+    ":where(.sui-scope).bg-sherick-surface-high": [
+      "--tw-bg-opacity: 1",
+      "background-color: oklch(var(--sui-surface-high) / var(--tw-bg-opacity, 1))"
+    ],
+    ":where(.sui-scope).bg-sherick-surface-high\\/\\[0\\.56\\]": [
+      "background-color: oklch(var(--sui-surface-high) / 0.56)"
+    ],
+    ":where(.sui-scope).bg-sherick-surface-high\\/\\[0\\.66\\]": [
+      "background-color: oklch(var(--sui-surface-high) / 0.66)"
+    ],
+    ":where(.sui-scope).bg-sherick-surface-high\\/\\[0\\.72\\]": [
+      "background-color: oklch(var(--sui-surface-high) / 0.72)"
+    ],
+    ":where(.sui-scope).bg-sherick-surface-high\\/\\[0\\.82\\]": [
+      "background-color: oklch(var(--sui-surface-high) / 0.82)"
+    ],
+    ":where(.sui-scope).bg-sherick-surface-high\\/\\[0\\.9\\]": [
+      "background-color: oklch(var(--sui-surface-high) / 0.9)"
+    ],
+    ":where(.sui-scope).bg-sherick-surface-overlay\\/\\[var\\(--sui-overlay-fill\\2c 0\\.9\\)\\]": [
+      "background-color: oklch(var(--sui-surface-overlay) / var(--sui-overlay-fill,0.9))"
+    ],
+    ":where(.sui-scope).bg-sherick-surface\\/\\[0\\.42\\]": [
+      "background-color: oklch(var(--sui-surface) / 0.42)"
+    ],
+    ":where(.sui-scope).bg-sherick-surface\\/\\[0\\.72\\]": [
+      "background-color: oklch(var(--sui-surface) / 0.72)"
+    ],
+    ":where(.sui-scope).bg-sherick-surface\\/\\[0\\.78\\]": [
+      "background-color: oklch(var(--sui-surface) / 0.78)"
+    ],
+    ":where(.sui-scope).bg-sherick-warning": [
+      "--tw-bg-opacity: 1",
+      "background-color: oklch(var(--sui-warning) / var(--tw-bg-opacity, 1))"
+    ],
+    ":where(.sui-scope).bg-sherick-warning\\/\\[0\\.09\\]": [
+      "background-color: oklch(var(--sui-warning) / 0.09)"
+    ],
+    ":where(.sui-scope).bg-sherick-warning\\/\\[0\\.16\\]": [
+      "background-color: oklch(var(--sui-warning) / 0.16)"
+    ],
+    ":where(.sui-scope).bg-transparent": [
       "background-color: transparent"
     ],
-    ".bg-\\[image\\:var\\(--sui-glass-gradient\\)\\]": [
+    ":where(.sui-scope).bg-\\[image\\:var\\(--sui-glass-gradient\\)\\]": [
       "background-image: var(--sui-glass-gradient)"
     ],
-    ".bg-\\[image\\:var\\(--sui-glass-gradient-dense\\)\\]": [
+    ":where(.sui-scope).bg-\\[image\\:var\\(--sui-glass-gradient-dense\\)\\]": [
       "background-image: var(--sui-glass-gradient-dense)"
     ],
-    ".bg-\\[image\\:var\\(--sui-glass-hero-gradient\\)\\]": [
+    ":where(.sui-scope).bg-\\[image\\:var\\(--sui-glass-hero-gradient\\)\\]": [
       "background-image: var(--sui-glass-hero-gradient)"
     ],
-    ".object-cover": [
+    ":where(.sui-scope).object-cover": [
       "object-fit: cover"
     ],
-    ".p-1\\.5": [
+    ":where(.sui-scope).p-1\\.5": [
       "padding: 0.375rem"
     ],
-    ".p-2\\.5": [
+    ":where(.sui-scope).p-2": [
+      "padding: 0.5rem"
+    ],
+    ":where(.sui-scope).p-2\\.5": [
       "padding: 0.625rem"
     ],
-    ".p-6": [
+    ":where(.sui-scope).p-4": [
+      "padding: 1rem"
+    ],
+    ":where(.sui-scope).p-6": [
       "padding: 1.5rem"
     ],
-    ".px-1\\.5": [
+    ":where(.sui-scope).px-1\\.5": [
       "padding-left: 0.375rem",
       "padding-right: 0.375rem"
     ],
-    ".px-2\\.5": [
+    ":where(.sui-scope).px-2\\.5": [
       "padding-left: 0.625rem",
       "padding-right: 0.625rem"
     ],
-    ".px-3": [
+    ":where(.sui-scope).px-3": [
       "padding-left: 0.75rem",
       "padding-right: 0.75rem"
     ],
-    ".px-4": [
+    ":where(.sui-scope).px-4": [
       "padding-left: 1rem",
       "padding-right: 1rem"
     ],
-    ".px-5": [
+    ":where(.sui-scope).px-5": [
       "padding-left: 1.25rem",
       "padding-right: 1.25rem"
     ],
-    ".px-6": [
+    ":where(.sui-scope).px-6": [
       "padding-left: 1.5rem",
       "padding-right: 1.5rem"
     ],
-    ".px-7": [
+    ":where(.sui-scope).px-7": [
       "padding-left: 1.75rem",
       "padding-right: 1.75rem"
     ],
-    ".px-8": [
+    ":where(.sui-scope).px-8": [
       "padding-left: 2rem",
       "padding-right: 2rem"
     ],
-    ".py-0\\.5": [
+    ":where(.sui-scope).py-0\\.5": [
       "padding-bottom: 0.125rem",
       "padding-top: 0.125rem"
     ],
-    ".py-1": [
+    ":where(.sui-scope).py-1": [
       "padding-bottom: 0.25rem",
       "padding-top: 0.25rem"
     ],
-    ".py-1\\.5": [
+    ":where(.sui-scope).py-1\\.5": [
       "padding-bottom: 0.375rem",
       "padding-top: 0.375rem"
     ],
-    ".py-2": [
+    ":where(.sui-scope).py-2": [
       "padding-bottom: 0.5rem",
       "padding-top: 0.5rem"
     ],
-    ".py-3": [
+    ":where(.sui-scope).py-3": [
       "padding-bottom: 0.75rem",
       "padding-top: 0.75rem"
     ],
-    ".py-3\\.5": [
+    ":where(.sui-scope).py-3\\.5": [
       "padding-bottom: 0.875rem",
       "padding-top: 0.875rem"
     ],
-    ".py-4": [
+    ":where(.sui-scope).py-4": [
       "padding-bottom: 1rem",
       "padding-top: 1rem"
     ],
-    ".pb-1": [
+    ":where(.sui-scope).pb-1": [
       "padding-bottom: 0.25rem"
     ],
-    ".pb-2": [
+    ":where(.sui-scope).pb-2": [
       "padding-bottom: 0.5rem"
     ],
-    ".pb-5": [
+    ":where(.sui-scope).pb-5": [
       "padding-bottom: 1.25rem"
     ],
-    ".pl-5": [
+    ":where(.sui-scope).pl-1": [
+      "padding-left: 0.25rem"
+    ],
+    ":where(.sui-scope).pl-5": [
       "padding-left: 1.25rem"
     ],
-    ".pl-6": [
+    ":where(.sui-scope).pl-6": [
       "padding-left: 1.5rem"
     ],
-    ".pr-12": [
+    ":where(.sui-scope).pr-12": [
       "padding-right: 3rem"
     ],
-    ".pr-16": [
+    ":where(.sui-scope).pr-16": [
       "padding-right: 4rem"
     ],
-    ".pt-1": [
+    ":where(.sui-scope).pt-1": [
       "padding-top: 0.25rem"
     ],
-    ".pt-2": [
+    ":where(.sui-scope).pt-2": [
       "padding-top: 0.5rem"
     ],
-    ".pt-5": [
+    ":where(.sui-scope).pt-5": [
       "padding-top: 1.25rem"
     ],
-    ".text-left": [
+    ":where(.sui-scope).text-left": [
       "text-align: left"
     ],
-    ".text-right": [
+    ":where(.sui-scope).text-right": [
       "text-align: right"
     ],
-    ".font-mono": [
+    ":where(.sui-scope).font-mono": [
       "font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, \"Liberation Mono\", \"Courier New\", monospace"
     ],
-    ".text-2xl": [
+    ":where(.sui-scope).text-2xl": [
       "font-size: 1.5rem",
       "line-height: 2rem"
     ],
-    ".text-\\[0\\.95rem\\]": [
+    ":where(.sui-scope).text-3xl": [
+      "font-size: 1.875rem",
+      "line-height: 2.25rem"
+    ],
+    ":where(.sui-scope).text-\\[0\\.95rem\\]": [
       "font-size: 0.95rem"
     ],
-    ".text-\\[0\\.9em\\]": [
+    ":where(.sui-scope).text-\\[0\\.9em\\]": [
       "font-size: 0.9em"
     ],
-    ".text-\\[11px\\]": [
+    ":where(.sui-scope).text-\\[11px\\]": [
       "font-size: 11px"
     ],
-    ".text-lg": [
+    ":where(.sui-scope).text-lg": [
       "font-size: 1.125rem",
       "line-height: 1.75rem"
     ],
-    ".text-sm": [
+    ":where(.sui-scope).text-sm": [
       "font-size: 0.875rem",
       "line-height: 1.25rem"
     ],
-    ".text-xl": [
+    ":where(.sui-scope).text-xl": [
       "font-size: 1.25rem",
       "line-height: 1.75rem"
     ],
-    ".text-xs": [
+    ":where(.sui-scope).text-xs": [
       "font-size: 0.75rem",
       "line-height: 1rem"
     ],
-    ".font-medium": [
+    ":where(.sui-scope).font-medium": [
       "font-weight: 500"
     ],
-    ".font-semibold": [
+    ":where(.sui-scope).font-semibold": [
       "font-weight: 600"
     ],
-    ".uppercase": [
+    ":where(.sui-scope).uppercase": [
       "text-transform: uppercase"
     ],
-    ".leading-6": [
+    ":where(.sui-scope).capitalize": [
+      "text-transform: capitalize"
+    ],
+    ":where(.sui-scope).italic": [
+      "font-style: italic"
+    ],
+    ":where(.sui-scope).leading-5": [
+      "line-height: 1.25rem"
+    ],
+    ":where(.sui-scope).leading-6": [
       "line-height: 1.5rem"
     ],
-    ".leading-7": [
+    ":where(.sui-scope).leading-7": [
       "line-height: 1.75rem"
     ],
-    ".tracking-\\[-0\\.01em\\]": [
+    ":where(.sui-scope).tracking-\\[-0\\.01em\\]": [
       "letter-spacing: -0.01em"
     ],
-    ".tracking-\\[-0\\.025em\\]": [
+    ":where(.sui-scope).tracking-\\[-0\\.025em\\]": [
       "letter-spacing: -0.025em"
     ],
-    ".tracking-\\[-0\\.02em\\]": [
+    ":where(.sui-scope).tracking-\\[-0\\.02em\\]": [
       "letter-spacing: -0.02em"
     ],
-    ".tracking-\\[0\\.08em\\]": [
+    ":where(.sui-scope).tracking-\\[-0\\.03em\\]": [
+      "letter-spacing: -0.03em"
+    ],
+    ":where(.sui-scope).tracking-\\[0\\.08em\\]": [
       "letter-spacing: 0.08em"
     ],
-    ".text-current": [
+    ":where(.sui-scope).text-current": [
       "color: currentColor"
     ],
-    ".text-inherit": [
+    ":where(.sui-scope).text-inherit": [
       "color: inherit"
     ],
-    ".text-sherick-danger": [
+    ":where(.sui-scope).text-sherick-danger": [
       "--tw-text-opacity: 1",
-      "color: oklch(var(--sui-danger, 0.72 0.13 25) / var(--tw-text-opacity, 1))"
+      "color: oklch(var(--sui-danger) / var(--tw-text-opacity, 1))"
     ],
-    ".text-sherick-ink": [
+    ":where(.sui-scope).text-sherick-ink": [
       "--tw-text-opacity: 1",
-      "color: oklch(var(--sui-ink, 0.94 0.008 255) / var(--tw-text-opacity, 1))"
+      "color: oklch(var(--sui-ink) / var(--tw-text-opacity, 1))"
     ],
-    ".text-sherick-ink-faint": [
+    ":where(.sui-scope).text-sherick-ink-faint": [
       "--tw-text-opacity: 1",
-      "color: oklch(var(--sui-ink-faint, 0.60 0.014 256) / var(--tw-text-opacity, 1))"
+      "color: oklch(var(--sui-ink-faint) / var(--tw-text-opacity, 1))"
     ],
-    ".text-sherick-ink-muted": [
+    ":where(.sui-scope).text-sherick-ink-muted": [
       "--tw-text-opacity: 1",
-      "color: oklch(var(--sui-ink-muted, 0.76 0.014 255) / var(--tw-text-opacity, 1))"
+      "color: oklch(var(--sui-ink-muted) / var(--tw-text-opacity, 1))"
     ],
-    ".text-sherick-on-danger": [
+    ":where(.sui-scope).text-sherick-on-danger": [
       "--tw-text-opacity: 1",
-      "color: oklch(var(--sui-on-danger, 0.205 0.012 260) / var(--tw-text-opacity, 1))"
+      "color: oklch(var(--sui-on-danger) / var(--tw-text-opacity, 1))"
     ],
-    ".text-sherick-on-primary": [
+    ":where(.sui-scope).text-sherick-on-primary": [
       "--tw-text-opacity: 1",
-      "color: oklch(var(--sui-on-primary, 0.205 0.012 260) / var(--tw-text-opacity, 1))"
+      "color: oklch(var(--sui-on-primary) / var(--tw-text-opacity, 1))"
     ],
-    ".text-sherick-primary": [
+    ":where(.sui-scope).text-sherick-on-success": [
       "--tw-text-opacity: 1",
-      "color: oklch(var(--sui-primary, 0.72 0.15 255) / var(--tw-text-opacity, 1))"
+      "color: oklch(var(--sui-on-success) / var(--tw-text-opacity, 1))"
     ],
-    ".text-sherick-success": [
+    ":where(.sui-scope).text-sherick-on-warning": [
       "--tw-text-opacity: 1",
-      "color: oklch(var(--sui-success, 0.75 0.10 160) / var(--tw-text-opacity, 1))"
+      "color: oklch(var(--sui-on-warning) / var(--tw-text-opacity, 1))"
     ],
-    ".opacity-45": [
+    ":where(.sui-scope).text-sherick-primary": [
+      "--tw-text-opacity: 1",
+      "color: oklch(var(--sui-primary) / var(--tw-text-opacity, 1))"
+    ],
+    ":where(.sui-scope).text-sherick-success": [
+      "--tw-text-opacity: 1",
+      "color: oklch(var(--sui-success) / var(--tw-text-opacity, 1))"
+    ],
+    ":where(.sui-scope).text-sherick-warning": [
+      "--tw-text-opacity: 1",
+      "color: oklch(var(--sui-warning) / var(--tw-text-opacity, 1))"
+    ],
+    ":where(.sui-scope).underline": [
+      "text-decoration-line: underline"
+    ],
+    ":where(.sui-scope).decoration-sherick-primary\\/\\[0\\.35\\]": [
+      "text-decoration-color: oklch(var(--sui-primary) / 0.35)"
+    ],
+    ":where(.sui-scope).underline-offset-4": [
+      "text-underline-offset: 4px"
+    ],
+    ":where(.sui-scope).opacity-45": [
       "opacity: 0.45"
     ],
-    ".shadow-sherick-control": [
-      "--tw-shadow-colored: inset 0 1px 2px 0 var(--tw-shadow-color)",
-      "--tw-shadow: var(--sui-elevation-control, 0 1px 2px rgba(0, 0, 0, 0.30), inset 0 1px 0 rgba(255, 255, 255, 0.08))",
+    ":where(.sui-scope).shadow": [
+      "--tw-shadow-colored: 0 1px 3px 0 var(--tw-shadow-color), 0 1px 2px -1px var(--tw-shadow-color)",
+      "--tw-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.1), 0 1px 2px -1px rgb(0 0 0 / 0.1)",
       "box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)"
     ],
-    ".shadow-sherick-floating": [
-      "--tw-shadow-colored: inset 0 18px 44px 0 var(--tw-shadow-color)",
-      "--tw-shadow: var(--sui-elevation-floating, 0 18px 44px rgba(0, 0, 0, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.05))",
+    ":where(.sui-scope).shadow-sherick-control": [
+      "--tw-shadow-colored: var(--sui-elevation-control)",
+      "--tw-shadow: var(--sui-elevation-control)",
       "box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)"
     ],
-    ".shadow-sherick-raised": [
-      "--tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color)",
-      "--tw-shadow: var(--sui-elevation-raised, 0 1px 2px rgba(0, 0, 0, 0.26), 0 4px 12px rgba(0, 0, 0, 0.15))",
+    ":where(.sui-scope).shadow-sherick-flat": [
+      "--tw-shadow-colored: var(--sui-elevation-flat)",
+      "--tw-shadow: var(--sui-elevation-flat)",
       "box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)"
     ],
-    ".shadow-sherick-recessed": [
-      "--tw-shadow-colored: inset 0 1px 3px 0 var(--tw-shadow-color)",
-      "--tw-shadow: var(--sui-elevation-recessed, inset 0 1px 3px rgba(0, 0, 0, 0.38), inset 0 -1px 0 rgba(255, 255, 255, 0.06))",
+    ":where(.sui-scope).shadow-sherick-floating": [
+      "--tw-shadow-colored: var(--sui-elevation-floating)",
+      "--tw-shadow: var(--sui-elevation-floating)",
       "box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)"
     ],
-    ".outline-none": [
+    ":where(.sui-scope).shadow-sherick-raised": [
+      "--tw-shadow-colored: var(--sui-elevation-raised)",
+      "--tw-shadow: var(--sui-elevation-raised)",
+      "box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)"
+    ],
+    ":where(.sui-scope).shadow-sherick-recessed": [
+      "--tw-shadow-colored: var(--sui-elevation-recessed)",
+      "--tw-shadow: var(--sui-elevation-recessed)",
+      "box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)"
+    ],
+    ":where(.sui-scope).outline-none": [
       "outline-offset: 2px",
       "outline: 2px solid transparent"
     ],
-    ".backdrop-blur-\\[var\\(--sui-glass-blur\\2c 32px\\)\\]": [
+    ":where(.sui-scope).outline": [
+      "outline-style: solid"
+    ],
+    ":where(.sui-scope).ring": [
+      "--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color)",
+      "--tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(3px + var(--tw-ring-offset-width)) var(--tw-ring-color)",
+      "box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)"
+    ],
+    ":where(.sui-scope).blur": [
+      "--tw-blur: blur(8px)",
+      "filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)"
+    ],
+    ":where(.sui-scope).backdrop-blur-\\[var\\(--sui-glass-blur\\2c 32px\\)\\]": [
       "--tw-backdrop-blur: blur(var(--sui-glass-blur,32px))",
       "-webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)",
       "backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)"
     ],
-    ".backdrop-blur-\\[var\\(--sui-glass-dense-blur\\2c 26px\\)\\]": [
+    ":where(.sui-scope).backdrop-blur-\\[var\\(--sui-glass-dense-blur\\2c 26px\\)\\]": [
       "--tw-backdrop-blur: blur(var(--sui-glass-dense-blur,26px))",
       "-webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)",
       "backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)"
     ],
-    ".backdrop-blur-\\[var\\(--sui-glass-hero-blur\\2c 14px\\)\\]": [
+    ":where(.sui-scope).backdrop-blur-\\[var\\(--sui-glass-hero-blur\\2c 14px\\)\\]": [
       "--tw-backdrop-blur: blur(var(--sui-glass-hero-blur,14px))",
       "-webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)",
       "backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)"
     ],
-    ".backdrop-brightness-\\[var\\(--sui-glass-brightness\\2c 1\\.04\\)\\]": [
+    ":where(.sui-scope).backdrop-blur-\\[var\\(--sui-scrim-blur\\)\\]": [
+      "--tw-backdrop-blur: blur(var(--sui-scrim-blur))",
+      "-webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)",
+      "backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)"
+    ],
+    ":where(.sui-scope).backdrop-brightness-\\[var\\(--sui-glass-brightness\\2c 1\\.04\\)\\]": [
       "--tw-backdrop-brightness: brightness(var(--sui-glass-brightness,1.04))",
       "-webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)",
       "backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)"
     ],
-    ".backdrop-brightness-\\[var\\(--sui-glass-dense-brightness\\2c 1\\.035\\)\\]": [
+    ":where(.sui-scope).backdrop-brightness-\\[var\\(--sui-glass-dense-brightness\\2c 1\\.035\\)\\]": [
       "--tw-backdrop-brightness: brightness(var(--sui-glass-dense-brightness,1.035))",
       "-webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)",
       "backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)"
     ],
-    ".backdrop-brightness-\\[var\\(--sui-glass-hero-brightness\\2c 1\\)\\]": [
+    ":where(.sui-scope).backdrop-brightness-\\[var\\(--sui-glass-hero-brightness\\2c 1\\)\\]": [
       "--tw-backdrop-brightness: brightness(var(--sui-glass-hero-brightness,1))",
       "-webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)",
       "backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)"
     ],
-    ".backdrop-saturate-\\[var\\(--sui-glass-dense-saturation\\2c 1\\.38\\)\\]": [
+    ":where(.sui-scope).backdrop-saturate-\\[var\\(--sui-glass-dense-saturation\\2c 1\\.38\\)\\]": [
       "--tw-backdrop-saturate: saturate(var(--sui-glass-dense-saturation,1.38))",
       "-webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)",
       "backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)"
     ],
-    ".backdrop-saturate-\\[var\\(--sui-glass-hero-saturation\\2c 1\\.06\\)\\]": [
+    ":where(.sui-scope).backdrop-saturate-\\[var\\(--sui-glass-hero-saturation\\2c 1\\.06\\)\\]": [
       "--tw-backdrop-saturate: saturate(var(--sui-glass-hero-saturation,1.06))",
       "-webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)",
       "backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)"
     ],
-    ".backdrop-saturate-\\[var\\(--sui-glass-saturation\\2c 1\\.45\\)\\]": [
+    ":where(.sui-scope).backdrop-saturate-\\[var\\(--sui-glass-saturation\\2c 1\\.45\\)\\]": [
       "--tw-backdrop-saturate: saturate(var(--sui-glass-saturation,1.45))",
       "-webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)",
       "backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)"
     ],
-    ".transition-\\[background-color\\2c color\\2c box-shadow\\2c opacity\\]": [
+    ":where(.sui-scope).transition-\\[background-color\\2c color\\2c box-shadow\\2c opacity\\]": [
       "transition-duration: 150ms",
       "transition-property: background-color,color,box-shadow,opacity",
       "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)"
     ],
-    ".transition-\\[background-color\\2c color\\2c box-shadow\\2c transform\\2c opacity\\2c width\\2c height\\]": [
+    ":where(.sui-scope).transition-\\[background-color\\2c color\\2c box-shadow\\2c transform\\2c opacity\\2c width\\2c height\\]": [
       "transition-duration: 150ms",
       "transition-property: background-color,color,box-shadow,transform,opacity,width,height",
       "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)"
     ],
-    ".duration-press": [
-      "transition-duration: var(--sui-duration-press, 150ms)"
+    ":where(.sui-scope).duration-overlay": [
+      "transition-duration: var(--sui-duration-overlay)"
     ],
-    ".duration-release": [
-      "transition-duration: var(--sui-duration-release, 200ms)"
+    ":where(.sui-scope).duration-overlay-exit": [
+      "transition-duration: var(--sui-duration-overlay-exit)"
     ],
-    ".ease-press": [
-      "transition-timing-function: var(--sui-ease-press, cubic-bezier(0.4, 0, 0.2, 1))"
+    ":where(.sui-scope).duration-press": [
+      "transition-duration: var(--sui-duration-press)"
     ],
-    ".ease-release": [
-      "transition-timing-function: var(--sui-ease-release, cubic-bezier(0.16, 1, 0.3, 1))"
+    ":where(.sui-scope).duration-release": [
+      "transition-duration: var(--sui-duration-release)"
     ],
-    ".\\[--sui-overlay-from-lift\\:-4px\\]": [
+    ":where(.sui-scope).ease-exit": [
+      "transition-timing-function: var(--sui-ease-exit)"
+    ],
+    ":where(.sui-scope).ease-press": [
+      "transition-timing-function: var(--sui-ease-press)"
+    ],
+    ":where(.sui-scope).ease-release": [
+      "transition-timing-function: var(--sui-ease-release)"
+    ],
+    ":where(.sui-scope).\\[--sui-overlay-from-lift\\:-4px\\]": [
       "--sui-overlay-from-lift: -4px\n"
     ],
-    ".\\[--sui-overlay-from-lift\\:8px\\]": [
+    ":where(.sui-scope).\\[--sui-overlay-from-lift\\:0px\\]": [
+      "--sui-overlay-from-lift: 0px\n"
+    ],
+    ":where(.sui-scope).\\[--sui-overlay-from-lift\\:4px\\]": [
+      "--sui-overlay-from-lift: 4px\n"
+    ],
+    ":where(.sui-scope).\\[--sui-overlay-from-lift\\:8px\\]": [
       "--sui-overlay-from-lift: 8px\n"
     ],
-    ".\\[--sui-overlay-from-scale\\:0\\.985\\]": [
+    ":where(.sui-scope).\\[--sui-overlay-from-scale\\:0\\.985\\]": [
       "--sui-overlay-from-scale: 0.985\n"
     ],
-    ".placeholder\\:text-sherick-danger\\/\\[0\\.72\\]::placeholder": [
-      "color: oklch(var(--sui-danger, 0.72 0.13 25) / 0.72)"
+    ":where(.sui-scope).\\[transform-origin\\:var\\(--transform-origin\\)\\]": [
+      "transform-origin: var(--transform-origin)"
     ],
-    ".placeholder\\:text-sherick-ink-muted::placeholder": [
+    ":where(.sui-scope).marker\\:text-sherick-primary *::marker": [
+      "color: oklch(var(--sui-primary) )"
+    ],
+    ":where(.sui-scope).marker\\:text-sherick-primary::marker": [
+      "color: oklch(var(--sui-primary) )"
+    ],
+    ":where(.sui-scope).placeholder\\:text-sherick-danger\\/\\[0\\.72\\]::placeholder": [
+      "color: oklch(var(--sui-danger) / 0.72)"
+    ],
+    ":where(.sui-scope).placeholder\\:text-sherick-ink-muted::placeholder": [
       "--tw-text-opacity: 1",
-      "color: oklch(var(--sui-ink-muted, 0.76 0.014 255) / var(--tw-text-opacity, 1))"
+      "color: oklch(var(--sui-ink-muted) / var(--tw-text-opacity, 1))"
     ],
-    ".before\\:pointer-events-none::before": [
+    ":where(.sui-scope).before\\:pointer-events-none::before": [
       "content: var(--tw-content)",
       "pointer-events: none"
     ],
-    ".before\\:absolute::before": [
+    ":where(.sui-scope).before\\:absolute::before": [
       "content: var(--tw-content)",
       "position: absolute"
     ],
-    ".before\\:inset-0::before": [
+    ":where(.sui-scope).before\\:inset-0::before": [
       "content: var(--tw-content)",
       "inset: 0px"
     ],
-    ".before\\:rounded-\\[inherit\\]::before": [
+    ":where(.sui-scope).before\\:rounded-\\[inherit\\]::before": [
       "border-radius: inherit",
       "content: var(--tw-content)"
     ],
-    ".before\\:bg-current::before": [
+    ":where(.sui-scope).before\\:bg-current::before": [
       "background-color: currentColor",
       "content: var(--tw-content)"
     ],
-    ".before\\:opacity-0::before": [
+    ":where(.sui-scope).before\\:opacity-0::before": [
       "content: var(--tw-content)",
       "opacity: 0"
     ],
-    ".before\\:transition-opacity::before": [
+    ":where(.sui-scope).before\\:transition-opacity::before": [
       "content: var(--tw-content)",
       "transition-duration: 150ms",
       "transition-property: opacity",
       "transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1)"
     ],
-    ".before\\:duration-release::before": [
+    ":where(.sui-scope).before\\:duration-release::before": [
       "content: var(--tw-content)",
-      "transition-duration: var(--sui-duration-release, 200ms)"
+      "transition-duration: var(--sui-duration-release)"
     ],
-    ".before\\:ease-release::before": [
+    ":where(.sui-scope).before\\:ease-release::before": [
       "content: var(--tw-content)",
-      "transition-timing-function: var(--sui-ease-release, cubic-bezier(0.16, 1, 0.3, 1))"
+      "transition-timing-function: var(--sui-ease-release)"
     ],
-    ".first\\:mt-0:first-child": [
+    ":where(.sui-scope).before\\:content-\\[\\'\\'\\]::before": [
+      "--tw-content: ''",
+      "content: var(--tw-content)"
+    ],
+    ":where(.sui-scope).first\\:mt-0:first-child": [
       "margin-top: 0px"
     ],
-    ".last\\:border-b-0:last-child": [
+    ":where(.sui-scope).last\\:border-b-0:last-child": [
       "border-bottom-width: 0px"
     ],
-    ".focus-within\\:bg-sherick-surface-high\\/\\[0\\.9\\]:focus-within": [
-      "background-color: oklch(var(--sui-surface-high, 0.295 0.016 260) / 0.9)"
+    ":where(.sui-scope).focus-within\\:bg-sherick-surface-high\\/\\[0\\.9\\]:focus-within": [
+      "background-color: oklch(var(--sui-surface-high) / 0.9)"
     ],
-    ".focus-within\\:outline:focus-within": [
+    ":where(.sui-scope).focus-within\\:outline:focus-within": [
       "outline-style: solid"
     ],
-    ".focus-within\\:outline-2:focus-within": [
+    ":where(.sui-scope).focus-within\\:outline-2:focus-within": [
       "outline-width: 2px"
     ],
-    ".focus-within\\:outline-offset-\\[3px\\]:focus-within": [
+    ":where(.sui-scope).focus-within\\:outline-offset-\\[3px\\]:focus-within": [
       "outline-offset: 3px"
     ],
-    ".focus-within\\:outline-sherick-focus:focus-within": [
-      "outline-color: oklch(var(--sui-focus, 0.72 0.15 255) / 1)"
+    ":where(.sui-scope).focus-within\\:outline-sherick-focus:focus-within": [
+      "outline-color: oklch(var(--sui-focus) / 1)"
     ],
-    ".hover\\:bg-sherick-danger\\/\\[0\\.10\\]:hover": [
-      "background-color: oklch(var(--sui-danger, 0.72 0.13 25) / 0.10)"
+    ":where(.sui-scope).hover\\:bg-sherick-danger\\/\\[0\\.10\\]:hover": [
+      "background-color: oklch(var(--sui-danger) / 0.10)"
     ],
-    ".hover\\:bg-sherick-ink\\/\\[0\\.05\\]:hover": [
-      "background-color: oklch(var(--sui-ink, 0.94 0.008 255) / 0.05)"
+    ":where(.sui-scope).hover\\:bg-sherick-ink\\/\\[0\\.05\\]:hover": [
+      "background-color: oklch(var(--sui-ink) / 0.05)"
     ],
-    ".hover\\:bg-sherick-surface-high\\/\\[0\\.82\\]:hover": [
-      "background-color: oklch(var(--sui-surface-high, 0.295 0.016 260) / 0.82)"
+    ":where(.sui-scope).hover\\:bg-sherick-surface-high\\/\\[0\\.82\\]:hover": [
+      "background-color: oklch(var(--sui-surface-high) / 0.82)"
     ],
-    ".hover\\:text-sherick-ink:hover": [
+    ":where(.sui-scope).hover\\:text-sherick-ink:hover": [
       "--tw-text-opacity: 1",
-      "color: oklch(var(--sui-ink, 0.94 0.008 255) / var(--tw-text-opacity, 1))"
+      "color: oklch(var(--sui-ink) / var(--tw-text-opacity, 1))"
     ],
-    ".hover\\:before\\:opacity-\\[0\\.05\\]:hover::before": [
+    ":where(.sui-scope).hover\\:decoration-sherick-primary:hover": [
+      "text-decoration-color: oklch(var(--sui-primary) / 1)"
+    ],
+    ":where(.sui-scope).hover\\:before\\:opacity-\\[0\\.05\\]:hover::before": [
       "content: var(--tw-content)",
       "opacity: 0.05"
     ],
-    ".hover\\:before\\:opacity-\\[0\\.09\\]:hover::before": [
+    ":where(.sui-scope).hover\\:before\\:opacity-\\[0\\.09\\]:hover::before": [
       "content: var(--tw-content)",
       "opacity: 0.09"
     ],
-    ".hover\\:before\\:opacity-\\[0\\.18\\]:hover::before": [
+    ":where(.sui-scope).hover\\:before\\:opacity-\\[0\\.18\\]:hover::before": [
       "content: var(--tw-content)",
       "opacity: 0.18"
     ],
-    ".focus\\:bg-sherick-danger\\/\\[0\\.13\\]:focus": [
-      "background-color: oklch(var(--sui-danger, 0.72 0.13 25) / 0.13)"
+    ":where(.sui-scope).focus\\:bg-sherick-danger\\/\\[0\\.13\\]:focus": [
+      "background-color: oklch(var(--sui-danger) / 0.13)"
     ],
-    ".focus\\:bg-sherick-surface-high\\/\\[0\\.9\\]:focus": [
-      "background-color: oklch(var(--sui-surface-high, 0.295 0.016 260) / 0.9)"
+    ":where(.sui-scope).focus\\:bg-sherick-surface-high\\/\\[0\\.9\\]:focus": [
+      "background-color: oklch(var(--sui-surface-high) / 0.9)"
     ],
-    ".focus\\:outline-none:focus": [
+    ":where(.sui-scope).focus\\:outline-none:focus": [
       "outline-offset: 2px",
       "outline: 2px solid transparent"
     ],
-    ".focus-visible\\:outline-none:focus-visible": [
+    ":where(.sui-scope).focus-visible\\:outline-none:focus-visible": [
       "outline-offset: 2px",
       "outline: 2px solid transparent"
     ],
-    ".focus-visible\\:outline:focus-visible": [
+    ":where(.sui-scope).focus-visible\\:outline:focus-visible": [
       "outline-style: solid"
     ],
-    ".focus-visible\\:outline-2:focus-visible": [
+    ":where(.sui-scope).focus-visible\\:outline-2:focus-visible": [
       "outline-width: 2px"
     ],
-    ".focus-visible\\:outline-offset-\\[3px\\]:focus-visible": [
+    ":where(.sui-scope).focus-visible\\:outline-offset-\\[3px\\]:focus-visible": [
       "outline-offset: 3px"
     ],
-    ".focus-visible\\:outline-sherick-focus:focus-visible": [
-      "outline-color: oklch(var(--sui-focus, 0.72 0.15 255) / 1)"
+    ":where(.sui-scope).focus-visible\\:outline-sherick-focus:focus-visible": [
+      "outline-color: oklch(var(--sui-focus) / 1)"
     ],
-    ".focus-visible\\:ring-2:focus-visible": [
+    ":where(.sui-scope).focus-visible\\:ring-2:focus-visible": [
       "--tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color)",
       "--tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color)",
       "box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)"
     ],
-    ".focus-visible\\:ring-inset:focus-visible": [
+    ":where(.sui-scope).focus-visible\\:ring-inset:focus-visible": [
       "--tw-ring-inset: inset\n"
     ],
-    ".focus-visible\\:ring-sherick-focus:focus-visible": [
-      "--tw-ring-color: oklch(var(--sui-focus, 0.72 0.15 255) / var(--tw-ring-opacity, 1))\n",
+    ":where(.sui-scope).focus-visible\\:ring-sherick-focus:focus-visible": [
+      "--tw-ring-color: oklch(var(--sui-focus) / var(--tw-ring-opacity, 1))\n",
       "--tw-ring-opacity: 1"
     ],
-    ".active\\:scale-\\[0\\.98\\]:active": [
+    ":where(.sui-scope).active\\:scale-\\[0\\.98\\]:active": [
       "--tw-scale-x: 0.98",
       "--tw-scale-y: 0.98",
       "transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))"
     ],
-    ".active\\:shadow-sherick-recessed:active": [
-      "--tw-shadow-colored: inset 0 1px 3px 0 var(--tw-shadow-color)",
-      "--tw-shadow: var(--sui-elevation-recessed, inset 0 1px 3px rgba(0, 0, 0, 0.38), inset 0 -1px 0 rgba(255, 255, 255, 0.06))",
+    ":where(.sui-scope).active\\:shadow-sherick-recessed:active": [
+      "--tw-shadow-colored: var(--sui-elevation-recessed)",
+      "--tw-shadow: var(--sui-elevation-recessed)",
       "box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)"
     ],
-    ".active\\:duration-press:active": [
-      "transition-duration: var(--sui-duration-press, 150ms)"
+    ":where(.sui-scope).active\\:duration-press:active": [
+      "transition-duration: var(--sui-duration-press)"
     ],
-    ".active\\:ease-press:active": [
-      "transition-timing-function: var(--sui-ease-press, cubic-bezier(0.4, 0, 0.2, 1))"
+    ":where(.sui-scope).active\\:ease-press:active": [
+      "transition-timing-function: var(--sui-ease-press)"
     ],
-    ".active\\:before\\:opacity-\\[0\\.09\\]:active::before": [
+    ":where(.sui-scope).active\\:before\\:opacity-\\[0\\.09\\]:active::before": [
       "content: var(--tw-content)",
       "opacity: 0.09"
     ],
-    ".active\\:before\\:opacity-\\[0\\.15\\]:active::before": [
+    ":where(.sui-scope).active\\:before\\:opacity-\\[0\\.15\\]:active::before": [
       "content: var(--tw-content)",
       "opacity: 0.15"
     ],
-    ".active\\:before\\:opacity-\\[0\\.26\\]:active::before": [
+    ":where(.sui-scope).active\\:before\\:opacity-\\[0\\.26\\]:active::before": [
       "content: var(--tw-content)",
       "opacity: 0.26"
     ],
-    ".active\\:before\\:duration-press:active::before": [
+    ":where(.sui-scope).active\\:before\\:duration-press:active::before": [
       "content: var(--tw-content)",
-      "transition-duration: var(--sui-duration-press, 150ms)"
+      "transition-duration: var(--sui-duration-press)"
     ],
-    ".active\\:before\\:ease-press:active::before": [
+    ":where(.sui-scope).active\\:before\\:ease-press:active::before": [
       "content: var(--tw-content)",
-      "transition-timing-function: var(--sui-ease-press, cubic-bezier(0.4, 0, 0.2, 1))"
+      "transition-timing-function: var(--sui-ease-press)"
     ],
-    ".group:hover .group-hover\\:before\\:opacity-\\[0\\.18\\]::before": [
+    ":where(.sui-scope).group:hover :where(.sui-scope).group-hover\\:before\\:opacity-\\[0\\.18\\]::before": [
       "content: var(--tw-content)",
       "opacity: 0.18"
     ],
-    ".group:focus-visible .group-focus-visible\\:outline": [
+    ":where(.sui-scope).group:focus-visible :where(.sui-scope).group-focus-visible\\:outline": [
       "outline-style: solid"
     ],
-    ".group:focus-visible .group-focus-visible\\:outline-2": [
+    ":where(.sui-scope).group:focus-visible :where(.sui-scope).group-focus-visible\\:outline-2": [
       "outline-width: 2px"
     ],
-    ".group:focus-visible .group-focus-visible\\:outline-offset-\\[3px\\]": [
+    ":where(.sui-scope).group:focus-visible :where(.sui-scope).group-focus-visible\\:outline-offset-\\[3px\\]": [
       "outline-offset: 3px"
     ],
-    ".group:focus-visible .group-focus-visible\\:outline-sherick-focus": [
-      "outline-color: oklch(var(--sui-focus, 0.72 0.15 255) / 1)"
+    ":where(.sui-scope).group:focus-visible :where(.sui-scope).group-focus-visible\\:outline-sherick-focus": [
+      "outline-color: oklch(var(--sui-focus) / 1)"
     ],
-    ".group:active .group-active\\:scale-\\[0\\.98\\]": [
+    ":where(.sui-scope).group:active :where(.sui-scope).group-active\\:scale-\\[0\\.98\\]": [
       "--tw-scale-x: 0.98",
       "--tw-scale-y: 0.98",
       "transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))"
     ],
-    ".group:active .group-active\\:before\\:opacity-\\[0\\.26\\]::before": [
+    ":where(.sui-scope).group:active :where(.sui-scope).group-active\\:before\\:opacity-\\[0\\.26\\]::before": [
       "content: var(--tw-content)",
       "opacity: 0.26"
     ],
-    ".group:active .group-active\\:before\\:duration-press::before": [
+    ":where(.sui-scope).group:active :where(.sui-scope).group-active\\:before\\:duration-press::before": [
       "content: var(--tw-content)",
-      "transition-duration: var(--sui-duration-press, 150ms)"
+      "transition-duration: var(--sui-duration-press)"
     ],
-    ".group:active .group-active\\:before\\:ease-press::before": [
+    ":where(.sui-scope).group:active :where(.sui-scope).group-active\\:before\\:ease-press::before": [
       "content: var(--tw-content)",
-      "transition-timing-function: var(--sui-ease-press, cubic-bezier(0.4, 0, 0.2, 1))"
+      "transition-timing-function: var(--sui-ease-press)"
     ],
-    ".data-\\[error\\]\\:invisible[data-error]": [
+    ":where(.sui-scope).data-\\[error\\]\\:invisible[data-error]": [
       "visibility: hidden"
     ],
-    ".data-\\[loading\\]\\:invisible[data-loading]": [
+    ":where(.sui-scope).data-\\[loading\\]\\:invisible[data-loading]": [
       "visibility: hidden"
     ],
-    ".group[data-popup-open] .group-data-\\[popup-open\\]\\:rotate-180": [
+    ":where(.sui-scope).data-\\[active\\=true\\]\\:before\\:opacity-\\[0\\.06\\][data-active=\"true\"]::before": [
+      "content: var(--tw-content)",
+      "opacity: 0.06"
+    ],
+    ":where(.sui-scope).data-\\[highlighted\\]\\:before\\:opacity-\\[0\\.06\\][data-highlighted]::before": [
+      "content: var(--tw-content)",
+      "opacity: 0.06"
+    ],
+    ":where(.sui-scope).group[data-popup-open] :where(.sui-scope).group-data-\\[popup-open\\]\\:rotate-180": [
       "--tw-rotate: 180deg",
       "transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))"
     ],
-    "@media (prefers-reduced-motion: reduce) | .motion-reduce\\:transform-none": [
+    "@media (prefers-reduced-motion: reduce) | :where(.sui-scope).motion-reduce\\:transform-none": [
       "transform: none"
     ],
-    "@media (prefers-reduced-motion: reduce) | .motion-reduce\\:animate-none": [
+    "@media (prefers-reduced-motion: reduce) | :where(.sui-scope).motion-reduce\\:animate-none": [
       "animation: none"
     ],
-    "@media (prefers-reduced-motion: reduce) | .motion-reduce\\:transition-none": [
+    "@media (prefers-reduced-motion: reduce) | :where(.sui-scope).motion-reduce\\:transition-none": [
       "transition-property: none"
     ],
-    "@media (prefers-reduced-motion: reduce) | .motion-reduce\\:before\\:transition-none::before": [
+    "@media (prefers-reduced-motion: reduce) | :where(.sui-scope).motion-reduce\\:before\\:transition-none::before": [
       "content: var(--tw-content)",
       "transition-property: none"
     ],
-    "@media (prefers-reduced-motion: reduce) | .motion-reduce\\:active\\:scale-100:active": [
+    "@media (prefers-reduced-motion: reduce) | :where(.sui-scope).motion-reduce\\:active\\:scale-100:active": [
       "--tw-scale-x: 1",
       "--tw-scale-y: 1",
       "transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))"
     ],
-    "@media (prefers-reduced-motion: reduce) | .group:active .motion-reduce\\:group-active\\:scale-100": [
+    "@media (prefers-reduced-motion: reduce) | :where(.sui-scope).group:active :where(.sui-scope).motion-reduce\\:group-active\\:scale-100": [
       "--tw-scale-x: 1",
       "--tw-scale-y: 1",
       "transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))"
     ],
-    "@media (min-width: 640px) | .sm\\:px-7": [
+    "@media (min-width: 640px) | :where(.sui-scope).sm\\:p-8": [
+      "padding: 2rem"
+    ],
+    "@media (min-width: 640px) | :where(.sui-scope).sm\\:px-7": [
       "padding-left: 1.75rem",
       "padding-right: 1.75rem"
     ],
-    "@media (min-width: 640px) | .sm\\:pl-7": [
+    "@media (min-width: 640px) | :where(.sui-scope).sm\\:pl-7": [
       "padding-left: 1.75rem"
+    ],
+    ":where(.sui-scope).\\[\\&\\>svg\\]\\:size-5>svg": [
+      "height: 1.25rem",
+      "width: 1.25rem"
+    ],
+    ":where(.sui-scope,.sui-scope *).sui-scope": [
+      "counter-reset: katexEqnNo mmlEqnNo"
+    ],
+    "@media (forced-colors: active) | :where(.sui-scope):focus-visible": [
+      "outline-offset: 2px",
+      "outline: 2px solid Highlight"
+    ],
+    "@media (forced-colors: active) | :where(.sui-scope)[role=\"dialog\"]": [
+      "border: 1px solid CanvasText"
+    ],
+    "@media (forced-colors: active) | :where(.sui-scope)[role=\"switch\"][aria-checked=\"true\"],\n  :where(.sui-scope)[role=\"tab\"][aria-selected=\"true\"]": [
+      "outline-offset: -2px",
+      "outline: 1px solid Highlight"
     ]
   },
   "specimens": {
-    "action-button.filled": "<button type=\"button\" tabindex=\"0\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.26] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary-strong cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.18] inline-flex items-center justify-center min-h-12 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-6 py-3 relative rounded-full text-[0.95rem] text-sherick-on-primary tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>Save</span></button>",
-    "action-button.filled.danger": "<button type=\"button\" tabindex=\"0\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.26] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-danger cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.18] inline-flex items-center justify-center min-h-12 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-6 py-3 relative rounded-full text-[0.95rem] text-sherick-on-danger tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>Delete</span></button>",
-    "action-button.tonal": "<button type=\"button\" tabindex=\"0\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.15] active:duration-press active:ease-press active:scale-[0.98] active:shadow-sherick-recessed before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-surface-high/[0.56] cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.09] inline-flex items-center justify-center min-h-12 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-6 py-3 relative rounded-full shadow-sherick-raised text-[0.95rem] text-sherick-ink tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>Cancel</span></button>",
-    "action-button.tonal.primary": "<button type=\"button\" tabindex=\"0\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.15] active:duration-press active:ease-press active:scale-[0.98] active:shadow-sherick-recessed before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary/[0.12] cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.09] inline-flex items-center justify-center min-h-12 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-6 py-3 relative rounded-full shadow-sherick-raised text-[0.95rem] text-sherick-primary tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>Continue</span></button>",
-    "action-button.text": "<button type=\"button\" tabindex=\"0\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.09] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.05] inline-flex items-center justify-center min-h-12 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-6 py-3 relative rounded-full text-[0.95rem] text-sherick-ink tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>Skip</span></button>",
-    "action-button.icon": "<button type=\"button\" tabindex=\"0\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.15] active:duration-press active:ease-press active:scale-[0.98] active:shadow-sherick-recessed before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary/[0.12] cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.09] inline-flex items-center justify-center min-h-12 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-6 py-3 relative rounded-full shadow-sherick-raised text-[0.95rem] text-sherick-primary tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span class=\"[&amp;&gt;svg]:size-5 inline-flex items-center shrink-0\" aria-hidden=\"true\"><span class=\"flex flex-col items-center justify-center\" role=\"status\" aria-live=\"polite\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"animate-spin lucide lucide-loader-2 lucide-loader-circle motion-reduce:animate-none size-4 text-current\" aria-hidden=\"true\"><path d=\"M21 12a9 9 0 1 1-6.219-8.56\"></path></svg></span></span><span>Sync</span></button>",
-    "action-button.size.sm": "<button type=\"button\" tabindex=\"0\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.15] active:duration-press active:ease-press active:scale-[0.98] active:shadow-sherick-recessed before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary/[0.12] cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.09] inline-flex items-center justify-center min-h-10 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-4 py-2 relative rounded-full shadow-sherick-raised text-sherick-primary text-sm tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>Small</span></button>",
-    "action-button.size.md": "<button type=\"button\" tabindex=\"0\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.15] active:duration-press active:ease-press active:scale-[0.98] active:shadow-sherick-recessed before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary/[0.12] cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.09] inline-flex items-center justify-center min-h-12 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-6 py-3 relative rounded-full shadow-sherick-raised text-[0.95rem] text-sherick-primary tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>Medium</span></button>",
-    "action-button.size.lg": "<button type=\"button\" tabindex=\"0\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.15] active:duration-press active:ease-press active:scale-[0.98] active:shadow-sherick-recessed before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary/[0.12] cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.09] inline-flex items-center justify-center min-h-14 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-8 py-4 relative rounded-full shadow-sherick-raised text-lg text-sherick-primary tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>Large</span></button>",
-    "action-button.disabled": "<button data-disabled=\"\" type=\"button\" tabindex=\"0\" disabled=\"\" class=\"active:duration-press active:ease-press bg-sherick-primary/[0.12] cursor-not-allowed duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 inline-flex items-center justify-center min-h-12 motion-reduce:transform-none motion-reduce:transition-none opacity-45 px-6 py-3 rounded-full text-[0.95rem] text-sherick-primary tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>Disabled</span></button>",
-    "action-button.loading": "<button data-disabled=\"\" type=\"button\" tabindex=\"0\" disabled=\"\" aria-busy=\"true\" class=\"active:duration-press active:ease-press bg-sherick-primary/[0.12] cursor-not-allowed duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 inline-flex items-center justify-center min-h-12 motion-reduce:transform-none motion-reduce:transition-none opacity-45 px-6 py-3 rounded-full text-[0.95rem] text-sherick-primary tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span class=\"flex flex-col items-center justify-center\" role=\"status\" aria-live=\"polite\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"animate-spin lucide lucide-loader-2 lucide-loader-circle motion-reduce:animate-none size-4 text-current\" aria-hidden=\"true\"><path d=\"M21 12a9 9 0 1 1-6.219-8.56\"></path></svg></span><span>Saving</span></button>",
-    "alert.primary": "<div role=\"status\" class=\"bg-sherick-primary/[0.12] flex gap-3 items-center px-4 py-3.5 rounded-[1.75rem] text-sherick-ink\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-info shrink-0 size-5 text-sherick-primary\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><path d=\"M12 16v-4\"></path><path d=\"M12 8h.01\"></path></svg><div class=\"flex-1 leading-6 min-w-0 text-sm\">A useful piece of information.</div></div>",
-    "alert.danger.closeable": "<div role=\"alert\" class=\"bg-sherick-danger/[0.09] flex gap-3 items-center px-4 py-3.5 rounded-[1.75rem] text-sherick-ink\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-circle-x lucide-x-circle shrink-0 size-5 text-sherick-danger\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><path d=\"m15 9-6 6\"></path><path d=\"m9 9 6 6\"></path></svg><div class=\"flex-1 leading-6 min-w-0 text-sm\">Something needs your attention.</div><button type=\"button\" tabindex=\"0\" aria-label=\"Dismiss alert\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.09] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity cursor-pointer duration-release ease-release focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-focus focus:outline-none hover:before:opacity-[0.05] inline-flex items-center justify-center min-h-11 min-w-11 ml-1 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none relative rounded-full shrink-0 transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-x size-4\" aria-hidden=\"true\"><path d=\"M18 6 6 18\"></path><path d=\"m6 6 12 12\"></path></svg></button></div>",
-    "alert.success": "<div role=\"status\" class=\"bg-sherick-success/[0.09] flex gap-3 items-center px-4 py-3.5 rounded-[1.75rem] text-sherick-ink\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-check-circle lucide-circle-check-big shrink-0 size-5 text-sherick-success\" aria-hidden=\"true\"><path d=\"M21.801 10A10 10 0 1 1 17 3.335\"></path><path d=\"m9 11 3 3L22 4\"></path></svg><div class=\"flex-1 leading-6 min-w-0 text-sm\">Changes were saved.</div></div>",
-    "avatar.circle.sm": "<span role=\"img\" aria-label=\"Example avatar\" class=\"bg-sherick-surface-high/[0.72] h-8 overflow-hidden rounded-full text-sherick-ink w-8\"><img alt=\"Example avatar\" aria-hidden=\"true\" width=\"32\" height=\"32\" loading=\"lazy\" src=\"/avatar.png\" class=\"data-[error]:invisible data-[loading]:invisible h-full object-cover w-full\"/></span>",
-    "avatar.rounded.md": "<span role=\"img\" aria-label=\"Example avatar\" class=\"bg-sherick-surface-high/[0.72] h-16 overflow-hidden rounded-[1.25rem] text-sherick-ink w-16\"><img alt=\"Example avatar\" aria-hidden=\"true\" width=\"64\" height=\"64\" loading=\"lazy\" src=\"/avatar.png\" class=\"data-[error]:invisible data-[loading]:invisible h-full object-cover w-full\"/></span>",
-    "badge.primary": "<span class=\"bg-sherick-primary/[0.12] font-semibold gap-1.5 inline-flex items-center justify-center min-h-7 px-3 py-1 rounded-full text-sherick-primary text-xs\">Primary</span>",
-    "badge.secondary": "<span class=\"bg-sherick-surface/[0.78] font-semibold gap-1.5 inline-flex items-center justify-center min-h-7 px-3 py-1 rounded-full text-sherick-ink text-xs\">Neutral</span>",
-    "badge.success.icon": "<span class=\"bg-sherick-success/[0.09] font-semibold gap-1.5 inline-flex items-center justify-center min-h-7 px-3 py-1 rounded-full text-sherick-success text-xs\"><span class=\"inline-flex items-center\" aria-hidden=\"true\"><span>·</span></span>Ready</span>",
-    "card.secondary": "<div class=\"bg-sherick-surface/[0.78] p-6 rounded-[1.75rem] text-sherick-ink\">Neutral card</div>",
-    "card.primary": "<div class=\"bg-sherick-primary/[0.12] p-6 rounded-[1.75rem] text-sherick-primary\">Tonal card</div>",
-    "code-block.block": "<div class=\"bg-sherick-surface/[0.78] mt-4 overflow-hidden rounded-[1.5rem] shadow-sherick-recessed text-sherick-ink\"><div class=\"flex gap-4 items-center justify-between min-h-11 px-4 py-2\"><span class=\"font-mono text-[11px] text-sherick-ink-muted tracking-[0.08em] uppercase\">tsx</span><button type=\"button\" tabindex=\"0\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.09] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none gap-1.5 hover:before:opacity-[0.05] hover:text-sherick-ink inline-flex items-center motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-2.5 py-1.5 relative rounded-[1.25rem] text-sherick-ink-muted text-xs transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-copy size-3.5\" aria-hidden=\"true\"><rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg><span>Copy</span></button></div><pre class=\"bg-sherick-canvas/[0.28] border-sherick-edge/[0.075] border-t language-jsx leading-6 overflow-x-auto prism-code px-4 py-4 text-sm\" style=\"color:var(--sui-code-text, #e2e8f0);background-color:transparent\"><code class=\"inline-block min-w-full\"><div class=\"token-line\" style=\"color:var(--sui-code-text, #e2e8f0)\"><span class=\"inline-block mr-4 select-none text-right text-sherick-ink-faint w-4\">1</span><span class=\"punctuation tag token\" style=\"color:var(--sui-code-text, #e2e8f0)\">&lt;</span><span class=\"class-name tag token\" style=\"color:var(--sui-code-tag, #7dd3fc)\">ActionButton</span><span class=\"tag token\" style=\"color:var(--sui-code-tag, #7dd3fc)\"> </span><span class=\"attr-name tag token\" style=\"color:var(--sui-code-keyword, #c084fc)\">appearance</span><span class=\"attr-equals attr-value punctuation tag token\" style=\"color:var(--sui-code-text, #e2e8f0)\">=</span><span class=\"attr-value punctuation tag token\" style=\"color:var(--sui-code-text, #e2e8f0)\">&quot;</span><span class=\"attr-value tag token\" style=\"color:var(--sui-code-string, #a5d6ff)\">filled</span><span class=\"attr-value punctuation tag token\" style=\"color:var(--sui-code-text, #e2e8f0)\">&quot;</span><span class=\"punctuation tag token\" style=\"color:var(--sui-code-text, #e2e8f0)\">&gt;</span><span class=\"plain-text token\">Save</span><span class=\"punctuation tag token\" style=\"color:var(--sui-code-text, #e2e8f0)\">&lt;/</span><span class=\"class-name tag token\" style=\"color:var(--sui-code-tag, #7dd3fc)\">ActionButton</span><span class=\"punctuation tag token\" style=\"color:var(--sui-code-text, #e2e8f0)\">&gt;</span></div></code></pre></div>",
-    "code-block.inline": "<code class=\"bg-sherick-surface-high/[0.72] font-mono px-1.5 py-0.5 rounded-full text-[0.9em] text-sherick-primary\">ActionButton</code>",
-    "divider.horizontal": "<div data-orientation=\"horizontal\" role=\"separator\" aria-orientation=\"horizontal\" class=\"border-sherick-edge/[0.075] border-t h-0 shrink-0 w-full\"></div>",
-    "divider.vertical": "<div data-orientation=\"vertical\" role=\"separator\" aria-orientation=\"vertical\" class=\"border-l border-sherick-edge/[0.075] h-full shrink-0 w-0\"></div>",
-    "dropdown.trigger": "<div class=\"inline-block min-w-64 relative\"><button type=\"button\" tabindex=\"0\" id=\"#\" role=\"combobox\" aria-expanded=\"false\" aria-haspopup=\"listbox\" class=\"active:duration-press active:ease-press active:scale-[0.98] bg-sherick-surface-high/[0.66] cursor-pointer duration-release ease-release flex focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:bg-sherick-surface-high/[0.9] focus:outline-none gap-3 group hover:bg-sherick-surface-high/[0.82] items-center justify-between min-h-12 min-w-64 motion-reduce:active:scale-100 motion-reduce:transform-none motion-reduce:transition-none placeholder:text-sherick-ink-muted px-5 py-3 rounded-[1.25rem] text-[0.95rem] text-left text-sherick-ink transition-[background-color,color,box-shadow,transform,opacity,width,height] w-full\"><span class=\"truncate\">Design system</span><span aria-hidden=\"true\" class=\"shrink-0\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"active:duration-press active:ease-press duration-release ease-release group-data-[popup-open]:rotate-180 lucide lucide-chevron-down motion-reduce:transform-none motion-reduce:transition-none size-5 text-sherick-ink transition-[background-color,color,box-shadow,transform,opacity,width,height]\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"></path></svg></span></button></div><input id=\"#\" style=\"clip-path:inset(50%);overflow:hidden;white-space:nowrap;border:0;padding:0;width:1px;height:1px;margin:-1px;position:fixed;top:0;left:0\" tabindex=\"-1\" aria-hidden=\"true\" value=\"design\"/>",
-    "dropdown.disabled": "<div class=\"inline-block min-w-64 relative\"><button type=\"button\" data-disabled=\"\" data-placeholder=\"\" tabindex=\"-1\" disabled=\"\" id=\"#\" role=\"combobox\" aria-expanded=\"false\" aria-haspopup=\"listbox\" class=\"active:duration-press active:ease-press bg-sherick-surface-high/[0.66] cursor-not-allowed duration-release ease-release flex focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none gap-3 group items-center justify-between min-h-12 min-w-64 motion-reduce:transform-none motion-reduce:transition-none opacity-45 placeholder:text-sherick-ink-muted px-5 py-3 rounded-[1.25rem] text-[0.95rem] text-left text-sherick-ink transition-[background-color,color,box-shadow,transform,opacity,width,height] w-full\"><span data-placeholder=\"\" class=\"text-sherick-ink-muted truncate\">Select an option</span><span aria-hidden=\"true\" class=\"shrink-0\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"active:duration-press active:ease-press duration-release ease-release group-data-[popup-open]:rotate-180 lucide lucide-chevron-down motion-reduce:transform-none motion-reduce:transition-none size-5 text-sherick-ink transition-[background-color,color,box-shadow,transform,opacity,width,height]\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"></path></svg></span></button></div><input id=\"#\" disabled=\"\" style=\"clip-path:inset(50%);overflow:hidden;white-space:nowrap;border:0;padding:0;width:1px;height:1px;margin:-1px;position:fixed;top:0;left:0\" tabindex=\"-1\" aria-hidden=\"true\" value=\"\"/>",
-    "icon-button.tonal": "<button type=\"button\" tabindex=\"0\" aria-label=\"Notifications\" class=\"[&amp;&gt;svg]:size-5 active:before:duration-press active:before:ease-press active:before:opacity-[0.15] active:duration-press active:ease-press active:scale-[0.98] active:shadow-sherick-recessed before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary/[0.12] cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none hover:before:opacity-[0.09] inline-flex items-center justify-center min-h-11 min-w-11 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none p-2.5 relative rounded-full shadow-sherick-raised text-sherick-primary transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>·</span></button>",
-    "icon-button.ghost": "<button type=\"button\" tabindex=\"0\" aria-label=\"Search\" class=\"[&amp;&gt;svg]:size-5 active:before:duration-press active:before:ease-press active:before:opacity-[0.09] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-transparent cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none hover:before:opacity-[0.05] inline-flex items-center justify-center min-h-11 min-w-11 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none p-2.5 relative rounded-full text-sherick-ink transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>·</span></button>",
-    "icon-button.acrylic": "<button type=\"button\" tabindex=\"0\" aria-label=\"Download\" class=\"[&amp;&gt;svg]:size-5 active:before:duration-press active:before:ease-press active:before:opacity-[0.15] active:duration-press active:ease-press active:scale-[0.98] backdrop-blur-[var(--sui-glass-dense-blur,26px)] backdrop-brightness-[var(--sui-glass-dense-brightness,1.035)] backdrop-saturate-[var(--sui-glass-dense-saturation,1.38)] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-[image:var(--sui-glass-gradient-dense)] bg-sherick-surface-float/[0.72] cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none hover:before:opacity-[0.09] inline-flex items-center justify-center min-h-11 min-w-11 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none p-2.5 relative rounded-full shadow-sherick-floating text-sherick-ink transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>·</span></button>",
-    "icon-button.disabled": "<button data-disabled=\"\" type=\"button\" tabindex=\"0\" disabled=\"\" aria-label=\"Favorite\" class=\"[&amp;&gt;svg]:size-5 active:duration-press active:ease-press bg-sherick-primary/[0.12] cursor-not-allowed duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none inline-flex items-center justify-center min-h-11 min-w-11 motion-reduce:transform-none motion-reduce:transition-none opacity-45 p-2.5 rounded-full text-sherick-primary transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>·</span></button>",
-    "input.default": "<div class=\"flex flex-col\"><label id=\"#\" for=\"#\" class=\"font-medium mb-2 text-sherick-ink text-sm\">Project name</label><input id=\"#\" placeholder=\"Sherick UI\" class=\"bg-sherick-surface-high/[0.66] cursor-text duration-press ease-press focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:bg-sherick-surface-high/[0.9] focus:outline-none hover:bg-sherick-surface-high/[0.82] min-h-12 min-w-64 motion-reduce:transition-none placeholder:text-sherick-ink-muted px-5 py-3 rounded-[1.25rem] text-[0.95rem] text-sherick-ink transition-[background-color,color,box-shadow,opacity]\"/></div>",
-    "input.required": "<div class=\"flex flex-col\"><label id=\"#\" for=\"#\" class=\"font-medium mb-2 text-sherick-ink text-sm\">Email<span class=\"ml-1 text-sherick-danger\" aria-hidden=\"true\">*</span></label><input id=\"#\" type=\"email\" required=\"\" class=\"bg-sherick-surface-high/[0.66] cursor-text duration-press ease-press focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:bg-sherick-surface-high/[0.9] focus:outline-none hover:bg-sherick-surface-high/[0.82] min-h-12 min-w-64 motion-reduce:transition-none placeholder:text-sherick-ink-muted px-5 py-3 rounded-[1.25rem] text-[0.95rem] text-sherick-ink transition-[background-color,color,box-shadow,opacity]\" name=\"email\"/></div>",
-    "input.error": "<div data-invalid=\"#\" class=\"flex flex-col\"><label data-invalid=\"#\" id=\"#\" for=\"#\" class=\"font-medium mb-2 text-sherick-ink text-sm\">Invalid</label><input data-invalid=\"#\" id=\"#\" placeholder=\"Required value\" aria-invalid=\"#\" class=\"bg-sherick-danger/[0.075] cursor-text duration-press ease-press focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:bg-sherick-danger/[0.13] focus:outline-none hover:bg-sherick-danger/[0.10] min-h-12 min-w-64 motion-reduce:transition-none placeholder:text-sherick-danger/[0.72] px-5 py-3 rounded-[1.25rem] text-[0.95rem] text-sherick-ink transition-[background-color,color,box-shadow,opacity]\"/></div>",
-    "input.disabled": "<div data-disabled=\"\" class=\"flex flex-col\"><label data-disabled=\"\" id=\"#\" for=\"#\" class=\"font-medium mb-2 text-sherick-ink text-sm\">Disabled</label><input data-disabled=\"\" id=\"#\" disabled=\"\" placeholder=\"Unavailable\" class=\"bg-sherick-surface-high/[0.66] cursor-not-allowed duration-press ease-press focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none min-h-12 min-w-64 motion-reduce:transition-none opacity-45 placeholder:text-sherick-ink-muted px-5 py-3 rounded-[1.25rem] text-[0.95rem] text-sherick-ink transition-[background-color,color,box-shadow,opacity]\"/></div>",
-    "markdown.document": "<h2 class=\"first:mt-0 font-semibold mb-3 mt-7 text-2xl text-sherick-ink tracking-[-0.025em]\" node=\"[object Object]\">Example</h2>\n<p class=\"leading-7 my-3 text-sherick-ink\" node=\"[object Object]\">Body copy with <code class=\"bg-sherick-surface-high/[0.72] font-mono px-1.5 py-0.5 rounded-full text-[0.9em] text-sherick-primary\">inline</code> code.</p>\n<blockquote class=\"bg-sherick-primary/[0.12] border-l-2 border-sherick-primary/[0.45] my-5 px-4 py-2 rounded-[1.25rem] rounded-l-none text-sherick-ink-muted\" node=\"[object Object]\">\n<p class=\"leading-7 my-3 text-sherick-ink\" node=\"[object Object]\">A quote.</p>\n</blockquote>\n<div class=\"bg-sherick-surface/[0.78] mt-4 overflow-hidden rounded-[1.5rem] shadow-sherick-recessed text-sherick-ink\"><div class=\"flex gap-4 items-center justify-between min-h-11 px-4 py-2\"><span class=\"font-mono text-[11px] text-sherick-ink-muted tracking-[0.08em] uppercase\">ts</span><button type=\"button\" tabindex=\"0\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.09] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none gap-1.5 hover:before:opacity-[0.05] hover:text-sherick-ink inline-flex items-center motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-2.5 py-1.5 relative rounded-[1.25rem] text-sherick-ink-muted text-xs transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-copy size-3.5\" aria-hidden=\"true\"><rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg><span>Copy</span></button></div><pre class=\"bg-sherick-canvas/[0.28] border-sherick-edge/[0.075] border-t language-ts leading-6 overflow-x-auto prism-code px-4 py-4 text-sm\" style=\"color:var(--sui-code-text, #e2e8f0);background-color:transparent\"><code class=\"inline-block min-w-full\"><div class=\"token-line\" style=\"color:var(--sui-code-text, #e2e8f0)\"><span class=\"inline-block mr-4 select-none text-right text-sherick-ink-faint w-4\">1</span><span class=\"keyword token\" style=\"color:var(--sui-code-tag, #7dd3fc)\">const</span><span class=\"plain token\"> a </span><span class=\"operator token\" style=\"color:var(--sui-code-text, #e2e8f0)\">=</span><span class=\"plain token\"> </span><span class=\"number token\" style=\"color:var(--sui-code-number, #f97316)\">1</span><span class=\"punctuation token\" style=\"color:var(--sui-code-text, #e2e8f0)\">;</span></div></code></pre></div>",
-    "modal.header": "<div class=\"pb-2 pl-6 pr-16 pt-5 sm:pl-7\"><h2 id=\"#\" class=\"font-semibold text-sherick-ink text-xl tracking-[-0.02em]\">Modal specimen</h2></div>",
-    "modal.content": "<div class=\"leading-7 pb-5 pt-2 px-6 sm:px-7 text-sherick-ink-muted text-sm\">Focused, translucent and separated from the page beneath it.</div>",
-    "modal.footer": "<div class=\"flex gap-3 items-center justify-end mt-auto pb-5 pt-1 px-6 sm:px-7\"><button type=\"button\" tabindex=\"0\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.26] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary-strong cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.18] inline-flex items-center justify-center min-h-12 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-6 py-3 relative rounded-full text-[0.95rem] text-sherick-on-primary tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>Confirm</span></button></div>",
-    "nav-group": "<div class=\"py-2 space-y-1.5\"><h3 class=\"font-semibold pb-1 px-3 text-sherick-ink-muted text-xs\">Components</h3><a href=\"#buttons\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.09] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity duration-release ease-release flex focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none gap-2 hover:before:opacity-[0.05] hover:text-sherick-ink items-center max-w-xs min-h-10 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none overflow-hidden px-3 py-2 relative rounded-[1.25rem] text-ellipsis text-sherick-ink-muted text-sm transition-[background-color,color,box-shadow,transform,opacity,width,height] whitespace-nowrap\"><span class=\"truncate\">Buttons</span></a><a href=\"#fields\" aria-current=\"page\" class=\"active:duration-press active:ease-press active:scale-[0.98] bg-sherick-primary/[0.22] duration-release ease-release flex focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 items-center max-w-xs min-h-10 motion-reduce:active:scale-100 motion-reduce:transform-none motion-reduce:transition-none overflow-hidden px-3 py-2 rounded-[1.25rem] text-ellipsis text-sherick-primary text-sm transition-[background-color,color,box-shadow,transform,opacity,width,height] whitespace-nowrap\"><span class=\"truncate\">Fields</span></a></div>",
-    "search.default": "<div class=\"bg-sherick-surface-high/[0.66] duration-press ease-press focus-within:bg-sherick-surface-high/[0.9] focus-within:outline focus-within:outline-2 focus-within:outline-offset-[3px] focus-within:outline-sherick-focus hover:bg-sherick-surface-high/[0.82] inline-flex items-center min-h-12 min-w-64 motion-reduce:transition-none placeholder:text-sherick-ink-muted relative rounded-[1.25rem] text-[0.95rem] text-sherick-ink transition-[background-color,color,box-shadow,opacity]\"><input id=\"#\" placeholder=\"Search components\" class=\"bg-transparent cursor-text min-h-12 outline-none pl-5 placeholder:text-sherick-ink-muted pr-12 py-3 rounded-[1.25rem] text-[0.95rem] text-inherit w-full\"/><button type=\"button\" tabindex=\"0\" aria-label=\"Submit search\" class=\"absolute active:before:duration-press active:before:ease-press active:before:opacity-[0.09] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity cursor-pointer duration-release ease-release focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-focus focus:outline-none hover:before:opacity-[0.05] inline-flex items-center justify-center min-h-11 min-w-11 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none right-1.5 rounded-full text-sherick-ink transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-search size-5\" aria-hidden=\"true\"><path d=\"m21 21-4.34-4.34\"></path><circle cx=\"11\" cy=\"11\" r=\"8\"></circle></svg></button></div>",
-    "search.loading": "<div class=\"bg-sherick-surface-high/[0.66] duration-press ease-press focus-within:bg-sherick-surface-high/[0.9] focus-within:outline focus-within:outline-2 focus-within:outline-offset-[3px] focus-within:outline-sherick-focus hover:bg-sherick-surface-high/[0.82] inline-flex items-center min-h-12 min-w-64 motion-reduce:transition-none placeholder:text-sherick-ink-muted relative rounded-[1.25rem] text-[0.95rem] text-sherick-ink transition-[background-color,color,box-shadow,opacity]\"><input id=\"#\" aria-busy=\"true\" placeholder=\"Search...\" class=\"bg-transparent cursor-text min-h-12 outline-none pl-5 placeholder:text-sherick-ink-muted pr-12 py-3 rounded-[1.25rem] text-[0.95rem] text-inherit w-full\"/><button type=\"button\" data-disabled=\"\" tabindex=\"0\" disabled=\"\" aria-label=\"Submit search\" class=\"absolute active:duration-press active:ease-press cursor-not-allowed duration-release ease-release focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-focus focus:outline-none inline-flex items-center justify-center min-h-11 min-w-11 motion-reduce:transform-none motion-reduce:transition-none right-1.5 rounded-full text-sherick-ink transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span class=\"flex flex-col items-center justify-center\" role=\"status\" aria-live=\"polite\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"animate-spin lucide lucide-loader-2 lucide-loader-circle motion-reduce:animate-none size-5 text-current\" aria-hidden=\"true\"><path d=\"M21 12a9 9 0 1 1-6.219-8.56\"></path></svg></span></button></div>",
-    "search.variant.primary": "<div class=\"bg-sherick-surface-high/[0.66] duration-press ease-press focus-within:bg-sherick-surface-high/[0.9] focus-within:outline focus-within:outline-2 focus-within:outline-offset-[3px] focus-within:outline-sherick-focus hover:bg-sherick-surface-high/[0.82] inline-flex items-center min-h-12 min-w-64 motion-reduce:transition-none placeholder:text-sherick-ink-muted relative rounded-[1.25rem] text-[0.95rem] text-sherick-ink transition-[background-color,color,box-shadow,opacity]\"><input id=\"#\" placeholder=\"Search...\" class=\"bg-transparent cursor-text min-h-12 outline-none pl-5 placeholder:text-sherick-ink-muted pr-12 py-3 rounded-[1.25rem] text-[0.95rem] text-inherit w-full\"/><button type=\"button\" tabindex=\"0\" aria-label=\"Submit search\" class=\"absolute active:before:duration-press active:before:ease-press active:before:opacity-[0.09] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity cursor-pointer duration-release ease-release focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-focus focus:outline-none hover:before:opacity-[0.05] inline-flex items-center justify-center min-h-11 min-w-11 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none right-1.5 rounded-full text-sherick-primary transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-search size-5\" aria-hidden=\"true\"><path d=\"m21 21-4.34-4.34\"></path><circle cx=\"11\" cy=\"11\" r=\"8\"></circle></svg></button></div>",
-    "skeleton": "<div aria-hidden=\"true\" class=\"animate-pulse bg-sherick-surface-high/[0.72] h-4 motion-reduce:animate-none rounded-[1.25rem] text-sherick-ink w-3/4\"></div>",
-    "spinner.small": "<span class=\"flex flex-col items-center justify-center\" role=\"status\" aria-live=\"polite\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"animate-spin lucide lucide-loader-2 lucide-loader-circle motion-reduce:animate-none size-4 text-current\" aria-hidden=\"true\"><path d=\"M21 12a9 9 0 1 1-6.219-8.56\"></path></svg></span>",
-    "switch.on": "<button type=\"button\" data-checked=\"\" tabindex=\"0\" id=\"#\" role=\"switch\" aria-checked=\"true\" class=\"cursor-pointer group inline-flex items-center justify-center min-h-12 min-w-14 outline-none rounded-full\"><span aria-hidden=\"true\" class=\"active:before:duration-press active:before:ease-press active:duration-press active:ease-press before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary-strong block duration-release ease-release group-active:before:duration-press group-active:before:ease-press group-active:before:opacity-[0.26] group-active:scale-[0.98] group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-offset-[3px] group-focus-visible:outline-sherick-focus group-hover:before:opacity-[0.18] h-8 motion-reduce:before:transition-none motion-reduce:group-active:scale-100 motion-reduce:transform-none motion-reduce:transition-none relative rounded-full shadow-sherick-recessed shrink-0 text-sherick-on-primary transition-[background-color,color,box-shadow,transform,opacity,width,height] w-[3.25rem]\"><span data-checked=\"\" class=\"-translate-y-1/2 absolute active:duration-press active:ease-press bg-current duration-release ease-release h-6 left-1 motion-reduce:transform-none motion-reduce:transition-none rounded-full shadow-sherick-control top-1/2 transition-[background-color,color,box-shadow,transform,opacity,width,height] translate-x-5 w-6\"></span></span></button><input style=\"clip-path:inset(50%);overflow:hidden;white-space:nowrap;border:0;padding:0;width:1px;height:1px;margin:-1px;position:fixed;top:0;left:0\" tabindex=\"-1\" type=\"checkbox\" aria-hidden=\"true\" checked=\"\"/>",
-    "switch.off": "<button type=\"button\" data-unchecked=\"\" tabindex=\"0\" id=\"#\" role=\"switch\" aria-checked=\"false\" class=\"cursor-pointer group inline-flex items-center justify-center min-h-12 min-w-14 outline-none rounded-full\"><span aria-hidden=\"true\" class=\"active:before:duration-press active:before:ease-press active:duration-press active:ease-press before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-surface-high block duration-release ease-release group-active:before:duration-press group-active:before:ease-press group-active:before:opacity-[0.26] group-active:scale-[0.98] group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-offset-[3px] group-focus-visible:outline-sherick-focus group-hover:before:opacity-[0.18] h-8 motion-reduce:before:transition-none motion-reduce:group-active:scale-100 motion-reduce:transform-none motion-reduce:transition-none relative rounded-full shadow-sherick-recessed shrink-0 text-sherick-ink-muted transition-[background-color,color,box-shadow,transform,opacity,width,height] w-[3.25rem]\"><span data-unchecked=\"\" class=\"-translate-y-1/2 absolute active:duration-press active:ease-press bg-current duration-release ease-release h-5 left-1 motion-reduce:transform-none motion-reduce:transition-none rounded-full shadow-sherick-control text-sherick-ink-muted top-1/2 transition-[background-color,color,box-shadow,transform,opacity,width,height] w-5\"></span></span></button><input style=\"clip-path:inset(50%);overflow:hidden;white-space:nowrap;border:0;padding:0;width:1px;height:1px;margin:-1px;position:fixed;top:0;left:0\" tabindex=\"-1\" type=\"checkbox\" aria-hidden=\"true\"/>",
-    "switch.disabled": "<button type=\"button\" data-disabled=\"\" data-checked=\"\" tabindex=\"0\" disabled=\"\" id=\"#\" role=\"switch\" aria-checked=\"true\" class=\"cursor-not-allowed group inline-flex items-center justify-center min-h-12 min-w-14 opacity-45 outline-none rounded-full\"><span aria-hidden=\"true\" class=\"active:duration-press active:ease-press bg-sherick-primary-strong block duration-release ease-release group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-offset-[3px] group-focus-visible:outline-sherick-focus h-8 motion-reduce:transform-none motion-reduce:transition-none relative rounded-full shadow-sherick-recessed shrink-0 text-sherick-on-primary transition-[background-color,color,box-shadow,transform,opacity,width,height] w-[3.25rem]\"><span data-disabled=\"\" data-checked=\"\" class=\"-translate-y-1/2 absolute active:duration-press active:ease-press bg-current duration-release ease-release h-6 left-1 motion-reduce:transform-none motion-reduce:transition-none rounded-full shadow-sherick-control top-1/2 transition-[background-color,color,box-shadow,transform,opacity,width,height] translate-x-5 w-6\"></span></span></button><input disabled=\"\" style=\"clip-path:inset(50%);overflow:hidden;white-space:nowrap;border:0;padding:0;width:1px;height:1px;margin:-1px;position:fixed;top:0;left:0\" tabindex=\"-1\" type=\"checkbox\" aria-hidden=\"true\" checked=\"\"/>",
-    "tab-group": "<div data-orientation=\"horizontal\" data-activation-direction=\"none\" class=\"w-full\"><div data-orientation=\"horizontal\" data-activation-direction=\"none\" role=\"tablist\" aria-label=\"Tabs\" class=\"bg-sherick-surface/[0.72] flex min-w-max p-1.5 relative rounded-full shadow-sherick-recessed\"><span data-orientation=\"horizontal\" data-activation-direction=\"none\" role=\"presentation\" hidden=\"\" class=\"absolute active:duration-press active:ease-press bg-sherick-primary/[0.22] duration-release ease-release h-[var(--active-tab-height)] left-[var(--active-tab-left)] motion-reduce:transform-none motion-reduce:transition-none rounded-full shadow-sherick-control text-sherick-ink top-[var(--active-tab-top)] transition-[background-color,color,box-shadow,transform,opacity,width,height] w-[var(--active-tab-width)]\"></span><button type=\"button\" data-active=\"\" data-orientation=\"horizontal\" data-activation-direction=\"none\" aria-disabled=\"false\" tabindex=\"-1\" role=\"tab\" aria-selected=\"true\" id=\"#\" data-composite-item-active=\"\" class=\"active:duration-press active:ease-press active:scale-[0.98] duration-release ease-release flex-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium min-h-12 min-w-28 motion-reduce:active:scale-100 motion-reduce:transform-none motion-reduce:transition-none px-7 py-3 relative rounded-full text-sherick-ink text-sm transition-[background-color,color,box-shadow,transform,opacity,width,height] whitespace-nowrap z-10\">Overview</button><button type=\"button\" data-orientation=\"horizontal\" data-activation-direction=\"none\" aria-disabled=\"false\" tabindex=\"-1\" role=\"tab\" aria-selected=\"false\" id=\"#\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.09] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity duration-release ease-release flex-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium hover:before:opacity-[0.05] hover:text-sherick-ink min-h-12 min-w-28 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-7 py-3 relative rounded-full text-sherick-ink-muted text-sm transition-[background-color,color,box-shadow,transform,opacity,width,height] whitespace-nowrap z-10\">Motion</button></div><div data-orientation=\"horizontal\" data-activation-direction=\"none\" id=\"#\" role=\"tabpanel\" tabindex=\"0\" data-index=\"-1\" class=\"mt-5\">Overview</div></div>",
-    "table": "<div class=\"bg-sherick-surface/[0.42] overflow-auto rounded-[1.25rem] text-sherick-ink w-full\"><table class=\"border-collapse w-full\"><thead><tr class=\"border-b border-sherick-edge/[0.10]\"><th class=\"font-medium px-4 py-3 text-left text-sherick-ink-muted text-sm\">Component</th><th class=\"font-medium px-4 py-3 text-left text-sherick-ink-muted text-sm\">Role</th></tr></thead><tbody><tr class=\"border-b border-sherick-edge/[0.06] duration-press ease-press hover:bg-sherick-ink/[0.05] last:border-b-0 motion-reduce:transition-none transition-[background-color,color,box-shadow,opacity]\"><td class=\"px-4 py-3 text-sherick-ink text-sm\">Dropdown</td><td class=\"px-4 py-3 text-sherick-ink text-sm\">Selection</td></tr><tr class=\"border-b border-sherick-edge/[0.06] duration-press ease-press hover:bg-sherick-ink/[0.05] last:border-b-0 motion-reduce:transition-none transition-[background-color,color,box-shadow,opacity]\"><td class=\"px-4 py-3 text-sherick-ink text-sm\">Table</td><td class=\"px-4 py-3 text-sherick-ink text-sm\">Data</td></tr></tbody></table></div>",
-    "textarea.default": "<div class=\"flex flex-col w-full\"><label id=\"#\" for=\"#\" class=\"font-medium mb-2 text-sherick-ink text-sm\">Notes</label><textarea placeholder=\"Describe what you want to build…\" id=\"#\" class=\"bg-sherick-surface-high/[0.66] cursor-text duration-press ease-press focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:bg-sherick-surface-high/[0.9] focus:outline-none hover:bg-sherick-surface-high/[0.82] min-h-28 min-w-64 motion-reduce:transition-none placeholder:text-sherick-ink-muted px-5 py-4 resize-y rounded-[1.25rem] text-[0.95rem] text-sherick-ink transition-[background-color,color,box-shadow,opacity] w-full\"></textarea></div>",
-    "textarea.error": "<div data-invalid=\"#\" class=\"flex flex-col w-full\"><label data-invalid=\"#\" id=\"#\" for=\"#\" class=\"font-medium mb-2 text-sherick-ink text-sm\">Invalid notes</label><textarea data-invalid=\"#\" id=\"#\" aria-invalid=\"#\" class=\"bg-sherick-danger/[0.075] cursor-text duration-press ease-press focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:bg-sherick-danger/[0.13] focus:outline-none hover:bg-sherick-danger/[0.10] min-h-28 min-w-64 motion-reduce:transition-none placeholder:text-sherick-danger/[0.72] px-5 py-4 resize-y rounded-[1.25rem] text-[0.95rem] text-sherick-ink transition-[background-color,color,box-shadow,opacity] w-full\"></textarea></div>",
-    "tooltip.trigger": "<span class=\"inline-block\"><button type=\"button\" tabindex=\"0\" id=\"#\" data-base-ui-tooltip-trigger=\"\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.15] active:duration-press active:ease-press active:scale-[0.98] active:shadow-sherick-recessed before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary/[0.12] cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.09] inline-flex items-center justify-center min-h-12 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-6 py-3 relative rounded-full shadow-sherick-raised text-[0.95rem] text-sherick-primary tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>Hover</span></button></span>"
+    "action-button.filled": "<button type=\"button\" tabindex=\"0\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.26] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary-strong cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.18] inline-flex items-center justify-center min-h-12 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-6 py-3 relative rounded-full sui-scope text-[0.95rem] text-sherick-on-primary tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>Save</span></button>",
+    "action-button.filled.danger": "<button type=\"button\" tabindex=\"0\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.26] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-danger cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.18] inline-flex items-center justify-center min-h-12 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-6 py-3 relative rounded-full sui-scope text-[0.95rem] text-sherick-on-danger tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>Delete</span></button>",
+    "action-button.tonal": "<button type=\"button\" tabindex=\"0\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.15] active:duration-press active:ease-press active:scale-[0.98] active:shadow-sherick-recessed before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-surface-high/[0.56] cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.09] inline-flex items-center justify-center min-h-12 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-6 py-3 relative rounded-full shadow-sherick-raised sui-scope text-[0.95rem] text-sherick-ink tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>Cancel</span></button>",
+    "action-button.tonal.primary": "<button type=\"button\" tabindex=\"0\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.15] active:duration-press active:ease-press active:scale-[0.98] active:shadow-sherick-recessed before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary/[0.12] cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.09] inline-flex items-center justify-center min-h-12 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-6 py-3 relative rounded-full shadow-sherick-raised sui-scope text-[0.95rem] text-sherick-primary tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>Continue</span></button>",
+    "action-button.text": "<button type=\"button\" tabindex=\"0\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.09] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.05] inline-flex items-center justify-center min-h-12 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-6 py-3 relative rounded-full sui-scope text-[0.95rem] text-sherick-ink tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>Skip</span></button>",
+    "action-button.icon": "<button type=\"button\" tabindex=\"0\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.15] active:duration-press active:ease-press active:scale-[0.98] active:shadow-sherick-recessed before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary/[0.12] cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.09] inline-flex items-center justify-center min-h-12 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-6 py-3 relative rounded-full shadow-sherick-raised sui-scope text-[0.95rem] text-sherick-primary tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span class=\"[&amp;&gt;svg]:size-5 inline-flex items-center shrink-0\" aria-hidden=\"true\"><span class=\"flex flex-col items-center justify-center sui-scope\" role=\"status\" aria-live=\"polite\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"animate-spin lucide lucide-loader-2 lucide-loader-circle motion-reduce:animate-none size-4 sui-scope text-current\" aria-hidden=\"true\"><path d=\"M21 12a9 9 0 1 1-6.219-8.56\"></path></svg></span></span><span>Sync</span></button>",
+    "action-button.size.sm": "<button type=\"button\" tabindex=\"0\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.15] active:duration-press active:ease-press active:scale-[0.98] active:shadow-sherick-recessed before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary/[0.12] cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.09] inline-flex items-center justify-center min-h-10 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-4 py-2 relative rounded-full shadow-sherick-raised sui-scope text-sherick-primary text-sm tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>Small</span></button>",
+    "action-button.size.md": "<button type=\"button\" tabindex=\"0\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.15] active:duration-press active:ease-press active:scale-[0.98] active:shadow-sherick-recessed before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary/[0.12] cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.09] inline-flex items-center justify-center min-h-12 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-6 py-3 relative rounded-full shadow-sherick-raised sui-scope text-[0.95rem] text-sherick-primary tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>Medium</span></button>",
+    "action-button.size.lg": "<button type=\"button\" tabindex=\"0\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.15] active:duration-press active:ease-press active:scale-[0.98] active:shadow-sherick-recessed before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary/[0.12] cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.09] inline-flex items-center justify-center min-h-14 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-8 py-4 relative rounded-full shadow-sherick-raised sui-scope text-lg text-sherick-primary tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>Large</span></button>",
+    "action-button.disabled": "<button data-disabled=\"\" type=\"button\" tabindex=\"0\" disabled=\"\" class=\"active:duration-press active:ease-press bg-sherick-primary/[0.12] cursor-not-allowed duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 inline-flex items-center justify-center min-h-12 motion-reduce:transform-none motion-reduce:transition-none opacity-45 px-6 py-3 rounded-full sui-scope text-[0.95rem] text-sherick-primary tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>Disabled</span></button>",
+    "action-button.loading": "<button data-disabled=\"\" type=\"button\" tabindex=\"0\" disabled=\"\" aria-busy=\"true\" class=\"active:duration-press active:ease-press bg-sherick-primary/[0.12] cursor-not-allowed duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 inline-flex items-center justify-center min-h-12 motion-reduce:transform-none motion-reduce:transition-none opacity-45 px-6 py-3 rounded-full sui-scope text-[0.95rem] text-sherick-primary tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span class=\"flex flex-col items-center justify-center sui-scope\" role=\"status\" aria-live=\"polite\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"animate-spin lucide lucide-loader-2 lucide-loader-circle motion-reduce:animate-none size-4 sui-scope text-current\" aria-hidden=\"true\"><path d=\"M21 12a9 9 0 1 1-6.219-8.56\"></path></svg></span><span>Saving</span></button>",
+    "alert.primary": "<div role=\"status\" class=\"bg-sherick-primary/[0.12] flex gap-3 items-center px-4 py-3.5 rounded-[1.75rem] sui-scope text-sherick-ink\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-info shrink-0 size-5 sui-scope text-sherick-primary\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><path d=\"M12 16v-4\"></path><path d=\"M12 8h.01\"></path></svg><div class=\"flex-1 leading-6 min-w-0 text-sm\">A useful piece of information.</div></div>",
+    "alert.danger.closeable": "<div role=\"alert\" class=\"bg-sherick-danger/[0.09] flex gap-3 items-center px-4 py-3.5 rounded-[1.75rem] sui-scope text-sherick-ink\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-circle-x lucide-x-circle shrink-0 size-5 sui-scope text-sherick-danger\" aria-hidden=\"true\"><circle cx=\"12\" cy=\"12\" r=\"10\"></circle><path d=\"m15 9-6 6\"></path><path d=\"m9 9 6 6\"></path></svg><div class=\"flex-1 leading-6 min-w-0 text-sm\">Something needs your attention.</div><button type=\"button\" tabindex=\"0\" aria-label=\"Dismiss alert\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.09] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity cursor-pointer duration-release ease-release focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-focus focus:outline-none hover:before:opacity-[0.05] inline-flex items-center justify-center min-h-11 min-w-11 ml-1 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none relative rounded-full shrink-0 sui-scope transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-x size-4\" aria-hidden=\"true\"><path d=\"M18 6 6 18\"></path><path d=\"m6 6 12 12\"></path></svg></button></div>",
+    "alert.success": "<div role=\"status\" class=\"bg-sherick-success/[0.09] flex gap-3 items-center px-4 py-3.5 rounded-[1.75rem] sui-scope text-sherick-ink\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-check-circle lucide-circle-check-big shrink-0 size-5 sui-scope text-sherick-success\" aria-hidden=\"true\"><path d=\"M21.801 10A10 10 0 1 1 17 3.335\"></path><path d=\"m9 11 3 3L22 4\"></path></svg><div class=\"flex-1 leading-6 min-w-0 text-sm\">Changes were saved.</div></div>",
+    "avatar.circle.sm": "<span role=\"img\" aria-label=\"Example avatar\" class=\"bg-sherick-surface-high/[0.72] h-8 overflow-hidden rounded-full sui-scope text-sherick-ink w-8\"><img alt=\"Example avatar\" aria-hidden=\"true\" width=\"32\" height=\"32\" loading=\"lazy\" src=\"/avatar.png\" class=\"data-[error]:invisible data-[loading]:invisible h-full object-cover w-full\"/></span>",
+    "avatar.rounded.md": "<span role=\"img\" aria-label=\"Example avatar\" class=\"bg-sherick-surface-high/[0.72] h-16 overflow-hidden rounded-[1.25rem] sui-scope text-sherick-ink w-16\"><img alt=\"Example avatar\" aria-hidden=\"true\" width=\"64\" height=\"64\" loading=\"lazy\" src=\"/avatar.png\" class=\"data-[error]:invisible data-[loading]:invisible h-full object-cover w-full\"/></span>",
+    "badge.primary": "<span class=\"bg-sherick-primary/[0.12] font-semibold gap-1.5 inline-flex items-center justify-center min-h-7 px-3 py-1 rounded-full sui-scope text-sherick-primary text-xs\">Primary</span>",
+    "badge.secondary": "<span class=\"bg-sherick-surface/[0.78] font-semibold gap-1.5 inline-flex items-center justify-center min-h-7 px-3 py-1 rounded-full sui-scope text-sherick-ink text-xs\">Neutral</span>",
+    "badge.success.icon": "<span class=\"bg-sherick-success/[0.09] font-semibold gap-1.5 inline-flex items-center justify-center min-h-7 px-3 py-1 rounded-full sui-scope text-sherick-success text-xs\"><span class=\"inline-flex items-center\" aria-hidden=\"true\"><span>·</span></span>Ready</span>",
+    "card.secondary": "<div class=\"bg-sherick-surface/[0.78] p-6 rounded-[1.75rem] sui-scope text-sherick-ink\">Neutral card</div>",
+    "card.primary": "<div class=\"bg-sherick-primary/[0.12] p-6 rounded-[1.75rem] sui-scope text-sherick-primary\">Tonal card</div>",
+    "code-block.block": "<div class=\"bg-sherick-surface/[0.78] mt-4 overflow-hidden rounded-[1.5rem] shadow-sherick-recessed sui-scope text-sherick-ink\"><div class=\"flex gap-4 items-center justify-between min-h-11 px-4 py-2 sui-scope\"><span class=\"font-mono sui-scope text-[11px] text-sherick-ink-muted tracking-[0.08em] uppercase\">tsx</span><button type=\"button\" tabindex=\"0\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.09] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none gap-1.5 hover:before:opacity-[0.05] hover:text-sherick-ink inline-flex items-center motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-2.5 py-1.5 relative rounded-[1.25rem] sui-scope text-sherick-ink-muted text-xs transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-copy size-3.5 sui-scope\" aria-hidden=\"true\"><rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg><span>Copy</span></button></div><pre class=\"bg-sherick-canvas/[0.28] border-sherick-edge/[0.075] border-t language-jsx leading-6 overflow-x-auto prism-code px-4 py-4 sui-scope text-sm\" style=\"color:var(--sui-code-text);background-color:transparent\"><code class=\"inline-block min-w-full sui-scope\"><span class=\"block sui-scope token-line\" style=\"color:var(--sui-code-text)\"><span class=\"inline-block mr-4 select-none sui-scope text-right text-sherick-ink-faint w-4\">1</span><span class=\"punctuation sui-scope tag token\" style=\"color:var(--sui-code-text)\">&lt;</span><span class=\"class-name sui-scope tag token\" style=\"color:var(--sui-code-tag)\">ActionButton</span><span class=\"sui-scope tag token\" style=\"color:var(--sui-code-tag)\"> </span><span class=\"attr-name sui-scope tag token\" style=\"color:var(--sui-code-keyword)\">appearance</span><span class=\"attr-equals attr-value punctuation sui-scope tag token\" style=\"color:var(--sui-code-text)\">=</span><span class=\"attr-value punctuation sui-scope tag token\" style=\"color:var(--sui-code-text)\">&quot;</span><span class=\"attr-value sui-scope tag token\" style=\"color:var(--sui-code-string)\">filled</span><span class=\"attr-value punctuation sui-scope tag token\" style=\"color:var(--sui-code-text)\">&quot;</span><span class=\"punctuation sui-scope tag token\" style=\"color:var(--sui-code-text)\">&gt;</span><span class=\"plain-text sui-scope token\">Save</span><span class=\"punctuation sui-scope tag token\" style=\"color:var(--sui-code-text)\">&lt;/</span><span class=\"class-name sui-scope tag token\" style=\"color:var(--sui-code-tag)\">ActionButton</span><span class=\"punctuation sui-scope tag token\" style=\"color:var(--sui-code-text)\">&gt;</span></span></code></pre></div>",
+    "code-block.inline": "<code class=\"bg-sherick-surface-high/[0.72] font-mono px-1.5 py-0.5 rounded-full sui-scope text-[0.9em] text-sherick-primary\">ActionButton</code>",
+    "divider.horizontal": "<div data-orientation=\"horizontal\" role=\"separator\" aria-orientation=\"horizontal\" class=\"border-sherick-edge/[0.075] border-t h-0 shrink-0 sui-scope w-full\"></div>",
+    "divider.vertical": "<div data-orientation=\"vertical\" role=\"separator\" aria-orientation=\"vertical\" class=\"border-l border-sherick-edge/[0.075] h-full shrink-0 sui-scope w-0\"></div>",
+    "dropdown.trigger": "<div class=\"inline-block min-w-64 relative sui-scope\"><button type=\"button\" tabindex=\"0\" id=\"#\" role=\"combobox\" aria-expanded=\"false\" aria-haspopup=\"listbox\" class=\"active:duration-press active:ease-press active:scale-[0.98] bg-sherick-surface-high/[0.66] cursor-pointer duration-release ease-release flex focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:bg-sherick-surface-high/[0.9] focus:outline-none gap-3 group hover:bg-sherick-surface-high/[0.82] items-center justify-between min-h-12 min-w-64 motion-reduce:active:scale-100 motion-reduce:transform-none motion-reduce:transition-none placeholder:text-sherick-ink-muted px-5 py-3 rounded-[1.25rem] sui-scope text-[0.95rem] text-left text-sherick-ink transition-[background-color,color,box-shadow,transform,opacity,width,height] w-full\"><span class=\"sui-scope truncate\">Design system</span><span aria-hidden=\"true\" class=\"shrink-0\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"active:duration-press active:ease-press duration-release ease-release group-data-[popup-open]:rotate-180 lucide lucide-chevron-down motion-reduce:transform-none motion-reduce:transition-none size-5 sui-scope text-sherick-ink transition-[background-color,color,box-shadow,transform,opacity,width,height]\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"></path></svg></span></button></div><input id=\"#\" style=\"clip-path:inset(50%);overflow:hidden;white-space:nowrap;border:0;padding:0;width:1px;height:1px;margin:-1px;position:fixed;top:0;left:0\" tabindex=\"-1\" aria-hidden=\"true\" value=\"design\"/>",
+    "dropdown.disabled": "<div class=\"inline-block min-w-64 relative sui-scope\"><button type=\"button\" data-disabled=\"\" data-placeholder=\"\" tabindex=\"-1\" disabled=\"\" id=\"#\" role=\"combobox\" aria-expanded=\"false\" aria-haspopup=\"listbox\" class=\"active:duration-press active:ease-press bg-sherick-surface-high/[0.66] cursor-not-allowed duration-release ease-release flex focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none gap-3 group items-center justify-between min-h-12 min-w-64 motion-reduce:transform-none motion-reduce:transition-none opacity-45 placeholder:text-sherick-ink-muted px-5 py-3 rounded-[1.25rem] sui-scope text-[0.95rem] text-left text-sherick-ink transition-[background-color,color,box-shadow,transform,opacity,width,height] w-full\"><span data-placeholder=\"\" class=\"sui-scope text-sherick-ink-muted truncate\">Select an option</span><span aria-hidden=\"true\" class=\"shrink-0\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"active:duration-press active:ease-press duration-release ease-release group-data-[popup-open]:rotate-180 lucide lucide-chevron-down motion-reduce:transform-none motion-reduce:transition-none size-5 sui-scope text-sherick-ink transition-[background-color,color,box-shadow,transform,opacity,width,height]\" aria-hidden=\"true\"><path d=\"m6 9 6 6 6-6\"></path></svg></span></button></div><input id=\"#\" disabled=\"\" style=\"clip-path:inset(50%);overflow:hidden;white-space:nowrap;border:0;padding:0;width:1px;height:1px;margin:-1px;position:fixed;top:0;left:0\" tabindex=\"-1\" aria-hidden=\"true\" value=\"\"/>",
+    "icon-button.tonal": "<button type=\"button\" tabindex=\"0\" aria-label=\"Notifications\" class=\"[&amp;&gt;svg]:size-5 active:before:duration-press active:before:ease-press active:before:opacity-[0.15] active:duration-press active:ease-press active:scale-[0.98] active:shadow-sherick-recessed before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary/[0.12] cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none hover:before:opacity-[0.09] inline-flex items-center justify-center min-h-11 min-w-11 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none p-2.5 relative rounded-full shadow-sherick-raised sui-scope text-sherick-primary transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>·</span></button>",
+    "icon-button.ghost": "<button type=\"button\" tabindex=\"0\" aria-label=\"Search\" class=\"[&amp;&gt;svg]:size-5 active:before:duration-press active:before:ease-press active:before:opacity-[0.09] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-transparent cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none hover:before:opacity-[0.05] inline-flex items-center justify-center min-h-11 min-w-11 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none p-2.5 relative rounded-full sui-scope text-sherick-ink transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>·</span></button>",
+    "icon-button.acrylic": "<button type=\"button\" tabindex=\"0\" aria-label=\"Download\" class=\"[&amp;&gt;svg]:size-5 active:before:duration-press active:before:ease-press active:before:opacity-[0.15] active:duration-press active:ease-press active:scale-[0.98] backdrop-blur-[var(--sui-glass-dense-blur,26px)] backdrop-brightness-[var(--sui-glass-dense-brightness,1.035)] backdrop-saturate-[var(--sui-glass-dense-saturation,1.38)] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-[image:var(--sui-glass-gradient-dense)] bg-sherick-surface-float/[0.72] cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none hover:before:opacity-[0.09] inline-flex items-center justify-center min-h-11 min-w-11 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none p-2.5 relative rounded-full shadow-sherick-floating sui-scope text-sherick-ink transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>·</span></button>",
+    "icon-button.disabled": "<button data-disabled=\"\" type=\"button\" tabindex=\"0\" disabled=\"\" aria-label=\"Favorite\" class=\"[&amp;&gt;svg]:size-5 active:duration-press active:ease-press bg-sherick-primary/[0.12] cursor-not-allowed duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none inline-flex items-center justify-center min-h-11 min-w-11 motion-reduce:transform-none motion-reduce:transition-none opacity-45 p-2.5 rounded-full sui-scope text-sherick-primary transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>·</span></button>",
+    "input.default": "<div class=\"flex flex-col sui-scope\"><label id=\"#\" for=\"#\" class=\"font-medium mb-2 sui-scope text-sherick-ink text-sm\">Project name</label><input id=\"#\" placeholder=\"Sherick UI\" class=\"bg-sherick-surface-high/[0.66] cursor-text duration-press ease-press focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:bg-sherick-surface-high/[0.9] focus:outline-none hover:bg-sherick-surface-high/[0.82] min-h-12 min-w-64 motion-reduce:transition-none placeholder:text-sherick-ink-muted px-5 py-3 rounded-[1.25rem] sui-scope text-[0.95rem] text-sherick-ink transition-[background-color,color,box-shadow,opacity]\"/></div>",
+    "input.required": "<div class=\"flex flex-col sui-scope\"><label id=\"#\" for=\"#\" class=\"font-medium mb-2 sui-scope text-sherick-ink text-sm\">Email<span class=\"ml-1 text-sherick-danger\" aria-hidden=\"true\">*</span></label><input id=\"#\" type=\"email\" required=\"\" class=\"bg-sherick-surface-high/[0.66] cursor-text duration-press ease-press focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:bg-sherick-surface-high/[0.9] focus:outline-none hover:bg-sherick-surface-high/[0.82] min-h-12 min-w-64 motion-reduce:transition-none placeholder:text-sherick-ink-muted px-5 py-3 rounded-[1.25rem] sui-scope text-[0.95rem] text-sherick-ink transition-[background-color,color,box-shadow,opacity]\" name=\"email\"/></div>",
+    "input.error": "<div data-invalid=\"#\" class=\"flex flex-col sui-scope\"><label data-invalid=\"#\" id=\"#\" for=\"#\" class=\"font-medium mb-2 sui-scope text-sherick-ink text-sm\">Invalid</label><input data-invalid=\"#\" id=\"#\" placeholder=\"Required value\" aria-invalid=\"#\" class=\"bg-sherick-danger/[0.075] cursor-text duration-press ease-press focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:bg-sherick-danger/[0.13] focus:outline-none hover:bg-sherick-danger/[0.10] min-h-12 min-w-64 motion-reduce:transition-none placeholder:text-sherick-danger/[0.72] px-5 py-3 rounded-[1.25rem] sui-scope text-[0.95rem] text-sherick-ink transition-[background-color,color,box-shadow,opacity]\"/></div>",
+    "input.disabled": "<div data-disabled=\"\" class=\"flex flex-col sui-scope\"><label data-disabled=\"\" id=\"#\" for=\"#\" class=\"font-medium mb-2 sui-scope text-sherick-ink text-sm\">Disabled</label><input data-disabled=\"\" id=\"#\" disabled=\"\" placeholder=\"Unavailable\" class=\"bg-sherick-surface-high/[0.66] cursor-not-allowed duration-press ease-press focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none min-h-12 min-w-64 motion-reduce:transition-none opacity-45 placeholder:text-sherick-ink-muted px-5 py-3 rounded-[1.25rem] sui-scope text-[0.95rem] text-sherick-ink transition-[background-color,color,box-shadow,opacity]\"/></div>",
+    "markdown.document": "<h2 class=\"first:mt-0 font-semibold mb-3 mt-7 sui-scope text-2xl text-sherick-ink tracking-[-0.025em]\" node=\"[object Object]\">Example</h2>\n<p class=\"leading-7 my-3 sui-scope text-sherick-ink\" node=\"[object Object]\">Body copy with <code class=\"bg-sherick-surface-high/[0.72] font-mono px-1.5 py-0.5 rounded-full sui-scope text-[0.9em] text-sherick-primary\">inline</code> code.</p>\n<blockquote class=\"bg-sherick-primary/[0.12] border-l-2 border-sherick-primary/[0.45] my-5 px-4 py-2 rounded-[1.25rem] rounded-l-none sui-scope text-sherick-ink-muted\" node=\"[object Object]\">\n<p class=\"leading-7 my-3 sui-scope text-sherick-ink\" node=\"[object Object]\">A quote.</p>\n</blockquote>\n<div class=\"bg-sherick-surface/[0.78] mt-4 overflow-hidden rounded-[1.5rem] shadow-sherick-recessed sui-scope text-sherick-ink\"><div class=\"flex gap-4 items-center justify-between min-h-11 px-4 py-2 sui-scope\"><span class=\"font-mono sui-scope text-[11px] text-sherick-ink-muted tracking-[0.08em] uppercase\">ts</span><button type=\"button\" tabindex=\"0\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.09] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none gap-1.5 hover:before:opacity-[0.05] hover:text-sherick-ink inline-flex items-center motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-2.5 py-1.5 relative rounded-[1.25rem] sui-scope text-sherick-ink-muted text-xs transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-copy size-3.5 sui-scope\" aria-hidden=\"true\"><rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\" ry=\"2\"></rect><path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\"></path></svg><span>Copy</span></button></div><pre class=\"bg-sherick-canvas/[0.28] border-sherick-edge/[0.075] border-t language-ts leading-6 overflow-x-auto prism-code px-4 py-4 sui-scope text-sm\" style=\"color:var(--sui-code-text);background-color:transparent\"><code class=\"inline-block min-w-full sui-scope\"><span class=\"block sui-scope token-line\" style=\"color:var(--sui-code-text)\"><span class=\"inline-block mr-4 select-none sui-scope text-right text-sherick-ink-faint w-4\">1</span><span class=\"keyword sui-scope token\" style=\"color:var(--sui-code-tag)\">const</span><span class=\"plain sui-scope token\"> a </span><span class=\"operator sui-scope token\" style=\"color:var(--sui-code-text)\">=</span><span class=\"plain sui-scope token\"> </span><span class=\"number sui-scope token\" style=\"color:var(--sui-code-number)\">1</span><span class=\"punctuation sui-scope token\" style=\"color:var(--sui-code-text)\">;</span></span></code></pre></div>",
+    "modal.header": "<div class=\"pb-2 pl-6 pr-16 pt-5 sm:pl-7 sui-scope\"><h2 id=\"#\" class=\"font-semibold sui-scope text-sherick-ink text-xl tracking-[-0.02em]\">Modal specimen</h2></div>",
+    "modal.content": "<div class=\"leading-7 pb-5 pt-2 px-6 sm:px-7 sui-scope text-sherick-ink-muted text-sm\">Focused, translucent and separated from the page beneath it.</div>",
+    "modal.footer": "<div class=\"flex gap-3 items-center justify-end mt-auto pb-5 pt-1 px-6 sm:px-7 sui-scope\"><button type=\"button\" tabindex=\"0\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.26] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary-strong cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.18] inline-flex items-center justify-center min-h-12 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-6 py-3 relative rounded-full sui-scope text-[0.95rem] text-sherick-on-primary tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>Confirm</span></button></div>",
+    "nav-group": "<div class=\"py-2 space-y-1.5 sui-scope\"><h3 class=\"font-semibold pb-1 px-3 text-sherick-ink-muted text-xs\">Components</h3><a href=\"#buttons\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.09] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity duration-release ease-release flex focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none gap-2 hover:before:opacity-[0.05] hover:text-sherick-ink items-center max-w-xs min-h-10 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none overflow-hidden px-3 py-2 relative rounded-[1.25rem] sui-scope sui-scope text-ellipsis text-sherick-ink-muted text-sm transition-[background-color,color,box-shadow,transform,opacity,width,height] whitespace-nowrap\"><span class=\"truncate\">Buttons</span></a><a href=\"#fields\" aria-current=\"page\" class=\"active:duration-press active:ease-press active:scale-[0.98] bg-sherick-primary/[0.22] duration-release ease-release flex focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 items-center max-w-xs min-h-10 motion-reduce:active:scale-100 motion-reduce:transform-none motion-reduce:transition-none overflow-hidden px-3 py-2 rounded-[1.25rem] sui-scope sui-scope text-ellipsis text-sherick-primary text-sm transition-[background-color,color,box-shadow,transform,opacity,width,height] whitespace-nowrap\"><span class=\"truncate\">Fields</span></a></div>",
+    "search.default": "<div class=\"bg-sherick-surface-high/[0.66] duration-press ease-press focus-within:bg-sherick-surface-high/[0.9] focus-within:outline focus-within:outline-2 focus-within:outline-offset-[3px] focus-within:outline-sherick-focus hover:bg-sherick-surface-high/[0.82] inline-flex items-center min-h-12 min-w-64 motion-reduce:transition-none placeholder:text-sherick-ink-muted relative rounded-[1.25rem] sui-scope text-[0.95rem] text-sherick-ink transition-[background-color,color,box-shadow,opacity]\"><input id=\"#\" placeholder=\"Search components\" class=\"bg-transparent cursor-text min-h-12 outline-none pl-5 placeholder:text-sherick-ink-muted pr-12 py-3 rounded-[1.25rem] sui-scope text-[0.95rem] text-inherit w-full\"/><button type=\"button\" tabindex=\"0\" aria-label=\"Submit search\" class=\"absolute active:before:duration-press active:before:ease-press active:before:opacity-[0.09] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity cursor-pointer duration-release ease-release focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-focus focus:outline-none hover:before:opacity-[0.05] inline-flex items-center justify-center min-h-11 min-w-11 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none right-1.5 rounded-full sui-scope text-sherick-ink transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-search size-5\" aria-hidden=\"true\"><path d=\"m21 21-4.34-4.34\"></path><circle cx=\"11\" cy=\"11\" r=\"8\"></circle></svg></button></div>",
+    "search.loading": "<div class=\"bg-sherick-surface-high/[0.66] duration-press ease-press focus-within:bg-sherick-surface-high/[0.9] focus-within:outline focus-within:outline-2 focus-within:outline-offset-[3px] focus-within:outline-sherick-focus hover:bg-sherick-surface-high/[0.82] inline-flex items-center min-h-12 min-w-64 motion-reduce:transition-none placeholder:text-sherick-ink-muted relative rounded-[1.25rem] sui-scope text-[0.95rem] text-sherick-ink transition-[background-color,color,box-shadow,opacity]\"><input id=\"#\" aria-busy=\"true\" placeholder=\"Search...\" class=\"bg-transparent cursor-text min-h-12 outline-none pl-5 placeholder:text-sherick-ink-muted pr-12 py-3 rounded-[1.25rem] sui-scope text-[0.95rem] text-inherit w-full\"/><button type=\"button\" data-disabled=\"\" tabindex=\"0\" disabled=\"\" aria-label=\"Submit search\" class=\"absolute active:duration-press active:ease-press cursor-not-allowed duration-release ease-release focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-focus focus:outline-none inline-flex items-center justify-center min-h-11 min-w-11 motion-reduce:transform-none motion-reduce:transition-none right-1.5 rounded-full sui-scope text-sherick-ink transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span class=\"flex flex-col items-center justify-center sui-scope\" role=\"status\" aria-live=\"polite\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"animate-spin lucide lucide-loader-2 lucide-loader-circle motion-reduce:animate-none size-5 sui-scope text-current\" aria-hidden=\"true\"><path d=\"M21 12a9 9 0 1 1-6.219-8.56\"></path></svg></span></button></div>",
+    "search.variant.primary": "<div class=\"bg-sherick-surface-high/[0.66] duration-press ease-press focus-within:bg-sherick-surface-high/[0.9] focus-within:outline focus-within:outline-2 focus-within:outline-offset-[3px] focus-within:outline-sherick-focus hover:bg-sherick-surface-high/[0.82] inline-flex items-center min-h-12 min-w-64 motion-reduce:transition-none placeholder:text-sherick-ink-muted relative rounded-[1.25rem] sui-scope text-[0.95rem] text-sherick-ink transition-[background-color,color,box-shadow,opacity]\"><input id=\"#\" placeholder=\"Search...\" class=\"bg-transparent cursor-text min-h-12 outline-none pl-5 placeholder:text-sherick-ink-muted pr-12 py-3 rounded-[1.25rem] sui-scope text-[0.95rem] text-inherit w-full\"/><button type=\"button\" tabindex=\"0\" aria-label=\"Submit search\" class=\"absolute active:before:duration-press active:before:ease-press active:before:opacity-[0.09] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity cursor-pointer duration-release ease-release focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-focus focus:outline-none hover:before:opacity-[0.05] inline-flex items-center justify-center min-h-11 min-w-11 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none right-1.5 rounded-full sui-scope text-sherick-primary transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-search size-5\" aria-hidden=\"true\"><path d=\"m21 21-4.34-4.34\"></path><circle cx=\"11\" cy=\"11\" r=\"8\"></circle></svg></button></div>",
+    "skeleton": "<div aria-hidden=\"true\" class=\"animate-pulse bg-sherick-surface-high/[0.72] h-4 motion-reduce:animate-none rounded-[1.25rem] sui-scope text-sherick-ink w-3/4\"></div>",
+    "spinner.small": "<span class=\"flex flex-col items-center justify-center sui-scope\" role=\"status\" aria-live=\"polite\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"animate-spin lucide lucide-loader-2 lucide-loader-circle motion-reduce:animate-none size-4 sui-scope text-current\" aria-hidden=\"true\"><path d=\"M21 12a9 9 0 1 1-6.219-8.56\"></path></svg></span>",
+    "switch.on": "<button type=\"button\" data-checked=\"\" tabindex=\"0\" id=\"#\" role=\"switch\" aria-checked=\"true\" class=\"cursor-pointer group inline-flex items-center justify-center min-h-12 min-w-14 outline-none rounded-full sui-scope\"><span aria-hidden=\"true\" class=\"active:before:duration-press active:before:ease-press active:duration-press active:ease-press before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary-strong block duration-release ease-release group-active:before:duration-press group-active:before:ease-press group-active:before:opacity-[0.26] group-active:scale-[0.98] group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-offset-[3px] group-focus-visible:outline-sherick-focus group-hover:before:opacity-[0.18] h-8 motion-reduce:before:transition-none motion-reduce:group-active:scale-100 motion-reduce:transform-none motion-reduce:transition-none relative rounded-full shadow-sherick-recessed shrink-0 sui-scope text-sherick-on-primary transition-[background-color,color,box-shadow,transform,opacity,width,height] w-[3.25rem]\"><span data-checked=\"\" class=\"-translate-y-1/2 absolute active:duration-press active:ease-press bg-current duration-release ease-release h-6 left-1 motion-reduce:transform-none motion-reduce:transition-none rounded-full shadow-sherick-control sui-scope top-1/2 transition-[background-color,color,box-shadow,transform,opacity,width,height] translate-x-5 w-6\"></span></span></button><input style=\"clip-path:inset(50%);overflow:hidden;white-space:nowrap;border:0;padding:0;width:1px;height:1px;margin:-1px;position:fixed;top:0;left:0\" tabindex=\"-1\" type=\"checkbox\" aria-hidden=\"true\" checked=\"\"/>",
+    "switch.off": "<button type=\"button\" data-unchecked=\"\" tabindex=\"0\" id=\"#\" role=\"switch\" aria-checked=\"false\" class=\"cursor-pointer group inline-flex items-center justify-center min-h-12 min-w-14 outline-none rounded-full sui-scope\"><span aria-hidden=\"true\" class=\"active:before:duration-press active:before:ease-press active:duration-press active:ease-press before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-surface-high block duration-release ease-release group-active:before:duration-press group-active:before:ease-press group-active:before:opacity-[0.26] group-active:scale-[0.98] group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-offset-[3px] group-focus-visible:outline-sherick-focus group-hover:before:opacity-[0.18] h-8 motion-reduce:before:transition-none motion-reduce:group-active:scale-100 motion-reduce:transform-none motion-reduce:transition-none relative rounded-full shadow-sherick-recessed shrink-0 sui-scope sui-scope text-sherick-ink-muted transition-[background-color,color,box-shadow,transform,opacity,width,height] w-[3.25rem]\"><span data-unchecked=\"\" class=\"-translate-y-1/2 absolute active:duration-press active:ease-press bg-current duration-release ease-release h-5 left-1 motion-reduce:transform-none motion-reduce:transition-none rounded-full shadow-sherick-control sui-scope text-sherick-ink-muted top-1/2 transition-[background-color,color,box-shadow,transform,opacity,width,height] w-5\"></span></span></button><input style=\"clip-path:inset(50%);overflow:hidden;white-space:nowrap;border:0;padding:0;width:1px;height:1px;margin:-1px;position:fixed;top:0;left:0\" tabindex=\"-1\" type=\"checkbox\" aria-hidden=\"true\"/>",
+    "switch.disabled": "<button type=\"button\" data-disabled=\"\" data-checked=\"\" tabindex=\"0\" disabled=\"\" id=\"#\" role=\"switch\" aria-checked=\"true\" class=\"cursor-not-allowed group inline-flex items-center justify-center min-h-12 min-w-14 opacity-45 outline-none rounded-full sui-scope\"><span aria-hidden=\"true\" class=\"active:duration-press active:ease-press bg-sherick-primary-strong block duration-release ease-release group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-offset-[3px] group-focus-visible:outline-sherick-focus h-8 motion-reduce:transform-none motion-reduce:transition-none relative rounded-full shadow-sherick-recessed shrink-0 sui-scope text-sherick-on-primary transition-[background-color,color,box-shadow,transform,opacity,width,height] w-[3.25rem]\"><span data-disabled=\"\" data-checked=\"\" class=\"-translate-y-1/2 absolute active:duration-press active:ease-press bg-current duration-release ease-release h-6 left-1 motion-reduce:transform-none motion-reduce:transition-none rounded-full shadow-sherick-control sui-scope top-1/2 transition-[background-color,color,box-shadow,transform,opacity,width,height] translate-x-5 w-6\"></span></span></button><input disabled=\"\" style=\"clip-path:inset(50%);overflow:hidden;white-space:nowrap;border:0;padding:0;width:1px;height:1px;margin:-1px;position:fixed;top:0;left:0\" tabindex=\"-1\" type=\"checkbox\" aria-hidden=\"true\" checked=\"\"/>",
+    "tab-group": "<div data-orientation=\"horizontal\" data-activation-direction=\"none\" class=\"sui-scope w-full\"><div data-orientation=\"horizontal\" data-activation-direction=\"none\" role=\"tablist\" aria-label=\"Tabs\" class=\"bg-sherick-surface/[0.72] flex min-w-max p-1.5 relative rounded-full shadow-sherick-recessed sui-scope\"><span data-orientation=\"horizontal\" data-activation-direction=\"none\" role=\"presentation\" hidden=\"\" class=\"absolute active:duration-press active:ease-press bg-sherick-primary/[0.22] duration-release ease-release h-[var(--active-tab-height)] left-[var(--active-tab-left)] motion-reduce:transform-none motion-reduce:transition-none rounded-full shadow-sherick-control sui-scope text-sherick-ink top-[var(--active-tab-top)] transition-[background-color,color,box-shadow,transform,opacity,width,height] w-[var(--active-tab-width)]\"></span><button type=\"button\" data-active=\"\" data-orientation=\"horizontal\" data-activation-direction=\"none\" aria-disabled=\"false\" tabindex=\"-1\" role=\"tab\" aria-selected=\"true\" id=\"#\" data-composite-item-active=\"\" class=\"active:duration-press active:ease-press active:scale-[0.98] duration-release ease-release flex-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium min-h-12 min-w-28 motion-reduce:active:scale-100 motion-reduce:transform-none motion-reduce:transition-none px-7 py-3 relative rounded-full sui-scope text-sherick-ink text-sm transition-[background-color,color,box-shadow,transform,opacity,width,height] whitespace-nowrap z-10\">Overview</button><button type=\"button\" data-orientation=\"horizontal\" data-activation-direction=\"none\" aria-disabled=\"false\" tabindex=\"-1\" role=\"tab\" aria-selected=\"false\" id=\"#\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.09] active:duration-press active:ease-press active:scale-[0.98] before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity duration-release ease-release flex-1 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium hover:before:opacity-[0.05] hover:text-sherick-ink min-h-12 min-w-28 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-7 py-3 relative rounded-full sui-scope sui-scope text-sherick-ink-muted text-sm transition-[background-color,color,box-shadow,transform,opacity,width,height] whitespace-nowrap z-10\">Motion</button></div><div data-orientation=\"horizontal\" data-activation-direction=\"none\" id=\"#\" role=\"tabpanel\" tabindex=\"0\" data-index=\"-1\" class=\"mt-5\">Overview</div></div>",
+    "table": "<div class=\"bg-sherick-surface/[0.42] overflow-auto rounded-[1.25rem] sui-scope text-sherick-ink w-full\"><table class=\"border-collapse sui-scope w-full\"><thead><tr class=\"border-b border-sherick-edge/[0.10] sui-scope\"><th class=\"font-medium px-4 py-3 sui-scope text-left text-sherick-ink-muted text-sm\">Component</th><th class=\"font-medium px-4 py-3 sui-scope text-left text-sherick-ink-muted text-sm\">Role</th></tr></thead><tbody><tr class=\"border-b border-sherick-edge/[0.06] duration-press ease-press hover:bg-sherick-ink/[0.05] last:border-b-0 motion-reduce:transition-none sui-scope transition-[background-color,color,box-shadow,opacity]\"><td class=\"px-4 py-3 sui-scope text-sherick-ink text-sm\">Dropdown</td><td class=\"px-4 py-3 sui-scope text-sherick-ink text-sm\">Selection</td></tr><tr class=\"border-b border-sherick-edge/[0.06] duration-press ease-press hover:bg-sherick-ink/[0.05] last:border-b-0 motion-reduce:transition-none sui-scope transition-[background-color,color,box-shadow,opacity]\"><td class=\"px-4 py-3 sui-scope text-sherick-ink text-sm\">Table</td><td class=\"px-4 py-3 sui-scope text-sherick-ink text-sm\">Data</td></tr></tbody></table></div>",
+    "textarea.default": "<div class=\"flex flex-col sui-scope w-full\"><label id=\"#\" for=\"#\" class=\"font-medium mb-2 sui-scope text-sherick-ink text-sm\">Notes</label><textarea placeholder=\"Describe what you want to build…\" id=\"#\" class=\"bg-sherick-surface-high/[0.66] cursor-text duration-press ease-press focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:bg-sherick-surface-high/[0.9] focus:outline-none hover:bg-sherick-surface-high/[0.82] min-h-28 min-w-64 motion-reduce:transition-none placeholder:text-sherick-ink-muted px-5 py-4 resize-y rounded-[1.25rem] sui-scope text-[0.95rem] text-sherick-ink transition-[background-color,color,box-shadow,opacity] w-full\"></textarea></div>",
+    "textarea.error": "<div data-invalid=\"#\" class=\"flex flex-col sui-scope w-full\"><label data-invalid=\"#\" id=\"#\" for=\"#\" class=\"font-medium mb-2 sui-scope text-sherick-ink text-sm\">Invalid notes</label><textarea data-invalid=\"#\" id=\"#\" aria-invalid=\"#\" class=\"bg-sherick-danger/[0.075] cursor-text duration-press ease-press focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:bg-sherick-danger/[0.13] focus:outline-none hover:bg-sherick-danger/[0.10] min-h-28 min-w-64 motion-reduce:transition-none placeholder:text-sherick-danger/[0.72] px-5 py-4 resize-y rounded-[1.25rem] sui-scope text-[0.95rem] text-sherick-ink transition-[background-color,color,box-shadow,opacity] w-full\"></textarea></div>",
+    "tooltip.trigger": "<span class=\"inline-block sui-scope\"><button type=\"button\" tabindex=\"0\" id=\"#\" data-base-ui-tooltip-trigger=\"\" class=\"active:before:duration-press active:before:ease-press active:before:opacity-[0.15] active:duration-press active:ease-press active:scale-[0.98] active:shadow-sherick-recessed before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity bg-sherick-primary/[0.12] cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:outline-none font-medium gap-2 hover:before:opacity-[0.09] inline-flex items-center justify-center min-h-12 motion-reduce:active:scale-100 motion-reduce:before:transition-none motion-reduce:transform-none motion-reduce:transition-none px-6 py-3 relative rounded-full shadow-sherick-raised sui-scope text-[0.95rem] text-sherick-primary tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity,width,height]\"><span>Hover</span></button></span>"
   },
   "overlays": {
     "menu": "origin-top [--sui-overlay-from-scale:0.985] [--sui-overlay-from-lift:-4px] rounded-[1.75rem] bg-sherick-surface-float/[0.60] bg-[image:var(--sui-glass-gradient)] text-sherick-ink backdrop-blur-[var(--sui-glass-blur,32px)] backdrop-saturate-[var(--sui-glass-saturation,1.45)] backdrop-brightness-[var(--sui-glass-brightness,1.04)] shadow-sherick-floating",

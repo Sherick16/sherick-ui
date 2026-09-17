@@ -16,6 +16,12 @@ replaceOnce(
 );
 
 replaceOnce(
+  '<div data-testid={testId} className={cn("flex min-h-20 items-center justify-center px-4 text-sm", shape.control, className)}>{label}</div>',
+  '<div\n        data-testid={label ? `tile-${label.toLowerCase().replace(/\\s+/g, "-")}` : undefined}\n        className={cn("flex min-h-20 items-center justify-center px-4 text-sm", shape.control, className)}\n      >\n        {label}\n      </div>',
+  "stable Tile test target"
+);
+
+replaceOnce(
   '<div className={cn("flex min-h-20 items-center justify-center px-4 text-sm", shape.control, className)}>{label}</div>',
   '<div\n        data-testid={label ? `tile-${label.toLowerCase().replace(/\\s+/g, "-")}` : undefined}\n        className={cn("flex min-h-20 items-center justify-center px-4 text-sm", shape.control, className)}\n      >\n        {label}\n      </div>',
   "stable Tile test target"

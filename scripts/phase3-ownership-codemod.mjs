@@ -110,10 +110,37 @@ const transformFile = async (path) => {
     result.dispose();
     return false;
   }
-
-  const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed });
-  let output = printer.printFile(result.transformed[0]);
   result.dispose();
+
+  // Apply the ownership edit textually so file formatting is preserved: only the
+  // className initializer expression is rewritten, never the whole file.
+  const edits = [];
+  const collect = (node) => {
+    if (
+      ts.isJsxAttribute(node) &&
+      node.name.text === "className" &&
+      node.initializer &&
+      ts.isJsxExpression(node.initializer) &&
+      node.initializer.expression
+    ) {
+      const expression = node.initializer.expression;
+      if (ts.isIdentifier(expression) && expression.text === "className") return;
+      if (isCnCall(expression)) return;
+      if (ts.isArrowFunction(expression)) return;
+      if (ts.isFunctionExpression(expression)) return;
+      edits.push(node.initializer);
+    }
+    ts.forEachChild(node, collect);
+  };
+  collect(sourceFile);
+  if (edits.length === 0) return false;
+  let output = source;
+  for (let index = edits.length - 1; index >= 0; index -= 1) {
+    const initializer = edits[index];
+    const expression = initializer.expression;
+    const text = source.slice(expression.getStart(sourceFile), expression.getEnd());
+    output = `${output.slice(0, initializer.getStart(sourceFile))}{cn(${text})}${output.slice(initializer.getEnd())}`;
+  }
   output = ensureCnImport(output);
   await writeFile(path, output);
   return true;

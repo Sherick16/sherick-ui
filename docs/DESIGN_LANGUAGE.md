@@ -3,12 +3,13 @@
 The canonical source of truth for Sherick UI's visual language. Every reusable visual
 rule lives here.
 
-Two files implement it and neither invents a rule of its own:
+Three sources implement it and none invents a rule of its own:
 
 | Layer | File | Contains |
 | --- | --- | --- |
 | Recipes | `packages/ui/src/components/ui.common.ts` | the named primitives a component composes |
-| Tokens | `packages/ui/theme.css` | the values those primitives resolve to, per theme |
+| Tokens | `packages/ui/src/styles/tokens.ts` | the authored runtime values those primitives resolve to, per theme |
+| CSS build | `packages/ui/scripts/build-styles.ts` | private compilation/scoping into generated `dist/theme.css` and `dist/styles.css` |
 
 If this document and any other file disagree — a README paragraph, a showcase caption,
 a code comment — this document wins and the other file is corrected.
@@ -131,8 +132,7 @@ of glass is a contradiction.
 
 ## 5. Elevation — how far a surface sits off the page
 
-Primitives: `flat`, `raised`, `floating`, `control`, `recessed` (published alias
-`pressed`).
+Primitives: `flat`, `raised`, `floating`, `control`, `recessed`.
 
 Depth is chosen by **anatomy**, never by state.
 
@@ -142,7 +142,6 @@ Depth is chosen by **anatomy**, never by state.
 | `raised` | a manipulated control lifted a hair above its own track | tactile tonal controls (`ActionButton` tonal, `IconButton`) | passive surfaces, table rows, menu rows |
 | `control` | the resting half of the tactile pair | a part the user moves — a switch thumb, a selected segment | wide surfaces, or a whole segmented control |
 | `recessed` | the other half of the pair | grooves, tracks and wells, which are sunk by definition | raised or resting controls |
-| `pressed` | the same depth, named for the moment a control reaches it by being held | published alias only; prefer `recessed` when the surface is simply sunk | new code — use `recessed` |
 | `floating` | a surface that genuinely sits above the application | acrylic overlays: menus, tooltips, dialogs | matte surfaces sitting on the page |
 
 The tactile pair (`control` / `recessed`) is deliberately shallower than the tonal

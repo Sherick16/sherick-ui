@@ -91,7 +91,7 @@ export default function Home() {
   };
 
   return (
-    <main className={cn("min-h-screen", material.canvas)}>
+    <main className={cn("min-h-screen text-left", material.canvas)}>
       <div className="mx-auto w-full max-w-[1320px] px-5 py-10 sm:px-8 lg:px-10 lg:py-14">
         <div className="mb-14 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-3xl">
@@ -511,7 +511,12 @@ function Specimen({ title, className = "", children }: { title: string; classNam
 function Tile({ label, caption, className, testId }: { label?: string; caption?: string; className?: string; testId?: string }) {
   return (
     <div className="flex flex-col gap-2">
-      <div data-testid={testId} className={cn("flex min-h-20 items-center justify-center px-4 text-sm", shape.control, className)}>{label}</div>
+      <div
+        data-testid={label ? `tile-${label.toLowerCase().replace(/\s+/g, "-")}` : undefined}
+        className={cn("flex min-h-20 items-center justify-center px-4 text-sm", shape.control, className)}
+      >
+        {label}
+      </div>
       {caption ? <div className={cn("text-xs font-medium", text.high)}>{caption}</div> : null}
     </div>
   );
