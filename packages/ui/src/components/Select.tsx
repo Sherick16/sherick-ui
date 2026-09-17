@@ -103,7 +103,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                 cn("truncate", showingPlaceholder && text.medium)
               }
             />
-            <BaseSelect.Icon className="shrink-0">
+            <BaseSelect.Icon className={cn("shrink-0")}>
               <ChevronDown
                 aria-hidden="true"
                 className={cn(
@@ -153,7 +153,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                       )
                     }
                   >
-                    <BaseSelect.ItemText className="min-w-0 flex-1 truncate">
+                    <BaseSelect.ItemText className={cn("min-w-0 flex-1 truncate")}>
                       {option.label}
                     </BaseSelect.ItemText>
                     <BaseSelect.ItemIndicator>

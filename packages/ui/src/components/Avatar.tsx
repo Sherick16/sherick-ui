@@ -50,7 +50,7 @@ const Avatar = ({
         width={dimensions.element}
         height={dimensions.element}
         loading="lazy"
-        className="h-full w-full object-cover data-[error]:invisible data-[loading]:invisible"
+        className={cn("h-full w-full object-cover data-[error]:invisible data-[loading]:invisible")}
         {...props}
       />
     </BaseAvatar.Root>

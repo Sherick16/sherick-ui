@@ -143,9 +143,9 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
           )}
         >
           {loading ? (
-            <Spinner className="size-5" size="small" />
+            <Spinner className={cn("size-5")} size="small" />
           ) : (
-            <SearchIcon className="size-5" aria-hidden="true" />
+            <SearchIcon className={cn("size-5")} aria-hidden="true" />
           )}
         </Button>
       </Field.Root>

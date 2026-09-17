@@ -116,19 +116,16 @@ const transformFile = async (path) => {
   // className initializer expression is rewritten, never the whole file.
   const edits = [];
   const collect = (node) => {
-    if (
-      ts.isJsxAttribute(node) &&
-      node.name.text === "className" &&
-      node.initializer &&
-      ts.isJsxExpression(node.initializer) &&
-      node.initializer.expression
-    ) {
-      const expression = node.initializer.expression;
-      if (ts.isIdentifier(expression) && expression.text === "className") return;
-      if (isCnCall(expression)) return;
-      if (ts.isArrowFunction(expression)) return;
-      if (ts.isFunctionExpression(expression)) return;
-      edits.push(node.initializer);
+    if (ts.isJsxAttribute(node) && node.name.text === "className" && node.initializer) {
+      if (ts.isStringLiteral(node.initializer)) {
+        edits.push({ initializer: node.initializer, expression: node.initializer });
+      } else if (ts.isJsxExpression(node.initializer) && node.initializer.expression) {
+        const expression = node.initializer.expression;
+        if (isCnCall(expression)) return;
+        if (ts.isArrowFunction(expression)) return;
+        if (ts.isFunctionExpression(expression)) return;
+        edits.push({ initializer: node.initializer, expression });
+      }
     }
     ts.forEachChild(node, collect);
   };
@@ -136,8 +133,7 @@ const transformFile = async (path) => {
   if (edits.length === 0) return false;
   let output = source;
   for (let index = edits.length - 1; index >= 0; index -= 1) {
-    const initializer = edits[index];
-    const expression = initializer.expression;
+    const { initializer, expression } = edits[index];
     const text = source.slice(expression.getStart(sourceFile), expression.getEnd());
     output = `${output.slice(0, initializer.getStart(sourceFile))}{cn(${text})}${output.slice(initializer.getEnd())}`;
   }

@@ -106,7 +106,7 @@ export const TabGroup = ({
       </Tabs.List>
 
       {tabs.map((tab) => (
-        <Tabs.Panel key={tab.id} value={tab.id} className="mt-5">
+        <Tabs.Panel key={tab.id} value={tab.id} className={cn("mt-5")}>
           {tab.content}
         </Tabs.Panel>
       ))}

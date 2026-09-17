@@ -107,7 +107,7 @@ const Modal = forwardRef<HTMLDivElement, ModalProps>(({
                 "absolute right-4 top-4 inline-flex items-center justify-center"
               )}
             >
-              <X className="size-5" aria-hidden="true" />
+              <X className={cn("size-5")} aria-hidden="true" />
             </BaseDialog.Close>
 
             {children}

@@ -39,8 +39,8 @@ const NavItem = ({ children, icon, className, to, active = false, ...props }: Na
     )}
     {...props}
   >
-    {icon && <span className="inline-flex shrink-0 items-center [&>svg]:size-5" aria-hidden="true">{icon}</span>}
-    <span className="truncate">{children}</span>
+    {icon && <span className={cn("inline-flex shrink-0 items-center [&>svg]:size-5")} aria-hidden="true">{icon}</span>}
+    <span className={cn("truncate")}>{children}</span>
   </a>
 );
 
