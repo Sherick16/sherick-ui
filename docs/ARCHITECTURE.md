@@ -13,7 +13,7 @@ Sherick UI is a small workspace repository by design:
 
 Application workspaces consume `sherick-ui`; library source must never import Next.js, Vite, showcase code or application aliases. Internal library modules import sibling/private modules rather than the package's public barrel.
 
-The showcase consumes `sherick-ui` through package exports. Its only privileged surface is `sherick-ui/dev`, an explicitly unstable development-only export that hands the workbench the shared visual recipes (`ui.common.ts`) and the `cn()` helper; production consumers must not depend on that subpath.
+The showcase consumes `sherick-ui` through package exports. Its only privileged surface is `sherick-ui/dev`, an explicitly unstable development-only export that hands the workbench the shared visual and motion recipes plus the `cn()` helper; production consumers must not depend on that subpath.
 
 ## Build and client boundaries
 
@@ -23,11 +23,14 @@ The library TypeScript configs contain no Next plugin or generated `.next` types
 
 ## Styling architecture
 
-`docs/DESIGN_LANGUAGE.md` is the visual authority. Its implementation has three distinct owners:
+`docs/DESIGN_LANGUAGE.md` is the visual authority. Its implementation has four distinct owners:
 
-- `packages/ui/src/components/ui.common.ts` owns reusable visual recipes;
+- `packages/ui/src/components/ui.common.ts` owns reusable non-temporal visual recipes;
+- `packages/ui/src/components/ui.motion.ts` owns semantic motion intents and temporal recipes;
 - `packages/ui/src/styles/tokens.ts` owns authored runtime token values;
 - `packages/ui/scripts/build-styles.ts` turns those sources and component utility usage into finished published CSS.
+
+The split between `ui.common.ts` and `ui.motion.ts` is ownership, not a second styling layer. Components still compose one design language through `cn()`: common recipes say what a state/surface looks like, motion recipes say how a change moves. During the motion migration the old `motion` object in `ui.common.ts` remains an explicit finite bridge for existing components; `packages/ui/scripts/verify-motion-policy.mjs` prevents new components from consuming that bridge or authoring their own timing/easing/transition utilities. The bridge and its allowlist are deleted once migration completes.
 
 Tailwind CSS is private authoring/build infrastructure. It is a development dependency of Sherick UI, not a peer dependency or consumer contract. The package exports no Tailwind preset and consumers do not scan package source or `dist`.
 
@@ -50,7 +53,19 @@ Cascade ownership is deliberate:
 - consumer `className` overrides still work for Tailwind utility conflicts because the shared `cn()` uses `tailwind-merge`, which removes the conflicting Sherick utility from the rendered element. Application-specific override CSS that is not expressed through `className` should be loaded after `sherick-ui/styles.css` in a separate override stylesheet;
 - no `!important` is used to enforce the package contract.
 
-## Theme contract
+## Motion architecture
+
+Motion is selected by **intent**, not by component. The canonical intents are `feedback`, `tactile`, `arrive`, `orient`, `relocate`, `direct`, `disclose`, `presence` and `activity`. Components may own target geometry, but not temporal values or transition declarations.
+
+The architecture has three hard boundaries:
+
+- one DOM node has one spatial-motion owner; non-spatial feedback may compose with it, competing spatial recipes may not;
+- Base UI Positioners own placement/collision and Popups own Sherick presence motion, so repositioning an already-open overlay never replays entrance;
+- direct manipulation has no positional interpolation while the pointer owns geometry.
+
+Base UI remains lifecycle authority. Sherick does not mirror open/closing state or add exit timers merely to animate a popup. Reduced-motion behavior is defined per intent in `docs/DESIGN_LANGUAGE.md`.
+
+### Theme contract
 
 Runtime theming is CSS-only:
 
@@ -139,13 +154,13 @@ Reusable components belong under `packages/ui/src/components` and are exported f
 
 For styling, a new component should only need to:
 
-1. compose existing recipes from `ui.common.ts`;
-2. use ordinary Tailwind utilities for component anatomy;
+1. compose non-temporal recipes from `ui.common.ts` and semantic temporal recipes from `ui.motion.ts`;
+2. use ordinary Tailwind utilities for component anatomy and target geometry, never for local timing/easing/transition declarations;
 3. route styled roots through the shared `cn()` helper so the private style scope is established;
 4. explicitly establish a scope on any independently portaled styled branch;
-5. extend `tokens.ts` or the design language only when a genuinely new system-level visual role is required.
+5. extend tokens or the design language only when a genuinely new system-level visual role is required.
 
-A new component must not require consumer Tailwind configuration, new focus/elevation systems, or a new CSS delivery mechanism.
+A new component must not require consumer Tailwind configuration, new focus/elevation/motion systems, or a new CSS delivery mechanism.
 
 ## Frozen architecture and extension rules
 
@@ -160,6 +175,8 @@ verification convenience:
   Tailwind, preset or content scanning);
 - theme/token ownership (`tokens.ts` as the single authored source; `--sui-*` at document
   root; no nested theme islands);
+- motion ownership (`ui.motion.ts` as the only temporal-recipe authority; no per-component
+  durations/easings/keyframes and no second animation framework);
 - public API naming (canonical names only, no aliases);
 - the rich-content boundary (subpath-only, never on the root barrel, ESM-only, and a bundle boundary rather than an install boundary);
 - the package `exports` map;
@@ -170,11 +187,11 @@ verification convenience:
 Extending the language is still expected — new recipes, new tokens, new components, new
 verification fixtures. What is closed is adding a new *layer*: a second component wrapper
 over Base UI, a parallel styling delivery mechanism, an alternative theme system, a second
-rich-content entry point, a duplicate compatibility name, or a second place that records size
-budgets. If an existing invariant genuinely cannot support a requirement, that is an
-architecture decision, documented here and in [`RELEASE.md`](RELEASE.md) — not a local
-workaround inside one component.
+motion engine, a second rich-content entry point, a duplicate compatibility name, or a second
+place that records size budgets. If an existing invariant genuinely cannot support a
+requirement, that is an architecture decision, documented here and in [`RELEASE.md`](RELEASE.md)
+— not a local workaround inside one component.
 
 ## Verification
 
-The root `bun run verify` proves both publication and integration boundaries. The packed-package test remains the publication boundary: workspace resolution alone is never accepted as evidence that npm consumers can install the package. Browser verification includes the existing reviewed visual baselines, the no-Tailwind consumer, CSS leakage checks, custom-theme torture coverage, forced-colors fallbacks, axe accessibility checks, narrow-viewport and RTL coverage and cross-component interaction composition. Size and tree-shaking budgets are enforced separately by `bun run test:bundle`. See `docs/VERIFICATION.md`.
+The root `bun run verify` proves both publication and integration boundaries. The packed-package test remains the publication boundary: workspace resolution alone is never accepted as evidence that npm consumers can install the package. Browser verification includes the existing reviewed visual baselines, the no-Tailwind consumer, CSS leakage checks, custom-theme torture coverage, forced-colors fallbacks, axe accessibility checks, narrow-viewport and RTL coverage and cross-component interaction composition. Size and tree-shaking budgets are enforced separately by `bun run test:bundle`; temporal ownership is enforced by `bun run test:motion`. See `docs/VERIFICATION.md`.

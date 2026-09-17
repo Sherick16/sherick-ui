@@ -8,7 +8,8 @@ in full. It is the canonical visual authority.
 
 Its implementation owners are:
 
-- `packages/ui/src/components/ui.common.ts` — reusable visual recipes;
+- `packages/ui/src/components/ui.common.ts` — reusable non-temporal visual recipes;
+- `packages/ui/src/components/ui.motion.ts` — semantic motion intents and temporal recipes;
 - `packages/ui/src/styles/tokens.ts` — authored runtime theme/token values;
 - `packages/ui/scripts/build-styles.ts` — private CSS compilation/scoping into published artifacts.
 
@@ -30,8 +31,22 @@ first — never write the rule into a component:
   `stateLayer`, not from a locally written color or depth change;
 - **focus treatment** — use the canonical focus recipes (`focusRing`, `focusRingInset`,
   `focusRingWithin`, `groupFocusRing`) rather than rebuilding their values locally;
-- **motion** — no literal durations or easings, and no new transition family outside the
-  shared motion recipes.
+- **motion** — choose a semantic intent from `ui.motion.ts` by what the part is doing
+  (`feedback`, `tactile`, `arrive`, `orient`, `relocate`, `direct`, `disclose`, `presence`,
+  `activity`). Do not write literal `duration-*`, `ease-*`, `transition-*`, `animate-*`
+  or keyframes in a component, and do not choose a spring/easing directly.
+
+Motion has one additional rule: **components decide what changes; the motion system decides
+how change moves.** Target geometry may remain component anatomy, but timing/easing/transition
+ownership does not. One DOM node has one spatial-motion owner. Direct manipulation never
+interpolates pointer-driven geometry. Stable selection boundaries do not bounce. Base UI owns
+popup placement/lifecycle; Sherick owns the Popup's visual presence and never animates the
+Positioner or adds exit timers.
+
+The old `motion` object in `ui.common.ts` is a finite migration bridge for existing components.
+New components must import semantic leaf recipes from `ui.motion.ts`. `bun run test:motion`
+enforces both the raw-temporal-class boundary and the no-new-legacy-consumer rule. Shrink the
+legacy allowlist as migration PRs land; never add a new file to it.
 
 ### Component-local anatomy is yours to decide
 
@@ -42,14 +57,17 @@ Do not promote ordinary anatomy into global primitives. Decide these inside the 
 - component-specific padding;
 - intrinsic dimensions and aspect;
 - responsive arrangement and breakpoints;
-- content typography for copy the component renders.
+- content typography for copy the component renders;
+- target motion geometry (for example a chevron's final rotation or an indicator's destination),
+  while `ui.motion.ts` still owns how that geometry transitions.
 
 ### If a genuinely new visual rule is required
 
 Extend the canonical language first:
 
 1. add the rule to `docs/DESIGN_LANGUAGE.md` with its role and when-to-use / when-not-to-use examples;
-2. add/reuse the recipe in `packages/ui/src/components/ui.common.ts`;
+2. add/reuse non-temporal recipes in `packages/ui/src/components/ui.common.ts`, or temporal
+   recipes in `packages/ui/src/components/ui.motion.ts`;
 3. if it requires a runtime theme value, add that value to `packages/ui/src/styles/tokens.ts`;
 4. then consume the primitive in the component.
 
