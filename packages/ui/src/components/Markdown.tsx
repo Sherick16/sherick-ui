@@ -34,7 +34,7 @@ const components: Components = {
     return language !== undefined || code.endsWith("\n") ? (
       <CodeBlock language={language ?? "text"}>{code}</CodeBlock>
     ) : (
-      <CodeBlock inline className={className} {...props}>{children}</CodeBlock>
+      <CodeBlock inline className={cn(className)} {...props}>{children}</CodeBlock>
     );
   },
 };

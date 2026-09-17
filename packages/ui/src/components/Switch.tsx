@@ -9,6 +9,7 @@ import React, {
 import { cn } from "@/libs/utils";
 import {
   elevation,
+  groupFocusRing,
   motion,
   shape,
   state,
@@ -78,7 +79,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(({
           shape.pill,
           elevation.recessed,
           motion.release,
-          "group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-sherick-focus group-focus-visible:outline-offset-[3px]",
+          groupFocusRing,
           checked ? tone.strong[variant] : cn(tone.strong.secondary, text.medium),
           !disabled && stateLayer.track,
           !disabled && state.groupPress

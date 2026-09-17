@@ -1,0 +1,141 @@
+import { expect, test, type Page } from "@playwright/test";
+
+const runtimeErrors = (page: Page) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(`pageerror: ${error.message}`));
+  page.on("console", (message) => {
+    if (message.type() === "error") errors.push(`console: ${message.text()}`);
+  });
+  return errors;
+};
+
+const genericUtilityStyle = async (locator: ReturnType<Page["getByTestId"]>) =>
+  locator.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      display: style.display,
+      position: style.position,
+      paddingLeft: style.paddingLeft,
+      borderRadius: style.borderRadius,
+    };
+  });
+
+test.beforeEach(async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByTestId("no-tailwind-ready")).toBeVisible();
+});
+
+test("package CSS styles Sherick components but never generic consumer descendants", async ({ page }) => {
+  const errors = runtimeErrors(page);
+
+  const siblingSentinel = await genericUtilityStyle(page.getByTestId("css-leak-sentinel"));
+  expect(siblingSentinel).toEqual({
+    display: "block",
+    position: "static",
+    paddingLeft: "0px",
+    borderRadius: "0px",
+  });
+
+  for (const testId of ["button-child-leak-sentinel", "card-child-leak-sentinel"]) {
+    const style = await genericUtilityStyle(page.getByTestId(testId));
+    expect(style, `${testId} inherited a Sherick generic utility`).toEqual({
+      display: "inline",
+      position: "static",
+      paddingLeft: "0px",
+      borderRadius: "0px",
+    });
+  }
+
+  const button = page.getByRole("button", { name: "Primary" });
+  const buttonStyle = await button.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      display: style.display,
+      borderRadius: style.borderRadius,
+      minHeight: style.minHeight,
+    };
+  });
+
+  expect(["flex", "inline-flex"]).toContain(buttonStyle.display);
+  expect(parseFloat(buttonStyle.borderRadius)).toBeGreaterThan(0);
+  expect(parseFloat(buttonStyle.minHeight)).toBeGreaterThanOrEqual(48);
+  expect(errors).toEqual([]);
+});
+
+test("shadow, ring and backdrop plumbing works without Tailwind preflight", async ({ page }) => {
+  const errors = runtimeErrors(page);
+
+  const switchControl = page.getByRole("switch", { name: "Enabled" });
+  const switchTrack = switchControl.locator(".shadow-sherick-recessed").first();
+  const switchThumb = switchControl.locator(".shadow-sherick-control").first();
+
+  const [trackShadow, thumbShadow] = await Promise.all([
+    switchTrack.evaluate((element) => getComputedStyle(element).boxShadow),
+    switchThumb.evaluate((element) => getComputedStyle(element).boxShadow),
+  ]);
+
+  expect(trackShadow).not.toBe("none");
+  expect(trackShadow).toContain("inset");
+  expect(thumbShadow).not.toBe("none");
+
+  await page.getByRole("button", { name: "Open dialog" }).click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  const dialogVisuals = await dialog.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      boxShadow: style.boxShadow,
+      backdropFilter: style.backdropFilter,
+    };
+  });
+
+  expect(dialogVisuals.boxShadow).not.toBe("none");
+  expect(dialogVisuals.backdropFilter).not.toBe("none");
+  expect(dialogVisuals.backdropFilter).toContain("blur");
+
+  expect(errors).toEqual([]);
+});
+
+test("portaled Select, Tooltip and Dialog remain styled", async ({ page }) => {
+  const errors = runtimeErrors(page);
+
+  const select = page.getByRole("combobox", { name: "Project type" });
+  await select.click();
+  const option = page.getByRole("option", { name: "Dashboard" });
+  await expect(option).toBeVisible();
+  await expect(option.evaluate((element) => getComputedStyle(element).borderRadius)).not.toBe("0px");
+  await page.keyboard.press("Escape");
+
+  await page.getByRole("button", { name: "Tooltip trigger" }).hover();
+  const tooltip = page.getByText("Portaled tooltip");
+  await expect(tooltip).toBeVisible();
+  const tooltipStyle = await tooltip.evaluate((element) => getComputedStyle(element));
+  expect(tooltipStyle.boxShadow).not.toBe("none");
+  expect(parseFloat(tooltipStyle.borderRadius)).toBeGreaterThan(0);
+
+  await page.getByRole("button", { name: "Open dialog" }).click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  const dialogStyle = await dialog.evaluate((element) => getComputedStyle(element));
+  expect(parseFloat(dialogStyle.borderRadius)).toBeGreaterThan(0);
+
+  const nestedSelect = page.getByRole("combobox", { name: "Dialog project type" });
+  await nestedSelect.click();
+  await expect(page.getByRole("option", { name: "Design system" })).toBeVisible();
+
+  expect(errors).toEqual([]);
+});
+
+test("theme tokens and KaTeX assets are present without consumer styling infrastructure", async ({ page }) => {
+  const errors = runtimeErrors(page);
+
+  const primary = await page.evaluate(() =>
+    getComputedStyle(document.documentElement).getPropertyValue("--sui-primary").trim()
+  );
+  expect(primary).not.toBe("");
+
+  await expect(page.locator(".katex").first()).toBeVisible();
+  const katexFont = await page.locator(".katex").first().evaluate((element) => getComputedStyle(element).fontFamily);
+  expect(katexFont.toLowerCase()).toContain("katex");
+  expect(errors).toEqual([]);
+});

@@ -14,6 +14,7 @@ import { cn, type TimerHandle } from "@/libs/utils";
 import {
   density,
   focusRingInset,
+  focusRingWithin,
   material,
   motion,
   shape,
@@ -101,7 +102,7 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
           shape.control,
           material.control,
           motion.press,
-          "focus-within:outline focus-within:outline-2 focus-within:outline-sherick-focus focus-within:outline-offset-[3px]",
+          focusRingWithin,
           !disabled && state.field.hover,
           !disabled && state.field.focusWithin,
           disabled && state.disabled,
@@ -142,9 +143,9 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
           )}
         >
           {loading ? (
-            <Spinner className="size-5" size="small" />
+            <Spinner className={cn("size-5")} size="small" />
           ) : (
-            <SearchIcon className="size-5" aria-hidden="true" />
+            <SearchIcon className={cn("size-5")} aria-hidden="true" />
           )}
         </Button>
       </Field.Root>

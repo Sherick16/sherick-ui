@@ -1,37 +1,16 @@
 #!/usr/bin/env node
 /*
- Visual regression gate
- ======================
- A token refactor can quietly restyle the entire library: every component keeps
- working, every type still checks, and the only symptom is that the product looks
- different. This script makes that visible to CI by pinning three things that
- together define what the library looks like:
-
-   1. tokens      every `--sui-*` value in every theme block of theme.css
-   2. utilities   what each Tailwind utility the components use actually resolves to
-   3. specimens   the exact class recipe each component applies, per variant/state
-
- Specimens are server-rendered, so a recipe is captured as the set of utilities the
- component applies — including every stateful one (`hover:`, `active:`, `disabled:`,
- `focus-visible:`) — plus its structure, roles and aria attributes. That covers rest,
- hover, pressed, selected, disabled and focus without a browser, which keeps the gate
- deterministic across machines and free of pixel anti-aliasing flake.
-
- `Modal` portals its open shell in the browser, so this deterministic pass snapshots its
- Header/Content/Footer parts inside the Base Dialog root context they require. The actual
- portal, focus and popup lifecycle remain browser concerns rather than being simulated by
- this source-level gate.
-
- The open overlay recipes (menu, tooltip, dialog) only exist while an overlay is open,
- so no closed-state render can reach them and a portal cannot be server-rendered. They
- are owned once, as data, by `overlay` in the primitives module, and pinned here from
- source — which is why this script runs under Bun (it can import the TypeScript module
- directly) and why those recipes are snapshotted as data rather than as markup.
+ Deterministic style-contract gate
+ =================================
+ This gate pins the exact generated theme tokens, the published scoped component CSS,
+ component specimen markup and shared overlay recipes. Browser screenshots separately
+ protect pixel output; this file protects the deterministic styling contract that feeds
+ those pixels.
 
  Usage:
-   bun scripts/visual-regression.mjs             check against the baseline
-   bun scripts/visual-regression.mjs --update    rewrite the baseline
-   bun scripts/visual-regression.mjs --preview   also write .visual/preview.html
+   bun scripts/visual-regression.mjs
+   bun scripts/visual-regression.mjs --update
+   bun scripts/visual-regression.mjs --preview
 */
 
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
@@ -41,10 +20,6 @@ import { fileURLToPath } from "node:url";
 import postcss from "postcss";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import tailwindcss from "tailwindcss";
-import preset from "../tailwind.preset.cjs";
-/* Source import: the primitives module is TypeScript and is not part of the published
-   entry point, and these recipes are internal data rather than public API. */
 import { motion, overlay } from "../src/components/ui.common.ts";
 
 const library = await import("../dist/esm/index.js");
@@ -83,8 +58,6 @@ const h = React.createElement;
 const noop = () => undefined;
 const inDialogContext = (child) => h(BaseDialog.Root, { open: true }, child);
 
-/* One specimen per visual decision a component makes. Variants and sizes stand in for
-   the API surface; states are carried by the recipes themselves. */
 const specimens = {
   "action-button.filled": h(ActionButton, { appearance: "filled" }, "Save"),
   "action-button.filled.danger": h(ActionButton, { appearance: "filled", variant: "danger" }, "Delete"),
@@ -146,8 +119,6 @@ const specimens = {
   "tooltip.trigger": h(Tooltip, { content: "Hint" }, h(ActionButton, { appearance: "tonal" }, "Hover")),
 };
 
-/* React's generated ids carry no visual meaning and change between renders; class
-   order is irrelevant to the cascade, so both are normalised out. */
 const normalizeMarkup = (html) =>
   html
     .replace(/(id|for|aria-controls|aria-labelledby|aria-describedby)="[^"]*"/g, '$1="#"')
@@ -167,22 +138,6 @@ const overlayRecipes = {
   "motion.scrimOut": motion.scrimOut,
 };
 
-const markup = [Object.values(rendered).join("\n"), ...Object.values(overlayRecipes)].join("\n");
-
-const utilityCss = (
-  await postcss([
-    tailwindcss({
-      presets: [preset],
-      content: [{ raw: markup, extension: "html" }],
-      corePlugins: { preflight: false },
-    }),
-  ]).process("@tailwind utilities;", { from: undefined })
-).css;
-
-/* Key every generated rule by its selector (and the at-rule it lives in) so a change in
-   what a utility resolves to — including the keyframes an animation refers to — shows
-   up as a diff rather than a silently different product. */
-const utilities = {};
 const collectDeclarations = (rule) => {
   const declarations = [];
   rule.each((node) => {
@@ -190,30 +145,43 @@ const collectDeclarations = (rule) => {
   });
   return declarations.sort();
 };
+
+const stylesCss = await readFile(join(root, "dist", "styles.css"), "utf8");
+const stylesRoot = postcss.parse(stylesCss);
+const utilities = {};
 const walkCss = (container, context = "") => {
   container.each((node) => {
-    if (node.type === "atrule") walkCss(node, `${context}@${node.name} ${node.params} | `);
-    else if (node.type === "rule") utilities[`${context}${node.selector}`] = collectDeclarations(node);
+    if (node.type === "atrule") {
+      if (node.name === "layer" && node.params === "sherick-ui-theme") return;
+      walkCss(node, `${context}@${node.name} ${node.params} | `);
+    } else if (node.type === "rule") {
+      if (node.selector.includes(".katex")) return;
+      utilities[`${context}${node.selector}`] = collectDeclarations(node);
+    }
   });
 };
-walkCss(postcss.parse(utilityCss));
+walkCss(stylesRoot);
 
-const themeRoot = postcss.parse(await readFile(join(root, "theme.css"), "utf8"));
+const themeRoot = postcss.parse(await readFile(join(root, "dist", "theme.css"), "utf8"));
 const tokens = {};
-const collectTokens = (rule, context) => {
-  const collected = {};
-  rule.walkDecls(/^--sui-/, (declaration) => {
-    collected[declaration.prop] = declaration.value.replace(/\s+/g, " ").trim();
+const collectTokenRules = (container, context = "") => {
+  container.each((node) => {
+    if (node.type === "atrule") {
+      collectTokenRules(node, `${context}@${node.name} ${node.params} | `);
+      return;
+    }
+    if (node.type !== "rule") return;
+    const collected = {};
+    node.walkDecls(/^--sui-/, (declaration) => {
+      collected[declaration.prop] = declaration.value.replace(/\s+/g, " ").trim();
+    });
+    if (Object.keys(collected).length > 0) {
+      tokens[`${context}${node.selector.replace(/\s+/g, " ")}`] = collected;
+    }
   });
-  if (Object.keys(collected).length > 0) tokens[`${context}${rule.selector.replace(/\s+/g, " ")}`] = collected;
 };
-themeRoot.each((node) => {
-  if (node.type === "atrule") node.each((rule) => collectTokens(rule, `@${node.name} ${node.params} | `));
-  else if (node.type === "rule") collectTokens(node, "");
-});
+collectTokenRules(themeRoot);
 
-/* Group a few decorative token families so a diff says what changed rather than
-   dumping the whole palette. */
 const snapshot = { tokens, utilities, specimens: rendered, overlays: overlayRecipes };
 
 const flatten = (value, prefix = "", out = {}) => {
@@ -228,19 +196,15 @@ const flatten = (value, prefix = "", out = {}) => {
 const baselineRaw = await readFile(baselinePath, "utf8").catch(() => null);
 
 if (baselineRaw === null && !update) {
-  console.error(`Visual regression: no baseline at ${baselinePath.replace(`${root}/`, "")}.
-
-The gate compares the library against a recorded baseline; without one it cannot tell a
-deliberate change from a silent restyle. Create it with:
-  bun run visual --update
-and review the diff before committing it.`);
+  console.error(`Style contract: no baseline at ${baselinePath.replace(`${root}/`, "")}.
+Create it with: bun run visual --update`);
   process.exit(1);
 }
 
 if (update) {
   await mkdir(join(root, "scripts", "visual-baselines"), { recursive: true });
   await writeFile(baselinePath, `${JSON.stringify(snapshot, null, 2)}\n`);
-  console.log(`Visual baseline written (${Object.keys(rendered).length} specimens).`);
+  console.log(`Style-contract baseline written (${Object.keys(rendered).length} specimens).`);
 } else {
   const baseline = flatten(JSON.parse(baselineRaw));
   const current = flatten(snapshot);
@@ -254,33 +218,26 @@ if (update) {
   }
 
   if (changes.length > 0) {
-    console.error(`Visual regression: ${changes.length} change(s) against scripts/visual-baselines/visual-regression.json\n`);
+    console.error(`Style contract: ${changes.length} change(s) against scripts/visual-baselines/visual-regression.json\n`);
     console.error(changes.slice(0, 40).join("\n"));
     if (changes.length > 40) console.error(`\n… ${changes.length - 40} more`);
-    console.error("\nReview each change against the design language, then re-run with --update to accept it.");
+    console.error("\nReview each deterministic change, then re-run with --update to accept it.");
     process.exit(1);
   }
 
-  console.log(`Visual regression passed (${Object.keys(rendered).length} specimens, ${Object.keys(overlayRecipes).length} overlay recipes, ${Object.keys(utilities).length} utilities, ${Object.keys(tokens).length} token blocks).`);
+  console.log(`Style contract passed (${Object.keys(rendered).length} specimens, ${Object.keys(overlayRecipes).length} overlay recipes, ${Object.keys(utilities).length} scoped rules, ${Object.keys(tokens).length} token blocks).`);
 }
 
 if (preview) {
   const previewDir = join(root, ".visual");
   await mkdir(previewDir, { recursive: true });
-  /* Self-contained: the theme tokens plus the utilities the specimens use, so the
-     preview renders exactly what the gate pinned. */
-  const previewTheme = (await readFile(join(root, "theme.css"), "utf8")).replace(/^@tailwind.*$/gm, "");
-  await writeFile(
-    join(previewDir, "preview.css"),
-    `${previewTheme}\n*,::before,::after{box-sizing:border-box}\n${utilityCss}\n`,
-    "utf8"
-  );
+  await writeFile(join(previewDir, "preview.css"), stylesCss, "utf8");
   const body = Object.entries(rendered)
     .map(([id, html]) => `<section><h2>${id}</h2><div class="specimen">${html}</div></section>`)
     .join("\n");
   await writeFile(
     join(previewDir, "preview.html"),
-    `<!doctype html><meta charset="utf-8"><title>Sherick UI visual preview</title>
+    `<!doctype html><meta charset="utf-8"><title>Sherick UI style preview</title>
 <link rel="stylesheet" href="preview.css">
 <style>body{background:oklch(var(--sui-canvas));color:oklch(var(--sui-ink));font-family:system-ui,sans-serif;padding:32px;margin:0}
 section{margin-bottom:32px}h2{font:600 14px/1.4 ui-monospace,monospace;margin:0 0 8px}

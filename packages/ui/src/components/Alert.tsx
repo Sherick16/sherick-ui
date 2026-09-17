@@ -56,7 +56,7 @@ export const Alert = ({
       )}
     >
       <Icon aria-hidden="true" className={cn("size-5 shrink-0", tone.text[variant])} />
-      <div className="min-w-0 flex-1 text-sm leading-6">{children}</div>
+      <div className={cn("min-w-0 flex-1 text-sm leading-6")}>{children}</div>
       {closeable && (
         <Button
           type="button"
@@ -76,7 +76,7 @@ export const Alert = ({
             state.enabled
           )}
         >
-          <X aria-hidden="true" className="size-4" />
+          <X aria-hidden="true" className={cn("size-4")} />
         </Button>
       )}
     </div>

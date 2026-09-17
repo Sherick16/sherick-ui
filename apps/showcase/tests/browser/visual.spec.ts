@@ -48,3 +48,69 @@ for (const theme of ["light", "dark"] as const) {
     expect(errors, `browser/runtime errors on the initially-open ${theme} dialog fixture`).toEqual([]);
   });
 }
+
+test("published component styles survive a host Tailwind reset", async ({ page }) => {
+  const errors = trackRuntimeErrors(page);
+
+  await page.goto("/verification/core");
+  await setTheme(page, "dark");
+
+  const primary = page.getByRole("button", { name: "Primary" });
+  const tonal = page.getByRole("button", { name: "Tonal" });
+  const switchControl = page.getByRole("switch", { name: "Enabled" });
+  const switchTrack = switchControl.locator(".shadow-sherick-recessed").first();
+  const switchThumb = switchControl.locator(".shadow-sherick-control").first();
+
+  await expect(primary).toBeVisible();
+  await expect(tonal).toBeVisible();
+  await expect(switchTrack).toBeVisible();
+  await expect(switchThumb).toBeVisible();
+
+  const styles = await Promise.all([
+    primary.evaluate((element) => getComputedStyle(element).backgroundColor),
+    tonal.evaluate((element) => getComputedStyle(element).backgroundColor),
+    tonal.evaluate((element) => getComputedStyle(element).boxShadow),
+    switchTrack.evaluate((element) => getComputedStyle(element).boxShadow),
+    switchThumb.evaluate((element) => getComputedStyle(element).boxShadow),
+  ]);
+
+  const [primaryBackground, tonalBackground, tonalShadow, trackShadow, thumbShadow] = styles;
+
+  expect(primaryBackground).not.toBe("rgba(0, 0, 0, 0)");
+  expect(tonalBackground).not.toBe("rgba(0, 0, 0, 0)");
+  expect(tonalShadow).not.toBe("none");
+  expect(trackShadow).not.toBe("none");
+  expect(trackShadow).toContain("inset");
+  expect(thumbShadow).not.toBe("none");
+
+  expect(errors, "host Tailwind compatibility fixture produced runtime errors").toEqual([]);
+});
+
+test("showcase elevations and structural lines retain their design-language values", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "Design system showcase" })).toBeVisible();
+  await setTheme(page, "dark");
+
+  const raised = page.getByTestId("tile-raised");
+  const recessed = page.getByTestId("tile-recessed");
+  const floating = page.getByTestId("tile-floating");
+  const columnHeader = page.getByText("Column header", { exact: true });
+
+  for (const surface of [raised, recessed, floating]) {
+    await expect(surface).toBeVisible();
+    expect(await surface.evaluate((element) => getComputedStyle(element).boxShadow)).not.toBe("none");
+  }
+
+  const borderColors = await columnHeader.evaluate((element) => {
+    const actual = getComputedStyle(element).borderBottomColor;
+    const probe = document.createElement("div");
+    probe.style.borderBottom = "1px solid oklch(var(--sui-edge) / 0.10)";
+    document.body.appendChild(probe);
+    const expected = getComputedStyle(probe).borderBottomColor;
+    probe.remove();
+    return { actual, expected };
+  });
+
+  expect(borderColors.actual).toBe(borderColors.expected);
+  expect(await columnHeader.evaluate((element) => getComputedStyle(element).borderBottomWidth)).toBe("1px");
+});

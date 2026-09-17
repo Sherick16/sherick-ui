@@ -2,7 +2,7 @@
 
 Sherick UI is a small React component library inspired by Material 3 Expressive: soft tonal surfaces, deliberate shape contrast, strong hierarchy and restrained motion without cloning Google's component system. The published component package is framework-agnostic and supports React 18/19.
 
-The guiding rule is **quiet by default, expressive where it matters**. Every component draws on the same small design language — material, elevation, shape, edge, tone, state, density and motion — so a new one is designed by choosing existing primitives rather than inventing visual rules. That language is specified in [docs/DESIGN_LANGUAGE.md](https://github.com/Sherick16/sherick-ui/blob/main/docs/DESIGN_LANGUAGE.md), its canonical source of truth.
+The guiding rule is **quiet by default, expressive where it matters**. Every component draws on the same small design language — material, elevation, shape, edge, tone, state, density and motion — so a new one is designed by choosing existing primitives rather than inventing visual rules. That language is specified in [docs/DESIGN_LANGUAGE.md](docs/DESIGN_LANGUAGE.md), its canonical source of truth.
 
 Interactive behavior is deliberately separate from visual design. Sherick UI uses [Base UI](https://base-ui.com/) as its unstyled behavioral and accessibility substrate wherever Base UI provides the primitive. Base UI owns generic mechanics such as keyboard navigation, focus management, ARIA relationships, form participation, portals, dismissal and popup positioning; Sherick UI owns the component anatomy, public design API and every visual decision.
 
@@ -12,31 +12,24 @@ Interactive behavior is deliberately separate from visual design. Sherick UI use
 bun add sherick-ui
 ```
 
-Sherick UI uses Tailwind CSS 3.x for its styling contract. Import the theme stylesheet once near your application root, then add the bundled Tailwind preset and scan the package output:
+Import the complete stylesheet once near your application root. If the application has a framework stylesheet, Tailwind build or reset, load that first and Sherick UI second:
 
 ```tsx
-import "sherick-ui/theme.css";
+import "./app.css";
+import "sherick-ui/styles.css";
 ```
 
-```js
-// tailwind.config.js
-const sherickUi = require("sherick-ui/tailwind-preset");
+That order is intentional. Sherick UI ships its already-compiled internal utility graph; loading it after a host Tailwind/reset prevents the host from accidentally redefining one of the same generic utility class names and changing component anatomy. If you maintain a dedicated application override stylesheet for Sherick components, load that override after `sherick-ui/styles.css`.
 
-module.exports = {
-  presets: [sherickUi],
-  content: [
-    "./src/**/*.{js,ts,jsx,tsx}",
-    "./app/**/*.{js,ts,jsx,tsx}",
-    "./node_modules/sherick-ui/dist/**/*.{js,cjs}",
-  ],
-};
-```
+That is the entire styling integration. Sherick UI compiles its own component CSS; consumers do not need Tailwind, a Sherick preset, package content scanning, or any other styling build configuration.
 
-The preset retains dark-theme fallback values so existing consumers do not fail if `theme.css` is omitted, but importing the stylesheet is required for runtime light/dark theming.
+Tailwind CSS is used privately inside the Sherick UI repository as an authoring compiler. It is not part of the published consumer contract.
+
+If you only need the runtime theme variables without component styles, `sherick-ui/theme.css` is also exported as a token-only stylesheet.
 
 ## Light, dark and system themes
 
-Sherick UI does not require a React theme provider. Theme selection is owned by CSS and one optional attribute on the document root:
+Sherick UI does not require a React theme provider. Theme selection is CSS-only and uses one optional attribute on the document root:
 
 ```ts
 // Force light mode
@@ -49,9 +42,9 @@ document.documentElement.dataset.sherickTheme = "dark";
 document.documentElement.removeAttribute("data-sherick-theme");
 ```
 
-With no `data-sherick-theme` attribute, `theme.css` follows the operating-system `prefers-color-scheme` value. This keeps the component runtime framework-agnostic and lets React, Next.js, Remix, Vite, Astro or plain DOM applications own persistence however they prefer.
+With no `data-sherick-theme` attribute, Sherick UI follows the operating-system `prefers-color-scheme` value. This keeps the runtime framework-agnostic and lets React, Next.js, Remix, Vite, Astro or plain DOM applications own persistence however they prefer.
 
-If a persisted user choice is applied client-side, set the attribute before first paint to avoid a theme flash. For example:
+If a persisted user choice is applied client-side, set the attribute before first paint to avoid a theme flash:
 
 ```html
 <script>
@@ -64,48 +57,57 @@ If a persisted user choice is applied client-side, set the attribute before firs
 </script>
 ```
 
-Use the attribute on `document.documentElement` for application-wide themes. Sherick overlays portal to `document.body`, so a root-level theme naturally applies to portaled UI as well.
+Themes are intentionally document-level. Sherick overlays portal to `document.body`, so root-level theme variables naturally apply to Dialog, Select and Tooltip surfaces as well. Arbitrary nested theme islands are not currently a supported contract.
 
 ### Custom themes
 
-The Tailwind names exposed by the library are semantic, while their actual values come from CSS variables. Consumers can override those variables without forking component styles:
+The supported customization surface is the `--sui-*` CSS-variable system. Override roles rather than component selectors:
 
 ```css
-[data-sherick-theme="light"] {
+:root {
   --sui-primary: 0.50 0.17 255;
-  --sui-canvas: 0.97 0.006 255;
-  --sui-surface: 0.99 0.004 255;
+  --sui-primary-strong: 0.47 0.19 257;
+  --sui-on-primary: 0.985 0.005 255;
 }
 ```
 
-Core variables include the canvas/surface levels, the three-step text hierarchy, the accent hierarchy (`--sui-primary`, `--sui-primary-strong`, `--sui-primary-soft`, `--sui-accent`), semantic states, the structural edge tint (`--sui-edge`), focus/scrim roles, the elevation ladder, the liquid-glass recipes and syntax-highlighting colors. Components reference semantic Tailwind classes such as `bg-sherick-surface`, `text-sherick-ink` and `text-sherick-edge`, so the same markup works in both modes.
+Or target a forced theme:
+
+```css
+[data-sherick-theme="dark"] {
+  --sui-primary: 0.74 0.14 270;
+}
+```
+
+Core roles include the canvas/surface levels, three-step text hierarchy, accent hierarchy, semantic states and their `on-*` colors, focus/scrim roles, structural edge tint, elevation ladder, acrylic recipes, motion and syntax-highlighting colors.
+
+Sherick UI's generated theme CSS is layered, so ordinary unlayered application CSS can override these variables without `!important` or selector escalation.
 
 ### One light source
 
-Every depth cue derives from a single light model: light comes from **directly above** the surface plane. `--sui-light-top` (the highlight color) and `--sui-light-bottom` (the shade color) are the two values the elevation ladder composites from, so re-tinting that pair re-lights every shadow, edge highlight and pressed state at once. The acrylic recipes are a separate family (`--sui-glass-*`): calibrated per theme, following the same top-to-bottom model without compositing from those two values. The model itself is specified in [docs/DESIGN_LANGUAGE.md](https://github.com/Sherick16/sherick-ui/blob/main/docs/DESIGN_LANGUAGE.md).
+Every depth cue derives from a single light model: light comes from **directly above** the surface plane. `--sui-light-top` and `--sui-light-bottom` are the two values the elevation ladder composites from, so re-tinting that pair re-lights every shared shadow and highlight. Acrylic is a separate material family (`--sui-glass-*`) calibrated per theme but following the same top-to-bottom lighting model.
 
 ### Elevation
 
-Depth is token-driven, and the ladder is the only source of shadow in the library. Overriding these variables re-tunes elevation for every surface without touching a component:
+Depth is token-driven, and the ladder is the only source of shadow in the library:
 
-| Utility | Token | Role |
+| Role | Token | Use |
 | --- | --- | --- |
-| `shadow-sherick-flat` | `--sui-elevation-flat` | no shadow — matte surfaces separate by tone alone |
-| `shadow-sherick-raised` | `--sui-elevation-raised` | raised matte surfaces and tactile tonal controls |
-| `shadow-sherick-floating` | `--sui-elevation-floating` | acrylic surfaces above the application |
-| `shadow-sherick-control` | `--sui-elevation-control` | tactile matte controls at rest, a hair above their own track |
-| `shadow-sherick-recessed` | `--sui-elevation-recessed` | grooves, tracks and wells — and the depth a held control presses to |
-| `shadow-sherick-pressed` | `--sui-elevation-pressed` | the published alias of that same recessed depth |
+| Flat | `--sui-elevation-flat` | passive surfaces |
+| Raised | `--sui-elevation-raised` | tactile tonal controls |
+| Floating | `--sui-elevation-floating` | acrylic overlays |
+| Control | `--sui-elevation-control` | movable control parts at rest |
+| Recessed | `--sui-elevation-recessed` | grooves, tracks, wells and held controls |
 
 ### Motion
 
-Motion is three families, each a token pair. Retiming the library is a token edit:
+Motion is three families, each tokenized rather than hard-coded per component:
 
-| Family | Durations | Easings | Used for |
-| --- | --- | --- | --- |
-| press | `--sui-duration-press` | `--sui-ease-press` | a tonality change with no travel — hover, focus, an engaged field |
-| release | `--sui-duration-release` | `--sui-ease-release` | a tactile control: press timing while held (`active:`), release timing as it settles, and the travel of a thumb or segment |
-| overlay | `--sui-duration-overlay`, `--sui-duration-overlay-exit` | `--sui-ease-release`, `--sui-ease-exit` | the entrance and exit of anything that floats |
+| Family | Tokens | Used for |
+| --- | --- | --- |
+| Press | `--sui-duration-press`, `--sui-ease-press` | hover/focus/engaged tonality |
+| Release | `--sui-duration-release`, `--sui-ease-release` | tactile controls and physical travel |
+| Overlay | `--sui-duration-overlay`, `--sui-duration-overlay-exit`, `--sui-ease-release`, `--sui-ease-exit` | floating surfaces and scrims |
 
 Base UI owns whether a floating primitive is mounted, opening or closing, plus its focus, dismissal, portal and positioning mechanics. Sherick UI applies the shared overlay material/elevation/shape recipes and motion tokens to those states; no Sherick-specific overlay lifecycle hook is required.
 
@@ -113,7 +115,7 @@ Base UI owns whether a floating primitive is mounted, opening or closing, plus i
 
 ```tsx
 import { Button, Input, Dialog, Select } from "sherick-ui";
-import "sherick-ui/theme.css";
+import "sherick-ui/styles.css";
 
 export function Example() {
   return (
@@ -166,7 +168,7 @@ This boundary is intentional: upgrading behavior should normally mean upgrading 
 
 ## Design language
 
-[`docs/DESIGN_LANGUAGE.md`](https://github.com/Sherick16/sherick-ui/blob/main/docs/DESIGN_LANGUAGE.md) is the canonical source of truth for Sherick UI's visual language: the material, elevation, edge, shape, tone, state, motion and density rules, the light model, the accessibility and focus requirements, and the examples of when each primitive should and should not be used.
+[`docs/DESIGN_LANGUAGE.md`](docs/DESIGN_LANGUAGE.md) is the canonical source of truth for Sherick UI's visual language: the material, elevation, edge, shape, tone, state, motion and density rules, the light model, the accessibility and focus requirements, and the examples of when each primitive should and should not be used.
 
 Components compose the primitives in `packages/ui/src/components/ui.common.ts`; none of them writes a color, tone role, material recipe, shadow, radius, duration, state treatment, structural rim or focus ring of its own. A new component is designed by choosing primitives — and if a genuinely new visual rule is needed, the language is extended there first. Ordinary anatomy — layout, spacing, component padding, intrinsic size, responsive arrangement and content typography — is decided inside the component.
 
@@ -180,7 +182,7 @@ bun run verify
 
 The private `apps/showcase` workbench includes `System`, `Light` and `Dark` controls so every component and state can be reviewed against all supported themes, and it links to the canonical design language from its heading.
 
-`bun run verify` now covers source checks, the ESM/CommonJS/declaration build, the production Next showcase, local smoke checks, a clean `npm pack` consumer install, deterministic style-contract snapshots, and Chromium hydration/visual regression. See [`docs/VERIFICATION.md`](docs/VERIFICATION.md) for the contract of each layer.
+`bun run verify` covers source checks, ESM/CommonJS/declaration builds, the production Next showcase, a Tailwind-free Vite consumer, local styling-contract checks, a clean `npm pack` consumer install, Chromium interaction tests and browser visual regression. See [`docs/VERIFICATION.md`](docs/VERIFICATION.md) for the contract of each layer.
 
 The Next.js app in `apps/showcase` is a development/showcase surface only; the published component runtime does not depend on Next.js.
 

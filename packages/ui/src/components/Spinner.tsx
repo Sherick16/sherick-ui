@@ -40,7 +40,7 @@ export type SpinnerContentProps = SpinnerProps;
 
 export function Spinner({ size, show, children, className }: SpinnerProps) {
   return (
-    <span className={spinnerVariants({ show })} role="status" aria-live="polite">
+    <span className={cn(spinnerVariants({ show }))} role="status" aria-live="polite">
       <Loader2 aria-hidden="true" className={cn(loaderVariants({ size }), className)} />
       {children}
     </span>

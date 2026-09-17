@@ -26,7 +26,7 @@ const Badge = ({
         className
       )}
     >
-      {icon && <span className="inline-flex items-center" aria-hidden="true">{icon}</span>}
+      {icon && <span className={cn("inline-flex items-center")} aria-hidden="true">{icon}</span>}
       {children}
     </span>
   );

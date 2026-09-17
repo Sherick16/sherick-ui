@@ -3,12 +3,13 @@
 The canonical source of truth for Sherick UI's visual language. Every reusable visual
 rule lives here.
 
-Two files implement it and neither invents a rule of its own:
+Three sources implement it and none invents a rule of its own:
 
 | Layer | File | Contains |
 | --- | --- | --- |
 | Recipes | `packages/ui/src/components/ui.common.ts` | the named primitives a component composes |
-| Tokens | `packages/ui/theme.css` | the values those primitives resolve to, per theme |
+| Tokens | `packages/ui/src/styles/tokens.ts` | the authored runtime values those primitives resolve to, per theme |
+| CSS build | `packages/ui/scripts/build-styles.ts` | private compilation/scoping into generated `dist/theme.css` and `dist/styles.css` |
 
 If this document and any other file disagree — a README paragraph, a showcase caption,
 a code comment — this document wins and the other file is corrected.
@@ -131,18 +132,16 @@ of glass is a contradiction.
 
 ## 5. Elevation — how far a surface sits off the page
 
-Primitives: `flat`, `raised`, `floating`, `control`, `recessed` (published alias
-`pressed`).
+Primitives: `flat`, `raised`, `floating`, `control`, `recessed`.
 
 Depth is chosen by **anatomy**, never by state.
 
 | Elevation | Role | Should be used for | Should not be used for |
 | --- | --- | --- | --- |
 | `flat` | at rest on the page | passive matte surfaces; wider surfaces such as cards | a well that is sunk by design — that is `recessed` |
-| `raised` | a manipulated control lifted a hair above its own track | tactile tonal controls (`ActionButton` tonal, `IconButton`) | passive surfaces, table rows, menu rows |
+| `raised` | a manipulated control lifted a hair above its own track | tactile tonal controls (tonal `Button`, `IconButton`) | passive surfaces, table rows, menu rows |
 | `control` | the resting half of the tactile pair | a part the user moves — a switch thumb, a selected segment | wide surfaces, or a whole segmented control |
 | `recessed` | the other half of the pair | grooves, tracks and wells, which are sunk by definition | raised or resting controls |
-| `pressed` | the same depth, named for the moment a control reaches it by being held | published alias only; prefer `recessed` when the surface is simply sunk | new code — use `recessed` |
 | `floating` | a surface that genuinely sits above the application | acrylic overlays: menus, tooltips, dialogs | matte surfaces sitting on the page |
 
 The tactile pair (`control` / `recessed`) is deliberately shallower than the tonal
@@ -367,9 +366,9 @@ flat or floating control press through the state layer's active step and `state.
 A press is never a single recipe, because a control's anatomy decides what it can do.
 The rule is:
 
-- a **raised / tactile** control (tonal `ActionButton`, tonal `IconButton`) returns to the
+- a **raised / tactile** control (tonal `Button`, tonal `IconButton`) returns to the
   recessed depth while it is held, and comes back up on release;
-- a **flat** control (filled or text `ActionButton`, ghost `IconButton`, a menu option, a
+- a **flat** control (filled or text `Button`, ghost `IconButton`, a menu option, a
   table row) does not change depth at all: the press is the state layer's active step
   plus `state.press`;
 - a **floating** control keeps its elevation while it is held — an acrylic `IconButton`
@@ -433,7 +432,7 @@ type step**, so controls of one density share a rhythm.
 
 Anatomy owns **padding**, not density: a button is gripped at its ends, a field holds
 text, and neither is derived from the other — one density can carry two paddings, so
-padding is written with the component rather than in these tokens. `ActionButton` is the
+padding is written with the component rather than in these tokens. `Button` is the
 worked example: its `sm` / `md` / `lg` sizes are `density.compact` + `px-4 py-2`,
 `density.normal` + `px-6 py-3` and `density.prominent` + `px-8 py-4`.
 
@@ -452,6 +451,9 @@ inline padding from a field's.
 - `focusRing` draws the ring **outside** the shape, for a control that stands alone.
 - `focusRingInset` draws it **inside**, for a control nested in another surface where an
   outer ring would collide with the parent's edge.
+- `focusRingWithin` draws the outer ring from the composite that owns the focus, for a
+  composite control whose inner input stays borderless.
+- `groupFocusRing` draws it from the wrapping control instead of the track it contains.
 - Fields use the outer ring only. No inner rim is added, so focus reads as one ring,
   never two.
 - Where Base UI provides the widget primitive, Base UI owns roles, ARIA relationships,
@@ -476,18 +478,14 @@ inline padding from a field's.
 
 ## 15. Theming
 
-Tokens are grouped as one small system in `packages/ui/theme.css`: tonality, lighting, elevation,
-material and motion. Theme selection is CSS-only — no attribute follows
+Tokens are grouped as one small system in `packages/ui/src/styles/tokens.ts`: tonality,
+lighting, elevation, material and motion. Theme selection is CSS-only — no attribute follows
 `prefers-color-scheme`, while `data-sherick-theme="light"` or `"dark"` force one.
 
 Consumers retune the library by overriding variables, not by forking component styles.
 Retinting `--sui-light-top` / `--sui-light-bottom` re-lights every shadow, pressed state
 and edge highlight; the acrylic recipes are retuned through their own `--sui-glass-*`
 variables instead.
-
-Three compatibility aliases keep resolving for consumers that shipped against 1.0.x:
-`--sui-elevation-grounded` (the former name of the flat step), `--sui-shadow-focus` and
-`--sui-shadow-primary`. New code uses `--sui-elevation-flat` and the shared focus ring.
 
 ---
 
@@ -502,12 +500,12 @@ If a genuinely new visual rule is required:
 1. add it to this document first, with its role and its when-to-use / when-not-to-use
    examples;
 2. add it as a named primitive in `packages/ui/src/components/ui.common.ts`, and its tokens to
-   `packages/ui/theme.css`;
+   `packages/ui/src/styles/tokens.ts`;
 3. then consume the primitive in the component.
 
 Not every local decision is a visual rule. **Layout, spacing, component-specific
 padding, intrinsic dimensions, responsive arrangement and content typography are the
-component's own anatomy** — decide them inside the component, exactly as `ActionButton`'s
+component's own anatomy** — decide them inside the component, exactly as `Button`'s
 size paddings are decided. They are not promoted into global primitives, and "could this
 be a primitive?" is not a reason to add one. The prohibition covers the visual system
 itself: color and tone roles, material recipes, elevation and shadows, semantic shape

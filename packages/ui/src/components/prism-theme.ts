@@ -2,14 +2,14 @@ import { PrismTheme } from "prism-react-renderer";
 
 const theme: PrismTheme = {
   plain: {
-    color: "var(--sui-code-text, #e2e8f0)",
+    color: "var(--sui-code-text)",
     backgroundColor: "transparent",
   },
   styles: [
     {
       types: ["comment", "prolog", "doctype", "cdata"],
       style: {
-        color: "var(--sui-code-comment, #64748b)",
+        color: "var(--sui-code-comment)",
         fontStyle: "italic",
       },
     },
@@ -22,13 +22,13 @@ const theme: PrismTheme = {
     {
       types: ["string", "attr-value"],
       style: {
-        color: "var(--sui-code-string, #a5d6ff)",
+        color: "var(--sui-code-string)",
       },
     },
     {
       types: ["punctuation", "operator"],
       style: {
-        color: "var(--sui-code-text, #e2e8f0)",
+        color: "var(--sui-code-text)",
       },
     },
     {
@@ -45,31 +45,31 @@ const theme: PrismTheme = {
         "inserted",
       ],
       style: {
-        color: "var(--sui-code-number, #f97316)",
+        color: "var(--sui-code-number)",
       },
     },
     {
       types: ["atrule", "keyword", "attr-name", "selector"],
       style: {
-        color: "var(--sui-code-keyword, #c084fc)",
+        color: "var(--sui-code-keyword)",
       },
     },
     {
       types: ["function", "deleted"],
       style: {
-        color: "var(--sui-code-function, #ff7b72)",
+        color: "var(--sui-code-function)",
       },
     },
     {
       types: ["function-variable"],
       style: {
-        color: "var(--sui-code-keyword, #c084fc)",
+        color: "var(--sui-code-keyword)",
       },
     },
     {
       types: ["tag", "selector", "keyword"],
       style: {
-        color: "var(--sui-code-tag, #7dd3fc)",
+        color: "var(--sui-code-tag)",
       },
     },
   ],

@@ -71,7 +71,7 @@ const CodeBlock = ({ inline = false, className, language = "text", children }: C
 
   return (
     <div className={cn("mt-4 overflow-hidden", shape.prominent, material.matte, elevation.recessed)}>
-      <div className="flex min-h-11 items-center justify-between gap-4 px-4 py-2">
+      <div className={cn("flex min-h-11 items-center justify-between gap-4 px-4 py-2")}>
         <span className={cn("font-mono text-[11px] uppercase tracking-[0.08em]", text.medium)}>
           {language}
         </span>
@@ -90,7 +90,7 @@ const CodeBlock = ({ inline = false, className, language = "text", children }: C
             state.enabled
           )}
         >
-          {copied ? <Check className="size-3.5" aria-hidden="true" /> : <Copy className="size-3.5" aria-hidden="true" />}
+          {copied ? <Check className={cn("size-3.5")} aria-hidden="true" /> : <Copy className={cn("size-3.5")} aria-hidden="true" />}
           <span>{copied ? "Copied" : "Copy"}</span>
         </Button>
       </div>
@@ -111,16 +111,17 @@ const CodeBlock = ({ inline = false, className, language = "text", children }: C
             )}
             style={style}
           >
-            <code className="inline-block min-w-full">
+            <code className={cn("inline-block min-w-full")}>
               {tokens.map((line, i) => (
-                <div key={i} {...getLineProps({ line })}>
+                <span key={i} {...getLineProps({ line })} className={cn("block", getLineProps({ line }).className)}>
                   <span className={cn("mr-4 inline-block w-4 select-none text-right", text.low)}>
                     {i + 1}
                   </span>
-                  {line.map((token, key) => (
-                    <span key={key} {...getTokenProps({ token })} />
-                  ))}
-                </div>
+                  {line.map((token, key) => {
+                    const tokenProps = getTokenProps({ token });
+                    return <span key={key} {...tokenProps} className={cn(tokenProps.className)} />;
+                  })}
+                </span>
               ))}
             </code>
           </pre>

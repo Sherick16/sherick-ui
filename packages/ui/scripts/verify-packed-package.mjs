@@ -46,6 +46,7 @@ try {
           react: "19.3.0",
           "react-dom": "19.3.0",
           typescript: "5.9.3",
+          vite: "7.1.7",
           "@types/react": "19.3.0",
           "@types/react-dom": "19.3.0"
         }
@@ -59,7 +60,7 @@ try {
 
   const esmFixture = `
 import assert from "node:assert/strict";
-import { access } from "node:fs/promises";
+import { access, readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
@@ -111,9 +112,14 @@ for (const [language, sample] of [
   );
 }
 
+const stylesPath = fileURLToPath(import.meta.resolve("sherick-ui/styles.css"));
 const themePath = fileURLToPath(import.meta.resolve("sherick-ui/theme.css"));
+await access(stylesPath);
 await access(themePath);
-console.log("Packed ESM/SSR/Prism verification passed.");
+const styles = await readFile(stylesPath, "utf8");
+assert.match(styles, /sui-scope/, "published styles must contain the Sherick scope");
+assert.match(styles, /@font-face/, "published styles must include KaTeX font declarations");
+console.log("Packed ESM/SSR/Prism/CSS verification passed.");
 `;
 
   const cjsFixture = `
@@ -125,8 +131,8 @@ assert.ok(ui.Button, "CommonJS export missing Button");
 assert.strictEqual(ui.ActionButton, ui.Button, "ActionButton should alias Button in CommonJS");
 assert.ok(ui.Dialog, "CommonJS export missing Dialog");
 assert.ok(ui.Select, "CommonJS export missing Select");
+assert.ok(fs.existsSync(require.resolve("sherick-ui/styles.css")), "styles.css export must resolve");
 assert.ok(fs.existsSync(require.resolve("sherick-ui/theme.css")), "theme.css export must resolve");
-assert.ok(require("sherick-ui/tailwind-preset"), "Tailwind preset export must be require-able");
 console.log("Packed CommonJS verification passed.");
 `;
 
@@ -223,16 +229,35 @@ export const fixture = (
   await writeFile(join(consumerDir, "consumer.tsx"), typeFixture);
   await writeFile(join(consumerDir, "tsconfig.json"), `${JSON.stringify(tsconfig, null, 2)}\n`);
 
+  await mkdir(join(consumerDir, "src"), { recursive: true });
+  await writeFile(
+    join(consumerDir, "index.html"),
+    '<!doctype html><html><body><div id="root"></div><script type="module" src="/src/main.jsx"></script></body></html>'
+  );
+  await writeFile(
+    join(consumerDir, "src", "main.jsx"),
+    'import React from "react"; import { createRoot } from "react-dom/client"; import { Button } from "sherick-ui"; import "sherick-ui/styles.css"; createRoot(document.getElementById("root")).render(React.createElement(Button, null, "Packed"));'
+  );
+
   run(process.execPath, ["esm.mjs"], consumerDir);
   run(process.execPath, ["cjs.cjs"], consumerDir);
   run(join(consumerDir, "node_modules", ".bin", "tsc"), ["-p", "tsconfig.json"], consumerDir);
+  run(join(consumerDir, "node_modules", ".bin", "vite"), ["build"], consumerDir);
 
   const installedPackage = JSON.parse(
     await readFile(join(consumerDir, "node_modules", "sherick-ui", "package.json"), "utf8")
   );
   assert.equal(installedPackage.main, "dist/cjs/index.cjs");
+  assert.equal(installedPackage.style, "dist/styles.css");
   assert.equal(installedPackage.exports["."].require, "./dist/cjs/index.cjs");
+  assert.equal(installedPackage.exports["./styles.css"], "./dist/styles.css");
+  assert.equal(installedPackage.exports["./theme.css"], "./dist/theme.css");
+  assert.equal(installedPackage.exports["./tailwind-preset"], undefined);
+  assert.equal(installedPackage.peerDependencies.tailwindcss, undefined);
   await access(join(consumerDir, "node_modules", "sherick-ui", "dist", "cjs", "index.cjs"));
+  await access(join(consumerDir, "node_modules", "sherick-ui", "dist", "styles.css"));
+  await access(join(consumerDir, "node_modules", "sherick-ui", "dist", "theme.css"));
+  await access(join(consumerDir, "node_modules", "sherick-ui", "dist", "fonts", "KaTeX_Main-Regular.woff2"));
 
   console.log(`Packed package verification passed: ${packed[0].filename}`);
 } finally {
