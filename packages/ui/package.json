@@ -1,6 +1,6 @@
 {
   "name": "sherick-ui",
-  "version": "1.0.5",
+  "version": "2.0.0-alpha.1",
   "description": "A reusable React component library inspired by Material 3 Expressive.",
   "keywords": [
     "react",
@@ -10,7 +10,8 @@
     "design"
   ],
   "publishConfig": {
-    "access": "public"
+    "access": "public",
+    "tag": "alpha"
   },
   "main": "dist/cjs/index.cjs",
   "module": "dist/esm/index.js",
@@ -32,6 +33,10 @@
       "import": "./dist/esm/index.js",
       "require": "./dist/cjs/index.cjs"
     },
+    "./content": {
+      "types": "./dist/types/content.d.ts",
+      "import": "./dist/esm/content.js"
+    },
     "./dev": {
       "types": "./dist/types/dev.d.ts",
       "import": "./dist/esm/dev.js",
@@ -47,6 +52,7 @@
     "typecheck": "tsc --noEmit",
     "test": "node scripts/smoke-package.mjs",
     "test:packed": "node scripts/verify-packed-package.mjs",
+    "test:bundle": "node scripts/bundle-budget.mjs",
     "visual": "bun scripts/visual-regression.mjs",
     "clean": "rimraf dist",
     "lint": "eslint src scripts/build-styles.ts"
@@ -67,23 +73,16 @@
     "rehype-katex": "^7.0.1",
     "remark-gfm": "^4.0.1",
     "remark-math": "^6.0.0",
-    "tailwind-merge": "^2.6.1",
-    "tslib": "^2.8.1"
+    "tailwind-merge": "^2.6.1"
   },
   "devDependencies": {
-    "@babel/core": "^7.29.7",
-    "@babel/preset-env": "^7.29.7",
-    "@babel/preset-react": "^7.29.7",
-    "@babel/preset-typescript": "^7.29.7",
-    "@rollup/plugin-babel": "^7.1.0",
-    "@rollup/plugin-commonjs": "^29.0.3",
     "@rollup/plugin-node-resolve": "^16.0.3",
     "@rollup/plugin-typescript": "^12.3.0",
-    "@size-limit/preset-small-lib": "^11.1.6",
     "@types/node": "^24.13.4",
     "@types/prismjs": "^1.26.6",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
+    "esbuild": "^0.28.2",
     "eslint": "^9.39.5",
     "postcss": "^8.5.28",
     "postcss-selector-parser": "^7.1.0",
@@ -92,20 +91,9 @@
     "rimraf": "^6.1.3",
     "rollup": "^4.63.3",
     "rollup-plugin-dts": "^6.5.1",
-    "rollup-plugin-peer-deps-external": "^2.2.4",
     "rollup-preserve-directives": "1.1.3",
     "tailwindcss": "^3.4.19",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.70.0"
-  },
-  "size-limit": [
-    {
-      "path": "dist/cjs/index.cjs",
-      "limit": "10 KB"
-    },
-    {
-      "path": "dist/esm/index.js",
-      "limit": "10 KB"
-    }
-  ]
+  }
 }

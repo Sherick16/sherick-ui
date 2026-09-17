@@ -1,6 +1,6 @@
 "use client";
 
-import { Tabs } from "@base-ui/react/tabs";
+import { Tabs as BaseTabs } from "@base-ui/react/tabs";
 import React, { type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import {
@@ -22,7 +22,7 @@ export interface Tab {
   disabled?: boolean;
 }
 
-export interface TabGroupProps {
+export interface TabsProps {
   tabs: Tab[];
   variant?: Variant;
   className?: string;
@@ -30,13 +30,9 @@ export interface TabGroupProps {
   defaultValue?: string;
   onValueChange?: (tabId: string) => void;
   ariaLabel?: string;
-  /** @deprecated Use `defaultValue` instead. */
-  defaultTabId?: string;
-  /** @deprecated Use `onValueChange` instead. */
-  onTabChange?: (tabId: string) => void;
 }
 
-export const TabGroup = ({
+export const Tabs = ({
   tabs,
   variant = "primary",
   className,
@@ -44,26 +40,23 @@ export const TabGroup = ({
   defaultValue,
   onValueChange,
   ariaLabel = "Tabs",
-  defaultTabId,
-  onTabChange,
-}: TabGroupProps) => {
+}: TabsProps) => {
   if (tabs.length === 0) return null;
 
   const fallbackValue = tabs.find((tab) => !tab.disabled)?.id ?? tabs[0].id;
-  const uncontrolledDefault = defaultValue ?? defaultTabId ?? fallbackValue;
+  const uncontrolledDefault = defaultValue ?? fallbackValue;
 
   return (
-    <Tabs.Root
+    <BaseTabs.Root
       value={value}
       defaultValue={value === undefined ? uncontrolledDefault : undefined}
       onValueChange={(nextValue) => {
         if (typeof nextValue !== "string") return;
         onValueChange?.(nextValue);
-        onTabChange?.(nextValue);
       }}
       className={cn("w-full", className)}
     >
-      <Tabs.List
+      <BaseTabs.List
         aria-label={ariaLabel}
         className={cn(
           "relative flex min-w-max bg-sherick-surface/[0.72] p-1.5",
@@ -71,7 +64,7 @@ export const TabGroup = ({
           elevation.recessed
         )}
       >
-        <Tabs.Indicator
+        <BaseTabs.Indicator
           className={cn(
             "absolute left-[var(--active-tab-left)] top-[var(--active-tab-top)] h-[var(--active-tab-height)] w-[var(--active-tab-width)]",
             shape.pill,
@@ -82,7 +75,7 @@ export const TabGroup = ({
         />
 
         {tabs.map((tab) => (
-          <Tabs.Tab
+          <BaseTabs.Tab
             key={tab.id}
             value={tab.id}
             disabled={tab.disabled}
@@ -101,15 +94,15 @@ export const TabGroup = ({
             }
           >
             {tab.label}
-          </Tabs.Tab>
+          </BaseTabs.Tab>
         ))}
-      </Tabs.List>
+      </BaseTabs.List>
 
       {tabs.map((tab) => (
-        <Tabs.Panel key={tab.id} value={tab.id} className={cn("mt-5")}>
+        <BaseTabs.Panel key={tab.id} value={tab.id} className={cn("mt-5")}>
           {tab.content}
-        </Tabs.Panel>
+        </BaseTabs.Panel>
       ))}
-    </Tabs.Root>
+    </BaseTabs.Root>
   );
 };

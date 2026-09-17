@@ -1,13 +1,10 @@
 import React, { type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import { edge, material, motion, shape, state, text } from "./ui.common";
-import { Variant } from "./ui.types";
 
 export interface TableProps {
   headers: string[];
   rows: ReactNode[][];
-  /** Retained for backwards compatibility. Tables intentionally use a neutral visual treatment. */
-  variant?: Variant;
   className?: string;
 }
 

@@ -19,6 +19,7 @@
     "sherick-ui": "workspace:*"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.13.0",
     "@playwright/test": "^1.59.1",
     "@types/node": "^24.13.4",
     "@types/react": "^19.3.0",

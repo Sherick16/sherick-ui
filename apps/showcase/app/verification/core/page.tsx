@@ -34,6 +34,7 @@ export default function VerificationCorePage() {
         <div className="grid gap-5 sm:grid-cols-2">
           <Input label="Project name" defaultValue="Sherick UI" />
           <Select
+            aria-label="Project type"
             options={[
               { label: "Design system", value: "design" },
               { label: "Dashboard", value: "dashboard" },
@@ -43,7 +44,7 @@ export default function VerificationCorePage() {
         </div>
 
         <div className="flex items-center gap-5">
-          <Switch checked onChange={noop} aria-label="Enabled" />
+          <Switch checked onCheckedChange={noop} aria-label="Enabled" />
           <span className="text-sm text-sherick-ink-muted">Enabled state</span>
         </div>
 
@@ -55,7 +56,7 @@ export default function VerificationCorePage() {
           ]}
         />
 
-        <Dialog open={false} onClose={noop}>
+        <Dialog open={false}>
           <Dialog.Header>Closed dialog</Dialog.Header>
           <Dialog.Content>This must remain absent after hydration.</Dialog.Content>
         </Dialog>

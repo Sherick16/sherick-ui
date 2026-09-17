@@ -20,11 +20,10 @@ import {
 import { Variant } from "./ui.types";
 
 export interface SwitchProps
-  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "onChange" | "value"> {
+  extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "value"> {
   checked?: boolean;
+  defaultChecked?: boolean;
   onCheckedChange?: (checked: boolean) => void;
-  /** @deprecated Use `onCheckedChange` instead. */
-  onChange?: (checked: boolean) => void;
   variant?: Variant;
   value?: string;
   uncheckedValue?: string;
@@ -34,9 +33,9 @@ export interface SwitchProps
 }
 
 export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(({
-  checked = false,
+  checked,
+  defaultChecked,
   onCheckedChange,
-  onChange,
   variant = "primary",
   className,
   disabled,
@@ -54,6 +53,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(({
       nativeButton
       render={<button {...buttonProps} ref={ref} type="button" />}
       checked={checked}
+      defaultChecked={defaultChecked}
       disabled={disabled}
       name={name}
       form={form}
@@ -62,10 +62,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(({
       readOnly={readOnly}
       required={required}
       inputRef={inputRef}
-      onCheckedChange={(nextChecked) => {
-        onCheckedChange?.(nextChecked);
-        onChange?.(nextChecked);
-      }}
+      onCheckedChange={onCheckedChange}
       className={cn(
         "group inline-flex min-h-12 min-w-14 items-center justify-center rounded-full outline-none",
         disabled ? state.disabled : state.enabled,

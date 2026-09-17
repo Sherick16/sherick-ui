@@ -474,6 +474,41 @@ inline padding from a field's.
 - Color is never the only carrier of meaning: a semantic state also carries an icon, a
   label or a position.
 
+### Known contrast gap (pre-release)
+
+The authored default palette does **not** meet WCAG AA text contrast, and this is a known,
+measured, deliberately recorded limitation rather than an oversight in a component. It is
+not fixed by the palette, because closing it means changing the brand accent and collapsing
+the three-step text ladder defined in §10 — a visual-language decision, tracked separately
+from component work.
+
+Measured with axe-core 4.13 against the rendered fixtures (the automated gate excludes only
+`color-contrast`; see `docs/VERIFICATION.md`):
+
+| Pair | Light | Dark |
+| --- | --- | --- |
+| `tone.text.primary` on `tone.tonal.primary` (`primary` / 0.12) | 3.82–4.51 | 4.53–5.94 |
+| `tone.text.primary` on `tone.selected.primary` (`primary` / 0.22) | 3.69–3.88 | 4.36–4.87 |
+| `text.low` on the page canvas | 3.16 | 4.54 |
+| `text.low` on `surface-high` | 2.80 | 3.52 |
+
+Consequences that follow from this gap, and the rules they impose:
+
+- **`tone.text.primary` is not an AA foreground on a primary tint.** A primary tonal control
+  or primary soft surface carries its label at roughly 3.8–4.4:1. Treat these as decorative
+  emphasis, not as the only way a user learns something they must act on.
+- **`text.low` is furniture, not copy.** §10 already restricts it to gutters, hints and token
+  names; because it measures 2.8–3.2:1 in light mode it must never carry information a user
+  needs in order to act, and it must not be the only place a value, label or error appears.
+- **Anything that must be readable uses `text.high` or `text.medium`**, both of which clear
+  AA on every authored surface in both themes.
+- A consumer that needs AA throughout can already retune `--sui-primary` and `--sui-ink-faint`
+  at the document root; that is an ordinary supported theme override, not a fork.
+
+Do not "fix" a failing contrast measurement inside a component by darkening that component's
+label: the roles above are the shared primitives, and a local color is exactly the kind of
+rule §16 forbids inventing locally.
+
 ---
 
 ## 15. Theming

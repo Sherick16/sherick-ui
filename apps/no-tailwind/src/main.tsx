@@ -6,12 +6,10 @@ import {
   Badge,
   Button,
   Card,
-  CodeBlock,
   Dialog,
   Divider,
   IconButton,
   Input,
-  Markdown,
   Search,
   Select,
   Skeleton,
@@ -22,6 +20,7 @@ import {
   Textarea,
   Tooltip,
 } from "sherick-ui";
+import { CodeBlock, Markdown } from "sherick-ui/content";
 import "./app.css";
 import "sherick-ui/styles.css";
 

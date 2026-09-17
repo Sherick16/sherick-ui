@@ -5,12 +5,12 @@ import React, { type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import { text } from "./ui.common";
 
-export interface ModalHeaderProps {
+export interface DialogHeaderProps {
   children: ReactNode;
   className?: string;
 }
 
-export const ModalHeader = ({ children, className }: ModalHeaderProps) => {
+export const DialogHeader = ({ children, className }: DialogHeaderProps) => {
   return (
     <div className={cn("pt-5 pb-2 pl-6 pr-16 sm:pl-7", className)}>
       <BaseDialog.Title className={cn("text-xl font-semibold tracking-[-0.02em]", text.high)}>

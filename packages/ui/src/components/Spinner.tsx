@@ -35,9 +35,6 @@ export interface SpinnerProps
   children?: React.ReactNode;
 }
 
-/** @deprecated Use `SpinnerProps` instead. */
-export type SpinnerContentProps = SpinnerProps;
-
 export function Spinner({ size, show, children, className }: SpinnerProps) {
   return (
     <span className={cn(spinnerVariants({ show }))} role="status" aria-live="polite">

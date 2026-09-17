@@ -114,6 +114,72 @@ Consumers customize themes through `--sui-*` variables at document/root level. D
 promise nested isolated theme islands unless the portal-container architecture is designed
 for them explicitly.
 
+## Public surface (mandatory)
+
+The package publishes exactly five subpaths, and they are settled:
+
+- `sherick-ui` — the core barrel, with the canonical component and prop-type exports;
+- `sherick-ui/content` — the rich-content boundary, **ESM only**: `Markdown`, `CodeBlock`, `MarkdownProps`, `CodeBlockProps`;
+- `sherick-ui/dev` — development-only helper exports for this repository's workbench. Unstable, unsupported, and not part of the consumer contract;
+- `sherick-ui/styles.css` — the complete published component stylesheet;
+- `sherick-ui/theme.css` — token-only theme output.
+
+The public naming surface is canonical: `Button`, `Select`, `Dialog`, `Tabs`. Compatibility
+aliases are not a supported pattern — not in source, not in types, not in fixtures, not in
+documentation. A rename is a clean cutover: delete the old name, migrate every caller.
+
+Rich content (`Markdown`, `CodeBlock`, Prism, remark/rehype, KaTeX) lives behind its own
+subpath, `sherick-ui/content`, and MUST NOT become reachable from the root barrel. Importing a
+core component must never *bundle* a syntax highlighter or a Markdown pipeline;
+`bun run test:bundle` fails if it does. The boundary is a bundle boundary, not an install one:
+the rich stack stays in `dependencies`, so installing the package installs it whether or not
+the subpath is ever imported.
+
+`sherick-ui/content` is **ESM only** and declares no `require` entry, because its dependency
+stack (`react-markdown`, `remark-*`, `rehype-*`) has no CommonJS build. Do not add a CommonJS
+entry for it, and do not add an `engines` floor to stand in for one — the subpath is expressed
+in `exports`, and the core entries stay CommonJS-safe on their own.
+
+`@base-ui/react` is internal behavioral infrastructure and `tailwindcss` is internal
+authoring/build infrastructure. Neither is consumer API: the package exposes no Tailwind
+preset, declares no Tailwind peer dependency, requires no content scanning, and consumers
+must not import Base UI to use Sherick UI. Base UI internals are not covered by this
+package's compatibility promise.
+
+The package is on a prerelease line. `1.0.0`-`1.0.5` are published and `1.0.5` holds the npm
+`latest` dist-tag, so the `1.x` line is frozen and new work ships as `2.0.0-alpha.N` under the
+`alpha` dist-tag. Breaking changes are allowed and expected without deprecation cycles, and
+compatibility starts being promised at the stable `2.0.0`. Do not add a release to `1.x`, and
+do not publish a prerelease under `latest`. See [`docs/RELEASE.md`](docs/RELEASE.md).
+
+## Frozen architecture (mandatory)
+
+The package boundary, the Base UI behavior boundary, the styling distribution, theme/token
+ownership, public API naming, the rich-content boundary, the package `exports` map, the
+verification layers and the size budgets are all **settled**:
+
+> New components should extend existing primitives, recipes, package exports and verification infrastructure. Do not introduce a new architectural layer unless an existing invariant cannot support the requirement.
+
+Do not reintroduce:
+
+- **compatibility aliases** — no `ActionButton`, `Dropdown`, `Modal`, `TabGroup`, no
+  deprecated prop shims (`Tabs.defaultTabId`, `Tabs.onTabChange`, `Dialog.onClose`,
+  `Select.selected`, `Select.onSelect`, `Table.variant`, an `onChange` re-added as a Sherick
+  callback), and no re-export of a removed name from any subpath;
+- **rich-content imports from the root barrel** — `Markdown`, `CodeBlock`, Prism or KaTeX
+  must never become reachable from `sherick-ui`, and no heavyweight dependency may be added
+  to the core barrel. Rich content also stays ESM-only: no CommonJS entry for
+  `sherick-ui/content`;
+- **a new architectural layer** — no second wrapper over Base UI, no parallel styling
+  delivery mechanism, no alternative theme system, no second rich-content entry point;
+- **a size-budget increase without a recorded reason** — `packages/ui/scripts/bundle-budget.mjs`
+  against `packages/ui/scripts/bundle-budget.json` is the single owner of size budgets; a
+  baseline increase is an architecture change and needs a deliberate, recorded reason.
+
+If an existing invariant genuinely cannot support a requirement, that is an architecture
+decision: update `docs/ARCHITECTURE.md` and `docs/RELEASE.md` in the same change rather than
+working around it locally inside one component.
+
 ## Behavioral foundation (mandatory)
 
 Base UI (`@base-ui/react`) is Sherick UI's behavioral and accessibility substrate. Sherick

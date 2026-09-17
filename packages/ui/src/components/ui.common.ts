@@ -224,11 +224,9 @@ export const stateLayer = {
      rather than the track itself. A segmented track is recessed for the same static
      reason but does not compose this layer. */
   track: `${stateLayerBase} before:rounded-[inherit] before:bg-current group-hover:before:opacity-[0.18] group-active:before:opacity-[0.26] group-active:before:duration-press group-active:before:ease-press`,
-  /* A row highlighted by keyboard navigation. Legacy Sherick rows expose `data-active`;
-     Base UI collection primitives expose `data-highlighted`, and both consume this one
-     canonical visual treatment. */
-  activeRow:
-    "data-[active=true]:before:opacity-[0.06] data-[highlighted]:before:opacity-[0.06]",
+  /* A row highlighted by keyboard navigation. Base UI collection primitives expose
+     `data-highlighted`; this is the one canonical visual treatment for it. */
+  activeRow: "data-[highlighted]:before:opacity-[0.06]",
 } as const;
 
 /* Material — fill only. No material carries elevation or a rim: the same matte

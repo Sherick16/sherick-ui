@@ -18,15 +18,13 @@ import {
   text,
 } from "./ui.common";
 
-export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "onChange"> {
+export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: ReactNode;
   description?: ReactNode;
   error?: boolean;
   errorMessage?: ReactNode;
   inputClassName?: string;
   onValueChange?: (value: string) => void;
-  /** @deprecated Use `onValueChange` instead. */
-  onChange?: (value: string) => void;
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(
@@ -42,17 +40,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     name,
     disabled,
     onValueChange,
-    onChange,
     ...props
   }, ref) => {
-    const handleValueChange = (value: string) => {
-      onValueChange?.(value);
-      onChange?.(value);
-    };
-
     return (
       <Field.Root
-        className={cn("flex flex-col", className)}
+        className={cn("flex w-full flex-col", className)}
         name={name}
         disabled={disabled}
         invalid={error}
@@ -70,10 +62,10 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           name={name}
           required={required}
           disabled={disabled}
-          onValueChange={handleValueChange}
+          onValueChange={onValueChange}
           className={cn(
             density.normal,
-            "min-w-64 px-5 py-3",
+            "w-full px-5 py-3",
             shape.control,
             motion.press,
             focusRing,
