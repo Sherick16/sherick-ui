@@ -204,6 +204,88 @@ test("a compact selection control keeps a compact layout box with a comfortable 
   expect(errors).toEqual([]);
 });
 
+test("a checkbox neither moves nor drifts off its line when its mark arrives", async ({ page }) => {
+  const errors = trackRuntimeErrors(page);
+  const inline = page.getByRole("checkbox", { name: "Inline terms" });
+
+  // The reported defect: the control sat on its text baseline, so its own mark changed the line
+  // box it was laid out in and the box jumped a couple of pixels on every toggle.
+  await inline.scrollIntoViewIfNeeded();
+  const read = () =>
+    inline.evaluate((element) => {
+      const line = element.parentElement?.getBoundingClientRect();
+      const box = element.getBoundingClientRect();
+      return {
+        lineTop: +(line?.top ?? 0).toFixed(2),
+        lineHeight: +(line?.height ?? 0).toFixed(2),
+        boxTop: +box.top.toFixed(2),
+        boxCenter: +(box.top + box.height / 2).toFixed(2),
+      };
+    });
+
+  const checked = await read();
+  await inline.click();
+  await expect(inline).toHaveAttribute("aria-checked", "false");
+  const unchecked = await read();
+  await inline.click();
+  await expect(inline).toHaveAttribute("aria-checked", "true");
+  const backToChecked = await read();
+
+  expect(unchecked.boxTop).toBe(checked.boxTop);
+  expect(backToChecked.boxTop).toBe(checked.boxTop);
+  expect(unchecked.lineHeight).toBe(checked.lineHeight);
+  expect(unchecked.boxCenter).toBe(checked.boxCenter);
+
+  expect(errors).toEqual([]);
+});
+
+test("a radio row keeps its circle on the text line in either state", async ({ page }) => {
+  const errors = trackRuntimeErrors(page);
+  const group = page.getByRole("radiogroup", { name: "Region", exact: true });
+
+  const read = () =>
+    group.evaluate((element) =>
+      [...element.querySelectorAll("label")].map((label) => {
+        const radio = label.querySelector('[role="radio"]');
+        const well = radio?.querySelector("span");
+        const text = [...label.querySelectorAll("span")].find(
+          (candidate) => candidate.textContent.trim().length > 2
+        );
+        const wellBox = well?.getBoundingClientRect();
+        const textBox = text?.getBoundingClientRect();
+        const radioBox = radio?.getBoundingClientRect();
+        return {
+          selected: radio?.getAttribute("aria-checked") === "true",
+          well: `${wellBox?.width.toFixed(1)}x${wellBox?.height.toFixed(1)}`,
+          centerDelta: +(
+            (wellBox?.top ?? 0) +
+            (wellBox?.height ?? 0) / 2 -
+            ((textBox?.top ?? 0) + (textBox?.height ?? 0) / 2)
+          ).toFixed(2),
+          top: +(radioBox?.top ?? 0).toFixed(2),
+        };
+      })
+    );
+
+  await group.scrollIntoViewIfNeeded();
+  const before = await read();
+  expect(before.length).toBeGreaterThan(1);
+
+  // Selecting another option must not move any row, and every circle sits on its own text line.
+  await group.getByRole("radio", { name: "United States" }).click();
+  const after = await read();
+
+  for (const [index, row] of after.entries()) {
+    expect(row.centerDelta, `row ${index} circle is off its text line`).toBeLessThanOrEqual(0.5);
+    expect(row.well, `row ${index} circle changed size`).toBe(before[index].well);
+    expect(row.top, `row ${index} moved on selection`).toBe(before[index].top);
+  }
+  expect(before.some((row) => row.selected)).toBe(true);
+  expect(after.some((row) => row.selected)).toBe(true);
+
+  expect(errors).toEqual([]);
+});
+
 test("NumberField types, steps and stops at its bounds", async ({ page }) => {
   const errors = trackRuntimeErrors(page);
   const field = page.getByTestId("seats-field");

@@ -130,6 +130,10 @@ export default function VerificationInteractionsPage() {
 
         <Checkbox indeterminate aria-label="Partial selection" />
 
+        <p className="text-sm">
+          I agree to the <Checkbox aria-label="Inline terms" defaultChecked /> deployment terms.
+        </p>
+
         <RadioGroup label="Region" value={region} onValueChange={setRegion} options={regionOptions} />
         <p data-testid="region-value">{region}</p>
 

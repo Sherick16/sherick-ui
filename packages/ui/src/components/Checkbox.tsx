@@ -63,7 +63,10 @@ export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(
         inputRef={inputRef}
         onCheckedChange={onCheckedChange}
         className={cn(
-          "group inline-flex w-fit",
+          // `align-middle` rather than the default baseline: an inline-level box whose baseline is
+          // derived from its own children moves by a couple of pixels the moment its mark appears
+          // or leaves, which is exactly what a checkbox does. Its centre is a stable anchor.
+          "group inline-flex w-fit align-middle",
           hitArea,
           disabled ? state.disabled : state.enabled,
           className
