@@ -81,7 +81,7 @@ The existing reviewed Chromium snapshots remain the visual baseline for:
 - initially-open Dialog overlays in light mode;
 - initially-open Dialog overlays in dark mode.
 
-Phase 3 treats those screenshots as immutable: a difference is a styling-distribution defect unless explicitly proven otherwise.
+Those screenshots are immutable: a difference is a styling-distribution defect unless explicitly proven otherwise.
 
 The showcase browser suite also verifies:
 
