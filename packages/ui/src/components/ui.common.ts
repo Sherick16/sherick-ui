@@ -101,8 +101,7 @@ export const motion = {
                a switch thumb, a selected segment.
    - recessed: the other half of that pair: a groove, a track or a well, which is
                recessed by definition, and a raised control while it is held, which
-               lands at the same depth. `pressed` is the published alias for that depth;
-               prefer `recessed` whenever the surface is simply sunk rather than held.
+               lands at the same depth.
    A passive surface is flat unless its anatomy is sunk by design: a well, a groove and
    a code well are `recessed` while they sit there, and `flat` is the default for
    everything else passive. A flat control never gains depth by being pressed. */
@@ -112,11 +111,6 @@ export const elevation = {
   floating: "shadow-sherick-floating",
   control: "shadow-sherick-control",
   recessed: "shadow-sherick-recessed",
-  /* The same physical depth, named for the moment a control reaches it by being held
-     down. Kept because it is published: a control that is actively pressed and a
-     passive groove resolve to one recessed depth, so neither name describes a
-     different height. */
-  pressed: "shadow-sherick-pressed",
 } as const;
 
 /* Shape — semantic corner roles, never an arbitrary radius. Softness grows with
@@ -273,11 +267,11 @@ export const material = {
   control: "bg-sherick-surface-high/[0.66] text-sherick-ink placeholder:text-sherick-ink-muted",
   controlError: "bg-sherick-danger/[0.075] text-sherick-ink placeholder:text-sherick-danger/[0.72]",
   acrylic:
-    "bg-sherick-surface-float/[0.60] bg-[image:var(--sui-glass-gradient)] text-sherick-ink backdrop-blur-[var(--sui-glass-blur,32px)] backdrop-saturate-[var(--sui-glass-saturation,1.45)] backdrop-brightness-[var(--sui-glass-brightness,1.04)]",
+    "bg-sherick-surface-float/[0.60] bg-[image:var(--sui-glass-gradient)] text-sherick-ink backdrop-blur-[var(--sui-glass-blur)] backdrop-saturate-[var(--sui-glass-saturation)] backdrop-brightness-[var(--sui-glass-brightness)]",
   acrylicDense:
-    "bg-sherick-surface-float/[0.72] bg-[image:var(--sui-glass-gradient-dense)] text-sherick-ink backdrop-blur-[var(--sui-glass-dense-blur,26px)] backdrop-saturate-[var(--sui-glass-dense-saturation,1.38)] backdrop-brightness-[var(--sui-glass-dense-brightness,1.035)]",
+    "bg-sherick-surface-float/[0.72] bg-[image:var(--sui-glass-gradient-dense)] text-sherick-ink backdrop-blur-[var(--sui-glass-dense-blur)] backdrop-saturate-[var(--sui-glass-dense-saturation)] backdrop-brightness-[var(--sui-glass-dense-brightness)]",
   acrylicHero:
-    "bg-sherick-surface-overlay/[var(--sui-overlay-fill,0.9)] bg-[image:var(--sui-glass-hero-gradient)] text-sherick-ink backdrop-blur-[var(--sui-glass-hero-blur,14px)] backdrop-saturate-[var(--sui-glass-hero-saturation,1.06)] backdrop-brightness-[var(--sui-glass-hero-brightness,1)]",
+    "bg-sherick-surface-overlay/[var(--sui-overlay-fill)] bg-[image:var(--sui-glass-hero-gradient)] text-sherick-ink backdrop-blur-[var(--sui-glass-hero-blur)] backdrop-saturate-[var(--sui-glass-hero-saturation)] backdrop-brightness-[var(--sui-glass-hero-brightness)]",
 } as const;
 
 /* Density — three control steps plus the accessible hit target.
