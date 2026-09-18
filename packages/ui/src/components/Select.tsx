@@ -84,7 +84,6 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                 !disabled && state.field.hover,
                 !disabled && state.field.focus,
                 open && state.field.engaged,
-                !disabled && state.press,
                 disabled ? state.disabled : state.enabled
               )
             }

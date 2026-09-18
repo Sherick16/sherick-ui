@@ -2,15 +2,20 @@
 
 import { useEffect, useState } from "react";
 import {
+  Alert,
   AlertDialog,
   Button,
   Checkbox,
   Combobox,
   Dialog,
+  Field,
+  IconButton,
   Menu,
   NavItem,
+  NumberField,
   Popover,
   RadioGroup,
+  Search,
   Select,
   Skeleton,
   Slider,
@@ -19,6 +24,7 @@ import {
   Tabs,
   Tooltip,
 } from "sherick-ui";
+import { Copy, Plus, Trash2 } from "lucide-react";
 
 type Speed = "normal" | "slow" | "reduce";
 
@@ -47,10 +53,10 @@ const Specimen = ({ intent, note, children }: { intent: string; note: string; ch
 /**
  * Development-only motion lab.
  *
- * It shows the motion primitives themselves — one live specimen per intent — so an
- * animation can be watched at normal speed, in slow motion, or with motion reduced. The
- * speed control is a workbench control, not an API: it overrides the canonical duration
- * variables on the document while this page is open, and nothing in the package reads it.
+ * One live specimen per intent, and the anchored family side by side, so an animation can be
+ * watched at normal speed, in slow motion, or with motion reduced instead of reasoned about.
+ * The speed controls are workbench controls, not an API: they override the canonical duration
+ * variables on the document while this page is open, and nothing in the package reads them.
  */
 export default function MotionLabPage() {
   const [speed, setSpeed] = useState<Speed>("normal");
@@ -58,6 +64,7 @@ export default function MotionLabPage() {
   const [alertOpen, setAlertOpen] = useState(false);
   const [checked, setChecked] = useState(false);
   const [region, setRegion] = useState("eu");
+  const [alertVisible, setAlertVisible] = useState(true);
 
   useEffect(() => {
     if (speed === "normal") delete document.documentElement.dataset.motionSpeed;
@@ -93,19 +100,91 @@ export default function MotionLabPage() {
           ))}
         </div>
 
+        {/* The family that has to read as one physical idea: the same presence, five triggers. */}
+        <Specimen
+          intent="anchored family"
+          note="The surface grows out of the anchor edge the primitive resolved. Compare Select with Combobox, and Menu with Popover."
+        >
+          <div className="grid w-full gap-6 sm:grid-cols-2">
+            <Field label="Select">
+              <Select options={options} defaultValue="design" />
+            </Field>
+            <Field label="Combobox">
+              <Combobox options={options} defaultValue="design" />
+            </Field>
+            <Field label="Menu">
+              <Menu>
+                <Menu.Trigger render={<Button appearance="tonal" variant="secondary">Open menu</Button>} />
+                <Menu.Content>
+                  <Menu.Item>Duplicate</Menu.Item>
+                  <Menu.Item>Add to project</Menu.Item>
+                  <Menu.Separator />
+                  <Menu.Item variant="danger">Delete</Menu.Item>
+                </Menu.Content>
+              </Menu>
+            </Field>
+            <Field label="Popover">
+              <Popover>
+                <Popover.Trigger
+                  render={
+                    <Button appearance="tonal" variant="secondary" data-testid="lab-popover-trigger">
+                      Open popover
+                    </Button>
+                  }
+                />
+                <Popover.Content>
+                  <p className="text-sm">Anchored content.</p>
+                </Popover.Content>
+              </Popover>
+            </Field>
+            <Field label="Tooltip">
+              <Tooltip content="Above the control" position="top">
+                <Button appearance="tonal" variant="secondary">Hover</Button>
+              </Tooltip>
+            </Field>
+          </div>
+        </Specimen>
+
         <Specimen intent="feedback" note="Non-spatial: tone, focus and highlight only.">
           <Button appearance="text">Hover or press</Button>
           <NavItem href="#feedback">A navigation row</NavItem>
         </Specimen>
 
-        <Specimen intent="tactile" note="A control answers a press and settles on release.">
+        <Specimen
+          intent="tactile"
+          note="A full control answers a press with its own compression; a small control inside a larger target takes the compact step."
+        >
           <Button appearance="filled">Filled</Button>
           <Button appearance="tonal">Tonal</Button>
           <Button appearance="text">Text</Button>
+          <IconButton variant="secondary" icon={<Copy className="size-5" />} aria-label="Copy" />
+          <IconButton appearance="ghost" variant="secondary" icon={<Plus className="size-5" />} aria-label="Add" />
+          <IconButton
+            appearance="acrylic"
+            variant="secondary"
+            icon={<Trash2 className="size-5" />}
+            aria-label="Delete"
+          />
+          <div className="w-40">
+            <NumberField aria-label="Stepper" defaultValue={4} min={1} max={10} />
+          </div>
+          <div className="w-56">
+            <Search aria-label="Search" onSearch={() => undefined} placeholder="Search" />
+          </div>
+          {alertVisible ? (
+            <Alert variant="danger" closeable onDismiss={() => setAlertVisible(false)}>
+              Dismissible
+            </Alert>
+          ) : (
+            <Button appearance="text" onClick={() => setAlertVisible(true)}>
+              Restore alert
+            </Button>
+          )}
         </Specimen>
 
         <Specimen intent="arrive" note="A subordinate mark lands inside a boundary that never moves.">
           <Checkbox checked={checked} onCheckedChange={setChecked} aria-label="Motion lab checkbox" />
+          <Checkbox indeterminate aria-label="Motion lab dash" />
           <RadioGroup
             aria-label="Motion lab region"
             value={region}
@@ -115,12 +194,12 @@ export default function MotionLabPage() {
               { value: "us", label: "United States" },
             ]}
           />
-          <Select aria-label="Motion lab select" options={options} defaultValue="design" />
         </Specimen>
 
-        <Specimen intent="orient" note="A persistent affordance turns in place.">
-          <Select aria-label="Orientation select" options={options} />
-          <Combobox aria-label="Orientation combobox" options={options} />
+        <Specimen intent="orient" note="A persistent affordance turns in place — the only rotation in the library.">
+          <p className="text-sm text-sherick-ink-muted">
+            Both chevrons above turn; open the Select and the Combobox to compare them.
+          </p>
         </Specimen>
 
         <Specimen intent="relocate" note="A persistent object travels between stable destinations.">
@@ -130,6 +209,7 @@ export default function MotionLabPage() {
             tabs={[
               { id: "one", label: "Overview", content: "Overview panel" },
               { id: "two", label: "Details", content: "Details panel" },
+              { id: "three", label: "History", content: "History panel" },
             ]}
           />
         </Specimen>
@@ -138,32 +218,6 @@ export default function MotionLabPage() {
           <div className="w-full max-w-md">
             <Slider aria-label="Motion lab slider" defaultValue={40} />
           </div>
-        </Specimen>
-
-        <Specimen intent="anchored presence" note="A surface grows out of the edge it resolved to.">
-          <Popover>
-            <Popover.Trigger
-              render={
-                <Button appearance="tonal" data-testid="lab-popover-trigger">
-                  Popover
-                </Button>
-              }
-            />
-            <Popover.Content>
-              <p className="text-sm">Anchored content.</p>
-            </Popover.Content>
-          </Popover>
-          <Menu>
-            <Menu.Trigger render={<Button appearance="tonal">Menu</Button>} />
-            <Menu.Content>
-              <Menu.Item>An action</Menu.Item>
-              <Menu.Separator />
-              <Menu.Item variant="danger">A destructive action</Menu.Item>
-            </Menu.Content>
-          </Menu>
-          <Tooltip content="Above the control" position="top">
-            <Button appearance="text">Tooltip</Button>
-          </Tooltip>
         </Specimen>
 
         <Specimen intent="modal presence" note="A large surface settles; the plane behind it only fades.">

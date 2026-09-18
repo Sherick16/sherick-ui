@@ -373,9 +373,15 @@ The color roles a surface can take, in rising strength:
 | `tonal` | a matte control fill at rest | tonal buttons, icon buttons, chips | surfaces that are not controls |
 | `selected` | the fill a selected control holds | menu options, navigation, the selected segment of a segmented control | hover — hover is a state layer, not this tone |
 | `strong` | the opaque accent fill that marks priority | the one primary action in a view | multiple actions competing for priority |
+| `strongChecked` | the same fills, keyed on the control's own selection marker | a control that holds its selection in the primitive — a `Switch` | a control whose selection the application owns as a prop |
 
 A fill step is composited over whatever sits beneath it, so one tone reads correctly on
 the canvas, inside a card and on an acrylic sheet.
+
+`strongChecked` exists because a fill that follows selection has to be written out literally to be
+compiled, and because an uncontrolled control has no prop to read: a `Switch` that is not told
+whether it is on still has to take its fill from the same source of truth as one that is, so the
+checked fill is a role keyed on the marker rather than a conditional at the call site.
 
 ### Semantic color
 
@@ -402,26 +408,19 @@ One language, applied the same way everywhere:
 | --- | --- | --- |
 | rest | the material at whatever elevation the anatomy calls for | — |
 | hover | one tonality step — a state layer over the fill, or a step up the surface ladder | depth, a new border, a size change |
-| pressed | a raised control returning to the recessed depth of its own track (`state.recess`), plus a slight compression; a flat control stays flat and presses through the state layer's active step and the same compression | a color swap alone |
+| pressed | a raised control returning to the recessed depth of its own track (`state.recess`), plus the tactile compression the motion system owns; a flat control stays flat and presses through the state layer's active step and the same compression | a color swap alone |
 | selected | a selected tone; depth comes from anatomy — a segment inside a groove is raised, a row in a list stays flat | depth alone |
 | disabled | 45% opacity, no pointer affordance, no interactive state at all | grey-on-grey colouring that breaks theme |
 | focus | the shared focus ring | any other indicator |
 
-Compression is a **distance, not a ratio**: a press travels about a pixel at the size of the ink it
-moves, and that one rule produces the two steps.
+How far a press travels is **motion amplitude**, not a state this table owns: it belongs with
+the tactile intent in §12, because a press travels about two pixels at the size of the ink it moves
+and every control has to agree on that distance.
 
-| Step | Moves | For |
-| --- | --- | --- |
-| `press` | 2% | a control whose outline is what the user sees — a button, an icon button, a selection mark |
-| `pressCompact` | 10% | a control whose visible ink is much smaller than the target it is aimed at — the dismiss control in an `Alert`, the close control in a `Dialog`, the submit control in a `Search`, and the parts a `Combobox` owns |
-
-Both are **centred zooms**: the part changes size in place, and a press never translates it.
-
-**A selection mark's boundary does not move.** A checkbox box or a radio circle takes the plain 2%
-step, not the compact one: ten percent of its own outline is a 2.4px change, and the eye reads that
-as the control jumping rather than as pressure. Expression belongs to the contents of that boundary
-— the mark arriving on the spring — while the press is carried by the state layer. This is the same
-division the slider does not follow, because there the handle moving *is* the interaction.
+**A selection mark's boundary does not move.** Expression belongs to the contents of that boundary
+— the mark arriving on a spring — while the press itself is carried by the state layer and a
+compression small enough not to read as the control jumping. This is the same division the slider
+does not follow, because there the handle moving *is* the interaction.
 
 State layers: replacing `background-color` on hover erases whatever fill a control owns,
 so states are composited by a `currentColor`-tinted overlay instead. Opacity carries the
@@ -485,7 +484,7 @@ members of the system rather than local styling:
 | `engaged` | a part the pointer is on sits matte and settles back from it: a value control's handle takes its accent and a little size while hovered or dragged, so the accent marks the range and the pointer marks the handle. It is target geometry, not timing: `motionDirect` owns how it transitions, and while the pointer owns the position the handle's own travel is not interpolated at all |
 
 **Do:** let tonality carry hover; let a raised control recess while it is held; let a
-flat or floating control press through the state layer's active step and `state.press`.
+flat or floating control press through the state layer's active step and the tactile compression.
 **Do not** use opacity for anything except disabled, or add depth to show a state.
 
 ### Collection rows
@@ -533,14 +532,14 @@ The rule is:
   recessed depth while it is held, and comes back up on release;
 - a **flat** control (filled or text `Button`, ghost `IconButton`, a menu option, a
   table row) does not change depth at all: the press is the state layer's active step
-  plus `state.press`;
+  plus the tactile compression;
 - a **floating** control keeps its elevation while it is held — an acrylic `IconButton`
   presses through its state layer, never by losing altitude;
 - a **groove** is recessed at rest because it is sunk by design, not because it is being
   pressed: a switch track sits at the recessed depth permanently and takes
   `stateLayer.track`, so its hover and press arrive from the wrapping button, while a
   segmented track is recessed for the same static reason and takes each segment's own
-  `state.press` as its press feedback. A track answers a press with tone only: the thumb
+  tactile compression as its press feedback. A track answers a press with tone only: the thumb
   moving is the physical event, and a track that also shrank would compete with it;
 - **selection** depth stays anatomy-dependent: the selected segment of a segmented
   control is raised inside its recessed track, while a selected row in a list stays flat.
@@ -556,7 +555,7 @@ library has nine intents, and one module owns the timing behind all of them
 | Intent | What it is | Recipe | Used for |
 | --- | --- | --- | --- |
 | `feedback` | a non-spatial state response | `motionFeedback` | hover, focus, a field's tone, a row's highlight, a filled surface |
-| `tactile` | a temporary physical answer to activation | `motionTactile` | a button, an icon button, a stepper, a navigation row, a composite field's own parts |
+| `tactile` | a temporary physical answer to activation | `motionTactile`, `motionTactileCompact`, `motionFieldPress` | a button, an icon button, a stepper, a navigation row, a composite field's own controls |
 | `arrive` | a meaningful subordinate part appears or leaves | `motionArrive` | a checkbox tick, a radio dot, the selected mark in a `Select` or `Combobox` |
 | `orient` | a persistent affordance changes orientation in place | `motionOrient` | the disclosure chevron of a `Select` or `Combobox` |
 | `relocate` | a persistent object travels between stable destinations | `motionRelocate` | a tab indicator, a switch thumb |
@@ -565,13 +564,43 @@ library has nine intents, and one module owns the timing behind all of them
 | `presence` | an independent surface enters or leaves | `motionPresenceAnchored`, `motionPresenceTooltip`, `motionPresenceModal`, `motionPresenceScrim` | every popup, tooltip and dialog, and the plane behind a viewport-owning surface |
 | `activity` | continuous movement that reports work | `motionActivitySpin`, `motionActivityPulse` | a spinner, a skeleton |
 
-**Dynamics live below the intents.** There are five, and a component never chooses one:
+**Dynamics live below the intents.** There are six, and a component never chooses one:
 `swift` (immediate response: `--sui-duration-press`, `--sui-ease-press`), `settle` (strong
-deceleration into a destination: `--sui-duration-release`, `--sui-ease-release`), `spring`
-(the one restrained overshoot: `--sui-ease-spring`), `exit` (decisive acceleration away:
-`--sui-duration-overlay-exit`, `--sui-ease-exit`) and `continuous` (a repeating loop). The
-intent picks the dynamic; the tokens in `src/styles/tokens.ts` are its only authored values,
-and they are also the whole of the workbench speed control in the motion lab.
+deceleration into a destination: `--sui-duration-release`, `--sui-ease-release`), `glide` (a
+persistent object crossing the distance between two stable destinations: `--sui-ease-glide` with
+the settle duration), `spring` (the one restrained overshoot: `--sui-ease-spring`), `exit`
+(decisive acceleration away: `--sui-duration-overlay-exit`, `--sui-ease-exit`) and `continuous`
+(a repeating loop). The intent picks the dynamic; the tokens in `src/styles/tokens.ts` are its
+only authored values, and they are also the whole of the workbench speed control in the motion
+lab.
+
+`settle` is an **arrival** curve: it spends 90% of a travel in the first third of its time, which
+is exactly right for a control letting go of a press and exactly wrong for an object that has to
+cross a distance. A tab indicator that moved on it would teleport and then creep, so `relocate`
+takes `glide` instead — it leaves the old position gently, crosses the middle of the travel in the
+middle of the time, and settles at the end, so the travel itself is what the eye sees.
+
+### Amplitude is part of the motion system
+
+How far something moves is the same kind of decision as how fast it moves, and it is owned in the
+same place. A component says *what participates*; the motion recipe says *how far, how fast and how
+it settles*.
+
+| Recipe | Amplitude | For |
+| --- | --- | --- |
+| `motionTactile` | 4% compression | a control whose outline is what the user sees |
+| `motionTactileCompact` | 12% compression | a control whose visible ink is much smaller than the target it is aimed at |
+| `motionFieldPress` | 4% compression of the whole field | a composite field answering a press on one of its own controls |
+| `motionPresenceAnchored` / `…Tooltip` | from 94% scale, 4px toward the anchor | any anchored surface |
+| `motionPresenceModal` | from 96% scale, 12px rise | a surface that owns the viewport |
+| `motionArrive` | from 50% scale | a selection mark |
+
+Every one of these is a **centred zoom** or a directional grow: a press changes size in place and
+never translates, and an anchored surface grows about the edge the primitive resolved for it.
+
+A press travels about two pixels at the size of the ink it moves, and the compact step exists
+because a 20px glyph inside a 44px target would never register two pixels of its own movement —
+not because a smaller control deserves a livelier animation.
 
 **Spring is not a general family.** It is reserved for an event that has to be acknowledged —
 a mark that is *made*. A tab indicator, a slider handle, a switch thumb and a dialog never
@@ -589,6 +618,11 @@ Opening a `Select` is therefore one dominant motion and one supporting motion, n
 - dominant: the popup's presence;
 - supporting: the chevron's orientation;
 - non-spatial: the trigger's tone.
+
+A press works the same way: when a control inside a composite field is pressed, the pressed
+control is the manipulated object and the field only echoes it — the control takes the compact
+compression because its ink is small, and the field takes the compression of the control it is,
+which is what makes a searchable field and a select trigger feel like two variants of one thing.
 
 There is no staggering, no per-row entrance, no label choreography and no generic layout
 animation: filtering a `Combobox` replaces the list immediately, tab panels switch
@@ -623,6 +657,12 @@ for the edge and `data-side` for which edge that is — so one recipe serves a `
 way it is actually placed. A tooltip is the same model on the local settle timing; a modal
 surface is anchored to the viewport, has no side and never bounces; a scrim animates opacity
 only, because a blur or a filter is never animated.
+
+The entrance takes the **glide** curve rather than the arrival curve, and that is what makes the
+grow visible at all. Opacity and scale run on the same curve: on a front-loaded one they both jump
+in the first frames, so the surface is already half grown by the time it is visible — a pop. On the
+glide curve the surface is seen while it is still small, so the eye reads it opening out of its
+anchor, and the four pixels of travel only support what the scale is doing.
 
 ### Reduced motion
 

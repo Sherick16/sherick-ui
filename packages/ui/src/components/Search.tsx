@@ -21,7 +21,7 @@ import {
   stateLayer,
   tone,
 } from "./ui.common";
-import { motionFeedback, motionTactile } from "./ui.motion";
+import { motionFeedback, motionTactileCompact } from "./ui.motion";
 import { Variant } from "./ui.types";
 import { Spinner } from "./Spinner";
 
@@ -134,10 +134,9 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
             density.target,
             shape.circle,
             focusRingInset,
-            motionTactile,
+            motionTactileCompact,
             tone.text[variant],
             !submitDisabled && stateLayer.quiet,
-            !submitDisabled && state.pressCompact,
             submitDisabled ? state.disabledDescendant : state.enabled,
             "absolute right-1.5 inline-flex items-center justify-center"
           )}

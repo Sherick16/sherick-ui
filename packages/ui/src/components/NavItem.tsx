@@ -4,7 +4,6 @@ import {
   density,
   focusRing,
   shape,
-  state,
   stateLayer,
   text,
   tone,
@@ -31,7 +30,6 @@ const NavItem = ({ children, icon, className, href, active = false, ...props }: 
       shape.control,
       motionTactile,
       focusRing,
-      state.press,
       active
         ? cn(tone.selected.primary, tone.text.primary, "font-medium")
         : cn(text.medium, "hover:text-sherick-ink", stateLayer.quiet),

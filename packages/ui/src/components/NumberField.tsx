@@ -13,7 +13,7 @@ import {
   stateLayer,
   tone,
 } from "./ui.common";
-import { motionFeedback, motionTactile } from "./ui.motion";
+import { motionFeedback, motionTactileCompact } from "./ui.motion";
 
 export interface NumberFieldProps
   extends Omit<
@@ -48,10 +48,9 @@ const stepperClassName = cn(
   "inline-flex shrink-0 items-center justify-center",
   density.target,
   shape.circle,
-  motionTactile,
+  motionTactileCompact,
   tone.text.secondary,
   stateLayer.tonal,
-  state.pressCompact,
   state.effectiveDisabled
 );
 

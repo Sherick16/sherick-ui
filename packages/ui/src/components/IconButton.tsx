@@ -63,7 +63,6 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
           isTonal && !isDisabled && state.recess,
           isAcrylic && material.acrylicDense,
           isAcrylic && elevation.floating,
-          !isDisabled && state.press,
           isDisabled ? state.disabled : state.enabled,
           className
         )}

@@ -86,7 +86,6 @@ const CodeBlock = ({ inline = false, className, language = "text", children }: C
             text.medium,
             "hover:text-sherick-ink",
             stateLayer.quiet,
-            state.press,
             state.enabled
           )}
         >

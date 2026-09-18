@@ -154,13 +154,9 @@ export const edge = {
      disabled   45% opacity, no pointer affordance, no interactive state at all
      focus      the shared outer focus ring, visible on keyboard focus */
 export const state = {
-  /* Tactile compression — controls only, never wide surfaces. A press travels about a pixel at
-     the size of the ink it moves, so a control whose outline is what the user sees takes 2% and a
-     control whose ink is far smaller than its target takes 10%. */
-  press: "active:scale-[0.98] motion-reduce:active:scale-100",
-  pressCompact: "active:scale-90 motion-reduce:active:scale-100",
   /* A raised matte control presses back into the track beneath it — the same physical
-     depth a groove or a well sits at. */
+     depth a groove or a well sits at. How far the press itself travels is motion amplitude, and
+     it belongs with the tactile intent in `ui.motion.ts`. */
   recess: "active:shadow-sherick-recessed",
   /* The disabled step for a control whose disabled state is a Sherick prop. */
   disabled: "cursor-not-allowed opacity-45",
@@ -480,6 +476,18 @@ export const tone = {
     danger: "bg-sherick-danger text-sherick-on-danger",
     warning: "bg-sherick-warning text-sherick-on-warning",
     success: "bg-sherick-success text-sherick-on-success",
+  },
+  /* The strong fills again, keyed on the primitive's own selection marker rather than on a
+     Sherick prop. A control that holds its selection in the primitive — an uncontrolled
+     `Switch` — has to take its fill from the same source of truth as a controlled one, and a
+     keyed fill has to be written out literally to be compiled, so it is a role here rather
+     than a conditional at the call site. */
+  strongChecked: {
+    primary: "group-data-[checked]:bg-sherick-primary-strong group-data-[checked]:text-sherick-on-primary",
+    secondary: "group-data-[checked]:bg-sherick-surface-high group-data-[checked]:text-sherick-ink",
+    danger: "group-data-[checked]:bg-sherick-danger group-data-[checked]:text-sherick-on-danger",
+    warning: "group-data-[checked]:bg-sherick-warning group-data-[checked]:text-sherick-on-warning",
+    success: "group-data-[checked]:bg-sherick-success group-data-[checked]:text-sherick-on-success",
   },
 } satisfies Record<string, Record<Variant, string>>;
 

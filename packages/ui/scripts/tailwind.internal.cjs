@@ -56,6 +56,7 @@ module.exports = {
         press: "var(--sui-ease-press)",
         release: "var(--sui-ease-release)",
         exit: "var(--sui-ease-exit)",
+        glide: "var(--sui-ease-glide)",
         spring: "var(--sui-ease-spring)",
       },
     },

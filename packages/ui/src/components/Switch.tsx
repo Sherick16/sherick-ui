@@ -69,6 +69,9 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(({
         className
       )}
     >
+      {/* Every state of the track and the thumb is keyed on the primitive's own selection
+          marker rather than on the `checked` prop, so an uncontrolled switch is styled from
+          the same source of truth as a controlled one — and its thumb actually travels. */}
       <span
         aria-hidden="true"
         className={cn(
@@ -77,17 +80,19 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(({
           elevation.recessed,
           motionFeedback,
           groupFocusRing,
-          checked ? tone.strong[variant] : cn(tone.strong.secondary, text.medium),
+          tone.strong.secondary,
+          text.medium,
+          tone.strongChecked[variant],
           !disabled && stateLayer.track
         )}
       >
         <BaseSwitch.Thumb
           className={cn(
-            "absolute left-1 top-1/2 -translate-y-1/2 bg-current",
+            "absolute left-1 top-1/2 h-5 w-5 -translate-y-1/2 bg-current",
+            "group-data-[checked]:h-6 group-data-[checked]:w-6 group-data-[checked]:translate-x-5",
             shape.circle,
             elevation.control,
-            motionRelocate,
-            checked ? "h-6 w-6 translate-x-5" : "h-5 w-5 text-sherick-ink-muted"
+            motionRelocate
           )}
         />
       </span>

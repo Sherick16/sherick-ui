@@ -171,11 +171,26 @@ motion layer. It reads computed styles, state attributes and geometry — never 
 because the subject is a physical contract rather than a pixel:
 
 - **a stable boundary stays still** — a checkbox box and a radio circle have byte-identical
-  bounding boxes before, during and after the pointer press that changes what is inside them,
-  and the mark that appears is on the arrival recipe;
-- **a relocation is complete** — a tab indicator interpolates every geometry property it
-  changes (position on both axes, width and height), and a keyboard selection relocates it
-  without the newly selected tab gaining any press geometry;
+  bounding boxes before, during and after the pointer press that changes what is inside them;
+- **a press really moves a control** — a full control compresses 4% of its own width under the
+  pointer, a compact control inside a larger target 12%, and a composite field 4% when one of its
+  own controls is pressed; and a field does not move at all while it is typed in or focused;
+- **the anchored family shares one entrance** — `Select`, `Combobox`, `Menu` and `Popover` are
+  compared field by field at frame 0 of their own transitions: starting scale, travel, resolved
+  side, transform origin, duration and curve. The starting geometry is read by pausing the
+  transition and seeking it to zero, because a running animation outranks the cascade. A tooltip
+  is the same geometry on a shorter duration, and a dialog is the restrained large-surface variant
+  with no side;
+- **the entrance grows rather than slides** — the painted edge moves more than the travel it is
+  given, so the scale is what the eye reads;
+- **a relocation is complete and never overshoots** — a tab indicator interpolates every geometry
+  property it changes, is strictly between its two destinations halfway through, and rides the
+  glide curve rather than the arrival curve; a keyboard selection relocates it without the newly
+  selected tab gaining any press geometry;
+- **a selection mark is made, not faded** — it arrives from half its size, passes slightly beyond
+  it and settles, while the boundary it lands inside never moves;
+- **an uncontrolled switch relocates** — the thumb travels and grows from the primitive's own
+  selection marker, which is what makes its motion reviewable at all;
 - **a drag is never interpolated** — a slider handle's transition list contains its positional
   property while a step settles and does not contain it while the pointer owns the position,
   with the handle centre measured against the pointer;

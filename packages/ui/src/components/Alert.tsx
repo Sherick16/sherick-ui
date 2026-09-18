@@ -13,7 +13,7 @@ import {
   text,
   tone,
 } from "./ui.common";
-import { motionTactile } from "./ui.motion";
+import { motionTactileCompact } from "./ui.motion";
 import { Variant } from "./ui.types";
 
 const iconMap = {
@@ -70,9 +70,8 @@ export const Alert = ({
             density.target,
             shape.circle,
             focusRingInset,
-            motionTactile,
+            motionTactileCompact,
             stateLayer.quiet,
-            state.pressCompact,
             state.enabled
           )}
         >

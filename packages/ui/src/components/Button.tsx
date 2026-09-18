@@ -72,7 +72,6 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           appearance === "text" && !isDisabled && stateLayer.quiet,
           isTactile && elevation.raised,
           isTactile && state.recess,
-          !isDisabled && state.press,
           isDisabled ? state.disabled : state.enabled,
           className
         )}

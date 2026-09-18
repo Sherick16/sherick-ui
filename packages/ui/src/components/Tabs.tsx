@@ -85,7 +85,6 @@ export const Tabs = ({
                 shape.pill,
                 motionTactile,
                 focusRing,
-                !disabled && state.press,
                 active
                   ? text.high
                   : cn(text.medium, !disabled && "hover:text-sherick-ink", !disabled && stateLayer.quiet),

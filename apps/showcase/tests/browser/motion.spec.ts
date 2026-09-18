@@ -58,6 +58,66 @@ const expectTiming = async (page: Page, locator: Locator, variable: string) => {
   expect(firstTiming(timing)).toBe(firstTiming(await token(page, variable)));
 };
 
+/**
+ * The geometry a transition starts from, read from frame 0 of the transition itself.
+ *
+ * A transition that has already begun cannot be inspected at its `from` value through the
+ * cascade — the running animation outranks it — so the animation is paused and seeked to 0,
+ * which is the state the entrance really paints first. The decomposed matrix gives the scale and
+ * the translation separately, because a growing surface and a sliding one can share an element.
+ */
+const startingGeometry = async (locator: Locator) => {
+  await locator.evaluate((element) =>
+    element.getAnimations().forEach((animation) => {
+      animation.pause();
+      animation.currentTime = 0;
+    })
+  );
+  const geometry = await locator.evaluate((element) => {
+    const style = getComputedStyle(element);
+    const matrix = new DOMMatrix(style.transform === "none" ? "" : style.transform);
+    return {
+      scale: Number(matrix.a.toFixed(3)),
+      translateX: Number(matrix.e.toFixed(2)),
+      translateY: Number(matrix.f.toFixed(2)),
+      side: element.getAttribute("data-side"),
+      origin: style.transformOrigin,
+      duration: style.transitionDuration.split(",")[0].trim(),
+      timing: style.transitionTimingFunction.split(/,(?=[^)]*(?:\(|$))/)[0].trim(),
+      width: Math.round(element.getBoundingClientRect().width),
+    };
+  });
+  await locator.evaluate((element) => element.getAnimations().forEach((animation) => animation.play()));
+  return geometry;
+};
+
+/** The scale a part is painted at right now. */
+const scaleOf = (locator: Locator) =>
+  locator.evaluate((element) => {
+    const transform = getComputedStyle(element).transform;
+    return Number(new DOMMatrix(transform === "none" ? "" : transform).a.toFixed(3));
+  });
+
+/** Presses a part and reports how much its painted geometry moved while it was held. */
+const pressDelta = async (page: Page, press: Locator, measured: Locator) => {
+  await measured.scrollIntoViewIfNeeded();
+  await page.mouse.move(0, 0);
+  await press.hover();
+  const atRest = await measured.boundingBox();
+  await page.mouse.down();
+  await page.waitForTimeout(320);
+  const pressed = await measured.boundingBox();
+  const pressedScale = await scaleOf(press);
+  await page.mouse.up();
+  if (!atRest || !pressed) throw new Error("the part has no box");
+  return {
+    restWidth: Number(atRest.width.toFixed(1)),
+    pressedWidth: Number(pressed.width.toFixed(1)),
+    compressionPercent: Number((((atRest.width - pressed.width) / atRest.width) * 100).toFixed(2)),
+    pressedScale,
+  };
+};
+
 type Entrance = { transform: string };
 
 /**
@@ -230,7 +290,7 @@ test("Select carries tactile, orientation, arrival and anchored presence", async
   await expectTiming(page, chevron, "--sui-ease-release");
 
   await trigger.click();
-  const popup = page.locator(".sui-scope.shadow-sherick-floating");
+  const popup = page.locator(".sui-scope.shadow-sherick-floating[data-base-ui-focusable]");
   await expect(popup).toBeVisible();
   await expect(popup).toHaveAttribute("data-side", "bottom");
 
@@ -238,6 +298,15 @@ test("Select carries tactile, orientation, arrival and anchored presence", async
   expect(presence.property).toContain("opacity");
   expect(presence.property).toContain("transform");
   await expectDuration(page, popup, "--sui-duration-overlay");
+  await expectTiming(page, popup, "--sui-ease-glide");
+
+  /* The entrance really grows: it paints a surface six percent smaller and four pixels closer
+     to its anchor, and the growth of the painted edge is larger than the travel that supports
+     it — which is what makes the surface appear to open out of the trigger rather than slide. */
+  const start = await startingGeometry(popup);
+  expect(start.scale).toBe(0.94);
+  expect(Math.abs(start.translateY)).toBe(4);
+  expect(start.width * (1 - start.scale)).toBeGreaterThan(4 * Math.abs(start.translateY));
 
   const selected = page.getByRole("option", { name: "Design system" });
   await expect(selected).toHaveAttribute("aria-selected", "true");
@@ -350,10 +419,13 @@ test("Tooltip resolves the same side-aware entrance on every edge", async ({ pag
     });
     expect(geometry).toEqual(expected[side]);
 
-    /* Lighter than an anchored popup: it settles on the local timing rather than the overlay
+    /* Lighter than an anchored popup: the same grow on the local timing rather than the overlay
        timing, and it never bounces. */
     await expectDuration(page, popup, "--sui-duration-release");
-    expect(firstTiming((await motionOf(popup)).timing)).toBe(firstTiming(await token(page, "--sui-ease-release")));
+    expect(firstTiming((await motionOf(popup)).timing)).toBe(firstTiming(await token(page, "--sui-ease-glide")));
+    expect(toMs(firstDuration((await motionOf(popup)).duration))).toBeLessThan(
+      toMs(await token(page, "--sui-duration-overlay"))
+    );
 
     await page.mouse.move(2, 2);
     await expect(popup).toHaveCount(0);
@@ -485,7 +557,7 @@ test("a repositioned or rapidly reversed surface never replays or queues", async
   await page.goto("/verification/motion");
   await page.getByTestId("motion-speed-slow").click();
   await page.getByTestId("lab-popover-trigger").click();
-  const labShell = page.locator(".sui-scope.shadow-sherick-floating");
+  const labShell = page.locator(".sui-scope.shadow-sherick-floating[data-base-ui-focusable]");
   await expect(labShell).toBeVisible();
 
   /* Let the entrance make progress before it is interrupted, so the reversal has a painted
@@ -504,6 +576,235 @@ test("a repositioned or rapidly reversed surface never replays or queues", async
 
   await page.keyboard.press("Escape");
   await expect(labShell).toHaveCount(0);
+
+  expect(errors).toEqual([]);
+});
+
+/*
+ The tests below prove geometry rather than taxonomy: that the anchored family really shares one
+ entrance, that a press really moves a control, and that a relocation really travels between its
+ two destinations without overshooting.
+*/
+
+const lab = "/verification/motion";
+const labPopupSelector = ".sui-scope.shadow-sherick-floating[data-base-ui-focusable]";
+
+const openLab = async (page: Page) => {
+  await page.goto(lab);
+  await page.getByTestId("motion-lab").waitFor();
+};
+
+test("the anchored family opens with one shared entrance geometry", async ({ page, errors }) => {
+  /* Select is the reference implementation: the other anchored surfaces have to open with the
+     same physics, and only the anchor resolution — side, origin, travel direction — may differ. */
+  const cases: { name: string; open: () => Promise<void> }[] = [
+    { name: "select", open: () => page.getByRole("combobox", { name: "Select", exact: true }).click() },
+    { name: "combobox", open: () => page.locator('[aria-label="Show options"]').first().click() },
+    { name: "menu", open: () => page.getByRole("button", { name: "Open menu", exact: true }).click() },
+    { name: "popover", open: () => page.getByTestId("lab-popover-trigger").click() },
+    { name: "dialog", open: () => page.getByRole("button", { name: "Dialog", exact: true }).click() },
+  ];
+
+  const geometry: Record<string, Awaited<ReturnType<typeof startingGeometry>>> = {};
+  for (const { name, open } of cases) {
+    await openLab(page);
+    await open();
+    const popup = page.locator(labPopupSelector);
+    await expect(popup).toBeVisible();
+    geometry[name] = await startingGeometry(popup);
+  }
+
+  const reference = geometry.select;
+  expect(reference.scale, "the reference surface must grow visibly").toBe(0.94);
+
+  for (const name of ["combobox", "menu", "popover"]) {
+    expect(geometry[name].scale, `${name} must grow like Select`).toBe(reference.scale);
+    expect(geometry[name].translateY, `${name} must travel like Select`).toBe(reference.translateY);
+    expect(geometry[name].side, `${name} must resolve the same side`).toBe(reference.side);
+    expect(geometry[name].origin, `${name} must grow from the same anchor edge`).toBe(reference.origin);
+    expect(geometry[name].duration, `${name} must enter on the same timing`).toBe(reference.duration);
+    expect(geometry[name].timing, `${name} must enter on the same curve`).toBe(reference.timing);
+  }
+
+  /* A modal is the large-surface variant: the same family, its own restrained scale and a
+     vertical settle, and it never grows from a side. */
+  expect(geometry.dialog.scale).toBe(0.96);
+  expect(geometry.dialog.translateY).toBe(12);
+  expect(geometry.dialog.side).toBeNull();
+
+  expect(errors).toEqual([]);
+});
+
+test("a tooltip is the same physical idea on the lighter timing", async ({ page, errors }) => {
+  await openLab(page);
+  await page.getByRole("button", { name: "Hover", exact: true }).hover();
+  const popup = page.locator(labPopupSelector);
+  await expect(popup).toBeVisible();
+
+  const tooltip = await startingGeometry(popup);
+  expect(tooltip.scale).toBe(0.94);
+  expect(Math.abs(tooltip.translateY)).toBe(4);
+  expect(toMs(tooltip.duration)).toBeLessThan(toMs(await token(page, "--sui-duration-overlay")));
+  expect(firstTiming(tooltip.timing)).toBe(firstTiming(await token(page, "--sui-ease-glide")));
+
+  expect(errors).toEqual([]);
+});
+
+test("a press moves a control by the amplitude its role owns", async ({ page, errors }) => {
+  await openLab(page);
+
+  /* A full control compresses four percent, which is about two pixels at the size of the ink it
+     moves; a small control inside a larger target takes the compact step. */
+  const button = await pressDelta(page, page.getByRole("button", { name: "Filled", exact: true }), page.getByRole("button", { name: "Filled", exact: true }));
+  expect(button.compressionPercent).toBeGreaterThan(3);
+  expect(button.compressionPercent).toBeLessThan(5);
+
+  const icon = await pressDelta(page, page.getByRole("button", { name: "Copy", exact: true }), page.getByRole("button", { name: "Copy", exact: true }));
+  expect(icon.compressionPercent).toBeGreaterThan(3);
+  expect(icon.compressionPercent).toBeLessThan(5);
+
+  const stepper = page.locator('[aria-label="Stepper"]').locator("xpath=..").locator("button").first();
+  const stepperDelta = await pressDelta(page, stepper, stepper);
+  expect(stepperDelta.compressionPercent).toBeGreaterThan(11);
+  expect(stepperDelta.compressionPercent).toBeLessThan(13);
+
+  /* A composite field answers a press on one of its own controls with the same four percent the
+     equivalent plain control takes — which is what keeps a searchable field and a select trigger
+     feeling like siblings. */
+  const disclosure = page.locator('[aria-label="Show options"]').first();
+  const field = disclosure.locator("xpath=..");
+  const fieldDelta = await pressDelta(page, disclosure, field);
+  expect(fieldDelta.compressionPercent).toBeGreaterThan(3);
+  expect(fieldDelta.compressionPercent).toBeLessThan(5);
+
+  expect(errors).toEqual([]);
+});
+
+test("a field stays perfectly still while it is typed in or focused", async ({ page, errors }) => {
+  await openLab(page);
+  const input = page.getByRole("combobox", { name: "Combobox", exact: true });
+  const field = input.locator("xpath=..").locator("xpath=..");
+
+  const atRest = await field.boundingBox();
+  await input.click();
+  await input.fill("dash");
+  await expect(input).toHaveValue("dash");
+  const typed = await field.boundingBox();
+
+  /* Typing is the field's own interaction and must never move it: only a button inside the field
+     can drive the composite's press response. */
+  expect(typed).toEqual(atRest);
+  expect(await scaleOf(field)).toBe(1);
+
+  await page.keyboard.press("Escape");
+  await page.locator("body").click({ position: { x: 4, y: 4 } });
+  const blurred = await field.boundingBox();
+  expect(blurred).toEqual(atRest);
+
+  expect(errors).toEqual([]);
+});
+
+test("a selection mark starts small and lands with an overshoot", async ({ page, errors }) => {
+  await openLab(page);
+  await page.getByRole("checkbox", { name: "Motion lab checkbox" }).click();
+  await page.waitForTimeout(60);
+
+  const mark = page.locator('[aria-label="Motion lab checkbox"] span span').first();
+  const flight = await mark.evaluate((element) => {
+    const animations = element.getAnimations();
+    const scaleAt = (fraction: number) => {
+      for (const animation of animations) {
+        animation.pause();
+        animation.currentTime = fraction * (animation.effect?.getTiming().duration as number);
+      }
+      const transform = getComputedStyle(element).transform;
+      return Number(new DOMMatrix(transform === "none" ? "" : transform).a.toFixed(3));
+    };
+    const start = scaleAt(0);
+    const middle = scaleAt(0.65);
+    const end = scaleAt(1);
+    for (const animation of animations) animation.cancel();
+    return { start, middle, end };
+  });
+
+  /* A mark is made, not faded: it arrives from half its size, passes slightly beyond it and
+     settles — and the boundary it lands inside never moves. */
+  expect(flight.start).toBe(0.5);
+  expect(flight.middle).toBeGreaterThan(1);
+  expect(flight.end).toBe(1);
+
+  expect(errors).toEqual([]);
+});
+
+test("a switch thumb relocates in place without overshooting", async ({ page, errors }) => {
+  await openLab(page);
+  const control = page.getByRole("switch", { name: "Motion lab switch" });
+  const thumb = control.locator(".shadow-sherick-control");
+
+  const atRest = await thumb.boundingBox();
+  await control.click();
+  await page.waitForTimeout(80);
+  const moving = await thumb.boundingBox();
+  if (!atRest || !moving) throw new Error("the switch thumb has no box");
+
+  /* The thumb has to actually travel — the primitive holds the state, so an uncontrolled switch
+     is styled from the primitive's own marker rather than from a prop. */
+  expect(await control.getAttribute("aria-checked")).toBe("true");
+  expect(moving.x).toBeGreaterThan(atRest.x);
+  expect(moving.width).toBeGreaterThan(atRest.width);
+
+  const travel = await thumb.evaluate((element) => {
+    const animations = element.getAnimations();
+    const translateAt = (fraction: number) => {
+      for (const animation of animations) {
+        animation.pause();
+        animation.currentTime = fraction * (animation.effect?.getTiming().duration as number);
+      }
+      const transform = getComputedStyle(element).transform;
+      return Number(new DOMMatrix(transform === "none" ? "" : transform).e.toFixed(2));
+    };
+    const start = translateAt(0);
+    const middle = translateAt(0.5);
+    const end = translateAt(1);
+    for (const animation of animations) animation.cancel();
+    return { start, middle, end };
+  });
+
+  expect(travel.start).toBeLessThan(travel.middle);
+  expect(travel.middle).toBeLessThan(travel.end);
+  expect(firstTiming((await motionOf(thumb)).timing)).toBe(firstTiming(await token(page, "--sui-ease-glide")));
+  expect(firstTiming((await motionOf(thumb)).timing)).not.toBe(firstTiming(await token(page, "--sui-ease-spring")));
+
+  expect(errors).toEqual([]);
+});
+
+test("a relocated indicator is mid-travel in the middle of its own motion", async ({ page, errors }) => {
+  await openFixture(page);
+  const indicator = page.getByRole("tablist").locator(":scope > span");
+
+  const leftAt = (fraction: number) =>
+    indicator.evaluate((element, f) => {
+      const animations = element.getAnimations();
+      for (const animation of animations) {
+        animation.pause();
+        animation.currentTime = (f as number) * (animation.effect?.getTiming().duration as number);
+      }
+      const value = Number.parseFloat(getComputedStyle(element).left);
+      for (const animation of animations) animation.cancel();
+      return value;
+    }, fraction);
+
+  const before = await leftAt(1);
+  await page.getByRole("tab", { name: "Details" }).click();
+  await page.waitForTimeout(40);
+  const middle = await leftAt(0.5);
+  const after = await leftAt(1);
+
+  /* The indicator is somewhere between its two destinations halfway through, and never beyond
+     the one it is heading for — a travel, not a snap and not a bounce. */
+  expect(middle).toBeGreaterThan(before);
+  expect(middle).toBeLessThan(after);
+  expect(firstTiming((await motionOf(indicator)).timing)).toBe(firstTiming(await token(page, "--sui-ease-glide")));
 
   expect(errors).toEqual([]);
 });

@@ -120,6 +120,13 @@ export const sharedTokens = {
   "ease-press": "cubic-bezier(0.4, 0, 0.2, 1)",
   "ease-release": "cubic-bezier(0.16, 1, 0.3, 1)",
   "ease-exit": "cubic-bezier(0.4, 0, 1, 1)",
+  /* A persistent object travelling between two stable destinations — a tab indicator, a switch
+     thumb. `ease-release` is an arrival curve: it spends 90% of a travel in the first third of
+     the time, which reads as a teleport followed by a creep once the distance is large. The
+     glide curve leaves the old position gently, crosses the middle of the travel in the middle
+     of the time, and settles at the end, so the movement itself is what the eye sees. It never
+     overshoots. */
+  "ease-glide": "cubic-bezier(0.32, 0, 0.24, 1)",
   /* The one overshooting curve in the system: a part that travels a little past where it lands
      and settles back. It is what makes a selection feel made and a released press feel answered,
      and it is deliberately reserved for the parts that carry that meaning. */

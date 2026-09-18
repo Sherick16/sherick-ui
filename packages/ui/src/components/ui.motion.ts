@@ -39,13 +39,31 @@ export type MotionIntent =
 export const motionFeedback =
   "transition-[background-color,color,box-shadow,opacity] duration-press ease-press motion-reduce:transition-none";
 
-/** A control answers a press immediately and settles on its release, compressing and
- *  returning as the component's own state geometry asks it to. Reduced motion removes
- *  the interpolation; `state.*` owns what the target geometry is, so the spatial part of
- *  a press is neutralised there rather than by a blanket `transform: none` that would
- *  also erase positioning transforms a part legitimately carries. */
+/** A control answers a press immediately and settles on its release.
+ *
+ *  The recipe owns the *amplitude* of that answer as well as its timing, because how far a
+ *  press travels is the system's physical character rather than a component's anatomy: a
+ *  control whose outline is what the user sees compresses 4%, which is about two pixels at the
+ *  size of the ink it moves. A control whose visible ink is far smaller than the target it is
+ *  aimed at takes `motionTactileCompact` instead. Both are neutralised under reduced motion by
+ *  dropping the interpolation and the compression together. */
 export const motionTactile =
-  "transition-[background-color,color,box-shadow,transform,opacity] duration-release ease-release active:duration-press active:ease-press motion-reduce:transition-none";
+  "transition-[background-color,color,box-shadow,transform,opacity] duration-release ease-release active:duration-press active:ease-press active:scale-[0.96] motion-reduce:transition-none motion-reduce:active:scale-100";
+
+/** The same physical answer for a control whose ink is much smaller than the target it is aimed
+ *  at — an icon inside a `density.target` stepper, a dialog's close control, the parts a
+ *  composite field owns — where the four percent a full control takes would never register on
+ *  the glyph. */
+export const motionTactileCompact =
+  "transition-[background-color,color,box-shadow,transform,opacity] duration-release ease-release active:duration-press active:ease-press active:scale-[0.88] motion-reduce:transition-none motion-reduce:active:scale-100";
+
+/** A composite field answers a press on one of its own controls. The field is the control the
+ *  user is aiming at, so it takes the same compression the equivalent plain control takes —
+ *  which is what keeps a searchable field and a select trigger feeling like siblings. The text
+ *  input itself never moves: only a *button* inside the field can drive this, so typing,
+ *  focusing and selecting text stay completely still. */
+export const motionFieldPress =
+  "has-[button:active]:scale-[0.96] motion-reduce:has-[button:active]:scale-100";
 
 /** A meaningful subordinate part arrives. Spring is reserved for this intent: a mark is
  *  made by overshooting the position it lands in. It leaves without the overshoot, and
@@ -59,11 +77,13 @@ export const motionOrient =
   "transition-transform duration-release ease-release motion-reduce:transition-none";
 
 /** A persistent object travels between stable destinations: a tab indicator, a switch
- *  thumb. Position, size and the tone it picks up on the way settle together, and an
- *  interrupted move retargets from wherever it currently is because it is a transition
- *  and not a keyframe. */
+ *  thumb. The travel itself is the event, so it takes the glide curve rather than the
+ *  arrival curve, and it never overshoots: a destination that is passed and come back
+ *  from reads as a defect. Position, size and the tone the object picks up on the way
+ *  settle together, and an interrupted move retargets from wherever it currently is
+ *  because it is a transition and not a keyframe. */
 export const motionRelocate =
-  "transition-[left,inset-inline-start,top,width,height,transform,background-color,color,box-shadow,opacity] duration-release ease-release motion-reduce:transition-none";
+  "transition-[left,inset-inline-start,top,width,height,transform,background-color,color,box-shadow,opacity] duration-release ease-glide motion-reduce:transition-none";
 
 /** Direct manipulation: the pointer owns the geometry, so a positional transition would be
  *  lag. While the primitive reports a drag, position and size are removed from the
@@ -109,39 +129,47 @@ const anchoredFrom = [
 
 const modalFrom = [
   "data-[starting-style]:opacity-0",
-  "data-[starting-style]:[transform:translate(0,8px)scale(0.985)]",
+  "data-[starting-style]:[transform:translate(0,12px)scale(0.96)]",
   "data-[ending-style]:opacity-0",
-  "data-[ending-style]:[transform:translate(0,8px)scale(0.985)]",
+  "data-[ending-style]:[transform:translate(0,12px)scale(0.96)]",
   "motion-reduce:data-[starting-style]:transform-none",
   "motion-reduce:data-[ending-style]:transform-none",
 ].join(" ");
 
 /** An anchored surface: `Select`, `Combobox`, `Menu` and `Popover`. It grows out of the edge
- *  it is attached to, enters on the overlay timing, and leaves on the shorter exit. */
+ *  it is attached to, enters on the overlay timing, and leaves on the shorter exit.
+ *
+ *  The grow is the motion's signature and the four pixels of travel only support it, so the
+ *  entrance takes the glide curve rather than the arrival curve. With a front-loaded curve the
+ *  opacity and the scale both jump in the first frames, which means the surface is already half
+ *  grown by the time it is visible at all — a pop, not a grow. The glide curve spends its whole
+ *  duration visible, so the eye actually sees the surface open out of its anchor. */
 export const motionPresenceAnchored = [
-  "transition-[opacity,transform] duration-overlay ease-release",
+  "transition-[opacity,transform] duration-overlay ease-glide",
   "data-[ending-style]:duration-overlay-exit data-[ending-style]:ease-exit",
   "motion-reduce:transition-[opacity]",
-  "[--sui-overlay-from-scale:0.985]",
+  "[--sui-overlay-from-scale:0.94]",
   anchoredGeometry,
   anchoredFrom,
 ].join(" ");
 
-/** A tooltip: the same side-aware model as an anchored popup, deliberately lighter. It
- *  settles on the local timing rather than the overlay timing and never bounces. */
+/** A tooltip: the same side-aware model and the same grow as an anchored popup, deliberately
+ *  lighter — it settles on the local timing rather than the overlay timing, and it never
+ *  bounces. */
 export const motionPresenceTooltip = [
-  "transition-[opacity,transform] duration-release ease-release",
+  "transition-[opacity,transform] duration-release ease-glide",
   "data-[ending-style]:duration-overlay-exit data-[ending-style]:ease-exit",
   "motion-reduce:transition-[opacity]",
-  "[--sui-overlay-from-scale:0.985]",
+  "[--sui-overlay-from-scale:0.94]",
   anchoredGeometry,
   anchoredFrom,
 ].join(" ");
 
 /** A modal surface: anchored to the viewport rather than to a trigger, so it has no side
- *  to grow from. A large surface never bounces; it fades, rises a little and settles. */
+ *  to grow from. A large surface never bounces; it fades, rises a little and settles, and its
+ *  scale stays restrained because a plane this big grows visibly even from a few percent. */
 export const motionPresenceModal = [
-  "transition-[opacity,transform] duration-overlay ease-release",
+  "transition-[opacity,transform] duration-overlay ease-glide",
   "data-[ending-style]:duration-overlay-exit data-[ending-style]:ease-exit",
   "motion-reduce:transition-[opacity]",
   modalFrom,
