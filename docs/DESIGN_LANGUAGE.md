@@ -435,11 +435,15 @@ state, so it fades on the feedback recipe rather than snapping.
 | `activeRow` | 0.05 | a collection row highlighted by keyboard or pointer navigation, from Base UI's `data-highlighted`. It pairs with `quiet` on the same row, so highlight and hover are the same tone at the same strength — asserted on the rendered layer in the browser suite. It is deliberately *not* gated on the disabled marker: a disabled row stays navigable and has to show where the navigation is |
 
 Fields are a single borderless family: a matte `surface-high` fill that steps up once on
-hover and once more while engaged, no ring and no lift. `state.field.*` covers hover,
+:hover and once more while engaged, no ring and no lift. `state.field.*` covers hover,
 focus, focus-within, engaged and their error counterparts. A control that reads its
 validity from the field it sits in rather than from a prop takes the same error ladder
 through `state.field.invalid*`, which is one tonality keyed on the field's own
 `data-invalid` attribute and deliberately outranks the prop-keyed step it overlaps.
+The tone is the whole of a plain text field's response, and a field that opens a list — a
+`Select` trigger, an editable `Combobox` field — adds the tactile press in §12 to it, because it
+is a control the user presses as well as a place text goes. Both forms press identically: the
+field is what compresses.
 
 **Selection is a recessed surface that fills.** A switch track, a checkbox box, a radio
 circle and a slider groove are one object at four sizes: `selectable.surface` gives them
@@ -555,7 +559,7 @@ library has nine intents, and one module owns the timing behind all of them
 | Intent | What it is | Recipe | Used for |
 | --- | --- | --- | --- |
 | `feedback` | a non-spatial state response | `motionFeedback` | hover, focus, a field's tone, a row's highlight, a filled surface |
-| `tactile` | a temporary physical answer to activation | `motionTactile`, `motionTactileCompact`, `motionFieldPress` | a button, an icon button, a stepper, a navigation row, a composite field's own controls |
+| `tactile` | a temporary physical answer to activation | `motionTactile`, `motionTactileCompact` | a button, an icon button, a stepper, a navigation row, a field that opens a list |
 | `arrive` | a meaningful subordinate part appears or leaves | `motionArrive` | a checkbox tick, a radio dot, the selected mark in a `Select` or `Combobox` |
 | `orient` | a persistent affordance changes orientation in place | `motionOrient` | the disclosure chevron of a `Select` or `Combobox` |
 | `relocate` | a persistent object travels between stable destinations | `motionRelocate` | a tab indicator, a switch thumb |
@@ -588,9 +592,8 @@ it settles*.
 
 | Recipe | Amplitude | For |
 | --- | --- | --- |
-| `motionTactile` | 4% compression | a control whose outline is what the user sees |
-| `motionTactileCompact` | 12% compression | a control whose visible ink is much smaller than the target it is aimed at |
-| `motionFieldPress` | 4% compression of the whole field | a composite field answering a press on one of its own controls |
+| `motionTactile` | 4% compression | a control whose outline is what the user sees, including a field that opens a list |
+| `motionTactileCompact` | 12% compression | a control whose visible ink is much smaller than the target it is aimed at — a stepper, a dismiss control, a close control |
 | `motionPresenceAnchored` / `…Tooltip` | from 94% scale, 4px toward the anchor | any anchored surface |
 | `motionPresenceModal` | from 96% scale, 12px rise | a surface that owns the viewport |
 | `motionArrive` | from 50% scale | a selection mark |
@@ -601,6 +604,15 @@ never translates, and an anchored surface grows about the edge the primitive res
 A press travels about two pixels at the size of the ink it moves, and the compact step exists
 because a 20px glyph inside a 44px target would never register two pixels of its own movement —
 not because a smaller control deserves a livelier animation.
+
+**A field that opens a list is a control, and presses like one.** A `Select`'s trigger and an
+editable `Combobox`'s field are the same control in two forms, so they take `motionTactile` as a
+whole: the *field* compresses, not the small affordances inside it, because the field is what the
+user is aiming at and a second compression nested inside the first would read as two events. A
+press activates the whole chain, which is what lets the field be the element that carries the
+answer — and typing, focus, hover and text selection never activate it, so a field stays perfectly
+still while it is used as a text field. A plain `Input` or `Textarea` is not a control you press to
+open anything, so it stays feedback-only.
 
 **Spring is not a general family.** It is reserved for an event that has to be acknowledged —
 a mark that is *made*. A tab indicator, a slider handle, a switch thumb and a dialog never

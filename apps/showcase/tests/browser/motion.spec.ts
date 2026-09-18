@@ -107,7 +107,7 @@ const pressDelta = async (page: Page, press: Locator, measured: Locator) => {
   await page.mouse.down();
   await page.waitForTimeout(320);
   const pressed = await measured.boundingBox();
-  const pressedScale = await scaleOf(press);
+  const pressedScale = await scaleOf(measured);
   await page.mouse.up();
   if (!atRest || !pressed) throw new Error("the part has no box");
   return {
@@ -281,9 +281,11 @@ test("a dragged slider handle is never interpolated", async ({ page, errors }) =
 
 test("Select carries tactile, orientation, arrival and anchored presence", async ({ page, errors }) => {
   const trigger = page.getByRole("combobox", { name: "Project type", exact: true });
-  const triggerMotion = await motionOf(trigger);
-  expect(triggerMotion.property).toContain("transform");
-  await expectDuration(page, trigger, "--sui-duration-release");
+  const field = trigger.locator("xpath=..");
+  const fieldMotion = await motionOf(field);
+  expect(fieldMotion.property, "the field is what presses").toContain("transform");
+  await expectDuration(page, field, "--sui-duration-release");
+  expect((await motionOf(trigger)).property, "the trigger itself only carries tone").not.toContain("transform");
 
   const chevron = trigger.locator("svg");
   expect((await motionOf(chevron)).property).toBe("transform");
@@ -668,14 +670,42 @@ test("a press moves a control by the amplitude its role owns", async ({ page, er
   expect(stepperDelta.compressionPercent).toBeGreaterThan(11);
   expect(stepperDelta.compressionPercent).toBeLessThan(13);
 
-  /* A composite field answers a press on one of its own controls with the same four percent the
-     equivalent plain control takes — which is what keeps a searchable field and a select trigger
-     feeling like siblings. */
+  expect(errors).toEqual([]);
+});
+
+test("Select and Combobox are the same control in two forms", async ({ page, errors }) => {
+  /* The same physical event has to produce the same response: pressing a select's trigger and
+     pressing an editable combobox's field have to move the field by the same amount, with the
+     same recipe, and neither may move its small affordances instead. */
+  await openLab(page);
+  const selectTrigger = page.getByRole("combobox", { name: "Select", exact: true });
+  const selectField = selectTrigger.locator("xpath=..");
+  expect((await motionOf(selectField)).property, "the field is what presses").toContain("transform");
+  await expectDuration(page, selectField, "--sui-duration-release");
+  expect((await motionOf(selectTrigger)).property, "the trigger itself only carries tone").not.toContain("transform");
+  const selectPress = await pressDelta(page, selectTrigger, selectField);
+
+  await openLab(page);
+  const comboboxInput = page.locator('input[role="combobox"]').first();
+  const comboboxField = comboboxInput.locator("xpath=..");
+  expect((await motionOf(comboboxField)).property).toContain("transform");
+  await expectDuration(page, comboboxField, "--sui-duration-release");
+  const comboboxPress = await pressDelta(page, comboboxInput, comboboxField);
+
+  expect(selectPress.pressedScale).toBe(0.96);
+  expect(comboboxPress.pressedScale).toBe(0.96);
+  expect(comboboxPress.compressionPercent).toBeCloseTo(selectPress.compressionPercent, 1);
+  expect(comboboxPress.restWidth).toBeCloseTo(selectPress.restWidth, 0);
+
+  /* The small affordances inside the field answer with tone only: a second compression nested
+     inside the field's own would read as two events for one press. Their measured box still
+     shrinks with the field around them, so the assertion is about their own geometry. */
+  await openLab(page);
   const disclosure = page.locator('[aria-label="Show options"]').first();
-  const field = disclosure.locator("xpath=..");
-  const fieldDelta = await pressDelta(page, disclosure, field);
-  expect(fieldDelta.compressionPercent).toBeGreaterThan(3);
-  expect(fieldDelta.compressionPercent).toBeLessThan(5);
+  const disclosureField = disclosure.locator("xpath=..");
+  const disclosurePress = await pressDelta(page, disclosure, disclosure);
+  expect(disclosurePress.pressedScale, "the disclosure control does not deform itself").toBe(1);
+  expect(await scaleOf(disclosureField), "the field it sits in takes the press").toBe(0.96);
 
   expect(errors).toEqual([]);
 });

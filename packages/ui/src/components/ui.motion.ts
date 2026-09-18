@@ -57,13 +57,13 @@ export const motionTactile =
 export const motionTactileCompact =
   "transition-[background-color,color,box-shadow,transform,opacity] duration-release ease-release active:duration-press active:ease-press active:scale-[0.88] motion-reduce:transition-none motion-reduce:active:scale-100";
 
-/** A composite field answers a press on one of its own controls. The field is the control the
- *  user is aiming at, so it takes the same compression the equivalent plain control takes —
- *  which is what keeps a searchable field and a select trigger feeling like siblings. The text
- *  input itself never moves: only a *button* inside the field can drive this, so typing,
- *  focusing and selecting text stay completely still. */
-export const motionFieldPress =
-  "has-[button:active]:scale-[0.96] motion-reduce:has-[button:active]:scale-100";
+/* A field-shaped control takes `motionTactile` as a whole, including the `Select` trigger and an
+   editable `Combobox` field — the same control in two forms, so they answer a press identically.
+   A press activates the whole chain, which is what lets the *field* be the element that carries
+   the compression: a descendant being pressed is what makes the field itself match `:active`,
+   whether the press lands on its text, on an affordance inside it, or (for a `Select`) on the
+   trigger, whose own active state the primitive suppresses. Typing, focus and text selection
+   never match it, so the field stays perfectly still while it is used as a text field. */
 
 /** A meaningful subordinate part arrives. Spring is reserved for this intent: a mark is
  *  made by overshooting the position it lands in. It leaves without the overshoot, and

@@ -20,10 +20,9 @@ import {
 import {
   motionArrive,
   motionFeedback,
-  motionFieldPress,
   motionOrient,
   motionPresenceAnchored,
-  motionTactileCompact,
+  motionTactile,
 } from "./ui.motion";
 
 export interface ComboboxOption {
@@ -76,7 +75,7 @@ export interface ComboboxProps {
    a read-only combobox still opens and browses, only its value is fixed. The clear control is
    handed its own `disabled` for that case because Base itself refuses to clear a read-only
    control; nothing here has to be derived from Sherick's props. */
-const partClassName = `inline-flex shrink-0 items-center justify-center ${density.part} ${shape.circle} ${text.medium} [&>svg]:size-5 ${motionTactileCompact} ${stateLayer.quiet} ${state.enabled} ${state.effectiveDisabled} [&:not([data-disabled]):not(:disabled)]:hover:text-sherick-ink`;
+const partClassName = `inline-flex shrink-0 items-center justify-center ${density.part} ${shape.circle} ${text.medium} [&>svg]:size-5 ${motionFeedback} ${stateLayer.quiet} ${state.enabled} ${state.effectiveDisabled} [&:not([data-disabled]):not(:disabled)]:hover:text-sherick-ink`;
 
 /**
  * A text field that filters a list of options and selects one of them. It is the searchable
@@ -127,8 +126,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(({
             density.normal,
             shape.control,
             material.control,
-            motionFeedback,
-            motionFieldPress,
+            motionTactile,
             focusRingWithin,
             !fieldDisabled && state.field.hover,
             !fieldDisabled && state.field.focusWithin,

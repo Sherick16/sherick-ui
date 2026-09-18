@@ -11,21 +11,21 @@
     },
     "form": {
       "definition": "Representative form composition: Button, Checkbox, Combobox, Field, Input, NumberField, RadioGroup, Select, Slider, Switch.",
-      "raw": 289554,
-      "gzip": 98798,
-      "brotli": 84900
+      "raw": 289472,
+      "gzip": 98776,
+      "brotli": 84872
     },
     "overlay": {
       "definition": "Representative overlay composition: AlertDialog, Combobox, Dialog, Menu, Popover, Select, Tooltip.",
-      "raw": 314359,
-      "gzip": 101776,
-      "brotli": 86164
+      "raw": 314277,
+      "gzip": 101756,
+      "brotli": 86052
     },
     "barrel": {
       "definition": "The complete core root barrel with nothing tree-shaken beyond unused exports.",
-      "raw": 409383,
-      "gzip": 136827,
-      "brotli": 113000
+      "raw": 409301,
+      "gzip": 136805,
+      "brotli": 113038
     },
     "content": {
       "definition": "The optional rich-content subpath: Markdown, CodeBlock and their full dependency stack.",
@@ -35,9 +35,9 @@
     },
     "stylesCss": {
       "definition": "Published component stylesheet.",
-      "raw": 100779,
-      "gzip": 11853,
-      "brotli": 9766
+      "raw": 100104,
+      "gzip": 11815,
+      "brotli": 9712
     },
     "themeCss": {
       "definition": "Published token-only theme stylesheet.",
