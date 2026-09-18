@@ -53,9 +53,10 @@
     "test": "node scripts/smoke-package.mjs",
     "test:packed": "node scripts/verify-packed-package.mjs",
     "test:bundle": "node scripts/bundle-budget.mjs",
+    "test:motion": "node scripts/verify-motion-policy.mjs",
     "visual": "bun scripts/visual-regression.mjs",
     "clean": "rimraf dist",
-    "lint": "eslint src scripts/build-styles.ts"
+    "lint": "eslint src scripts/build-styles.ts scripts/verify-motion-policy.mjs"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",

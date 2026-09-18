@@ -3,11 +3,12 @@
 The canonical source of truth for Sherick UI's visual language. Every reusable visual
 rule lives here.
 
-Three sources implement it and none invents a rule of its own:
+Four sources implement it and none invents a rule of its own:
 
 | Layer | File | Contains |
 | --- | --- | --- |
-| Recipes | `packages/ui/src/components/ui.common.ts` | the named primitives a component composes |
+| Visual recipes | `packages/ui/src/components/ui.common.ts` | material, elevation, shape, state, tone and other non-temporal primitives |
+| Motion recipes | `packages/ui/src/components/ui.motion.ts` | the semantic motion grammar and temporal recipes |
 | Tokens | `packages/ui/src/styles/tokens.ts` | the authored runtime values those primitives resolve to, per theme |
 | CSS build | `packages/ui/scripts/build-styles.ts` | private compilation/scoping into generated `dist/theme.css` and `dist/styles.css` |
 
@@ -198,32 +199,32 @@ and do not re-tune a sheet's blur to make it "pop".
 Primitives: `overlay.menu`, `overlay.tooltip`, `overlay.dialog`.
 
 An overlay is a **composition**, not a new material. Each recipe bundles the floating
-shell's standard **material + elevation + shape + entrance geometry**, so every floating
-surface in the library resolves the same way and stays consistent with the material,
-elevation, acrylic and shape rules above.
+shell's standard **material + elevation + shape** so every floating surface in the library
+resolves the same way and stays consistent with the material, elevation, acrylic and shape
+rules above. Motion is deliberately not owned by the shell: §12's `presence` intent owns
+how an independent surface enters and leaves.
 
-| Recipe | Shell | Composes | Entrance geometry |
-| --- | --- | --- | --- |
-| `overlay.menu` | a menu, listbox or popup that grows out of its trigger | `shape.surface` + `material.acrylic` + `elevation.floating` | grows from its trigger: origin at the top, a small scale-up and a −4px lift |
-| `overlay.tooltip` | a small anchored hint | `shape.prominent` + `material.acrylicDense` + `elevation.floating` | grows out of the edge it is anchored to, so its geometry is applied with its position |
-| `overlay.dialog` | the dialog that owns the viewport | `shape.expressive` + `material.acrylicHero` + `elevation.floating` | rises into place from its own scale, with a larger lift than a menu |
+| Recipe | Shell | Composes |
+| --- | --- | --- |
+| `overlay.menu` | a menu, listbox or popup | `shape.surface` + `material.acrylic` + `elevation.floating` |
+| `overlay.tooltip` | a small anchored hint | `shape.prominent` + `material.acrylicDense` + `elevation.floating` |
+| `overlay.dialog` | the dialog that owns the viewport | `shape.expressive` + `material.acrylicHero` + `elevation.floating` |
 
-The recipes own only the **visual shell** and the geometry its motion grows from. Base UI
-owns popup presence, portals, focus management, pointer/focus suppression while closing,
-outside interaction, Escape dismissal and anchored positioning. A Base-backed component
-selects `motion.overlayIn` / `motion.overlayOut` (and the matching scrim family) from the
-primitive's open/closing state; Sherick UI does not maintain a second overlay lifecycle.
+Base UI owns popup presence lifecycle, portals, focus management, pointer/focus suppression
+while closing, outside interaction, Escape dismissal and anchored positioning. Sherick UI
+owns the visual presence recipe layered onto that lifecycle. A Positioner owns placement; a
+Popup owns presence. Collision repositioning must never replay entrance motion.
 
 Rules:
 
 - **a new menu, tooltip or dialog consumes one of these recipes** rather than
-  reconstructing floating-surface classes by hand: pick `overlay.menu`,
-  `overlay.tooltip` or `overlay.dialog`, and let the recipe own the material, the
-  elevation, the shape and the entrance geometry;
-- a shell that needs a different combination is a **new recipe** — add it to this
-  document and to `overlay` in `packages/ui/src/components/ui.common.ts` before anything uses it;
+  reconstructing floating-surface classes by hand;
+- the matching presence recipe comes from `ui.motion.ts`; shell and presence remain
+  independent so the same popup physics can be reused across materials;
+- a shell that needs a different material/elevation/shape combination is a **new recipe** —
+  add it here and to `overlay` in `ui.common.ts` before anything uses it;
 - behavior remains the Base primitive's responsibility; do not add Sherick-specific
-  portal, focus-trap, dismissal, positioning or presence infrastructure around it.
+  portal, focus-trap, dismissal, positioning or presence timers around it.
 
 ---
 
@@ -347,8 +348,9 @@ Both are **centred zooms**: the part changes size in place, and a press never tr
 **A selection mark's boundary does not move.** A checkbox box or a radio circle takes the plain 2%
 step, not the compact one: ten percent of its own outline is a 2.4px change, and the eye reads that
 as the control jumping rather than as pressure. Expression belongs to the contents of that boundary
-— the mark arriving on the spring — while the press is carried by the state layer. This is the same
-division the slider does not follow, because there the handle moving *is* the interaction.
+— the mark arriving through §12's `arrive` intent — while the press is carried by the state layer.
+This is the same division the slider does not follow, because there the handle moving *is* the
+interaction.
 
 State layers: replacing `background-color` on hover erases whatever fill a control owns,
 so states are composited by a `currentColor`-tinted overlay instead. Opacity carries the
@@ -371,18 +373,15 @@ through `state.field.invalid*`, which is one tonality keyed on the field's own
 
 **Selection is a recessed surface that fills.** A switch track, a checkbox box, a radio
 circle and a slider groove are one object at four sizes: `selectable.surface` gives them
-the recessed depth of a groove and the tactile motion family, `selectable.rest` is the
-neutral matte step they hold until they are selected, and `selectable.selected` /
-`selectable.indeterminate` are the accent they take once they are — keyed on the
-primitive's own selection attribute, so an uncontrolled control is styled from the same
-source of truth as a controlled one. Selection never changes their depth: tone carries it,
-exactly as it carries hover. Each of them states hover and press through the wrapping
-control's state layer, because whether those layers apply while the control is disabled is
-decided where the disabled state is known.
+the recessed depth of a groove, `selectable.rest` is the neutral matte step they hold until
+they are selected, and `selectable.selected` / `selectable.indeterminate` are the accent
+they take once they are — keyed on the primitive's own selection attribute, so an
+uncontrolled control is styled from the same source of truth as a controlled one.
+Selection never changes their depth: tone carries it, exactly as it carries hover.
 
 The mark inside that surface — a tick, a dash, a dot — exists **only while the control is
-selected**, and it arrives under `motion.spring` from the middle of the surface rather
-than appearing, so a made selection lands.
+selected**, and its temporal behavior belongs to `motionArrive`: the boundary stays stable
+while the meaningful mark lands.
 
 A value control's handle follows the same economy: the accent belongs to the **range**, so
 the handle sits on it as the `handle` matte fill and takes the accent itself only while the
@@ -441,47 +440,187 @@ The rule is:
 
 ## 12. Motion
 
-Five families, no exceptions. A component picks a family, never a duration.
+Motion is a grammar, not a collection of component animations.
 
-| Family | Role | Tokens | Should be used for |
-| --- | --- | --- | --- |
-| `press` | a tonality change with no physical travel, fast and decisive in both directions | `--sui-duration-press`, `--sui-ease-press` | hover, focus, an engaged field |
-| `release` | a tactile control: every property a tactile control can animate — colour, shadow, transform, and the size a selection or a thumb travels with | `--sui-duration-release`, `--sui-ease-release`, plus the press pair on `active:` | any control whose transform changes |
-| `spring` | the one family that overshoots: the part travels a little past where it lands and settles back | `--sui-duration-release`, `--sui-ease-spring`, plus the press pair on `active:` / `group-active:` | a selection mark arriving, the surface it is made in, the value a stepper drives |
-| `travel` | geometry the user is aiming — a slider's thumb and the fill it carries | `--sui-duration-release`, `--sui-ease-release`, plus the press pair on `active:` | a value control's moving parts |
-| overlay | entrance and exit for anything that floats, plus a matching scrim family (`scrimIn` / `scrimOut`) for the plane behind it | `--sui-duration-overlay`, `--sui-duration-overlay-exit`, `--sui-ease-release`, `--sui-ease-exit` | menus, tooltips, dialogs and their scrims |
+> **Components decide what changes. The motion system decides how change moves.**
 
-`release` and `spring` take the press timing while they are held (`active:`, or
-`group-active:` when the press arrives from the wrapping control), so the press lands
-immediately, and the release timing carries the settle, so letting go is expressive.
-`travel` suspends its own position property while the control is dragged: the pointer
-already carries that position, and interpolating it would make the fill and the handle
-disagree with the finger.
+A component chooses an **intent** from `ui.motion.ts`. It never chooses a duration, easing,
+keyframe or generic transition family itself. Motion intent is based on what a part is doing,
+not which component it belongs to.
 
-`--sui-ease-spring` is the **only** overshooting curve in the system, and it is reserved
-for the parts that say something by arriving: a tick that lands, a value that leans into
-the press that changed it, a surface that rebounds. A part that is merely relocating —
-a slider handle under a keyboard step, a travelling fill — settles without overshoot,
-because a value that passes its own value and comes back reads as a defect.
+### Intents
 
-Rules:
+| Intent | Meaning | Typical use |
+| --- | --- | --- |
+| `feedback` | a visual state changes without spatial movement | hover, focus, field tone, row highlight |
+| `tactile` | a control temporarily responds physically to activation | buttons, icon buttons, steppers |
+| `arrive` | a meaningful subordinate part appears/leaves inside a stable parent | checkbox tick, radio dot, selected check |
+| `orient` | a persistent part changes orientation in place | disclosure chevrons, arrows |
+| `relocate` | a persistent part moves/resizes between stable states | tab/segmented indicators, switch thumb |
+| `direct` | geometry is continuously controlled by the user | slider dragging, scrubbing, resize handles |
+| `disclose` | in-flow content explicitly expands/collapses | accordion/collapsible panels, tree branches |
+| `presence` | an independent surface enters/leaves the scene | menu, select/combobox popup, popover, tooltip, dialog, toast |
+| `activity` | continuous motion communicates ongoing work | spinner, skeleton pulse, indeterminate progress |
 
-- a control whose transform changes **must** use `release`, `spring` or `travel`; `press`
-  is for pure tonality and colour transitions that never move or resize anything;
-- floating overlays share the Sherick overlay motion family while **Base UI owns their
-  presence and lifecycle**. A menu grows from its trigger, a tooltip grows out of the
-  anchored edge and a dialog rises from its own center; Sherick consumes Base's state and
-  positioning variables rather than maintaining mount/closing state itself;
-- there is no Sherick timer tied to `--sui-duration-overlay-exit`: Base UI keeps closing
-  primitives present for their CSS exit animation and removes them when the transition is
-  complete. `prefers-reduced-motion` still neutralises Sherick's animation classes;
-- every family is neutralised under `prefers-reduced-motion`, and `release`, `spring` and
-  `travel` additionally drop their transform;
-- loading feedback (`animate-spin`, `animate-pulse`) sits outside these families: it
-  reports progress rather than responding to interaction.
+`disclose` is part of the grammar now but deliberately has no implementation recipe until the
+first disclosure primitive lands; its actual Base lifecycle and geometry should determine that
+recipe rather than speculative infrastructure.
 
-**Do not** write a literal duration, easing or `transition-*` list in a component, or
-animate a property no family covers.
+### Dynamics are not intents
+
+Only the motion implementation chooses dynamics:
+
+- **swift** — immediate response, no overshoot;
+- **settle** — strong deceleration into a destination;
+- **spring** — restrained overshoot, reserved for meaningful arrival;
+- **exit** — decisive acceleration away;
+- **continuous** — repeating activity only.
+
+Spring is never a component option. A checkbox tick may overshoot because it communicates that a
+selection happened. A tab indicator must not pass its selected tab and return; a slider handle must
+not pass the pointer; a dialog must not bounce.
+
+The existing CSS token names (`duration-press`, `duration-release`, `duration-overlay`, etc.) remain
+unchanged during the component migration so this foundation does not alter published styling. They
+are implementation transport, not the semantic API. Components consume semantic leaf recipes.
+
+### Directionality
+
+The canonical temporal asymmetry is:
+
+```
+interaction begins     -> swift
+interaction releases   -> settle
+something enters       -> settle
+something exits        -> exit
+selection mark appears -> spring
+state-driven movement  -> settle
+direct manipulation    -> no positional easing
+```
+
+Entering settles into the interface; leaving gets out of the way. Exits are not reverse entrances
+with identical timing.
+
+### Spatial ownership
+
+A DOM node has **one spatial-motion owner**. It may additionally receive non-spatial feedback, but
+never two recipes competing for transform geometry.
+
+For floating primitives:
+
+```
+Positioner -> placement and collision geometry (Base UI)
+Popup      -> visual presence (Sherick UI)
+```
+
+Never animate the Positioner. If Base flips or repositions an already-open popup, it moves to the
+new placement without replaying entrance motion.
+
+Prefer transform longhands (`translate`, `scale`, `rotate`) when they prevent transform ownership
+from colliding. Do not force a transform rewrite where Base already exposes a simpler stable
+geometry path; the invariant is ownership, not a particular CSS trick.
+
+### Stable boundaries
+
+A stable control boundary does not wobble merely because its state changed. Checkbox/radio outlines
+remain fixed: their surface can retone and their mark can `arrive`, but the boundary does not bounce.
+The slider is different because moving its handle is the interaction.
+
+### Direct manipulation
+
+While direct manipulation is active:
+
+> pointer movement -> visual position with zero interpolation.
+
+No spring, no positional transition, no lag. Hover/tone/elevation feedback may still change around
+the directly manipulated geometry. Keyboard/programmatic changes may `settle` because they are not
+pointer tracking.
+
+### Presence
+
+Presence is a subsystem, not a generic overlay animation. Its role variants are separate leaf
+recipes even when they share dynamics:
+
+- anchored presence — Select, Combobox, Menu, Popover;
+- tooltip presence — lighter/quicker anchored hint;
+- modal presence — centered large surface plus its scrim;
+- future toast/sheet presence — added only when the role exists.
+
+Anchored presence must eventually derive its entrance vector and transform origin from Base UI's
+resolved side/origin so collision flipping automatically yields the correct direction. Base owns
+mount/unmount lifecycle; Sherick must prefer Base lifecycle markers such as `data-starting-style` /
+`data-ending-style` instead of mirrored React open state or animation timers.
+
+An initially open server-rendered surface is already present: hydration must not replay entrance.
+Rapid open/close/open must retarget from current visual state; motion never queues stale sequences.
+
+### Disclosure is not generic layout animation
+
+`disclose` exists only for an explicit disclosure relationship. Dynamic popup content getting taller,
+filtered lists reordering, and ordinary layout changes do not automatically animate. Sherick UI is
+not a layout-animation framework.
+
+### Activity
+
+Activity is first-class rather than an exception. Spin, pulse and future indeterminate progress are
+continuous status motion and never borrow interaction dynamics. They still have an intentional
+reduced-motion alternative.
+
+### Composition budget
+
+One interaction normally gets **one dominant spatial motion and at most one subordinate spatial
+response**. Non-spatial feedback may reinforce it.
+
+Opening Select, for example:
+
+```
+dominant:    popup -> presence
+subordinate: chevron -> orient
+non-spatial: trigger tone -> feedback
+```
+
+Do not stack trigger bounce + popup spring + row stagger + check scale + spinning chevron. Expressive
+means intentional, not busy. List-item staggering is never the default.
+
+### Performance
+
+Prefer opacity and transform-like geometry (`translate`, `scale`, `rotate`). Color and shadow may
+transition where their state recipe requires it. Width/height/position are acceptable for a small
+persistent indicator when Base's geometry makes that simpler; do not build a FLIP engine to avoid a
+small, measured layout transition.
+
+Do not animate backdrop blur/filter during ordinary interaction, add `transition-all`, or scatter
+`will-change` hints through the component library.
+
+### Reduced motion
+
+Reduced motion is semantic, not a blanket afterthought:
+
+| Intent | Reduced-motion behavior |
+| --- | --- |
+| `feedback` | immediate tonal/state feedback remains |
+| `tactile` | remove scale/travel; retain state/depth feedback |
+| `arrive` | immediate state or minimal opacity |
+| `orient` | immediate orientation |
+| `relocate` | immediate destination |
+| `direct` | unchanged — already pointer-direct |
+| `disclose` | immediate layout state, optionally minimal opacity |
+| `presence` | opacity-only or immediate; no spatial travel |
+| `activity` | static/minimal status alternative |
+
+### Ownership and enforcement
+
+`packages/ui/src/components/ui.motion.ts` owns temporal class recipes. Component files may describe
+target geometry — e.g. `rotate-180`, a destination translate, a pressed scale supplied by state — but
+may not author literal `duration-*`, `ease-*`, `transition-*`, `animate-*` or keyframes.
+
+`bun run test:motion` enforces that boundary. During the migration, the old `motion` object in
+`ui.common.ts` and the existing Spinner/Skeleton activity classes are an explicit finite legacy
+allowlist. **New components may not use the legacy object.** The allowlist only shrinks as migration
+PRs land and disappears when the repository is fully converted.
+
+Do not add motion state in React when CSS/Base state already expresses the lifecycle. Do not add a
+Sherick timer for popup exits. Do not write a literal duration/easing in a component.
 
 ---
 
@@ -545,7 +684,8 @@ inline padding from a field's.
   while the rows around them are at least as tall as that floor, which the library's own
   `density.normal` rhythm is and a 40px table row is not. A control that owns a labelled row —
   a radio option — needs no extension at all, because the row itself is the label.
-- `prefers-reduced-motion` is respected by every motion family.
+- `prefers-reduced-motion` follows the per-intent behavior defined in §12 rather than a
+  component-specific fallback.
 - The component runtime is font-agnostic; typography is the consumer's decision.
 - Color is never the only carrier of meaning: a semantic state also carries an icon, a
   label or a position.
@@ -610,8 +750,9 @@ If a genuinely new visual rule is required:
 
 1. add it to this document first, with its role and its when-to-use / when-not-to-use
    examples;
-2. add it as a named primitive in `packages/ui/src/components/ui.common.ts`, and its tokens to
-   `packages/ui/src/styles/tokens.ts`;
+2. add non-temporal visual recipes to `packages/ui/src/components/ui.common.ts`; add
+   temporal/motion recipes to `packages/ui/src/components/ui.motion.ts`; add runtime theme
+   values to `packages/ui/src/styles/tokens.ts` only when a new token is genuinely required;
 3. then consume the primitive in the component.
 
 Not every local decision is a visual rule. **Layout, spacing, component-specific
@@ -621,7 +762,7 @@ size paddings are decided. They are not promoted into global primitives, and "co
 be a primitive?" is not a reason to add one. The prohibition covers the visual system
 itself: color and tone roles, material recipes, elevation and shadows, semantic shape
 roles, structural edges and rims, state treatments, focus treatment, and motion timing,
-easing and families.
+easing and intent recipes.
 
 Extending the language is the intended path. Implementing a rule locally — a one-off
 shadow, a literal color, an inline radius, a bespoke transition — is not. A local rule
@@ -629,7 +770,7 @@ makes the language non-canonical: the next component cannot reuse the decision, 
 theme cannot retint it, and no verification can catch it.
 
 A new **behavioral** requirement is different: if Base UI provides that behavior, consume
-its primitive directly. Do not extend the visual primitive module with focus managers,
+its primitive directly. Do not extend the visual primitive modules with focus managers,
 portal helpers, controllable-state hooks or accessibility machinery. If Base UI lacks a
 required widget behavior, document that gap before introducing local infrastructure.
 
