@@ -6,27 +6,33 @@ import {
   Bell,
   Check,
   Download,
+  Ellipsis,
   Heart,
   Monitor,
   Moon,
   Search as SearchIcon,
+  SlidersHorizontal,
   Sun,
   Trash2,
 } from "lucide-react";
 import {
   Alert,
+  AlertDialog,
   Avatar,
   Badge,
   Button,
   Card,
   Checkbox,
+  Combobox,
   Dialog,
   Divider,
   Field,
   IconButton,
   Input,
+  Menu,
   NavGroup,
   NumberField,
+  Popover,
   RadioGroup,
   Search,
   Select,
@@ -61,6 +67,12 @@ const selectOptions = [
   { label: "Marketing site", value: "marketing" },
 ];
 
+const comboboxOptions = [
+  { label: "Design system", value: "design" },
+  { label: "Dashboard", value: "dashboard" },
+  { label: "Marketing site", value: "marketing", disabled: true },
+];
+
 type ThemeMode = "system" | "light" | "dark";
 
 const isThemeMode = (value: string | null): value is ThemeMode =>
@@ -79,6 +91,7 @@ export default function Home() {
   const [switchOn, setSwitchOn] = useState(true);
   const [motionSwitch, setMotionSwitch] = useState(false);
   const [selection, setSelection] = useState("design");
+  const [alertOpen, setAlertOpen] = useState(false);
   const [theme, setTheme] = useState<ThemeMode>("system");
 
   useEffect(() => {
@@ -482,6 +495,71 @@ export default function Home() {
             </Specimen>
           </section>
 
+          <section>
+            <SectionHeading title="Floating surfaces" />
+            <div className="mt-6 grid gap-4 xl:grid-cols-2">
+              <Specimen title="Popover">
+                <Popover>
+                  <Popover.Trigger
+                    render={
+                      <Button appearance="tonal" variant="secondary" icon={<SlidersHorizontal />}>
+                        Filters
+                      </Button>
+                    }
+                  />
+                  <Popover.Content className="w-72">
+                    <div className="space-y-3">
+                      <p className={cn("text-sm font-medium", text.high)}>Refine results</p>
+                      <Input label="Owner" placeholder="Anyone" />
+                      <Field label="Status">
+                        <Select options={selectOptions} defaultValue="design" />
+                      </Field>
+                    </div>
+                    <div className="mt-5 flex items-center justify-between gap-3">
+                      <Button appearance="tonal" variant="secondary">Reset</Button>
+                      <Button appearance="filled">Apply</Button>
+                    </div>
+                  </Popover.Content>
+                </Popover>
+              </Specimen>
+
+              <Specimen title="Menu">
+                <Menu>
+                  <Menu.Trigger
+                    render={
+                      <Button appearance="tonal" variant="secondary" icon={<Ellipsis />}>
+                        Actions
+                      </Button>
+                    }
+                  />
+                  <Menu.Content>
+                    <Menu.Item onClick={() => undefined}>Rename</Menu.Item>
+                    <Menu.Item disabled>Duplicate</Menu.Item>
+                    <Menu.Separator />
+                    <Menu.Item variant="danger" onClick={() => undefined}>Delete</Menu.Item>
+                  </Menu.Content>
+                </Menu>
+              </Specimen>
+
+              <Specimen title="Combobox">
+                <div className="space-y-4">
+                  <Field label="Project">
+                    <Combobox options={comboboxOptions} defaultValue="dashboard" />
+                  </Field>
+                  <Field label="No results">
+                    <Combobox options={comboboxOptions} defaultInputValue="Nothing matches this query" />
+                  </Field>
+                </div>
+              </Specimen>
+
+              <Specimen title="Alert dialog">
+                <Button appearance="filled" variant="danger" icon={<Trash2 />} onClick={() => setAlertOpen(true)}>
+                  Delete project
+                </Button>
+              </Specimen>
+            </div>
+          </section>
+
           <section className="pb-12">
             <SectionHeading title="Content" />
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
@@ -499,13 +577,29 @@ export default function Home() {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <Dialog.Header>Dialog specimen</Dialog.Header>
         <Dialog.Content>
-          Overlay specimen content.
+          <div className="space-y-5">
+            <p>Overlay specimen content.</p>
+            <Field label="Dialog project type">
+              <Combobox options={comboboxOptions} defaultValue="design" />
+            </Field>
+          </div>
         </Dialog.Content>
         <Dialog.Footer>
           <Button appearance="text" variant="secondary" onClick={() => setDialogOpen(false)}>Cancel</Button>
           <Button appearance="filled" onClick={() => setDialogOpen(false)}>Confirm</Button>
         </Dialog.Footer>
       </Dialog>
+
+      <AlertDialog
+        open={alertOpen}
+        onOpenChange={setAlertOpen}
+        title="Delete project?"
+        description="Every deployment of this project will be removed. This action cannot be undone."
+        cancelLabel="Keep project"
+        confirmLabel="Delete project"
+        onConfirm={() => undefined}
+        onCancel={() => undefined}
+      />
     </main>
   );
 }

@@ -24,3 +24,18 @@ export const test = base.extend<{ errors: string[] }>({
 
 export { expect };
 export type { Locator, Page };
+
+/**
+ * Whether `locator` is what the document actually hit-tests at its own center.
+ *
+ * `toBeVisible` cannot see occlusion: a popup rendered behind a modal is still visible, still has
+ * a box, and still answers its own accessible name — it is simply painted under the surface that
+ * owns the viewport. A nested overlay therefore has to be checked against the stack, not the
+ * tree.
+ */
+export const isTopmost = (locator: Locator) =>
+  locator.evaluate((element) => {
+    const box = element.getBoundingClientRect();
+    const top = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2);
+    return top === element || element.contains(top);
+  });

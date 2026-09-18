@@ -2,14 +2,19 @@ import { useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
   Alert,
+  AlertDialog,
   Avatar,
   Badge,
   Button,
   Card,
+  Combobox,
   Dialog,
   Divider,
+  Field,
   IconButton,
   Input,
+  Menu,
+  Popover,
   Search,
   Select,
   Skeleton,
@@ -31,6 +36,7 @@ const options = [
 
 function App() {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
   const [enabled, setEnabled] = useState(true);
 
   return (
@@ -123,6 +129,26 @@ function App() {
       </section>
 
       <section className="section">
+        <Popover>
+          <Popover.Trigger render={<Button appearance="tonal">Portaled popover</Button>} />
+          <Popover.Content>
+            <p>Popover content</p>
+          </Popover.Content>
+        </Popover>
+        <Menu>
+          <Menu.Trigger render={<Button appearance="tonal">Portaled menu</Button>} />
+          <Menu.Content>
+            <Menu.Item>Rename</Menu.Item>
+            <Menu.Separator />
+            <Menu.Item variant="danger">Delete</Menu.Item>
+          </Menu.Content>
+        </Menu>
+        <Field label="Portaled combobox">
+          <Combobox options={options} defaultValue="design" />
+        </Field>
+      </section>
+
+      <section className="section">
         <CodeBlock language="typescript">{"const scoped: boolean = true;"}</CodeBlock>
         <Markdown>{"Inline $x^2$ and display math:\n\n$$x = 42$$"}</Markdown>
       </section>
@@ -131,6 +157,9 @@ function App() {
         <Button appearance="filled" onClick={() => setDialogOpen(true)}>
           Open dialog
         </Button>
+        <Button appearance="filled" variant="danger" onClick={() => setAlertOpen(true)}>
+          Open portaled alert
+        </Button>
       </section>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -138,6 +167,9 @@ function App() {
         <Dialog.Description>Portaled styles must remain scoped and complete.</Dialog.Description>
         <Dialog.Content>
           <Select aria-label="Dialog project type" options={options} defaultValue="design" />
+          <Field label="Dialog combobox">
+            <Combobox options={options} defaultValue="design" />
+          </Field>
         </Dialog.Content>
         <Dialog.Footer>
           <Button appearance="filled" onClick={() => setDialogOpen(false)}>
@@ -145,6 +177,14 @@ function App() {
           </Button>
         </Dialog.Footer>
       </Dialog>
+
+      <AlertDialog
+        open={alertOpen}
+        onOpenChange={setAlertOpen}
+        title="Portaled alert dialog"
+        description="The alert dialog surface must be styled by package CSS alone."
+        confirmLabel="Delete"
+      />
     </main>
   );
 }

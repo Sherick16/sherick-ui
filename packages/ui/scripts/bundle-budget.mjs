@@ -50,8 +50,8 @@ const expectedRichContent = [
 
 const fixtures = {
   button: `import { Button } from "sherick-ui";\nexport default Button;\n`,
-  form: `import { Button, Checkbox, Field, Input, NumberField, RadioGroup, Select, Slider, Switch } from "sherick-ui";\nexport default [Button, Checkbox, Field, Input, NumberField, RadioGroup, Select, Slider, Switch];\n`,
-  overlay: `import { Dialog, Select, Tooltip } from "sherick-ui";\nexport default [Dialog, Select, Tooltip];\n`,
+  form: `import { Button, Checkbox, Combobox, Field, Input, NumberField, RadioGroup, Select, Slider, Switch } from "sherick-ui";\nexport default [Button, Checkbox, Combobox, Field, Input, NumberField, RadioGroup, Select, Slider, Switch];\n`,
+  overlay: `import { AlertDialog, Combobox, Dialog, Menu, Popover, Select, Tooltip } from "sherick-ui";\nexport default [AlertDialog, Combobox, Dialog, Menu, Popover, Select, Tooltip];\n`,
   barrel: `export * from "sherick-ui";\n`,
   content: `import { Markdown, CodeBlock } from "sherick-ui/content";\nexport const a = [Markdown, CodeBlock];\nexport * from "sherick-ui/content";\n`,
 };
@@ -124,8 +124,8 @@ if (update) {
   const definitions = {
     button:
       "Button alone through the root export. Guards against the root barrel pulling optional feature code.",
-    form: "Representative form composition: Button, Checkbox, Field, Input, NumberField, RadioGroup, Select, Slider, Switch.",
-    overlay: "Representative overlay composition: Dialog, Select, Tooltip.",
+    form: "Representative form composition: Button, Checkbox, Combobox, Field, Input, NumberField, RadioGroup, Select, Slider, Switch.",
+    overlay: "Representative overlay composition: AlertDialog, Combobox, Dialog, Menu, Popover, Select, Tooltip.",
     barrel: "The complete core root barrel with nothing tree-shaken beyond unused exports.",
     content: "The optional rich-content subpath: Markdown, CodeBlock and their full dependency stack.",
     stylesCss: "Published component stylesheet.",

@@ -14,6 +14,13 @@ Three sources implement it and none invents a rule of its own:
 If this document and any other file disagree — a README paragraph, a showcase caption,
 a code comment — this document wins and the other file is corrected.
 
+**Class names are literal.** The recipes in `ui.common.ts` are strings, and the stylesheet is
+compiled by scanning the package source for the class names it should emit: a name that only
+exists once a recipe is evaluated — a variant fragment glued to a suffix, `${variant}:before:opacity-[0.09]`
+— compiles to no rule at all, and that step of the recipe silently disappears. Compose from whole
+class names, and write one out in full wherever a variant prefix would otherwise be assembled by
+hand. A recipe that renders a class `styles.css` has no rule for fails the package check.
+
 Sherick UI deliberately keeps **visual design** separate from **widget mechanics**.
 `@base-ui/react` is the behavioral and accessibility substrate wherever it provides the
 primitive: keyboard navigation, focus management, semantic relationships, form
@@ -120,14 +127,20 @@ A material is a fill. Tone separates matte surfaces from each other; nothing els
 | `control` | the fill every text control shares | text fields, textareas, search, select triggers | passive content surfaces |
 | `controlError` | the same fill carrying danger tone | an invalid field | any non-semantic state |
 | `handle` | the one matte fill that separates from the surfaces around it in both themes | a small part the user has to find — a value control's handle | anything large: a surface this loud stops being quiet |
-| `acrylic` | a translucent sheet lit from above | menus, popovers and other surfaces floating above the app | anything grounded in the page |
-| `acrylicDense` | the same sheet at higher opacity | small floating surfaces that must stay legible, such as tooltips | large sheets — use `acrylicHero` |
-| `acrylicHero` | the large-overlay recipe | a surface that owns the viewport, such as a dialog | menus and tooltips |
+| `acrylic` | the anchored sheet, lit from above | an anchored surface with room to breathe: a selection list, a menu, a structured popover | anything grounded in the page |
+| `acrylicDense` | the same sheet at higher opacity | the smallest floating surfaces — a tooltip, a floating control | anchored popovers and lists — use `acrylic` |
+| `acrylicHero` | the large-overlay recipe | a surface that owns the viewport, such as a dialog | menus, popovers and tooltips |
 
 **Do:** choose the material by what the surface *is*, then let tone alone separate it.
 **Do not:** give a material a shadow or a rim, or reach for acrylic because a surface
 "feels important". Acrylic is reserved for genuinely floating UI — a grounded card made
 of glass is a contradiction.
+
+An anchored sheet carries most of its own tone, because it has to stay legible over
+whatever it happens to sit over. A popup is small and its contents are the only thing the
+user is looking at, so a saturated control or a bright image behind it must not read as
+the popup's own state: the sheet's opacity is the floor that prevents it, and the blur
+only softens what is left.
 
 ---
 
@@ -163,21 +176,30 @@ Acrylic is only correct for UI that floats above the application. Three recipes 
 and the difference between them is opacity, blur and how much of the sheet is its own
 tone rather than the defocused page behind it.
 
-- `acrylic` — menus and popups. Translucent, gradient-lit, blurred.
-- `acrylicDense` — small floating surfaces (tooltips). Same sheet, higher opacity,
-  because a small surface has little room to stay legible.
+- `acrylic` — anchored surfaces: a selection list, a menu, a structured popover. Gradient-lit
+  and blurred, and carrying most of its own tone, because an anchored sheet sits over whatever
+  the page happens to have there — a saturated button behind a popup must not read as the
+  popup's own state.
+- `acrylicDense` — the smallest floating surfaces (tooltips and floating controls). The same
+  sheet at higher opacity still, because a surface this small has no room to stay legible.
 - `acrylicHero` — the large overlay sheet (dialogs; reachable through `overlay.dialog`).
-  Markedly more opaque and calmer: a surface that owns the viewport must read first as a
-  physical surface and only secondarily as glass. The scrim behind it does the
-  separating, the blur only defocuses, and the gradient is a restrained top-to-bottom
-  light rather than a frosted haze. Its tone is a **subtle step above the canvas** in
-  every theme — the invariant is enough separation from the canvas while staying
+  Calmer than the smaller sheets and as opaque as the densest of them: a surface that owns the
+  viewport must read first as a physical surface and only secondarily as glass. The scrim
+  behind it does the separating, the blur only defocuses, and the gradient is a restrained
+  top-to-bottom light rather than a frosted haze. Its tone is a **subtle step above the
+  canvas** in every theme — the invariant is enough separation from the canvas while staying
   substantially darker than a grey, foggy sheet. In dark mode that is a step of roughly
   0.03 in OKLCH lightness over the canvas (0.236 over 0.205), not a panel lighter than
   the floating surface level; in light mode it is 0.993 over 0.965. Because the step is
   small the sheet never leans on its shadow, and `--sui-overlay-fill` decides how much of
   it is its own tone rather than the defocused page — which is what a large overlay
   actually leans on, not blur.
+
+How opaque each sheet is comes from a runtime value per theme rather than from a literal in
+the recipe — `--sui-glass-fill` for an anchored sheet, `--sui-glass-dense-fill` for the
+smallest one, `--sui-overlay-fill` for the overlay that owns the viewport. How much of a
+sheet has to be its own tone is a property of the theme (a dark sheet has to hide a bright
+page, a light one has to hide a dark page), not of the component that renders it.
 
 Two implementation constraints, both load-bearing:
 
@@ -195,19 +217,22 @@ and do not re-tune a sheet's blur to make it "pop".
 
 ## 7. Floating shells — the overlay recipes
 
-Primitives: `overlay.menu`, `overlay.tooltip`, `overlay.dialog`.
+Primitives: `overlay.scrim`, `overlay.popup`, `overlay.menu`, `overlay.tooltip`, `overlay.dialog`.
 
-An overlay is a **composition**, not a new material. Each recipe bundles the floating
-shell's standard **material + elevation + shape + entrance geometry**, so every floating
+An overlay is a **composition**, not a new material. A shell recipe bundles the floating
+surface's standard **material + elevation + shape + entrance geometry**, so every floating
 surface in the library resolves the same way and stays consistent with the material,
-elevation, acrylic and shape rules above.
+elevation, acrylic and shape rules above. `overlay.scrim` is the one recipe that is not a
+shell: it is the plane a viewport-owning surface sits on, and it carries a fill and a blur
+rather than a material, a depth or a corner.
 
 | Recipe | Shell | Composes | Entrance geometry |
 | --- | --- | --- | --- |
-| `overlay.menu` | a menu, listbox or popup that grows out of its trigger | `shape.surface` + `material.acrylic` + `elevation.floating` | grows from its trigger: origin at the top, a small scale-up and a −4px lift |
-| `overlay.tooltip` | a small anchored hint | `shape.prominent` + `material.acrylicDense` + `elevation.floating` | grows out of the edge it is anchored to, so its geometry is applied with its position |
-| `overlay.dialog` | the dialog that owns the viewport | `shape.expressive` + `material.acrylicHero` + `elevation.floating` | rises into place from its own scale, with a larger lift than a menu |
-
+| `overlay.scrim` | the plane behind a surface that owns the viewport | a scrim fill plus a backdrop blur — no material, elevation or shape of its own | selects `motion.scrimIn` / `motion.scrimOut` instead of an entrance transform |
+| `overlay.popup` | an anchored surface with room to breathe: a selection list (`Select`, `Combobox`) or structured content (`Popover`) | `shape.surface` + `material.acrylic` + `elevation.floating` | grows from the edge it was anchored to, with a small scale-up and 4px of travel out of that edge |
+| `overlay.menu` | a compact list of commands (`Menu`) | `shape.control` + `material.acrylic` + `elevation.floating` | the same growth as `popup`, so a command list and a listbox arrive identically |
+| `overlay.tooltip` | a small anchored hint | `shape.prominent` + `material.acrylicDense` + `elevation.floating` | grows from the edge it was anchored to, like the other anchored shells |
+| `overlay.dialog` | the dialog that owns the viewport | `shape.expressive` + `material.acrylicHero` + `elevation.floating` | rises into place from its own scale, with a larger lift than a popup |
 The recipes own only the **visual shell** and the geometry its motion grows from. Base UI
 owns popup presence, portals, focus management, pointer/focus suppression while closing,
 outside interaction, Escape dismissal and anchored positioning. A Base-backed component
@@ -217,13 +242,50 @@ primitive's open/closing state; Sherick UI does not maintain a second overlay li
 Rules:
 
 - **a new menu, tooltip or dialog consumes one of these recipes** rather than
-  reconstructing floating-surface classes by hand: pick `overlay.menu`,
-  `overlay.tooltip` or `overlay.dialog`, and let the recipe own the material, the
-  elevation, the shape and the entrance geometry;
+  reconstructing floating-surface classes by hand: pick `overlay.popup` for an anchored surface
+  with room to breathe, `overlay.menu` for a compact list of commands, `overlay.tooltip` for a
+  hint, and `overlay.dialog` plus `overlay.scrim` for a surface that owns the viewport — and let
+  the recipe own the material, the elevation, the shape and the entrance geometry;
 - a shell that needs a different combination is a **new recipe** — add it to this
   document and to `overlay` in `packages/ui/src/components/ui.common.ts` before anything uses it;
 - behavior remains the Base primitive's responsibility; do not add Sherick-specific
   portal, focus-trap, dismissal, positioning or presence infrastructure around it.
+
+### The entrance follows the placement
+
+An anchored shell does **not** assume it is below its trigger. It reads both halves of its
+geometry from the primitive at the moment it is placed:
+
+- the **origin** is `--transform-origin`, which Base publishes on the positioner: the anchor
+  edge, resolved after collision handling. A surface above its trigger therefore grows out of
+  its own *bottom* edge, and one beside it grows out of its side;
+- the **travel** is 4px *into* that edge, selected from the popup's own `data-side`: down into
+  place from above, up into place from below, sideways when it is anchored to a side.
+  `overlay.dialog` is anchored to the viewport rather than to a control, so it has no side and
+  rises from a larger lift of its own.
+
+**Do:** expose a `side` and let the recipe place the entrance — every anchored shell in the
+library shares one policy, including a popup Base flips above its trigger to keep it on screen.
+**Do not** write `origin-top` or a fixed lift into a shell, and do not add per-component
+motion for an anchored surface: a surface that animates as if it were below its trigger when it
+is not is a surface that looks like it moved the wrong way.
+
+### Stacking
+
+Every floating surface shares one stacking level (`stacking.float`), and **document order decides**
+between them. That is not a shortcut, it is the rule Base UI's portals already implement: a popup's
+portal is nested *inside* the portal of the surface it was opened from and appended last, so the
+innermost — the one opened last — is later in the document and paints on top.
+
+A scale that ranks surfaces by kind, with dialogs above tooltips above popups, cannot be right:
+a popup opened from inside a dialog is the innermost surface there is, and a ranking draws the
+dialog over it and hides the popup behind the modal that owns it. Sharing one level keeps that
+nesting authoritative at any depth, and it also orders the two cases a ranking gets wrong in the
+other direction — a dialog opening over a popup, and a popup opening over a tooltip — because
+each one is opened after the surface it covers.
+
+The level exists to clear the application's own content, not to rank Sherick's surfaces against
+each other.
 
 ---
 
@@ -261,7 +323,8 @@ size of the object and the emphasis it carries.
 | Shape | Radius | Role | Should not be used for |
 | --- | --- | --- | --- |
 | `control` | 1.25rem | ordinary controls, dense data regions — fields, rows, options, chips, tables | large surfaces |
-| `mark` | 0.625rem | a compact square selection mark — the `Checkbox` box | anything larger than a compact square, which wants `control`; a round mark, which is `circle` |
+| `mark` | 0.625rem | a compact square selection mark — the `Checkbox` box | anything the size of a field, which wants `control`; a full-width row, which wants `row`; a round mark, which is `circle` |
+| `row` | 0.875rem | a row at command density — a row in a list that is scanned rather than read | anything the size of a field or larger, which wants `control` and up; a compact square, which wants `mark` |
 | `prominent` | 1.5rem | prominent controls, compact floating surfaces | small inline controls |
 | `surface` | 1.75rem | large surfaces — cards, menus, panels | buttons |
 | `expressive` | 2rem | an expressive surface that owns the viewport — the large overlay sheet, tightened so it reads as a focused surface rather than a pillowy one | anything smaller than a dialog |
@@ -271,6 +334,13 @@ size of the object and the emphasis it carries.
 **Do:** hold one role across a whole component family, so a switch and a segmented
 control read as the same object at two scales.
 **Do not** substitute a numeric radius, or mix two adjacent steps inside one surface.
+
+A role is chosen by the object's own extent, not by how important it feels. `control`'s
+radius is right for anything the size of a field; on a 24px square or a 36px command row
+it reaches the object's half-extent and the object stops being a rounded rectangle at all
+and becomes a capsule. That is why a compact object takes a tighter step than `control`:
+`mark` for a square that has to stay a square, `row` for a full-width row whose corner has
+to stay proportional to its own height. A control-sized row keeps `control` at both ends.
 
 ---
 
@@ -356,11 +426,11 @@ state, so it fades on the shared motion curve rather than snapping.
 
 | Layer | Hover / active opacity | Applies to |
 | --- | --- | --- |
-| `quiet` | 0.05 / 0.09 | ghost controls, navigation rows, menu options |
+| `quiet` | 0.05 / 0.09 | ghost controls, navigation rows, and every collection row. Both interactive steps are gated on the primitive's own disabled marker as well as the native attribute, so a row disabled by a list neither tints under the pointer nor presses |
 | `tonal` | 0.09 / 0.15 | tinted matte controls — tonal buttons, icon buttons, acrylic buttons |
 | `filled` | 0.18 / 0.26 | opaque accent fills |
 | `track` | 0.18 / 0.26 | a switch track, where hover and press arrive from the wrapping button via `group-*` |
-| `activeRow` | `data-active` / `data-highlighted` | a collection row highlighted by keyboard navigation; Base UI collection primitives use `data-highlighted` |
+| `activeRow` | 0.05 | a collection row highlighted by keyboard or pointer navigation, from Base UI's `data-highlighted`. It pairs with `quiet` on the same row, so highlight and hover are the same tone at the same strength — asserted on the rendered layer in the browser suite. It is deliberately *not* gated on the disabled marker: a disabled row stays navigable and has to show where the navigation is |
 
 Fields are a single borderless family: a matte `surface-high` fill that steps up once on
 hover and once more while engaged, no ring and no lift. `state.field.*` covers hover,
@@ -415,6 +485,42 @@ members of the system rather than local styling:
 **Do:** let tonality carry hover; let a raised control recess while it is held; let a
 flat or floating control press through the state layer's active step and `state.press`.
 **Do not** use opacity for anything except disabled, or add depth to show a state.
+
+### Collection rows
+
+A **collection row** is one line in a list the user scans — a `Select` option, a `Combobox`
+option, a `Menu` command. It is its own small system inside the one above, because the same
+object appears at two densities and has to behave identically at both:
+
+| Entry | Carries |
+| --- | --- |
+| `list.option` | a row in a selection list: full width, one line, chosen rather than performed |
+| `list.command` | the same row at the density a list of short actions wants — a command is scanned, not read |
+| `list.sheet` | the sheet a list of rows sits in: it never exceeds what the viewport leaves it, and scrolls inside itself rather than growing. The width is the list's own decision — a control's list is never narrower than the control it came from and grows to fit its own content until the viewport clamp, and a command list only ever grows to its commands and no narrower than a short list of actions needs |
+
+The two rows differ only in **density and the corner their own extent allows** — an option row
+is a field-sized object and takes `control`, a command row is an object smaller than a field and
+takes `row` — and in what they are *for*: an option holds a value, a command performs an action.
+Everything else is shared, and that sharing is the point:
+
+- **hover and keyboard highlight are one tone at one strength.** A row composes `quiet` and
+  `activeRow` together, so a row under the pointer and a row under the arrow keys read as the
+  same thing happening;
+- **selection is a tint of the sheet** (`tone.selected`), never the opaque accent. The one
+  primary fill in a view belongs to the primary action, not to a row that happens to be chosen;
+- **a destructive command wears its tone on its own label**, and its hover and highlight are
+  then a restrained tint of that same tone. A menu never paints a whole row — or its sheet —
+  in danger to announce that one item in it destroys something;
+- **a row that cannot be used takes no hover and no press.** The primitive's own `data-disabled`
+  marker gates both interactive steps — a row is a `div`, so `:active` matches it while the
+  pointer is down on it and `:disabled` never does — and the muted tone is the rest of what says
+  so. It **keeps the navigation highlight**: a disabled option or command stays reachable by
+  keyboard so it can be discovered and announced as unavailable, and a reader still has to see
+  which row the navigation is on when it arrives there. Disabled means "cannot be chosen or
+  performed", never "cannot be found", so `activeRow` is deliberately *not* gated on the marker.
+
+A row is **flat**: depth never announces hover, highlight or selection, because the row sits in
+a list rather than on the page.
 
 ### Pressed, precisely
 
@@ -495,7 +601,8 @@ type step**, so controls of one density share a rhythm.
 | `compact` | 2.5rem | 0.875rem | dense desktop UI |
 | `normal` | 3rem | 0.95rem | the default rhythm |
 | `prominent` | 3.5rem | 1.125rem | the largest step, still compact by consumer-app standards |
-| `target` | 2.75rem square | inherits | the minimum interactive target for an icon-only control |
+| `target` | 2.75rem square | inherits | the minimum interactive target for an icon-only control that stands on its own |
+| `part` | 2.75rem tall, 2.25rem wide | inherits | one control **inside** a composite field — the trailing controls a `Combobox` owns |
 
 Anatomy owns **padding**, not density: a button is gripped at its ends, a field holds
 text, and neither is derived from the other — one density can carry two paddings, so
@@ -503,12 +610,21 @@ padding is written with the component rather than in these tokens. `Button` is t
 worked example: its `sm` / `md` / `lg` sizes are `density.compact` + `px-4 py-2`,
 `density.normal` + `px-6 py-3` and `density.prominent` + `px-8 py-4`.
 
+**`part` is the one step below the floor, and it is not a loose target.** A composite field
+is the target: the pointer is already in it, and the two controls at its trailing edge are
+gripped as one cluster rather than as two buttons beside a field — at the full width each one
+reads as a separate control. So a part keeps the floor's *height*, because it has to sit in
+the field's row, and takes only the width its own glyph needs. It still clears the 24px
+pointer-target minimum WCAG AA asks for.
+
 The library targets dense desktop and product UI, so even the prominent step stays
 compact. Body copy, headings and labels are content rather than controls and set their
 own type.
 
-**Do not** invent a fourth size step, scale a control by transform, or derive a button's
-inline padding from a field's.
+**Do:** use `target` for a control that is the whole target of its own action, and `part`
+only for a control that is one part of a composite field.
+**Do not** invent a fourth size step, scale a control by transform, derive a button's
+inline padding from a field's, or reach for `part` to make a standalone control denser.
 
 ---
 

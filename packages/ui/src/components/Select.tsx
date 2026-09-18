@@ -7,11 +7,14 @@ import { cn } from "@/libs/utils";
 import {
   density,
   focusRing,
+  list,
+  material,
   motion,
   overlay,
+  selectable,
   shape,
+  stacking,
   state,
-  stateLayer,
   text,
   tone,
 } from "./ui.common";
@@ -76,7 +79,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                 "group flex w-full items-center justify-between gap-3 px-5 py-3 text-left",
                 density.normal,
                 shape.control,
-                "bg-sherick-surface-high/[0.66] text-sherick-ink placeholder:text-sherick-ink-muted",
+                material.control,
                 motion.release,
                 focusRing,
                 !disabled && state.field.hover,
@@ -113,13 +116,14 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
             side="bottom"
             align="start"
             sideOffset={8}
-            className={cn("z-30")}
+            className={cn(stacking.float)}
           >
             <BaseSelect.Popup
               className={({ open }) =>
                 cn(
-                  "w-[var(--anchor-width)] min-w-max max-h-[var(--available-height)] space-y-1 overflow-y-auto p-2",
-                  overlay.menu,
+                  list.sheet,
+                  "w-max min-w-[var(--anchor-width)] space-y-1 p-2",
+                  overlay.popup,
                   open ? motion.overlayIn : motion.overlayOut
                 )
               }
@@ -130,24 +134,15 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                     key={option.value}
                     value={option.value}
                     disabled={option.disabled}
-                    className={({ selected: isSelected, disabled: itemDisabled }) =>
-                      cn(
-                        "flex items-center justify-between gap-4 px-4 py-3 text-left text-sm outline-none",
-                        shape.control,
-                        motion.press,
-                        text.high,
-                        isSelected
-                          ? tone.selected[variant]
-                          : cn(stateLayer.quiet, stateLayer.activeRow),
-                        itemDisabled && state.disabled
-                      )
+                    className={({ selected: isSelected }) =>
+                      cn(list.option, isSelected && tone.selected[variant])
                     }
                   >
                     <BaseSelect.ItemText className={cn("min-w-0 flex-1 truncate")}>
                       {option.label}
                     </BaseSelect.ItemText>
                     <BaseSelect.ItemIndicator>
-                      <Check aria-hidden="true" className={cn("size-4", tone.text[variant])} />
+                      <Check aria-hidden="true" className={cn("size-4", selectable.mark, tone.text[variant])} />
                     </BaseSelect.ItemIndicator>
                   </BaseSelect.Item>
                 ))}

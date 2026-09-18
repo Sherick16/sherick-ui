@@ -3,7 +3,7 @@ import { expect, test, type Locator, type Page } from "./fixtures";
 const NARROW_VIEWPORT = { width: 320, height: 800 };
 
 /* The measured field controls: native inputs, the textarea, the Select trigger and the
-   Wave A family. Each must be laid out within the narrow wrapper it sits in. */
+   Wave A/B family. Each must be laid out within the narrow wrapper it sits in. */
 const fieldControls = (page: Page): Array<[string, Locator]> => [
   ["narrow project name", page.getByRole("textbox", { name: "Narrow project name" })],
   ["narrow notes", page.getByRole("textbox", { name: "Narrow notes" })],
@@ -14,6 +14,7 @@ const fieldControls = (page: Page): Array<[string, Locator]> => [
   ["narrow budget", page.getByRole("slider", { name: "Narrow budget" })],
   ["narrow seats", page.getByRole("textbox", { name: "Narrow seats" })],
   ["narrow seats stepper", page.getByRole("button", { name: "Increase" })],
+  ["narrow combobox", page.getByRole("combobox", { name: "Narrow combobox" })],
 ];
 
 const openFixture = async (page: Page) => {
@@ -89,6 +90,57 @@ test("controls stay contained when the document direction is RTL", async ({ page
       document.documentElement.removeAttribute("dir");
     });
   }
+
+  expect(errors).toEqual([]);
+});
+
+test("anchored popups stay inside a narrow viewport with long labels", async ({ page, errors }) => {
+  await page.setViewportSize(NARROW_VIEWPORT);
+  await page.goto("/verification/responsive");
+  await expect(page.getByTestId("edge-surfaces")).toBeVisible();
+
+  /* A popup is clamped to what the viewport leaves rather than to its own preferred width, and a
+     label longer than that space truncates inside the sheet instead of widening the page. */
+  const assertContained = async (name: string, locator: ReturnType<Page["getByRole"]>) => {
+    await expect(locator).toBeVisible();
+    const metrics = await locator.evaluate((element) => {
+      const box = element.getBoundingClientRect();
+      return {
+        left: box.left,
+        right: box.right,
+        overflow: element.scrollWidth - element.clientWidth,
+      };
+    });
+
+    expect(metrics.left, `${name} starts left of the viewport: ${metrics.left}px`).toBeGreaterThanOrEqual(0);
+    expect(
+      metrics.right,
+      `${name} ends right of the viewport: ${metrics.right}px of ${NARROW_VIEWPORT.width}px`
+    ).toBeLessThanOrEqual(NARROW_VIEWPORT.width);
+    expect(metrics.overflow, `${name} overflows its own sheet by ${metrics.overflow}px`).toBeLessThanOrEqual(1);
+  };
+
+  await page.getByRole("combobox", { name: "Long option combobox" }).click();
+  await assertContained("combobox popup", page.getByRole("option", { name: /A project name long enough/ }));
+  await page.keyboard.press("Escape");
+
+  /* A control's own list follows the control, and is clamped to the viewport rather than to its
+     own preferred width — a long option truncates inside the sheet. */
+  await page.getByRole("combobox", { name: "Narrow project type" }).click();
+  await assertContained(
+    "select popup",
+    page.getByRole("option", { name: /A project type whose name is longer/ })
+  );
+  await page.keyboard.press("Escape");
+
+  await page.getByRole("button", { name: "Edge menu" }).click();
+  await assertContained("menu popup", page.getByRole("menuitem", { name: /A menu label long enough/ }));
+  await page.keyboard.press("Escape");
+
+  await page.getByRole("button", { name: "Edge popover" }).click();
+  await assertContained("popover sheet", page.getByText("Anchored to the edges of a narrow viewport."));
+
+  await assertNoPageOverflow(page, "open anchored popups");
 
   expect(errors).toEqual([]);
 });

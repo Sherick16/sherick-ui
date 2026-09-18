@@ -2,12 +2,16 @@
 
 import { useState } from "react";
 import {
+  AlertDialog,
   Button,
   Checkbox,
+  Combobox,
   Dialog,
   Field,
   Input,
+  Menu,
   NumberField,
+  Popover,
   RadioGroup,
   Search,
   Select,
@@ -28,6 +32,16 @@ const regionOptions = [
   { value: "apac", label: "Asia Pacific", disabled: true },
 ];
 
+const languageOptions = [
+  { label: "TypeScript", value: "ts" },
+  { label: "Rust", value: "rust" },
+  { label: "COBOL", value: "cobol", disabled: true },
+];
+
+const teamOptions = [
+  { label: "Platform", value: "platform" },
+  { label: "Design", value: "design" },
+];
 export default function VerificationInteractionsPage() {
   const [query, setQuery] = useState("initial");
   const [lastSearch, setLastSearch] = useState("");
@@ -39,6 +53,13 @@ export default function VerificationInteractionsPage() {
   const [region, setRegion] = useState("eu");
   const [budget, setBudget] = useState(30);
   const [fieldsResult, setFieldsResult] = useState("");
+  const [popoverOpen, setPopoverOpen] = useState(false);
+  const [popoverOwner, setPopoverOwner] = useState("");
+  const [menuAction, setMenuAction] = useState("");
+  const [comboboxValue, setComboboxValue] = useState<string | null>("design");
+  const [comboboxFormResult, setComboboxFormResult] = useState("");
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertOutcome, setAlertOutcome] = useState("");
 
   return (
     <main className="min-h-screen bg-sherick-canvas px-10 py-12 text-sherick-ink">
@@ -194,10 +215,134 @@ export default function VerificationInteractionsPage() {
         </form>
         <p data-testid="fields-result">{fieldsResult}</p>
 
+        <div className="flex flex-wrap items-center gap-4">
+          <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+            <Popover.Trigger
+              render={
+                <Button appearance="tonal" variant="secondary">
+                  Open popover
+                </Button>
+              }
+            />
+            <Popover.Content>
+              <div className="w-64 space-y-4">
+                <Input
+                  label="Popover owner"
+                  value={popoverOwner}
+                  onChange={(event) => setPopoverOwner(event.target.value)}
+                />
+                <Button appearance="filled" onClick={() => setPopoverOpen(false)}>
+                  Apply
+                </Button>
+              </div>
+            </Popover.Content>
+          </Popover>
+          <span data-testid="popover-state">{popoverOpen ? "open" : "closed"}</span>
+          <span data-testid="popover-owner">{popoverOwner}</span>
+        </div>
+
+        {/* Anchored above its trigger, so the entrance geometry has a resolved side that is not
+            the default one. */}
+        <div className="flex flex-wrap items-center gap-4">
+          <Popover>
+            <Popover.Trigger
+              render={
+                <Button appearance="tonal" variant="secondary">
+                  Open top popover
+                </Button>
+              }
+            />
+            <Popover.Content side="top">
+              <p className="text-sm">Anchored above the control that opened it.</p>
+            </Popover.Content>
+          </Popover>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-4">
+          <Menu>
+            <Menu.Trigger
+              render={
+                <Button appearance="tonal" variant="secondary">
+                  Open menu
+                </Button>
+              }
+            />
+            <Menu.Content>
+              <Menu.Item onClick={() => setMenuAction("rename")}>Rename</Menu.Item>
+              <Menu.Item disabled>Duplicate</Menu.Item>
+              <Menu.Item onClick={() => setMenuAction("archive")}>
+                Archive every deployment in this workspace
+              </Menu.Item>
+              <Menu.Item disabled>Transfer ownership</Menu.Item>
+              <Menu.Separator />
+              <Menu.Item variant="danger" onClick={() => setMenuAction("delete")}>
+                Delete
+              </Menu.Item>
+            </Menu.Content>
+          </Menu>
+          <span data-testid="menu-action">{menuAction}</span>
+        </div>
+
+        <Field label="Combobox project" description="Search or pick from the list.">
+          <Combobox
+            options={projectOptions}
+            value={comboboxValue}
+            onValueChange={setComboboxValue}
+          />
+        </Field>
+        <p data-testid="combobox-value">{comboboxValue ?? ""}</p>
+
+        <Field label="Combobox language" description="Some options cannot be chosen." error="Pick a language." required>
+          <Combobox options={languageOptions} required />
+        </Field>
+
+        <Field label="Disabled combobox">
+          <Combobox options={projectOptions} defaultValue="design" disabled />
+        </Field>
+
+        <Field label="Locked combobox" disabled>
+          <Combobox options={projectOptions} defaultValue="design" />
+        </Field>
+
+        {/* Read-only is not disabled: the value cannot change, but the list still opens and
+            browses — only clearing is unavailable. */}
+        <Field label="Read-only combobox">
+          <Combobox options={projectOptions} defaultValue="design" readOnly />
+        </Field>
+
+        <form
+          className="flex flex-wrap items-end gap-4"
+          onSubmit={(event) => {
+            event.preventDefault();
+            const data = new FormData(event.currentTarget);
+            setComboboxFormResult(
+              [...data.entries()]
+                .map(([key, value]) => `${key}=${String(value)}`)
+                .sort()
+                .join("&")
+            );
+          }}
+        >
+          <Field label="Combobox team" description="Submitted through the control's own hidden input.">
+            <Combobox name="team" options={teamOptions} defaultValue="platform" />
+          </Field>
+          <Button type="submit">Submit combobox</Button>
+        </form>
+        <p data-testid="combobox-form-result">{comboboxFormResult}</p>
+
+        <div className="flex flex-wrap items-center gap-4">
+          <Button appearance="filled" variant="danger" onClick={() => setAlertOpen(true)}>
+            Delete workspace
+          </Button>
+          <span data-testid="alert-state">{alertOpen ? "open" : "closed"}</span>
+          <span data-testid="alert-outcome">{alertOutcome}</span>
+        </div>
         <div className="flex items-center gap-4">
           <Button appearance="filled" onClick={() => setDialogOpen(true)}>
             Open dialog
           </Button>
+          {/* A control that cannot be used carries no interactive state at all. */}
+          <Button disabled>Disabled action</Button>
           <span data-testid="dialog-state">{dialogOpen ? "open" : "closed"}</span>
         </div>
 
@@ -214,12 +359,26 @@ export default function VerificationInteractionsPage() {
                 options={projectOptions}
                 defaultValue="design"
               />
+              <Field label="Dialog combobox">
+                <Combobox options={projectOptions} defaultValue="design" />
+              </Field>
               <Tooltip content="Helpful context">
                 <Button appearance="text">Help</Button>
               </Tooltip>
             </div>
           </Dialog.Content>
         </Dialog>
+
+        <AlertDialog
+          open={alertOpen}
+          onOpenChange={setAlertOpen}
+          title="Delete workspace?"
+          description="Every project in this workspace is removed. This action cannot be undone."
+          cancelLabel="Keep workspace"
+          confirmLabel="Delete workspace"
+          onConfirm={() => setAlertOutcome("confirmed")}
+          onCancel={() => setAlertOutcome("cancelled")}
+        />
       </section>
     </main>
   );
