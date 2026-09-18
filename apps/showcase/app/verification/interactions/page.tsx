@@ -184,14 +184,16 @@ export default function VerificationInteractionsPage() {
         <RadioGroup label="Region" value={region} onValueChange={setRegion} options={regionOptions} />
         <p data-testid="region-value">{region}</p>
 
-        <Slider
-          label="Budget"
-          value={budget}
-          onValueChange={setBudget}
-          min={0}
-          max={100}
-          step={10}
-        />
+        <div data-testid="budget-slider">
+          <Slider
+            label="Budget"
+            value={budget}
+            onValueChange={setBudget}
+            min={0}
+            max={100}
+            step={10}
+          />
+        </div>
         <p data-testid="budget-value">{budget}</p>
 
         <form
@@ -329,6 +331,48 @@ export default function VerificationInteractionsPage() {
           <Button type="submit">Submit combobox</Button>
         </form>
         <p data-testid="combobox-form-result">{comboboxFormResult}</p>
+
+        <div className="flex flex-wrap items-center gap-4">
+          <Menu>
+            <Menu.Trigger
+              render={
+                <button type="button" data-testid="menu-plain-trigger" className="rounded-full px-4 py-2 text-sm">
+                  Plain menu trigger
+                </button>
+              }
+            />
+            <Menu.Content>
+              <Menu.Item onClick={() => setMenuAction("plain")}>Plain action</Menu.Item>
+            </Menu.Content>
+          </Menu>
+        </div>
+
+        {/* A consumer-rendered trigger: the surface hands the element its own props and injects
+            no motion into it. */}
+        <div className="flex flex-wrap items-center gap-4">
+          <Popover>
+            <Popover.Trigger
+              render={
+                <button type="button" data-testid="popover-plain-trigger" className="rounded-full px-4 py-2 text-sm">
+                  Plain popover trigger
+                </button>
+              }
+            />
+            <Popover.Content>
+              <p className="text-sm">The trigger moves however the caller says it moves.</p>
+            </Popover.Content>
+          </Popover>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-4">
+          {(["top", "right", "bottom", "left"] as const).map((side) => (
+            <Tooltip key={side} content={`Hint ${side}`} position={side}>
+              <button type="button" data-testid={`tooltip-${side}`} className="rounded-full px-4 py-2 text-sm">
+                Tip {side}
+              </button>
+            </Tooltip>
+          ))}
+        </div>
 
         <div className="flex flex-wrap items-center gap-4">
           <Button appearance="filled" variant="danger" onClick={() => setAlertOpen(true)}>

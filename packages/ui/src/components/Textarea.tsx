@@ -11,11 +11,11 @@ import {
   density,
   focusRing,
   material,
-  motion,
   shape,
   state,
   text,
 } from "./ui.common";
+import { motionFeedback } from "./ui.motion";
 
 export interface TextareaProps
   extends TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -71,7 +71,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
             density.normal,
             "min-h-28 px-5 py-4",
             shape.control,
-            motion.press,
+            motionFeedback,
             focusRing,
             error ? material.controlError : material.control,
             !disabled && (error ? state.field.errorHover : state.field.hover),

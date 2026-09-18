@@ -4,6 +4,7 @@ import { Avatar as BaseAvatar } from "@base-ui/react/avatar";
 import React, { type ImgHTMLAttributes } from "react";
 import { cn } from "@/libs/utils";
 import { material, shape } from "./ui.common";
+import { motionFeedback } from "./ui.motion";
 
 const sizeMap: Record<"sm" | "md" | "lg", { element: number; styles: string }> = {
   sm: { element: 32, styles: "h-8 w-8" },
@@ -50,7 +51,11 @@ const Avatar = ({
         width={dimensions.element}
         height={dimensions.element}
         loading="lazy"
-        className={cn("h-full w-full object-cover data-[error]:invisible data-[loading]:invisible")}
+        className={cn(
+          "h-full w-full object-cover",
+          motionFeedback,
+          "data-[error]:opacity-0 data-[loading]:opacity-0"
+        )}
         {...props}
       />
     </BaseAvatar.Root>

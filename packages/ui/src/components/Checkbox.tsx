@@ -5,6 +5,7 @@ import { Check as CheckIcon, Minus } from "lucide-react";
 import React, { forwardRef, type ButtonHTMLAttributes, type Ref } from "react";
 import { cn } from "@/libs/utils";
 import { groupFocusRing, hitArea, selectable, shape, state, stateLayer } from "./ui.common";
+import { motionArrive } from "./ui.motion";
 
 export interface CheckboxProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "value" | "type"> {
@@ -86,7 +87,7 @@ export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(
             groupFocusRing
           )}
         >
-          <BaseCheckbox.Indicator className={cn("flex items-center justify-center", selectable.mark)}>
+          <BaseCheckbox.Indicator className={cn("flex items-center justify-center", motionArrive)}>
             {indeterminate ? (
               <Minus className={cn("size-4")} />
             ) : (

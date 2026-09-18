@@ -3,7 +3,8 @@
 import { Popover as BasePopover } from "@base-ui/react/popover";
 import React, { type ReactElement, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { motion, overlay, stacking } from "./ui.common";
+import { overlay, stacking } from "./ui.common";
+import { motionPresenceAnchored } from "./ui.motion";
 import type { OverlayAlign, OverlaySide } from "./ui.types";
 
 export interface PopoverProps {
@@ -75,14 +76,12 @@ const PopoverContent = ({
         className={cn(stacking.float)}
       >
         <BasePopover.Popup
-          className={({ open }) =>
-            cn(
-              "w-max max-w-[min(24rem,var(--available-width))] max-h-[var(--available-height)] overflow-y-auto p-5",
-              overlay.popup,
-              open ? motion.overlayIn : motion.overlayOut,
-              className
-            )
-          }
+          className={cn(
+            "w-max max-w-[min(24rem,var(--available-width))] max-h-[var(--available-height)] overflow-y-auto p-5",
+            overlay.popup,
+            motionPresenceAnchored,
+            className
+          )}
         >
           {children}
         </BasePopover.Popup>

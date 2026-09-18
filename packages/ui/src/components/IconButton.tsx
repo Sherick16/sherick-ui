@@ -8,12 +8,12 @@ import {
   elevation,
   focusRing,
   material,
-  motion,
   shape,
   state,
   stateLayer,
   tone,
 } from "./ui.common";
+import { motionTactile } from "./ui.motion";
 import { Variant } from "./ui.types";
 import { Spinner } from "./Spinner";
 
@@ -52,7 +52,7 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
           "inline-flex items-center justify-center p-2.5 [&>svg]:size-5",
           density.target,
           shape.circle,
-          motion.release,
+          motionTactile,
           focusRing,
           tone.text[variant],
           isTonal && tone.tonal[variant],

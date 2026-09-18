@@ -9,15 +9,14 @@ import {
   focusRing,
   list,
   material,
-  motion,
   overlay,
-  selectable,
   shape,
   stacking,
   state,
   text,
   tone,
 } from "./ui.common";
+import { motionArrive, motionOrient, motionPresenceAnchored, motionTactile } from "./ui.motion";
 import { Variant } from "./ui.types";
 
 export interface SelectOption {
@@ -80,7 +79,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                 density.normal,
                 shape.control,
                 material.control,
-                motion.release,
+                motionTactile,
                 focusRing,
                 !disabled && state.field.hover,
                 !disabled && state.field.focus,
@@ -102,7 +101,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                 className={cn(
                   "size-5",
                   text.high,
-                  motion.release,
+                  motionOrient,
                   "group-data-[popup-open]:rotate-180"
                 )}
               />
@@ -119,14 +118,12 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
             className={cn(stacking.float)}
           >
             <BaseSelect.Popup
-              className={({ open }) =>
-                cn(
-                  list.sheet,
-                  "w-max min-w-[var(--anchor-width)] space-y-1 p-2",
-                  overlay.popup,
-                  open ? motion.overlayIn : motion.overlayOut
-                )
-              }
+              className={cn(
+                list.sheet,
+                "w-max min-w-[var(--anchor-width)] space-y-1 p-2",
+                overlay.popup,
+                motionPresenceAnchored
+              )}
             >
               <BaseSelect.List>
                 {options.map((option) => (
@@ -142,7 +139,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                       {option.label}
                     </BaseSelect.ItemText>
                     <BaseSelect.ItemIndicator>
-                      <Check aria-hidden="true" className={cn("size-4", selectable.mark, tone.text[variant])} />
+                      <Check aria-hidden="true" className={cn("size-4", motionArrive, tone.text[variant])} />
                     </BaseSelect.ItemIndicator>
                   </BaseSelect.Item>
                 ))}

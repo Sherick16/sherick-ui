@@ -53,7 +53,7 @@ import {
   elevation,
   focusRing,
   material,
-  motion,
+  motionFeedback,
   shape,
   state,
   stateLayer,
@@ -119,7 +119,7 @@ export default function Home() {
             </p>
             <a
               href="https://github.com/Sherick16/sherick-ui/blob/main/docs/DESIGN_LANGUAGE.md"
-              className={cn("mt-4 inline-flex items-center gap-1.5 text-sm", text.medium, motion.press, `${focusRing} focus-visible:outline-offset-2`, "hover:text-sherick-ink")}
+              className={cn("mt-4 inline-flex items-center gap-1.5 text-sm", text.medium, motionFeedback, `${focusRing} focus-visible:outline-offset-2`, "hover:text-sherick-ink")}
             >
               Design language
               <ArrowUpRight className="size-3.5" aria-hidden="true" />
@@ -626,7 +626,7 @@ function ThemePicker({ theme, onChange }: { theme: ThemeMode; onChange: (theme: 
               className={cn(
                 "inline-flex min-h-9 items-center gap-1.5 px-3 text-xs font-medium",
                 shape.pill,
-                motion.press,
+                motionFeedback,
                 `${focusRing} focus-visible:outline-offset-2`,
                 selected
                   ? cn(tone.selected.primary, elevation.control, text.high)

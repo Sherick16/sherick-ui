@@ -28,13 +28,13 @@ import {
   elevation,
   focusRing,
   material,
-  motion,
   shape,
   state,
   stateLayer,
   text,
   tone,
 } from "./ui.common";
+import { motionTactile } from "./ui.motion";
 import theme from "./prism-theme";
 
 export interface CodeBlockProps {
@@ -81,7 +81,7 @@ const CodeBlock = ({ inline = false, className, language = "text", children }: C
           className={cn(
             "inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs",
             shape.control,
-            motion.release,
+            motionTactile,
             focusRing,
             text.medium,
             "hover:text-sherick-ink",

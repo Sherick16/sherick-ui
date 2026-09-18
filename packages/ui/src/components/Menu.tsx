@@ -4,7 +4,8 @@ import { Menu as BaseMenu } from "@base-ui/react/menu";
 import React, { type MouseEventHandler, type ReactElement, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import Divider from "./Divider";
-import { list, motion, overlay, stacking, tone } from "./ui.common";
+import { list, overlay, stacking, tone } from "./ui.common";
+import { motionPresenceAnchored } from "./ui.motion";
 import type { OverlayAlign, OverlaySide, Variant } from "./ui.types";
 
 export interface MenuProps {
@@ -98,15 +99,13 @@ const MenuContent = ({
         className={cn(stacking.float)}
       >
         <BaseMenu.Popup
-          className={({ open }) =>
-            cn(
-              list.sheet,
-              "w-max min-w-44 max-w-[min(20rem,var(--available-width))] space-y-1 p-1.5",
-              overlay.menu,
-              open ? motion.overlayIn : motion.overlayOut,
-              className
-            )
-          }
+          className={cn(
+            list.sheet,
+            "w-max min-w-44 max-w-[min(20rem,var(--available-width))] space-y-1 p-1.5",
+            overlay.menu,
+            motionPresenceAnchored,
+            className
+          )}
         >
           {children}
         </BaseMenu.Popup>

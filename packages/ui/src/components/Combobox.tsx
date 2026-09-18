@@ -9,9 +9,7 @@ import {
   focusRingWithin,
   list,
   material,
-  motion,
   overlay,
-  selectable,
   shape,
   stacking,
   state,
@@ -19,6 +17,7 @@ import {
   text,
   tone,
 } from "./ui.common";
+import { motionArrive, motionFeedback, motionOrient, motionPresenceAnchored, motionTactile } from "./ui.motion";
 
 export interface ComboboxOption {
   label: string;
@@ -70,7 +69,7 @@ export interface ComboboxProps {
    a read-only combobox still opens and browses, only its value is fixed. The clear control is
    handed its own `disabled` for that case because Base itself refuses to clear a read-only
    control; nothing here has to be derived from Sherick's props. */
-const partClassName = `inline-flex shrink-0 items-center justify-center ${density.part} ${shape.circle} ${text.medium} [&>svg]:size-5 ${motion.press} ${stateLayer.quiet} ${state.enabled} ${state.effectiveDisabled} [&:not([data-disabled]):not(:disabled)]:hover:text-sherick-ink`;
+const partClassName = `inline-flex shrink-0 items-center justify-center ${density.part} ${shape.circle} ${text.medium} [&>svg]:size-5 ${motionTactile} ${state.pressCompact} ${stateLayer.quiet} ${state.enabled} ${state.effectiveDisabled} [&:not([data-disabled]):not(:disabled)]:hover:text-sherick-ink`;
 
 /**
  * A text field that filters a list of options and selects one of them. It is the searchable
@@ -121,7 +120,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(({
             density.normal,
             shape.control,
             material.control,
-            motion.press,
+            motionFeedback,
             focusRingWithin,
             !fieldDisabled && state.field.hover,
             !fieldDisabled && state.field.focusWithin,
@@ -150,8 +149,8 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(({
         >
           <X aria-hidden="true" />
         </BaseCombobox.Clear>
-        <BaseCombobox.Trigger aria-label="Show options" className={cn(partClassName)}>
-          <ChevronDown aria-hidden="true" />
+        <BaseCombobox.Trigger aria-label="Show options" className={cn(partClassName, "group")}>
+          <ChevronDown aria-hidden="true" className={cn("size-5", motionOrient, "group-data-[popup-open]:rotate-180")} />
         </BaseCombobox.Trigger>
       </BaseCombobox.InputGroup>
 
@@ -163,14 +162,12 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(({
           className={cn(stacking.float)}
         >
           <BaseCombobox.Popup
-            className={({ open }) =>
-              cn(
-                list.sheet,
-                "w-max min-w-[var(--anchor-width)] p-2",
-                overlay.popup,
-                open ? motion.overlayIn : motion.overlayOut
-              )
-            }
+            className={cn(
+              list.sheet,
+              "w-max min-w-[var(--anchor-width)] p-2",
+              overlay.popup,
+              motionPresenceAnchored
+            )}
           >
             {/* Base keeps this element mounted so a screen reader hears the change, and renders
                 its children only while the list is empty. The padding therefore lives on the
@@ -191,7 +188,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(({
                 >
                   <span className={cn("min-w-0 flex-1 truncate")}>{option.label}</span>
                   <BaseCombobox.ItemIndicator>
-                    <Check aria-hidden="true" className={cn("size-4", selectable.mark, tone.text.primary)} />
+                    <Check aria-hidden="true" className={cn("size-4", motionArrive, tone.text.primary)} />
                   </BaseCombobox.ItemIndicator>
                 </BaseCombobox.Item>
               )}

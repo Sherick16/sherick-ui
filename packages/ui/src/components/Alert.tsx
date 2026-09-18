@@ -7,13 +7,13 @@ import { cn } from "@/libs/utils";
 import {
   density,
   focusRingInset,
-  motion,
   shape,
   state,
   stateLayer,
   text,
   tone,
 } from "./ui.common";
+import { motionTactile } from "./ui.motion";
 import { Variant } from "./ui.types";
 
 const iconMap = {
@@ -70,9 +70,9 @@ export const Alert = ({
             density.target,
             shape.circle,
             focusRingInset,
-            motion.release,
+            motionTactile,
             stateLayer.quiet,
-            state.press,
+            state.pressCompact,
             state.enabled
           )}
         >

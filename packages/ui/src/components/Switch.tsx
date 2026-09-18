@@ -10,13 +10,13 @@ import { cn } from "@/libs/utils";
 import {
   elevation,
   groupFocusRing,
-  motion,
   shape,
   state,
   stateLayer,
   text,
   tone,
 } from "./ui.common";
+import { motionFeedback, motionRelocate } from "./ui.motion";
 import { Variant } from "./ui.types";
 
 export interface SwitchProps
@@ -75,11 +75,10 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(({
           "relative block h-8 w-[3.25rem] shrink-0",
           shape.pill,
           elevation.recessed,
-          motion.release,
+          motionFeedback,
           groupFocusRing,
           checked ? tone.strong[variant] : cn(tone.strong.secondary, text.medium),
-          !disabled && stateLayer.track,
-          !disabled && state.groupPress
+          !disabled && stateLayer.track
         )}
       >
         <BaseSwitch.Thumb
@@ -87,7 +86,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(({
             "absolute left-1 top-1/2 -translate-y-1/2 bg-current",
             shape.circle,
             elevation.control,
-            motion.release,
+            motionRelocate,
             checked ? "h-6 w-6 translate-x-5" : "h-5 w-5 text-sherick-ink-muted"
           )}
         />

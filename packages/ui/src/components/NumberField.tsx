@@ -8,12 +8,12 @@ import {
   density,
   focusRingWithin,
   material,
-  motion,
   shape,
   state,
   stateLayer,
   tone,
 } from "./ui.common";
+import { motionFeedback, motionTactile } from "./ui.motion";
 
 export interface NumberFieldProps
   extends Omit<
@@ -48,7 +48,7 @@ const stepperClassName = cn(
   "inline-flex shrink-0 items-center justify-center",
   density.target,
   shape.circle,
-  motion.spring,
+  motionTactile,
   tone.text.secondary,
   stateLayer.tonal,
   state.pressCompact,
@@ -103,7 +103,7 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
             "group flex w-full items-center gap-1 p-1.5",
             density.normal,
             shape.control,
-            motion.press,
+            motionFeedback,
             focusRingWithin,
             material.control,
             state.effectiveDisabled,
@@ -123,8 +123,6 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
             ref={ref}
             className={cn(
               "min-w-0 flex-1 bg-transparent py-2 text-center text-inherit outline-none",
-              motion.spring,
-              state.steppedValue,
               state.text,
               inputClassName
             )}

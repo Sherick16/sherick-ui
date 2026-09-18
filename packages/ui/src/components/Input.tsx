@@ -12,11 +12,11 @@ import {
   density,
   focusRing,
   material,
-  motion,
   shape,
   state,
   text,
 } from "./ui.common";
+import { motionFeedback } from "./ui.motion";
 
 export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   label?: ReactNode;
@@ -67,7 +67,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             density.normal,
             "w-full px-5 py-3",
             shape.control,
-            motion.press,
+            motionFeedback,
             focusRing,
             error ? material.controlError : material.control,
             !disabled && (error ? state.field.errorHover : state.field.hover),

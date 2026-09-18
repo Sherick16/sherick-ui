@@ -4,7 +4,22 @@ Sherick UI uses complementary verification layers. Each layer has a deliberately
 
 ## Static repository checks
 
-`bun run lint` and workspace typechecks protect source-level correctness, repository conventions and TypeScript compatibility. They do not prove that the package consumers install is correctly assembled or styled.
+`bun run lint`, workspace typechecks and the motion policy enforce source-level correctness, repository conventions and temporal ownership. They do not prove that the package consumers install is correctly assembled or styled.
+
+## Temporal ownership (`verify-motion-policy.mjs`)
+
+`bun run test:motion` is a deterministic text check over `packages/ui/src/components`, and it is
+the gate that keeps `ui.motion.ts` the only temporal owner in the package. A component module
+may not author a `duration-*`, `ease-*`, `transition-*` or `animate-*` utility, an animation
+declaration or `@keyframes`, or a component-local presence lifecycle
+(`data-[starting-style]` / `data-[ending-style]`) — it composes a semantic recipe from
+`ui.motion.ts` instead. The check has no allowlist and no per-file exception: when a component
+needs a new physical behaviour, the recipe is added to the motion module.
+
+It is deliberately a plain repository search rather than a parser: the contract is about which
+tokens may appear in a component's source at all, and a deterministic search states that
+directly. The same module's exact class contract is pinned by `bun run visual`, which snapshots
+every motion recipe beside the overlay shells.
 
 ## Library build
 
@@ -108,7 +123,8 @@ not a routine refresh to make a red gate green.
 - generated theme-token blocks from `dist/theme.css`;
 - scoped rules from `dist/styles.css`;
 - server-rendered component specimen markup;
-- shared overlay recipes.
+- shared overlay shell and motion recipes, including the presence recipes and the reduced-motion
+  neutralization they carry;
 
 This is a deterministic **style-contract** regression gate, not a pixel/browser visual test.
 
@@ -143,9 +159,58 @@ The showcase browser suite also verifies:
   style themselves from the primitive's own markers;
 - an anchored surface placed on each side of its trigger, asserting the resolved origin and the
   direction of its travel rather than only that it appeared;
+- the motion invariants (`motion.spec.ts`, below);
 - Wave B surface semantics under the torture theme and in forced colors;
 - hostile custom theme roles, including portaled content;
 - forced-colors focus/state/boundary fallbacks.
+
+#### Motion invariants (`motion.spec.ts`)
+
+`apps/showcase/tests/browser/motion.spec.ts` pins what the rendered component does with the
+motion layer. It reads computed styles, state attributes and geometry — never a screenshot —
+because the subject is a physical contract rather than a pixel:
+
+- **a stable boundary stays still** — a checkbox box and a radio circle have byte-identical
+  bounding boxes before, during and after the pointer press that changes what is inside them,
+  and the mark that appears is on the arrival recipe;
+- **a relocation is complete** — a tab indicator interpolates every geometry property it
+  changes (position on both axes, width and height), and a keyboard selection relocates it
+  without the newly selected tab gaining any press geometry;
+- **a drag is never interpolated** — a slider handle's transition list contains its positional
+  property while a step settles and does not contain it while the pointer owns the position,
+  with the handle centre measured against the pointer;
+- **`Select` and `Combobox` agree** — the same trigger tactility, the same orientation recipe on
+  the chevron, the same anchored presence on the popup and the same arrival on the selected
+  mark, and filtering a list replaces its rows with no transform, height or opacity
+  choreography;
+- **consumer triggers are untouched** — a plain `<button>` handed to `Popover`/`Menu` as a
+  trigger gains no authored motion before or after the surface opens;
+- **every tooltip edge resolves** — top, right, bottom and left each report their own resolved
+  side and travel direction from one recipe, on the lighter local timing;
+- **the modal roles share one presence** — `Dialog` and `AlertDialog` render the same presence
+  contract, the scrim animates opacity only, and the dialog's own anatomy carries no transition
+  at all;
+- **an entrance is observable** — `data-starting-style` exists for a single frame and is applied
+  imperatively to a node that is not yet in the document, so the suite observes the attribute
+  write and reads the computed style one microtask later. That recorder is what makes the two
+  presence invariants below checkable rather than vacuous;
+- **an initially-open surface never enters** — the initially-open dialog at `/verification/dialog`
+  records no entrance after hydration and runs no animation, while a surface the user opens does;
+- **repositioning is not presence** — resizing the viewport with a popup open re-places it without
+  recording a second entrance, and a rapid close → open in the motion lab's slow motion leaves
+  exactly one surface, no stale `data-ending-style` and a settled opacity;
+- **reduced motion** — emulated at the page level, it records no spatial entrance at all, reports
+  the popup on opacity-only presence, keeps a control's hover state, and turns the spinner and the
+  skeleton into static glyphs.
+
+The suite runs with motion enabled and emulates the reduced-motion preference itself, because the
+host stylesheet also answers that preference. The motion lab (`/verification/motion`) is the same
+specimens under workbench controls — normal speed, 4× slow motion, and reduced motion — and is
+development-only: the two speed controls override the canonical duration variables on the document
+while the page is open, and nothing in the package reads them. A page cannot force a media feature,
+so the reduced-motion control mirrors this host's own reduced-motion reset (durations collapsed)
+rather than re-implementing the package's `motion-reduce:` rules; the canonical reduced-motion
+behaviour is verified above, with the preference emulated by the browser.
 
 #### Accessibility (`accessibility.spec.ts`)
 
@@ -254,14 +319,15 @@ rewrite it.
 `bun run verify` executes, in order:
 
 1. lint (library and showcase);
-2. library typecheck and build (ESM/CJS/declarations plus generated `styles.css`/`theme.css`);
-3. showcase and no-Tailwind typechecks and production builds;
-4. `bun run test` — library smoke checks over the built artifact;
-5. `bun run test:bundle` — size and tree-shaking budgets;
-6. `bun run test:packed` — `npm pack` publication contract in a clean consumer;
-7. `bun run visual` — deterministic style-contract snapshots;
-8. `bun run test:browser` — showcase (interaction, accessibility, responsive, visual) and
-   no-Tailwind browser suites.
+2. `bun run test:motion` — temporal ownership across component modules;
+3. library typecheck and build (ESM/CJS/declarations plus generated `styles.css`/`theme.css`);
+4. showcase and no-Tailwind typechecks and production builds;
+5. `bun run test` — library smoke checks over the built artifact;
+6. `bun run test:bundle` — size and tree-shaking budgets;
+7. `bun run test:packed` — `npm pack` publication contract in a clean consumer;
+8. `bun run visual` — deterministic style-contract snapshots;
+9. `bun run test:browser` — showcase (interaction, motion, accessibility, responsive, visual)
+   and no-Tailwind browser suites.
 
 Each step has a different job and a different failure meaning. A red bundle gate is a size or
 boundary regression, not a styling defect; a red browser suite is not a publication defect.

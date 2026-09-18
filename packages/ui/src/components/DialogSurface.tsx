@@ -3,7 +3,8 @@
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import React, { type ComponentProps, type ReactNode, type Ref } from "react";
 import { cn } from "@/libs/utils";
-import { motion, overlay, stacking } from "./ui.common";
+import { overlay, stacking } from "./ui.common";
+import { motionPresenceModal, motionPresenceScrim } from "./ui.motion";
 
 export interface DialogSurfaceProps {
   children: ReactNode;
@@ -31,9 +32,7 @@ export interface DialogSurfaceProps {
 export const DialogSurface = ({ children, className, popupRef, initialFocus }: DialogSurfaceProps) => {
   return (
     <BaseDialog.Portal>
-      <BaseDialog.Backdrop
-        className={({ open }) => cn(overlay.scrim, open ? motion.scrimIn : motion.scrimOut)}
-      />
+      <BaseDialog.Backdrop className={cn(overlay.scrim, motionPresenceScrim)} />
       <BaseDialog.Viewport
         className={cn("fixed inset-0 flex min-h-full items-center justify-center overflow-y-auto p-4 sm:p-8", stacking.float)}
       >
@@ -41,14 +40,12 @@ export const DialogSurface = ({ children, className, popupRef, initialFocus }: D
           ref={popupRef}
           initialFocus={initialFocus}
           tabIndex={-1}
-          className={({ open }) =>
-            cn(
-              "relative w-full max-w-lg outline-none",
-              overlay.dialog,
-              open ? motion.overlayIn : motion.overlayOut,
-              className
-            )
-          }
+          className={cn(
+            "relative w-full max-w-lg outline-none",
+            overlay.dialog,
+            motionPresenceModal,
+            className
+          )}
         >
           {children}
         </BaseDialog.Popup>

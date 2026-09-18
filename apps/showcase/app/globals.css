@@ -58,3 +58,22 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* The motion lab's workbench controls. The speed control overrides the canonical duration
+   scale on the document element, so portaled surfaces inherit it too. The reduced-motion
+   control mirrors this host's own reduced-motion reset above, because a page cannot force the
+   media feature itself. Neither is a package API, and neither ships in dist/. */
+[data-motion-speed="slow"] {
+  --sui-duration-press: 600ms;
+  --sui-duration-release: 800ms;
+  --sui-duration-overlay: 960ms;
+  --sui-duration-overlay-exit: 640ms;
+}
+
+[data-motion-speed="reduce"] *,
+[data-motion-speed="reduce"] *::before,
+[data-motion-speed="reduce"] *::after {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}

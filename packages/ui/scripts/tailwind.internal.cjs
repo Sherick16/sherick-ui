@@ -58,42 +58,6 @@ module.exports = {
         exit: "var(--sui-ease-exit)",
         spring: "var(--sui-ease-spring)",
       },
-      animation: {
-        "sherick-overlay-in":
-          "sherick-overlay-in var(--sui-duration-overlay) var(--sui-ease-release)",
-        "sherick-overlay-out":
-          "sherick-overlay-out var(--sui-duration-overlay-exit) var(--sui-ease-exit) both",
-        "sherick-scrim-in":
-          "sherick-scrim-in var(--sui-duration-overlay) var(--sui-ease-release)",
-        "sherick-scrim-out":
-          "sherick-scrim-out var(--sui-duration-overlay-exit) var(--sui-ease-exit) both",
-      },
-      keyframes: {
-        "sherick-overlay-in": {
-          from: {
-            opacity: "0",
-            scale: "var(--sui-overlay-from-scale, 0.98)",
-            translate: "var(--sui-overlay-from-shift-x, 0px) var(--sui-overlay-from-shift-y, 0px)",
-          },
-          to: { opacity: "1", scale: "1", translate: "0 0" },
-        },
-        "sherick-overlay-out": {
-          from: { opacity: "1", scale: "1", translate: "0 0" },
-          to: {
-            opacity: "0",
-            scale: "var(--sui-overlay-from-scale, 0.98)",
-            translate: "var(--sui-overlay-from-shift-x, 0px) var(--sui-overlay-from-shift-y, 0px)",
-          },
-        },
-        "sherick-scrim-in": {
-          from: { opacity: "0" },
-          to: { opacity: "1" },
-        },
-        "sherick-scrim-out": {
-          from: { opacity: "1" },
-          to: { opacity: "0" },
-        },
-      },
     },
   },
 };

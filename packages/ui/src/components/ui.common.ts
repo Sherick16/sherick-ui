@@ -1,4 +1,5 @@
 import type { Variant } from "./ui.types";
+import { motionFeedback, motionStateLayer } from "./ui.motion";
 
 /* Sherick UI design primitives
    ==========================================================================
@@ -15,9 +16,12 @@ import type { Variant } from "./ui.types";
      tone       its color role                     (text, soft, tonal, selected, strong)
      text       the three-step emphasis ladder     (high, medium, low)
      density    how tightly it is packed           (compact, normal, prominent, target)
-     motion     how it moves                       (press, release, spring, travel, overlay)
      overlay    floating shells                    (menu, tooltip, dialog)
     focusRing  the one focus language             (focusRing, focusRingInset, focusRingWithin, groupFocusRing)
+
+   Temporal behavior is deliberately not here: `ui.motion.ts` owns every transition,
+   duration, curve and reduced-motion rule, and a recipe below names one of its recipes
+   rather than writing a timing of its own.
 
    The canonical statement of these rules — and of what is deliberately left to a
    component's own anatomy, such as layout, spacing, padding, intrinsic size,
@@ -64,36 +68,11 @@ export const focusRingWithin =
 export const groupFocusRing =
   "group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-sherick-focus group-focus-visible:outline-offset-[3px]";
 
-/* Motion — three families. A component picks a family, never a duration:
-   - press:   a tonality change with no physical travel — hover, focus, an engaged field.
-   - release: a tactile control: colour, shadow, transform and the size a selection or a
-              thumb travels with.
-   - travel:  geometry the user is aiming — a slider's handle and the fill it carries. A
-              drag is never interpolated; a keyboard or programmatic step glides.
-   - spring:  a part that arrives, compresses or rebounds — a selection mark, the surface
-              it is made in, the value a stepper drives. The one family that overshoots.
-   - overlay: the entrance and exit of anything that floats above the page, with a
-              matching scrim family for the plane behind it.
-   A control whose transform changes must use `release`, `spring` or `travel`; `press` is for
-   pure tonality and colour transitions that never move or resize anything.
-   Every family is neutralised under `prefers-reduced-motion`; the overlay family
-   additionally drops its exit window entirely, so nothing lingers.
-   Loading feedback (`animate-spin`, `animate-pulse`) sits outside these families:
-   it reports progress rather than responding to interaction. */
-export const motion = {
-  press:
-    "transition-[background-color,color,box-shadow,opacity] duration-press ease-press motion-reduce:transition-none",
-  release:
-    "transition-[background-color,color,box-shadow,transform,opacity,width,height] duration-release ease-release active:duration-press active:ease-press motion-reduce:transition-none motion-reduce:transform-none",
-  travel:
-    "transition-[inset-inline-start,width,height,background-color,color,box-shadow,transform,opacity] duration-release ease-release active:duration-press active:ease-press data-[dragging]:transition-[background-color,color,box-shadow,transform,opacity] motion-reduce:transition-none motion-reduce:transform-none",
-  spring:
-    "transition-[background-color,color,box-shadow,transform,opacity] duration-release ease-spring active:duration-press active:ease-press group-active:duration-press group-active:ease-press motion-reduce:transition-none motion-reduce:transform-none",
-  overlayIn: "animate-sherick-overlay-in motion-reduce:animate-none",
-  overlayOut: "animate-sherick-overlay-out motion-reduce:animate-none",
-  scrimIn: "animate-sherick-scrim-in motion-reduce:animate-none",
-  scrimOut: "animate-sherick-scrim-out motion-reduce:animate-none",
-} as const;
+/* Motion is not owned here. Every physical event — feedback, tactile, arrive, orient,
+   relocate, direct, presence and activity — is a named recipe in `ui.motion.ts`, which
+   owns the timing and the reduced-motion behavior for it. A recipe in this module
+   interpolates one of those names; it never writes a duration, a curve, a transition or
+   an animation of its own. */
 
 /* Elevation — distance from the surface plane, and nothing else. Three depth roles
    exist, and the last two are a single tactile pair:
@@ -179,7 +158,6 @@ export const state = {
      the size of the ink it moves, so a control whose outline is what the user sees takes 2% and a
      control whose ink is far smaller than its target takes 10%. */
   press: "active:scale-[0.98] motion-reduce:active:scale-100",
-  groupPress: "group-active:scale-[0.98] motion-reduce:group-active:scale-100",
   pressCompact: "active:scale-90 motion-reduce:active:scale-100",
   /* A raised matte control presses back into the track beneath it — the same physical
      depth a groove or a well sits at. */
@@ -202,9 +180,6 @@ export const state = {
      where the pointer has been captured and left the control. */
   engaged:
     "group-[:not([data-disabled])]:hover:scale-110 group-[:not([data-disabled])]:hover:bg-sherick-primary-strong group-[:not([data-disabled])]:hover:text-sherick-on-primary data-[dragging]:scale-110 data-[dragging]:bg-sherick-primary-strong data-[dragging]:text-sherick-on-primary",
-  /* A part that is not the element being pressed but answers it — the value a stepper drives. */
-  steppedValue:
-    "group-has-[button:active]:scale-[1.06] group-has-[button:active]:duration-press group-has-[button:active]:ease-press",
   /* A control with a hit area of its own. */
   enabled: "cursor-pointer",
   /* A text field: the normal text cursor, never a pointer. */
@@ -248,8 +223,7 @@ export const state = {
    by the field around it. `:disabled` alone cannot gate a press: a row in a collection is a
    `div`, so `:active` matches it while the pointer is down on it and the marker is the only gate
    there is. */
-const stateLayerBase =
-  "before:pointer-events-none before:absolute before:inset-0 before:content-[''] before:opacity-0 before:transition-opacity before:duration-release before:ease-release active:before:duration-press active:before:ease-press motion-reduce:before:transition-none";
+const stateLayerBase = `before:pointer-events-none before:absolute before:inset-0 before:content-[''] before:opacity-0 ${motionStateLayer}`;
 
 /* A part answers the pointer only while it is interactive. A native control carries `disabled`, and
    a collection primitive marks its rows with `data-disabled` instead. One rule covers both, in the
@@ -281,7 +255,7 @@ export const stateLayer = {
   filled: `relative ${stateLayerBase} before:rounded-[inherit] before:bg-current ${hoverFilled} ${pressFilled}`,
   /* A switch track or a selection well: the same layer, but hover and press arrive from the
      wrapping control rather than from the surface itself. */
-  track: `${stateLayerBase} before:rounded-[inherit] before:bg-current ${hoverTrack} ${pressTrack} group-active:before:duration-press group-active:before:ease-press`,
+  track: `${stateLayerBase} before:rounded-[inherit] before:bg-current ${hoverTrack} ${pressTrack}`,
   /* A row highlighted by keyboard or pointer navigation. Base UI collection primitives expose
      `data-highlighted`; this is the one canonical visual treatment for it, and it pairs with a
      row's own `quiet` layer — the row carries both, so a highlighted row and a hovered row are the
@@ -392,33 +366,14 @@ export const stacking = {
   float: "z-50",
 } as const;
 
-/* The geometry an anchored surface grows from, read from the primitive instead of assumed.
-   Base publishes the resolved anchor edge as `--transform-origin` on the positioner, and the
-   popup's own `data-side` says which edge that is — after collision handling, not before it.
-   So the surface scales out of the edge it is actually attached to, and travels four pixels in
-   from its own side: a surface below its trigger rises into place, one above it settles down
-   into it, one beside it slides in from that side. A popup flipped above its trigger by a
-   collision therefore animates the way it is placed, and neither the component nor the caller
-   has to know which way that turned out. */
-const anchoredGeometry = [
-  "[transform-origin:var(--transform-origin)]",
-  "[--sui-overlay-from-shift-y:-4px]",
-  "data-[side=top]:[--sui-overlay-from-shift-y:4px]",
-  "data-[side=left]:[--sui-overlay-from-shift-y:0px] data-[side=left]:[--sui-overlay-from-shift-x:4px]",
-  "data-[side=right]:[--sui-overlay-from-shift-y:0px] data-[side=right]:[--sui-overlay-from-shift-x:-4px]",
-  "data-[side=inline-start]:[--sui-overlay-from-shift-y:0px] data-[side=inline-start]:[--sui-overlay-from-shift-x:4px]",
-  "data-[side=inline-end]:[--sui-overlay-from-shift-y:0px] data-[side=inline-end]:[--sui-overlay-from-shift-x:-4px]",
-].join(" ");
-
 /* Floating overlay shells.
    Base UI owns popup presence, focus, dismissal, portals and anchored positioning.
-   Sherick UI owns only the visual shell: material, elevation, shape and the geometry
-   that its shared overlay motion grows from. A Base-backed overlay composes one recipe
-   here and selects `motion.overlayIn` / `motion.overlayOut` from Base's open state.
-   `scrim` is the plane *behind* a surface that owns the viewport, so it is a fill and a
-   blur with no elevation, shape or entrance geometry of its own: it selects
-   `motion.scrimIn` / `motion.scrimOut` instead. It is shared rather than written per
-   component so a dialog and an alert dialog separate from the page identically. */
+   Sherick UI owns only the visual shell: material, elevation and shape. Where the entrance
+   grows from and how it moves on the way are the presence recipes' in `ui.motion.ts`, so a
+   surface's shell never depends on the primitive's open state. `scrim` is the plane
+   *behind* a surface that owns the viewport, so it is a fill and a blur with no elevation
+   or shape of its own. It is shared rather than written per component so a dialog and an
+   alert dialog separate from the page identically. */
 export const overlay = {
   /* The plane behind a surface that owns the viewport. */
   scrim: `fixed inset-0 ${stacking.float} bg-sherick-scrim/[0.38] backdrop-blur-[var(--sui-scrim-blur)]`,
@@ -427,18 +382,18 @@ export const overlay = {
      surface corner, because what it holds is read rather than scanned.
      When not to use it: a short list of commands wants `menu`, and a hint wants
      `tooltip`. */
-  popup: `[--sui-overlay-from-scale:0.985] ${anchoredGeometry} ${shape.surface} ${material.acrylic} ${elevation.floating}`,
-  /* A compact list of commands. The same sheet, the same entrance and the same lighting as
+  popup: `${shape.surface} ${material.acrylic} ${elevation.floating}`,
+  /* A compact list of commands. The same sheet, the same presence and the same lighting as
      `popup`, tightened in shape so a handful of short actions reads as a list rather than a
      page: a command list should feel like one more control on the surface it came from.
      When not to use it: a list of options that are chosen rather than performed, or a
      surface holding structured content, wants `popup`. */
-  menu: `[--sui-overlay-from-scale:0.985] ${anchoredGeometry} ${shape.control} ${material.acrylic} ${elevation.floating}`,
+  menu: `${shape.control} ${material.acrylic} ${elevation.floating}`,
   /* A tooltip is anchored like the others, and reads its edge the same way. */
-  tooltip: `${anchoredGeometry} ${shape.prominent} ${material.acrylicDense} ${elevation.floating}`,
-  /* A dialog rises further than a menu, from its own scale. It is anchored to the viewport, so it
-     has no side to grow from. */
-  dialog: `[--sui-overlay-from-scale:0.985] [--sui-overlay-from-shift-y:8px] ${shape.expressive} ${material.acrylicHero} ${elevation.floating}`,
+  tooltip: `${shape.prominent} ${material.acrylicDense} ${elevation.floating}`,
+  /* A dialog rises further than a menu. It is anchored to the viewport rather than to a trigger,
+     so it has no side to grow from and takes the modal presence instead of the anchored one. */
+  dialog: `${shape.expressive} ${material.acrylicHero} ${elevation.floating}`,
 } as const;
 
 /* Text hierarchy — three steps, no more. High emphasis carries labels and values,
@@ -473,12 +428,12 @@ export const text = {
 export const list = {
   sheet: "max-w-[var(--available-width)] max-h-[var(--available-height)] overflow-y-auto",
   /* A row in a selection list: one line, read one at a time and chosen. */
-  option: `flex w-full items-center justify-between gap-4 px-4 py-3 text-left text-sm outline-none ${shape.control} ${motion.press} ${text.high} ${stateLayer.quiet} ${stateLayer.activeRow} ${state.effectiveDisabled}`,
+  option: `flex w-full items-center justify-between gap-4 px-4 py-3 text-left text-sm outline-none ${shape.control} ${motionFeedback} ${text.high} ${stateLayer.quiet} ${stateLayer.activeRow} ${state.effectiveDisabled}`,
   /* The same object at the density a list of short actions wants, where the row is scanned
      rather than read and the list is a control rather than a page. `shape.row` keeps the
      command's corner proportional to its own height, so its highlight nests in the tighter
      sheet the menu is. */
-  command: `flex w-full items-center gap-3 px-3 py-2 text-left text-sm outline-none ${shape.row} ${motion.press} ${text.high} ${stateLayer.quiet} ${stateLayer.activeRow} ${state.effectiveDisabled}`,
+  command: `flex w-full items-center gap-3 px-3 py-2 text-left text-sm outline-none ${shape.row} ${motionFeedback} ${text.high} ${stateLayer.quiet} ${stateLayer.activeRow} ${state.effectiveDisabled}`,
 } as const;
 
 /* Tone hierarchy — the color roles a surface can take, in rising strength:
@@ -534,12 +489,10 @@ export const tone = {
    from the same source of truth as a controlled one. A mixed box is selected but is not
    ticked, which is why the second attribute stands beside the first. */
 export const selectable = {
-  surface: `relative ${elevation.recessed} ${motion.spring}`,
+  surface: `relative ${elevation.recessed} ${motionFeedback}`,
   rest: `${material.matteHigh} ${text.medium}`,
   selected:
     "group-data-[checked]:bg-sherick-primary-strong group-data-[checked]:text-sherick-on-primary",
   indeterminate:
     "group-data-[indeterminate]:bg-sherick-primary-strong group-data-[indeterminate]:text-sherick-on-primary",
-  /* The mark exists only while the control is selected, and leaves softly. */
-  mark: `${motion.spring} data-[starting-style]:scale-50 data-[ending-style]:scale-50 data-[ending-style]:opacity-0`,
 } as const;

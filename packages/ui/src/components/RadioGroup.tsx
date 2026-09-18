@@ -14,6 +14,7 @@ import {
   stateLayer,
   text,
 } from "./ui.common";
+import { motionArrive } from "./ui.motion";
 
 export interface RadioGroupOption {
   value: string;
@@ -123,7 +124,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
                       groupFocusRing
                     )}
                   >
-                    <Radio.Indicator className={cn("flex items-center justify-center", selectable.mark)}>
+                    <Radio.Indicator className={cn("flex items-center justify-center", motionArrive)}>
                       <span className={cn("block size-2.5", shape.circle, "bg-current")} />
                     </Radio.Indicator>
                   </span>

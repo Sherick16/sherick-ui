@@ -10,7 +10,8 @@ import React, {
 } from "react";
 import { X } from "lucide-react";
 import { cn } from "@/libs/utils";
-import { density, focusRing, motion, shape, state, stateLayer, text } from "./ui.common";
+import { density, focusRing, shape, state, stateLayer, text } from "./ui.common";
+import { motionTactile } from "./ui.motion";
 import { DialogContent } from "./DialogContent";
 import { DialogDescription } from "./DialogDescription";
 import { DialogFooter } from "./DialogFooter";
@@ -65,10 +66,10 @@ const Dialog = forwardRef<HTMLDivElement, DialogProps>(({
             shape.circle,
             text.medium,
             "hover:text-sherick-ink",
-            motion.release,
+            motionTactile,
             focusRing,
             stateLayer.quiet,
-            state.press,
+            state.pressCompact,
             state.enabled,
             "absolute right-4 top-4 inline-flex items-center justify-center"
           )}
