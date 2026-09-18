@@ -4,6 +4,7 @@ import { extname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import selectorParser from "postcss-selector-parser";
 import postcss from "postcss";
 import ts from "typescript";
 
@@ -19,19 +20,23 @@ const packageJson = JSON.parse(await readFile(new URL("../package.json", import.
 
 for (const exportName of [
   "Alert",
+  "AlertDialog",
   "Avatar",
   "Badge",
   "Button",
   "Card",
   "Checkbox",
+  "Combobox",
   "Dialog",
   "Divider",
   "Field",
   "IconButton",
   "Input",
+  "Menu",
   "NavGroup",
   "NavItem",
   "NumberField",
+  "Popover",
   "RadioGroup",
   "Search",
   "Select",
@@ -75,6 +80,12 @@ for (const propType of [
   "RadioGroupOption",
   "SliderProps",
   "NumberFieldProps",
+  "AlertDialogProps",
+  "PopoverProps",
+  "MenuProps",
+  "MenuItemProps",
+  "ComboboxProps",
+  "ComboboxOption",
 ]) {
   assert.ok(declarations.includes(propType), `declarations should expose ${propType}`);
 }
@@ -146,6 +157,8 @@ for (const token of [
   "--sui-elevation-floating",
   "--sui-elevation-control",
   "--sui-elevation-recessed",
+  "--sui-glass-fill",
+  "--sui-glass-dense-fill",
   "--sui-glass-gradient",
   "--sui-code-text",
 ]) {
@@ -269,6 +282,47 @@ for (const criticalUtility of [
   }
 }
 
+/* Every class name an authored recipe produces has to have a rule in the published stylesheet.
+   The stylesheet compiler reads class names as literal text, so a name that only exists once
+   the recipe is evaluated compiles to nothing and that step of the recipe silently disappears —
+   which is how every state layer once shipped without its hover rule, leaving every hover tint
+   in the library inert. This walks the published recipes and the published CSS, so the two
+   cannot disagree without failing here. */
+const styledClassNames = new Set();
+stylesRoot.walkRules((rule) => {
+  if (isInKeyframes(rule)) return;
+  selectorParser((selectors) => {
+    selectors.walkClasses((node) => styledClassNames.add(node.value));
+  }).processSync(rule.selector);
+});
+
+const devRecipes = await import("../dist/esm/dev.js");
+const missingRecipeClasses = [];
+const checkRecipe = (path, value) => {
+  if (typeof value !== "string") return;
+  for (const className of value.split(/\s+/).filter(Boolean)) {
+    if (!styledClassNames.has(className)) missingRecipeClasses.push(`${path} → ${className}`);
+  }
+};
+for (const [name, value] of Object.entries(devRecipes)) {
+  if (typeof value === "string") {
+    checkRecipe(name, value);
+    continue;
+  }
+  if (value === null || typeof value !== "object") continue;
+  for (const [group, nested] of Object.entries(value)) {
+    if (typeof nested === "string") checkRecipe(`${name}.${group}`, nested);
+    else if (nested !== null && typeof nested === "object") {
+      for (const [entry, recipe] of Object.entries(nested)) checkRecipe(`${name}.${group}.${entry}`, recipe);
+    }
+  }
+}
+assert.deepEqual(
+  missingRecipeClasses,
+  [],
+  `published recipes render classes that styles.css has no rule for:\n  ${missingRecipeClasses.join("\n  ")}`
+);
+
 for (const forbidden of [
   /(^|})\s*\*\s*\{/,
   /(^|})\s*button\s*\{/,
@@ -288,6 +342,26 @@ const inputMarkup = renderToStaticMarkup(
 assert.match(inputMarkup, /sui-scope/);
 assert.match(inputMarkup, /<label[^>]*\sfor=/);
 assert.match(inputMarkup, /required=""/);
+assert.match(inputMarkup, /required=""/);
+
+/* Base's popup portal renders nothing on the server, so server rendering proves only that a
+   floating surface is safe to render there. The scope of a portaled subtree is asserted where
+   the portal actually exists: the browser suites.
+*/
+const serverSurfaces = [
+  ["AlertDialog", { defaultOpen: true, title: "Delete project?", confirmLabel: "Delete" }],
+  ["Popover", { defaultOpen: true }],
+  ["Menu", { defaultOpen: true }],
+  ["Combobox", { options: [{ label: "Design system", value: "design" }] }],
+];
+for (const [componentName, props] of serverSurfaces) {
+  for (const open of [false, true]) {
+    assert.doesNotThrow(
+      () => renderToStaticMarkup(React.createElement(library[componentName], { ...props, open, onOpenChange() {} })),
+      `${componentName} must render on the server`
+    );
+  }
+}
 
 const rawNeutralUtilities = [];
 const rawLiteralColors = [];

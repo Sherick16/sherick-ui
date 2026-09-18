@@ -4,10 +4,13 @@ import { useState } from "react";
 import {
   Button,
   Checkbox,
+  Combobox,
   Dialog,
   Field,
   Input,
+  Menu,
   NumberField,
+  Popover,
   RadioGroup,
   Search,
   Select,
@@ -20,6 +23,13 @@ import {
 const projectOptions = [
   { label: "Design system", value: "design" },
   { label: "Dashboard", value: "dashboard" },
+  { label: "A project type whose name is longer than the field it is chosen in", value: "long" },
+];
+
+/* A label long enough to exceed the sheet as well as the 240px anchor. */
+const longOptions = [
+  { label: "A project name long enough that it cannot fit the popup without a constraint", value: "long" },
+  { label: "Short", value: "short" },
 ];
 
 const regionOptions = [
@@ -82,6 +92,10 @@ export default function VerificationResponsivePage() {
 
           <NumberField aria-label="Narrow seats" defaultValue={3} min={1} max={10} />
 
+          <Field label="Narrow combobox">
+            <Combobox options={projectOptions} defaultValue="design" />
+          </Field>
+
           <div className="overflow-x-auto">
             <Tabs
               ariaLabel="Narrow sections"
@@ -114,16 +128,52 @@ export default function VerificationResponsivePage() {
             The overlay fills the viewport without widening the page.
           </Dialog.Description>
           <Dialog.Content>
-            <Select
-              aria-label="Narrow dialog project type"
-              options={projectOptions}
-              defaultValue="design"
-            />
+            <div className="space-y-5">
+              <Select
+                aria-label="Narrow dialog project type"
+                options={projectOptions}
+                defaultValue="design"
+              />
+              <Field label="Narrow dialog combobox">
+                <Combobox options={projectOptions} defaultValue="design" />
+              </Field>
+            </div>
           </Dialog.Content>
           <Dialog.Footer>
             <Button appearance="filled">Confirm</Button>
           </Dialog.Footer>
         </Dialog>
+
+        <div data-testid="edge-surfaces" className="flex flex-col items-start gap-4">
+          <Menu>
+            <Menu.Trigger
+              render={
+                <Button appearance="tonal" variant="secondary">
+                  Edge menu
+                </Button>
+              }
+            />
+            <Menu.Content>
+              <Menu.Item>A menu label long enough that it cannot fit the popup without a constraint</Menu.Item>
+              <Menu.Item>Short</Menu.Item>
+            </Menu.Content>
+          </Menu>
+          <Popover>
+            <Popover.Trigger
+              render={
+                <Button appearance="tonal" variant="secondary">
+                  Edge popover
+                </Button>
+              }
+            />
+            <Popover.Content>
+              <p className="text-sm">Anchored to the edges of a narrow viewport.</p>
+            </Popover.Content>
+          </Popover>
+          <Field label="Long option combobox">
+            <Combobox options={longOptions} defaultValue="long" />
+          </Field>
+        </div>
       </section>
     </main>
   );

@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "./fixtures";
+import { expect, isTopmost, test, type Page } from "./fixtures";
 
 test.beforeEach(async ({ page, errors }) => {
   await page.goto("/verification/interactions");
@@ -54,7 +54,18 @@ test("nested Select consumes Escape before Dialog", async ({ page, errors }) => 
 
   const select = page.getByRole("combobox", { name: "Dialog project type" });
   await select.click();
-  await expect(page.getByRole("option", { name: "Design system" })).toBeVisible();
+  const option = page.getByRole("option", { name: "Design system" });
+  await expect(option).toBeVisible();
+  expect(await isTopmost(option), "a popup opened from inside a dialog must sit above it").toBe(true);
+
+  /* A tooltip belongs to the dialog it was opened in, so it has to clear the dialog too. */
+  await page.getByRole("button", { name: "Help" }).hover();
+  const tooltip = page.getByText("Helpful context");
+  await expect(tooltip).toBeVisible();
+  expect(await isTopmost(tooltip)).toBe(true);
+  /* Park the pointer so the hint is gone before the dismissal order is exercised. */
+  await page.mouse.move(2, 2);
+  await expect(tooltip).toHaveCount(0);
 
   await page.keyboard.press("Escape");
   await expect(page.getByRole("option", { name: "Design system" })).toHaveCount(0);

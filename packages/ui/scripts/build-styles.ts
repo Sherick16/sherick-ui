@@ -210,7 +210,11 @@ output.append(
     outline-offset: 2px;
   }
 
-  :where(.${SUI_SCOPE_CLASS})[role="dialog"] {
+  /* A dialog and an alert dialog both separate from the page by their sheet and their shadow,
+     and forced colors removes both. The alert dialog is a different role, not a different
+     surface, so it needs the same boundary. */
+  :where(.${SUI_SCOPE_CLASS})[role="dialog"],
+  :where(.${SUI_SCOPE_CLASS})[role="alertdialog"] {
     border: 1px solid CanvasText;
   }
 

@@ -126,6 +126,61 @@ test("portaled Select, Tooltip and Dialog remain styled", async ({ page }) => {
   expect(errors).toEqual([]);
 });
 
+test("portaled Wave B surfaces remain scoped and styled", async ({ page }) => {
+  const errors = runtimeErrors(page);
+
+  /* Each popup is portaled out of the page subtree, so the stylesheet can only style it because
+     the subtree establishes the same private scope every other Sherick surface does. */
+  const popupShell = page.locator(".sui-scope.shadow-sherick-floating");
+
+  await page.getByRole("button", { name: "Portaled popover" }).click();
+  await expect(page.getByText("Popover content")).toBeVisible();
+  const popover = await popupShell.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      portaled: element.closest("main") === null,
+      radius: parseFloat(style.borderRadius),
+      shadow: style.boxShadow,
+      backdrop: style.backdropFilter,
+    };
+  });
+  expect(popover.portaled).toBe(true);
+  expect(popover.radius).toBeGreaterThan(0);
+  expect(popover.shadow).not.toBe("none");
+  expect(popover.backdrop).toContain("blur");
+  await page.keyboard.press("Escape");
+
+  await page.getByRole("button", { name: "Portaled menu" }).click();
+  const menuItem = page.getByRole("menuitem", { name: "Delete" });
+  await expect(menuItem).toBeVisible();
+  expect(await menuItem.evaluate((element) => getComputedStyle(element).borderRadius)).not.toBe("0px");
+  await page.keyboard.press("Escape");
+
+  await page.getByRole("combobox", { name: "Portaled combobox" }).click();
+  const option = page.getByRole("option", { name: "Dashboard" });
+  await expect(option).toBeVisible();
+  expect(await option.evaluate((element) => getComputedStyle(element).borderRadius)).not.toBe("0px");
+  await page.keyboard.press("Escape");
+
+  /* The alert dialog is a surface of its own with its own role, styled by package CSS alone. */
+  await page.getByRole("button", { name: "Open portaled alert" }).click();
+  const alertDialog = page.getByRole("alertdialog");
+  await expect(alertDialog).toBeVisible();
+  const alertStyle = await alertDialog.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { radius: parseFloat(style.borderRadius), shadow: style.boxShadow };
+  });
+  expect(alertStyle.radius).toBeGreaterThan(0);
+  expect(alertStyle.shadow).not.toBe("none");
+
+  const confirm = alertDialog.getByRole("button", { name: "Delete" });
+  expect(await confirm.evaluate((element) => getComputedStyle(element).backgroundColor)).not.toBe(
+    "rgba(0, 0, 0, 0)"
+  );
+
+  expect(errors).toEqual([]);
+});
+
 test("theme tokens and KaTeX assets are present without consumer styling infrastructure", async ({ page }) => {
   const errors = runtimeErrors(page);
 

@@ -82,6 +82,39 @@ assert.equal(typeof Dialog.Header, "function");
 assert.equal(typeof Dialog.Content, "function");
 assert.equal(typeof Select, "object");
 
+/* Wave B publishes four floating surfaces through the same barrel. Each is one component with
+   attached parts, and each must survive the packed build rather than only the workspace. */
+for (const [name, parts] of [
+  ["Popover", ["Trigger", "Content"]],
+  ["Menu", ["Trigger", "Content", "Item", "Separator"]],
+  ["AlertDialog", []],
+]) {
+  assert.ok(
+    ["function", "object"].includes(typeof root[name]),
+    name + " must be exported from the root barrel"
+  );
+  for (const part of parts) {
+    assert.ok(
+      ["function", "object"].includes(typeof root[name][part]),
+      name + "." + part + " must be a component"
+    );
+  }
+}
+assert.ok(root.Combobox, "ESM export missing Combobox");
+
+/* An alert dialog's own semantics have to survive publication, and its surface has to render on
+   the server for the state a consumer may server-render. */
+assert.doesNotThrow(() =>
+  renderToStaticMarkup(
+    React.createElement(root.AlertDialog, {
+      open: true,
+      onOpenChange() {},
+      title: "Delete package?",
+      confirmLabel: "Delete",
+    })
+  )
+);
+
 for (const open of [false, true]) {
   assert.doesNotThrow(() =>
     renderToStaticMarkup(
@@ -159,6 +192,10 @@ assert.ok(ui.Button, "CommonJS export missing Button");
 assert.ok(ui.Dialog, "CommonJS export missing Dialog");
 assert.ok(ui.Select, "CommonJS export missing Select");
 assert.ok(ui.Tabs, "CommonJS export missing Tabs");
+assert.ok(ui.Popover, "CommonJS export missing Popover");
+assert.ok(ui.Menu, "CommonJS export missing Menu");
+assert.ok(ui.Combobox, "CommonJS export missing Combobox");
+assert.ok(ui.AlertDialog, "CommonJS export missing AlertDialog");
 assert.equal(ui.ActionButton, undefined, "removed aliases must not survive in CommonJS");
 assert.equal(ui.Markdown, undefined, "rich content must not be reachable from the CommonJS root");
 assert.ok(fs.existsSync(require.resolve("sherick-ui/styles.css")), "styles.css export must resolve");
@@ -188,17 +225,27 @@ assert.throws(
   const typeFixture = `
 import * as React from "react";
 import {
+  AlertDialog,
   Button,
+  Combobox,
   Dialog,
   Input,
+  Menu,
+  Popover,
   Search,
   Select,
   Switch,
   Tabs,
   Textarea,
+  type AlertDialogProps,
   type AlertProps,
   type ButtonProps,
+  type ComboboxOption,
+  type ComboboxProps,
   type DialogProps,
+  type MenuItemProps,
+  type MenuProps,
+  type PopoverProps,
   type InputProps,
   type SearchProps,
   type SelectProps,
@@ -240,12 +287,30 @@ const tabsProps: TabsProps = {
   tabs: [{ id: "one", label: "One", content: "Panel" }],
 };
 const dialogProps: DialogProps = { defaultOpen: true, onOpenChange() {}, children: null };
+const comboboxProps: ComboboxProps = {
+  options: [{ label: "Design", value: "design", disabled: false }],
+  value: "design",
+  onValueChange(value: string | null) {
+    void value;
+  },
+};
+const comboboxOption: ComboboxOption = { label: "Design", value: "design" };
+const popoverProps: PopoverProps = { defaultOpen: true, onOpenChange() {}, children: null };
+const menuItemProps: MenuItemProps = { children: "Rename", variant: "danger" };
+const menuProps: MenuProps = { defaultOpen: true, onOpenChange() {}, children: null };
+const alertDialogProps: AlertDialogProps = {
+  defaultOpen: true,
+  onOpenChange() {},
+  title: "Delete package?",
+  confirmLabel: "Delete",
+};
 const markdownProps: MarkdownProps = { children: "# Title" };
 const codeBlockProps: CodeBlockProps = { language: "ts", children: "const a = 1;" };
 const alertProps: AlertProps = { children: "Notice", onDismiss() {} };
 const skeletonProps: SkeletonProps = { "aria-label": "Loading" };
 const spinnerProps: SpinnerProps = { size: "small" };
 void alertProps;
+void comboboxOption;
 void skeletonProps;
 void spinnerProps;
 
@@ -256,6 +321,14 @@ export const fixture = (
     <Textarea label="Body" onChange={(event) => void event.currentTarget.value} />
     <Search {...searchProps} />
     <Select {...selectProps} />
+    <Combobox {...comboboxProps} />
+    <Popover {...popoverProps}>
+      <Popover.Content>Body</Popover.Content>
+    </Popover>
+    <Menu {...menuProps}>
+      <Menu.Item {...menuItemProps} />
+    </Menu>
+    <AlertDialog {...alertDialogProps} />
     <Switch {...switchProps} />
     <Switch {...uncontrolledSwitchProps} aria-label="Uncontrolled" />
     <Tabs {...tabsProps} />

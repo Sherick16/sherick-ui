@@ -6,6 +6,13 @@ const WCAG_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
 /* Every other rule is enabled as normal, so a regression names both the broken rule and
    where it lives. */
 const expectNoA11yViolations = async (page: Page) => {
+  /* Base UI wires every generated ARIA relationship on the client: the server-rendered shell
+     carries none of them, so a field that is named a moment later looks unnamed to a scan that
+     races hydration. The wait is for hydration itself — the marker the root layout sets once the
+     whole tree below it has run its effects — rather than for any one attribute, which some other
+     component on the page could satisfy while the component under test is still bare. */
+  await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
+
   const results = await new AxeBuilder({ page })
     .withTags(WCAG_TAGS)
     /* `color-contrast` is excluded deliberately, not to make a red run green. The default
@@ -70,6 +77,57 @@ test("Select opened inside a dialog has no automatically detectable WCAG A/AA vi
   await expect(page.getByRole("option", { name: "Design system" })).toBeVisible();
 
   await expectNoA11yViolations(page);
+
+  expect(errors).toEqual([]);
+});
+
+test("AlertDialog opened over the interactions fixture has no automatically detectable WCAG A/AA violations", async ({ page, errors }) => {
+
+  await page.goto("/verification/interactions");
+  await page.getByRole("button", { name: "Delete workspace" }).click();
+  await expect(page.getByRole("alertdialog")).toBeVisible();
+
+  await expectNoA11yViolations(page);
+
+  expect(errors).toEqual([]);
+});
+
+test("an open Menu has no automatically detectable WCAG A/AA violations", async ({ page, errors }) => {
+
+  await page.goto("/verification/interactions");
+  await page.getByRole("button", { name: "Open menu" }).click();
+  await expect(page.getByRole("menuitem", { name: "Rename" })).toBeVisible();
+
+  await expectNoA11yViolations(page);
+
+  await page.keyboard.press("Escape");
+  expect(errors).toEqual([]);
+});
+
+/* An open Combobox listbox is asserted directly rather than scanned, and the divergence is
+   recorded in docs/VERIFICATION.md: Base UI's combobox focus manager marks the page around an
+   open listbox `aria-hidden` without `inert`, which axe reports as `aria-hidden-focus` on page
+   content Sherick does not own. The listbox relationships Sherick is responsible for are checked
+   here instead. */
+test("an open Combobox publishes its own listbox relationships", async ({ page, errors }) => {
+
+  await page.goto("/verification/interactions");
+
+  const searchable = page.getByRole("combobox", { name: "Combobox project" });
+  await searchable.click();
+
+  const listbox = page.getByRole("listbox");
+  await expect(listbox).toBeVisible();
+
+  await expect(page.getByRole("option", { name: "Design system" })).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByRole("option", { name: "Dashboard" })).toHaveAttribute("aria-selected", "false");
+
+  await searchable.fill("dash");
+  await page.keyboard.press("ArrowDown");
+  const active = await searchable.getAttribute("aria-activedescendant");
+  expect(active, "navigating the listbox must expose the active option on the input").toBeTruthy();
+  await expect(page.locator(`[id="${active}"]`)).toHaveAttribute("data-highlighted", "");
+  await expect(page.locator(`[id="${active}"]`)).toHaveText("Dashboard");
 
   expect(errors).toEqual([]);
 });
