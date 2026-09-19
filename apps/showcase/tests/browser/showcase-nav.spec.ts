@@ -1,4 +1,4 @@
-import { expect, test } from "./fixtures";
+import { expect, test, type Locator, type Page } from "./fixtures";
 
 /*
  The showcase table of contents is presentation, so these assert its two layouts and its scrollspy
@@ -9,6 +9,25 @@ import { expect, test } from "./fixtures";
 const DESKTOP = { width: 1800, height: 900 };
 const NARROW = { width: 1280, height: 900 };
 
+/*
+ The entries are rendered from the page's shared section list, so the contract worth testing is that
+ every entry is a same-page anchor resolving to exactly one rendered section. The number of sections
+ is deliberately not asserted — the list is free to grow or shrink.
+*/
+const expectEntriesTargetRealSections = async (page: Page, nav: Locator) => {
+  const links = nav.getByRole("link");
+  await expect(links.first()).toBeVisible();
+
+  const hrefs = await links.evaluateAll((entries) => entries.map((entry) => entry.getAttribute("href")));
+  expect(hrefs.length, "the navigation must list at least one section").toBeGreaterThan(0);
+
+  for (const href of hrefs) {
+    const target = href ?? "";
+    expect(target, "every navigation entry must be a same-page anchor").toMatch(/^#[^#]+$/);
+    await expect(page.locator(target), `${target} must resolve to one rendered section`).toHaveCount(1);
+  }
+};
+
 test("the wide layout keeps a gutter table of contents in sync with the reader", async ({ page }) => {
   await page.setViewportSize(DESKTOP);
   await page.goto("/");
@@ -16,7 +35,7 @@ test("the wide layout keeps a gutter table of contents in sync with the reader",
 
   const nav = page.getByRole("navigation", { name: "Showcase sections" });
   await expect(nav).toBeVisible();
-  await expect(nav.getByRole("link")).toHaveCount(9);
+  await expectEntriesTargetRealSections(page, nav);
   await expect(page.getByRole("button", { name: "Jump to…" })).toHaveCount(0);
 
   // A native anchor carries the location in the URL, and the entry it landed on is current.
@@ -33,18 +52,24 @@ test("the wide layout keeps a gutter table of contents in sync with the reader",
   await expect(nav.getByRole("link", { name: "Content" })).toHaveAttribute("aria-current", "location");
 });
 
-test("the narrow layout replaces the gutter table of contents with a jump control", async ({ page }) => {
+test("the narrow layout replaces the gutter table of contents with a sticky jump control", async ({ page }) => {
   await page.setViewportSize(NARROW);
   await page.goto("/");
   await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
 
   await expect(page.getByRole("navigation", { name: "Showcase sections" })).toHaveCount(0);
 
-  await page.getByRole("button", { name: "Jump to…" }).click();
+  const trigger = page.getByRole("button", { name: "Jump to…" });
+  await trigger.click();
+
   const nav = page.getByRole("navigation", { name: "Showcase sections" });
-  await expect(nav.getByRole("link")).toHaveCount(9);
+  await expectEntriesTargetRealSections(page, nav);
 
   await nav.getByRole("link", { name: "Surfaces" }).click();
   await expect(page).toHaveURL(/#surfaces$/);
-  await expect(page.getByRole("button", { name: "Jump to…" })).toHaveAttribute("aria-expanded", "false");
+  await expect(trigger).toHaveAttribute("aria-expanded", "false");
+
+  // The control has to stay reachable once the reader scrolls past it.
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await expect(trigger).toBeInViewport();
 });

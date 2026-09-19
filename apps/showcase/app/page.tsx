@@ -142,7 +142,7 @@ export default function Home() {
           <ShowcaseSideNav activeId={activeSection} className="sticky top-28 ml-auto mr-3 w-36" />
         </div>
         <div className="min-w-0 px-5 pb-10 sm:px-8 lg:px-10 lg:pb-14">
-        <div className="mb-6 min-[1660px]:hidden">
+        <div className="sticky top-4 z-30 mb-6 min-[1660px]:hidden">
           <ShowcaseJumpNav activeId={activeSection} />
         </div>
         <div className="space-y-16">

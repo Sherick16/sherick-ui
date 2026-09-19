@@ -5,9 +5,9 @@ import { Button, Popover } from "sherick-ui";
 import { cn, focusRing, motionFeedback, shape, text } from "sherick-ui/dev";
 
 /*
- One authority for the showcase's major sections: the identifier the page renders, the heading it
- shows, and the short label a narrow gutter can hold. Both navigations and every section read it,
- so a section can never drift from its entry.
+ Shared metadata for the showcase's major sections: the identifier the section renders, the heading
+ it shows, and the short label a narrow gutter can hold. Both navigations read it, and the sections
+ themselves take their id and title from it; the page still decides where each section is placed.
 */
 export const showcaseSections = [
   { id: "design-language", title: "Design language", nav: "Design language" },
