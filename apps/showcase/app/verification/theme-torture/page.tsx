@@ -7,17 +7,21 @@ import {
   Badge,
   Button,
   Checkbox,
+  Chip,
+  ChipGroup,
   Combobox,
   Dialog,
   Field,
   Menu,
   NumberField,
   Popover,
+  Progress,
   RadioGroup,
   Select,
   Slider,
   Switch,
   Tabs,
+  ToggleGroup,
   Tooltip,
 } from "sherick-ui";
 
@@ -96,6 +100,23 @@ export default function ThemeTorturePage() {
             { id: "two", label: "Other", content: "Other panel" },
           ]}
         />
+
+        {/* A pressed toggle and a progress fill both carry their meaning in tone alone, which is
+            what forced colors removes. */}
+        <div className="flex flex-wrap items-center gap-4" data-testid="torture-toggle-family">
+          <ChipGroup aria-label="Torture filters" defaultValue={["alpha"]}>
+            <Chip value="alpha">Alpha</Chip>
+            <Chip value="beta">Beta</Chip>
+          </ChipGroup>
+          <ToggleGroup aria-label="Torture view" defaultValue={["list"]}>
+            <ToggleGroup.Item value="list">List</ToggleGroup.Item>
+            <ToggleGroup.Item value="grid">Grid</ToggleGroup.Item>
+          </ToggleGroup>
+        </div>
+
+        <div className="w-64">
+          <Progress value={40} label="Torture progress" locale="en-US" />
+        </div>
 
         <Select aria-label="Torture select" options={options} defaultValue="alpha" variant="warning" />
 

@@ -127,10 +127,11 @@ hard-coded per component:
 | Dynamic | Tokens | Used for |
 | --- | --- | --- |
 | Swift | `--sui-duration-press`, `--sui-ease-press` | immediate response: feedback and the press half of a tactile control |
-| Settle | `--sui-duration-release`, `--sui-ease-release` | tactile release, orientation, relocation, direct steps and a tooltip's entrance |
+| Settle | `--sui-duration-release`, `--sui-ease-release` | a tactile release settling, and a direct step |
+| Glide | `--sui-ease-glide` with the settle duration, or with `--sui-duration-overlay` for a floating surface | an object crossing between two stable destinations, and a floating surface entering |
 | Spring | `--sui-ease-spring` | the one restrained overshoot, reserved for a mark arriving |
 | Exit | `--sui-duration-overlay-exit`, `--sui-ease-exit` | decisive departure |
-| Anchored / modal | `--sui-duration-overlay`, `--sui-ease-release` | a floating surface entering |
+| Continuous | `--sui-duration-activity` with `linear` | a loop that reports work: the fill of a bar whose extent is not known |
 
 Overriding those variables at the document root retunes every motion in the library at once.
 
@@ -183,6 +184,9 @@ The public package exports:
 - Tabs
 - Table
 - Tooltip
+- Chip and ChipGroup
+- SegmentedControl and ToggleGroup (with `ToggleGroup.Item`)
+- Progress
 
 Public prop types and the shared `Variant` type are exported from the package root as well. The names above are the canonical ones — there are no compatibility aliases.
 

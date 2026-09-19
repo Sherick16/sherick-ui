@@ -22,6 +22,7 @@ import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
 import { overlay } from "../src/components/ui.common.ts";
 import {
+  motionActivityIndeterminate,
   motionActivityPulse,
   motionActivitySpin,
   motionArrive,
@@ -48,6 +49,8 @@ const {
   Button,
   Card,
   Checkbox,
+  Chip,
+  ChipGroup,
   Combobox,
   Divider,
   Field,
@@ -57,14 +60,17 @@ const {
   NavGroup,
   NumberField,
   Popover,
+  Progress,
   RadioGroup,
   Search,
+  SegmentedControl,
   Select,
   Skeleton,
   Slider,
   Spinner,
   Switch,
   Tabs,
+  ToggleGroup,
   Table,
   Textarea,
   Tooltip,
@@ -184,6 +190,60 @@ const specimens = {
   "tooltip.trigger": h(Tooltip, { content: "Hint" }, h(Button, { appearance: "tonal" }, "Hover")),
   "combobox.default": h(Combobox, { options: comboboxOptions, value: "design", onValueChange: noop }),
   "combobox.disabled": h(Combobox, { options: comboboxOptions, value: "design", disabled: true }),
+  /* The toggle family, and the two shapes a progress bar can take. A progress specimen pins its
+     locale, because the formatted value it renders is a locale decision and this gate is a
+     deterministic one. */
+  "chip.toggle.rest": h(Chip, { value: "design" }, "Design"),
+  "chip.toggle.selected": h(Chip, { value: "design", defaultChecked: true }, "Design"),
+  "chip.toggle.icon": h(Chip, { value: "code", variant: "success", icon: h("span", null, "·") }, "Code"),
+  "chip.toggle.disabled": h(Chip, { value: "design", disabled: true }, "Design"),
+  "chip.tag": h(Chip, { variant: "warning" }, "Beta"),
+  "chip.tag.icon": h(Chip, { variant: "success", icon: h("span", null, "·") }, "Ready"),
+  "chip.tag.dismissible": h(Chip, { onRemove: noop }, "Platform"),
+  "chip-group": h(
+    ChipGroup,
+    { "aria-label": "Filters", defaultValue: ["design"] },
+    h(Chip, { key: "design", value: "design" }, "Design"),
+    h(Chip, { key: "code", value: "code" }, "Code"),
+    h(Chip, { key: "ops", value: "ops", disabled: true }, "Ops")
+  ),
+  "toggle-group.single": h(
+    ToggleGroup,
+    { "aria-label": "View", defaultValue: ["list"] },
+    h(ToggleGroup.Item, { key: "list", value: "list" }, "List"),
+    h(ToggleGroup.Item, { key: "grid", value: "grid" }, "Grid")
+  ),
+  "toggle-group.multiple": h(
+    ToggleGroup,
+    { "aria-label": "Format", multiple: true, defaultValue: ["bold"] },
+    h(ToggleGroup.Item, { key: "bold", value: "bold", variant: "secondary" }, "Bold"),
+    h(ToggleGroup.Item, { key: "italic", value: "italic", variant: "secondary" }, "Italic")
+  ),
+  "toggle-group.disabled": h(
+    ToggleGroup,
+    { "aria-label": "View", disabled: true, defaultValue: ["list"] },
+    h(ToggleGroup.Item, { key: "list", value: "list" }, "List")
+  ),
+  "segmented-control": h(SegmentedControl, {
+    "aria-label": "View",
+    defaultValue: "list",
+    options: [
+      { value: "list", label: "List" },
+      { value: "grid", label: "Grid" },
+      { value: "board", label: "Board", disabled: true },
+    ],
+  }),
+  "segmented-control.icons": h(SegmentedControl, {
+    "aria-label": "Alignment",
+    defaultValue: "start",
+    options: [
+      { value: "start", label: "Start", icon: h("span", null, "·") },
+      { value: "center", label: "Center", icon: h("span", null, "·") },
+    ],
+  }),
+  "progress.determinate": h(Progress, { value: 40, label: "Uploading", showValue: true, locale: "en-US" }),
+  "progress.indeterminate": h(Progress, { value: null, label: "Working", locale: "en-US" }),
+  "progress.bare": h(Progress, { value: 65, variant: "success", locale: "en-US" }),
 };
 
 const normalizeMarkup = (html) =>
@@ -215,6 +275,7 @@ const overlayRecipes = {
   "motion.presence.scrim": motionPresenceScrim,
   "motion.activity.spin": motionActivitySpin,
   "motion.activity.pulse": motionActivityPulse,
+  "motion.activity.indeterminate": motionActivityIndeterminate,
   "motion.stateLayer": motionStateLayer,
 };
 

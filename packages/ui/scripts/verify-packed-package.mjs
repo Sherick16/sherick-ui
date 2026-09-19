@@ -87,6 +87,7 @@ assert.equal(typeof Select, "object");
 for (const [name, parts] of [
   ["Popover", ["Trigger", "Content"]],
   ["Menu", ["Trigger", "Content", "Item", "Separator"]],
+  ["ToggleGroup", ["Item"]],
   ["AlertDialog", []],
 ]) {
   assert.ok(
@@ -144,6 +145,46 @@ assert.match(
   /aria-checked="false"/
 );
 
+/* A toggle chip holds its state in the primitive, so its pressed ARIA state is what proves the
+   wiring survived publication. A chip with no selection prop is a tag and must not publish as a
+   button at all. */
+const { Chip, Progress, SegmentedControl, ToggleGroup } = root;
+assert.match(
+  renderToStaticMarkup(React.createElement(Chip, null, "Beta")),
+  /^<span/,
+  "a chip with no selection must publish as a tag, not as a button"
+);
+assert.match(
+  renderToStaticMarkup(React.createElement(Chip, { value: "beta", defaultChecked: true }, "Beta")),
+  /aria-pressed="true"/
+);
+assert.match(
+  renderToStaticMarkup(
+    React.createElement(ToggleGroup, { "aria-label": "View", defaultValue: ["list"] }, null)
+  ),
+  /role="group"/
+);
+assert.match(
+  renderToStaticMarkup(
+    React.createElement(SegmentedControl, {
+      "aria-label": "View",
+      defaultValue: "list",
+      options: [{ value: "list", label: "List" }],
+    })
+  ),
+  /aria-pressed="true"/
+);
+/* Base owns the meter role and the value boundaries; the packed build has to carry both. */
+const determinate = renderToStaticMarkup(
+  React.createElement(Progress, { value: 40, max: 100, label: "Uploading" })
+);
+assert.match(determinate, /role="progressbar"/);
+assert.match(determinate, /aria-valuenow="40"/);
+assert.doesNotMatch(
+  renderToStaticMarkup(React.createElement(Progress, { value: null, label: "Working" })),
+  /aria-valuenow/
+);
+
 /* Language-specific grammars are registered by bare side-effect imports inside the
    published content entry. A language outside core Prism (yaml, python, sql, docker)
    only produces token spans when those imports survived publication. */
@@ -195,6 +236,11 @@ assert.ok(ui.Tabs, "CommonJS export missing Tabs");
 assert.ok(ui.Popover, "CommonJS export missing Popover");
 assert.ok(ui.Menu, "CommonJS export missing Menu");
 assert.ok(ui.Combobox, "CommonJS export missing Combobox");
+assert.ok(ui.Chip, "CommonJS export missing Chip");
+assert.ok(ui.ChipGroup, "CommonJS export missing ChipGroup");
+assert.ok(ui.Progress, "CommonJS export missing Progress");
+assert.ok(ui.SegmentedControl, "CommonJS export missing SegmentedControl");
+assert.ok(ui.ToggleGroup, "CommonJS export missing ToggleGroup");
 assert.ok(ui.AlertDialog, "CommonJS export missing AlertDialog");
 assert.equal(ui.ActionButton, undefined, "removed aliases must not survive in CommonJS");
 assert.equal(ui.Markdown, undefined, "rich content must not be reachable from the CommonJS root");
@@ -227,32 +273,43 @@ import * as React from "react";
 import {
   AlertDialog,
   Button,
+  Chip,
+  ChipGroup,
   Combobox,
   Dialog,
   Input,
   Menu,
   Popover,
+  Progress,
   Search,
+  SegmentedControl,
   Select,
   Switch,
   Tabs,
   Textarea,
+  ToggleGroup,
   type AlertDialogProps,
   type AlertProps,
   type ButtonProps,
+  type ChipGroupProps,
+  type ChipProps,
   type ComboboxOption,
   type ComboboxProps,
   type DialogProps,
   type MenuItemProps,
   type MenuProps,
   type PopoverProps,
+  type ProgressProps,
   type InputProps,
   type SearchProps,
+  type SegmentedControlProps,
   type SelectProps,
   type SkeletonProps,
   type SpinnerProps,
   type SwitchProps,
   type TabsProps,
+  type ToggleGroupItemProps,
+  type ToggleGroupProps,
 } from "sherick-ui";
 import { CodeBlock, Markdown, type CodeBlockProps, type MarkdownProps } from "sherick-ui/content";
 
@@ -309,10 +366,68 @@ const codeBlockProps: CodeBlockProps = { language: "ts", children: "const a = 1;
 const alertProps: AlertProps = { children: "Notice", onDismiss() {} };
 const skeletonProps: SkeletonProps = { "aria-label": "Loading" };
 const spinnerProps: SpinnerProps = { size: "small" };
+/* A chip is a toggle when it is given a selection contract and a tag when it is not; both shapes
+   are part of the published contract. */
+const chipToggleProps: ChipProps = {
+  children: "Design",
+  value: "design",
+  defaultChecked: true,
+  onCheckedChange(pressed: boolean) {
+    void pressed;
+  },
+};
+const chipTagProps: ChipProps = { children: "Beta", variant: "warning", onRemove() {} };
+const chipGroupProps: ChipGroupProps = {
+  children: null,
+  multiple: true,
+  defaultValue: ["design"],
+  onValueChange(values: string[]) {
+    void values;
+  },
+};
+const toggleGroupProps: ToggleGroupProps = {
+  children: null,
+  multiple: true,
+  defaultValue: ["list"],
+  onValueChange(values: string[]) {
+    void values;
+  },
+};
+const toggleGroupItemProps: ToggleGroupItemProps = {
+  value: "list",
+  variant: "primary",
+  children: "List",
+};
+const segmentedControlProps: SegmentedControlProps = {
+  options: [
+    { value: "list", label: "List" },
+    { value: "grid", label: "Grid", disabled: false },
+  ],
+  defaultValue: "list",
+  onValueChange(value: string) {
+    void value;
+  },
+};
+const progressProps: ProgressProps = {
+  value: 40,
+  max: 100,
+  label: "Uploading",
+  showValue: true,
+  variant: "primary",
+};
+const indeterminateProgressProps: ProgressProps = { value: null, label: "Working" };
 void alertProps;
 void comboboxOption;
 void skeletonProps;
 void spinnerProps;
+void chipToggleProps;
+void chipTagProps;
+void chipGroupProps;
+void toggleGroupProps;
+void toggleGroupItemProps;
+void segmentedControlProps;
+void progressProps;
+void indeterminateProgressProps;
 
 export const fixture = (
   <>
@@ -332,6 +447,17 @@ export const fixture = (
     <Switch {...switchProps} />
     <Switch {...uncontrolledSwitchProps} aria-label="Uncontrolled" />
     <Tabs {...tabsProps} />
+    <Chip {...chipToggleProps} />
+    <Chip {...chipTagProps} />
+    <ChipGroup {...chipGroupProps}>
+      <Chip value="design">Design</Chip>
+    </ChipGroup>
+    <ToggleGroup {...toggleGroupProps}>
+      <ToggleGroup.Item {...toggleGroupItemProps} />
+    </ToggleGroup>
+    <SegmentedControl {...segmentedControlProps} />
+    <Progress {...progressProps} />
+    <Progress {...indeterminateProgressProps} />
     <Dialog {...dialogProps}>
       <Dialog.Header>Title</Dialog.Header>
       <Dialog.Content>Body</Dialog.Content>

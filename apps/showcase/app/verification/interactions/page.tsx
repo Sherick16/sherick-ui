@@ -5,6 +5,8 @@ import {
   AlertDialog,
   Button,
   Checkbox,
+  Chip,
+  ChipGroup,
   Combobox,
   Dialog,
   Field,
@@ -12,12 +14,15 @@ import {
   Menu,
   NumberField,
   Popover,
+  Progress,
   RadioGroup,
   Search,
+  SegmentedControl,
   Select,
   Slider,
   Switch,
   Tabs,
+  ToggleGroup,
   Tooltip,
 } from "sherick-ui";
 import { BaseDirectionProvider } from "sherick-ui/dev";
@@ -62,6 +67,12 @@ export default function VerificationInteractionsPage() {
   const [comboboxFormResult, setComboboxFormResult] = useState("");
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertOutcome, setAlertOutcome] = useState("");
+  const [filters, setFilters] = useState<string[]>(["design"]);
+  const [removableChipVisible, setRemovableChipVisible] = useState(true);
+  const [groupTagVisible, setGroupTagVisible] = useState(true);
+  const [range, setRange] = useState("week");
+  const [formats, setFormats] = useState<string[]>(["bold"]);
+  const [progress, setProgress] = useState(40);
 
   return (
     <main className="min-h-screen bg-sherick-canvas px-10 py-12 text-sherick-ink">
@@ -471,6 +482,84 @@ export default function VerificationInteractionsPage() {
           onConfirm={() => setAlertOutcome("confirmed")}
           onCancel={() => setAlertOutcome("cancelled")}
         />
+
+        {/* The toggle family: a grouped value, a grouped value that is exclusive, a standalone
+            toggle, and tags with dismiss controls both inside a group and outside one. */}
+        <div className="space-y-2">
+          <ChipGroup
+            aria-label="Interactions filters"
+            value={filters}
+            onValueChange={setFilters}
+          >
+            <Chip value="design">Design</Chip>
+            <Chip value="code">Code</Chip>
+            <Chip value="ops" disabled>Ops</Chip>
+            {groupTagVisible ? (
+              <Chip onRemove={() => setGroupTagVisible(false)}>Draft</Chip>
+            ) : null}
+          </ChipGroup>
+          <p data-testid="chip-group-value">{filters.join(",")}</p>
+          <p data-testid="group-tag-state">{groupTagVisible ? "present" : "removed"}</p>
+        </div>
+
+        <div className="space-y-2">
+          <Chip value="standalone" defaultChecked>Standalone chip</Chip>
+          {removableChipVisible ? (
+            <Chip onRemove={() => setRemovableChipVisible(false)}>Removable chip</Chip>
+          ) : null}
+          <p data-testid="removable-chip-state">
+            {removableChipVisible ? "present" : "removed"}
+          </p>
+        </div>
+
+        <div className="space-y-2">
+          <SegmentedControl
+            aria-label="Interactions range"
+            value={range}
+            onValueChange={setRange}
+            options={[
+              { value: "day", label: "Day" },
+              { value: "week", label: "Week" },
+              { value: "month", label: "Month", disabled: true },
+            ]}
+          />
+          <p data-testid="segmented-value">{range}</p>
+        </div>
+
+        {/* Left uncontrolled with no default: a segmented control still starts on the first option
+            it can hold, so it is never a row of segments waiting to be told what they are. */}
+        <SegmentedControl
+          aria-label="Interactions default range"
+          options={[
+            { value: "day", label: "Day" },
+            { value: "week", label: "Week" },
+          ]}
+        />
+
+        <div className="space-y-2">
+          <ToggleGroup
+            aria-label="Interactions formatting"
+            multiple
+            value={formats}
+            onValueChange={setFormats}
+          >
+            <ToggleGroup.Item value="bold">Bold</ToggleGroup.Item>
+            <ToggleGroup.Item value="italic">Italic</ToggleGroup.Item>
+          </ToggleGroup>
+          <p data-testid="toggle-group-value">{formats.join(",")}</p>
+        </div>
+
+        <div className="space-y-3">
+          <div data-testid="progress-determinate">
+            <Progress value={progress} label="Interactions progress" showValue locale="en-US" />
+          </div>
+          <div data-testid="progress-indeterminate">
+            <Progress value={null} label="Interactions indeterminate" />
+          </div>
+          <Button onClick={() => setProgress((current) => (current >= 100 ? 0 : current + 25))}>
+            Advance progress
+          </Button>
+        </div>
       </section>
     </main>
   );

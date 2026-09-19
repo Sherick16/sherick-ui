@@ -325,7 +325,7 @@ size of the object and the emphasis it carries.
 
 | Shape | Radius | Role | Should not be used for |
 | --- | --- | --- | --- |
-| `control` | 1.25rem | ordinary controls, dense data regions — fields, rows, options, chips, tables | large surfaces |
+| `control` | 1.25rem | ordinary controls, dense data regions — fields, rows, options, chips, segments, tables | large surfaces |
 | `mark` | 0.625rem | a compact square selection mark — the `Checkbox` box | anything the size of a field, which wants `control`; a full-width row, which wants `row`; a round mark, which is `circle` |
 | `row` | 0.875rem | a row at command density — a row in a list that is scanned rather than read | anything the size of a field or larger, which wants `control` and up; a compact square, which wants `mark` |
 | `prominent` | 1.5rem | prominent controls, compact floating surfaces | small inline controls |
@@ -491,6 +491,46 @@ members of the system rather than local styling:
 flat or floating control press through the state layer's active step and the tactile compression.
 **Do not** use opacity for anything except disabled, or add depth to show a state.
 
+### Toggle buttons: chips and segments
+
+A chip and the segment of a `ToggleGroup` are one object at two sizes: a two-state control that
+holds a **selection** rather than a value. Both take `tone.selected` from the primitive's own
+pressed marker, so an uncontrolled toggle is styled from the same source of truth as a controlled
+one.
+
+`variant` names the tone the control takes **once it holds something**. At rest a toggle is the
+neutral matte control step, and it is quiet on purpose: expression belongs to the held state, not
+to the object that could hold it. That is what lets a row of eight filter chips stay calm with
+two of them lit.
+
+The two differ only in what surrounds them:
+
+| | Surrounds it | At rest | Selected |
+| --- | --- | --- | --- |
+| a `Chip` | nothing — it is a control in its own right | the neutral matte control fill, raised | `tone.selected`; still raised |
+| a `ToggleGroup.Item` | the recessed track the group owns | the track showing through, flat | `tone.selected`, raised inside the track |
+
+Both answer a press the way the elevation table says: a raised object returns to the recessed
+depth of its own track, so a chip presses back and a selected segment settles into the groove it
+sits in, while an unselected segment is flat and presses through the state layer and the tactile
+compression alone.
+
+A chip's own group is a wrapping row with no track, because a chip is not a segment of one
+object. It is still a group: it owns the shared value, the roving tab index and the arrow keys,
+and a member disabled by its own prop or by the group takes the disabled cursor and loses its
+interactive state.
+
+**A tag is not a toggle.** A chip that holds no selection is read rather than manipulated, so it
+stays flat, and its semantic tone lands on its fill and its icon while its copy keeps its normal
+emphasis — the same rule §10 gives every semantic mark. Only a tag can be dismissed: a control
+that both holds a value and deletes itself is one target with two meanings, and a button cannot
+legally nest inside a button.
+
+**Do:** hold one tone role across the family, so a chip and a segment read as the same object at
+two sizes.
+**Do not** tint a toggle's rest state with the tone it *could* take, change a chip's depth to
+announce selection, or let a tag spring, raise or tint under the pointer.
+
 ### Collection rows
 
 A **collection row** is one line in a list the user scans — a `Select` option, a `Combobox`
@@ -566,7 +606,7 @@ library has nine intents, and one module owns the timing behind all of them
 | `direct` | the pointer owns the geometry | `motionDirect` | a slider's handle and the fill it carries |
 | `disclose` | in-flow content expands and collapses | — reserved | nothing yet: it lands with the first disclosure primitive |
 | `presence` | an independent surface enters or leaves | `motionPresenceAnchored`, `motionPresenceTooltip`, `motionPresenceModal`, `motionPresenceScrim` | every popup, tooltip and dialog, and the plane behind a viewport-owning surface |
-| `activity` | continuous movement that reports work | `motionActivitySpin`, `motionActivityPulse` | a spinner, a skeleton |
+| `activity` | continuous movement that reports work | `motionActivitySpin`, `motionActivityPulse`, `motionActivityIndeterminate` | a spinner, a skeleton, the fill of a bar whose extent is not known |
 
 **Dynamics live below the intents.** There are six, and a component never chooses one:
 `swift` (immediate response: `--sui-duration-press`, `--sui-ease-press`), `settle` (strong
@@ -574,9 +614,9 @@ deceleration into a destination: `--sui-duration-release`, `--sui-ease-release`)
 persistent object crossing the distance between two stable destinations: `--sui-ease-glide` with
 the settle duration), `spring` (the one restrained overshoot: `--sui-ease-spring`), `exit`
 (decisive acceleration away: `--sui-duration-overlay-exit`, `--sui-ease-exit`) and `continuous`
-(a repeating loop). The intent picks the dynamic; the tokens in `src/styles/tokens.ts` are its
-only authored values, and they are also the whole of the workbench speed control in the motion
-lab.
+(a repeating loop: `--sui-duration-activity` with `linear`). The intent picks the dynamic; the
+tokens in `src/styles/tokens.ts` are its only authored values, and they are also the whole of the
+workbench speed control in the motion lab.
 
 `settle` is an **arrival** curve: it spends 90% of a travel in the first third of its time, which
 is exactly right for a control letting go of a press and exactly wrong for an object that has to
@@ -597,6 +637,12 @@ it settles*.
 | `motionPresenceAnchored` / `…Tooltip` | from 94% scale, 4px toward the anchor | any anchored surface |
 | `motionPresenceModal` | from 96% scale, 12px rise | a surface that owns the viewport |
 | `motionArrive` | from 50% scale | a selection mark |
+| `motionActivityIndeterminate` | the track's own width, as a composited transform | the fill of a bar whose extent is not known |
+
+The one loop is a **travel** rather than a zoom: its amplitude is measured against the track rather
+than against the part that moves, so it does not depend on how wide that part happens to be, and it
+is carried by a transform so an endless loop never sits on the layout path. It follows the writing
+direction, because a transform is physical and the page is not.
 
 Every one of these is a **centred zoom** or a directional grow: a press changes size in place and
 never translates, and an anchored surface grows about the edge the primitive resolved for it.

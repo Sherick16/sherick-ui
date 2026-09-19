@@ -117,6 +117,11 @@ export const sharedTokens = {
   "duration-release": "200ms",
   "duration-overlay": "240ms",
   "duration-overlay-exit": "160ms",
+  /* Continuous activity runs for as long as the work does: a spinner's loop has no duration of
+     its own, but a sweep across a track is paced, so the one loop that is timed is authored
+     here with the rest of the system's timing. It is a pace, not a response, so it is the one
+     duration that never shortens for a press or a release. */
+  "duration-activity": "1400ms",
   "ease-press": "cubic-bezier(0.4, 0, 0.2, 1)",
   "ease-release": "cubic-bezier(0.16, 1, 0.3, 1)",
   "ease-exit": "cubic-bezier(0.4, 0, 1, 1)",

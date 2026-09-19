@@ -2,6 +2,9 @@
 
 import { useEffect, useState } from "react";
 import {
+  AlignCenter,
+  AlignLeft,
+  AlignRight,
   ArrowUpRight,
   Bell,
   Check,
@@ -23,6 +26,8 @@ import {
   Button,
   Card,
   Checkbox,
+  Chip,
+  ChipGroup,
   Combobox,
   Dialog,
   Divider,
@@ -33,8 +38,10 @@ import {
   NavGroup,
   NumberField,
   Popover,
+  Progress,
   RadioGroup,
   Search,
+  SegmentedControl,
   Select,
   Skeleton,
   Slider,
@@ -43,6 +50,7 @@ import {
   Table,
   Tabs,
   Textarea,
+  ToggleGroup,
   Tooltip,
 } from "sherick-ui";
 import { CodeBlock, Markdown } from "sherick-ui/content";
@@ -100,6 +108,9 @@ export default function Home() {
   const [motionSwitch, setMotionSwitch] = useState(false);
   const [selection, setSelection] = useState("design");
   const [alertOpen, setAlertOpen] = useState(false);
+  const [filters, setFilters] = useState<string[]>(["design"]);
+  const [range, setRange] = useState("week");
+  const [alignment, setAlignment] = useState<string[]>(["left"]);
   const [theme, setTheme] = useState<ThemeMode>("system");
   const activeSection = useShowcaseScrollSpy();
 
@@ -424,6 +435,45 @@ export default function Home() {
                 </div>
               </Specimen>
 
+              <Specimen title="Chips">
+                <div className="space-y-5">
+                  <ChipGroup aria-label="Filters" value={filters} onValueChange={setFilters}>
+                    <Chip value="design">Design</Chip>
+                    <Chip value="code">Code</Chip>
+                    <Chip value="ops" disabled>Ops</Chip>
+                  </ChipGroup>
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <Chip variant="success" icon={<Check />}>Ready</Chip>
+                    <Chip variant="warning">Beta</Chip>
+                    <Chip onRemove={() => undefined}>Platform</Chip>
+                    <Chip onRemove={() => undefined}>Design system</Chip>
+                  </div>
+                </div>
+              </Specimen>
+
+              <Specimen title="Segmented control">
+                {/* Each control hugs its own content, and they are separate objects rather than one
+                    pair, so they stack: a plain block column would leave the two inline-flex
+                    tracks on one line with nothing between them. */}
+                <div className="flex flex-col items-start gap-5">
+                  <SegmentedControl
+                    aria-label="Range"
+                    value={range}
+                    onValueChange={setRange}
+                    options={[
+                      { value: "day", label: "Day" },
+                      { value: "week", label: "Week" },
+                      { value: "month", label: "Month" },
+                    ]}
+                  />
+                  <ToggleGroup aria-label="Text alignment" multiple value={alignment} onValueChange={setAlignment}>
+                    <ToggleGroup.Item value="left" aria-label="Align left"><AlignLeft className="size-4" /></ToggleGroup.Item>
+                    <ToggleGroup.Item value="center" aria-label="Align center"><AlignCenter className="size-4" /></ToggleGroup.Item>
+                    <ToggleGroup.Item value="right" aria-label="Align right" disabled><AlignRight className="size-4" /></ToggleGroup.Item>
+                  </ToggleGroup>
+                </div>
+              </Specimen>
+
               <Specimen title="Tabs">
                 <Tabs className="overflow-x-auto" tabs={[
                   { id: "one", label: "Overview", content: <p className={cn("text-sm", text.medium)}>Overview content</p> },
@@ -459,6 +509,14 @@ export default function Home() {
                 <div className="space-y-7">
                   <div className={cn("flex items-center gap-4", text.medium)}><Spinner size="small" /><Spinner size="medium" /><Spinner size="large" /></div>
                   <div className="space-y-3"><Skeleton className="h-4 w-3/4" /><Skeleton className="h-4 w-1/2" /><Skeleton className="h-20 w-full" /></div>
+                </div>
+              </Specimen>
+
+              <Specimen title="Progress">
+                <div className="space-y-7">
+                  <Progress value={62} label="Uploading assets" showValue />
+                  <Progress value={null} label="Scanning dependencies" />
+                  <Progress value={100} variant="success" label="Deploy finished" showValue />
                 </div>
               </Specimen>
             </div>

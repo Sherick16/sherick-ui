@@ -146,6 +146,33 @@ test("forced-colors preserves canonical focus and important state boundaries", a
   const thumb = page.getByRole("slider", { name: "Torture slider" }).locator("..");
   expect(await thumb.evaluate((element) => getComputedStyle(element).borderStyle)).not.toBe("none");
 
+  // A pressed toggle and a progress fill carry their meaning in tone alone, so forced colors has
+  // to give each of them a boundary of its own.
+  const pressedChip = page.getByRole("button", { name: "Alpha", exact: true });
+  await expect(pressedChip).toHaveAttribute("aria-pressed", "true");
+  expect(
+    await pressedChip.evaluate((element) => getComputedStyle(element).outlineStyle)
+  ).not.toBe("none");
+
+  const progressFill = page
+    .getByRole("progressbar", { name: "Torture progress" })
+    .locator("[data-sui-progress-indicator]");
+  expect(await progressFill.evaluate((element) => getComputedStyle(element).borderStyle)).not.toBe(
+    "none"
+  );
+
+  // A focused control keeps the canonical focus ring even when it is also selected: the focus rule
+  // is emitted after the selection boundaries, which it shares its specificity with.
+  const selectedSegment = page.getByRole("button", { name: "List", exact: true });
+  await expect(selectedSegment).toHaveAttribute("aria-pressed", "true");
+  await selectedSegment.focus();
+  const segmentFocus = await selectedSegment.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { style: style.outlineStyle, width: style.outlineWidth };
+  });
+  expect(segmentFocus.style).not.toBe("none");
+  expect(parseFloat(segmentFocus.width)).toBeGreaterThanOrEqual(2);
+
   await page.getByRole("button", { name: "Open torture dialog" }).click();
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
