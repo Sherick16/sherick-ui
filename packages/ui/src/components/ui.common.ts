@@ -50,17 +50,20 @@ import { motionFeedback, motionStateLayer } from "./ui.motion";
 
 /* Focus visibility — one language for every interactive element.
    `focusRing` draws the ring outside the shape, for a control that stands alone, and it follows
-   keyboard focus: a button does not announce itself when a pointer presses it.
+   **visible** focus: a button does not announce itself when a pointer presses it.
    `focusRingInset` draws it inside, for a control nested within another surface
    where an outer ring would collide with the parent's edge. Fields use the outer
    ring only: no inner rim is added, so focus reads as one ring, never two.
-   A control that **holds a value** wears the ring for as long as it holds it, and while its own
-   surface is open — `focusRingHeld` where the control is the focusable element, `focusRingWithin`
-   where the focus lives in a borderless input inside it. That is what a native `select` and a
-   native text field do, and it is what keeps a select trigger and an editable combobox field
-   identical in every state: neither looks ringed at rest, both look ringed the moment either is
-   used, and both lose it together. `groupFocusRing` draws it from the wrapping control instead
-   of the track it contains. */
+   `focusRingHeld` and `focusRingWithin` are the same ring for a control that **holds a value**,
+   where the platform moves focus somewhere a plain ring cannot follow: the first for a control
+   that is itself focusable and hands focus to the surface it opens, the second for one whose
+   focus lives in a borderless input inside it. `focusRingHeld` follows *any* focus, because a
+   select has no focus left to follow once its list has taken it; `focusRingWithin` follows
+   *visible* focus, so what a field does is what the platform does — a text field is
+   `:focus-visible` whenever it is focused, a range input only for the keyboard — and a select
+   trigger and an editable combobox field end up identical in every state: neither looks ringed at
+   rest, both look ringed the moment either is used, and both lose it together. `groupFocusRing`
+   draws it from the wrapping control instead of the track it contains. */
 export const focusRing =
   "focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-sherick-focus focus-visible:outline-offset-[3px]";
 
@@ -75,8 +78,14 @@ export const focusRingInset =
 export const focusRingHeld =
   "focus:outline-none focus:outline focus:outline-2 focus:outline-sherick-focus focus:outline-offset-[3px] data-[popup-open]:outline data-[popup-open]:outline-2 data-[popup-open]:outline-sherick-focus data-[popup-open]:outline-offset-[3px]";
 
+/* The same ring for a value control whose focus lives in a borderless input inside it. It follows
+   **visible** focus rather than any focus, which is what makes a field and a slider differ for
+   the platform's reasons instead of by local say-so: a text field is `:focus-visible` whenever it
+   is focused, so a combobox or search field wears the ring the moment it is used, while a range
+   input is `:focus-visible` only for the keyboard, so a slider's handle saves its ring for the
+   keyboard and lets its own engagement answer the pointer. */
 export const focusRingWithin =
-  "focus-within:outline focus-within:outline-2 focus-within:outline-sherick-focus focus-within:outline-offset-[3px]";
+  "has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-sherick-focus has-[:focus-visible]:outline-offset-[3px]";
 
 export const groupFocusRing =
   "group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-sherick-focus group-focus-visible:outline-offset-[3px]";

@@ -748,13 +748,25 @@ inline padding from a field's, or reach for `part` to make a standalone control 
   native `select` shows, and it is the only focus indication the field has left once the list has
   taken over.
 - `focusRingWithin` is the same ring for a value control whose focus lives in a borderless input
-  **inside** it — a combobox field, a search field, a number field.
-- The two together are one rule: **a value control looks ringed the moment it is used, and only
-  then.** A select trigger and an editable combobox field are the same control in two forms, so
-  neither looks ringed at rest, both look ringed as soon as either is used, and both lose it
-  together. A plain button keeps the quieter keyboard-only ring, because it does not hold a value
-  a user returns to.
+  **inside** it — a combobox field, a search field, a number field. It follows **visible** focus.
 - `groupFocusRing` draws it from the wrapping control instead of the track it contains.
+
+The whole rule, in one line: **the ring says where the keyboard will act**, so it appears when focus
+arrived from the keyboard and stays quiet when a pointer did the focusing — *unless the platform
+itself reports the pointer's focus as visible*, which it does for a text field and does not for a
+button or a range input. The library follows the platform instead of fighting it, which is why the
+ring lands differently by control and why every difference below is a platform fact rather than a
+local preference:
+
+| Control | Ring |
+| --- | --- |
+| a text field — `Input`, `Textarea`, `Search`, `NumberField`, an editable `Combobox` | **whenever it is focused**, pointer or keyboard: a focused text field is always `:focus-visible` |
+| a `Select` trigger | **whenever it holds focus or its list is open** (`focusRingHeld`): a select hands the DOM focus to its list, so the ring follows the field's engagement — exactly as a native `select` does |
+| a slider handle, a button, an icon button, a nav row, a menu item | **keyboard focus only**: a press, and a drag, already answer visibly |
+
+That is what keeps a select trigger and an editable combobox field identical in every state —
+neither ringed at rest, both ringed the moment either is used, both losing it together — while a
+handle that the pointer is already moving keeps its ring for the keyboard.
 - Fields use the outer ring only. No inner rim is added, so focus reads as one ring,
   never two.
 - Where Base UI provides the widget primitive, Base UI owns roles, ARIA relationships,

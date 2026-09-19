@@ -91,6 +91,18 @@ const startingGeometry = async (locator: Locator) => {
   return geometry;
 };
 
+/** Whether a part is painting a focus ring: the recipes suppress the user agent's outline with a
+ *  transparent one, so a solid style on its own proves nothing. */
+const paintedRing = (locator: Locator) =>
+  locator.evaluate((element) => {
+    const style = getComputedStyle(element);
+    const painted =
+      style.outlineStyle !== "none" &&
+      style.outlineColor !== "rgba(0, 0, 0, 0)" &&
+      Number.parseFloat(style.outlineWidth) > 0;
+    return painted ? "ringed" : "none";
+  });
+
 /** The scale a part is painted at right now. */
 const scaleOf = (locator: Locator) =>
   locator.evaluate((element) => {
@@ -849,14 +861,7 @@ test("a value control looks ringed while it is being used, and only then", async
      open — so the two are ringed in exactly the same states. */
   await openLab(page);
 
-  /* A ring is only real when it is painted: the recipes suppress the user agent's outline with a
-     transparent one, so a solid style on its own proves nothing. */
-  const ringOf = (locator: Locator) =>
-    locator.evaluate((element) => {
-      const style = getComputedStyle(element);
-      const painted = style.outlineStyle !== "none" && style.outlineColor !== "rgba(0, 0, 0, 0)" && parseFloat(style.outlineWidth) > 0;
-      return painted ? "ringed" : "none";
-    });
+  const ringOf = paintedRing;
 
   const selectTrigger = page.getByRole("combobox", { name: "Select", exact: true });
   const comboboxField = page.locator('input[role="combobox"]').first().locator("xpath=..");
@@ -897,6 +902,48 @@ test("a value control looks ringed while it is being used, and only then", async
   await page.keyboard.press("Shift+Tab");
   await page.keyboard.press("Tab");
   expect(await ringOf(button), "and is ringed by keyboard focus").toBe("ringed");
+
+  expect(errors).toEqual([]);
+});
+
+test("a slider handle rings for the keyboard, not for a drag", async ({ page, errors }) => {
+  /* The handle answers a pointer with its own engagement — it grows and takes the accent — so a
+     ring on top of that is noise while the pointer owns it. The ring is still what tells a keyboard
+     user where the arrow keys will act, and the platform draws the line for us: a range input is
+     `:focus-visible` only for the keyboard, where a text field always is. */
+  await openLab(page);
+  const thumb = page.locator("[data-sui-slider-thumb]");
+  await thumb.scrollIntoViewIfNeeded();
+
+  expect(await paintedRing(thumb), "at rest").toBe("none");
+
+  const box = await thumb.boundingBox();
+  if (!box) throw new Error("the slider handle has no box");
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await page.mouse.down();
+  await expect.poll(() => scaleOf(thumb), { message: "the handle answers the pointer itself" }).toBe(1.1);
+  await page.mouse.move(box.x + 110, box.y + box.height / 2, { steps: 6 });
+  expect(await paintedRing(thumb), "a drag is not a keyboard focus").toBe("none");
+  await page.mouse.up();
+  await page.waitForTimeout(400);
+  expect(await paintedRing(thumb), "and the ring does not appear on release either").toBe("none");
+
+  await page.locator("body").click({ position: { x: 4, y: 4 } });
+  await page.waitForTimeout(300);
+  await page.locator('input[type="range"]').first().focus();
+  await page.keyboard.press("Tab");
+  await page.keyboard.press("Shift+Tab");
+  await page.keyboard.press("ArrowRight");
+  await page.waitForTimeout(200);
+  expect(await paintedRing(thumb), "keyboard focus rings it").toBe("ringed");
+
+  /* and the fields are untouched: a text field rings the moment it is used */
+  await page.locator("body").click({ position: { x: 4, y: 4 } });
+  await page.waitForTimeout(300);
+  const comboboxField = page.locator('input[role="combobox"]').first().locator("xpath=..");
+  await page.locator('input[role="combobox"]').first().click();
+  expect(await paintedRing(comboboxField), "a field still rings on a pointer press").toBe("ringed");
+  await page.keyboard.press("Escape");
 
   expect(errors).toEqual([]);
 });
