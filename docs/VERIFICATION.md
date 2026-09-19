@@ -173,7 +173,14 @@ The showcase browser suite also verifies:
   title, dismissal through the stack's control and through `close()`, an action that reports its
   outcome and leaves the toast to the caller, the limit marking the oldest toast `limited` and
   inert, a timeout dismissing itself, and a collapsed stack that lays every toast out at the
-  frontmost one's height until the stack is engaged;
+  frontmost one's height until the stack is engaged. The corner the stack is anchored to is
+  re-read under RTL, where `end` resolves to the other physical edge — the API names its ends, so a
+  physical inset would leave the stack against the wrong edge; the root is measured while the clamp
+  is released, to prove the height is interpolated rather than applied and that the content's own
+  height is unchanged throughout, because the content is what the primitive measures and must never
+  be sized to the value it produces; and each promise state (`loading`, `success`, `error`) is
+  asserted on the mark it renders, since those states are set by the primitive rather than chosen
+  by a caller;
 - an anchored surface placed on each side of its trigger, asserting the resolved origin and the
   direction of its travel rather than only that it appeared;
 - the motion invariants (`motion.spec.ts`, below);

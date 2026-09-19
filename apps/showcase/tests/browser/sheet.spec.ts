@@ -166,18 +166,23 @@ test("a sheet is attached to its edge, above the page, and never leaves the view
   expect(geometry.transition).toContain("opacity");
   /* `shape` supplies the radius on the corner that faces away from the edge, and the attached
      corner is square — a rounded one there would draw a gap against the viewport. The exposed
-     radius is the sheet's own role, one step tighter than a dialog's: a surface meeting an edge is
-     read as an extension of the page, not as an oversized floating card. Read from the token, so
-     the assertion follows the ladder rather than a number written here. */
-  const prominentRadius = await page.evaluate(() => {
-    const probe = document.createElement("div");
-    probe.style.borderRadius = "1.5rem";
-    document.body.appendChild(probe);
-    const value = Number.parseFloat(getComputedStyle(probe).borderRadius);
-    probe.remove();
-    return value;
-  });
-  expect(geometry.innerRadius).toBe(prominentRadius);
+     radius is `shape.sheet`, which steps *below* the prominent step a compact floating control
+     takes: a surface meeting an edge is read as an extension of the page, so a corner sized for a
+     self-contained card makes it read as an oversized one. Both values are read from the ladder
+     rather than written here, so the assertion follows the roles. */
+  const radiusOf = (value: string) =>
+    page.evaluate((authored) => {
+      const probe = document.createElement("div");
+      probe.style.borderRadius = authored;
+      document.body.appendChild(probe);
+      const radius = Number.parseFloat(getComputedStyle(probe).borderRadius);
+      probe.remove();
+      return radius;
+    }, value);
+
+  const exposedRadius = await radiusOf("1.25rem");
+  expect(geometry.innerRadius).toBe(exposedRadius);
+  expect(geometry.innerRadius).toBeLessThan(await radiusOf("1.5rem"));
   expect(geometry.attachedRadius).toBe(0);
 
   expect(errors).toEqual([]);

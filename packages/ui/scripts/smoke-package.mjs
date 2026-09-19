@@ -53,6 +53,7 @@ for (const exportName of [
   "Switch",
   "Table",
   "Tabs",
+  "ToggleGroup",
   "Textarea",
   "ToastProvider",
   "ToastViewport",
@@ -88,6 +89,7 @@ for (const propType of [
   "AccordionProps",
   "AccordionHeadingLevel",
   "CollapsibleProps",
+  "FieldProps",
   "CheckboxProps",
   "RadioGroupProps",
   "RadioGroupOption",
@@ -114,6 +116,9 @@ for (const propType of [
   "ToastType",
   "ToastPosition",
   "ToastManager",
+  "ToastActionOptions",
+  "ToastUpdateOptions",
+  "ToastPromiseOptions",
 ]) {
   assert.ok(declarations.includes(propType), `declarations should expose ${propType}`);
 }

@@ -713,6 +713,57 @@ function ToastFixture({ onAction }: { onAction: (value: string) => void }) {
       >
         Raise fleeting toast
       </Button>
+      {/* A toast whose copy is taller than the frontmost one's, so a collapsed stack has to clamp a
+          root whose content is bigger than the root itself. */}
+      <Button
+        onClick={() =>
+          toast.add({
+            type: "warning",
+            title: "Tall toast",
+            description:
+              "This toast carries enough copy to wrap onto several lines, which makes its own height larger than the frontmost toast's and puts the stack's clamp on the root behind it.",
+          })
+        }
+      >
+        Raise tall toast
+      </Button>
+      {/* A promise reports itself through one toast: it arrives as `loading` and becomes `success`
+          or `error` when the promise settles. Base sets those three types itself, so the marks are
+          what proves the renderer knows them. */}
+      <Button
+        onClick={() => {
+          void toast.promise(
+            new Promise<void>((resolve) => {
+              window.setTimeout(resolve, 400);
+            }),
+            {
+              loading: { title: "Promise pending", description: "Waiting for it to settle." },
+              success: { title: "Promise settled", description: "It resolved." },
+              error: { title: "Promise rejected", description: "It failed." },
+            }
+          );
+        }}
+      >
+        Raise resolving toast
+      </Button>
+      <Button
+        onClick={() => {
+          void toast
+            .promise(
+              new Promise<void>((_resolve, reject) => {
+                window.setTimeout(() => reject(new Error("rejected")), 400);
+              }),
+              {
+                loading: { title: "Promise pending", description: "Waiting for it to settle." },
+                success: { title: "Promise settled", description: "It resolved." },
+                error: { title: "Promise rejected", description: "It failed." },
+              }
+            )
+            .catch(() => undefined);
+        }}
+      >
+        Raise failing toast
+      </Button>
       <Button onClick={() => toast.close()}>Close toasts</Button>
     </div>
   );

@@ -127,6 +127,7 @@ if (update) {
   const definitions = {
     button:
       "Button alone through the root export. Guards against the root barrel pulling optional feature code.",
+    form: "Representative form composition: Button, Checkbox, Combobox, Field, Input, NumberField, RadioGroup, Select, Slider, Switch.",
     overlay:
       "Representative overlay composition: AlertDialog, Combobox, Dialog, Drawer, Menu, Popover, Select, Tooltip.",
     disclosure: "The disclosure family: Accordion and Collapsible, which share one row and one measured panel.",

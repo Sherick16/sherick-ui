@@ -332,11 +332,14 @@ import {
   type SpinnerProps,
   type SwitchProps,
   type TabsProps,
+  type ToastActionOptions,
   type ToastManager,
   type ToastOptions,
   type ToastPosition,
+  type ToastPromiseOptions,
   type ToastProviderProps,
   type ToastType,
+  type ToastUpdateOptions,
   type ToastViewportProps,
   type ToggleGroupItemProps,
   type ToggleGroupProps,
@@ -488,6 +491,13 @@ const toastOptions: ToastOptions = {
   description: "Every change was stored.",
   actionProps: { children: "Undo" },
 };
+const toastActionOptions: ToastActionOptions = { children: "Undo" };
+const toastUpdateOptions: ToastUpdateOptions = { title: "Saved again" };
+const toastPromiseOptions: ToastPromiseOptions<string> = {
+  loading: "Saving",
+  success: (result) => ({ description: result }),
+  error: { title: "Failed", type: "danger" },
+};
 void alertProps;
 void comboboxOption;
 void skeletonProps;
@@ -511,6 +521,9 @@ void toastType;
 void toastPosition;
 void toastManager;
 void toastOptions;
+void toastActionOptions;
+void toastUpdateOptions;
+void toastPromiseOptions;
 
 export const fixture = (
   <>

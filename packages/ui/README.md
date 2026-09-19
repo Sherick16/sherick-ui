@@ -121,7 +121,7 @@ These components compose Base UI primitives, and Base UI stays internal: the par
 capabilities this package documents rather than the primitive's complete prop set, so a Base
 upgrade is not a Sherick breaking change.
 
-Five further families are worth naming, because each is one behavioral foundation under more than
+Six further families are worth naming, because each is one behavioral foundation under more than
 one name:
 
 - **disclosure** — `Accordion` and `Collapsible` are one object at two scopes: the same row and the
@@ -139,7 +139,15 @@ one name:
   `useToast()` raises one from inside the tree. The queue, the auto-dismiss timer, the limit, the
   live region, swipe dismissal and the stack's own state all stay with the primitive, and
   `createToastManager()` builds a manager that lives outside React for code that has no component
-  to raise one from;
+  to raise one from. What a toast is raised with is this package's own contract — `add`, `update`,
+  `close` and `promise`, with `title`, `description`, `type`, `timeout`, `priority`, `actionProps`
+  and the two lifecycle callbacks — rather than the primitive's whole option set; `promise()`
+  reports one promise through one toast, and its loading, success and error states each carry a
+  mark and a tone;
+- **navigation** — `NavGroup` is a titled group of `NavGroupItem`s that brings no surface of its
+  own, so a navigation column reads as one region rather than a card holding cards. `NavItem` is a
+  row the densest density step sizes, whose current destination takes the lightest accent tint and
+  publishes `aria-current`;
 - **the toggle family** — a `Chip` is a tag until it is given a selection, and a toggle chip inside a
   `ChipGroup` is a button that holds the group's value; a `ToggleGroup` and its `ToggleGroup.Item`
   segments are the same object inside a recessed track, and `SegmentedControl` is that group's

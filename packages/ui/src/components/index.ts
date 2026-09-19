@@ -88,10 +88,13 @@ export type {
   DrawerTriggerProps,
 } from "./Drawer";
 export type {
+  ToastActionOptions,
   ToastManager,
   ToastOptions,
   ToastPosition,
+  ToastPromiseOptions,
   ToastProviderProps,
   ToastType,
+  ToastUpdateOptions,
   ToastViewportProps,
 } from "./Toast";

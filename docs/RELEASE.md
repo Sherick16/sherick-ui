@@ -104,7 +104,8 @@ The root `sherick-ui` export is:
   `MenuContentProps`, `MenuItemProps`, `MenuSeparatorProps`, `PopoverProps`, `PopoverContentProps`,
   `TooltipProps`, `TableProps`, `TabsProps`, `Tab`, `NavGroupProps`, `NavGroupItem`,
   `NavItemProps`, `DividerProps`, `DividerWeight`, `ToastProviderProps`, `ToastViewportProps`,
-  `ToastOptions`, `ToastType`, `ToastPosition`, `ToastManager`) and the shared `Variant`,
+  `ToastOptions`, `ToastActionOptions`, `ToastUpdateOptions`, `ToastPromiseOptions`, `ToastType`,
+  `ToastPosition`, `ToastManager`) and the shared `Variant`,
   `OverlaySide` and `OverlayAlign` types.
 
 `Dialog`, `Drawer`, `Accordion`, `Collapsible` and `Menu` compose from parts:
@@ -236,7 +237,49 @@ as `bun run test:bundle`.
 
 | Change | Fixtures | Recorded reason |
 | --- | --- | --- |
-| Wave C: `Accordion`, `Collapsible`, `Drawer` and `Toast` added to the core barrel | `disclosure` and `toast` fixtures added; `overlay` extended with `Drawer`; `barrel` and `stylesCss` raised | The core component catalog is completed. `Drawer` is a positioned `Dialog`, so it adds no second modal system and no gesture machinery: `overlay` moved by less than 1%. `toast` is the wave's cost — Base's toast primitive owns the queue, the timer, the limit, the live region and the stack, and it is the only new dependency subtree. Nothing changed in `button`, `form` or `content`, and no core bundle reaches rich-content code. |
+| Wave C: `Accordion`, `Collapsible`, `Drawer` and `Toast` added to the core barrel | `disclosure` and `toast` fixtures added; `overlay` extended with `Drawer`; `barrel` and `stylesCss` raised | The core component catalog is completed. `Drawer` is a positioned `Dialog`, so it adds no second modal system and no gesture machinery: `overlay` moved by less than 1%. `toast` is the wave's cost — Base's toast primitive owns the queue, the timer, the limit, the live region and the stack, and it is the only new dependency subtree. No core bundle reaches rich-content code. |
+| Wave C follow-up: shared recipe modules made tree-shakeable | `button`, `form`, `toggles` and `content` all **lowered** | The wave had also raised fixtures it does not touch — `button` by 5.2%, just past the tolerance — because the visual and motion recipe modules are shared by every component and their unused recipes survived tree-shaking. See below. |
+
+### What the shared-recipe modules cost, and what they cost now
+
+Adding a family to a shared module had been taxing every unrelated bundle, and the gate caught it.
+The mechanism, measured rather than inferred:
+
+- a recipe composed from other recipes is a template literal with substitutions, and a template
+  literal is not provably side-effect-free — joining class strings may in principle call something —
+  so an *unused* recipe was kept, along with everything it referenced. Every consumer that imported
+  any part of `ui.common.ts` or `ui.motion.ts` therefore paid for every recipe in both. In the
+  `button` bundle alone the two shared modules were **11.9 kB of the 45.6 kB** it weighed, almost
+  all of it recipes `Button` never uses;
+- the recipes are now composed through `cx` in `libs/utils.ts`, whose call is marked pure. A pure
+  call is dropped whole when nothing references it, so composition no longer costs anything the
+  bundle does not use. The annotation survives the library build, so a consumer's bundler sees it
+  too;
+- measured, against the wave's raised baselines and then against the state before the wave
+  (gate figures, kB):
+
+  | Fixture | Before the wave | Raised by the wave | Now |
+  | --- | --- | --- | --- |
+  | `button` | 43.3 | 45.5 | **41.8** |
+  | `form` | 283.3 | 285.6 | **283.2** |
+  | `toggles` | 63.5 | 65.7 | **62.0** |
+  | `content` | 614.6 | 616.7 | **613.0** |
+  | `overlay` | 307.5 | 311.5 | 310.4 |
+  | `barrel` | 409.4 | 448.4 | 448.9 |
+
+  Every fixture the wave does not itself compose is now at or **below** where it started: `button`
+  is 1.5 kB *lighter* than before `Accordion`, `Collapsible`, `Drawer` and `Toast` existed. `overlay`
+  and `barrel` grew for the right reason — they contain `Drawer` and the toast stack — and no core
+  bundle reaches rich-content code;
+- no class string changed. The deterministic style contract was reviewed change by change and shows
+  only the intended sheet-radius and toast-positioning edits;
+- what remains is *pre-existing* and recorded rather than fixed: an **object**-valued recipe table
+  (`overlay`, `list`, `disclosure`, `selectable`, `edge`) still cannot be dropped property by
+  property, because a bundler keeps an object literal whose properties contain calls. Those tables
+  cost roughly 7.5 kB in every core bundle and did so before this wave too. Flattening them into
+  single literal strings would drop them, at the cost of the composition the design language
+  depends on — a shell recipe genuinely bundles material, elevation and shape — so that is left as a
+  separate, deliberate change rather than folded into this one.
 
 ## Known accessibility limitation: default palette text contrast
 

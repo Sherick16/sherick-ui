@@ -1,3 +1,4 @@
+import { cx } from "@/libs/utils";
 import type { Variant } from "./ui.types";
 import { motionDisclose, motionFeedback, motionStateLayer } from "./ui.motion";
 
@@ -131,9 +132,14 @@ export const elevation = {
                   would reach a 36px row's half-extent and read as a capsule.
    - prominent:   prominent controls and compact floating surfaces.
    - surface:     large surfaces — cards, menus, panels.
-   - expressive:  an expressive surface that owns the viewport — the large overlay
-                  sheet, tightened so it reads as a focused surface rather than a
-                  pillowy one.
+   - sheet:       a surface attached to one edge of the viewport. Its exposed corners step
+                  below `prominent` rather than above it, because a surface that meets an
+                  edge is read as an extension of the page: a corner sized for a
+                  free-floating object makes it read as an oversized floating card. It is a
+                  role of its own rather than a smaller `prominent`, because `prominent`
+                  also holds compact floating controls, and those must keep their softness.
+   - expressive:  an expressive surface that owns the viewport — a dialog, tightened so it
+                  reads as a focused surface rather than a pillowy one.
    - pill:        fully rounded controls whose width follows their content.
    - circle:      fully rounded square targets. */
 export const shape = {
@@ -142,6 +148,7 @@ export const shape = {
   row: "rounded-[0.875rem]",
   prominent: "rounded-[1.5rem]",
   surface: "rounded-[1.75rem]",
+  sheet: "rounded-[1.25rem]",
   expressive: "rounded-[2rem]",
   pill: "rounded-full",
   circle: "rounded-full",
@@ -168,9 +175,9 @@ export const edgeTone = {
 
 export const edge = {
   /* Rows of a stacked list or table. */
-  row: `border-b ${edgeTone.row} last:border-b-0`,
+  row: /* @__PURE__ */ cx("border-b", edgeTone.row, "last:border-b-0"),
   /* The heavier rule beneath a column header. */
-  header: `border-b ${edgeTone.header}`,
+  header: /* @__PURE__ */ cx("border-b", edgeTone.header),
   /* A section break inside one surface, or a standalone rule. Pair it with the
      directional border class at the call site (`border-t`, `border-l`). */
   rule: edgeTone.rule,
@@ -257,7 +264,10 @@ export const state = {
    by the field around it. `:disabled` alone cannot gate a press: a row in a collection is a
    `div`, so `:active` matches it while the pointer is down on it and the marker is the only gate
    there is. */
-const stateLayerBase = `before:pointer-events-none before:absolute before:inset-0 before:content-[''] before:opacity-0 ${motionStateLayer}`;
+const stateLayerBase = /* @__PURE__ */ cx(
+  "before:pointer-events-none before:absolute before:inset-0 before:content-[''] before:opacity-0",
+  motionStateLayer
+);
 
 /* A part answers the pointer only while it is interactive. A native control carries `disabled`, and
    a collection primitive marks its rows with `data-disabled` instead. One rule covers both, in the
@@ -279,17 +289,17 @@ const pressTrack = "group-[:not([data-disabled]):not(:disabled)]:active:before:o
 
 export const stateLayer = {
   /* Quiet surfaces — ghost controls, navigation rows, menu options. */
-  quiet: `relative ${stateLayerBase} before:rounded-[inherit] before:bg-current ${hoverQuiet} ${pressQuiet}`,
+  quiet: /* @__PURE__ */ cx("relative", stateLayerBase, "before:rounded-[inherit] before:bg-current", hoverQuiet, pressQuiet),
   /* Tinted containers: the fill is nearly page color already, so the container's own
      on-color (`current`) carries the state at a light step. Shared by every matte
      control with a fill — tonal buttons, icon buttons, acrylic buttons. */
-  tonal: `relative ${stateLayerBase} before:rounded-[inherit] before:bg-current ${hoverTonal} ${pressTonal}`,
+  tonal: /* @__PURE__ */ cx("relative", stateLayerBase, "before:rounded-[inherit] before:bg-current", hoverTonal, pressTonal),
   /* Opaque fills: `current` is the fill's own on-color — the color furthest from it in
      either theme — so one step reads on a saturated blue and a neutral gray alike. */
-  filled: `relative ${stateLayerBase} before:rounded-[inherit] before:bg-current ${hoverFilled} ${pressFilled}`,
+  filled: /* @__PURE__ */ cx("relative", stateLayerBase, "before:rounded-[inherit] before:bg-current", hoverFilled, pressFilled),
   /* A switch track or a selection well: the same layer, but hover and press arrive from the
      wrapping control rather than from the surface itself. */
-  track: `${stateLayerBase} before:rounded-[inherit] before:bg-current ${hoverTrack} ${pressTrack}`,
+  track: /* @__PURE__ */ cx(stateLayerBase, "before:rounded-[inherit] before:bg-current", hoverTrack, pressTrack),
   /* A row highlighted by keyboard or pointer navigation. Base UI collection primitives expose
      `data-highlighted`; this is the one canonical visual treatment for it, and it pairs with a
      row's own `quiet` layer — the row carries both, so a highlighted row and a hovered row are the
@@ -410,39 +420,39 @@ export const stacking = {
    alert dialog separate from the page identically. */
 export const overlay = {
   /* The plane behind a surface that owns the viewport. */
-  scrim: `fixed inset-0 ${stacking.float} bg-sherick-scrim/[0.38] backdrop-blur-[var(--sui-scrim-blur)]`,
+  scrim: /* @__PURE__ */ cx("fixed inset-0", stacking.float, "bg-sherick-scrim/[0.38] backdrop-blur-[var(--sui-scrim-blur)]"),
   /* An anchored surface with room to breathe: a selection list (Select, Combobox) or
      structured content (Popover). It grows out of its trigger and carries the softer
      surface corner, because what it holds is read rather than scanned.
      When not to use it: a short list of commands wants `menu`, and a hint wants
      `tooltip`. */
-  popup: `${shape.surface} ${material.acrylic} ${elevation.floating}`,
+  popup: /* @__PURE__ */ cx(shape.surface, material.acrylic, elevation.floating),
   /* A compact list of commands. The same sheet, the same presence and the same lighting as
      `popup`, tightened in shape so a handful of short actions reads as a list rather than a
      page: a command list should feel like one more control on the surface it came from.
      When not to use it: a list of options that are chosen rather than performed, or a
      surface holding structured content, wants `popup`. */
-  menu: `${shape.control} ${material.acrylic} ${elevation.floating}`,
+  menu: /* @__PURE__ */ cx(shape.control, material.acrylic, elevation.floating),
   /* A tooltip is anchored like the others, and reads its edge the same way. */
-  tooltip: `${shape.prominent} ${material.acrylicDense} ${elevation.floating}`,
+  tooltip: /* @__PURE__ */ cx(shape.prominent, material.acrylicDense, elevation.floating),
   /* A toast is a floating status surface that arrives on its own and leaves on its own. It
      holds a line or two of copy rather than being read as a page, so it takes the compact
      floating corner rather than the wide sheet a popup is.
      When not to use it: a hint attached to a control wants `tooltip`, and anything the user
      opened themselves wants `popup`. */
-  toast: `${shape.prominent} ${material.acrylic} ${elevation.floating}`,
+  toast: /* @__PURE__ */ cx(shape.prominent, material.acrylic, elevation.floating),
   /* A dialog rises further than a menu. It is anchored to the viewport rather than to a trigger,
      so it has no side to grow from and takes the modal presence instead of the anchored one.
      Its corner is the most generous in the library, because a surface that floats free of every
      edge has nothing to line up with. */
-  dialog: `${shape.expressive} ${material.acrylicHero} ${elevation.floating}`,
+  dialog: /* @__PURE__ */ cx(shape.expressive, material.acrylicHero, elevation.floating),
   /* A sheet is the same viewport-owning surface as a dialog, attached to one edge of the
-     viewport. Its exposed corners take one step less, because a surface that meets an edge is
-     read as an extension of the page rather than as an oversized floating card, and its attached
-     edge is squared by the component's own anatomy — which corners those are is decided by the
-     edge, and `shape` still supplies the radius that the other two keep.
+     viewport. Its exposed corners take `shape.sheet` — one step below a compact floating
+     surface rather than above it — because a surface that meets an edge is read as an extension
+     of the page, and its attached edge is squared by the component's own anatomy. Which corners
+     those are is decided by the edge; the radius the other two keep is still `shape`'s.
      When not to use it: a surface with no edge to attach to wants `dialog`. */
-  sheet: `${shape.prominent} ${material.acrylicHero} ${elevation.floating}`,
+  sheet: /* @__PURE__ */ cx(shape.sheet, material.acrylicHero, elevation.floating),
 } as const;
 
 /* Text hierarchy — three steps, no more. High emphasis carries labels and values,
@@ -477,12 +487,28 @@ export const text = {
 export const list = {
   sheet: "max-w-[var(--available-width)] max-h-[var(--available-height)] overflow-y-auto",
   /* A row in a selection list: one line, read one at a time and chosen. */
-  option: `flex w-full items-center justify-between gap-4 px-4 py-3 text-left text-sm outline-none ${shape.control} ${motionFeedback} ${text.high} ${stateLayer.quiet} ${stateLayer.activeRow} ${state.effectiveDisabled}`,
+  option: /* @__PURE__ */ cx(
+    "flex w-full items-center justify-between gap-4 px-4 py-3 text-left text-sm outline-none",
+    shape.control,
+    motionFeedback,
+    text.high,
+    stateLayer.quiet,
+    stateLayer.activeRow,
+    state.effectiveDisabled
+  ),
   /* The same object at the density a list of short actions wants, where the row is scanned
      rather than read and the list is a control rather than a page. `shape.row` keeps the
      command's corner proportional to its own height, so its highlight nests in the tighter
      sheet the menu is. */
-  command: `flex w-full items-center gap-3 px-3 py-2 text-left text-sm outline-none ${shape.row} ${motionFeedback} ${text.high} ${stateLayer.quiet} ${stateLayer.activeRow} ${state.effectiveDisabled}`,
+  command: /* @__PURE__ */ cx(
+    "flex w-full items-center gap-3 px-3 py-2 text-left text-sm outline-none",
+    shape.row,
+    motionFeedback,
+    text.high,
+    stateLayer.quiet,
+    stateLayer.activeRow,
+    state.effectiveDisabled
+  ),
 } as const;
 
 /* A disclosure — one row that opens the region beneath it. An item in an `Accordion` and a
@@ -495,8 +521,16 @@ export const disclosure = {
   /* The row: the same object `list.option` is, because a disclosure header is scanned and
      activated the same way a selectable row is. The chevron the component puts in it is the
      disclosure's own affordance and turns in place under `motionOrient`. */
-  trigger: `group flex w-full items-center justify-between gap-4 px-4 py-3 text-left text-sm outline-none ${shape.control} ${motionFeedback} ${text.high} ${stateLayer.quiet} ${state.enabled} ${state.effectiveDisabled}`,
-  panel: `h-[var(--sui-disclose-height)] overflow-hidden ${motionDisclose}`,
+  trigger: /* @__PURE__ */ cx(
+    "group flex w-full items-center justify-between gap-4 px-4 py-3 text-left text-sm outline-none",
+    shape.control,
+    motionFeedback,
+    text.high,
+    stateLayer.quiet,
+    state.enabled,
+    state.effectiveDisabled
+  ),
+  panel: /* @__PURE__ */ cx("h-[var(--sui-disclose-height)] overflow-hidden", motionDisclose),
 } as const;
 
 /* Tone hierarchy — the color roles a surface can take, in rising strength:
@@ -564,8 +598,8 @@ export const tone = {
    from the same source of truth as a controlled one. A mixed box is selected but is not
    ticked, which is why the second attribute stands beside the first. */
 export const selectable = {
-  surface: `relative ${elevation.recessed} ${motionFeedback}`,
-  rest: `${material.matteHigh} ${text.medium}`,
+  surface: /* @__PURE__ */ cx("relative", elevation.recessed, motionFeedback),
+  rest: /* @__PURE__ */ cx(material.matteHigh, text.medium),
   selected:
     "group-data-[checked]:bg-sherick-primary-strong group-data-[checked]:text-sherick-on-primary",
   indeterminate:

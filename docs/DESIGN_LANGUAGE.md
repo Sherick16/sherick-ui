@@ -232,16 +232,17 @@ depth or a corner.
 | --- | --- | --- |
 | `overlay.scrim` | the plane behind a surface that owns the viewport | a scrim fill plus a backdrop blur — no material, elevation or shape of its own |
 | `overlay.popup` | an anchored surface with room to breathe: a selection list (`Select`, `Combobox`) or structured content (`Popover`) | `shape.surface` + `material.acrylic` + `elevation.floating` |
-| `overlay.sheet` | a surface that owns the viewport and is attached to one edge of it (`Drawer`) | `shape.prominent` + `material.acrylicHero` + `elevation.floating` |
+| `overlay.sheet` | a surface that owns the viewport and is attached to one edge of it (`Drawer`) | `shape.sheet` + `material.acrylicHero` + `elevation.floating` |
 | `overlay.dialog` | a surface that owns the viewport with no edge to attach to (`Dialog`, `AlertDialog`) | `shape.expressive` + `material.acrylicHero` + `elevation.floating` |
 
 A **sheet** is a `Dialog` with an edge, and the two differ only in the corner role they take.
 `overlay.sheet` keeps `material.acrylicHero` — a sheet still has to read as the page's own plane —
-and takes `shape.prominent`, because `shape.expressive` is calibrated for a surface that floats
-free of every edge: a surface meeting an edge is read as an extension of the page, and a corner
-that generous makes it read as an oversized floating card instead. Which corners are squared is the
-attachment's anatomy rather than the recipe's: the edge the sheet is attached to stays square and
-the exposed corners keep the recipe's radius.
+and takes `shape.sheet`, which steps *below* `prominent` rather than above it. `shape.expressive`
+is calibrated for a surface that floats free of every edge, and even `prominent` is the corner of a
+compact floating control; a surface meeting a viewport edge is read as an extension of the page, so
+a corner sized for a self-contained card makes it read as an oversized one. Which corners are
+squared is the attachment's anatomy rather than the recipe's: the edge the sheet is attached to
+stays square and the exposed corners keep `shape.sheet`.
 
 A `Drawer` is therefore not a second modal system. It composes `overlay.sheet`, `overlay.scrim` and
 the same `DialogSurface` a centered dialog does, so focus trapping, dismissal, scroll locking, the
@@ -355,7 +356,8 @@ size of the object and the emphasis it carries.
 | `row` | 0.875rem | a row at command density — a row in a list that is scanned rather than read | anything the size of a field or larger, which wants `control` and up; a compact square, which wants `mark` |
 | `prominent` | 1.5rem | prominent controls, compact floating surfaces | small inline controls |
 | `surface` | 1.75rem | large surfaces — cards, menus, panels | buttons |
-| `expressive` | 2rem | an expressive surface that owns the viewport — the large overlay sheet, tightened so it reads as a focused surface rather than a pillowy one | anything smaller than a dialog |
+| `sheet` | 1.25rem | a surface attached to one edge of the viewport — the exposed corners of a `Drawer` sheet | a free-floating surface, which is what `prominent`, `surface` and `expressive` are for |
+| `expressive` | 2rem | an expressive surface that owns the viewport — a `Dialog`, tightened so it reads as a focused surface rather than a pillowy one | anything smaller than a dialog, and anything attached to an edge, which wants `sheet` |
 | `pill` | full | fully rounded controls whose width follows their content, and the fully rounded form of a compact part at either ratio — a value control's capsule handle | a wide button with a fixed width |
 | `circle` | full | fully rounded square targets | non-square targets |
 
