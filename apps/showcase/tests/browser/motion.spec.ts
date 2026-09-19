@@ -338,7 +338,10 @@ test("Select carries tactile, orientation, arrival and anchored presence", async
 });
 
 test("Combobox matches Select and filtering does not choreograph the list", async ({ page, errors }) => {
-  const input = page.getByRole("combobox", { name: "Combobox project", exact: true });
+  /* Addressed by its label rather than by role: while the listbox is open Base marks the page
+     around it `aria-hidden`, so a role locator stops resolving exactly when the query has to be
+     typed into it. */
+  const input = page.getByLabel("Combobox project").and(page.locator('input[role="combobox"]'));
 
   /* The primitive hides its trigger from the accessibility tree while the list is open, so the
      trigger and its chevron are addressed by their own attributes. */
@@ -498,9 +501,22 @@ test("reduced motion drops every spatial entrance and keeps the state response",
   await expect(popup).toBeVisible();
   expect((await motionOf(popup)).property, "reduced presence is opacity only").toBe("opacity");
 
+  /* Arrival is a spatial entrance too: a mark that arrived from half scale would be an instant
+     50% → 100% jump once its transition was gone, which is why the recipe needs a state-specific
+     override rather than a plain `transform: none`. Checkbox, radio and a select's mark all take
+     the same recipe, so all three are exercised here. */
+  await page.getByRole("checkbox", { name: "First row" }).click();
+  await page.getByRole("radiogroup", { name: "Region", exact: true }).getByRole("radio", { name: "United States", exact: true }).click();
+  await page.getByRole("combobox", { name: "Project type", exact: true }).click();
+  await page.getByRole("option", { name: "Dashboard" }).click();
+  await page.waitForTimeout(200);
+
   const recorded = await entrances(page);
   expect(recorded.length, "the entrance lifecycle still runs").toBeGreaterThan(0);
-  expect(recorded.every((entry) => entry.transform === "none"), "no reduced entrance travels").toBe(true);
+  /* A mark that arrived from half scale would still paint an identity transform rather than
+     `none`, so both are spatial stillness. */
+  const still = (transform: string) => transform === "none" || transform.replace(/\s+/g, "") === "matrix(1,0,0,1,0,0)";
+  expect(recorded.every((entry) => still(entry.transform)), "no reduced entrance travels").toBe(true);
 
   /* The response to an event is not motion: a control still reports hover. */
   const primary = page.getByRole("button", { name: "Submit form" });
@@ -679,10 +695,8 @@ test("a press moves a control by the amplitude its role owns", async ({ page, er
   expect(icon.compressionPercent).toBeGreaterThan(3);
   expect(icon.compressionPercent).toBeLessThan(5);
 
-  const stepper = page.locator('[aria-label="Stepper"]').locator("xpath=..").locator("button").first();
-  const stepperDelta = await pressDelta(page, stepper, stepper);
-  expect(stepperDelta.compressionPercent).toBeGreaterThan(11);
-  expect(stepperDelta.compressionPercent).toBeLessThan(13);
+  /* A control whose ink is much smaller than its target is the other case, and it is asserted
+     separately: its *target* is stable and its mark takes the press. */
 
   expect(errors).toEqual([]);
 });
@@ -700,50 +714,64 @@ test("Select and Combobox are the same control in two forms", async ({ page, err
   const selectPress = await pressDelta(page, selectTrigger, selectField);
 
   await openLab(page);
-  const comboboxInput = page.locator('input[role="combobox"]').first();
-  const comboboxField = comboboxInput.locator("xpath=..");
+  const comboboxField = page.locator('input[role="combobox"]').first().locator("xpath=..");
   expect((await motionOf(comboboxField)).property).toContain("transform");
   await expectDuration(page, comboboxField, "--sui-duration-release");
-  const comboboxPress = await pressDelta(page, comboboxInput, comboboxField);
+  const comboboxDisclosure = page.locator('[aria-label="Show options"]').first();
+  const comboboxPress = await pressDelta(page, comboboxDisclosure, comboboxField);
 
   expect(selectPress.pressedScale).toBe(0.96);
   expect(comboboxPress.pressedScale).toBe(0.96);
   expect(comboboxPress.compressionPercent).toBeCloseTo(selectPress.compressionPercent, 1);
   expect(comboboxPress.restWidth).toBeCloseTo(selectPress.restWidth, 0);
 
-  /* The small affordances inside the field answer with tone only: a second compression nested
-     inside the field's own would read as two events for one press. Their measured box still
-     shrinks with the field around them, so the assertion is about their own geometry. */
-  await openLab(page);
-  const disclosure = page.locator('[aria-label="Show options"]').first();
-  const disclosureField = disclosure.locator("xpath=..");
-  const disclosurePress = await pressDelta(page, disclosure, disclosure, disclosureField);
+  /* The affordance itself answers with tone only: a second compression nested inside the field's
+     own would read as two events for one press. Its measured box still shrinks with the field
+     around it, so the assertion is about its own geometry. */
+  const disclosureField = comboboxDisclosure.locator("xpath=..");
+  const disclosurePress = await pressDelta(page, comboboxDisclosure, comboboxDisclosure, disclosureField);
   expect(disclosurePress.pressedScale, "the disclosure control does not deform itself").toBe(1);
   expect(disclosurePress.alsoScale, "the field it sits in takes the press").toBe(0.96);
 
   expect(errors).toEqual([]);
 });
 
-test("a field stays perfectly still while it is typed in or focused", async ({ page, errors }) => {
+test("a field's text never moves it, and its own controls still do", async ({ page, errors }) => {
+  /* A press activates the whole chain, so an editable field that answered every `:active` would
+     shrink while the pointer was placing a caret or dragging across a word. The field's *controls*
+     are what it answers — and it answers them exactly as a select trigger answers a press on
+     itself, which is what keeps the two forms of the same control together. */
   await openLab(page);
   const input = page.getByRole("combobox", { name: "Combobox", exact: true });
-  const field = input.locator("xpath=..").locator("xpath=..");
+  const field = input.locator("xpath=..");
 
   const atRest = await field.boundingBox();
   await input.click();
   await input.fill("dash");
   await expect(input).toHaveValue("dash");
-  const typed = await field.boundingBox();
+  expect(await field.boundingBox(), "typing does not move the field").toEqual(atRest);
 
-  /* Typing is the field's own interaction and must never move it: only a button inside the field
-     can drive the composite's press response. */
-  expect(typed).toEqual(atRest);
-  expect(await scaleOf(field)).toBe(1);
-
+  /* The failing case the old test missed: the pointer down *inside* the text, held and dragged,
+     which is a caret click or a text selection. */
   await page.keyboard.press("Escape");
+  const textBox = await input.boundingBox();
+  if (!textBox) throw new Error("the field has no box");
+  await page.mouse.move(textBox.x + 12, textBox.y + textBox.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(textBox.x + 90, textBox.y + textBox.height / 2, { steps: 5 });
+  await page.waitForTimeout(320);
+  expect(await scaleOf(field), "a press and drag inside the text never moves the field").toBe(1);
+  expect(await field.boundingBox()).toEqual(atRest);
+  await page.mouse.up();
+  await page.keyboard.press("Escape");
+
+  /* Its own control still moves it, by the same four percent a select trigger takes. */
   await page.locator("body").click({ position: { x: 4, y: 4 } });
-  const blurred = await field.boundingBox();
-  expect(blurred).toEqual(atRest);
+  await openLab(page);
+  const disclosure = page.locator('[aria-label="Show options"]').first();
+  const fieldOfDisclosure = disclosure.locator("xpath=..");
+  const disclosurePress = await pressDelta(page, disclosure, fieldOfDisclosure);
+  expect(disclosurePress.pressedScale, "the field answers a press on its own control").toBe(0.96);
 
   expect(errors).toEqual([]);
 });
@@ -944,6 +972,121 @@ test("a slider handle rings for the keyboard, not for a drag", async ({ page, er
   await page.locator('input[role="combobox"]').first().click();
   expect(await paintedRing(comboboxField), "a field still rings on a pointer press").toBe("ringed");
   await page.keyboard.press("Escape");
+
+  expect(errors).toEqual([]);
+});
+
+test("a logical side travels toward its anchor in both directions", async ({ page, errors }) => {
+  /* `inline-start` means the anchor's inline-start edge, which is physical *left* on a
+     left-to-right page and physical *right* on a right-to-left one, so the four pixels that travel
+     toward the anchor change sign with the page. The primitive resolves the side from the
+     direction it is told about, so each specimen declares its own direction to Base while the
+     document's `dir` drives the CSS — the pair a real right-to-left application sets. */
+  const read = async (direction: string, side: string) => {
+    const trigger = page.getByTestId(`logical-${direction}-${side}`);
+    const triggerBox = await trigger.boundingBox();
+    await trigger.click();
+    const popup = page.locator(labPopupSelector).last();
+    await expect(popup).toBeVisible();
+    await page.waitForTimeout(120);
+    const popupBox = await popup.boundingBox();
+    if (!triggerBox || !popupBox) throw new Error("the surface has no box");
+    const geometry = await popup.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return {
+        side: element.getAttribute("data-side"),
+        shiftX: Number.parseFloat(style.getPropertyValue("--sui-overlay-from-shift-x")),
+      };
+    });
+    await page.keyboard.press("Escape");
+    await page.waitForTimeout(700);
+    return {
+      ...geometry,
+      placed:
+        popupBox.x + popupBox.width / 2 < triggerBox.x + triggerBox.width / 2 ? "left" : "right",
+    };
+  };
+
+  await page.goto(fixture);
+  await expect(page.getByRole("heading", { name: "Interaction verification" })).toBeVisible();
+
+  /* left-to-right: inline-start is the popup's left edge, and the travel moves right into place */
+  expect(await read("ltr", "inline-start")).toEqual({ side: "inline-start", shiftX: 4, placed: "left" });
+  expect(await read("ltr", "inline-end")).toEqual({ side: "inline-end", shiftX: -4, placed: "right" });
+
+  await page.evaluate(() => {
+    document.documentElement.dir = "rtl";
+  });
+  await page.waitForTimeout(200);
+
+  /* right-to-left: the same logical side is the popup's right edge, and the travel follows it */
+  expect(await read("rtl", "inline-start")).toEqual({ side: "inline-start", shiftX: -4, placed: "right" });
+  expect(await read("rtl", "inline-end")).toEqual({ side: "inline-end", shiftX: 4, placed: "left" });
+
+  await page.evaluate(() => {
+    document.documentElement.removeAttribute("dir");
+  });
+
+  expect(errors).toEqual([]);
+});
+
+test("a compact control keeps its target stable while its mark takes the press", async ({ page, errors }) => {
+  /* A control whose visible ink is much smaller than the target it is aimed at must not compress
+     the target: the pointer is already on it, and a 44px target that became 38.7px while held
+     would move the ground under a near-edge release. The mark inside carries the press instead. */
+  await openLab(page);
+
+  const cases: { name: string; target: () => Locator; position: string; prepare?: () => Promise<void> }[] = [
+    {
+      name: "stepper",
+      target: () => page.locator('[aria-label="Stepper"]').locator("xpath=..").locator("button").first(),
+      /* `relative` is the state layer's own, and carries no offset: the control is not moved. */
+      position: "relative",
+    },
+    { name: "alert dismiss", target: () => page.getByRole("button", { name: "Dismiss alert" }), position: "relative" },
+    {
+      name: "search submit",
+      target: () => page.getByRole("button", { name: "Submit search" }),
+      position: "absolute",
+    },
+    {
+      name: "dialog close",
+      target: () => page.getByRole("button", { name: "Close dialog" }),
+      position: "absolute",
+      prepare: async () => {
+        await page.getByRole("button", { name: "Dialog", exact: true }).click();
+        await page.getByRole("dialog").waitFor();
+        /* The surface is scaled while its entrance runs, so "at rest" has to mean settled. */
+        await page.waitForFunction(() => document.querySelector('[role="dialog"]')?.getAnimations().length === 0);
+      },
+    },
+  ];
+
+  for (const { name, target, position, prepare } of cases) {
+    await openLab(page);
+    if (prepare) await prepare();
+
+    const control = target().first();
+    /* A control that places itself must keep its own position: the state layer is `relative`, and
+       a position written before it in the class list is merged away by `tailwind-merge`. */
+    expect(
+      await control.evaluate((element) => getComputedStyle(element).position),
+      `${name} keeps its own position`
+    ).toBe(position);
+    await control.scrollIntoViewIfNeeded();
+    const atRest = await control.boundingBox();
+    if (!atRest) throw new Error(`${name} has no box`);
+    const box = await control.boundingBox();
+    if (!box) throw new Error(`${name} has no box`);
+    await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+    await page.mouse.down();
+    await page.waitForTimeout(320);
+
+    expect(await control.boundingBox(), `${name} keeps its target`).toEqual(atRest);
+    expect(await scaleOf(control), `${name} does not deform itself`).toBe(1);
+    expect(await scaleOf(control.locator("span").first()), `${name} compresses its mark`).toBe(0.88);
+    await page.mouse.up();
+  }
 
   expect(errors).toEqual([]);
 });

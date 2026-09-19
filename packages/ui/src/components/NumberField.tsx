@@ -13,7 +13,7 @@ import {
   stateLayer,
   tone,
 } from "./ui.common";
-import { motionFeedback, motionTactileCompact } from "./ui.motion";
+import { motionFeedback, motionInkPress } from "./ui.motion";
 
 export interface NumberFieldProps
   extends Omit<
@@ -45,14 +45,19 @@ export interface NumberFieldProps
    steps from the keyboard. The steppers never take a focus ring: they are not reachable by
    `:focus-visible`. */
 const stepperClassName = cn(
-  "inline-flex shrink-0 items-center justify-center",
+  "group inline-flex shrink-0 items-center justify-center",
   density.target,
   shape.circle,
-  motionTactileCompact,
+  motionFeedback,
   tone.text.secondary,
   stateLayer.tonal,
   state.effectiveDisabled
 );
+
+/* The target stays exactly where the pointer found it — a 44px target that shrank while held would
+   move the ground under a pointer that is already near its edge — and the glyph inside it takes the
+   press. */
+const stepperIconClassName = cn("inline-flex items-center justify-center", motionInkPress);
 
 /**
  * A number typed or stepped. Base UI owns parsing, stepping, clamping, spinbutton semantics and
@@ -115,7 +120,9 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
           )}
         >
           <BaseNumberField.Decrement className={cn(stepperClassName)}>
-            <Minus aria-hidden="true" className={cn("size-4")} />
+            <span className={cn(stepperIconClassName)}>
+              <Minus aria-hidden="true" className={cn("size-4")} />
+            </span>
           </BaseNumberField.Decrement>
           <BaseNumberField.Input
             {...inputProps}
@@ -127,7 +134,9 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
             )}
           />
           <BaseNumberField.Increment className={cn(stepperClassName)}>
-            <Plus aria-hidden="true" className={cn("size-4")} />
+            <span className={cn(stepperIconClassName)}>
+              <Plus aria-hidden="true" className={cn("size-4")} />
+            </span>
           </BaseNumberField.Increment>
         </BaseNumberField.Group>
       </BaseNumberField.Root>

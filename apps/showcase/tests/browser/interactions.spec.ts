@@ -76,3 +76,23 @@ test("nested Select consumes Escape before Dialog", async ({ page, errors }) => 
   await expect(page.getByTestId("dialog-state")).toHaveText("closed");
   expect(errors).toEqual([]);
 });
+
+test("a combobox names itself through `id`, and its callbacks keep Base's event details", async ({ page, errors }) => {
+  await page.goto("/verification/interactions");
+
+  /* Base drops props it does not destructure, so `id` only names the control if the component
+     forwards it to the input a native label can reach. */
+  const byId = page.getByRole("combobox", { name: "Combobox by id" });
+  await expect(byId).toHaveAttribute("id", "combobox-by-id");
+
+  /* And a public callback is Base's callback: the event details arrive with the value. */
+  await page.getByRole("button", { name: "Open popover" }).click();
+  await expect(page.getByTestId("popover-state")).toHaveText("open");
+  await expect(page.getByTestId("popover-reason")).not.toHaveText("");
+
+  await page.keyboard.press("Escape");
+  await expect(page.getByTestId("popover-state")).toHaveText("closed");
+  await expect(page.getByTestId("popover-reason")).toHaveText("escape-key");
+
+  expect(errors).toEqual([]);
+});

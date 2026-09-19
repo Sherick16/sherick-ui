@@ -33,7 +33,8 @@ export interface AlertDialogProps {
   className?: string;
   open?: boolean;
   defaultOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
+  /** Base's own open-change callback, event details included. */
+  onOpenChange?: BaseAlertDialog.Root.Props["onOpenChange"];
 }
 
 /**
@@ -63,7 +64,7 @@ const AlertDialog = forwardRef<HTMLDivElement, AlertDialogProps>(({
            than from a key handler here: one place observes the closure, so a keyboard dismissal
            and the cancel action report the same thing. */
         if (!nextOpen && eventDetails.reason === "escape-key") onCancel?.();
-        onOpenChange?.(nextOpen);
+        onOpenChange?.(nextOpen, eventDetails);
       }}
     >
       <DialogSurface className={cn(className)} popupRef={ref}>

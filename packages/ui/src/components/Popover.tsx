@@ -11,7 +11,8 @@ export interface PopoverProps {
   children: ReactNode;
   open?: boolean;
   defaultOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
+  /** Base's own open-change callback, event details included. */
+  onOpenChange?: BasePopover.Root.Props["onOpenChange"];
 }
 
 export interface PopoverTriggerProps {

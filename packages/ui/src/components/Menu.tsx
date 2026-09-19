@@ -12,7 +12,8 @@ export interface MenuProps {
   children: ReactNode;
   open?: boolean;
   defaultOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
+  /** Base's own open-change callback, event details included. */
+  onOpenChange?: BaseMenu.Root.Props["onOpenChange"];
 }
 
 export interface MenuTriggerProps {

@@ -20,6 +20,7 @@ import {
   Tabs,
   Tooltip,
 } from "sherick-ui";
+import { BaseDirectionProvider } from "sherick-ui/dev";
 
 const projectOptions = [
   { label: "Design system", value: "design" },
@@ -54,6 +55,7 @@ export default function VerificationInteractionsPage() {
   const [budget, setBudget] = useState(30);
   const [fieldsResult, setFieldsResult] = useState("");
   const [popoverOpen, setPopoverOpen] = useState(false);
+  const [popoverReason, setPopoverReason] = useState("");
   const [popoverOwner, setPopoverOwner] = useState("");
   const [menuAction, setMenuAction] = useState("");
   const [comboboxValue, setComboboxValue] = useState<string | null>("design");
@@ -218,7 +220,14 @@ export default function VerificationInteractionsPage() {
         <p data-testid="fields-result">{fieldsResult}</p>
 
         <div className="flex flex-wrap items-center gap-4">
-          <Popover open={popoverOpen} onOpenChange={setPopoverOpen}>
+          {/* Base's open-change callback keeps its own signature, event details included. */}
+          <Popover
+            open={popoverOpen}
+            onOpenChange={(open, eventDetails) => {
+              setPopoverOpen(open);
+              setPopoverReason(eventDetails.reason);
+            }}
+          >
             <Popover.Trigger
               render={
                 <Button appearance="tonal" variant="secondary">
@@ -240,6 +249,7 @@ export default function VerificationInteractionsPage() {
             </Popover.Content>
           </Popover>
           <span data-testid="popover-state">{popoverOpen ? "open" : "closed"}</span>
+          <span data-testid="popover-reason">{popoverReason}</span>
           <span data-testid="popover-owner">{popoverOwner}</span>
         </div>
 
@@ -332,6 +342,15 @@ export default function VerificationInteractionsPage() {
         </form>
         <p data-testid="combobox-form-result">{comboboxFormResult}</p>
 
+        {/* Base's combobox root drops props it does not destructure, so `id` has to reach the
+            input for a native `<label htmlFor>` to name the control. */}
+        <div className="flex flex-col gap-2">
+          <label htmlFor="combobox-by-id" className="text-sm font-medium">
+            Combobox by id
+          </label>
+          <Combobox id="combobox-by-id" options={projectOptions} />
+        </div>
+
         <div className="flex flex-wrap items-center gap-4">
           <Menu>
             <Menu.Trigger
@@ -363,6 +382,35 @@ export default function VerificationInteractionsPage() {
             </Popover.Content>
           </Popover>
         </div>
+
+        {/* A logical side is resolved against the writing direction, and the primitive has to be
+            told that direction: it never reads the `dir` attribute itself. These four specimens
+            declare the direction to Base and rely on the document's `dir` for the CSS, which is
+            the pair a real right-to-left application sets; the browser suite drives both. */}
+        {(["ltr", "rtl"] as const).map((direction) => (
+          <BaseDirectionProvider key={direction} direction={direction}>
+            <div data-testid={`logical-sides-${direction}`} className="flex flex-wrap items-center gap-4">
+              {(["inline-start", "inline-end"] as const).map((side) => (
+                <Popover key={side}>
+                  <Popover.Trigger
+                    render={
+                      <button
+                        type="button"
+                        data-testid={`logical-${direction}-${side}`}
+                        className="rounded-full px-4 py-2 text-sm"
+                      >
+                        {direction} {side}
+                      </button>
+                    }
+                  />
+                  <Popover.Content side={side}>
+                    <p className="text-sm">Anchored to a logical edge.</p>
+                  </Popover.Content>
+                </Popover>
+              ))}
+            </div>
+          </BaseDirectionProvider>
+        ))}
 
         <div className="flex flex-wrap items-center gap-4">
           {(["top", "right", "bottom", "left"] as const).map((side) => (

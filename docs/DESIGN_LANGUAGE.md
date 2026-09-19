@@ -559,7 +559,7 @@ library has nine intents, and one module owns the timing behind all of them
 | Intent | What it is | Recipe | Used for |
 | --- | --- | --- | --- |
 | `feedback` | a non-spatial state response | `motionFeedback` | hover, focus, a field's tone, a row's highlight, a filled surface |
-| `tactile` | a temporary physical answer to activation | `motionTactile`, `motionTactileCompact` | a button, an icon button, a stepper, a navigation row, a field that opens a list |
+| `tactile` | a temporary physical answer to activation | `motionTactile`, `motionTactileFromControl`, `motionInkPress` | a button, an icon button, a stepper, a navigation row, a field that opens a list |
 | `arrive` | a meaningful subordinate part appears or leaves | `motionArrive` | a checkbox tick, a radio dot, the selected mark in a `Select` or `Combobox` |
 | `orient` | a persistent affordance changes orientation in place | `motionOrient` | the disclosure chevron of a `Select` or `Combobox` |
 | `relocate` | a persistent object travels between stable destinations | `motionRelocate` | a tab indicator, a switch thumb |
@@ -592,8 +592,9 @@ it settles*.
 
 | Recipe | Amplitude | For |
 | --- | --- | --- |
-| `motionTactile` | 4% compression | a control whose outline is what the user sees, including a field that opens a list |
-| `motionTactileCompact` | 12% compression | a control whose visible ink is much smaller than the target it is aimed at — a stepper, a dismiss control, a close control |
+| `motionTactile` | 4% compression | a control whose outline is what the user sees, including a select trigger, whose field carries the press |
+| `motionTactileFromControl` | 4% compression | a composite field answering a press on one of its own controls — and only on a control, never on its text |
+| `motionInkPress` | 12% compression **of the mark** | a control whose visible ink is much smaller than the target it is aimed at — a stepper, a dismiss control, a close control. The target keeps its geometry; the mark inside it takes the press |
 | `motionPresenceAnchored` / `…Tooltip` | from 94% scale, 4px toward the anchor | any anchored surface |
 | `motionPresenceModal` | from 96% scale, 12px rise | a surface that owns the viewport |
 | `motionArrive` | from 50% scale | a selection mark |
@@ -606,13 +607,27 @@ because a 20px glyph inside a 44px target would never register two pixels of its
 not because a smaller control deserves a livelier animation.
 
 **A field that opens a list is a control, and presses like one.** A `Select`'s trigger and an
-editable `Combobox`'s field are the same control in two forms, so they take `motionTactile` as a
-whole: the *field* compresses, not the small affordances inside it, because the field is what the
-user is aiming at and a second compression nested inside the first would read as two events. A
-press activates the whole chain, which is what lets the field be the element that carries the
-answer — and typing, focus, hover and text selection never activate it, so a field stays perfectly
-still while it is used as a text field. A plain `Input` or `Textarea` is not a control you press to
-open anything, so it stays feedback-only.
+editable `Combobox`'s field are the same control in two forms, so a press on either compresses the
+same field by the same four percent. What differs is *what counts as a press*, and the difference
+is what the field is:
+
+- a `Select` trigger **is** the control, so the whole field answers a press anywhere on it;
+- an editable `Combobox` field contains a text field, so it answers a press on one of its **own
+  controls** and never on its text — a caret click and a drag across a word are `:active` on the
+  whole ancestor chain, and a field that shrank while the user was selecting a word would be moving
+  the ground under the pointer. Typing, focus and text selection therefore leave it perfectly
+  still, which is asserted in the browser suite.
+
+Neither moves its own affordances: the clear and disclosure controls answer with tone alone,
+because the field is what the user is aiming at and a second compression nested inside the first
+would read as two events. A plain `Input` or `Textarea` opens nothing, so it stays feedback-only.
+
+**A target the pointer is already on never moves.** A control whose visible ink is much smaller
+than its target — a stepper, a dismiss control, a close control — compresses the *mark*, not the
+target: a 44px target that became 38.7px while held would move the ground under a near-edge
+release, and it would contradict the separation between a large hit area and small visible ink that
+`density.target` and `hitArea` exist to keep. Its focus ring and state layer stay on the target, and
+they stay still with it.
 
 **Spring is not a general family.** It is reserved for an event that has to be acknowledged —
 a mark that is *made*. A tab indicator, a slider handle, a switch thumb and a dialog never
@@ -631,10 +646,9 @@ Opening a `Select` is therefore one dominant motion and one supporting motion, n
 - supporting: the chevron's orientation;
 - non-spatial: the trigger's tone.
 
-A press works the same way: when a control inside a composite field is pressed, the pressed
-control is the manipulated object and the field only echoes it — the control takes the compact
-compression because its ink is small, and the field takes the compression of the control it is,
-which is what makes a searchable field and a select trigger feel like two variants of one thing.
+A press works the same way: when a control inside a composite field is pressed, the field is the
+manipulated object and the control inside it answers with tone — one field-level compression, not
+a control compressing inside a field that compresses too.
 
 There is no staggering, no per-row entrance, no label choreography and no generic layout
 animation: filtering a `Combobox` replaces the list immediately, tab panels switch
@@ -666,7 +680,12 @@ exit timer; Base keeps the node mounted until the transition it started has fini
 Anchored surfaces read their direction from what the primitive resolved — `--transform-origin`
 for the edge and `data-side` for which edge that is — so one recipe serves a `Select`, a
 `Combobox`, a `Menu`, a `Popover` and a `Tooltip`, and a popup flipped by collision enters the
-way it is actually placed. A tooltip is the same model on the local settle timing; a modal
+way it is actually placed. A **logical** side resolves against the writing direction: `inline-start`
+takes the popup to the anchor's physical left on a left-to-right page and its physical right on a
+right-to-left one, and the four pixels of travel change sign with it, because they always move
+*toward* the anchor. The direction is declared twice — `dir` for CSS and Base UI's
+`DirectionProvider` for the placement — exactly as `apps/showcase` does for its logical-side
+specimens; the physical sides never depend on it. A tooltip is the same model on the local settle timing; a modal
 surface is anchored to the viewport, has no side and never bounces; a scrim animates opacity
 only, because a blur or a filter is never animated.
 

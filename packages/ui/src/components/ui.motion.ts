@@ -45,31 +45,48 @@ export const motionFeedback =
  *  press travels is the system's physical character rather than a component's anatomy: a
  *  control whose outline is what the user sees compresses 4%, which is about two pixels at the
  *  size of the ink it moves. A control whose visible ink is far smaller than the target it is
- *  aimed at takes `motionTactileCompact` instead. Both are neutralised under reduced motion by
- *  dropping the interpolation and the compression together. */
+ *  aimed at takes `motionInkPress` on that ink instead, so the target itself never moves. The
+ *  interpolation and the compression are neutralised together under reduced motion. */
 export const motionTactile =
   "transition-[background-color,color,box-shadow,transform,opacity] duration-release ease-release active:duration-press active:ease-press active:scale-[0.96] motion-reduce:transition-none motion-reduce:active:scale-100";
 
-/** The same physical answer for a control whose ink is much smaller than the target it is aimed
- *  at — an icon inside a `density.target` stepper, a dialog's close control, the parts a
- *  composite field owns — where the four percent a full control takes would never register on
- *  the glyph. */
-export const motionTactileCompact =
-  "transition-[background-color,color,box-shadow,transform,opacity] duration-release ease-release active:duration-press active:ease-press active:scale-[0.88] motion-reduce:transition-none motion-reduce:active:scale-100";
+/** The same physical answer for a composite field, where only a *control* inside the field answers
+ *  a press. The field's text is a text field: a caret click, a text selection and a drag inside it
+ *  are all `:active` on the field's ancestor chain, and a field that shrank while the user was
+ *  selecting a word would be moving the ground under the pointer. A disclosure control or a clear
+ *  control is a control, so the field answers it as a whole — the same four percent, and the same
+ *  timing, that the equivalent plain control takes. */
+export const motionTactileFromControl =
+  "transition-[background-color,color,box-shadow,transform,opacity] duration-release ease-release active:duration-press active:ease-press has-[button:active]:scale-[0.96] motion-reduce:transition-none motion-reduce:has-[button:active]:scale-100";
 
-/* A field-shaped control takes `motionTactile` as a whole, including the `Select` trigger and an
-   editable `Combobox` field — the same control in two forms, so they answer a press identically.
-   A press activates the whole chain, which is what lets the *field* be the element that carries
-   the compression: a descendant being pressed is what makes the field itself match `:active`,
-   whether the press lands on its text, on an affordance inside it, or (for a `Select`) on the
-   trigger, whose own active state the primitive suppresses. Typing, focus and text selection
-   never match it, so the field stays perfectly still while it is used as a text field. */
+/** The spatial half of a compact press, applied to the *mark* rather than to the control.
+ *
+ *  A control whose visible ink is much smaller than the target it is aimed at — a dialog's close
+ *  control, a stepper, a search field's submit — is a large target around a small glyph, and only
+ *  the glyph is visible at rest. Compressing the whole control would shrink the ground the pointer
+ *  is already on (a 44px target becomes 38.7px while held, which is exactly where a near-edge
+ *  release lands), so the mark takes the twelve percent and the target keeps its geometry. The
+ *  target still owns the focus ring and the state layer, and still carries the tone and depth
+ *  response, so the boundary a press happens inside never moves. */
+export const motionInkPress =
+  "transition-transform duration-release ease-release group-active:duration-press group-active:ease-press group-active:scale-[0.88] motion-reduce:transition-none motion-reduce:group-active:scale-100";
+
+/* Motion is not owned here — but the recipes above are the whole vocabulary: every press, arrival,
+   travel, presence and activity in the library is one of these names plus its owner's own target
+   geometry. */
+
+/* A `Select`'s trigger takes `motionTactile` on the field that owns it: the trigger's own active
+   state is suppressed by the primitive, while a press on it still activates its wrapper as an
+   ancestor — so the *field* is the element that carries the compression, and the press reads as
+   "this field was pressed" exactly as an editable combobox field does. */
 
 /** A meaningful subordinate part arrives. Spring is reserved for this intent: a mark is
  *  made by overshooting the position it lands in. It leaves without the overshoot, and
- *  reduced motion lands it in one step. */
+ *  reduced motion lands it in one step — which takes a *state-specific* override, because the
+ *  starting state is a higher-specificity rule than a plain `transform: none` and would otherwise
+ *  win under reduced motion while the transition was gone, turning a spring into an instant jump. */
 export const motionArrive =
-  "transition-[background-color,color,box-shadow,transform,opacity] duration-release ease-spring data-[starting-style]:scale-50 data-[ending-style]:scale-50 data-[ending-style]:opacity-0 data-[ending-style]:duration-overlay-exit data-[ending-style]:ease-exit motion-reduce:transition-none motion-reduce:transform-none";
+  "transition-[background-color,color,box-shadow,transform,opacity] duration-release ease-spring data-[starting-style]:scale-50 data-[ending-style]:scale-50 data-[ending-style]:opacity-0 data-[ending-style]:duration-overlay-exit data-[ending-style]:ease-exit motion-reduce:transition-none motion-reduce:transform-none motion-reduce:data-[starting-style]:scale-100 motion-reduce:data-[ending-style]:scale-100";
 
 /** A persistent affordance changes orientation in place: a disclosure chevron. It reaches
  *  its target orientation consistently and never overshoots. */
@@ -109,8 +126,18 @@ const anchoredGeometry = [
   "data-[side=top]:[--sui-overlay-from-shift-y:4px]",
   "data-[side=left]:[--sui-overlay-from-shift-y:0px] data-[side=left]:[--sui-overlay-from-shift-x:4px]",
   "data-[side=right]:[--sui-overlay-from-shift-y:0px] data-[side=right]:[--sui-overlay-from-shift-x:-4px]",
+  /* The logical sides resolve against the writing direction: `inline-start` puts the popup at the
+     anchor's inline-start edge, which is its physical *left* on a left-to-right page and its
+     physical *right* on a right-to-left one, so the four pixels that travel toward the anchor
+     change sign with the page while the physical sides above never do. The direction is read from
+     the `dir` attribute — the attribute that lays the page out, and the only one a portaled
+     surface can see. The primitive resolves the side from the direction *it* is told about
+     (`DirectionProvider`), so a consumer whose page is right-to-left declares that direction to
+     both, exactly as the workbench's RTL specimens do. */
   "data-[side=inline-start]:[--sui-overlay-from-shift-y:0px] data-[side=inline-start]:[--sui-overlay-from-shift-x:4px]",
+  "[[dir=rtl]_&]:data-[side=inline-start]:[--sui-overlay-from-shift-x:-4px]",
   "data-[side=inline-end]:[--sui-overlay-from-shift-y:0px] data-[side=inline-end]:[--sui-overlay-from-shift-x:-4px]",
+  "[[dir=rtl]_&]:data-[side=inline-end]:[--sui-overlay-from-shift-x:4px]",
 ].join(" ");
 
 /* Both ends of a presence animation start from the same state, and reduced motion drops the

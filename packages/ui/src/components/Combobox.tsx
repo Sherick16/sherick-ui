@@ -22,7 +22,7 @@ import {
   motionFeedback,
   motionOrient,
   motionPresenceAnchored,
-  motionTactile,
+  motionTactileFromControl,
 } from "./ui.motion";
 
 export interface ComboboxOption {
@@ -35,12 +35,19 @@ export interface ComboboxOption {
    renders no element of its own and ignores props it does not destructure: inheriting its type
    would accept `aria-label` and then silently drop it, leaving an unlabeled field. Naming is the
    `Field`'s job — or a native `<label htmlFor>` against this control's `id`. */
+type ComboboxRootProps = BaseCombobox.Root.Props<ComboboxOption>;
+type ComboboxChangeDetails = Parameters<NonNullable<ComboboxRootProps["onValueChange"]>>[1];
+
 export interface ComboboxProps {
   options: ComboboxOption[];
   /** The selected option's value, or `null` for no selection. */
   value?: string | null;
   defaultValue?: string | null;
-  onValueChange?: (value: string | null) => void;
+  /**
+   * The selected option's own `value`, so two equal options compare equal even when a caller
+   * rebuilds its options array. Base's event details are passed through unchanged.
+   */
+  onValueChange?: (value: string | null, eventDetails: ComboboxChangeDetails) => void;
   placeholder?: string;
   /** Shown in place of the list when the query matches no option. */
   emptyMessage?: ReactNode;
@@ -50,11 +57,15 @@ export interface ComboboxProps {
   filter?: ((option: ComboboxOption, query: string) => boolean) | null;
   open?: boolean;
   defaultOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
+  /** Base's own open-change callback, event details included. */
+  onOpenChange?: ComboboxRootProps["onOpenChange"];
   /** The query, when the application controls it. */
   inputValue?: string;
   defaultInputValue?: string;
-  onInputValueChange?: (value: string) => void;
+  /** Base's own input-value callback, event details included. */
+  onInputValueChange?: ComboboxRootProps["onInputValueChange"];
+  /** The control's own id, for a native `<label htmlFor>`. */
+  id?: ComboboxRootProps["id"];
   /** Highlights the first match as the query narrows, so `Enter` chooses it. */
   autoHighlight?: boolean;
   /** Identifies the field when a form is submitted. */
@@ -114,7 +125,9 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(({
       isItemEqualToValue={(itemValue, currentValue) =>
         (itemValue as ComboboxOption | null)?.value === (currentValue as ComboboxOption | null)?.value
       }
-      onValueChange={(next) => onValueChange?.((next as ComboboxOption | null)?.value ?? null)}
+      onValueChange={(next, eventDetails) =>
+        onValueChange?.((next as ComboboxOption | null)?.value ?? null, eventDetails)
+      }
       filter={filter ? (item, query) => filter(item as ComboboxOption, query) : filter}
       disabled={disabled}
       readOnly={readOnly}
@@ -126,7 +139,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(({
             density.normal,
             shape.control,
             material.control,
-            motionTactile,
+            motionTactileFromControl,
             focusRingWithin,
             !fieldDisabled && state.field.hover,
             !fieldDisabled && state.field.focusWithin,

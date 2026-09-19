@@ -227,6 +227,11 @@ export const state = {
 } as const;
 
 /* State layers.
+   A layer is `relative` itself, because its overlay is absolutely positioned inside the control.
+   A component that positions the control — an absolutely placed close or submit control — writes
+   that position *after* the layer in its class list: `tailwind-merge` keeps the last class in a
+   conflicting group, so a position written before the layer is silently replaced by the layer's
+   own.
    Replacing `background-color` on hover erases whatever fill a control owns: an
    opaque fill collapses to a bare tint and a tinted fill loses most of its step.
    This overlay instead composites over the fill, tinted with `currentColor` — the
