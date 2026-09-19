@@ -5,45 +5,56 @@
   "budgets": {
     "button": {
       "definition": "Button alone through the root export. Guards against the root barrel pulling optional feature code.",
-      "raw": 44347,
-      "gzip": 14576,
-      "brotli": 12996
+      "raw": 46644,
+      "gzip": 14938,
+      "brotli": 13307
     },
     "form": {
-      "definition": "Representative form composition: Button, Checkbox, Combobox, Field, Input, NumberField, RadioGroup, Select, Slider, Switch.",
-      "raw": 290104,
-      "gzip": 98859,
-      "brotli": 84933
+      "raw": 292411,
+      "gzip": 99471,
+      "brotli": 85386
     },
     "overlay": {
-      "definition": "Representative overlay composition: AlertDialog, Combobox, Dialog, Menu, Popover, Select, Tooltip.",
-      "raw": 314863,
-      "gzip": 101707,
-      "brotli": 86254
+      "definition": "Representative overlay composition: AlertDialog, Combobox, Dialog, Drawer, Menu, Popover, Select, Tooltip.",
+      "raw": 319032,
+      "gzip": 102888,
+      "brotli": 86914
+    },
+    "disclosure": {
+      "definition": "The disclosure family: Accordion and Collapsible, which share one row and one measured panel.",
+      "raw": 63480,
+      "gzip": 21241,
+      "brotli": 18786
+    },
+    "toast": {
+      "definition": "The toast stack: its provider, its viewport and the two ways a toast is raised.",
+      "raw": 116577,
+      "gzip": 40004,
+      "brotli": 35401
     },
     "toggles": {
       "definition": "Representative toggle composition: Chip, ChipGroup, Progress, SegmentedControl, ToggleGroup.",
-      "raw": 65035,
-      "gzip": 21871,
-      "brotli": 19467
+      "raw": 67330,
+      "gzip": 22270,
+      "brotli": 19686
     },
     "barrel": {
       "definition": "The complete core root barrel with nothing tree-shaken beyond unused exports.",
-      "raw": 419273,
-      "gzip": 139835,
-      "brotli": 115269
+      "raw": 459181,
+      "gzip": 152399,
+      "brotli": 125463
     },
     "content": {
       "definition": "The optional rich-content subpath: Markdown, CodeBlock and their full dependency stack.",
-      "raw": 629361,
-      "gzip": 191089,
-      "brotli": 152133
+      "raw": 631529,
+      "gzip": 191443,
+      "brotli": 152400
     },
     "stylesCss": {
       "definition": "Published component stylesheet.",
-      "raw": 105374,
-      "gzip": 12739,
-      "brotli": 10494
+      "raw": 113881,
+      "gzip": 13985,
+      "brotli": 11534
     },
     "themeCss": {
       "definition": "Published token-only theme stylesheet.",

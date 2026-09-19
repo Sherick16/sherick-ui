@@ -9,7 +9,7 @@
    - orient: a persistent part changes orientation in place;
    - relocate: a persistent part moves or resizes between stable states;
    - direct: geometry continuously follows the user;
-   - disclose: in-flow content expands/collapses (reserved until the first disclosure primitive);
+   - disclose: in-flow content expands and collapses;
    - presence: an independent surface enters/leaves;
    - activity: continuous motion that communicates ongoing work.
 
@@ -223,5 +223,59 @@ export const motionActivityIndeterminate =
 export const motionStateLayer =
   "before:transition-opacity before:duration-release before:ease-release active:before:duration-press active:before:ease-press group-active:before:duration-press group-active:before:ease-press motion-reduce:before:transition-none";
 
-/* `disclose` is intentionally semantic-only for now. Its implementation lands with the first
-   Accordion/Collapsible primitive, when the actual Base lifecycle and geometry are known. */
+/* `disclose` is the in-flow counterpart of presence: nothing mounts or unmounts, and nothing
+   leaves the page — one region changes its own height where it sits. Base measures the panel and
+   publishes that height, so the geometry is the primitive's and only the interpolation is here.
+   The panel states the height it opens to; this recipe owns how it gets there, and reduced
+   motion applies the layout state in one step rather than travelling through it. */
+export const motionDisclose =
+  "transition-[height] duration-release ease-release data-[starting-style]:h-0 data-[ending-style]:h-0 motion-reduce:transition-none";
+
+/* A sheet is a surface that owns the viewport and is attached to one edge of it, so its presence is
+   a slide out of that edge rather than the modal lift, and it never bounces. The component names the
+   edge by setting exactly one of `--sui-sheet-from-x` / `--sui-sheet-from-y` to a full own-extent
+   offset, because which edge a sheet is attached to is anatomy; how far it travels and how long it
+   takes are not.
+
+   The other axis is `0px`, and that default is load-bearing: a fallback of `100%` on the axis the
+   component did not set would translate a side sheet on both axes at once, so a sheet attached to
+   the right edge would enter from the bottom-right corner and travel diagonally instead of
+   straight in. One edge means one axis. */
+export const motionPresenceSheet = [
+  "transition-[transform,opacity] duration-overlay ease-glide",
+  "data-[ending-style]:duration-overlay-exit data-[ending-style]:ease-exit",
+  "motion-reduce:transition-[opacity]",
+  "data-[starting-style]:opacity-0",
+  "data-[ending-style]:opacity-0",
+  "data-[starting-style]:[transform:translate(var(--sui-sheet-from-x,0px),var(--sui-sheet-from-y,0px))]",
+  "data-[ending-style]:[transform:translate(var(--sui-sheet-from-x,0px),var(--sui-sheet-from-y,0px))]",
+  "motion-reduce:data-[starting-style]:transform-none",
+  "motion-reduce:data-[ending-style]:transform-none",
+].join(" ");
+
+/* A toast is a stack, not a single surface: several independent surfaces share one corner,
+   re-flow when one of them leaves, and can each be flung away by the pointer. That is one
+   spatial owner on one node, and this is it.
+
+   The component owns where a toast rests — its stacked offset, its clamped height and the
+   expanded fan are geometry — and sets `--sui-toast-from-y` to the direction the stack grows in.
+   This recipe owns the entrance, the exit, the stack's re-flow, and the gesture: while
+   `data-swiping` is set the node follows the pointer with no interpolation at all, and a
+   dismissal carries the movement it was flung with so the toast keeps travelling the way it was
+   already going instead of turning around. */
+export const motionPresenceToast = [
+  "transition-[transform,opacity,height] duration-overlay ease-glide",
+  "data-[ending-style]:duration-overlay-exit data-[ending-style]:ease-exit",
+  "data-[swiping]:transition-none",
+  "motion-reduce:transition-[opacity]",
+  "data-[starting-style]:opacity-0",
+  "data-[ending-style]:opacity-0",
+  "data-[starting-style]:[transform:translateY(var(--sui-toast-from-y,150%))]",
+  "[&[data-ending-style]:not([data-swipe-direction])]:[transform:translateY(var(--sui-toast-from-y,150%))]",
+  "data-[ending-style]:data-[swipe-direction=down]:[transform:translateY(calc(var(--toast-swipe-movement-y,0px)+150%))]",
+  "data-[ending-style]:data-[swipe-direction=up]:[transform:translateY(calc(var(--toast-swipe-movement-y,0px)-150%))]",
+  "data-[ending-style]:data-[swipe-direction=left]:[transform:translateX(calc(var(--toast-swipe-movement-x,0px)-150%))]",
+  "data-[ending-style]:data-[swipe-direction=right]:[transform:translateX(calc(var(--toast-swipe-movement-x,0px)+150%))]",
+  "motion-reduce:data-[starting-style]:transform-none",
+  "motion-reduce:data-[ending-style]:transform-none",
+].join(" ");

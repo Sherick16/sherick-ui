@@ -19,6 +19,7 @@ import {
   Trash2,
 } from "lucide-react";
 import {
+  Accordion,
   Alert,
   AlertDialog,
   Avatar,
@@ -28,9 +29,11 @@ import {
   Checkbox,
   Chip,
   ChipGroup,
+  Collapsible,
   Combobox,
   Dialog,
   Divider,
+  Drawer,
   Field,
   IconButton,
   Input,
@@ -50,9 +53,13 @@ import {
   Table,
   Tabs,
   Textarea,
+  ToastProvider,
+  ToastViewport,
   ToggleGroup,
   Tooltip,
+  useToast,
 } from "sherick-ui";
+import type { DrawerSide } from "sherick-ui";
 import { CodeBlock, Markdown } from "sherick-ui/content";
 import {
   cn,
@@ -483,12 +490,24 @@ export default function Home() {
               </Specimen>
 
               <Specimen title="Navigation groups">
-                <div className={cn("max-w-xs p-2", shape.control, material.matte)}>
-                  <NavGroup title="Components" activeHref="#fields" items={[
-                    { label: "Buttons", href: "#buttons" },
-                    { label: "Fields", href: "#fields" },
-                    { label: "Feedback", href: "#feedback" },
-                  ]} />
+                <div className={cn("flex max-w-xs flex-col gap-4")}>
+                  <NavGroup
+                    title="Components"
+                    activeHref="#fields"
+                    items={[
+                      { label: "Buttons", href: "#buttons" },
+                      { label: "Fields", href: "#fields" },
+                      { label: "Feedback", href: "#feedback" },
+                    ]}
+                  />
+                  <NavGroup
+                    title="Foundations"
+                    activeHref="#design-language"
+                    items={[
+                      { label: "Design language", href: "#design-language" },
+                      { label: "Surfaces", href: "#surfaces" },
+                    ]}
+                  />
                 </div>
               </Specimen>
             </div>
@@ -518,6 +537,60 @@ export default function Home() {
                   <Progress value={null} label="Scanning dependencies" />
                   <Progress value={100} variant="success" label="Deploy finished" showValue />
                 </div>
+              </Specimen>
+
+              <Specimen title="Toasts">
+                {/* The provider is the demo's own: it wraps the button that raises a toast and the
+                    stack that renders it, which is the whole of the relationship the component
+                    asks of an application. */}
+                <ToastProvider>
+                  <ToastSpecimen />
+                  <ToastViewport />
+                </ToastProvider>
+              </Specimen>
+            </div>
+          </ShowcaseSection>
+
+          <ShowcaseSection id="disclosure">
+            <div className="mt-6 grid gap-4 xl:grid-cols-2">
+              <Specimen title="Accordion">
+                <Accordion multiple defaultValue={["foundation", "motion"]}>
+                  <Accordion.Item value="foundation">
+                    <Accordion.Trigger>What is Sherick UI?</Accordion.Trigger>
+                    <Accordion.Panel className={cn("text-sm leading-7", text.medium)}>
+                      A component library that owns its visual language and lets Base UI own the
+                      behavioural one.
+                    </Accordion.Panel>
+                  </Accordion.Item>
+                  <Accordion.Item value="motion">
+                    <Accordion.Trigger>How does motion work?</Accordion.Trigger>
+                    <Accordion.Panel className={cn("text-sm leading-7", text.medium)}>
+                      One module owns every transition, and a component names the intent it needs
+                      instead of writing a duration.
+                    </Accordion.Panel>
+                  </Accordion.Item>
+                  <Accordion.Item value="styling">
+                    <Accordion.Trigger>How is it styled?</Accordion.Trigger>
+                    <Accordion.Panel className={cn("text-sm leading-7", text.medium)}>
+                      The published stylesheet is self-contained and scoped, so a consumer needs no
+                      Tailwind installation.
+                    </Accordion.Panel>
+                  </Accordion.Item>
+                  <Accordion.Item value="locked" disabled>
+                    <Accordion.Trigger>A section that cannot be opened</Accordion.Trigger>
+                    <Accordion.Panel>Unreachable.</Accordion.Panel>
+                  </Accordion.Item>
+                </Accordion>
+              </Specimen>
+
+              <Specimen title="Collapsible">
+                <Collapsible>
+                  <Collapsible.Trigger>Advanced options</Collapsible.Trigger>
+                  <Collapsible.Panel className={cn("text-sm leading-7", text.medium)}>
+                    The same row and the same panel as an accordion item, at the scope of one
+                    region: nothing else in the page holds its state.
+                  </Collapsible.Panel>
+                </Collapsible>
               </Specimen>
             </div>
           </ShowcaseSection>
@@ -623,6 +696,10 @@ export default function Home() {
                 <Button appearance="filled" variant="danger" icon={<Trash2 />} onClick={() => setAlertOpen(true)}>
                   Delete project
                 </Button>
+              </Specimen>
+
+              <Specimen title="Sheet">
+                <SheetSpecimen />
               </Specimen>
             </div>
           </ShowcaseSection>
@@ -770,4 +847,102 @@ function Swatch({ label, className }: { label: string; className: string }) {
 
 function StateLabel({ label, children }: { label: string; children: React.ReactNode }) {
   return <div className="flex items-center gap-2"><div>{children}</div><span className={cn("text-sm", text.medium)}>{label}</span></div>;
+}
+
+function SheetSpecimen() {
+  const [side, setSide] = useState<DrawerSide>("bottom");
+  const [open, setOpen] = useState(false);
+
+  const sides: DrawerSide[] = ["bottom", "right", "left", "top"];
+
+  return (
+    <>
+      <div className="flex flex-wrap gap-3">
+        {sides.map((value) => (
+          <Button
+            key={value}
+            appearance="tonal"
+            variant="secondary"
+            onClick={() => {
+              setSide(value);
+              setOpen(true);
+            }}
+          >
+            {value}
+          </Button>
+        ))}
+      </div>
+      <Drawer
+        open={open}
+        onOpenChange={(next) => setOpen(next)}
+        side={side}
+      >
+        <Drawer.Content>
+          <Drawer.Header>Sheet</Drawer.Header>
+          <Drawer.Description>
+            A surface attached to the {side} edge of the viewport.
+          </Drawer.Description>
+          <Drawer.Footer>
+            <Drawer.Close
+              render={
+                <Button appearance="text" variant="secondary">
+                  Cancel
+                </Button>
+              }
+            />
+            <Drawer.Close render={<Button appearance="filled">Confirm</Button>} />
+          </Drawer.Footer>
+        </Drawer.Content>
+      </Drawer>
+    </>
+  );
+}
+
+function ToastSpecimen() {
+  const toast = useToast();
+
+  return (
+    <div className="flex flex-wrap gap-3">
+      <Button
+        appearance="tonal"
+        variant="secondary"
+        onClick={() =>
+          toast.add({
+            type: "success",
+            title: "Deployment finished",
+            description: "The build is live.",
+          })
+        }
+      >
+        Success
+      </Button>
+      <Button
+        appearance="tonal"
+        variant="secondary"
+        onClick={() =>
+          toast.add({
+            type: "warning",
+            title: "Quota almost reached",
+            description: "Eighty per cent of the monthly budget is used.",
+          })
+        }
+      >
+        Warning
+      </Button>
+      <Button
+        appearance="tonal"
+        variant="danger"
+        onClick={() =>
+          toast.add({
+            type: "danger",
+            title: "Upload failed",
+            description: "The connection dropped before the file was sent.",
+            actionProps: { children: "Retry", onClick: () => undefined },
+          })
+        }
+      >
+        Danger + action
+      </Button>
+    </div>
+  );
 }

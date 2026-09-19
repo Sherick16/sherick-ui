@@ -1,5 +1,5 @@
 import type { Variant } from "./ui.types";
-import { motionFeedback, motionStateLayer } from "./ui.motion";
+import { motionDisclose, motionFeedback, motionStateLayer } from "./ui.motion";
 
 /* Sherick UI design primitives
    ==========================================================================
@@ -13,10 +13,11 @@ import { motionFeedback, motionStateLayer } from "./ui.motion";
      edge       the hairline between stacked parts (row, header, rule)
      state      how it responds                    (rest, hover, pressed, selected, disabled, focus)
      stateLayer the composited hover/press overlay (quiet, tonal, filled, track, activeRow)
+     disclosure one expandable region and its row (trigger, panel)
      tone       its color role                     (text, soft, tonal, selected, strong)
      text       the three-step emphasis ladder     (high, medium, low)
      density    how tightly it is packed           (compact, normal, prominent, target)
-     overlay    floating shells                    (menu, tooltip, dialog)
+     overlay    floating shells                    (menu, tooltip, popup, toast, sheet, dialog)
     focusRing  the one focus language             (focusRing, focusRingInset, focusRingHeld, focusRingWithin, groupFocusRing)
 
    Temporal behavior is deliberately not here: `ui.motion.ts` owns every transition,
@@ -154,15 +155,25 @@ export const shape = {
    One tone serves every line, so table rows, dividers, the `Divider` component and
    code sections agree with each other. A Markdown blockquote is not one of these: it
    takes a primary accent, because a quote is content-level emphasis rather than a
-   structural join between two parts. */
+   structural join between two parts.
+
+   The three roles are a tone each, and two of them carry the direction the row draws. The tone
+   is authored once and separately, because a `Divider` draws its own direction: a row's line and
+   a standalone rule have to agree on the tone without sharing a border. */
+export const edgeTone = {
+  row: "border-sherick-edge/[0.06]",
+  header: "border-sherick-edge/[0.10]",
+  rule: "border-sherick-edge/[0.075]",
+} as const;
+
 export const edge = {
   /* Rows of a stacked list or table. */
-  row: "border-b border-sherick-edge/[0.06] last:border-b-0",
+  row: `border-b ${edgeTone.row} last:border-b-0`,
   /* The heavier rule beneath a column header. */
-  header: "border-b border-sherick-edge/[0.10]",
+  header: `border-b ${edgeTone.header}`,
   /* A section break inside one surface, or a standalone rule. Pair it with the
      directional border class at the call site (`border-t`, `border-l`). */
-  rule: "border-sherick-edge/[0.075]",
+  rule: edgeTone.rule,
 } as const;
 
 /* Interaction states:
@@ -414,9 +425,24 @@ export const overlay = {
   menu: `${shape.control} ${material.acrylic} ${elevation.floating}`,
   /* A tooltip is anchored like the others, and reads its edge the same way. */
   tooltip: `${shape.prominent} ${material.acrylicDense} ${elevation.floating}`,
+  /* A toast is a floating status surface that arrives on its own and leaves on its own. It
+     holds a line or two of copy rather than being read as a page, so it takes the compact
+     floating corner rather than the wide sheet a popup is.
+     When not to use it: a hint attached to a control wants `tooltip`, and anything the user
+     opened themselves wants `popup`. */
+  toast: `${shape.prominent} ${material.acrylic} ${elevation.floating}`,
   /* A dialog rises further than a menu. It is anchored to the viewport rather than to a trigger,
-     so it has no side to grow from and takes the modal presence instead of the anchored one. */
+     so it has no side to grow from and takes the modal presence instead of the anchored one.
+     Its corner is the most generous in the library, because a surface that floats free of every
+     edge has nothing to line up with. */
   dialog: `${shape.expressive} ${material.acrylicHero} ${elevation.floating}`,
+  /* A sheet is the same viewport-owning surface as a dialog, attached to one edge of the
+     viewport. Its exposed corners take one step less, because a surface that meets an edge is
+     read as an extension of the page rather than as an oversized floating card, and its attached
+     edge is squared by the component's own anatomy — which corners those are is decided by the
+     edge, and `shape` still supplies the radius that the other two keep.
+     When not to use it: a surface with no edge to attach to wants `dialog`. */
+  sheet: `${shape.prominent} ${material.acrylicHero} ${elevation.floating}`,
 } as const;
 
 /* Text hierarchy — three steps, no more. High emphasis carries labels and values,
@@ -457,6 +483,20 @@ export const list = {
      command's corner proportional to its own height, so its highlight nests in the tighter
      sheet the menu is. */
   command: `flex w-full items-center gap-3 px-3 py-2 text-left text-sm outline-none ${shape.row} ${motionFeedback} ${text.high} ${stateLayer.quiet} ${stateLayer.activeRow} ${state.effectiveDisabled}`,
+} as const;
+
+/* A disclosure — one row that opens the region beneath it. An item in an `Accordion` and a
+   standalone `Collapsible` are the same object: a stacked row, and the in-flow panel its
+   primitive measures. They share this recipe so the two cannot drift into two designs, and the
+   height itself is the primitive's — it arrives as `--sui-disclose-height`, which each
+   component maps its own primitive's panel variable onto, because the measured geometry is
+   anatomy and only the interpolation is temporal. */
+export const disclosure = {
+  /* The row: the same object `list.option` is, because a disclosure header is scanned and
+     activated the same way a selectable row is. The chevron the component puts in it is the
+     disclosure's own affordance and turns in place under `motionOrient`. */
+  trigger: `group flex w-full items-center justify-between gap-4 px-4 py-3 text-left text-sm outline-none ${shape.control} ${motionFeedback} ${text.high} ${stateLayer.quiet} ${state.enabled} ${state.effectiveDisabled}`,
+  panel: `h-[var(--sui-disclose-height)] overflow-hidden ${motionDisclose}`,
 } as const;
 
 /* Tone hierarchy — the color roles a surface can take, in rising strength:

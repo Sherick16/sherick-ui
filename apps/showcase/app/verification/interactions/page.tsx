@@ -2,16 +2,20 @@
 
 import { useState } from "react";
 import {
+  Accordion,
   AlertDialog,
   Button,
   Checkbox,
   Chip,
   ChipGroup,
+  Collapsible,
   Combobox,
   Dialog,
+  Drawer,
   Field,
   Input,
   Menu,
+  NavGroup,
   NumberField,
   Popover,
   Progress,
@@ -22,8 +26,12 @@ import {
   Slider,
   Switch,
   Tabs,
+  ToastProvider,
+  ToastViewport,
   ToggleGroup,
   Tooltip,
+  useToast,
+  type DrawerSide,
 } from "sherick-ui";
 import { BaseDirectionProvider } from "sherick-ui/dev";
 
@@ -73,9 +81,15 @@ export default function VerificationInteractionsPage() {
   const [range, setRange] = useState("week");
   const [formats, setFormats] = useState<string[]>(["bold"]);
   const [progress, setProgress] = useState(40);
+  const [sections, setSections] = useState<string[]>(["first"]);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
+  const [sheetSide, setSheetSide] = useState<DrawerSide>("right");
+  const [toastAction, setToastAction] = useState("none");
 
   return (
-    <main className="min-h-screen bg-sherick-canvas px-10 py-12 text-sherick-ink">
+    <ToastProvider>
+      <main className="min-h-screen bg-sherick-canvas px-10 py-12 text-sherick-ink">
       <section className="mx-auto flex max-w-3xl flex-col gap-10">
         <header className="space-y-2">
           <h1 className="text-3xl font-semibold tracking-[-0.03em]">Interaction verification</h1>
@@ -116,6 +130,20 @@ export default function VerificationInteractionsPage() {
           ]}
         />
         <p data-testid="tab-value">{tab}</p>
+
+        {/* Navigation rows: one destination is current, which is carried by the tint, the label's
+            emphasis and `aria-current` together rather than by colour alone. */}
+        <div data-testid="nav-group" className="max-w-xs">
+          <NavGroup
+            title="Sections"
+            activeHref="#nav-group-current"
+            items={[
+              { label: "Overview", href: "#nav-group-overview" },
+              { label: "Current section", href: "#nav-group-current" },
+              { label: "Archived", href: "#nav-group-archived" },
+            ]}
+          />
+        </div>
 
         <form
           className="flex flex-wrap items-center gap-4"
@@ -560,7 +588,132 @@ export default function VerificationInteractionsPage() {
             Advance progress
           </Button>
         </div>
+
+        {/* Disclosure: one canonical expandable region at both scopes. The accordion is single,
+            so opening a section closes the one before it, and one of its items is inert. */}
+        <div className="space-y-3">
+          <Accordion
+            value={sections}
+            onValueChange={(value) => setSections(value as string[])}
+          >
+            <Accordion.Item value="first">
+              <Accordion.Trigger>First section</Accordion.Trigger>
+              <Accordion.Panel>First panel content</Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item value="second">
+              <Accordion.Trigger>Second section</Accordion.Trigger>
+              <Accordion.Panel>
+                Second panel content, long enough that its measured height is worth travelling
+                through.
+              </Accordion.Panel>
+            </Accordion.Item>
+            <Accordion.Item value="locked" disabled>
+              <Accordion.Trigger>Locked section</Accordion.Trigger>
+              <Accordion.Panel>Locked panel content</Accordion.Panel>
+            </Accordion.Item>
+          </Accordion>
+          <p data-testid="accordion-value">{sections.join(",")}</p>
+          <Collapsible open={detailsOpen} onOpenChange={setDetailsOpen}>
+            <Collapsible.Trigger>Details</Collapsible.Trigger>
+            <Collapsible.Panel>
+              Details panel content, which nothing else in the page holds the state of.
+            </Collapsible.Panel>
+          </Collapsible>
+          <p data-testid="collapsible-value">{detailsOpen ? "open" : "closed"}</p>
+        </div>
+
+        {/* A sheet is a dialog with an edge: it traps focus, locks the page and dismisses on
+            Escape exactly as the dialog above does. */}
+        <div className="space-y-2">
+          <div className="flex flex-wrap gap-2">
+            {(["right", "left", "bottom", "top"] as const).map((side) => (
+              <Button
+                key={side}
+                onClick={() => {
+                  setSheetSide(side);
+                  setSheetOpen(true);
+                }}
+              >
+                {`Open ${side} sheet`}
+              </Button>
+            ))}
+          </div>
+          <p data-testid="sheet-state">{sheetOpen ? "open" : "closed"}</p>
+          <p data-testid="sheet-side">{sheetSide}</p>
+          <Drawer open={sheetOpen} onOpenChange={(next) => setSheetOpen(next)} side={sheetSide}>
+            <Drawer.Content>
+              <Drawer.Header>Sheet</Drawer.Header>
+              <Drawer.Description>Sheet description</Drawer.Description>
+              <Drawer.Footer>
+                <Drawer.Close
+                  render={
+                    <Button appearance="text" variant="secondary">
+                      Cancel
+                    </Button>
+                  }
+                />
+                <Drawer.Close render={<Button appearance="filled">Confirm</Button>} />
+              </Drawer.Footer>
+            </Drawer.Content>
+          </Drawer>
+        </div>
+
+        <ToastFixture onAction={setToastAction} />
+        <p data-testid="toast-action">{toastAction}</p>
       </section>
-    </main>
+      </main>
+      <ToastViewport />
+    </ToastProvider>
+  );
+}
+
+/* The toast fixture raises through the hook, so it has to sit beneath the provider the page
+   renders rather than beside it. */
+function ToastFixture({ onAction }: { onAction: (value: string) => void }) {
+  const toast = useToast();
+
+  return (
+    <div className="space-y-2">
+      <Button
+        onClick={() =>
+          toast.add({
+            type: "success",
+            title: "Interactions toast",
+            description: "Raised from the interactions fixture.",
+          })
+        }
+      >
+        Raise toast
+      </Button>
+      <Button
+        onClick={() =>
+          toast.add({
+            type: "danger",
+            title: "Sticky toast",
+            description: "This one waits to be dismissed.",
+            timeout: 0,
+            actionProps: {
+              children: "Retry",
+              onClick: () => onAction("retry"),
+            },
+          })
+        }
+      >
+        Raise sticky toast
+      </Button>
+      <Button
+        onClick={() =>
+          toast.add({
+            type: "info",
+            title: "Fleeting toast",
+            description: "This one dismisses itself.",
+            timeout: 400,
+          })
+        }
+      >
+        Raise fleeting toast
+      </Button>
+      <Button onClick={() => toast.close()}>Close toasts</Button>
+    </div>
   );
 }

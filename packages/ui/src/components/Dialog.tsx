@@ -8,15 +8,12 @@ import React, {
   type RefAttributes,
   useRef,
 } from "react";
-import { X } from "lucide-react";
 import { cn } from "@/libs/utils";
-import { density, focusRing, shape, state, stateLayer, text } from "./ui.common";
-import { motionFeedback, motionInkPress } from "./ui.motion";
 import { DialogContent } from "./DialogContent";
 import { DialogDescription } from "./DialogDescription";
 import { DialogFooter } from "./DialogFooter";
 import { DialogHeader } from "./DialogHeader";
-import { DialogSurface } from "./DialogSurface";
+import { DialogDismiss, DialogSurface } from "./DialogSurface";
 
 export interface DialogProps {
   children: ReactNode;
@@ -59,28 +56,7 @@ const Dialog = forwardRef<HTMLDivElement, DialogProps>(({
       {/* The dialog focuses its own surface rather than the first control in it: a dialog's
           content is read before it is acted on, and its close button is not the reason it opened. */}
       <DialogSurface className={cn(className)} popupRef={setPopupRef} initialFocus={popupRef}>
-        <BaseDialog.Close
-          aria-label="Close dialog"
-          className={cn(
-            density.target,
-            shape.circle,
-            text.medium,
-            "hover:text-sherick-ink",
-            motionFeedback,
-            focusRing,
-            stateLayer.quiet,
-            state.enabled,
-            /* After the state layer, which is `relative` itself: `tailwind-merge` keeps the last
-               class in a conflicting group, so the control's own position has to be written last. */
-            "group absolute right-4 top-4 inline-flex items-center justify-center"
-          )}
-        >
-          {/* The target stays exactly where the pointer found it; the mark inside it carries the
-              press. */}
-          <span className={cn("inline-flex items-center justify-center", motionInkPress)}>
-            <X className={cn("size-5")} aria-hidden="true" />
-          </span>
-        </BaseDialog.Close>
+        <DialogDismiss label="Close dialog" />
 
         {children}
       </DialogSurface>

@@ -98,7 +98,7 @@ export function Example() {
 
 The package publishes these subpaths:
 
-- `sherick-ui` — the core component barrel: `Alert`, `AlertDialog`, `Avatar`, `Badge`, `Button`, `Card`, `Checkbox`, `Chip`, `ChipGroup`, `Combobox`, `Dialog`, `Divider`, `Field`, `IconButton`, `Input`, `Menu`, `NavGroup`, `NavItem`, `NumberField`, `Popover`, `Progress`, `RadioGroup`, `Search`, `SegmentedControl`, `Select`, `Skeleton`, `Slider`, `Spinner`, `Switch`, `Table`, `Tabs`, `Textarea`, `ToggleGroup`, `Tooltip`, plus their prop types and the shared `Variant` type.
+- `sherick-ui` — the core component barrel: `Accordion`, `Alert`, `AlertDialog`, `Avatar`, `Badge`, `Button`, `Card`, `Checkbox`, `Chip`, `ChipGroup`, `Collapsible`, `Combobox`, `Dialog`, `Divider`, `Drawer`, `Field`, `IconButton`, `Input`, `Menu`, `NavGroup`, `NavItem`, `NumberField`, `Popover`, `Progress`, `RadioGroup`, `Search`, `SegmentedControl`, `Select`, `Skeleton`, `Slider`, `Spinner`, `Switch`, `Table`, `Tabs`, `Textarea`, `ToastProvider`, `ToastViewport`, `ToggleGroup`, `Tooltip`, `useToast`, `createToastManager`, plus their prop types and the shared `Variant` type.
 - `sherick-ui/content` — the rich-content boundary, **ESM only**: `Markdown`, `CodeBlock` and their prop types.
 - `sherick-ui/styles.css` — the complete component stylesheet.
 - `sherick-ui/theme.css` — token-only theme output.
@@ -106,7 +106,7 @@ The package publishes these subpaths:
 
 The names above are canonical. There are no compatibility aliases: `ActionButton`, `Dropdown`, `Modal`, `TabGroup` and their prop types are gone, as are the deprecated `Select.selected`, `Select.onSelect`, `Tabs.defaultTabId`, `Tabs.onTabChange`, `Dialog.onClose` and `Table.variant` props. The `onChange` props on `Input`, `Textarea` and `Switch` are no longer Sherick callbacks — `Input` and `Textarea` pass through native `onChange`, and boolean state goes through `Switch.onCheckedChange`.
 
-Two floating-surface families exist and they differ in what they own. `Dialog` composes as
+The viewport-owning surfaces differ in what they own. `Dialog` composes as
 `Dialog.Header`, `Dialog.Description`, `Dialog.Content` and `Dialog.Footer`; `AlertDialog` is the
 destructive confirmation, with `title`, `description`, `confirmLabel`, `onConfirm` and `onCancel`
 — `onCancel` runs for every user cancellation, the cancel action and Escape alike — and it is
@@ -121,9 +121,25 @@ These components compose Base UI primitives, and Base UI stays internal: the par
 capabilities this package documents rather than the primitive's complete prop set, so a Base
 upgrade is not a Sherick breaking change.
 
-Three further families are worth naming, because each is one behavioral foundation under more than
+Five further families are worth naming, because each is one behavioral foundation under more than
 one name:
 
+- **disclosure** — `Accordion` and `Collapsible` are one object at two scopes: the same row and the
+  same measured panel, one holding a group's value array and one holding a single region's boolean.
+  Compose `Accordion.Item`/`Accordion.Trigger`/`Accordion.Panel`, or
+  `Collapsible.Trigger`/`Collapsible.Panel`. The region's height is measured by the primitive and
+  moved by the disclosure recipe, so a collapsed panel is not mounted and an expanded one can grow
+  with its own content;
+- **the sheet** — `Drawer` is a `Dialog` with an edge rather than a second kind of modal, so it
+  traps focus, restores it, locks the page and dismisses exactly as a dialog does. Compose a
+  `Drawer.Trigger` and a `Drawer.Content`, with `Drawer.Header`/`Drawer.Description`/
+  `Drawer.Footer`/`Drawer.Close`. `side` is physical — `"right"` is the right edge of the screen
+  in every writing direction — and it is also the edge the surface slides out of;
+- **toasts** — `ToastProvider` wraps the application, `ToastViewport` renders the stack, and
+  `useToast()` raises one from inside the tree. The queue, the auto-dismiss timer, the limit, the
+  live region, swipe dismissal and the stack's own state all stay with the primitive, and
+  `createToastManager()` builds a manager that lives outside React for code that has no component
+  to raise one from;
 - **the toggle family** — a `Chip` is a tag until it is given a selection, and a toggle chip inside a
   `ChipGroup` is a button that holds the group's value; a `ToggleGroup` and its `ToggleGroup.Item`
   segments are the same object inside a recessed track, and `SegmentedControl` is that group's

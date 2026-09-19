@@ -20,18 +20,21 @@ import { fileURLToPath } from "node:url";
 import postcss from "postcss";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { overlay } from "../src/components/ui.common.ts";
+import { disclosure, overlay } from "../src/components/ui.common.ts";
 import {
   motionActivityIndeterminate,
   motionActivityPulse,
   motionActivitySpin,
   motionArrive,
   motionDirect,
+  motionDisclose,
   motionFeedback,
   motionOrient,
   motionPresenceAnchored,
   motionPresenceModal,
   motionPresenceScrim,
+  motionPresenceSheet,
+  motionPresenceToast,
   motionPresenceTooltip,
   motionRelocate,
   motionStateLayer,
@@ -42,6 +45,7 @@ const library = await import("../dist/esm/index.js");
 const content = await import("../dist/esm/content.js");
 
 const {
+  Accordion,
   Alert,
   AlertDialog,
   Avatar,
@@ -51,8 +55,10 @@ const {
   Checkbox,
   Chip,
   ChipGroup,
+  Collapsible,
   Combobox,
   Divider,
+  Drawer,
   Field,
   IconButton,
   Input,
@@ -73,6 +79,8 @@ const {
   ToggleGroup,
   Table,
   Textarea,
+  ToastProvider,
+  ToastViewport,
   Tooltip,
 } = library;
 
@@ -121,6 +129,36 @@ const specimens = {
   "code-block.inline": h(CodeBlock, { inline: true }, "Button"),
   "divider.horizontal": h(Divider, {}),
   "divider.vertical": h(Divider, { orientation: "vertical" }),
+  "divider.row": h(Divider, { weight: "row" }),
+  "divider.header": h(Divider, { weight: "header" }),
+  "accordion.group": h(
+    Accordion,
+    { defaultValue: ["one"], onValueChange: noop },
+    h(
+      Accordion.Item,
+      { value: "one" },
+      h(Accordion.Trigger, null, "First section"),
+      h(Accordion.Panel, null, "First panel content")
+    ),
+    h(
+      Accordion.Item,
+      { value: "two", disabled: true },
+      h(Accordion.Trigger, null, "Second section"),
+      h(Accordion.Panel, null, "Second panel content")
+    )
+  ),
+  "collapsible.open": h(
+    Collapsible,
+    { defaultOpen: true, onOpenChange: noop },
+    h(Collapsible.Trigger, null, "Details"),
+    h(Collapsible.Panel, null, "Details content")
+  ),
+  "collapsible.closed": h(
+    Collapsible,
+    null,
+    h(Collapsible.Trigger, null, "Details"),
+    h(Collapsible.Panel, null, "Details content")
+  ),
   "select.trigger": h(Select, { options: [{ label: "Design system", value: "design" }], value: "design", onValueChange: noop }),
   "select.disabled": h(Select, { options: [{ label: "Design system", value: "design" }], disabled: true }),
   "icon-button.tonal": h(IconButton, { icon: h("span", null, "·"), "aria-label": "Notifications" }),
@@ -262,16 +300,23 @@ const overlayRecipes = {
   popup: overlay.popup,
   menu: overlay.menu,
   tooltip: overlay.tooltip,
+  toast: overlay.toast,
+  sheet: overlay.sheet,
   dialog: overlay.dialog,
+  disclosureTrigger: disclosure.trigger,
+  disclosurePanel: disclosure.panel,
   "motion.feedback": motionFeedback,
   "motion.tactile": motionTactile,
   "motion.arrive": motionArrive,
   "motion.orient": motionOrient,
   "motion.relocate": motionRelocate,
   "motion.direct": motionDirect,
+  "motion.disclose": motionDisclose,
   "motion.presence.anchored": motionPresenceAnchored,
   "motion.presence.tooltip": motionPresenceTooltip,
   "motion.presence.modal": motionPresenceModal,
+  "motion.presence.sheet": motionPresenceSheet,
+  "motion.presence.toast": motionPresenceToast,
   "motion.presence.scrim": motionPresenceScrim,
   "motion.activity.spin": motionActivitySpin,
   "motion.activity.pulse": motionActivityPulse,

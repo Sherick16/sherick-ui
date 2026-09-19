@@ -80,26 +80,39 @@ These are the subpaths the package publishes, and nothing else:
 
 The root `sherick-ui` export is:
 
-- `Button`, `IconButton`
-- `Alert`, `Avatar`, `Badge`, `Card`
-- `Divider`
-- `Input`, `Textarea`, `Search`
-- `Select`, `Switch`
-- `Dialog`
-- `Tabs`, `Table`
-- `NavGroup`, `NavItem`
-- `Skeleton`, `Spinner`
-- `Tooltip`
-- the matching prop types (`ButtonProps`, `ButtonAppearance`, `ButtonSize`, `AlertProps`,
-  `AvatarProps`, `BadgeProps`, `CardProps`, `DividerProps`, `InputProps`, `TextareaProps`,
-  `SearchProps`, `SelectProps`, `SelectOption`, `SwitchProps`, `DialogProps`,
+- **Disclosure**: `Accordion`, `Collapsible`;
+- **Actions and feedback**: `Button`, `IconButton`, `Alert`, `AlertDialog`, `Avatar`, `Badge`,
+  `Card`, `Chip`, `ChipGroup`, `Progress`, `SegmentedControl`, `Skeleton`, `Spinner`;
+- **Forms and value controls**: `Field`, `Input`, `Textarea`, `Search`, `NumberField`, `Select`,
+  `Combobox`, `Checkbox`, `RadioGroup`, `Slider`, `Switch`, `ToggleGroup`;
+- **Surfaces and overlays**: `Dialog`, `Drawer`, `Menu`, `Popover`, `Tooltip`, `Table`, `Tabs`,
+  `NavGroup`, `NavItem`, `Divider`;
+- **Toasts**: `ToastProvider`, `ToastViewport`, `useToast`, `createToastManager`, and the
+  `createToastManager()` factory for a manager that lives outside the React tree;
+- the matching prop types (`AccordionProps`, `AccordionItemProps`, `AccordionTriggerProps`,
+  `AccordionPanelProps`, `AccordionHeadingLevel`, `CollapsibleProps`, `CollapsibleTriggerProps`,
+  `CollapsiblePanelProps`, `ButtonProps`, `ButtonAppearance`, `ButtonSize`, `IconButtonProps`,
+  `IconButtonAppearance`, `AlertProps`, `AlertDialogProps`, `AvatarProps`, `BadgeProps`,
+  `CardProps`, `ChipProps`, `ChipGroupProps`, `ProgressProps`, `SegmentedControlProps`,
+  `SegmentedControlOption`, `SkeletonProps`, `SpinnerProps`, `FieldProps`, `InputProps`,
+  `TextareaProps`, `SearchProps`, `NumberFieldProps`, `SelectProps`, `SelectOption`,
+  `ComboboxProps`, `ComboboxOption`, `CheckboxProps`, `RadioGroupProps`, `RadioGroupOption`,
+  `SliderProps`, `SwitchProps`, `ToggleGroupProps`, `ToggleGroupItemProps`, `DialogProps`,
   `DialogHeaderProps`, `DialogDescriptionProps`, `DialogContentProps`, `DialogFooterProps`,
-  `TabsProps`, `Tab`, `TableProps`, `NavGroupProps`, `NavGroupItem`, `NavItemProps`,
-  `SkeletonProps`, `SpinnerProps`, `IconButtonProps`, `IconButtonAppearance`,
-  `TooltipProps`) and the shared `Variant` type.
+  `DrawerProps`, `DrawerTriggerProps`, `DrawerContentProps`, `DrawerHeaderProps`,
+  `DrawerDescriptionProps`, `DrawerFooterProps`, `DrawerSide`, `MenuProps`, `MenuTriggerProps`,
+  `MenuContentProps`, `MenuItemProps`, `MenuSeparatorProps`, `PopoverProps`, `PopoverContentProps`,
+  `TooltipProps`, `TableProps`, `TabsProps`, `Tab`, `NavGroupProps`, `NavGroupItem`,
+  `NavItemProps`, `DividerProps`, `DividerWeight`, `ToastProviderProps`, `ToastViewportProps`,
+  `ToastOptions`, `ToastType`, `ToastPosition`, `ToastManager`) and the shared `Variant`,
+  `OverlaySide` and `OverlayAlign` types.
 
-`Dialog` composes as `Dialog.Header`, `Dialog.Description`, `Dialog.Content` and
-`Dialog.Footer`. There are no compatibility aliases for any export, and compatibility aliases
+`Dialog`, `Drawer`, `Accordion`, `Collapsible` and `Menu` compose from parts:
+`Dialog.Header` / `Dialog.Description` / `Dialog.Content` / `Dialog.Footer`;
+`Drawer.Trigger` / `Drawer.Content` / `Drawer.Header` / `Drawer.Description` / `Drawer.Footer` /
+`Drawer.Close`; `Accordion.Item` / `Accordion.Trigger` / `Accordion.Panel`;
+`Collapsible.Trigger` / `Collapsible.Panel`; and `Menu.Trigger` / `Menu.Content` / `Menu.Item` /
+`Menu.Separator`. There are no compatibility aliases for any export, and compatibility aliases
 are not a supported pattern on the prerelease line.
 
 `sherick-ui/content` exports `Markdown`, `MarkdownProps`, `CodeBlock` and `CodeBlockProps`,
@@ -218,6 +231,12 @@ as `bun run test:bundle`.
   baseline change in either direction requires a deliberate, recorded reason** — raising it
   is a size regression, lowering it is a maintained contract, and neither is a routine
   refresh.
+
+### Recorded baseline changes
+
+| Change | Fixtures | Recorded reason |
+| --- | --- | --- |
+| Wave C: `Accordion`, `Collapsible`, `Drawer` and `Toast` added to the core barrel | `disclosure` and `toast` fixtures added; `overlay` extended with `Drawer`; `barrel` and `stylesCss` raised | The core component catalog is completed. `Drawer` is a positioned `Dialog`, so it adds no second modal system and no gesture machinery: `overlay` moved by less than 1%. `toast` is the wave's cost — Base's toast primitive owns the queue, the timer, the limit, the live region and the stack, and it is the only new dependency subtree. Nothing changed in `button`, `form` or `content`, and no core bundle reaches rich-content code. |
 
 ## Known accessibility limitation: default palette text contrast
 
