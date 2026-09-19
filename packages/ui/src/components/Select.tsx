@@ -6,7 +6,7 @@ import { Check, ChevronDown } from "lucide-react";
 import { cn } from "@/libs/utils";
 import {
   density,
-  focusRing,
+  focusRingHeld,
   list,
   material,
   overlay,
@@ -84,7 +84,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                 shape.control,
                 material.control,
                 motionFeedback,
-                focusRing,
+                focusRingHeld,
                 !disabled && state.field.hover,
                 !disabled && state.field.focus,
                 open && state.field.engaged,

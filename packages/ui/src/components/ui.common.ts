@@ -17,7 +17,7 @@ import { motionFeedback, motionStateLayer } from "./ui.motion";
      text       the three-step emphasis ladder     (high, medium, low)
      density    how tightly it is packed           (compact, normal, prominent, target)
      overlay    floating shells                    (menu, tooltip, dialog)
-    focusRing  the one focus language             (focusRing, focusRingInset, focusRingWithin, groupFocusRing)
+    focusRing  the one focus language             (focusRing, focusRingInset, focusRingHeld, focusRingWithin, groupFocusRing)
 
    Temporal behavior is deliberately not here: `ui.motion.ts` owns every transition,
    duration, curve and reduced-motion rule, and a recipe below names one of its recipes
@@ -49,18 +49,31 @@ import { motionFeedback, motionStateLayer } from "./ui.motion";
    one set of numbers. */
 
 /* Focus visibility — one language for every interactive element.
-   `focusRing` draws the ring outside the shape, for a control that stands alone.
+   `focusRing` draws the ring outside the shape, for a control that stands alone, and it follows
+   keyboard focus: a button does not announce itself when a pointer presses it.
    `focusRingInset` draws it inside, for a control nested within another surface
    where an outer ring would collide with the parent's edge. Fields use the outer
    ring only: no inner rim is added, so focus reads as one ring, never two.
-   `focusRingWithin` draws the outer ring from the composite that owns the focus,
-   for a composite control whose inner input stays borderless. `groupFocusRing`
-   draws it from the wrapping control instead of the track it contains. */
+   A control that **holds a value** wears the ring for as long as it holds it, and while its own
+   surface is open — `focusRingHeld` where the control is the focusable element, `focusRingWithin`
+   where the focus lives in a borderless input inside it. That is what a native `select` and a
+   native text field do, and it is what keeps a select trigger and an editable combobox field
+   identical in every state: neither looks ringed at rest, both look ringed the moment either is
+   used, and both lose it together. `groupFocusRing` draws it from the wrapping control instead
+   of the track it contains. */
 export const focusRing =
   "focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-sherick-focus focus-visible:outline-offset-[3px]";
 
 export const focusRingInset =
   "focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-focus";
+
+/* The ring of a value control that is itself the focusable element: it wears it whenever it
+   holds focus, however it was focused, and whenever the surface it opened is on screen. A select
+   hands the DOM focus to its list while that list is open, so the ring follows the control's
+   engagement rather than the focus — which is exactly what a native `select` shows, and the only
+   focus indication the field has left once the list has taken over. */
+export const focusRingHeld =
+  "focus:outline-none focus:outline focus:outline-2 focus:outline-sherick-focus focus:outline-offset-[3px] data-[popup-open]:outline data-[popup-open]:outline-2 data-[popup-open]:outline-sherick-focus data-[popup-open]:outline-offset-[3px]";
 
 export const focusRingWithin =
   "focus-within:outline focus-within:outline-2 focus-within:outline-sherick-focus focus-within:outline-offset-[3px]";

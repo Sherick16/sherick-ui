@@ -737,11 +737,23 @@ inline padding from a field's, or reach for `part` to make a standalone control 
 ## 14. Accessibility and focus
 
 - One visible focus language everywhere: a 2px ring in `--sui-focus`.
-- `focusRing` draws the ring **outside** the shape, for a control that stands alone.
+- `focusRing` draws the ring **outside** the shape, for a control that stands alone. It follows
+  **keyboard** focus: a button does not announce itself when a pointer presses it.
 - `focusRingInset` draws it **inside**, for a control nested in another surface where an
   outer ring would collide with the parent's edge.
-- `focusRingWithin` draws the outer ring from the composite that owns the focus, for a
-  composite control whose inner input stays borderless.
+- `focusRingHeld` is the ring of a control that **holds a value** and is itself the focusable
+  element — a select trigger. It is worn whenever the control holds focus *however it was focused*,
+  and while the surface it opened is on screen: a select hands the DOM focus to its list while that
+  list is open, so the ring follows the control's engagement rather than the focus. This is what a
+  native `select` shows, and it is the only focus indication the field has left once the list has
+  taken over.
+- `focusRingWithin` is the same ring for a value control whose focus lives in a borderless input
+  **inside** it — a combobox field, a search field, a number field.
+- The two together are one rule: **a value control looks ringed the moment it is used, and only
+  then.** A select trigger and an editable combobox field are the same control in two forms, so
+  neither looks ringed at rest, both look ringed as soon as either is used, and both lose it
+  together. A plain button keeps the quieter keyboard-only ring, because it does not hold a value
+  a user returns to.
 - `groupFocusRing` draws it from the wrapping control instead of the track it contains.
 - Fields use the outer ring only. No inner rim is added, so focus reads as one ring,
   never two.
@@ -750,7 +762,9 @@ inline padding from a field's, or reach for `part` to make a standalone control 
   form participation. Sherick UI owns the visible focus/state treatment layered onto
   that behavior. Do not duplicate Base's semantic machinery locally.
 - Focus is visible on keyboard focus (`:focus-visible`), and never removed without a
-  replacement indicator.
+  replacement indicator. A control that holds a value widens that to "while it is being used",
+  as described above, because that is what the platform does for a native `select` and a native
+  text field.
 - Every action is keyboard operable, and keyboard interaction receives an equivalent
   visible focus/state treatment — the same ring and the same tonality a pointer sees.
   `disabled` removes interactivity entirely rather than merely dimming it.

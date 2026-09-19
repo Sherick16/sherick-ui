@@ -99,7 +99,7 @@ const scaleOf = (locator: Locator) =>
   });
 
 /** Presses a part and reports how much its painted geometry moved while it was held. */
-const pressDelta = async (page: Page, press: Locator, measured: Locator) => {
+const pressDelta = async (page: Page, press: Locator, measured: Locator, alsoMeasured?: Locator) => {
   await measured.scrollIntoViewIfNeeded();
   await page.mouse.move(0, 0);
   await press.hover();
@@ -108,6 +108,7 @@ const pressDelta = async (page: Page, press: Locator, measured: Locator) => {
   await page.waitForTimeout(320);
   const pressed = await measured.boundingBox();
   const pressedScale = await scaleOf(measured);
+  const alsoScale = alsoMeasured ? await scaleOf(alsoMeasured) : null;
   await page.mouse.up();
   if (!atRest || !pressed) throw new Error("the part has no box");
   return {
@@ -115,6 +116,7 @@ const pressDelta = async (page: Page, press: Locator, measured: Locator) => {
     pressedWidth: Number(pressed.width.toFixed(1)),
     compressionPercent: Number((((atRest.width - pressed.width) / atRest.width) * 100).toFixed(2)),
     pressedScale,
+    alsoScale,
   };
 };
 
@@ -703,9 +705,9 @@ test("Select and Combobox are the same control in two forms", async ({ page, err
   await openLab(page);
   const disclosure = page.locator('[aria-label="Show options"]').first();
   const disclosureField = disclosure.locator("xpath=..");
-  const disclosurePress = await pressDelta(page, disclosure, disclosure);
+  const disclosurePress = await pressDelta(page, disclosure, disclosure, disclosureField);
   expect(disclosurePress.pressedScale, "the disclosure control does not deform itself").toBe(1);
-  expect(await scaleOf(disclosureField), "the field it sits in takes the press").toBe(0.96);
+  expect(disclosurePress.alsoScale, "the field it sits in takes the press").toBe(0.96);
 
   expect(errors).toEqual([]);
 });
@@ -835,6 +837,66 @@ test("a relocated indicator is mid-travel in the middle of its own motion", asyn
   expect(middle).toBeGreaterThan(before);
   expect(middle).toBeLessThan(after);
   expect(firstTiming((await motionOf(indicator)).timing)).toBe(firstTiming(await token(page, "--sui-ease-glide")));
+
+  expect(errors).toEqual([]);
+});
+
+test("a value control looks ringed while it is being used, and only then", async ({ page, errors }) => {
+  /* A select trigger and an editable combobox field are the same control in two forms, and the
+     ring is the one part of that pair the platform treats differently: a focused text field always
+     matches `:focus-visible`, while a button does not. The rule the library states instead is that
+     a control which *holds a value* wears the ring while it holds focus or while its surface is
+     open — so the two are ringed in exactly the same states. */
+  await openLab(page);
+
+  /* A ring is only real when it is painted: the recipes suppress the user agent's outline with a
+     transparent one, so a solid style on its own proves nothing. */
+  const ringOf = (locator: Locator) =>
+    locator.evaluate((element) => {
+      const style = getComputedStyle(element);
+      const painted = style.outlineStyle !== "none" && style.outlineColor !== "rgba(0, 0, 0, 0)" && parseFloat(style.outlineWidth) > 0;
+      return painted ? "ringed" : "none";
+    });
+
+  const selectTrigger = page.getByRole("combobox", { name: "Select", exact: true });
+  const comboboxField = page.locator('input[role="combobox"]').first().locator("xpath=..");
+
+  expect(await ringOf(selectTrigger), "at rest, neither is ringed").toBe("none");
+  expect(await ringOf(comboboxField), "at rest, neither is ringed").toBe("none");
+
+  /* used by pointer */
+  await selectTrigger.click();
+  await expect(selectTrigger).toHaveAttribute("data-popup-open", "");
+  expect(await ringOf(selectTrigger), "a select is ringed while its list is open").toBe("ringed");
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("option")).toHaveCount(0);
+  expect(await ringOf(selectTrigger), "and it stays ringed while it holds focus").toBe("ringed");
+
+  await page.locator("body").click({ position: { x: 4, y: 4 } });
+  expect(await ringOf(selectTrigger), "and loses it when focus moves away").toBe("none");
+
+  const input = page.locator('input[role="combobox"]').first();
+  await input.click();
+  expect(await ringOf(comboboxField), "a combobox field is ringed while its list is open").toBe("ringed");
+  await page.keyboard.press("Escape");
+  expect(await ringOf(comboboxField), "and it stays ringed while it holds focus").toBe("ringed");
+  await page.locator("body").click({ position: { x: 4, y: 4 } });
+  expect(await ringOf(comboboxField), "and loses it when focus moves away").toBe("none");
+
+  /* keyboard focus rings both, and a plain button keeps the quieter rule: it does not announce
+     itself to a pointer. */
+  await page.keyboard.press("Tab");
+  await input.focus();
+  expect(await ringOf(comboboxField)).toBe("ringed");
+
+  const button = page.getByRole("button", { name: "Filled", exact: true });
+  await button.click();
+  expect(await ringOf(button), "a button is not ringed by a pointer press").toBe("none");
+  await page.keyboard.press("Tab");
+  await button.focus();
+  await page.keyboard.press("Shift+Tab");
+  await page.keyboard.press("Tab");
+  expect(await ringOf(button), "and is ringed by keyboard focus").toBe("ringed");
 
   expect(errors).toEqual([]);
 });
