@@ -19,6 +19,7 @@ const themeCss = await readFile(new URL("../dist/theme.css", import.meta.url), "
 const packageJson = JSON.parse(await readFile(new URL("../package.json", import.meta.url), "utf8"));
 
 for (const exportName of [
+  "Accordion",
   "Alert",
   "AlertDialog",
   "Avatar",
@@ -28,9 +29,11 @@ for (const exportName of [
   "Checkbox",
   "Chip",
   "ChipGroup",
+  "Collapsible",
   "Combobox",
   "Dialog",
   "Divider",
+  "Drawer",
   "Field",
   "IconButton",
   "Input",
@@ -52,7 +55,11 @@ for (const exportName of [
   "Tabs",
   "ToggleGroup",
   "Textarea",
+  "ToastProvider",
+  "ToastViewport",
   "Tooltip",
+  "createToastManager",
+  "useToast",
 ]) {
   assert.ok(library[exportName], `missing public export: ${exportName}`);
 }
@@ -79,6 +86,9 @@ assert.ok(!esm.includes("@/"), "bundle must not contain unresolved source aliase
 assert.ok(declarations.includes("ButtonProps"), "declarations should expose Button props");
 assert.ok(declarations.includes("SelectProps"), "declarations should expose Select props");
 for (const propType of [
+  "AccordionProps",
+  "AccordionHeadingLevel",
+  "CollapsibleProps",
   "FieldProps",
   "CheckboxProps",
   "RadioGroupProps",
@@ -98,13 +108,26 @@ for (const propType of [
   "SegmentedControlProps",
   "SegmentedControlOption",
   "ProgressProps",
+  "DrawerProps",
+  "DrawerSide",
+  "ToastProviderProps",
+  "ToastViewportProps",
+  "ToastOptions",
+  "ToastType",
+  "ToastPosition",
+  "ToastManager",
+  "ToastActionOptions",
+  "ToastUpdateOptions",
+  "ToastPromiseOptions",
 ]) {
   assert.ok(declarations.includes(propType), `declarations should expose ${propType}`);
 }
 
 const buttonModule = await readFile(new URL("../dist/esm/components/Button.js", import.meta.url), "utf8");
 const cardModule = await readFile(new URL("../dist/esm/components/Card.js", import.meta.url), "utf8");
+const drawerModule = await readFile(new URL("../dist/esm/components/Drawer.js", import.meta.url), "utf8");
 assert.match(buttonModule, /^\s*["']use client["'];/, "interactive modules must preserve their client boundary");
+assert.match(drawerModule, /^\s*["']use client["'];/, "interactive modules must preserve their client boundary");
 assert.doesNotMatch(cardModule, /^\s*["']use client["'];/, "passive modules must remain server-usable");
 assert.doesNotMatch(esm, /^\s*["']use client["'];/, "the package barrel must not blanket the package as client-only");
 
@@ -374,6 +397,61 @@ for (const [componentName, props] of serverSurfaces) {
       `${componentName} must render on the server`
     );
   }
+}
+
+/* The composition-shaped surfaces take their parts as children rather than as props, so each one
+   is assembled once here: a disclosure group, a sheet and the toast stack. All three render
+   nothing portable on the server — a portal and a measured panel are client facts — so what
+   this proves is that composing them is safe to render there at all. */
+const serverCompositions = [
+  [
+    "Accordion",
+    React.createElement(
+      library.Accordion,
+      { defaultValue: ["a"] },
+      React.createElement(
+        library.Accordion.Item,
+        { value: "a" },
+        React.createElement(library.Accordion.Trigger, null, "Section"),
+        React.createElement(library.Accordion.Panel, null, "Content")
+      )
+    ),
+  ],
+  [
+    "Collapsible",
+    React.createElement(
+      library.Collapsible,
+      { defaultOpen: true },
+      React.createElement(library.Collapsible.Trigger, null, "Details"),
+      React.createElement(library.Collapsible.Panel, null, "Content")
+    ),
+  ],
+  [
+    "Drawer",
+    React.createElement(
+      library.Drawer,
+      { open: true, onOpenChange() {} },
+      React.createElement(
+        library.Drawer.Content,
+        null,
+        React.createElement(library.Drawer.Header, null, "Sheet")
+      )
+    ),
+  ],
+  [
+    "ToastProvider",
+    React.createElement(
+      library.ToastProvider,
+      null,
+      React.createElement(library.ToastViewport)
+    ),
+  ],
+];
+for (const [componentName, element] of serverCompositions) {
+  assert.doesNotThrow(
+    () => renderToStaticMarkup(element),
+    `${componentName} must render on the server`
+  );
 }
 
 const rawNeutralUtilities = [];

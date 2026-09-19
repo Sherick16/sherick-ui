@@ -85,6 +85,9 @@ assert.equal(typeof Select, "object");
 /* Wave B publishes four floating surfaces through the same barrel. Each is one component with
    attached parts, and each must survive the packed build rather than only the workspace. */
 for (const [name, parts] of [
+  ["Accordion", ["Item", "Trigger", "Panel"]],
+  ["Collapsible", ["Trigger", "Panel"]],
+  ["Drawer", ["Trigger", "Content", "Header", "Description", "Footer", "Close"]],
   ["Popover", ["Trigger", "Content"]],
   ["Menu", ["Trigger", "Content", "Item", "Separator"]],
   ["ToggleGroup", ["Item"]],
@@ -102,6 +105,9 @@ for (const [name, parts] of [
   }
 }
 assert.ok(root.Combobox, "ESM export missing Combobox");
+for (const name of ["ToastProvider", "ToastViewport", "useToast", "createToastManager"]) {
+  assert.equal(typeof root[name], "function", name + " must be a function");
+}
 
 /* An alert dialog's own semantics have to survive publication, and its surface has to render on
    the server for the state a consumer may server-render. */
@@ -241,6 +247,13 @@ assert.ok(ui.ChipGroup, "CommonJS export missing ChipGroup");
 assert.ok(ui.Progress, "CommonJS export missing Progress");
 assert.ok(ui.SegmentedControl, "CommonJS export missing SegmentedControl");
 assert.ok(ui.ToggleGroup, "CommonJS export missing ToggleGroup");
+assert.ok(ui.Accordion, "CommonJS export missing Accordion");
+assert.ok(ui.Collapsible, "CommonJS export missing Collapsible");
+assert.ok(ui.Drawer, "CommonJS export missing Drawer");
+assert.ok(ui.ToastProvider, "CommonJS export missing ToastProvider");
+assert.ok(ui.ToastViewport, "CommonJS export missing ToastViewport");
+assert.ok(ui.useToast, "CommonJS export missing useToast");
+assert.ok(ui.createToastManager, "CommonJS export missing createToastManager");
 assert.ok(ui.AlertDialog, "CommonJS export missing AlertDialog");
 assert.equal(ui.ActionButton, undefined, "removed aliases must not survive in CommonJS");
 assert.equal(ui.Markdown, undefined, "rich content must not be reachable from the CommonJS root");
@@ -271,12 +284,15 @@ assert.throws(
   const typeFixture = `
 import * as React from "react";
 import {
+  Accordion,
   AlertDialog,
   Button,
   Chip,
   ChipGroup,
+  Collapsible,
   Combobox,
   Dialog,
+  Drawer,
   Input,
   Menu,
   Popover,
@@ -287,15 +303,23 @@ import {
   Switch,
   Tabs,
   Textarea,
+  ToastProvider,
+  ToastViewport,
   ToggleGroup,
+  createToastManager,
+  type AccordionHeadingLevel,
+  type AccordionProps,
   type AlertDialogProps,
   type AlertProps,
   type ButtonProps,
   type ChipGroupProps,
   type ChipProps,
+  type CollapsibleProps,
   type ComboboxOption,
   type ComboboxProps,
   type DialogProps,
+  type DrawerProps,
+  type DrawerSide,
   type MenuItemProps,
   type MenuProps,
   type PopoverProps,
@@ -308,6 +332,15 @@ import {
   type SpinnerProps,
   type SwitchProps,
   type TabsProps,
+  type ToastActionOptions,
+  type ToastManager,
+  type ToastOptions,
+  type ToastPosition,
+  type ToastPromiseOptions,
+  type ToastProviderProps,
+  type ToastType,
+  type ToastUpdateOptions,
+  type ToastViewportProps,
   type ToggleGroupItemProps,
   type ToggleGroupProps,
 } from "sherick-ui";
@@ -416,6 +449,55 @@ const progressProps: ProgressProps = {
   variant: "primary",
 };
 const indeterminateProgressProps: ProgressProps = { value: null, label: "Working" };
+const accordionProps: AccordionProps = {
+  children: null,
+  multiple: true,
+  defaultValue: ["one"],
+  headingLevel: 3,
+  onValueChange(value) {
+    void value;
+  },
+};
+const accordionHeadingLevel: AccordionHeadingLevel = 2;
+const collapsibleProps: CollapsibleProps = {
+  children: null,
+  defaultOpen: true,
+  onOpenChange(open) {
+    void open;
+  },
+};
+const drawerProps: DrawerProps = {
+  children: null,
+  defaultOpen: true,
+  side: "right",
+  onOpenChange(open, details) {
+    void open;
+    void details;
+  },
+};
+const drawerSide: DrawerSide = "bottom";
+const toastProviderProps: ToastProviderProps = {
+  children: null,
+  limit: 3,
+  timeout: 5000,
+};
+const toastViewportProps: ToastViewportProps = { position: "bottom-end" };
+const toastType: ToastType = "success";
+const toastPosition: ToastPosition = "top-start";
+const toastManager: ToastManager = createToastManager();
+const toastOptions: ToastOptions = {
+  type: "success",
+  title: "Saved",
+  description: "Every change was stored.",
+  actionProps: { children: "Undo" },
+};
+const toastActionOptions: ToastActionOptions = { children: "Undo" };
+const toastUpdateOptions: ToastUpdateOptions = { title: "Saved again" };
+const toastPromiseOptions: ToastPromiseOptions<string> = {
+  loading: "Saving",
+  success: (result) => ({ description: result }),
+  error: { title: "Failed", type: "danger" },
+};
 void alertProps;
 void comboboxOption;
 void skeletonProps;
@@ -428,6 +510,20 @@ void toggleGroupItemProps;
 void segmentedControlProps;
 void progressProps;
 void indeterminateProgressProps;
+void accordionProps;
+void accordionHeadingLevel;
+void collapsibleProps;
+void drawerProps;
+void drawerSide;
+void toastProviderProps;
+void toastViewportProps;
+void toastType;
+void toastPosition;
+void toastManager;
+void toastOptions;
+void toastActionOptions;
+void toastUpdateOptions;
+void toastPromiseOptions;
 
 export const fixture = (
   <>
@@ -463,6 +559,33 @@ export const fixture = (
       <Dialog.Content>Body</Dialog.Content>
       <Dialog.Footer>Actions</Dialog.Footer>
     </Dialog>
+    <Accordion {...accordionProps}>
+      <Accordion.Item value="one">
+        <Accordion.Trigger>One</Accordion.Trigger>
+        <Accordion.Panel>Panel</Accordion.Panel>
+      </Accordion.Item>
+    </Accordion>
+    <Collapsible {...collapsibleProps}>
+      <Collapsible.Trigger>Details</Collapsible.Trigger>
+      <Collapsible.Panel>Body</Collapsible.Panel>
+    </Collapsible>
+    <Drawer {...drawerProps}>
+      <Drawer.Trigger render={<Button>Open</Button>} />
+      <Drawer.Content>
+        <Drawer.Header>Sheet</Drawer.Header>
+        <Drawer.Description>Copy</Drawer.Description>
+        <Drawer.Footer>
+          <Drawer.Close render={<Button>Close</Button>} />
+        </Drawer.Footer>
+      </Drawer.Content>
+    </Drawer>
+    <ToastProvider
+      limit={toastProviderProps.limit}
+      timeout={toastProviderProps.timeout}
+      manager={toastManager}
+    >
+      <ToastViewport {...toastViewportProps} />
+    </ToastProvider>
     <Markdown {...markdownProps} />
     <CodeBlock {...codeBlockProps} />
   </>

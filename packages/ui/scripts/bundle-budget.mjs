@@ -51,7 +51,9 @@ const expectedRichContent = [
 const fixtures = {
   button: `import { Button } from "sherick-ui";\nexport default Button;\n`,
   form: `import { Button, Checkbox, Combobox, Field, Input, NumberField, RadioGroup, Select, Slider, Switch } from "sherick-ui";\nexport default [Button, Checkbox, Combobox, Field, Input, NumberField, RadioGroup, Select, Slider, Switch];\n`,
-  overlay: `import { AlertDialog, Combobox, Dialog, Menu, Popover, Select, Tooltip } from "sherick-ui";\nexport default [AlertDialog, Combobox, Dialog, Menu, Popover, Select, Tooltip];\n`,
+  overlay: `import { AlertDialog, Combobox, Dialog, Drawer, Menu, Popover, Select, Tooltip } from "sherick-ui";\nexport default [AlertDialog, Combobox, Dialog, Drawer, Menu, Popover, Select, Tooltip];\n`,
+  disclosure: `import { Accordion, Collapsible } from "sherick-ui";\nexport default [Accordion, Collapsible];\n`,
+  toast: `import { ToastProvider, ToastViewport, createToastManager, useToast } from "sherick-ui";\nexport default [ToastProvider, ToastViewport, createToastManager, useToast];\n`,
   toggles: `import { Chip, ChipGroup, Progress, SegmentedControl, ToggleGroup } from "sherick-ui";\nexport default [Chip, ChipGroup, Progress, SegmentedControl, ToggleGroup];\n`,
   barrel: `export * from "sherick-ui";\n`,
   content: `import { Markdown, CodeBlock } from "sherick-ui/content";\nexport const a = [Markdown, CodeBlock];\nexport * from "sherick-ui/content";\n`,
@@ -126,7 +128,10 @@ if (update) {
     button:
       "Button alone through the root export. Guards against the root barrel pulling optional feature code.",
     form: "Representative form composition: Button, Checkbox, Combobox, Field, Input, NumberField, RadioGroup, Select, Slider, Switch.",
-    overlay: "Representative overlay composition: AlertDialog, Combobox, Dialog, Menu, Popover, Select, Tooltip.",
+    overlay:
+      "Representative overlay composition: AlertDialog, Combobox, Dialog, Drawer, Menu, Popover, Select, Tooltip.",
+    disclosure: "The disclosure family: Accordion and Collapsible, which share one row and one measured panel.",
+    toast: "The toast stack: its provider, its viewport and the two ways a toast is raised.",
     toggles: "Representative toggle composition: Chip, ChipGroup, Progress, SegmentedControl, ToggleGroup.",
     barrel: "The complete core root barrel with nothing tree-shaken beyond unused exports.",
     content: "The optional rich-content subpath: Markdown, CodeBlock and their full dependency stack.",

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { createRoot } from "react-dom/client";
 import {
+  Accordion,
   Alert,
   AlertDialog,
   Avatar,
@@ -9,9 +10,11 @@ import {
   Card,
   Chip,
   ChipGroup,
+  Collapsible,
   Combobox,
   Dialog,
   Divider,
+  Drawer,
   Field,
   IconButton,
   Input,
@@ -27,8 +30,11 @@ import {
   Table,
   Tabs,
   Textarea,
+  ToastProvider,
+  ToastViewport,
   ToggleGroup,
   Tooltip,
+  useToast,
 } from "sherick-ui";
 import { CodeBlock, Markdown } from "sherick-ui/content";
 import "./app.css";
@@ -42,6 +48,7 @@ const options = [
 function App() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [alertOpen, setAlertOpen] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
   const [enabled, setEnabled] = useState(true);
 
   return (
@@ -195,6 +202,51 @@ function App() {
         </Button>
       </section>
 
+      <section className="section">
+        <Accordion defaultValue={["one"]}>
+          <Accordion.Item value="one">
+            <Accordion.Trigger>Accordion section</Accordion.Trigger>
+            <Accordion.Panel>Measured by the primitive, moved by package CSS alone.</Accordion.Panel>
+          </Accordion.Item>
+          <Accordion.Item value="two">
+            <Accordion.Trigger>Second section</Accordion.Trigger>
+            <Accordion.Panel>Second panel content.</Accordion.Panel>
+          </Accordion.Item>
+        </Accordion>
+        <Collapsible defaultOpen>
+          <Collapsible.Trigger>Disclosure</Collapsible.Trigger>
+          <Collapsible.Panel>One region, its own state.</Collapsible.Panel>
+        </Collapsible>
+      </section>
+
+      <section className="section">
+        <Button appearance="filled" onClick={() => setSheetOpen(true)}>
+          Open sheet
+        </Button>
+        <ToastProvider>
+          <ToastTrigger />
+          <ToastViewport />
+        </ToastProvider>
+      </section>
+
+      <Drawer open={sheetOpen} onOpenChange={setSheetOpen} side="right">
+        <Drawer.Content>
+          <Drawer.Header>No-Tailwind sheet</Drawer.Header>
+          <Drawer.Description>
+            A sheet is a dialog with an edge, and it must be styled by package CSS alone.
+          </Drawer.Description>
+          <Drawer.Footer>
+            <Drawer.Close
+              render={
+                <Button appearance="filled" onClick={() => setSheetOpen(false)}>
+                  Close
+                </Button>
+              }
+            />
+          </Drawer.Footer>
+        </Drawer.Content>
+      </Drawer>
+
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <Dialog.Header>No-Tailwind dialog</Dialog.Header>
         <Dialog.Description>Portaled styles must remain scoped and complete.</Dialog.Description>
@@ -210,7 +262,6 @@ function App() {
           </Button>
         </Dialog.Footer>
       </Dialog>
-
       <AlertDialog
         open={alertOpen}
         onOpenChange={setAlertOpen}
@@ -219,6 +270,26 @@ function App() {
         confirmLabel="Delete"
       />
     </main>
+  );
+}
+
+/* The toast is raised through the hook, so it has to sit beneath the provider the page renders. */
+function ToastTrigger() {
+  const toast = useToast();
+
+  return (
+    <Button
+      appearance="tonal"
+      onClick={() =>
+        toast.add({
+          type: "success",
+          title: "No-Tailwind toast",
+          description: "Styled by package CSS alone.",
+        })
+      }
+    >
+      Raise toast
+    </Button>
   );
 }
 

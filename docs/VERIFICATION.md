@@ -157,6 +157,30 @@ The showcase browser suite also verifies:
 - a Combobox that is read-only (browsable, clear unavailable) and one disabled both by its own prop
   and by the `Field` around it (both trailing parts marked and unavailable), since those parts
   style themselves from the primitive's own markers;
+- a disclosure group (`disclosure.spec.ts`): the row is a button inside a heading, the region is
+  reached through the role and the name it publishes, single-open closes the section before it, a
+  disabled section stays closed, and the group's own `Divider` is inset to the band the row and the
+  panel share, wears the lightest edge role, yields beside a hovered section and holds under an
+  expanded one. An opening region is observed growing out of the collapsed state the primitive
+  opens from, and a closing one is sampled as the close begins — still at its opened size, which is
+  only true when the height is interpolated rather than applied. Reduced motion is asserted on the
+  property itself (`transition-property: none`), not on its duration;
+- a sheet (`sheet.spec.ts`): flush to the edge it was given, above the page, square against that
+  edge and rounded away from it, arriving with a transform and an opacity; it locks the page's own
+  scroll, traps focus through a full cycle in both directions and returns it to the trigger, and
+  closes on Escape, on a press outside and from its own dismissal control;
+- the toast stack (`toast.spec.ts`): one polite live region, each toast a dialog named by its own
+  title, dismissal through the stack's control and through `close()`, an action that reports its
+  outcome and leaves the toast to the caller, the limit marking the oldest toast `limited` and
+  inert, a timeout dismissing itself, and a collapsed stack that lays every toast out at the
+  frontmost one's height until the stack is engaged. The corner the stack is anchored to is
+  re-read under RTL, where `end` resolves to the other physical edge — the API names its ends, so a
+  physical inset would leave the stack against the wrong edge; the root is measured while the clamp
+  is released, to prove the height is interpolated rather than applied and that the content's own
+  height is unchanged throughout, because the content is what the primitive measures and must never
+  be sized to the value it produces; and each promise state (`loading`, `success`, `error`) is
+  asserted on the mark it renders, since those states are set by the primitive rather than chosen
+  by a caller;
 - an anchored surface placed on each side of its trigger, asserting the resolved origin and the
   direction of its travel rather than only that it appeared;
 - the motion invariants (`motion.spec.ts`, below);

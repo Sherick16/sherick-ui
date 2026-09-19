@@ -15,6 +15,7 @@ export const showcaseSections = [
   { id: "fields", title: "Fields", nav: "Fields" },
   { id: "selection", title: "Selection & navigation", nav: "Selection" },
   { id: "feedback", title: "Feedback", nav: "Feedback" },
+  { id: "disclosure", title: "Disclosure", nav: "Disclosure" },
   { id: "surfaces", title: "Surfaces & overlays", nav: "Surfaces" },
   { id: "data", title: "Data display", nav: "Data" },
   { id: "floating", title: "Floating surfaces", nav: "Floating" },

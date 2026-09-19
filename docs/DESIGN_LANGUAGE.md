@@ -217,7 +217,9 @@ and do not re-tune a sheet's blur to make it "pop".
 
 ## 7. Floating shells — the overlay recipes
 
-Primitives: `overlay.scrim`, `overlay.popup`, `overlay.menu`, `overlay.tooltip`, `overlay.dialog`.
+Primitives: `overlay.scrim`, `overlay.popup`, `overlay.menu`, `overlay.tooltip`, `overlay.toast`,
+ `overlay.sheet`, `overlay.dialog`.
+ `overlay.dialog`.
 
 An overlay is a **composition**, not a new material. A shell recipe bundles the floating
 surface's standard **material + elevation + shape**, so every floating surface in the library
@@ -230,9 +232,21 @@ depth or a corner.
 | --- | --- | --- |
 | `overlay.scrim` | the plane behind a surface that owns the viewport | a scrim fill plus a backdrop blur — no material, elevation or shape of its own |
 | `overlay.popup` | an anchored surface with room to breathe: a selection list (`Select`, `Combobox`) or structured content (`Popover`) | `shape.surface` + `material.acrylic` + `elevation.floating` |
-| `overlay.menu` | a compact list of commands (`Menu`) | `shape.control` + `material.acrylic` + `elevation.floating` |
-| `overlay.tooltip` | a small anchored hint | `shape.prominent` + `material.acrylicDense` + `elevation.floating` |
-| `overlay.dialog` | the dialog that owns the viewport | `shape.expressive` + `material.acrylicHero` + `elevation.floating` |
+| `overlay.sheet` | a surface that owns the viewport and is attached to one edge of it (`Drawer`) | `shape.sheet` + `material.acrylicHero` + `elevation.floating` |
+| `overlay.dialog` | a surface that owns the viewport with no edge to attach to (`Dialog`, `AlertDialog`) | `shape.expressive` + `material.acrylicHero` + `elevation.floating` |
+
+A **sheet** is a `Dialog` with an edge, and the two differ only in the corner role they take.
+`overlay.sheet` keeps `material.acrylicHero` — a sheet still has to read as the page's own plane —
+and takes `shape.sheet`, which steps *below* `prominent` rather than above it. `shape.expressive`
+is calibrated for a surface that floats free of every edge, and even `prominent` is the corner of a
+compact floating control; a surface meeting a viewport edge is read as an extension of the page, so
+a corner sized for a self-contained card makes it read as an oversized one. Which corners are
+squared is the attachment's anatomy rather than the recipe's: the edge the sheet is attached to
+stays square and the exposed corners keep `shape.sheet`.
+
+A `Drawer` is therefore not a second modal system. It composes `overlay.sheet`, `overlay.scrim` and
+the same `DialogSurface` a centered dialog does, so focus trapping, dismissal, scroll locking, the
+portal and the scrim have exactly one implementation across `Dialog`, `AlertDialog` and `Drawer`.
 
 The recipes own only the **visual shell**. Base UI owns popup presence, portals, focus
 management, pointer/focus suppression while closing, outside interaction, Escape dismissal
@@ -294,12 +308,24 @@ each other.
 
 ## 8. Edge — structural lines
 
-Primitives: `row` (the faintest), `header` (the heaviest), `rule` (between the two).
+Primitives: `edge.row` (the faintest), `edge.header` (the heaviest), `edge.rule` (between the two).
+The tone alone is `edgeTone`; the two row roles also carry the direction their row draws.
 
-The hairline is reserved for **where two parts of one surface actually meet**: stacked
-table rows, the rule beneath a column header, a divider, a code section boundary. One
-tone serves every line, so those all agree with each other, and the public `Divider`
-component renders exactly this tone so consumers never reach for a hand-built border.
+The hairline is reserved for **where two parts of one surface actually meet**: stacked table rows,
+the rule beneath a column header, a divider, a code section boundary. One tone serves every line, so
+those all agree with each other, and the public `Divider` component renders exactly this tone so
+consumers never reach for a hand-built border. `Divider`'s `weight` selects which of the three roles
+it draws — the line between the rows of a stacked list, the general break inside a surface, or the
+rule beneath a column header — so a caller names the join it is drawing instead of picking an
+opacity.
+
+A line is only ever as wide as the join it marks. A divider inside a padded stack is **inset to the
+band the two parts share** rather than spanning the whole surface, and it keeps air on both sides,
+so it reads as the boundary between two parts instead of a rule across a table. A line that belongs
+to a group also **yields to the part beside it**: while a row whose content is not expanded is
+hovered, the hairline next to it fades, so the boundary is visible while the group is scanned
+without competing with the state the pointer is already showing. `Accordion` is the worked example
+— an inset `Divider` at `edge.row`, fading beside a hovered section and held under an expanded one.
 
 A quote is **not** one of these. `Markdown` marks a blockquote with a primary accent,
 because a quote is content-level emphasis rather than a structural join between two
@@ -330,7 +356,8 @@ size of the object and the emphasis it carries.
 | `row` | 0.875rem | a row at command density — a row in a list that is scanned rather than read | anything the size of a field or larger, which wants `control` and up; a compact square, which wants `mark` |
 | `prominent` | 1.5rem | prominent controls, compact floating surfaces | small inline controls |
 | `surface` | 1.75rem | large surfaces — cards, menus, panels | buttons |
-| `expressive` | 2rem | an expressive surface that owns the viewport — the large overlay sheet, tightened so it reads as a focused surface rather than a pillowy one | anything smaller than a dialog |
+| `sheet` | 1.25rem | a surface attached to one edge of the viewport — the exposed corners of a `Drawer` sheet | a free-floating surface, which is what `prominent`, `surface` and `expressive` are for |
+| `expressive` | 2rem | an expressive surface that owns the viewport — a `Dialog`, tightened so it reads as a focused surface rather than a pillowy one | anything smaller than a dialog, and anything attached to an edge, which wants `sheet` |
 | `pill` | full | fully rounded controls whose width follows their content, and the fully rounded form of a compact part at either ratio — a value control's capsule handle | a wide button with a fixed width |
 | `circle` | full | fully rounded square targets | non-square targets |
 
@@ -371,7 +398,7 @@ The color roles a surface can take, in rising strength:
 | `text` | foreground only | quiet rows and links | fills |
 | `soft` | a de-emphasized tinted surface | alerts, badges, quiet cards | primary actions |
 | `tonal` | a matte control fill at rest | tonal buttons, icon buttons, chips | surfaces that are not controls |
-| `selected` | the fill a selected control holds | menu options, navigation, the selected segment of a segmented control | hover — hover is a state layer, not this tone |
+| `selected` | the fill a selected control holds | menu options, the selected segment of a segmented control | hover — hover is a state layer, not this tone; a navigation destination, which is a place rather than something the user chose |
 | `strong` | the opaque accent fill that marks priority | the one primary action in a view | multiple actions competing for priority |
 | `strongChecked` | the same fills, keyed on the control's own selection marker | a control that holds its selection in the primitive — a `Switch` | a control whose selection the application owns as a prop |
 
@@ -567,6 +594,44 @@ Everything else is shared, and that sharing is the point:
 A row is **flat**: depth never announces hover, highlight or selection, because the row sits in
 a list rather than on the page.
 
+**A navigation row is not a collection row.** A destination list is scanned the way a list is, so
+it takes the same row: flat, the same `quiet` hover layer, the same `shape.row` corner proportional
+to its own height, and the densest density step the ladder has. What differs is what being *current*
+means. A collection row's selection step marks a value the user chose, and it is the strongest tone
+a row can hold; a chapter heading is not a choice, so a navigation row takes `tone.tonal` — the
+lightest accent tint there is — which keeps a column of eight destinations calm with one of them
+lit. Everything else still says which one it is: its label returns to `text.high` with a touch of
+weight, it stays flat, and the row publishes `aria-current`, which is what assistive technology
+reads. A `NavGroup` is structure inside the surface it sits on and brings no surface of its own,
+and its title takes the emphasis step a value takes — a section label rather than an eyebrow.
+
+### Disclosure groups
+
+An expandable region is also a small system, because the same object appears at two scopes — an
+`Accordion` and a `Collapsible` — and it has to behave identically at both:
+
+| Entry | Carries |
+| --- | --- |
+| `disclosure.trigger` | the row that opens the region: the same object `list.option` is, because a disclosure header is scanned and activated the same way a selectable row is |
+| `disclosure.panel` | the measured region: it is clipped to the height its primitive reports, and the height is the only thing `motionDisclose` moves |
+
+The two are one definition, not two designs that drift: an accordion item's row and a standalone
+disclosure's row are the same object, and only the state contract behind them differs — a group
+holds a value array, one disclosure holds a boolean. Both are the primitive's state; neither is
+mirrored by the component.
+
+A disclosure group's **own** structure is the group's, never a section's: the hairline between two
+sections is a `Divider` at `edge.row`, and a section never draws its own edge. A group's line
+follows the same economy §8 gives every structural line — inset to the band the row and the panel
+share, air on both sides, and a yield while a neighbouring section is hovered without competing
+with the state the pointer is already showing.
+
+**Do:** let the primitive measure the region and let `motionDisclose` move it, so an accordion and
+a disclosure expand by the same physical event.
+**Do not** animate a panel's contents, stagger rows into view, or give a section its own border to
+announce that it is open: the chevron turns, the region's height changes, and that is the whole
+of it.
+
 ### Pressed, precisely
 
 A press is never a single recipe, because a control's anatomy decides what it can do.
@@ -601,11 +666,11 @@ library has nine intents, and one module owns the timing behind all of them
 | `feedback` | a non-spatial state response | `motionFeedback` | hover, focus, a field's tone, a row's highlight, a filled surface |
 | `tactile` | a temporary physical answer to activation | `motionTactile`, `motionInkPress` | a button, an icon button, a stepper, a navigation row, a field that opens a list |
 | `arrive` | a meaningful subordinate part appears or leaves | `motionArrive` | a checkbox tick, a radio dot, the selected mark in a `Select` or `Combobox` |
-| `orient` | a persistent affordance changes orientation in place | `motionOrient` | the disclosure chevron of a `Select` or `Combobox` |
+| `orient` | a persistent affordance changes orientation in place | `motionOrient` | the disclosure chevron of a `Select`, a `Combobox`, an `Accordion` row or a `Collapsible` |
 | `relocate` | a persistent object travels between stable destinations | `motionRelocate` | a tab indicator, a switch thumb |
 | `direct` | the pointer owns the geometry | `motionDirect` | a slider's handle and the fill it carries |
-| `disclose` | in-flow content expands and collapses | — reserved | nothing yet: it lands with the first disclosure primitive |
-| `presence` | an independent surface enters or leaves | `motionPresenceAnchored`, `motionPresenceTooltip`, `motionPresenceModal`, `motionPresenceScrim` | every popup, tooltip and dialog, and the plane behind a viewport-owning surface |
+| `disclose` | in-flow content expands and collapses | `motionDisclose` | the measured region of an `Accordion` item or a `Collapsible` |
+| `presence` | an independent surface enters or leaves | `motionPresenceAnchored`, `motionPresenceTooltip`, `motionPresenceModal`, `motionPresenceSheet`, `motionPresenceToast`, `motionPresenceScrim` | every popup, tooltip, dialog and sheet, the toast stack, and the plane behind a viewport-owning surface |
 | `activity` | continuous movement that reports work | `motionActivitySpin`, `motionActivityPulse`, `motionActivityIndeterminate` | a spinner, a skeleton, the fill of a bar whose extent is not known |
 
 **Dynamics live below the intents.** There are six, and a component never chooses one:
@@ -635,7 +700,9 @@ it settles*.
 | `motionTactile` | 4% compression | a control whose outline is what the user sees, including a field that opens a list, whose field carries the press |
 | `motionInkPress` | 12% compression **of the mark** | a control whose visible ink is much smaller than the target it is aimed at — a stepper, a dismiss control, a close control. The target keeps its geometry; the mark inside it takes the press |
 | `motionPresenceAnchored` / `…Tooltip` | from 94% scale, 4px toward the anchor | any anchored surface |
-| `motionPresenceModal` | from 96% scale, 12px rise | a surface that owns the viewport |
+| `motionPresenceModal` | from 96% scale, 12px rise | a surface that owns the viewport with no edge |
+| `motionPresenceSheet` | a full own extent, out of the edge the surface is attached to | a `Drawer`: the same viewport-owning surface, placed against one edge, so it slides rather than lifting |
+| `motionPresenceToast` | the stack's own geometry: a clamped height, a stepped-back offset, and a travel in the direction the stack grows from | the toast stack, where one node carries the arrival, the re-flow and the gesture together |
 | `motionArrive` | from 50% scale | a selection mark |
 | `motionActivityIndeterminate` | the track's own width, as a composited transform | the fill of a bar whose extent is not known |
 
@@ -703,6 +770,12 @@ A press works the same way: when a control inside a composite field is pressed, 
 manipulated object and the control inside it answers with tone — one field-level compression, not
 a control compressing inside a field that compresses too.
 
+One recipe may carry several of those events on one node when the primitive reports them on that
+node. A toast's transform is its arrival, its place in the stack and the drag the pointer owns,
+all three read from what Base publishes — but they are one spatial owner (`motionPresenceToast`),
+not three recipes composed, which is why an interrupted stack retargets from what is painted
+instead of restarting.
+
 There is no staggering, no per-row entrance, no label choreography and no generic layout
 animation: filtering a `Combobox` replaces the list immediately, tab panels switch
 immediately, and a surface whose content changes height changes height.
@@ -760,9 +833,9 @@ Reduced motion removes interpolation and travel, not state:
 | `orient` | the target orientation applies immediately |
 | `relocate` | the destination applies immediately |
 | `direct` | unchanged — the pointer already owns the geometry |
-| `presence` | opacity only, on the same timing, and an exit never lingers |
+| `presence` | opacity only, on the same timing, and an exit never lingers: a sheet is not carried out of its edge and the toast stack does not travel. |
 | `activity` | a static status glyph |
-| `disclose` | immediate layout state, when it exists |
+| `disclose` | the layout state applies immediately — the region is open at its own height, in one step |
 
 **Do not** write a literal duration, easing, `transition-*` list or animation in a component,
 and do not treat reduced motion as "no visual state at all".

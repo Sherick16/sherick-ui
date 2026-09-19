@@ -9,7 +9,7 @@
    - orient: a persistent part changes orientation in place;
    - relocate: a persistent part moves or resizes between stable states;
    - direct: geometry continuously follows the user;
-   - disclose: in-flow content expands/collapses (reserved until the first disclosure primitive);
+   - disclose: in-flow content expands and collapses;
    - presence: an independent surface enters/leaves;
    - activity: continuous motion that communicates ongoing work.
 
@@ -21,6 +21,13 @@
    `docs/DESIGN_LANGUAGE.md` owns the semantics. Target geometry, material, tone and
    elevation remain component/anatomy concerns: a component says where something ends
    up, and this module says how it gets there. */
+
+/* A recipe that is composed from other recipes is built through `cx`, whose call is marked pure.
+   That is load-bearing for the published bundles rather than a bundler detail: an unused recipe
+   whose value is a template literal with a substitution in it is not provably side-effect-free, so
+   it survives tree-shaking and every consumer that imports any part of this module pays for every
+   recipe in it — including the families it never uses. See `libs/utils.ts`. */
+import { cx } from "@/libs/utils";
 
 export type MotionIntent =
   | "feedback"
@@ -116,7 +123,7 @@ export const motionDirect =
    a surface below its trigger rises into place, one above it settles down into it, and one
    flipped by a collision animates the way it is actually placed. */
 
-const anchoredGeometry = [
+const anchoredGeometry = /* @__PURE__ */ cx(
   "[transform-origin:var(--transform-origin)]",
   "[--sui-overlay-from-shift-y:-4px]",
   "data-[side=top]:[--sui-overlay-from-shift-y:4px]",
@@ -134,30 +141,30 @@ const anchoredGeometry = [
   "[[dir=rtl]_&]:data-[side=inline-start]:[--sui-overlay-from-shift-x:-4px]",
   "data-[side=inline-end]:[--sui-overlay-from-shift-y:0px] data-[side=inline-end]:[--sui-overlay-from-shift-x:-4px]",
   "[[dir=rtl]_&]:data-[side=inline-end]:[--sui-overlay-from-shift-x:4px]",
-].join(" ");
+);
 
 /* Both ends of a presence animation start from the same state, and reduced motion drops the
    spatial half of it: presence still reads as arriving, but only through opacity. The
    transform is a literal class rather than an interpolated one, because the stylesheet
    compiler reads class names as text: a name that only exists once a template is evaluated
    compiles to no rule at all. */
-const anchoredFrom = [
+const anchoredFrom = /* @__PURE__ */ cx(
   "data-[starting-style]:opacity-0",
   "data-[starting-style]:[transform:translate(var(--sui-overlay-from-shift-x,0px),var(--sui-overlay-from-shift-y,0px))scale(var(--sui-overlay-from-scale,1))]",
   "data-[ending-style]:opacity-0",
   "data-[ending-style]:[transform:translate(var(--sui-overlay-from-shift-x,0px),var(--sui-overlay-from-shift-y,0px))scale(var(--sui-overlay-from-scale,1))]",
   "motion-reduce:data-[starting-style]:transform-none",
   "motion-reduce:data-[ending-style]:transform-none",
-].join(" ");
+);
 
-const modalFrom = [
+const modalFrom = /* @__PURE__ */ cx(
   "data-[starting-style]:opacity-0",
   "data-[starting-style]:[transform:translate(0,12px)scale(0.96)]",
   "data-[ending-style]:opacity-0",
   "data-[ending-style]:[transform:translate(0,12px)scale(0.96)]",
   "motion-reduce:data-[starting-style]:transform-none",
   "motion-reduce:data-[ending-style]:transform-none",
-].join(" ");
+);
 
 /** An anchored surface: `Select`, `Combobox`, `Menu` and `Popover`. It grows out of the edge
  *  it is attached to, enters on the overlay timing, and leaves on the shorter exit.
@@ -167,36 +174,36 @@ const modalFrom = [
  *  opacity and the scale both jump in the first frames, which means the surface is already half
  *  grown by the time it is visible at all — a pop, not a grow. The glide curve spends its whole
  *  duration visible, so the eye actually sees the surface open out of its anchor. */
-export const motionPresenceAnchored = [
+export const motionPresenceAnchored = /* @__PURE__ */ cx(
   "transition-[opacity,transform] duration-overlay ease-glide",
   "data-[ending-style]:duration-overlay-exit data-[ending-style]:ease-exit",
   "motion-reduce:transition-[opacity]",
   "[--sui-overlay-from-scale:0.94]",
   anchoredGeometry,
   anchoredFrom,
-].join(" ");
+);
 
 /** A tooltip: the same side-aware model and the same grow as an anchored popup, deliberately
  *  lighter — it settles on the local timing rather than the overlay timing, and it never
  *  bounces. */
-export const motionPresenceTooltip = [
+export const motionPresenceTooltip = /* @__PURE__ */ cx(
   "transition-[opacity,transform] duration-release ease-glide",
   "data-[ending-style]:duration-overlay-exit data-[ending-style]:ease-exit",
   "motion-reduce:transition-[opacity]",
   "[--sui-overlay-from-scale:0.94]",
   anchoredGeometry,
   anchoredFrom,
-].join(" ");
+);
 
 /** A modal surface: anchored to the viewport rather than to a trigger, so it has no side
  *  to grow from. A large surface never bounces; it fades, rises a little and settles, and its
  *  scale stays restrained because a plane this big grows visibly even from a few percent. */
-export const motionPresenceModal = [
+export const motionPresenceModal = /* @__PURE__ */ cx(
   "transition-[opacity,transform] duration-overlay ease-glide",
   "data-[ending-style]:duration-overlay-exit data-[ending-style]:ease-exit",
   "motion-reduce:transition-[opacity]",
   modalFrom,
-].join(" ");
+);
 
 /** The plane behind a surface that owns the viewport. Opacity only: a blur or a filter is
  *  never animated, so the plane can never animate the page behind it. */
@@ -223,5 +230,59 @@ export const motionActivityIndeterminate =
 export const motionStateLayer =
   "before:transition-opacity before:duration-release before:ease-release active:before:duration-press active:before:ease-press group-active:before:duration-press group-active:before:ease-press motion-reduce:before:transition-none";
 
-/* `disclose` is intentionally semantic-only for now. Its implementation lands with the first
-   Accordion/Collapsible primitive, when the actual Base lifecycle and geometry are known. */
+/* `disclose` is the in-flow counterpart of presence: nothing mounts or unmounts, and nothing
+   leaves the page — one region changes its own height where it sits. Base measures the panel and
+   publishes that height, so the geometry is the primitive's and only the interpolation is here.
+   The panel states the height it opens to; this recipe owns how it gets there, and reduced
+   motion applies the layout state in one step rather than travelling through it. */
+export const motionDisclose =
+  "transition-[height] duration-release ease-release data-[starting-style]:h-0 data-[ending-style]:h-0 motion-reduce:transition-none";
+
+/* A sheet is a surface that owns the viewport and is attached to one edge of it, so its presence is
+   a slide out of that edge rather than the modal lift, and it never bounces. The component names the
+   edge by setting exactly one of `--sui-sheet-from-x` / `--sui-sheet-from-y` to a full own-extent
+   offset, because which edge a sheet is attached to is anatomy; how far it travels and how long it
+   takes are not.
+
+   The other axis is `0px`, and that default is load-bearing: a fallback of `100%` on the axis the
+   component did not set would translate a side sheet on both axes at once, so a sheet attached to
+   the right edge would enter from the bottom-right corner and travel diagonally instead of
+   straight in. One edge means one axis. */
+export const motionPresenceSheet = /* @__PURE__ */ cx(
+  "transition-[transform,opacity] duration-overlay ease-glide",
+  "data-[ending-style]:duration-overlay-exit data-[ending-style]:ease-exit",
+  "motion-reduce:transition-[opacity]",
+  "data-[starting-style]:opacity-0",
+  "data-[ending-style]:opacity-0",
+  "data-[starting-style]:[transform:translate(var(--sui-sheet-from-x,0px),var(--sui-sheet-from-y,0px))]",
+  "data-[ending-style]:[transform:translate(var(--sui-sheet-from-x,0px),var(--sui-sheet-from-y,0px))]",
+  "motion-reduce:data-[starting-style]:transform-none",
+  "motion-reduce:data-[ending-style]:transform-none",
+);
+
+/* A toast is a stack, not a single surface: several independent surfaces share one corner,
+   re-flow when one of them leaves, and can each be flung away by the pointer. That is one
+   spatial owner on one node, and this is it.
+
+   The component owns where a toast rests — its stacked offset, its clamped height and the
+   expanded fan are geometry — and sets `--sui-toast-from-y` to the direction the stack grows in.
+   This recipe owns the entrance, the exit, the stack's re-flow, and the gesture: while
+   `data-swiping` is set the node follows the pointer with no interpolation at all, and a
+   dismissal carries the movement it was flung with so the toast keeps travelling the way it was
+   already going instead of turning around. */
+export const motionPresenceToast = /* @__PURE__ */ cx(
+  "transition-[transform,opacity,height] duration-overlay ease-glide",
+  "data-[ending-style]:duration-overlay-exit data-[ending-style]:ease-exit",
+  "data-[swiping]:transition-none",
+  "motion-reduce:transition-[opacity]",
+  "data-[starting-style]:opacity-0",
+  "data-[ending-style]:opacity-0",
+  "data-[starting-style]:[transform:translateY(var(--sui-toast-from-y,150%))]",
+  "[&[data-ending-style]:not([data-swipe-direction])]:[transform:translateY(var(--sui-toast-from-y,150%))]",
+  "data-[ending-style]:data-[swipe-direction=down]:[transform:translateY(calc(var(--toast-swipe-movement-y,0px)+150%))]",
+  "data-[ending-style]:data-[swipe-direction=up]:[transform:translateY(calc(var(--toast-swipe-movement-y,0px)-150%))]",
+  "data-[ending-style]:data-[swipe-direction=left]:[transform:translateX(calc(var(--toast-swipe-movement-x,0px)-150%))]",
+  "data-[ending-style]:data-[swipe-direction=right]:[transform:translateX(calc(var(--toast-swipe-movement-x,0px)+150%))]",
+  "motion-reduce:data-[starting-style]:transform-none",
+  "motion-reduce:data-[ending-style]:transform-none",
+);

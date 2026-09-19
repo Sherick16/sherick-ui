@@ -38,6 +38,58 @@ test("interactive surfaces tint on hover and stay inert while disabled", async (
   expect(errors).toEqual([]);
 });
 
+test("a current destination is a row carrying the quiet tint, not a pill or a card", async ({
+  page,
+  errors,
+}) => {
+  await page.goto("/verification/interactions");
+
+  const group = page.getByTestId("nav-group");
+  const current = group.getByRole("link", { name: "Current section" });
+  const resting = group.getByRole("link", { name: "Overview" });
+
+  /* Which destination is current is published rather than implied by colour alone. */
+  await expect(current).toHaveAttribute("aria-current", "page");
+  await expect(resting).not.toHaveAttribute("aria-current", "page");
+
+  const surface = await current.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return {
+      radius: Number.parseFloat(style.borderTopLeftRadius),
+      height: element.getBoundingClientRect().height,
+      shadow: style.boxShadow,
+    };
+  });
+  /* A row, not a control the size of a field: the corner stays proportional to the row's own
+     height instead of reaching its half-extent, so a compact row never becomes a capsule. */
+  expect(surface.radius).toBeLessThan(surface.height / 2);
+  /* And flat: depth never announces which page you are on. */
+  expect(surface.shadow).toBe("none");
+
+  /* The current destination holds the lightest accent tint there is, read from the token itself,
+     and a resting destination holds nothing. */
+  const tint = await page.evaluate(() => {
+    const probe = document.createElement("div");
+    probe.style.backgroundColor = "oklch(var(--sui-primary) / 0.12)";
+    document.body.appendChild(probe);
+    const value = getComputedStyle(probe).backgroundColor;
+    probe.remove();
+    return value;
+  });
+  const background = (locator: ReturnType<Page["getByRole"]>) =>
+    locator.evaluate((element) => getComputedStyle(element).backgroundColor);
+  expect(await background(current)).toBe(tint);
+  expect(await background(resting)).toBe("rgba(0, 0, 0, 0)");
+
+  /* Hover is the shared quiet layer on top of that, not a change of fill. */
+  await page.mouse.move(0, 0);
+  expect(await layerOpacity(resting)).toBe("0");
+  await resting.hover();
+  await expect.poll(() => layerOpacity(resting)).toBe("0.05");
+
+  expect(errors).toEqual([]);
+});
+
 test("a hovered row and a keyboard-navigated row carry the same tone", async ({ page, errors }) => {
   await page.goto("/verification/interactions");
   const item = (name: string) => page.getByRole("menuitem", { name });
