@@ -105,7 +105,11 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
                  stylesheet give the one part that carries the meaning a boundary. */
               data-sui-progress-indicator=""
               className={cn(
-                "block h-full",
+                /* Placed by its own insets rather than by a height: Base writes the indicator's
+                   height inline as `inherit`, which resolves against whatever box happens to
+                   hold it — and a fill with no height paints nothing, which no class-name or
+                   width assertion can see. */
+                "absolute inset-y-0 start-0",
                 shape.pill,
                 tone.strong[variant],
                 /* The measure itself is Base's: it writes the indicator's own width. */

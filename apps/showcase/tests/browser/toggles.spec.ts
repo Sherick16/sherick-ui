@@ -168,18 +168,24 @@ test("progress measures a known value and sweeps an unknown one", async ({ page,
   await expect(determinate).toHaveAttribute("aria-valuenow", "40");
   await expect(page.getByTestId("progress-determinate").getByText("40%")).toBeVisible();
 
-  const measure = async () => {
-    const trackBox = await track.boundingBox();
-    const fillBox = await fill.boundingBox();
+  /* A fill is a shape, not a width: Base writes the indicator's height inline, so a fill can keep
+     the right width while painting a band of nothing at all. Both axes are asserted. */
+  const measure = async (bar: Locator) => {
+    const trackBox = await bar.locator(".shadow-sherick-recessed").boundingBox();
+    const fillBox = await bar.locator("[data-sui-progress-indicator]").boundingBox();
     if (!trackBox || !fillBox) throw new Error("the progress bar did not lay out");
-    return fillBox.width / trackBox.width;
+    return { width: fillBox.width / trackBox.width, height: fillBox.height / trackBox.height };
   };
 
-  expect(await measure()).toBeCloseTo(0.4, 1);
+  const determinateFill = await measure(determinate);
+  expect(determinateFill.width).toBeCloseTo(0.4, 1);
+  expect(determinateFill.height).toBeCloseTo(1, 2);
 
   await page.getByRole("button", { name: "Advance progress" }).click();
   await expect(determinate).toHaveAttribute("aria-valuenow", "65");
-  expect(await measure()).toBeCloseTo(0.65, 1);
+  const advancedFill = await measure(determinate);
+  expect(advancedFill.width).toBeCloseTo(0.65, 1);
+  expect(advancedFill.height).toBeCloseTo(1, 2);
 
   /* An unknown extent reports work rather than a position: no value is announced, and the fill
      sweeps its own track instead of sitting at one. The box that travels is the fill's own
@@ -191,6 +197,9 @@ test("progress measures a known value and sweeps an unknown one", async ({ page,
   expect(await sweep.evaluate((element) => getComputedStyle(element).animationIterationCount)).toBe(
     "infinite"
   );
+  const sweepingFill = await measure(indeterminate);
+  expect(sweepingFill.width).toBeCloseTo(0.4, 1);
+  expect(sweepingFill.height).toBeCloseTo(1, 2);
 
   expect(errors).toEqual([]);
 });

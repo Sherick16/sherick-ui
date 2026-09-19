@@ -23,15 +23,15 @@
     },
     "toggles": {
       "definition": "Representative toggle composition: Chip, ChipGroup, Progress, SegmentedControl, ToggleGroup.",
-      "raw": 65021,
-      "gzip": 21878,
-      "brotli": 19449
+      "raw": 65035,
+      "gzip": 21871,
+      "brotli": 19467
     },
     "barrel": {
       "definition": "The complete core root barrel with nothing tree-shaken beyond unused exports.",
-      "raw": 419259,
+      "raw": 419273,
       "gzip": 139835,
-      "brotli": 115388
+      "brotli": 115269
     },
     "content": {
       "definition": "The optional rich-content subpath: Markdown, CodeBlock and their full dependency stack.",

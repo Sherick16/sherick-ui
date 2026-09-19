@@ -452,7 +452,10 @@ export default function Home() {
               </Specimen>
 
               <Specimen title="Segmented control">
-                <div className="space-y-5">
+                {/* Each control hugs its own content, and they are separate objects rather than one
+                    pair, so they stack: a plain block column would leave the two inline-flex
+                    tracks on one line with nothing between them. */}
+                <div className="flex flex-col items-start gap-5">
                   <SegmentedControl
                     aria-label="Range"
                     value={range}
