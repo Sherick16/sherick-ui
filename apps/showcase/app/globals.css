@@ -8,6 +8,8 @@
 
 html {
   background: oklch(var(--sui-canvas));
+  /* Anchor navigation moves smoothly; the reduced-motion reset below turns it back off. */
+  scroll-behavior: smooth;
 }
 
 body {
