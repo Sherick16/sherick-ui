@@ -7,6 +7,8 @@ import {
   Badge,
   Button,
   Card,
+  Chip,
+  ChipGroup,
   Combobox,
   Dialog,
   Divider,
@@ -15,7 +17,9 @@ import {
   Input,
   Menu,
   Popover,
+  Progress,
   Search,
+  SegmentedControl,
   Select,
   Skeleton,
   Spinner,
@@ -23,6 +27,7 @@ import {
   Table,
   Tabs,
   Textarea,
+  ToggleGroup,
   Tooltip,
 } from "sherick-ui";
 import { CodeBlock, Markdown } from "sherick-ui/content";
@@ -77,6 +82,34 @@ function App() {
         </div>
         <Alert variant="warning">Semantic alert</Alert>
         <Skeleton className="skeleton" />
+      </section>
+
+      <section className="section">
+        <h2>Selection and progress</h2>
+        <div className="row">
+          <ChipGroup aria-label="Filters" defaultValue={["design"]}>
+            <Chip value="design">Design</Chip>
+            <Chip value="code">Code</Chip>
+          </ChipGroup>
+          <Chip variant="success">Ready</Chip>
+          <Chip onRemove={() => undefined}>Platform</Chip>
+        </div>
+        <div className="row">
+          <ToggleGroup aria-label="View" defaultValue={["list"]}>
+            <ToggleGroup.Item value="list">List</ToggleGroup.Item>
+            <ToggleGroup.Item value="grid">Grid</ToggleGroup.Item>
+          </ToggleGroup>
+          <SegmentedControl
+            aria-label="Density"
+            defaultValue="comfortable"
+            options={[
+              { value: "compact", label: "Compact" },
+              { value: "comfortable", label: "Comfortable" },
+            ]}
+          />
+        </div>
+        <Progress value={40} label="Uploading" showValue locale="en-US" />
+        <Progress value={null} label="Indexing" />
       </section>
 
       <section className="section grid">

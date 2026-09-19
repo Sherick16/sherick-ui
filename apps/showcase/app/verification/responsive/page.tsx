@@ -4,6 +4,8 @@ import { useState } from "react";
 import {
   Button,
   Checkbox,
+  Chip,
+  ChipGroup,
   Combobox,
   Dialog,
   Field,
@@ -11,8 +13,10 @@ import {
   Menu,
   NumberField,
   Popover,
+  Progress,
   RadioGroup,
   Search,
+  SegmentedControl,
   Select,
   Slider,
   Table,
@@ -106,6 +110,26 @@ export default function VerificationResponsivePage() {
               ]}
             />
           </div>
+
+          <ChipGroup aria-label="Narrow filters" defaultValue={["design"]}>
+            <Chip value="design">Design</Chip>
+            <Chip value="code">Code</Chip>
+          </ChipGroup>
+
+          {/* A segmented control never wraps, so the wrapper scrolls it rather than the page. */}
+          <div className="overflow-x-auto">
+            <SegmentedControl
+              aria-label="Narrow range"
+              defaultValue="week"
+              options={[
+                { value: "day", label: "Day" },
+                { value: "week", label: "Week" },
+                { value: "month", label: "Month" },
+              ]}
+            />
+          </div>
+
+          <Progress value={40} label="Narrow progress" locale="en-US" />
 
           <Table
             headers={["Step", "Value"]}

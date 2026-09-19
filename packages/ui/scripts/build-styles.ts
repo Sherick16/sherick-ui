@@ -205,10 +205,6 @@ output.append(...componentRoot.nodes.map((node) => node.clone()));
 output.append(...katexRoot.nodes.map((node) => node.clone()));
 output.append(
   postcss.parse(`@media (forced-colors: active) {
-  :where(.${SUI_SCOPE_CLASS}):focus-visible {
-    outline: 2px solid Highlight;
-    outline-offset: 2px;
-  }
 
   /* A dialog and an alert dialog both separate from the page by their sheet and their shadow,
      and forced colors removes both. The alert dialog is a different role, not a different
@@ -218,11 +214,15 @@ output.append(
     border: 1px solid CanvasText;
   }
 
+  /* A control whose selection is carried by tone or depth alone needs a boundary once forced
+     colors flattens both: a checked switch, checkbox or radio, the selected tab, and a pressed
+     toggle button — a chip or a segment. */
   :where(.${SUI_SCOPE_CLASS})[role="switch"][aria-checked="true"],
   :where(.${SUI_SCOPE_CLASS})[role="tab"][aria-selected="true"],
   :where(.${SUI_SCOPE_CLASS})[role="checkbox"][aria-checked="true"],
   :where(.${SUI_SCOPE_CLASS})[role="checkbox"][aria-checked="mixed"],
-  :where(.${SUI_SCOPE_CLASS})[role="radio"][aria-checked="true"] {
+  :where(.${SUI_SCOPE_CLASS})[role="radio"][aria-checked="true"],
+  :where(.${SUI_SCOPE_CLASS})[aria-pressed="true"] {
     outline: 1px solid Highlight;
     outline-offset: -2px;
   }
@@ -232,6 +232,24 @@ output.append(
      collection attributes are not component identity. */
   :where(.${SUI_SCOPE_CLASS})[data-sui-slider-thumb] {
     border: 1px solid CanvasText;
+  }
+
+  /* A progress bar says how far along the work is through the fill of its track alone, and
+     forced colors flattens the fill into the track. The indicator carries a Sherick-owned marker
+     for the same reason the slider thumb does: a primitive's own attributes are not component
+     identity. */
+  :where(.${SUI_SCOPE_CLASS})[data-sui-progress-indicator] {
+    border: 1px solid CanvasText;
+  }
+
+  /* Last, because it has to win. It shares its specificity with the selected-state outlines
+     above — a :where() wrapper contributes nothing, and a pseudo-class and an attribute
+     selector are worth the same — so the later declaration is the one that applies. Focus is the
+     transient state and the one a keyboard user cannot afford to lose: a focused control shows
+     the focus ring, and the boundary that marks its selection returns when focus moves on. */
+  :where(.${SUI_SCOPE_CLASS}):focus-visible {
+    outline: 2px solid Highlight;
+    outline-offset: 2px;
   }
 }`).nodes
 );

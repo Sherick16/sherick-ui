@@ -91,8 +91,8 @@ It is the **single owner of size budgets** in this repository. The budgets live 
 `packages/ui/scripts/bundle-budget.json`; the gate is `packages/ui/scripts/bundle-budget.mjs`.
 Nothing else records a size number, and no other layer re-implements a size check.
 
-Five runtime fixtures are bundled with esbuild — `button`, `form`, `overlay`, `barrel` and
-`content` — resolved through Node package self-reference exactly as a consumer bundler would,
+Six runtime fixtures are bundled with esbuild — `button`, `form`, `overlay`, `toggles`,
+`barrel` and `content` — resolved through Node package self-reference exactly as a consumer bundler would,
 plus the published `dist/styles.css` and `dist/theme.css`. The gate fails when any
 rich-content module (prismjs, prism-react-renderer, react-markdown, remark-*, rehype-*,
 katex, or the micromark/mdast/hast/unified family) appears in the module graph of a

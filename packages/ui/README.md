@@ -98,7 +98,7 @@ export function Example() {
 
 The package publishes these subpaths:
 
-- `sherick-ui` — the core component barrel: `Alert`, `AlertDialog`, `Avatar`, `Badge`, `Button`, `Card`, `Checkbox`, `Combobox`, `Dialog`, `Divider`, `Field`, `IconButton`, `Input`, `Menu`, `NavGroup`, `NavItem`, `NumberField`, `Popover`, `RadioGroup`, `Search`, `Select`, `Skeleton`, `Slider`, `Spinner`, `Switch`, `Table`, `Tabs`, `Textarea`, `Tooltip`, plus their prop types and the shared `Variant` type.
+- `sherick-ui` — the core component barrel: `Alert`, `AlertDialog`, `Avatar`, `Badge`, `Button`, `Card`, `Checkbox`, `Chip`, `ChipGroup`, `Combobox`, `Dialog`, `Divider`, `Field`, `IconButton`, `Input`, `Menu`, `NavGroup`, `NavItem`, `NumberField`, `Popover`, `Progress`, `RadioGroup`, `Search`, `SegmentedControl`, `Select`, `Skeleton`, `Slider`, `Spinner`, `Switch`, `Table`, `Tabs`, `Textarea`, `ToggleGroup`, `Tooltip`, plus their prop types and the shared `Variant` type.
 - `sherick-ui/content` — the rich-content boundary, **ESM only**: `Markdown`, `CodeBlock` and their prop types.
 - `sherick-ui/styles.css` — the complete component stylesheet.
 - `sherick-ui/theme.css` — token-only theme output.
@@ -120,6 +120,20 @@ cannot change its value.
 These components compose Base UI primitives, and Base UI stays internal: the parts above accept the
 capabilities this package documents rather than the primitive's complete prop set, so a Base
 upgrade is not a Sherick breaking change.
+
+Three further families are worth naming, because each is one behavioral foundation under more than
+one name:
+
+- **the toggle family** — a `Chip` is a tag until it is given a selection, and a toggle chip inside a
+  `ChipGroup` is a button that holds the group's value; a `ToggleGroup` and its `ToggleGroup.Item`
+  segments are the same object inside a recessed track, and `SegmentedControl` is that group's
+  single-choice form over an `options` array. Selection lives in Base UI's own pressed marker, so an
+  uncontrolled toggle is styled from the same source of truth as a controlled one, and a
+  `SegmentedControl` never empties itself;
+- **`Progress`** — a determinate bar announces its value through Base UI's meter role, and omitting
+  `value`, or passing `null`, sweeps the fill instead of reporting a position;
+- **removable tags** — only a chip that holds no selection can be dismissed, because a control that
+  both holds a value and deletes itself is one target with two meanings.
 
 ## Rich content
 

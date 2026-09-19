@@ -208,6 +208,15 @@ export const motionPresenceScrim =
 export const motionActivitySpin = "animate-spin motion-reduce:animate-none";
 export const motionActivityPulse = "animate-pulse motion-reduce:animate-none";
 
+/** The indeterminate half of a progress bar. A task with no known value cannot report a
+ *  position, so it reports *work* instead: the fill sweeps across its own track on the one loop
+ *  that is paced, because a loop that reports rather than answers cannot arrive. The keyframe
+ *  travels a logical edge, so a right-to-left page sweeps the other way without a second recipe.
+ *  Under reduced motion the loop stops and the fill rests where it starts: a static status
+ *  glyph, exactly as the spin and the pulse rest. */
+export const motionActivityIndeterminate =
+  "animate-sherick-indeterminate motion-reduce:animate-none";
+
 /** The state layer is a composited overlay, so its own opacity is the only thing that
  *  moves. Shared here because four interaction states across the library ride it. */
 export const motionStateLayer =

@@ -59,6 +59,19 @@ module.exports = {
         glide: "var(--sui-ease-glide)",
         spring: "var(--sui-ease-spring)",
       },
+      /* The one paced loop in the system: a progress bar with no known value sweeps its fill
+         across its own track. It travels a logical edge rather than a transform, so the sweep
+         follows the writing direction; `linear` is the timing a loop that never accelerates or
+         settles takes, and the pace is the authored `--sui-duration-activity` token. */
+      keyframes: {
+        "sherick-indeterminate": {
+          "0%": { insetInlineStart: "-40%" },
+          "100%": { insetInlineStart: "100%" },
+        },
+      },
+      animation: {
+        "sherick-indeterminate": "sherick-indeterminate var(--sui-duration-activity) linear infinite",
+      },
     },
   },
 };
