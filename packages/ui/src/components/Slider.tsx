@@ -7,13 +7,13 @@ import {
   elevation,
   focusRingWithin,
   material,
-  motion,
   selectable,
   shape,
   state,
   text,
   tone,
 } from "./ui.common";
+import { motionDirect } from "./ui.motion";
 
 export interface SliderProps
   extends Omit<ComponentProps<"div">, "defaultValue" | "onChange" | "children"> {
@@ -99,7 +99,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
                 "box-border border-e-[length:var(--sui-slider-reserve)] border-e-transparent bg-clip-padding",
                 shape.pill,
                 tone.strong.primary,
-                motion.travel
+                motionDirect
               )}
             />
             {/* A compact capsule rather than a dot: taller than the groove, and narrow enough that
@@ -111,7 +111,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
               className={cn(
                 "h-5 w-3",
                 shape.pill,
-                motion.travel,
+                motionDirect,
                 elevation.control,
                 material.handle,
                 state.engaged,

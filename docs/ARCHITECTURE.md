@@ -30,7 +30,7 @@ The library TypeScript configs contain no Next plugin or generated `.next` types
 - `packages/ui/src/styles/tokens.ts` owns authored runtime token values;
 - `packages/ui/scripts/build-styles.ts` turns those sources and component utility usage into finished published CSS.
 
-The split between `ui.common.ts` and `ui.motion.ts` is ownership, not a second styling layer. Components still compose one design language through `cn()`: common recipes say what a state/surface looks like, motion recipes say how a change moves. During the motion migration the old `motion` object in `ui.common.ts` remains an explicit finite bridge for existing components; `packages/ui/scripts/verify-motion-policy.mjs` prevents new components from consuming that bridge or authoring their own timing/easing/transition utilities. The bridge and its allowlist are deleted once migration completes.
+The split between `ui.common.ts` and `ui.motion.ts` is ownership, not a second styling layer. Components still compose one design language through `cn()`: common recipes say what a state or a surface looks like, motion recipes say how a change moves. `ui.motion.ts` is the **only** temporal owner in the package — transition properties, durations, curves, animation and reduced-motion behaviour are written there and nowhere else. `packages/ui/scripts/verify-motion-policy.mjs` enforces that boundary with no allowlist: a component module may not author a `duration-*` / `ease-*` / `transition-*` / `animate-*` utility, an animation declaration, or a component-local presence lifecycle, and the removed legacy `motion` bridge may not come back.
 
 Tailwind CSS is private authoring/build infrastructure. It is a development dependency of Sherick UI, not a peer dependency or consumer contract. The package exports no Tailwind preset and consumers do not scan package source or `dist`.
 
@@ -55,15 +55,16 @@ Cascade ownership is deliberate:
 
 ## Motion architecture
 
-Motion is selected by **intent**, not by component. The canonical intents are `feedback`, `tactile`, `arrive`, `orient`, `relocate`, `direct`, `disclose`, `presence` and `activity`. Components may own target geometry, but not temporal values or transition declarations.
+Motion is selected by **intent**, not by component. The canonical intents are `feedback`, `tactile`, `arrive`, `orient`, `relocate`, `direct`, `disclose`, `presence` and `activity`, and the dynamics below them (`swift`, `settle`, `spring`, `exit`, `continuous`) are the motion module's business alone. Components own target geometry — where a part ends up — but never a duration, a curve, a transition declaration or a keyframe. `disclose` is a reserved semantic role with no recipe until a disclosure primitive exists.
 
-The architecture has three hard boundaries:
+The architecture has four hard boundaries:
 
+- `ui.motion.ts` is the only owner of temporal behaviour; `ui.common.ts` and every component compose its recipes by name;
 - one DOM node has one spatial-motion owner; non-spatial feedback may compose with it, competing spatial recipes may not;
-- Base UI Positioners own placement/collision and Popups own Sherick presence motion, so repositioning an already-open overlay never replays entrance;
-- direct manipulation has no positional interpolation while the pointer owns geometry.
+- Base UI Positioners own placement/collision and Popups own Sherick presence motion, so repositioning an already-open overlay never replays an entrance;
+- direct manipulation has no positional interpolation while the pointer owns the geometry.
 
-Base UI remains lifecycle authority. Sherick does not mirror open/closing state or add exit timers merely to animate a popup. Reduced-motion behavior is defined per intent in `docs/DESIGN_LANGUAGE.md`.
+Base UI remains lifecycle authority. Sherick does not mirror open/closing state or add exit timers merely to animate a popup: a surface describes its settled, `data-starting-style` and `data-ending-style` states and lets the primitive mount and unmount it. Presence is authored as transitions rather than keyframes so an interrupted surface retargets from what is painted. Reduced-motion behaviour is defined per intent in `docs/DESIGN_LANGUAGE.md`.
 
 ### Theme contract
 
@@ -176,7 +177,8 @@ verification convenience:
 - theme/token ownership (`tokens.ts` as the single authored source; `--sui-*` at document
   root; no nested theme islands);
 - motion ownership (`ui.motion.ts` as the only temporal-recipe authority; no per-component
-  durations/easings/keyframes and no second animation framework);
+  durations, easings, transitions, keyframes or presence lifecycle, and no second animation
+  framework);
 - public API naming (canonical names only, no aliases);
 - the rich-content boundary (subpath-only, never on the root barrel, ESM-only, and a bundle boundary rather than an install boundary);
 - the package `exports` map;
@@ -194,4 +196,4 @@ requirement, that is an architecture decision, documented here and in [`RELEASE.
 
 ## Verification
 
-The root `bun run verify` proves both publication and integration boundaries. The packed-package test remains the publication boundary: workspace resolution alone is never accepted as evidence that npm consumers can install the package. Browser verification includes the existing reviewed visual baselines, the no-Tailwind consumer, CSS leakage checks, custom-theme torture coverage, forced-colors fallbacks, axe accessibility checks, narrow-viewport and RTL coverage and cross-component interaction composition. Size and tree-shaking budgets are enforced separately by `bun run test:bundle`; temporal ownership is enforced by `bun run test:motion`. See `docs/VERIFICATION.md`.
+The root `bun run verify` proves both publication and integration boundaries. The packed-package test remains the publication boundary: workspace resolution alone is never accepted as evidence that npm consumers can install the package. Browser verification includes the existing reviewed visual baselines, the no-Tailwind consumer, CSS leakage checks, custom-theme torture coverage, forced-colors fallbacks, axe accessibility checks, narrow-viewport and RTL coverage, cross-component interaction composition and the motion invariants (which physical event each part answers with, that a stable boundary stays put, that a drag is never interpolated, and that presence is Base's lifecycle). Size and tree-shaking budgets are enforced separately by `bun run test:bundle`; temporal ownership is enforced by `bun run test:motion`. See `docs/VERIFICATION.md`.

@@ -20,24 +20,43 @@ import { fileURLToPath } from "node:url";
 import postcss from "postcss";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { motion, overlay } from "../src/components/ui.common.ts";
+import { overlay } from "../src/components/ui.common.ts";
+import {
+  motionActivityPulse,
+  motionActivitySpin,
+  motionArrive,
+  motionDirect,
+  motionFeedback,
+  motionOrient,
+  motionPresenceAnchored,
+  motionPresenceModal,
+  motionPresenceScrim,
+  motionPresenceTooltip,
+  motionRelocate,
+  motionStateLayer,
+  motionTactile,
+} from "../src/components/ui.motion.ts";
 
 const library = await import("../dist/esm/index.js");
 const content = await import("../dist/esm/content.js");
 
 const {
   Alert,
+  AlertDialog,
   Avatar,
   Badge,
   Button,
   Card,
   Checkbox,
+  Combobox,
   Divider,
   Field,
   IconButton,
   Input,
+  Menu,
   NavGroup,
   NumberField,
+  Popover,
   RadioGroup,
   Search,
   Select,
@@ -63,6 +82,12 @@ const preview = process.argv.includes("--preview");
 const h = React.createElement;
 const noop = () => undefined;
 const inDialogContext = (child) => h(BaseDialog.Root, { open: true }, child);
+
+const comboboxOptions = [
+  { label: "Design system", value: "design" },
+  { label: "Dashboard", value: "dashboard" },
+  { label: "Marketing site", value: "marketing", disabled: true },
+];
 
 const specimens = {
   "button.filled": h(Button, { appearance: "filled" }, "Save"),
@@ -157,6 +182,8 @@ const specimens = {
   "textarea.default": h(Textarea, { label: "Notes", placeholder: "Describe what you want to build…" }),
   "textarea.error": h(Textarea, { label: "Invalid notes", error: true }),
   "tooltip.trigger": h(Tooltip, { content: "Hint" }, h(Button, { appearance: "tonal" }, "Hover")),
+  "combobox.default": h(Combobox, { options: comboboxOptions, value: "design", onValueChange: noop }),
+  "combobox.disabled": h(Combobox, { options: comboboxOptions, value: "design", disabled: true }),
 };
 
 const normalizeMarkup = (html) =>
@@ -168,14 +195,27 @@ const rendered = Object.fromEntries(
   Object.entries(specimens).map(([id, element]) => [id, normalizeMarkup(renderToStaticMarkup(element))])
 );
 
+/* The overlay shells own material, elevation and shape; the motion recipes own every temporal
+   decision. Both are pinned here, so a recipe cannot drift without the contract gate saying so. */
 const overlayRecipes = {
+  scrim: overlay.scrim,
+  popup: overlay.popup,
   menu: overlay.menu,
   tooltip: overlay.tooltip,
   dialog: overlay.dialog,
-  "motion.in": motion.overlayIn,
-  "motion.out": motion.overlayOut,
-  "motion.scrimIn": motion.scrimIn,
-  "motion.scrimOut": motion.scrimOut,
+  "motion.feedback": motionFeedback,
+  "motion.tactile": motionTactile,
+  "motion.arrive": motionArrive,
+  "motion.orient": motionOrient,
+  "motion.relocate": motionRelocate,
+  "motion.direct": motionDirect,
+  "motion.presence.anchored": motionPresenceAnchored,
+  "motion.presence.tooltip": motionPresenceTooltip,
+  "motion.presence.modal": motionPresenceModal,
+  "motion.presence.scrim": motionPresenceScrim,
+  "motion.activity.spin": motionActivitySpin,
+  "motion.activity.pulse": motionActivityPulse,
+  "motion.stateLayer": motionStateLayer,
 };
 
 const collectDeclarations = (rule) => {

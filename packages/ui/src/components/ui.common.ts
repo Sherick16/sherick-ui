@@ -1,4 +1,5 @@
 import type { Variant } from "./ui.types";
+import { motionFeedback, motionStateLayer } from "./ui.motion";
 
 /* Sherick UI design primitives
    ==========================================================================
@@ -15,9 +16,12 @@ import type { Variant } from "./ui.types";
      tone       its color role                     (text, soft, tonal, selected, strong)
      text       the three-step emphasis ladder     (high, medium, low)
      density    how tightly it is packed           (compact, normal, prominent, target)
-     motion     how it moves                       (press, release, spring, travel, overlay)
      overlay    floating shells                    (menu, tooltip, dialog)
-    focusRing  the one focus language             (focusRing, focusRingInset, focusRingWithin, groupFocusRing)
+    focusRing  the one focus language             (focusRing, focusRingInset, focusRingHeld, focusRingWithin, groupFocusRing)
+
+   Temporal behavior is deliberately not here: `ui.motion.ts` owns every transition,
+   duration, curve and reduced-motion rule, and a recipe below names one of its recipes
+   rather than writing a timing of its own.
 
    The canonical statement of these rules — and of what is deliberately left to a
    component's own anatomy, such as layout, spacing, padding, intrinsic size,
@@ -45,12 +49,20 @@ import type { Variant } from "./ui.types";
    one set of numbers. */
 
 /* Focus visibility — one language for every interactive element.
-   `focusRing` draws the ring outside the shape, for a control that stands alone.
+   `focusRing` draws the ring outside the shape, for a control that stands alone, and it follows
+   **visible** focus: a button does not announce itself when a pointer presses it.
    `focusRingInset` draws it inside, for a control nested within another surface
    where an outer ring would collide with the parent's edge. Fields use the outer
    ring only: no inner rim is added, so focus reads as one ring, never two.
-   `focusRingWithin` draws the outer ring from the composite that owns the focus,
-   for a composite control whose inner input stays borderless. `groupFocusRing`
+   `focusRingHeld` and `focusRingWithin` are the same ring for a control that **holds a value**,
+   where the platform moves focus somewhere a plain ring cannot follow: the first for a control
+   that is itself focusable and hands focus to the surface it opens, the second for one whose
+   focus lives in a borderless input inside it. `focusRingHeld` follows *any* focus, because a
+   select has no focus left to follow once its list has taken it; `focusRingWithin` follows
+   *visible* focus, so what a field does is what the platform does — a text field is
+   `:focus-visible` whenever it is focused, a range input only for the keyboard — and a select
+   trigger and an editable combobox field end up identical in every state: neither looks ringed at
+   rest, both look ringed the moment either is used, and both lose it together. `groupFocusRing`
    draws it from the wrapping control instead of the track it contains. */
 export const focusRing =
   "focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-sherick-focus focus-visible:outline-offset-[3px]";
@@ -58,42 +70,31 @@ export const focusRing =
 export const focusRingInset =
   "focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-focus";
 
+/* The ring of a value control that is itself the focusable element: it wears it whenever it
+   holds focus, however it was focused, and whenever the surface it opened is on screen. A select
+   hands the DOM focus to its list while that list is open, so the ring follows the control's
+   engagement rather than the focus — which is exactly what a native `select` shows, and the only
+   focus indication the field has left once the list has taken over. */
+export const focusRingHeld =
+  "focus:outline-none focus:outline focus:outline-2 focus:outline-sherick-focus focus:outline-offset-[3px] data-[popup-open]:outline data-[popup-open]:outline-2 data-[popup-open]:outline-sherick-focus data-[popup-open]:outline-offset-[3px]";
+
+/* The same ring for a value control whose focus lives in a borderless input inside it. It follows
+   **visible** focus rather than any focus, which is what makes a field and a slider differ for
+   the platform's reasons instead of by local say-so: a text field is `:focus-visible` whenever it
+   is focused, so a combobox or search field wears the ring the moment it is used, while a range
+   input is `:focus-visible` only for the keyboard, so a slider's handle saves its ring for the
+   keyboard and lets its own engagement answer the pointer. */
 export const focusRingWithin =
-  "focus-within:outline focus-within:outline-2 focus-within:outline-sherick-focus focus-within:outline-offset-[3px]";
+  "has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-sherick-focus has-[:focus-visible]:outline-offset-[3px]";
 
 export const groupFocusRing =
   "group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-sherick-focus group-focus-visible:outline-offset-[3px]";
 
-/* Motion — three families. A component picks a family, never a duration:
-   - press:   a tonality change with no physical travel — hover, focus, an engaged field.
-   - release: a tactile control: colour, shadow, transform and the size a selection or a
-              thumb travels with.
-   - travel:  geometry the user is aiming — a slider's handle and the fill it carries. A
-              drag is never interpolated; a keyboard or programmatic step glides.
-   - spring:  a part that arrives, compresses or rebounds — a selection mark, the surface
-              it is made in, the value a stepper drives. The one family that overshoots.
-   - overlay: the entrance and exit of anything that floats above the page, with a
-              matching scrim family for the plane behind it.
-   A control whose transform changes must use `release`, `spring` or `travel`; `press` is for
-   pure tonality and colour transitions that never move or resize anything.
-   Every family is neutralised under `prefers-reduced-motion`; the overlay family
-   additionally drops its exit window entirely, so nothing lingers.
-   Loading feedback (`animate-spin`, `animate-pulse`) sits outside these families:
-   it reports progress rather than responding to interaction. */
-export const motion = {
-  press:
-    "transition-[background-color,color,box-shadow,opacity] duration-press ease-press motion-reduce:transition-none",
-  release:
-    "transition-[background-color,color,box-shadow,transform,opacity,width,height] duration-release ease-release active:duration-press active:ease-press motion-reduce:transition-none motion-reduce:transform-none",
-  travel:
-    "transition-[inset-inline-start,width,height,background-color,color,box-shadow,transform,opacity] duration-release ease-release active:duration-press active:ease-press data-[dragging]:transition-[background-color,color,box-shadow,transform,opacity] motion-reduce:transition-none motion-reduce:transform-none",
-  spring:
-    "transition-[background-color,color,box-shadow,transform,opacity] duration-release ease-spring active:duration-press active:ease-press group-active:duration-press group-active:ease-press motion-reduce:transition-none motion-reduce:transform-none",
-  overlayIn: "animate-sherick-overlay-in motion-reduce:animate-none",
-  overlayOut: "animate-sherick-overlay-out motion-reduce:animate-none",
-  scrimIn: "animate-sherick-scrim-in motion-reduce:animate-none",
-  scrimOut: "animate-sherick-scrim-out motion-reduce:animate-none",
-} as const;
+/* Motion is not owned here. Every physical event — feedback, tactile, arrive, orient,
+   relocate, direct, presence and activity — is a named recipe in `ui.motion.ts`, which
+   owns the timing and the reduced-motion behavior for it. A recipe in this module
+   interpolates one of those names; it never writes a duration, a curve, a transition or
+   an animation of its own. */
 
 /* Elevation — distance from the surface plane, and nothing else. Three depth roles
    exist, and the last two are a single tactile pair:
@@ -124,6 +125,9 @@ export const elevation = {
    - mark:        a compact square selection mark — a checkbox box. `control` is a role
                   for objects the size of a field; its radius exceeds the half-extent of a
                   24px square, so a mark needs a step of its own.
+   - row:         a row at command density — a row in a list that is scanned rather than
+                  read holds a corner proportional to its own height, because `control`
+                  would reach a 36px row's half-extent and read as a capsule.
    - prominent:   prominent controls and compact floating surfaces.
    - surface:     large surfaces — cards, menus, panels.
    - expressive:  an expressive surface that owns the viewport — the large overlay
@@ -134,6 +138,7 @@ export const elevation = {
 export const shape = {
   control: "rounded-[1.25rem]",
   mark: "rounded-[0.625rem]",
+  row: "rounded-[0.875rem]",
   prominent: "rounded-[1.5rem]",
   surface: "rounded-[1.75rem]",
   expressive: "rounded-[2rem]",
@@ -171,14 +176,9 @@ export const edge = {
      disabled   45% opacity, no pointer affordance, no interactive state at all
      focus      the shared outer focus ring, visible on keyboard focus */
 export const state = {
-  /* Tactile compression — controls only, never wide surfaces. A press travels about a pixel at
-     the size of the ink it moves, so a control whose outline is what the user sees takes 2% and a
-     control whose ink is far smaller than its target takes 10%. */
-  press: "active:scale-[0.98] motion-reduce:active:scale-100",
-  groupPress: "group-active:scale-[0.98] motion-reduce:group-active:scale-100",
-  pressCompact: "active:scale-90 motion-reduce:active:scale-100",
   /* A raised matte control presses back into the track beneath it — the same physical
-     depth a groove or a well sits at. */
+     depth a groove or a well sits at. How far the press itself travels is motion amplitude, and
+     it belongs with the tactile intent in `ui.motion.ts`. */
   recess: "active:shadow-sherick-recessed",
   /* The disabled step for a control whose disabled state is a Sherick prop. */
   disabled: "cursor-not-allowed opacity-45",
@@ -198,9 +198,6 @@ export const state = {
      where the pointer has been captured and left the control. */
   engaged:
     "group-[:not([data-disabled])]:hover:scale-110 group-[:not([data-disabled])]:hover:bg-sherick-primary-strong group-[:not([data-disabled])]:hover:text-sherick-on-primary data-[dragging]:scale-110 data-[dragging]:bg-sherick-primary-strong data-[dragging]:text-sherick-on-primary",
-  /* A part that is not the element being pressed but answers it — the value a stepper drives. */
-  steppedValue:
-    "group-has-[button:active]:scale-[1.06] group-has-[button:active]:duration-press group-has-[button:active]:ease-press",
   /* A control with a hit area of its own. */
   enabled: "cursor-pointer",
   /* A text field: the normal text cursor, never a pointer. */
@@ -230,6 +227,11 @@ export const state = {
 } as const;
 
 /* State layers.
+   A layer is `relative` itself, because its overlay is absolutely positioned inside the control.
+   A component that positions the control — an absolutely placed close or submit control — writes
+   that position *after* the layer in its class list: `tailwind-merge` keeps the last class in a
+   conflicting group, so a position written before the layer is silently replaced by the layer's
+   own.
    Replacing `background-color` on hover erases whatever fill a control owns: an
    opaque fill collapses to a bare tint and a tinted fill loses most of its step.
    This overlay instead composites over the fill, tinted with `currentColor` — the
@@ -239,34 +241,54 @@ export const state = {
    and it takes the press timing while the control is held.
    One step per fill strength: a quiet surface tints lightly, an opaque accent fill
    takes the heaviest step.
-   The hover step is gated on the primitive's own disabled markers, so an effectively
-   disabled control never tints — whether it was disabled by a prop, by its group or by
-   the field around it. A disabled element cannot be `:active`, so the press step needs
-   no gate. */
-const stateLayerBase =
-  "before:pointer-events-none before:absolute before:inset-0 before:content-[''] before:opacity-0 before:transition-opacity before:duration-release before:ease-release active:before:duration-press active:before:ease-press motion-reduce:before:transition-none";
+   Both interactive steps are gated on the primitive's own disabled markers, so an effectively
+   disabled control neither tints nor presses — whether it was disabled by a prop, by its group or
+   by the field around it. `:disabled` alone cannot gate a press: a row in a collection is a
+   `div`, so `:active` matches it while the pointer is down on it and the marker is the only gate
+   there is. */
+const stateLayerBase = `before:pointer-events-none before:absolute before:inset-0 before:content-[''] before:opacity-0 ${motionStateLayer}`;
 
-/* A part is hoverable only while it is interactive: `[&:not(:disabled)]` for a native control,
-   and the group form for a part whose hover arrives from the wrapping control. */
-const whileInteractive = "[&:not(:disabled)]:hover";
-const whileGroupInteractive = "group-[:not([data-disabled]):not(:disabled)]:hover";
+/* A part answers the pointer only while it is interactive. A native control carries `disabled`, and
+   a collection primitive marks its rows with `data-disabled` instead. One rule covers both, in the
+   same shape for hover and for press, and the group form is that rule for a part whose pointer
+   arrives from the wrapping control.
+
+   Each step is written out as a whole class name rather than assembled from a variant fragment and
+   a suffix, because the stylesheet compiler reads class names as literal text: a name that only
+   exists once the recipe is evaluated compiles to no rule at all, and the step silently disappears.
+   Interpolating one of these consts is safe — the name is still written here in full. */
+const hoverQuiet = "[&:not([data-disabled]):not(:disabled)]:hover:before:opacity-[0.05]";
+const hoverTonal = "[&:not([data-disabled]):not(:disabled)]:hover:before:opacity-[0.09]";
+const hoverFilled = "[&:not([data-disabled]):not(:disabled)]:hover:before:opacity-[0.18]";
+const hoverTrack = "group-[:not([data-disabled]):not(:disabled)]:hover:before:opacity-[0.18]";
+const pressQuiet = "[&:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.09]";
+const pressTonal = "[&:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.15]";
+const pressFilled = "[&:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.26]";
+const pressTrack = "group-[:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.26]";
 
 export const stateLayer = {
   /* Quiet surfaces — ghost controls, navigation rows, menu options. */
-  quiet: `relative ${stateLayerBase} before:rounded-[inherit] before:bg-current ${whileInteractive}:before:opacity-[0.05] active:before:opacity-[0.09]`,
+  quiet: `relative ${stateLayerBase} before:rounded-[inherit] before:bg-current ${hoverQuiet} ${pressQuiet}`,
   /* Tinted containers: the fill is nearly page color already, so the container's own
      on-color (`current`) carries the state at a light step. Shared by every matte
      control with a fill — tonal buttons, icon buttons, acrylic buttons. */
-  tonal: `relative ${stateLayerBase} before:rounded-[inherit] before:bg-current ${whileInteractive}:before:opacity-[0.09] active:before:opacity-[0.15]`,
+  tonal: `relative ${stateLayerBase} before:rounded-[inherit] before:bg-current ${hoverTonal} ${pressTonal}`,
   /* Opaque fills: `current` is the fill's own on-color — the color furthest from it in
      either theme — so one step reads on a saturated blue and a neutral gray alike. */
-  filled: `relative ${stateLayerBase} before:rounded-[inherit] before:bg-current ${whileInteractive}:before:opacity-[0.18] active:before:opacity-[0.26]`,
+  filled: `relative ${stateLayerBase} before:rounded-[inherit] before:bg-current ${hoverFilled} ${pressFilled}`,
   /* A switch track or a selection well: the same layer, but hover and press arrive from the
      wrapping control rather than from the surface itself. */
-  track: `${stateLayerBase} before:rounded-[inherit] before:bg-current ${whileGroupInteractive}:before:opacity-[0.18] group-active:before:opacity-[0.26] group-active:before:duration-press group-active:before:ease-press`,
-  /* A row highlighted by keyboard navigation. Base UI collection primitives expose
-     `data-highlighted`; this is the one canonical visual treatment for it. */
-  activeRow: "data-[highlighted]:before:opacity-[0.06]",
+  track: `${stateLayerBase} before:rounded-[inherit] before:bg-current ${hoverTrack} ${pressTrack}`,
+  /* A row highlighted by keyboard or pointer navigation. Base UI collection primitives expose
+     `data-highlighted`; this is the one canonical visual treatment for it, and it pairs with a
+     row's own `quiet` layer — the row carries both, so a highlighted row and a hovered row are the
+     same tone at the same strength. That strength is written twice because a class name has to be
+     literal to be compiled; that the two rendered layers agree is asserted in the browser suite
+     rather than left to these lines to stay in step.
+     It is deliberately not gated on the disabled markers: a disabled command stays reachable by
+     keyboard so it can be discovered and announced as unavailable, and a reader still has to see
+     which row the navigation is on when it lands there. */
+  activeRow: "data-[highlighted]:before:opacity-[0.05]",
 } as const;
 
 /* Hit area — the interactive region of a control whose visible mark is smaller than a comfortable
@@ -298,8 +320,11 @@ export const hitArea =
                   either the fill or the gradient. Each one is written out literally, so
                   the class scanner never meets a half-built name. The fill stays an
                   ordinary background colour, so a caller can retone a sheet without
-                  touching its lighting. `acrylicDense` is the same sheet at higher opacity for
-                  small floating surfaces that must stay legible.
+                  touching its lighting. An anchored sheet carries most of its own tone,
+                  because it has to stay legible over whatever it happens to sit on: a
+                  saturated button behind a popup must not read as the popup's own
+                  state. `acrylicDense` is the same sheet at higher opacity still, for
+                  the smallest floating surfaces — a tooltip, a floating control.
    - acrylicHero: the large-overlay sheet, for a surface that owns the viewport. It is
                   markedly more opaque and calmer than the smaller sheets: it has to
                   read first as a physical surface and only secondarily as glass, so the
@@ -319,9 +344,9 @@ export const material = {
   controlError: "bg-sherick-danger/[0.075] text-sherick-ink placeholder:text-sherick-danger/[0.72]",
   handle: "bg-sherick-ink-muted text-sherick-canvas",
   acrylic:
-    "bg-sherick-surface-float/[0.60] bg-[image:var(--sui-glass-gradient)] text-sherick-ink backdrop-blur-[var(--sui-glass-blur)] backdrop-saturate-[var(--sui-glass-saturation)] backdrop-brightness-[var(--sui-glass-brightness)]",
+    "bg-sherick-surface-float/[var(--sui-glass-fill)] bg-[image:var(--sui-glass-gradient)] text-sherick-ink backdrop-blur-[var(--sui-glass-blur)] backdrop-saturate-[var(--sui-glass-saturation)] backdrop-brightness-[var(--sui-glass-brightness)]",
   acrylicDense:
-    "bg-sherick-surface-float/[0.72] bg-[image:var(--sui-glass-gradient-dense)] text-sherick-ink backdrop-blur-[var(--sui-glass-dense-blur)] backdrop-saturate-[var(--sui-glass-dense-saturation)] backdrop-brightness-[var(--sui-glass-dense-brightness)]",
+    "bg-sherick-surface-float/[var(--sui-glass-dense-fill)] bg-[image:var(--sui-glass-gradient-dense)] text-sherick-ink backdrop-blur-[var(--sui-glass-dense-blur)] backdrop-saturate-[var(--sui-glass-dense-saturation)] backdrop-brightness-[var(--sui-glass-dense-brightness)]",
   acrylicHero:
     "bg-sherick-surface-overlay/[var(--sui-overlay-fill)] bg-[image:var(--sui-glass-hero-gradient)] text-sherick-ink backdrop-blur-[var(--sui-glass-hero-blur)] backdrop-saturate-[var(--sui-glass-hero-saturation)] backdrop-brightness-[var(--sui-glass-hero-brightness)]",
 } as const;
@@ -337,23 +362,61 @@ export const density = {
   compact: "min-h-10 text-sm",
   normal: "min-h-12 text-[0.95rem]",
   prominent: "min-h-14 text-lg",
-  /* Minimum interactive target for an icon-only control. */
+  /* Minimum interactive target for an icon-only control that stands on its own. */
   target: "min-h-11 min-w-11",
+  /* A control that is one part of a composite field — the trailing controls a Combobox owns. It
+     keeps the floor's height, because it has to sit in the field's row, and takes only the width
+     its glyph needs: the two of them are gripped as one cluster at the field's edge, and two full
+     squares there read as two controls beside a field rather than as parts of it.
+     The narrower step still clears the 24px pointer-target minimum WCAG AA asks for. It is below
+     this system's own 44px floor on purpose: that floor belongs to a control that is the whole
+     target of its own action, and this one is a part of a field the pointer is already in. */
+  part: "min-h-11 min-w-9",
+} as const;
+
+/* Stacking level — where anything that floats sits relative to the application.
+
+   One level, deliberately. Base UI nests a popup's portal *inside* the portal of the surface it
+   was opened from, and appends it last, so document order already says which floating surface is
+   on top: the innermost — the one opened last — wins. A scale that ranked surfaces by kind would
+   fight that, and it cannot be right: a popup opened from inside a dialog is the innermost
+   surface there is, yet a ranking puts the dialog above it and the popup renders behind the modal
+   that owns it. Sharing one level lets the nesting Base already built decide, at any depth.
+
+   The level's job is to clear the application's own content, not to rank Sherick surfaces against
+   each other. */
+export const stacking = {
+  float: "z-50",
 } as const;
 
 /* Floating overlay shells.
    Base UI owns popup presence, focus, dismissal, portals and anchored positioning.
-   Sherick UI owns only the visual shell: material, elevation, shape and the geometry
-   that its shared overlay motion grows from. A Base-backed overlay composes one recipe
-   here and selects `motion.overlayIn` / `motion.overlayOut` from Base's open state. */
+   Sherick UI owns only the visual shell: material, elevation and shape. Where the entrance
+   grows from and how it moves on the way are the presence recipes' in `ui.motion.ts`, so a
+   surface's shell never depends on the primitive's open state. `scrim` is the plane
+   *behind* a surface that owns the viewport, so it is a fill and a blur with no elevation
+   or shape of its own. It is shared rather than written per component so a dialog and an
+   alert dialog separate from the page identically. */
 export const overlay = {
-  /* A menu grows out of its trigger. */
-  menu: `origin-top [--sui-overlay-from-scale:0.985] [--sui-overlay-from-lift:-4px] ${shape.surface} ${material.acrylic} ${elevation.floating}`,
-  /* A tooltip grows out of the edge it is anchored to, so its geometry is per position
-     and is applied with the position in the component. */
+  /* The plane behind a surface that owns the viewport. */
+  scrim: `fixed inset-0 ${stacking.float} bg-sherick-scrim/[0.38] backdrop-blur-[var(--sui-scrim-blur)]`,
+  /* An anchored surface with room to breathe: a selection list (Select, Combobox) or
+     structured content (Popover). It grows out of its trigger and carries the softer
+     surface corner, because what it holds is read rather than scanned.
+     When not to use it: a short list of commands wants `menu`, and a hint wants
+     `tooltip`. */
+  popup: `${shape.surface} ${material.acrylic} ${elevation.floating}`,
+  /* A compact list of commands. The same sheet, the same presence and the same lighting as
+     `popup`, tightened in shape so a handful of short actions reads as a list rather than a
+     page: a command list should feel like one more control on the surface it came from.
+     When not to use it: a list of options that are chosen rather than performed, or a
+     surface holding structured content, wants `popup`. */
+  menu: `${shape.control} ${material.acrylic} ${elevation.floating}`,
+  /* A tooltip is anchored like the others, and reads its edge the same way. */
   tooltip: `${shape.prominent} ${material.acrylicDense} ${elevation.floating}`,
-  /* A dialog rises further than a menu, from its own scale. */
-  dialog: `[--sui-overlay-from-scale:0.985] [--sui-overlay-from-lift:8px] ${shape.expressive} ${material.acrylicHero} ${elevation.floating}`,
+  /* A dialog rises further than a menu. It is anchored to the viewport rather than to a trigger,
+     so it has no side to grow from and takes the modal presence instead of the anchored one. */
+  dialog: `${shape.expressive} ${material.acrylicHero} ${elevation.floating}`,
 } as const;
 
 /* Text hierarchy — three steps, no more. High emphasis carries labels and values,
@@ -363,6 +426,37 @@ export const text = {
   high: "text-sherick-ink",
   medium: "text-sherick-ink-muted",
   low: "text-sherick-ink-faint",
+} as const;
+
+/* A list surface — the sheet a collection of rows sits in, and the two row densities it can
+   hold. Select, Combobox and Menu all compose these, so an option and a command are the same
+   object at two densities instead of three independent designs.
+
+   The sheet never exceeds what the viewport leaves it, and scrolls inside itself rather than
+   growing. Its width is the list's own decision: a control's list is never narrower than the
+   control it came from and grows to fit its own content until the viewport clamp, and a command
+   list only ever grows to its content. A row is flat — depth never announces a state —
+   and one row step of `stateLayer.quiet` plus `stateLayer.activeRow` carries both its hover and
+   its keyboard highlight, so an option and a command are highlighted by the same tone at the
+   same strength. That highlight *is* the row's focus indicator — Base gives the active row real
+   DOM focus, so the row suppresses the user agent's own ring and shows the highlight instead.
+   Selection is a tint of the sheet through `tone.selected` and never the opaque
+   accent, which belongs to the one primary action in the view rather than to a row that happens
+   to be chosen.
+   A row that cannot be used takes no hover and no press, and its tone step says so on its own —
+   but it keeps the navigation highlight. A disabled option or command stays reachable by
+   keyboard so it can be discovered and announced as unavailable, and a reader still has to see
+   which row the navigation is on when it arrives there. Disabled means "cannot be chosen or
+   performed", never "cannot be found". */
+export const list = {
+  sheet: "max-w-[var(--available-width)] max-h-[var(--available-height)] overflow-y-auto",
+  /* A row in a selection list: one line, read one at a time and chosen. */
+  option: `flex w-full items-center justify-between gap-4 px-4 py-3 text-left text-sm outline-none ${shape.control} ${motionFeedback} ${text.high} ${stateLayer.quiet} ${stateLayer.activeRow} ${state.effectiveDisabled}`,
+  /* The same object at the density a list of short actions wants, where the row is scanned
+     rather than read and the list is a control rather than a page. `shape.row` keeps the
+     command's corner proportional to its own height, so its highlight nests in the tighter
+     sheet the menu is. */
+  command: `flex w-full items-center gap-3 px-3 py-2 text-left text-sm outline-none ${shape.row} ${motionFeedback} ${text.high} ${stateLayer.quiet} ${stateLayer.activeRow} ${state.effectiveDisabled}`,
 } as const;
 
 /* Tone hierarchy — the color roles a surface can take, in rising strength:
@@ -410,6 +504,18 @@ export const tone = {
     warning: "bg-sherick-warning text-sherick-on-warning",
     success: "bg-sherick-success text-sherick-on-success",
   },
+  /* The strong fills again, keyed on the primitive's own selection marker rather than on a
+     Sherick prop. A control that holds its selection in the primitive — an uncontrolled
+     `Switch` — has to take its fill from the same source of truth as a controlled one, and a
+     keyed fill has to be written out literally to be compiled, so it is a role here rather
+     than a conditional at the call site. */
+  strongChecked: {
+    primary: "group-data-[checked]:bg-sherick-primary-strong group-data-[checked]:text-sherick-on-primary",
+    secondary: "group-data-[checked]:bg-sherick-surface-high group-data-[checked]:text-sherick-ink",
+    danger: "group-data-[checked]:bg-sherick-danger group-data-[checked]:text-sherick-on-danger",
+    warning: "group-data-[checked]:bg-sherick-warning group-data-[checked]:text-sherick-on-warning",
+    success: "group-data-[checked]:bg-sherick-success group-data-[checked]:text-sherick-on-success",
+  },
 } satisfies Record<string, Record<Variant, string>>;
 
 /* Selectable surface — the recessed surface of a control that fills once it is selected: a
@@ -418,12 +524,10 @@ export const tone = {
    from the same source of truth as a controlled one. A mixed box is selected but is not
    ticked, which is why the second attribute stands beside the first. */
 export const selectable = {
-  surface: `relative ${elevation.recessed} ${motion.spring}`,
+  surface: `relative ${elevation.recessed} ${motionFeedback}`,
   rest: `${material.matteHigh} ${text.medium}`,
   selected:
     "group-data-[checked]:bg-sherick-primary-strong group-data-[checked]:text-sherick-on-primary",
   indeterminate:
     "group-data-[indeterminate]:bg-sherick-primary-strong group-data-[indeterminate]:text-sherick-on-primary",
-  /* The mark exists only while the control is selected, and leaves softly. */
-  mark: `${motion.spring} data-[starting-style]:scale-50 data-[ending-style]:scale-50 data-[ending-style]:opacity-0`,
 } as const;

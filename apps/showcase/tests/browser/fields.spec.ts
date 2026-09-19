@@ -111,8 +111,13 @@ test("an indeterminate checkbox is mixed, not ticked", async ({ page, errors }) 
 
   await expect(partial).toHaveAttribute("aria-checked", "mixed");
 
-  // The mixed state must reach the native input, not only the rendered box: a form input
-  // that reports `indeterminate: false` silently loses the distinction.
+  /* The mixed state must reach the native input, not only the rendered box: a form input
+     that reports `indeterminate: false` silently loses the distinction. `aria-checked` is in
+     the server-rendered markup, while the input's `indeterminate` *property* can only be
+     assigned once React has hydrated — so the read waits for the marker the root layout sets
+     after the whole tree below it has run its effects, which is the state and not a timeout. */
+  await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
+
   const inputIndeterminate = await partial.evaluate((element) => {
     const sibling = element.nextElementSibling;
     return sibling instanceof HTMLInputElement ? sibling.indeterminate : null;

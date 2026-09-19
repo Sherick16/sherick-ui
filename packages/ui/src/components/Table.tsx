@@ -1,6 +1,7 @@
 import React, { type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { edge, material, motion, shape, state, text } from "./ui.common";
+import { edge, material, shape, state, text } from "./ui.common";
+import { motionFeedback } from "./ui.motion";
 
 export interface TableProps {
   headers: string[];
@@ -33,7 +34,7 @@ export const Table = ({
         </thead>
         <tbody>
           {rows.map((row, i) => (
-            <tr key={i} className={cn(edge.row, motion.press, state.rowHover)}>
+            <tr key={i} className={cn(edge.row, motionFeedback, state.rowHover)}>
               {row.map((cell, j) => (
                 <td key={j} className={cn("px-4 py-3 text-sm", text.high)}>
                   {cell}

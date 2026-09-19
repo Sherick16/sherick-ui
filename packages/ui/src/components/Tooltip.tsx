@@ -3,7 +3,8 @@
 import { Tooltip as BaseTooltip } from "@base-ui/react/tooltip";
 import React, { type ReactElement, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { motion, overlay, text } from "./ui.common";
+import { overlay, stacking, text } from "./ui.common";
+import { motionPresenceTooltip } from "./ui.motion";
 
 export interface TooltipProps {
   children: ReactElement;
@@ -11,12 +12,6 @@ export interface TooltipProps {
   className?: string;
   position?: "top" | "right" | "bottom" | "left";
 }
-
-const liftForSide = (side: string) => {
-  if (side === "top") return "[--sui-overlay-from-lift:4px]";
-  if (side === "bottom") return "[--sui-overlay-from-lift:-4px]";
-  return "[--sui-overlay-from-lift:0px]";
-};
 
 const Tooltip = ({ children, content, className, position = "bottom" }: TooltipProps) => {
   return (
@@ -26,17 +21,14 @@ const Tooltip = ({ children, content, className, position = "bottom" }: TooltipP
           <BaseTooltip.Trigger render={children} />
         </span>
         <BaseTooltip.Portal>
-          <BaseTooltip.Positioner side={position} sideOffset={8} className={cn("z-40")}>
+          <BaseTooltip.Positioner side={position} sideOffset={8} className={cn(stacking.float)}>
             <BaseTooltip.Popup
-              className={({ open, side }) =>
-                cn(
-                  "w-max max-w-64 whitespace-normal px-3 py-2 text-xs leading-5 [transform-origin:var(--transform-origin)]",
-                  overlay.tooltip,
-                  text.high,
-                  liftForSide(side),
-                  open ? motion.overlayIn : motion.overlayOut
-                )
-              }
+              className={cn(
+                "w-max max-w-64 whitespace-normal px-3 py-2 text-xs leading-5",
+                overlay.tooltip,
+                text.high,
+                motionPresenceTooltip
+              )}
             >
               {content}
             </BaseTooltip.Popup>

@@ -16,12 +16,12 @@ import {
   focusRingInset,
   focusRingWithin,
   material,
-  motion,
   shape,
   state,
   stateLayer,
   tone,
 } from "./ui.common";
+import { motionFeedback, motionInkPress } from "./ui.motion";
 import { Variant } from "./ui.types";
 import { Spinner } from "./Spinner";
 
@@ -101,7 +101,7 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
           density.normal,
           shape.control,
           material.control,
-          motion.press,
+          motionFeedback,
           focusRingWithin,
           !disabled && state.field.hover,
           !disabled && state.field.focusWithin,
@@ -134,19 +134,24 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
             density.target,
             shape.circle,
             focusRingInset,
-            motion.release,
+            motionFeedback,
             tone.text[variant],
             !submitDisabled && stateLayer.quiet,
-            !submitDisabled && state.press,
             submitDisabled ? state.disabledDescendant : state.enabled,
-            "absolute right-1.5 inline-flex items-center justify-center"
+            /* After the state layer, which is `relative` itself: `tailwind-merge` keeps the last
+               class in a conflicting group, so the control's own position has to be written last. */
+            "group absolute right-1.5 inline-flex items-center justify-center"
           )}
         >
-          {loading ? (
-            <Spinner className={cn("size-5")} size="small" />
-          ) : (
-            <SearchIcon className={cn("size-5")} aria-hidden="true" />
-          )}
+          {/* The target stays exactly where the pointer found it; the mark inside it carries the
+              press. */}
+          <span className={cn("inline-flex items-center justify-center", motionInkPress)}>
+            {loading ? (
+              <Spinner className={cn("size-5")} size="small" />
+            ) : (
+              <SearchIcon className={cn("size-5")} aria-hidden="true" />
+            )}
+          </span>
         </Button>
       </Field.Root>
     );

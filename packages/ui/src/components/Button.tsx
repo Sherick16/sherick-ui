@@ -7,12 +7,12 @@ import {
   density,
   elevation,
   focusRing,
-  motion,
   shape,
   state,
   stateLayer,
   tone,
 } from "./ui.common";
+import { motionTactile } from "./ui.motion";
 import { Variant } from "./ui.types";
 import { Spinner } from "./Spinner";
 
@@ -61,7 +61,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           "inline-flex items-center justify-center gap-2 font-medium tracking-[-0.01em]",
           shape.pill,
           sizeMap[size],
-          motion.release,
+          motionTactile,
           focusRing,
           appearance === "filled" && tone.strong[variant],
           appearance === "filled" && !isDisabled && stateLayer.filled,
@@ -72,7 +72,6 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           appearance === "text" && !isDisabled && stateLayer.quiet,
           isTactile && elevation.raised,
           isTactile && state.recess,
-          !isDisabled && state.press,
           isDisabled ? state.disabled : state.enabled,
           className
         )}

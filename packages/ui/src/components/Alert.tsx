@@ -7,13 +7,13 @@ import { cn } from "@/libs/utils";
 import {
   density,
   focusRingInset,
-  motion,
   shape,
   state,
   stateLayer,
   text,
   tone,
 } from "./ui.common";
+import { motionFeedback, motionInkPress } from "./ui.motion";
 import { Variant } from "./ui.types";
 
 const iconMap = {
@@ -66,17 +66,20 @@ export const Alert = ({
             setIsVisible(false);
           }}
           className={cn(
-            "ml-1 inline-flex shrink-0 items-center justify-center",
+            "group ml-1 inline-flex shrink-0 items-center justify-center",
             density.target,
             shape.circle,
             focusRingInset,
-            motion.release,
+            motionFeedback,
             stateLayer.quiet,
-            state.press,
             state.enabled
           )}
         >
-          <X aria-hidden="true" className={cn("size-4")} />
+          {/* The target stays exactly where the pointer found it; the mark inside it carries the
+              press. */}
+          <span className={cn("inline-flex items-center justify-center", motionInkPress)}>
+            <X aria-hidden="true" className={cn("size-4")} />
+          </span>
         </Button>
       )}
     </div>

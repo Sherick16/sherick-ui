@@ -117,15 +117,28 @@ Depth is token-driven, and the ladder is the only source of shadow in the librar
 
 ### Motion
 
-Motion is three families, each tokenized rather than hard-coded per component:
+Motion is chosen by what a part is doing, never by which component it belongs to. Nine intents
+cover the library — `feedback`, `tactile`, `arrive`, `orient`, `relocate`, `direct`, `disclose`,
+`presence` and `activity` — and each one is a named recipe in
+`packages/ui/src/components/ui.motion.ts`, which owns every transition property, duration, curve
+and reduced-motion rule in the package. The dynamics below the intents are tokenized rather than
+hard-coded per component:
 
-| Family | Tokens | Used for |
+| Dynamic | Tokens | Used for |
 | --- | --- | --- |
-| Press | `--sui-duration-press`, `--sui-ease-press` | hover/focus/engaged tonality |
-| Release | `--sui-duration-release`, `--sui-ease-release` | tactile controls and physical travel |
-| Overlay | `--sui-duration-overlay`, `--sui-duration-overlay-exit`, `--sui-ease-release`, `--sui-ease-exit` | floating surfaces and scrims |
+| Swift | `--sui-duration-press`, `--sui-ease-press` | immediate response: feedback and the press half of a tactile control |
+| Settle | `--sui-duration-release`, `--sui-ease-release` | tactile release, orientation, relocation, direct steps and a tooltip's entrance |
+| Spring | `--sui-ease-spring` | the one restrained overshoot, reserved for a mark arriving |
+| Exit | `--sui-duration-overlay-exit`, `--sui-ease-exit` | decisive departure |
+| Anchored / modal | `--sui-duration-overlay`, `--sui-ease-release` | a floating surface entering |
 
-Base UI owns whether a floating primitive is mounted, opening or closing, plus its focus, dismissal, portal and positioning mechanics. Sherick UI applies the shared overlay material/elevation/shape recipes and motion tokens to those states; no Sherick-specific overlay lifecycle hook is required.
+Overriding those variables at the document root retunes every motion in the library at once.
+
+Base UI owns whether a floating primitive is mounted, opening or closing, plus its focus,
+dismissal, portal and positioning mechanics. Sherick UI describes a surface's settled,
+`data-starting-style` and `data-ending-style` states through a presence recipe and animates
+transitions rather than keyframes, so a rapid open → close → open retargets instead of
+restarting; no Sherick timer, mirrored open state or overlay lifecycle hook exists.
 
 ## Usage
 

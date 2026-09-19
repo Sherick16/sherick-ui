@@ -6,13 +6,13 @@ import { cn } from "@/libs/utils";
 import {
   elevation,
   focusRing,
-  motion,
   shape,
   state,
   stateLayer,
   text,
   tone,
 } from "./ui.common";
+import { motionRelocate, motionTactile } from "./ui.motion";
 import { Variant } from "./ui.types";
 
 export interface Tab {
@@ -70,7 +70,7 @@ export const Tabs = ({
             shape.pill,
             tone.selected[variant],
             elevation.control,
-            motion.release
+            motionRelocate
           )}
         />
 
@@ -83,9 +83,8 @@ export const Tabs = ({
               cn(
                 "relative z-10 min-h-12 min-w-28 flex-1 whitespace-nowrap px-7 py-3 text-sm font-medium",
                 shape.pill,
-                motion.release,
+                motionTactile,
                 focusRing,
-                !disabled && state.press,
                 active
                   ? text.high
                   : cn(text.medium, !disabled && "hover:text-sherick-ink", !disabled && stateLayer.quiet),

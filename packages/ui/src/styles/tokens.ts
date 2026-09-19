@@ -30,11 +30,13 @@ export const lightTokens = {
   "elevation-floating": "0 16px 40px oklch(var(--sui-light-bottom) / 0.20), inset 0 1px 0 oklch(var(--sui-light-top) / 0.70)",
   "elevation-control": "0 1px 2px oklch(var(--sui-light-bottom) / 0.19), inset 0 1px 0 oklch(var(--sui-light-top) / 0.55)",
   "elevation-recessed": "inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.22), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.50)",
+  "glass-fill": "0.86",
   "glass-blur": "28px",
-  "glass-saturation": "1.18",
+  "glass-saturation": "1.06",
   "glass-brightness": "1.012",
+  "glass-dense-fill": "0.90",
   "glass-dense-blur": "22px",
-  "glass-dense-saturation": "1.12",
+  "glass-dense-saturation": "1.05",
   "glass-dense-brightness": "1.008",
   "glass-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.76) 0%, rgb(255 255 255 / 0.30) 30%, rgb(112 156 224 / 0.05) 70%, rgb(38 46 62 / 0.05) 100%)",
   "glass-gradient-dense": "linear-gradient(180deg, rgb(255 255 255 / 0.68) 0%, rgb(255 255 255 / 0.24) 36%, rgb(112 156 224 / 0.04) 76%, rgb(38 46 62 / 0.045) 100%)",
@@ -84,12 +86,14 @@ export const darkTokens = {
   "elevation-floating": "0 18px 44px oklch(var(--sui-light-bottom) / 0.38), inset 0 1px 0 oklch(var(--sui-light-top) / 0.05)",
   "elevation-control": "0 1px 2px oklch(var(--sui-light-bottom) / 0.30), inset 0 1px 0 oklch(var(--sui-light-top) / 0.08)",
   "elevation-recessed": "inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.38), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.06)",
+  "glass-fill": "0.90",
   "glass-blur": "32px",
-  "glass-saturation": "1.45",
-  "glass-brightness": "1.04",
+  "glass-saturation": "1.10",
+  "glass-brightness": "1.01",
+  "glass-dense-fill": "0.96",
   "glass-dense-blur": "26px",
-  "glass-dense-saturation": "1.38",
-  "glass-dense-brightness": "1.035",
+  "glass-dense-saturation": "1.08",
+  "glass-dense-brightness": "1.01",
   "glass-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.075) 0%, rgb(255 255 255 / 0.028) 30%, rgb(112 156 255 / 0.02) 70%, rgb(0 0 0 / 0.10) 100%)",
   "glass-gradient-dense": "linear-gradient(180deg, rgb(255 255 255 / 0.06) 0%, rgb(255 255 255 / 0.018) 36%, rgb(112 156 255 / 0.016) 76%, rgb(0 0 0 / 0.08) 100%)",
   "glass-hero-blur": "10px",
@@ -116,6 +120,13 @@ export const sharedTokens = {
   "ease-press": "cubic-bezier(0.4, 0, 0.2, 1)",
   "ease-release": "cubic-bezier(0.16, 1, 0.3, 1)",
   "ease-exit": "cubic-bezier(0.4, 0, 1, 1)",
+  /* A persistent object travelling between two stable destinations — a tab indicator, a switch
+     thumb. `ease-release` is an arrival curve: it spends 90% of a travel in the first third of
+     the time, which reads as a teleport followed by a creep once the distance is large. The
+     glide curve leaves the old position gently, crosses the middle of the travel in the middle
+     of the time, and settles at the end, so the movement itself is what the eye sees. It never
+     overshoots. */
+  "ease-glide": "cubic-bezier(0.32, 0, 0.24, 1)",
   /* The one overshooting curve in the system: a part that travels a little past where it lands
      and settles back. It is what makes a selection feel made and a released press feel answered,
      and it is deliberately reserved for the parts that carry that meaning. */

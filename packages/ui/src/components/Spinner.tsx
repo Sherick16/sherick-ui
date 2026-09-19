@@ -2,6 +2,7 @@ import React from "react";
 import { Loader2 } from "lucide-react";
 import { type VariantProps, cva } from "class-variance-authority";
 import { cn } from "@/libs/utils";
+import { motionActivitySpin } from "./ui.motion";
 
 const spinnerVariants = cva("flex-col items-center justify-center", {
   variants: {
@@ -15,7 +16,7 @@ const spinnerVariants = cva("flex-col items-center justify-center", {
   },
 });
 
-const loaderVariants = cva("animate-spin text-current motion-reduce:animate-none", {
+const loaderVariants = cva(`text-current ${motionActivitySpin}`, {
   variants: {
     size: {
       small: "size-4",

@@ -43,10 +43,10 @@ interpolates pointer-driven geometry. Stable selection boundaries do not bounce.
 popup placement/lifecycle; Sherick owns the Popup's visual presence and never animates the
 Positioner or adds exit timers.
 
-The old `motion` object in `ui.common.ts` is a finite migration bridge for existing components.
-New components must import semantic leaf recipes from `ui.motion.ts`. `bun run test:motion`
-enforces both the raw-temporal-class boundary and the no-new-legacy-consumer rule. Shrink the
-legacy allowlist as migration PRs land; never add a new file to it.
+The old `motion` object in `ui.common.ts` is gone, and it must not come back. `ui.motion.ts` is
+the package's only temporal owner, `bun run test:motion` enforces that with no allowlist, and a
+component that needs a new physical behaviour extends the motion module rather than a file's own
+classes.
 
 ### Component-local anatomy is yours to decide
 

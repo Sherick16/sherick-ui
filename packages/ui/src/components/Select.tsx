@@ -6,15 +6,17 @@ import { Check, ChevronDown } from "lucide-react";
 import { cn } from "@/libs/utils";
 import {
   density,
-  focusRing,
-  motion,
+  focusRingHeld,
+  list,
+  material,
   overlay,
   shape,
+  stacking,
   state,
-  stateLayer,
   text,
   tone,
 } from "./ui.common";
+import { motionArrive, motionFeedback, motionOrient, motionPresenceAnchored, motionTactile } from "./ui.motion";
 import { Variant } from "./ui.types";
 
 export interface SelectOption {
@@ -66,7 +68,11 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
         name={name}
         form={form}
       >
-        <div className={cn("relative block w-full", className)}>
+        {/* The field is the control the user presses, so the *wrapper* carries the tactile answer:
+            a `Select` trigger's own active state is suppressed by the primitive, while a press on
+            it still activates this element as its ancestor. The trigger itself is the field's
+            surface, so it takes the tone. */}
+        <div className={cn("relative block w-full", motionTactile, className)}>
           <BaseSelect.Trigger
             {...triggerProps}
             ref={ref}
@@ -76,13 +82,12 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                 "group flex w-full items-center justify-between gap-3 px-5 py-3 text-left",
                 density.normal,
                 shape.control,
-                "bg-sherick-surface-high/[0.66] text-sherick-ink placeholder:text-sherick-ink-muted",
-                motion.release,
-                focusRing,
+                material.control,
+                motionFeedback,
+                focusRingHeld,
                 !disabled && state.field.hover,
                 !disabled && state.field.focus,
                 open && state.field.engaged,
-                !disabled && state.press,
                 disabled ? state.disabled : state.enabled
               )
             }
@@ -99,7 +104,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                 className={cn(
                   "size-5",
                   text.high,
-                  motion.release,
+                  motionOrient,
                   "group-data-[popup-open]:rotate-180"
                 )}
               />
@@ -113,16 +118,15 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
             side="bottom"
             align="start"
             sideOffset={8}
-            className={cn("z-30")}
+            className={cn(stacking.float)}
           >
             <BaseSelect.Popup
-              className={({ open }) =>
-                cn(
-                  "w-[var(--anchor-width)] min-w-max max-h-[var(--available-height)] space-y-1 overflow-y-auto p-2",
-                  overlay.menu,
-                  open ? motion.overlayIn : motion.overlayOut
-                )
-              }
+              className={cn(
+                list.sheet,
+                "w-max min-w-[var(--anchor-width)] space-y-1 p-2",
+                overlay.popup,
+                motionPresenceAnchored
+              )}
             >
               <BaseSelect.List>
                 {options.map((option) => (
@@ -130,24 +134,15 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                     key={option.value}
                     value={option.value}
                     disabled={option.disabled}
-                    className={({ selected: isSelected, disabled: itemDisabled }) =>
-                      cn(
-                        "flex items-center justify-between gap-4 px-4 py-3 text-left text-sm outline-none",
-                        shape.control,
-                        motion.press,
-                        text.high,
-                        isSelected
-                          ? tone.selected[variant]
-                          : cn(stateLayer.quiet, stateLayer.activeRow),
-                        itemDisabled && state.disabled
-                      )
+                    className={({ selected: isSelected }) =>
+                      cn(list.option, isSelected && tone.selected[variant])
                     }
                   >
                     <BaseSelect.ItemText className={cn("min-w-0 flex-1 truncate")}>
                       {option.label}
                     </BaseSelect.ItemText>
                     <BaseSelect.ItemIndicator>
-                      <Check aria-hidden="true" className={cn("size-4", tone.text[variant])} />
+                      <Check aria-hidden="true" className={cn("size-4", motionArrive, tone.text[variant])} />
                     </BaseSelect.ItemIndicator>
                   </BaseSelect.Item>
                 ))}

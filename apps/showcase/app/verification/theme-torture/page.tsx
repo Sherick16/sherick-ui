@@ -3,12 +3,16 @@
 import { useState } from "react";
 import {
   Alert,
+  AlertDialog,
   Badge,
   Button,
   Checkbox,
+  Combobox,
   Dialog,
   Field,
+  Menu,
   NumberField,
+  Popover,
   RadioGroup,
   Select,
   Slider,
@@ -24,6 +28,7 @@ const options = [
 
 export default function ThemeTorturePage() {
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [alertOpen, setAlertOpen] = useState(false);
 
   return (
     <main className="min-h-screen bg-sherick-canvas px-10 py-12 text-sherick-ink" data-testid="theme-torture">
@@ -106,6 +111,36 @@ export default function ThemeTorturePage() {
             <Button appearance="filled" variant="danger">Dialog danger</Button>
           </Dialog.Content>
         </Dialog>
+
+        <Menu>
+          <Menu.Trigger render={<Button appearance="tonal" variant="secondary">Open torture menu</Button>} />
+          <Menu.Content>
+            <Menu.Item>Rename</Menu.Item>
+            <Menu.Item variant="danger">Delete deployment</Menu.Item>
+          </Menu.Content>
+        </Menu>
+
+        <Popover>
+          <Popover.Trigger render={<Button appearance="tonal" variant="secondary">Open torture popover</Button>} />
+          <Popover.Content>
+            <p className="text-sm">Torture popover content</p>
+          </Popover.Content>
+        </Popover>
+
+        <Field label="Torture combobox">
+          <Combobox options={options} defaultValue="alpha" />
+        </Field>
+
+        <Button appearance="filled" variant="danger" onClick={() => setAlertOpen(true)}>
+          Open torture alert
+        </Button>
+        <AlertDialog
+          open={alertOpen}
+          onOpenChange={setAlertOpen}
+          title="Torture alert"
+          description="Semantic roles must survive the portal."
+          confirmLabel="Torture confirm"
+        />
       </section>
     </main>
   );
