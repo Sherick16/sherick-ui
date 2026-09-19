@@ -117,7 +117,23 @@ const pressDelta = async (page: Page, press: Locator, measured: Locator, alsoMea
   await press.hover();
   const atRest = await measured.boundingBox();
   await page.mouse.down();
-  await page.waitForTimeout(320);
+  /* Wait for the press to *settle* rather than guessing a delay: a fixed wait reads a
+     mid-transition scale whenever the browser is busy, which reports a coincidence as a
+     measurement. The element that compresses is the one the press propagates to, which is a
+     co-measured field when the press target is an affordance inside it; the compression counts as
+     settled once a transform is applied and nothing is animating it, and at rest the transform is
+     `none`, so this cannot pass early. */
+  const compressing = alsoMeasured ?? measured;
+  await expect
+    .poll(
+      () =>
+        compressing.evaluate((element) => {
+          const transform = getComputedStyle(element).transform;
+          return transform !== "none" && element.getAnimations().length === 0;
+        }),
+      { message: "the press lands and settles" }
+    )
+    .toBe(true);
   const pressed = await measured.boundingBox();
   const pressedScale = await scaleOf(measured);
   const alsoScale = alsoMeasured ? await scaleOf(alsoMeasured) : null;
@@ -518,6 +534,24 @@ test("reduced motion drops every spatial entrance and keeps the state response",
   const still = (transform: string) => transform === "none" || transform.replace(/\s+/g, "") === "matrix(1,0,0,1,0,0)";
   expect(recorded.every((entry) => still(entry.transform)), "no reduced entrance travels").toBe(true);
 
+  /* A press is spatial, so reduced motion removes the compression while keeping the tone that
+     reports it — measured on both forms of the same field. */
+  const reducedSelect = page.getByRole("combobox", { name: "Project type", exact: true });
+  const reducedSelectField = reducedSelect.locator("xpath=..");
+  const reducedPress = await pressDelta(page, reducedSelect, reducedSelectField);
+  expect(reducedPress.pressedScale, "the select field does not compress").toBe(1);
+  expect(reducedPress.compressionPercent).toBe(0);
+  await page.keyboard.press("Escape");
+
+  await expect(page.getByTestId("popover-reason")).not.toHaveText("");
+
+  const reducedCombobox = page.locator('input[role="combobox"]').first();
+  const reducedComboboxField = reducedCombobox.locator("xpath=..");
+  const reducedComboboxPress = await pressDelta(page, reducedCombobox, reducedComboboxField);
+  expect(reducedComboboxPress.pressedScale, "the combobox field does not compress either").toBe(1);
+  await page.keyboard.press("Escape");
+  await page.locator("body").click({ position: { x: 4, y: 4 } });
+
   /* The response to an event is not motion: a control still reports hover. */
   const primary = page.getByRole("button", { name: "Submit form" });
   await primary.hover();
@@ -686,7 +720,8 @@ test("a press moves a control by the amplitude its role owns", async ({ page, er
   await openLab(page);
 
   /* A full control compresses four percent, which is about two pixels at the size of the ink it
-     moves; a small control inside a larger target takes the compact step. */
+     moves. A control whose ink is smaller than its target is the other case, asserted separately:
+     its target is stable and its mark takes the press. */
   const button = await pressDelta(page, page.getByRole("button", { name: "Filled", exact: true }), page.getByRole("button", { name: "Filled", exact: true }));
   expect(button.compressionPercent).toBeGreaterThan(3);
   expect(button.compressionPercent).toBeLessThan(5);
@@ -695,16 +730,15 @@ test("a press moves a control by the amplitude its role owns", async ({ page, er
   expect(icon.compressionPercent).toBeGreaterThan(3);
   expect(icon.compressionPercent).toBeLessThan(5);
 
-  /* A control whose ink is much smaller than its target is the other case, and it is asserted
-     separately: its *target* is stable and its mark takes the press. */
-
   expect(errors).toEqual([]);
 });
 
+
 test("Select and Combobox are the same control in two forms", async ({ page, errors }) => {
-  /* The same physical event has to produce the same response: pressing a select's trigger and
-     pressing an editable combobox's field have to move the field by the same amount, with the
-     same recipe, and neither may move its small affordances instead. */
+  /* The same physical event has to produce the same response, measured as geometry rather than
+     inferred from a class name: a press on a select's trigger and a press on an editable
+     combobox's field both compress the *whole field*, by the same amount, through the same recipe
+     and the same timing. */
   await openLab(page);
   const selectTrigger = page.getByRole("combobox", { name: "Select", exact: true });
   const selectField = selectTrigger.locator("xpath=..");
@@ -714,64 +748,65 @@ test("Select and Combobox are the same control in two forms", async ({ page, err
   const selectPress = await pressDelta(page, selectTrigger, selectField);
 
   await openLab(page);
-  const comboboxField = page.locator('input[role="combobox"]').first().locator("xpath=..");
-  expect((await motionOf(comboboxField)).property).toContain("transform");
+  const comboboxInput = page.locator('input[role="combobox"]').first();
+  const comboboxField = comboboxInput.locator("xpath=..");
+  expect((await motionOf(comboboxField)).property, "the field is what presses").toContain("transform");
   await expectDuration(page, comboboxField, "--sui-duration-release");
-  const comboboxDisclosure = page.locator('[aria-label="Show options"]').first();
-  const comboboxPress = await pressDelta(page, comboboxDisclosure, comboboxField);
+  const comboboxPress = await pressDelta(page, comboboxInput, comboboxField);
 
-  expect(selectPress.pressedScale).toBe(0.96);
-  expect(comboboxPress.pressedScale).toBe(0.96);
-  expect(comboboxPress.compressionPercent).toBeCloseTo(selectPress.compressionPercent, 1);
+  expect(selectPress.pressedScale, "a select compresses its whole field").toBe(0.96);
+  expect(comboboxPress.pressedScale, "and the combobox reaches the same scale on the same press").toBe(0.96);
+  expect(comboboxPress.compressionPercent, "the amplitudes match").toBeCloseTo(selectPress.compressionPercent, 1);
   expect(comboboxPress.restWidth).toBeCloseTo(selectPress.restWidth, 0);
+  expect(comboboxPress.restWidth - comboboxPress.pressedWidth).toBeGreaterThan(10);
 
-  /* The affordance itself answers with tone only: a second compression nested inside the field's
-     own would read as two events for one press. Its measured box still shrinks with the field
-     around it, so the assertion is about its own geometry. */
-  const disclosureField = comboboxDisclosure.locator("xpath=..");
-  const disclosurePress = await pressDelta(page, comboboxDisclosure, comboboxDisclosure, disclosureField);
-  expect(disclosurePress.pressedScale, "the disclosure control does not deform itself").toBe(1);
-  expect(disclosurePress.alsoScale, "the field it sits in takes the press").toBe(0.96);
-
-  expect(errors).toEqual([]);
-});
-
-test("a field's text never moves it, and its own controls still do", async ({ page, errors }) => {
-  /* A press activates the whole chain, so an editable field that answered every `:active` would
-     shrink while the pointer was placing a caret or dragging across a word. The field's *controls*
-     are what it answers — and it answers them exactly as a select trigger answers a press on
-     itself, which is what keeps the two forms of the same control together. */
-  await openLab(page);
-  const input = page.getByRole("combobox", { name: "Combobox", exact: true });
-  const field = input.locator("xpath=..");
-
-  const atRest = await field.boundingBox();
-  await input.click();
-  await input.fill("dash");
-  await expect(input).toHaveValue("dash");
-  expect(await field.boundingBox(), "typing does not move the field").toEqual(atRest);
-
-  /* The failing case the old test missed: the pointer down *inside* the text, held and dragged,
-     which is a caret click or a text selection. */
-  await page.keyboard.press("Escape");
-  const textBox = await input.boundingBox();
-  if (!textBox) throw new Error("the field has no box");
-  await page.mouse.move(textBox.x + 12, textBox.y + textBox.height / 2);
-  await page.mouse.down();
-  await page.mouse.move(textBox.x + 90, textBox.y + textBox.height / 2, { steps: 5 });
-  await page.waitForTimeout(320);
-  expect(await scaleOf(field), "a press and drag inside the text never moves the field").toBe(1);
-  expect(await field.boundingBox()).toEqual(atRest);
-  await page.mouse.up();
-  await page.keyboard.press("Escape");
-
-  /* Its own control still moves it, by the same four percent a select trigger takes. */
+  /* The field's own affordances add nothing: they answer with tone, because a second compression
+     nested inside the field's would read as two events for one press. Their measured box still
+     shrinks with the field around them, so the assertion is about their own geometry. */
   await page.locator("body").click({ position: { x: 4, y: 4 } });
   await openLab(page);
   const disclosure = page.locator('[aria-label="Show options"]').first();
   const fieldOfDisclosure = disclosure.locator("xpath=..");
-  const disclosurePress = await pressDelta(page, disclosure, fieldOfDisclosure);
-  expect(disclosurePress.pressedScale, "the field answers a press on its own control").toBe(0.96);
+  const disclosurePress = await pressDelta(page, disclosure, disclosure, fieldOfDisclosure);
+  expect(disclosurePress.pressedScale, "the disclosure control does not deform itself").toBe(1);
+  expect(disclosurePress.alsoScale, "the field it sits in takes the press").toBe(0.96);
+
+  /* And once the press has completed, the field is a text field: typing does not move it. */
+  await openLab(page);
+  const field = page.locator('input[role="combobox"]').first().locator("xpath=..");
+  const atRest = await field.boundingBox();
+  await comboboxInput.click();
+  await comboboxInput.fill("dash");
+  await expect(comboboxInput).toHaveValue("dash");
+  await expect.poll(() => scaleOf(field), { message: "typing is not a press" }).toBe(1);
+  expect(await field.boundingBox(), "typing does not move the field").toEqual(atRest);
+
+  expect(errors).toEqual([]);
+});
+
+test("a press inside a field's text is the same press", async ({ page, errors }) => {
+  /* A caret click and a drag across a word activate the field's ancestor chain exactly as a press
+     on its disclosure control does, so the field compresses for them too. That is deliberate:
+     telling the two apart would take pointer bookkeeping or an interaction state machine inside a
+     component, and one press is one press. What must stay still is the field used *as a text
+     field* — typing and focus, asserted above. */
+  await openLab(page);
+  const input = page.locator('input[role="combobox"]').first();
+  const field = input.locator("xpath=..");
+  const atRest = await field.boundingBox();
+  const textBox = await input.boundingBox();
+  if (!atRest || !textBox) throw new Error("the field has no box");
+
+  await page.mouse.move(textBox.x + 12, textBox.y + textBox.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(textBox.x + 90, textBox.y + textBox.height / 2, { steps: 5 });
+  await page.waitForTimeout(320);
+  expect(await scaleOf(field), "pressing the text presses the field").toBe(0.96);
+
+  await page.mouse.up();
+  await page.keyboard.press("Escape");
+  await expect.poll(() => scaleOf(field), { message: "and it settles back" }).toBe(1);
+  expect(await field.boundingBox(), "with the field back at rest").toEqual(atRest);
 
   expect(errors).toEqual([]);
 });
@@ -1080,11 +1115,13 @@ test("a compact control keeps its target stable while its mark takes the press",
     if (!box) throw new Error(`${name} has no box`);
     await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
     await page.mouse.down();
-    await page.waitForTimeout(320);
+    /* Once the mark has landed, the press is settled — and only then is "the target while held"
+       a state worth measuring. */
+    const mark = control.locator("span").first();
+    await expect.poll(() => scaleOf(mark), { message: `${name} compresses its mark` }).toBe(0.88);
 
     expect(await control.boundingBox(), `${name} keeps its target`).toEqual(atRest);
     expect(await scaleOf(control), `${name} does not deform itself`).toBe(1);
-    expect(await scaleOf(control.locator("span").first()), `${name} compresses its mark`).toBe(0.88);
     await page.mouse.up();
   }
 

@@ -57,7 +57,7 @@ const stepperClassName = cn(
 /* The target stays exactly where the pointer found it — a 44px target that shrank while held would
    move the ground under a pointer that is already near its edge — and the glyph inside it takes the
    press. */
-const stepperIconClassName = cn("inline-flex items-center justify-center", motionInkPress);
+const stepperIconClassName = `inline-flex items-center justify-center ${motionInkPress}`;
 
 /**
  * A number typed or stepped. Base UI owns parsing, stepping, clamping, spinbutton semantics and

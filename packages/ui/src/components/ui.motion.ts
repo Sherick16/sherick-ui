@@ -50,15 +50,6 @@ export const motionFeedback =
 export const motionTactile =
   "transition-[background-color,color,box-shadow,transform,opacity] duration-release ease-release active:duration-press active:ease-press active:scale-[0.96] motion-reduce:transition-none motion-reduce:active:scale-100";
 
-/** The same physical answer for a composite field, where only a *control* inside the field answers
- *  a press. The field's text is a text field: a caret click, a text selection and a drag inside it
- *  are all `:active` on the field's ancestor chain, and a field that shrank while the user was
- *  selecting a word would be moving the ground under the pointer. A disclosure control or a clear
- *  control is a control, so the field answers it as a whole — the same four percent, and the same
- *  timing, that the equivalent plain control takes. */
-export const motionTactileFromControl =
-  "transition-[background-color,color,box-shadow,transform,opacity] duration-release ease-release active:duration-press active:ease-press has-[button:active]:scale-[0.96] motion-reduce:transition-none motion-reduce:has-[button:active]:scale-100";
-
 /** The spatial half of a compact press, applied to the *mark* rather than to the control.
  *
  *  A control whose visible ink is much smaller than the target it is aimed at — a dialog's close
@@ -75,10 +66,15 @@ export const motionInkPress =
    travel, presence and activity in the library is one of these names plus its owner's own target
    geometry. */
 
-/* A `Select`'s trigger takes `motionTactile` on the field that owns it: the trigger's own active
-   state is suppressed by the primitive, while a press on it still activates its wrapper as an
-   ancestor — so the *field* is the element that carries the compression, and the press reads as
-   "this field was pressed" exactly as an editable combobox field does. */
+/* A field that opens a list — a `Select`'s trigger, an editable `Combobox`'s field — takes
+   `motionTactile` as a whole, which is what makes the two forms of the same control press
+   identically. The *field* is the element that carries the compression in both: a press activates
+   the whole chain, so a descendant being pressed is what makes the field itself match `:active`
+   (and a select trigger's own active state is suppressed by the primitive, so its field's wrapper
+   is the only element left to carry it). Typing, focus and hover never match it, so the field is
+   perfectly still while it is used as a text field; a press that places a caret or drags across a
+   word is the same press the field already answers, and distinguishing it would take pointer
+   bookkeeping inside a component for a case that reads as one interaction either way. */
 
 /** A meaningful subordinate part arrives. Spring is reserved for this intent: a mark is
  *  made by overshooting the position it lands in. It leaves without the overshoot, and

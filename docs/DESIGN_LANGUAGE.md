@@ -559,7 +559,7 @@ library has nine intents, and one module owns the timing behind all of them
 | Intent | What it is | Recipe | Used for |
 | --- | --- | --- | --- |
 | `feedback` | a non-spatial state response | `motionFeedback` | hover, focus, a field's tone, a row's highlight, a filled surface |
-| `tactile` | a temporary physical answer to activation | `motionTactile`, `motionTactileFromControl`, `motionInkPress` | a button, an icon button, a stepper, a navigation row, a field that opens a list |
+| `tactile` | a temporary physical answer to activation | `motionTactile`, `motionInkPress` | a button, an icon button, a stepper, a navigation row, a field that opens a list |
 | `arrive` | a meaningful subordinate part appears or leaves | `motionArrive` | a checkbox tick, a radio dot, the selected mark in a `Select` or `Combobox` |
 | `orient` | a persistent affordance changes orientation in place | `motionOrient` | the disclosure chevron of a `Select` or `Combobox` |
 | `relocate` | a persistent object travels between stable destinations | `motionRelocate` | a tab indicator, a switch thumb |
@@ -592,8 +592,7 @@ it settles*.
 
 | Recipe | Amplitude | For |
 | --- | --- | --- |
-| `motionTactile` | 4% compression | a control whose outline is what the user sees, including a select trigger, whose field carries the press |
-| `motionTactileFromControl` | 4% compression | a composite field answering a press on one of its own controls — and only on a control, never on its text |
+| `motionTactile` | 4% compression | a control whose outline is what the user sees, including a field that opens a list, whose field carries the press |
 | `motionInkPress` | 12% compression **of the mark** | a control whose visible ink is much smaller than the target it is aimed at — a stepper, a dismiss control, a close control. The target keeps its geometry; the mark inside it takes the press |
 | `motionPresenceAnchored` / `…Tooltip` | from 94% scale, 4px toward the anchor | any anchored surface |
 | `motionPresenceModal` | from 96% scale, 12px rise | a surface that owns the viewport |
@@ -607,20 +606,28 @@ because a 20px glyph inside a 44px target would never register two pixels of its
 not because a smaller control deserves a livelier animation.
 
 **A field that opens a list is a control, and presses like one.** A `Select`'s trigger and an
-editable `Combobox`'s field are the same control in two forms, so a press on either compresses the
-same field by the same four percent. What differs is *what counts as a press*, and the difference
-is what the field is:
+editable `Combobox`'s field are the same control in two forms, and the whole field answers a press
+in both — one recipe, one amplitude, one timing, so pressing either reads as the same physical
+event:
 
-- a `Select` trigger **is** the control, so the whole field answers a press anywhere on it;
-- an editable `Combobox` field contains a text field, so it answers a press on one of its **own
-  controls** and never on its text — a caret click and a drag across a word are `:active` on the
-  whole ancestor chain, and a field that shrank while the user was selecting a word would be moving
-  the ground under the pointer. Typing, focus and text selection therefore leave it perfectly
-  still, which is asserted in the browser suite.
+```
+Select      press → whole field compresses → the list grows out of it
+Combobox    press → whole field compresses → the list grows out of it
+```
 
-Neither moves its own affordances: the clear and disclosure controls answer with tone alone,
-because the field is what the user is aiming at and a second compression nested inside the first
-would read as two events. A plain `Input` or `Textarea` opens nothing, so it stays feedback-only.
+The field is the element that carries it because a press activates the whole chain: a descendant
+being pressed is what makes the field itself match `:active`, which is also why a `Select` can
+compress at all — the primitive suppresses the trigger's own active state, and its field's wrapper
+is the only element left to answer. Composition follows from there:
+
+- the field's **own affordances** — a clear control, a disclosure control — answer with tone alone,
+  because a second compression nested inside the field's would read as two events for one press;
+- **typing and focus** never match, so the field is perfectly still while it is used as a text
+  field;
+- a press that **places a caret or drags across a word** is the same press, and the field compresses
+  for it too. That is accepted rather than special-cased: telling it apart would take pointer
+  bookkeeping or an interaction state machine inside a component, for a case that reads as one
+  interaction either way. A plain `Input` or `Textarea` opens nothing, so it stays feedback-only.
 
 **A target the pointer is already on never moves.** A control whose visible ink is much smaller
 than its target — a stepper, a dismiss control, a close control — compresses the *mark*, not the
