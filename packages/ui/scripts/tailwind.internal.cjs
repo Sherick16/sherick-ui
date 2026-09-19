@@ -60,13 +60,16 @@ module.exports = {
         spring: "var(--sui-ease-spring)",
       },
       /* The one paced loop in the system: a progress bar with no known value sweeps its fill
-         across its own track. It travels a logical edge rather than a transform, so the sweep
-         follows the writing direction; `linear` is the timing a loop that never accelerates or
-         settles takes, and the pace is the authored `--sui-duration-activity` token. */
+         across its own track. The travel is a transform, so an endless loop never sits on the
+         layout path, and it is measured against the track rather than against the fill, which is
+         what keeps the sweep independent of how wide the fill happens to be. A transform is
+         physical, so the direction is a value the recipe flips for a right-to-left page;
+         `linear` is the timing a loop that never accelerates or settles takes, and the pace is
+         the authored `--sui-duration-activity` token. */
       keyframes: {
         "sherick-indeterminate": {
-          "0%": { insetInlineStart: "-40%" },
-          "100%": { insetInlineStart: "100%" },
+          "0%": { transform: "translateX(calc(-100% * var(--sui-indeterminate-direction, 1)))" },
+          "100%": { transform: "translateX(calc(100% * var(--sui-indeterminate-direction, 1)))" },
         },
       },
       animation: {

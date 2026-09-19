@@ -637,7 +637,12 @@ it settles*.
 | `motionPresenceAnchored` / `…Tooltip` | from 94% scale, 4px toward the anchor | any anchored surface |
 | `motionPresenceModal` | from 96% scale, 12px rise | a surface that owns the viewport |
 | `motionArrive` | from 50% scale | a selection mark |
-| `motionActivityIndeterminate` | the fill's whole width, across the track | the fill of a bar whose extent is not known |
+| `motionActivityIndeterminate` | the track's own width, as a composited transform | the fill of a bar whose extent is not known |
+
+The one loop is a **travel** rather than a zoom: its amplitude is measured against the track rather
+than against the part that moves, so it does not depend on how wide that part happens to be, and it
+is carried by a transform so an endless loop never sits on the layout path. It follows the writing
+direction, because a transform is physical and the page is not.
 
 Every one of these is a **centred zoom** or a directional grow: a press changes size in place and
 never translates, and an anchored surface grows about the edge the primitive resolved for it.

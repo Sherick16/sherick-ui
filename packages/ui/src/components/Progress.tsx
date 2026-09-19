@@ -29,9 +29,9 @@ export interface ProgressProps
 }
 
 /**
- * How far along a task has come. Base UI owns the meter role, the value boundaries, the
- * percentage and the accessible text; Sherick UI owns the recessed groove, the accent fill and
- * the sweep an unknown extent reports itself with.
+ * How far along a task has come. Base UI owns the `progressbar` role, the value boundaries, the
+ * percentage and the accessible text; Sherick UI owns the recessed groove, the accent fill and the
+ * sweep an unknown extent reports itself with.
  */
 export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
   (
@@ -90,20 +90,29 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
             material.matteQuiet
           )}
         >
-          <BaseProgress.Indicator
-            /* Forced colors flattens the fill into its track, so the marker is what lets the
-               stylesheet give the one part that carries the meaning a boundary. */
-            data-sui-progress-indicator=""
+          {/* The box that travels. It is the track's own width, so the sweep is expressed as a
+              fraction of the track rather than of the fill, and it stays a composited transform
+              while the fill keeps the geometry its own role gives it: a measured width when the
+              value is known, and one bar's worth of track when it is not. */}
+          <div
             className={cn(
-              "absolute inset-y-0 start-0",
-              shape.pill,
-              tone.strong[variant],
-              indeterminate
-                ? cn("w-2/5", motionActivityIndeterminate)
-                : /* The measure itself is Base's: it writes the indicator's own width. */
-                  "w-full"
+              "absolute inset-y-0 start-0 w-full",
+              indeterminate && motionActivityIndeterminate
             )}
-          />
+          >
+            <BaseProgress.Indicator
+              /* Forced colors flattens the fill into its track, so the marker is what lets the
+                 stylesheet give the one part that carries the meaning a boundary. */
+              data-sui-progress-indicator=""
+              className={cn(
+                "block h-full",
+                shape.pill,
+                tone.strong[variant],
+                /* The measure itself is Base's: it writes the indicator's own width. */
+                indeterminate ? "w-2/5" : "w-full"
+              )}
+            />
+          </div>
         </BaseProgress.Track>
       </BaseProgress.Root>
     );

@@ -130,7 +130,7 @@ one name:
   single-choice form over an `options` array. Selection lives in Base UI's own pressed marker, so an
   uncontrolled toggle is styled from the same source of truth as a controlled one, and a
   `SegmentedControl` never empties itself;
-- **`Progress`** — a determinate bar announces its value through Base UI's meter role, and omitting
+- **`Progress`** — a determinate bar announces its value through Base UI's `progressbar` role, and omitting
   `value`, or passing `null`, sweeps the fill instead of reporting a position;
 - **removable tags** — only a chip that holds no selection can be dismissed, because a control that
   both holds a value and deletes itself is one target with two meanings.

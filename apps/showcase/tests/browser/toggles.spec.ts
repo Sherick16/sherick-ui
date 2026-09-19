@@ -1,4 +1,4 @@
-import { expect, test, type Locator } from "./fixtures";
+import { expect, test, type Locator, type Page } from "./fixtures";
 
 /* The toggle family and the progress bar. These assert the rendered contract rather than the
    implementation: which role a part publishes, where its value lives, and what the browser
@@ -9,6 +9,33 @@ const boxShadow = (locator: Locator) =>
 
 const animationName = (locator: Locator) =>
   locator.evaluate((element) => getComputedStyle(element).animationName);
+
+/** A computed duration is normalized to milliseconds: a browser prints `1.4s` where the token says
+ *  `1400ms`, and the Web Animations API counts in milliseconds. */
+const asMilliseconds = (value: string) => {
+  const trimmed = value.trim();
+  return trimmed.endsWith("ms") ? Number.parseFloat(trimmed) : Number.parseFloat(trimmed) * 1000;
+};
+
+/** The x translation a sweep paints at a point of its own loop. The animation is paused and
+ *  seeked rather than sampled, because a running animation outranks the cascade and the loop's
+ *  start is the state it really paints first. */
+const sweepTravelAt = async (page: Page, locator: Locator, fraction: number) => {
+  const loop = await page.evaluate((name) =>
+    getComputedStyle(document.documentElement).getPropertyValue(name), "--sui-duration-activity");
+
+  await locator.evaluate((element, currentTime) => {
+    element.getAnimations().forEach((animation) => {
+      animation.pause();
+      animation.currentTime = currentTime;
+    });
+  }, asMilliseconds(loop) * fraction);
+
+  return locator.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return new DOMMatrix(style.transform === "none" ? "" : style.transform).e;
+  });
+};
 
 test.use({ reducedMotion: "no-preference" });
 
@@ -155,10 +182,11 @@ test("progress measures a known value and sweeps an unknown one", async ({ page,
   expect(await measure()).toBeCloseTo(0.65, 1);
 
   /* An unknown extent reports work rather than a position: no value is announced, and the fill
-     sweeps its own track instead of sitting at one. */
+     sweeps its own track instead of sitting at one. The box that travels is the fill's own
+     wrapper — the track's width — so the sweep is measured against the track, not the fill. */
   const indeterminate = page.getByTestId("progress-indeterminate").getByRole("progressbar");
   await expect(indeterminate).not.toHaveAttribute("aria-valuenow");
-  const sweep = indeterminate.locator("[data-sui-progress-indicator]");
+  const sweep = indeterminate.locator("[data-sui-progress-indicator]").locator("xpath=..");
   expect(await animationName(sweep)).toBe("sherick-indeterminate");
   expect(await sweep.evaluate((element) => getComputedStyle(element).animationIterationCount)).toBe(
     "infinite"
@@ -170,14 +198,21 @@ test("progress measures a known value and sweeps an unknown one", async ({ page,
 test("reduced motion leaves the indeterminate bar a static status glyph", async ({ page, errors }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/verification/interactions");
-  const sweep = page
+  const fill = page
     .getByTestId("progress-indeterminate")
     .getByRole("progressbar")
     .locator("[data-sui-progress-indicator]");
 
-  expect(await animationName(sweep)).toBe("none");
-  const box = await sweep.boundingBox();
-  expect(box?.width ?? 0).toBeGreaterThan(0);
+  expect(await animationName(fill.locator("xpath=.."))).toBe("none");
+
+  /* The loop stops, but the bar still reports work: the fill rests where it starts, as one bar's
+     worth of the track rather than as nothing at all. */
+  const fillBox = await fill.boundingBox();
+  const trackBox = await page
+    .getByTestId("progress-indeterminate")
+    .locator(".shadow-sherick-recessed")
+    .boundingBox();
+  expect((fillBox?.width ?? 0) / (trackBox?.width ?? 1)).toBeCloseTo(0.4, 1);
 
   expect(errors).toEqual([]);
 });
@@ -200,6 +235,65 @@ test("an uncontrolled segmented control starts on the first option it can hold",
   /* And the choice it holds cannot be released either. */
   await week.click();
   await expect(week).toHaveAttribute("aria-pressed", "true");
+
+  expect(errors).toEqual([]);
+});
+
+test("the sweep travels a composited transform, in the page's own direction", async ({
+  page,
+  errors,
+}) => {
+  const bar = page.getByTestId("progress-indeterminate").getByRole("progressbar");
+  const fill = bar.locator("[data-sui-progress-indicator]");
+  const sweep = fill.locator("xpath=..");
+
+  /* The box stays where it is put, and the travel is carried by the transform list: an endless
+     loop must never sit on the layout path. */
+  expect(
+    await sweep.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return style.getPropertyValue("inset-inline-start") || style.getPropertyValue("left");
+    })
+  ).toBe("0px");
+  expect(await sweep.evaluate((element) => getComputedStyle(element).transform)).not.toBe("none");
+
+  /* On a page that reads left to right the box is before the track at the top of its loop, over
+     it in the middle, and past it at the end. */
+  const forwardStart = await sweepTravelAt(page, sweep, 0);
+  const forwardMiddle = await sweepTravelAt(page, sweep, 0.5);
+  const forwardEnd = await sweepTravelAt(page, sweep, 0.99);
+  expect(forwardStart).toBeLessThan(0);
+  expect(Math.abs(forwardMiddle)).toBeLessThan(Math.abs(forwardStart));
+  expect(forwardEnd).toBeGreaterThan(0);
+
+  /* A transform is physical and the page is not: the same recipe sweeps the other way when the
+     document is laid out right to left. */
+  await page.evaluate(() => {
+    document.documentElement.dir = "rtl";
+  });
+  expect(await sweepTravelAt(page, sweep, 0)).toBeGreaterThan(0);
+  expect(await sweepTravelAt(page, sweep, 0.99)).toBeLessThan(0);
+
+  expect(errors).toEqual([]);
+});
+
+test("a dismiss control inside a chip group keeps its own keys", async ({ page, errors }) => {
+  const dismiss = page.getByRole("button", { name: "Remove Draft" });
+  await expect(dismiss).toBeVisible();
+  await dismiss.focus();
+  await expect(dismiss).toBeFocused();
+
+  /* The dismiss control is not one of the group's items, so the keys aimed at it belong to it:
+     the group's roving navigation must not take focus off the control the user is standing on. */
+  for (const key of ["ArrowRight", "ArrowLeft", "Home", "End"]) {
+    await page.keyboard.press(key);
+    await expect(dismiss, `pressing ${key} in the dismiss control`).toBeFocused();
+  }
+
+  /* It is still a control: it activates, and it removes the chip it belongs to. */
+  await page.keyboard.press("Enter");
+  await expect(page.getByTestId("group-tag-state")).toHaveText("removed");
+  await expect(page.getByRole("button", { name: "Remove Draft" })).toHaveCount(0);
 
   expect(errors).toEqual([]);
 });

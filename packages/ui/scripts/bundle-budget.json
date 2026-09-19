@@ -23,15 +23,15 @@
     },
     "toggles": {
       "definition": "Representative toggle composition: Chip, ChipGroup, Progress, SegmentedControl, ToggleGroup.",
-      "raw": 64879,
-      "gzip": 21837,
-      "brotli": 19442
+      "raw": 65021,
+      "gzip": 21878,
+      "brotli": 19449
     },
     "barrel": {
       "definition": "The complete core root barrel with nothing tree-shaken beyond unused exports.",
-      "raw": 419117,
-      "gzip": 139793,
-      "brotli": 115404
+      "raw": 419259,
+      "gzip": 139835,
+      "brotli": 115388
     },
     "content": {
       "definition": "The optional rich-content subpath: Markdown, CodeBlock and their full dependency stack.",
@@ -41,9 +41,9 @@
     },
     "stylesCss": {
       "definition": "Published component stylesheet.",
-      "raw": 105145,
-      "gzip": 12700,
-      "brotli": 10463
+      "raw": 105374,
+      "gzip": 12739,
+      "brotli": 10494
     },
     "themeCss": {
       "definition": "Published token-only theme stylesheet.",

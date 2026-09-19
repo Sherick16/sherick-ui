@@ -69,6 +69,7 @@ export default function VerificationInteractionsPage() {
   const [alertOutcome, setAlertOutcome] = useState("");
   const [filters, setFilters] = useState<string[]>(["design"]);
   const [removableChipVisible, setRemovableChipVisible] = useState(true);
+  const [groupTagVisible, setGroupTagVisible] = useState(true);
   const [range, setRange] = useState("week");
   const [formats, setFormats] = useState<string[]>(["bold"]);
   const [progress, setProgress] = useState(40);
@@ -483,7 +484,7 @@ export default function VerificationInteractionsPage() {
         />
 
         {/* The toggle family: a grouped value, a grouped value that is exclusive, a standalone
-            toggle and a tag with a dismiss control. */}
+            toggle, and tags with dismiss controls both inside a group and outside one. */}
         <div className="space-y-2">
           <ChipGroup
             aria-label="Interactions filters"
@@ -493,8 +494,12 @@ export default function VerificationInteractionsPage() {
             <Chip value="design">Design</Chip>
             <Chip value="code">Code</Chip>
             <Chip value="ops" disabled>Ops</Chip>
+            {groupTagVisible ? (
+              <Chip onRemove={() => setGroupTagVisible(false)}>Draft</Chip>
+            ) : null}
           </ChipGroup>
           <p data-testid="chip-group-value">{filters.join(",")}</p>
+          <p data-testid="group-tag-state">{groupTagVisible ? "present" : "removed"}</p>
         </div>
 
         <div className="space-y-2">

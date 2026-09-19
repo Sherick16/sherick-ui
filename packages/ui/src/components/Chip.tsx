@@ -182,6 +182,12 @@ export const Chip = forwardRef<HTMLElement, ChipProps>(
       removeLabel ??
       (typeof children === "string" ? `Remove ${children}` : "Remove");
 
+    /* A tag's dismiss control is not one of a group's items, so the keys aimed at it are its own.
+       The composite root answers Arrow/Home/End for its items in the bubble phase, and without
+       this its roving navigation would take focus away from the control the user is standing on. */
+    const keepOwnKeys = (event: React.KeyboardEvent<HTMLButtonElement>) =>
+      event.stopPropagation();
+
     return (
       <span
         {...(chipProps as HTMLAttributes<HTMLSpanElement>)}
@@ -200,6 +206,7 @@ export const Chip = forwardRef<HTMLElement, ChipProps>(
           <BaseButton
             type="button"
             aria-label={dismissLabel}
+            onKeyDown={keepOwnKeys}
             onClick={onRemove}
             className={cn(
               "group inline-flex size-7 shrink-0 items-center justify-center",
