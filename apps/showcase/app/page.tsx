@@ -61,6 +61,14 @@ import {
   tone,
 } from "sherick-ui/dev";
 
+import {
+  ShowcaseJumpNav,
+  ShowcaseSideNav,
+  showcaseSections,
+  useShowcaseScrollSpy,
+  type ShowcaseSectionId,
+} from "../components/ShowcaseNav";
+
 const selectOptions = [
   { label: "Design system", value: "design" },
   { label: "Dashboard", value: "dashboard" },
@@ -93,6 +101,7 @@ export default function Home() {
   const [selection, setSelection] = useState("design");
   const [alertOpen, setAlertOpen] = useState(false);
   const [theme, setTheme] = useState<ThemeMode>("system");
+  const activeSection = useShowcaseScrollSpy();
 
   useEffect(() => {
     const stored = localStorage.getItem("sherick-ui-theme");
@@ -109,7 +118,7 @@ export default function Home() {
 
   return (
     <main className={cn("min-h-screen text-left", material.canvas)}>
-      <div className="mx-auto w-full max-w-[1320px] px-5 py-10 sm:px-8 lg:px-10 lg:py-14">
+      <div className="mx-auto w-full max-w-[1320px] px-5 pt-10 sm:px-8 lg:px-10 lg:pt-14">
         <div className="mb-14 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
           <div className="max-w-3xl">
             <Badge variant="primary">Sherick UI · development workbench</Badge>
@@ -127,10 +136,17 @@ export default function Home() {
           </div>
           <ThemePicker theme={theme} onChange={changeTheme} />
         </div>
-
+      </div>
+      <div className="mx-auto grid w-full max-w-[1320px] grid-cols-1 min-[1660px]:max-w-none min-[1660px]:grid-cols-[minmax(0,1fr)_1320px_minmax(0,1fr)]">
+        <div className="hidden min-[1660px]:block">
+          <ShowcaseSideNav activeId={activeSection} className="sticky top-28 ml-auto mr-3 w-36" />
+        </div>
+        <div className="min-w-0 px-5 pb-10 sm:px-8 lg:px-10 lg:pb-14">
+        <div className="mb-6 min-[1660px]:hidden">
+          <ShowcaseJumpNav activeId={activeSection} />
+        </div>
         <div className="space-y-16">
-          <section>
-            <SectionHeading title="Design language" />
+          <ShowcaseSection id="design-language">
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
               <Specimen title="Material">
                 <div className={cn("grid grid-cols-2 gap-4 p-5 sm:grid-cols-3", shape.control, material.canvas)}>
@@ -269,10 +285,9 @@ export default function Home() {
                 </div>
               </Specimen>
             </div>
-          </section>
+          </ShowcaseSection>
 
-          <section>
-            <SectionHeading title="Buttons" />
+          <ShowcaseSection id="buttons">
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
               <Specimen title="Appearances">
                 <div className="flex flex-wrap items-center gap-3">
@@ -309,10 +324,9 @@ export default function Home() {
                 </div>
               </Specimen>
             </div>
-          </section>
+          </ShowcaseSection>
 
-          <section>
-            <SectionHeading title="Fields" />
+          <ShowcaseSection id="fields">
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
               <Specimen title="Text input">
                 <div className="space-y-4">
@@ -377,10 +391,9 @@ export default function Home() {
                 </div>
               </Specimen>
             </div>
-          </section>
+          </ShowcaseSection>
 
-          <section>
-            <SectionHeading title="Selection & navigation" />
+          <ShowcaseSection id="selection">
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
               <Specimen title="Checkbox">
                 <div className="flex flex-wrap items-center gap-6">
@@ -429,10 +442,9 @@ export default function Home() {
                 </div>
               </Specimen>
             </div>
-          </section>
+          </ShowcaseSection>
 
-          <section>
-            <SectionHeading title="Feedback" />
+          <ShowcaseSection id="feedback">
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
               <Specimen title="Alerts">
                 <div className="space-y-3">
@@ -450,10 +462,9 @@ export default function Home() {
                 </div>
               </Specimen>
             </div>
-          </section>
+          </ShowcaseSection>
 
-          <section>
-            <SectionHeading title="Surfaces & overlays" />
+          <ShowcaseSection id="surfaces">
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
               <Specimen title="Cards & badges">
                 <div className="grid gap-3 sm:grid-cols-2">
@@ -481,10 +492,9 @@ export default function Home() {
                 <Button appearance="tonal" variant="secondary" onClick={() => setDialogOpen(true)}>Open dialog</Button>
               </Specimen>
             </div>
-          </section>
+          </ShowcaseSection>
 
-          <section>
-            <SectionHeading title="Data display" />
+          <ShowcaseSection id="data">
             <Specimen title="Table" className="mt-6">
               <Table headers={["Component", "Role", "Status"]} rows={[
                 ["Select", "Custom selection", <Badge key="select" variant="success">Ready</Badge>],
@@ -493,10 +503,9 @@ export default function Home() {
                 ["Input", "Form control", <Badge key="input" variant="primary">Core</Badge>],
               ]} />
             </Specimen>
-          </section>
+          </ShowcaseSection>
 
-          <section>
-            <SectionHeading title="Floating surfaces" />
+          <ShowcaseSection id="floating">
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
               <Specimen title="Popover">
                 <Popover>
@@ -558,10 +567,9 @@ export default function Home() {
                 </Button>
               </Specimen>
             </div>
-          </section>
+          </ShowcaseSection>
 
-          <section className="pb-12">
-            <SectionHeading title="Content" />
+          <ShowcaseSection id="content" className="pb-12">
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
               <Specimen title="Code block">
                 <CodeBlock language="tsx">{'<Button appearance="filled">Save</Button>'}</CodeBlock>
@@ -570,8 +578,10 @@ export default function Home() {
                 <Markdown>{`## Example\nSherick UI keeps **dense information quiet** and gives floating UI more depth.\n\n- Predictable controls\n- Soft hierarchy\n- [Accessible interactions](#)\n\n> Expression should clarify hierarchy, not decorate every surface.\n\nUse \`Button\` for primary actions, and reach for a fenced block when the code carries its own hierarchy:\n\n\`\`\`ts\nconst surface = material.matte;\nconst action = shape.pill;\n\`\`\``}</Markdown>
               </Specimen>
             </div>
-          </section>
+          </ShowcaseSection>
         </div>
+        </div>
+        <div className="hidden min-[1660px]:block" aria-hidden="true" />
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -648,6 +658,28 @@ function SectionHeading({ title }: { title: string }) {
     <div className={cn("border-b pb-5", edge.rule)}>
       <h2 className="text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{title}</h2>
     </div>
+  );
+}
+
+function ShowcaseSection({
+  id,
+  className,
+  children,
+}: {
+  id: ShowcaseSectionId;
+  className?: string;
+  children: React.ReactNode;
+}) {
+  const section = showcaseSections.find((entry) => entry.id === id);
+  if (!section) {
+    throw new Error(`Unknown showcase section: ${id}`);
+  }
+
+  return (
+    <section id={section.id} className={cn("scroll-mt-28", className)}>
+      <SectionHeading title={section.title} />
+      {children}
+    </section>
   );
 }
 
