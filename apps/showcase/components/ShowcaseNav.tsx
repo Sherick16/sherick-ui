@@ -11,14 +11,12 @@ import { cn, focusRing, motionFeedback, shape, text } from "sherick-ui/dev";
 */
 export const showcaseSections = [
   { id: "design-language", title: "Design language", nav: "Design language" },
-  { id: "optical-balance", title: "Optical balance", nav: "Optical balance" },
   { id: "buttons", title: "Buttons", nav: "Buttons" },
   { id: "fields", title: "Fields", nav: "Fields" },
   { id: "selection", title: "Selection & navigation", nav: "Selection" },
   { id: "feedback", title: "Feedback", nav: "Feedback" },
   { id: "disclosure", title: "Disclosure", nav: "Disclosure" },
-  { id: "surfaces", title: "Surfaces & overlays", nav: "Surfaces" },
-  { id: "data", title: "Data display", nav: "Data" },
+  { id: "display", title: "Display", nav: "Display" },
   { id: "floating", title: "Floating surfaces", nav: "Floating" },
   { id: "content", title: "Content", nav: "Content" },
 ] as const;

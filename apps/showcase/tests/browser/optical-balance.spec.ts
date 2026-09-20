@@ -1,8 +1,9 @@
 import { expect, test, type Locator, type Page } from "./fixtures";
 
 /*
- The optical-balance specimens exist so the anatomy a reviewer judges by eye also has a
- deterministic contract. Nothing here asserts a pixel: every check reads geometry the browser
+ The design language's §17 makes optical balance a property of every control rather than a
+ section of the showcase, so the invariants it states are asserted against the components where
+ they actually live. Nothing here asserts a pixel: every check reads geometry the browser
  computed — a slot's own box, a target's size, the side a logical property resolved to, and the
  line a mark is centred on.
 
@@ -10,10 +11,10 @@ import { expect, test, type Locator, type Page } from "./fixtures";
  runtime-error claim.
 */
 
-const openShowcase = async (page: Page) => {
+const openShowcase = async (page: Page, section: string) => {
   await page.goto("/");
   await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
-  return page.locator("#optical-balance");
+  return page.locator(`#${section}`);
 };
 
 /* The distance from the control's own box to its surface's inline **end** edge, read from the
@@ -30,12 +31,12 @@ const endInset = (control: Locator) =>
   });
 
 test("a loading mark takes the slot its icon had, without changing the control", async ({ page }) => {
-  const section = await openShowcase(page);
+  const section = await openShowcase(page, "buttons");
 
-  // The two buttons share one label; the first is idle and the second is loading.
-  const download = section.getByRole("button", { name: "Download", exact: true });
-  await expect(download).toHaveCount(2);
-  const [idle, busy] = [download.nth(0), download.nth(1)];
+  // Two buttons share one label; the first is at rest and the second is loading.
+  const exports = section.getByRole("button", { name: "Export", exact: true });
+  await expect(exports).toHaveCount(2);
+  const [idle, busy] = [exports.nth(0), exports.nth(1)];
 
   const idleButton = await idle.boundingBox();
   const busyButton = await busy.boundingBox();
@@ -48,14 +49,14 @@ test("a loading mark takes the slot its icon had, without changing the control",
   expect(busyMark?.height).toBe(idleMark?.height);
 
   // The icon-only control is the same rule with no label to hide behind.
-  const iconIdle = await section.getByRole("button", { name: "Notification mark" }).boundingBox();
-  const iconBusy = await section.getByRole("button", { name: "Notification loading" }).boundingBox();
+  const iconIdle = await section.getByRole("button", { name: "Notifications", exact: true }).boundingBox();
+  const iconBusy = await section.getByRole("button", { name: "Saving notifications", exact: true }).boundingBox();
   expect(iconBusy?.width).toBe(iconIdle?.width);
   expect(iconBusy?.height).toBe(iconIdle?.height);
 });
 
 test("a chip's dismiss mark keeps its target and its edge distance", async ({ page }) => {
-  const section = await openShowcase(page);
+  const section = await openShowcase(page, "selection");
   const dismiss = section.getByRole("button", { name: "Remove Platform" });
   await expect(dismiss).toBeVisible();
 
@@ -74,8 +75,8 @@ test("a chip's dismiss mark keeps its target and its edge distance", async ({ pa
 });
 
 test("a field's embedded mark follows the writing direction", async ({ page }) => {
-  const section = await openShowcase(page);
-  const field = section.getByPlaceholder("Embedded mark").locator("..");
+  const section = await openShowcase(page, "fields");
+  const field = section.getByPlaceholder("Search components").locator("..");
   const submit = field.getByRole("button", { name: "Submit search" });
   await expect(submit).toBeVisible();
 
@@ -90,8 +91,8 @@ test("a field's embedded mark follows the writing direction", async ({ page }) =
 });
 
 test("a status mark and a dismissal hold the first line of copy that wraps", async ({ page }) => {
-  const section = await openShowcase(page);
-  const alert = section.getByRole("alert").filter({ hasText: "Review these settings" });
+  const section = await openShowcase(page, "feedback");
+  const alert = section.getByRole("alert").filter({ hasText: "The connection dropped" });
   await expect(alert).toBeVisible();
 
   const geometry = await alert.evaluate((element) => {
@@ -121,8 +122,8 @@ test("a status mark and a dismissal hold the first line of copy that wraps", asy
 });
 
 test("a toast's dismissal is not clipped by the stack that owns the overflow", async ({ page }) => {
-  const section = await openShowcase(page);
-  await section.getByRole("button", { name: "Status mark" }).click();
+  const section = await openShowcase(page, "feedback");
+  await section.getByRole("button", { name: "Warning", exact: true }).click();
 
   /* The stack carries the toast root, and Base keeps its dismissal control out of the reading
      order until the stack is engaged — which hovering it is. */

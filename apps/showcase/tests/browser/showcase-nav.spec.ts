@@ -65,8 +65,8 @@ test("the narrow layout replaces the gutter table of contents with a sticky jump
   const nav = page.getByRole("navigation", { name: "Showcase sections" });
   await expectEntriesTargetRealSections(page, nav);
 
-  await nav.getByRole("link", { name: "Surfaces" }).click();
-  await expect(page).toHaveURL(/#surfaces$/);
+  await nav.getByRole("link", { name: "Display" }).click();
+  await expect(page).toHaveURL(/#display$/);
   await expect(trigger).toHaveAttribute("aria-expanded", "false");
 
   // The control has to stay reachable once the reader scrolls past it.

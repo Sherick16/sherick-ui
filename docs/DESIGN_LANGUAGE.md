@@ -1140,3 +1140,12 @@ does not argue for them. Rules, rationale and explanation belong here.
 A foundation card isolates **one primitive at a time**: the depth ladder is shown against a
 single neutral fill, so a pairing inside a specimen card is not a recommendation to compose
 it, and a specimen may outline a fill that would otherwise be invisible against the card.
+
+The page is organised **one concern per section**, and a section is named for its concern
+rather than for a component: foundations, buttons, fields, selection, feedback, disclosure,
+display, floating surfaces and content. A control's meaningful states appear beside that
+control — a button at rest beside the same button loading, a chip with and without a leading
+mark or a dismiss control — because a section of their own would make a property the whole
+library shares look like a feature of it. A property like optical balance is a rule in this
+document and a state of every control, never a section of the page. A component may appear as
+*content* inside another section (a popover's body, a table cell), but it is specimened once.

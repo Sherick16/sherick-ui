@@ -305,143 +305,6 @@ export default function Home() {
             </div>
           </ShowcaseSection>
 
-          {/* One comparison section for optical balance: every specimen here is a control whose
-              internal geometry was decided by eye rather than by its own box arithmetic, so a
-              regression shows up as a mark that drifts, shrinks or leaves a trailing void. */}
-          <ShowcaseSection id="optical-balance">
-            <div className="mt-6 grid gap-4 xl:grid-cols-2">
-              <Specimen title="Label, leading mark and trailing action">
-                <div className="flex flex-wrap items-center gap-2.5">
-                  <Chip variant="warning">Beta</Chip>
-                  <Chip variant="success" icon={<Check />}>Ready</Chip>
-                  <Chip onRemove={() => undefined}>Platform</Chip>
-                  <Chip variant="success" icon={<Check />} onRemove={() => undefined}>Ready</Chip>
-                </div>
-                <div className="mt-4 flex flex-wrap items-center gap-3">
-                  <Button appearance="tonal" variant="secondary" size="sm">Text only</Button>
-                  <Button appearance="tonal" variant="secondary" size="sm" icon={<Download />}>Leading mark</Button>
-                </div>
-                <div className="mt-4 flex flex-wrap items-center gap-2">
-                  <Badge variant="secondary">Text only</Badge>
-                  <Badge variant="success" icon={<Check />}>Leading mark</Badge>
-                </div>
-              </Specimen>
-
-              <Specimen title="A loading mark keeps its slot">
-                <div className="flex flex-wrap items-center gap-3">
-                  <Button appearance="tonal" variant="secondary" icon={<Download />}>Download</Button>
-                  <Button appearance="tonal" variant="secondary" icon={<Download />} loading>Download</Button>
-                  <IconButton appearance="tonal" variant="secondary" icon={<Bell />} aria-label="Notification mark" />
-                  <IconButton appearance="tonal" variant="secondary" icon={<Bell />} aria-label="Notification loading" loading />
-                </div>
-                <div className="mt-4 space-y-4">
-                  <Search onSearch={() => undefined} placeholder="Embedded mark" />
-                  <Search onSearch={() => undefined} placeholder="Embedded loading mark" loading />
-                </div>
-              </Specimen>
-
-              <Specimen title="A status mark holds the first line">
-                <div className="space-y-3">
-                  <Alert variant="primary">A useful piece of information.</Alert>
-                  <Alert variant="warning" closeable>
-                    Review these settings before continuing. Copy that wraps across several lines keeps
-                    its status mark and its dismiss control on the first readable line instead of
-                    drifting to the middle of the block.
-                  </Alert>
-                </div>
-                <div className="mt-5">
-                  <RadioGroup
-                    label="Deployment target"
-                    defaultValue="cluster"
-                    options={[
-                      { value: "production", label: "Production" },
-                      {
-                        value: "cluster",
-                        label: "Shared cluster, whose label is long enough to wrap across more than one line",
-                      },
-                    ]}
-                  />
-                </div>
-              </Specimen>
-
-              <Specimen title="Trailing affordances">
-                <div className="space-y-4">
-                  <Select options={selectOptions} defaultValue="design" aria-label="Trailing chevron" />
-                  <Combobox options={comboboxOptions} defaultValue="design" />
-                  <NumberField defaultValue={4} min={1} max={10} aria-label="Plus and minus marks" />
-                </div>
-              </Specimen>
-
-              <Specimen title="Selection marks">
-                <div className="flex flex-wrap items-center gap-6">
-                  <StateLabel label="Checked"><Checkbox defaultChecked aria-label="Checked mark" /></StateLabel>
-                  <StateLabel label="Indeterminate"><Checkbox indeterminate aria-label="Indeterminate mark" /></StateLabel>
-                </div>
-                <div className="mt-5 flex flex-col items-start gap-5">
-                  <SegmentedControl
-                    aria-label="Text segments"
-                    defaultValue="day"
-                    options={[
-                      { value: "day", label: "Day" },
-                      { value: "week", label: "Week" },
-                      { value: "month", label: "Month" },
-                    ]}
-                  />
-                  <SegmentedControl
-                    aria-label="Icon segments"
-                    defaultValue="start"
-                    options={[
-                      { value: "start", label: "Start", icon: <AlignLeft className="size-4" /> },
-                      { value: "center", label: "Center", icon: <AlignCenter className="size-4" /> },
-                    ]}
-                  />
-                  <ToggleGroup aria-label="Icon-only segments" multiple defaultValue={["left"]}>
-                    <ToggleGroup.Item value="left" aria-label="Align left"><AlignLeft className="size-4" /></ToggleGroup.Item>
-                    <ToggleGroup.Item value="center" aria-label="Align center"><AlignCenter className="size-4" /></ToggleGroup.Item>
-                  </ToggleGroup>
-                </div>
-              </Specimen>
-
-              <Specimen title="Disclosure chevrons">
-                <Accordion defaultValue={["wrapped"]}>
-                  <Accordion.Item value="plain">
-                    <Accordion.Trigger>A row that fits on one line</Accordion.Trigger>
-                    <Accordion.Panel className={cn("text-sm leading-7", text.medium)}>Panel content.</Accordion.Panel>
-                  </Accordion.Item>
-                  <Accordion.Item value="wrapped">
-                    <Accordion.Trigger>
-                      A row whose label wraps across more than one line, which is the case the chevron
-                      slot has to survive
-                    </Accordion.Trigger>
-                    <Accordion.Panel className={cn("text-sm leading-7", text.medium)}>Panel content.</Accordion.Panel>
-                  </Accordion.Item>
-                </Accordion>
-                <div className="mt-5">
-                  <Collapsible>
-                    <Collapsible.Trigger>Advanced options</Collapsible.Trigger>
-                    <Collapsible.Panel className={cn("text-sm leading-7", text.medium)}>Panel content.</Collapsible.Panel>
-                  </Collapsible>
-                </div>
-              </Specimen>
-
-              <Specimen title="Dismissal on a floating surface">
-                <Button appearance="tonal" variant="secondary" onClick={() => setDialogOpen(true)}>
-                  Open dialog
-                </Button>
-                <div className="mt-5">
-                  <SheetSpecimen />
-                </div>
-              </Specimen>
-
-              <Specimen title="Toast status and loading">
-                <ToastProvider>
-                  <OpticalToastSpecimen />
-                  <ToastViewport />
-                </ToastProvider>
-              </Specimen>
-            </div>
-          </ShowcaseSection>
-
           <ShowcaseSection id="buttons">
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
               <Specimen title="Appearances">
@@ -450,15 +313,17 @@ export default function Home() {
                   <Button appearance="tonal" variant="secondary">Tonal</Button>
                   <Button appearance="text" variant="secondary">Text</Button>
                   <Button appearance="tonal" variant="danger" icon={<Trash2 />}>Delete</Button>
-                  <IconButton appearance="tonal" variant="secondary" icon={<Bell />} aria-label="Tonal icon button" />
                 </div>
               </Specimen>
 
               <Specimen title="States">
-                <div className="flex flex-wrap items-center gap-3">
-                  <Button loading>Saving</Button>
-                  <Button disabled>Disabled</Button>
-                  <Button className="outline outline-2 outline-sherick-focus outline-offset-[3px]">Focus-visible</Button>
+                {/* A loading button keeps its label, so the two states sit beside each other and the
+                    control can be compared without it moving. */}
+                <div className="flex flex-wrap items-center gap-6">
+                  <StateLabel label="Rest"><Button icon={<Download />}>Export</Button></StateLabel>
+                  <StateLabel label="Loading"><Button icon={<Download />} loading>Export</Button></StateLabel>
+                  <StateLabel label="Disabled"><Button disabled>Disabled</Button></StateLabel>
+                  <StateLabel label="Focus"><Button className="outline outline-2 outline-sherick-focus outline-offset-[3px]">Focus-visible</Button></StateLabel>
                 </div>
               </Specimen>
 
@@ -475,6 +340,7 @@ export default function Home() {
                   <Tooltip content="Notifications"><IconButton icon={<Bell />} aria-label="Notifications" /></Tooltip>
                   <Tooltip content="Search"><IconButton appearance="ghost" variant="secondary" icon={<SearchIcon />} aria-label="Search" /></Tooltip>
                   <Tooltip content="Download"><IconButton appearance="acrylic" variant="secondary" icon={<Download />} aria-label="Download" /></Tooltip>
+                  <IconButton icon={<Bell />} loading aria-label="Saving notifications" />
                   <IconButton disabled icon={<Heart />} aria-label="Disabled favorite" />
                 </div>
               </Specimen>
@@ -508,40 +374,36 @@ export default function Home() {
 
               <Specimen title="Select">
                 <div className="space-y-4">
+                  <Select options={selectOptions} aria-label="Empty project type" />
                   <Select options={selectOptions} value={selection} onValueChange={(next) => setSelection(next ?? "")} aria-label="Project type" />
                   <Select options={selectOptions} disabled aria-label="Disabled project type" />
                 </div>
               </Specimen>
 
-              <Specimen title="Field">
-                <div className="space-y-6">
-                  <Field label="Notifications" description="Sent for every production deployment.">
-                    <Checkbox defaultChecked />
+              <Specimen title="Combobox">
+                <div className="space-y-4">
+                  <Field label="Project">
+                    <Combobox options={comboboxOptions} defaultValue="dashboard" />
                   </Field>
-                  <Field label="Seats" description="Between 1 and 10." required error="Choose between 1 and 10 seats.">
+                  <Field label="No results">
+                    <Combobox options={comboboxOptions} defaultInputValue="Nothing matches this query" />
+                  </Field>
+                  <Field label="Disabled">
+                    <Combobox options={comboboxOptions} defaultValue="design" disabled />
+                  </Field>
+                </div>
+              </Specimen>
+
+              <Specimen title="Field & validation">
+                <div className="space-y-5">
+                  <Field label="Quantity" description="Between 1 and 10.">
                     <NumberField min={1} max={10} defaultValue={4} />
                   </Field>
-                </div>
-              </Specimen>
-
-              <Specimen title="Number field">
-                <div className="space-y-4">
-                  <Field label="Quantity">
-                    <NumberField placeholder="0" />
+                  <Field label="Seats" required error="Choose between 1 and 10 seats.">
+                    <NumberField min={1} max={10} defaultValue={10} />
                   </Field>
-                  <Field label="Constrained">
-                    <NumberField min={1} max={10} step={1} defaultValue={4} />
-                  </Field>
-                </div>
-              </Specimen>
-
-              <Specimen title="Slider">
-                <div className="space-y-6">
-                  <Field label="Budget">
-                    <Slider defaultValue={40} />
-                  </Field>
-                  <Field label="Disabled budget">
-                    <Slider defaultValue={65} disabled />
+                  <Field label="Locked" description="Owned by the workspace.">
+                    <NumberField defaultValue={4} disabled />
                   </Field>
                 </div>
               </Specimen>
@@ -566,7 +428,8 @@ export default function Home() {
                   options={[
                     { value: "production", label: "Production" },
                     { value: "preview", label: "Preview" },
-                    { value: "cluster", label: "Shared cluster", disabled: true },
+                    { value: "cluster", label: "Shared cluster, whose label is long enough to wrap across more than one line" },
+                    { value: "edge", label: "Edge", disabled: true },
                   ]}
                 />
               </Specimen>
@@ -576,6 +439,17 @@ export default function Home() {
                   <StateLabel label="On"><Switch checked={switchOn} onCheckedChange={setSwitchOn} aria-label="On" /></StateLabel>
                   <StateLabel label="Off"><Switch checked={false} onCheckedChange={() => undefined} aria-label="Off" /></StateLabel>
                   <StateLabel label="Disabled"><Switch checked disabled aria-label="Disabled" /></StateLabel>
+                </div>
+              </Specimen>
+
+              <Specimen title="Slider">
+                <div className="space-y-6">
+                  <Field label="Budget">
+                    <Slider defaultValue={40} />
+                  </Field>
+                  <Field label="Disabled budget">
+                    <Slider defaultValue={65} disabled />
+                  </Field>
                 </div>
               </Specimen>
 
@@ -589,16 +463,13 @@ export default function Home() {
                   <div className="flex flex-wrap items-center gap-2.5">
                     <Chip variant="success" icon={<Check />}>Ready</Chip>
                     <Chip variant="warning">Beta</Chip>
+                    <Chip icon={<Check />} onRemove={() => undefined}>Verified</Chip>
                     <Chip onRemove={() => undefined}>Platform</Chip>
-                    <Chip onRemove={() => undefined}>Design system</Chip>
                   </div>
                 </div>
               </Specimen>
 
               <Specimen title="Segmented control">
-                {/* Each control hugs its own content, and they are separate objects rather than one
-                    pair, so they stack: a plain block column would leave the two inline-flex
-                    tracks on one line with nothing between them. */}
                 <div className="flex flex-col items-start gap-5">
                   <SegmentedControl
                     aria-label="Range"
@@ -610,7 +481,15 @@ export default function Home() {
                       { value: "month", label: "Month" },
                     ]}
                   />
-                  <ToggleGroup aria-label="Text alignment" multiple value={alignment} onValueChange={setAlignment}>
+                  <SegmentedControl
+                    aria-label="Text alignment"
+                    defaultValue="start"
+                    options={[
+                      { value: "start", label: "Start", icon: <AlignLeft className="size-4" /> },
+                      { value: "center", label: "Center", icon: <AlignCenter className="size-4" /> },
+                    ]}
+                  />
+                  <ToggleGroup aria-label="Text format" multiple value={alignment} onValueChange={setAlignment}>
                     <ToggleGroup.Item value="left" aria-label="Align left"><AlignLeft className="size-4" /></ToggleGroup.Item>
                     <ToggleGroup.Item value="center" aria-label="Align center"><AlignCenter className="size-4" /></ToggleGroup.Item>
                     <ToggleGroup.Item value="right" aria-label="Align right" disabled><AlignRight className="size-4" /></ToggleGroup.Item>
@@ -621,28 +500,28 @@ export default function Home() {
               <Specimen title="Tabs">
                 <Tabs className="overflow-x-auto" tabs={[
                   { id: "one", label: "Overview", content: <p className={cn("text-sm", text.medium)}>Overview content</p> },
-                  { id: "two", label: "Motion", content: <p className={cn("text-sm", text.medium)}>Motion content</p> },
-                  { id: "three", label: "Density", content: <p className={cn("text-sm", text.medium)}>Density content</p> },
+                  { id: "two", label: "Activity", content: <p className={cn("text-sm", text.medium)}>Activity content</p> },
+                  { id: "three", label: "Members", content: <p className={cn("text-sm", text.medium)}>Members content</p> },
                 ]} />
               </Specimen>
 
               <Specimen title="Navigation groups">
                 <div className={cn("flex max-w-xs flex-col gap-4")}>
                   <NavGroup
-                    title="Components"
-                    activeHref="#fields"
-                    items={[
-                      { label: "Buttons", href: "#buttons" },
-                      { label: "Fields", href: "#fields" },
-                      { label: "Feedback", href: "#feedback" },
-                    ]}
-                  />
-                  <NavGroup
                     title="Foundations"
                     activeHref="#design-language"
                     items={[
                       { label: "Design language", href: "#design-language" },
-                      { label: "Surfaces", href: "#surfaces" },
+                      { label: "Display", href: "#display" },
+                    ]}
+                  />
+                  <NavGroup
+                    title="Controls"
+                    activeHref="#fields"
+                    items={[
+                      { label: "Buttons", href: "#buttons" },
+                      { label: "Fields", href: "#fields" },
+                      { label: "Selection", href: "#selection" },
                     ]}
                   />
                 </div>
@@ -657,7 +536,10 @@ export default function Home() {
                   <Alert variant="primary">A useful piece of information.</Alert>
                   <Alert variant="success">Changes were saved successfully.</Alert>
                   <Alert variant="warning">Review these settings before continuing.</Alert>
-                  <Alert variant="danger" closeable>Something needs your attention.</Alert>
+                  <Alert variant="danger" closeable>
+                    The connection dropped before the file was sent. Retry the upload, or split the
+                    file and add each part to the workspace again.
+                  </Alert>
                 </div>
               </Specimen>
 
@@ -691,31 +573,25 @@ export default function Home() {
           <ShowcaseSection id="disclosure">
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
               <Specimen title="Accordion">
-                <Accordion multiple defaultValue={["foundation", "motion"]}>
-                  <Accordion.Item value="foundation">
-                    <Accordion.Trigger>What is Sherick UI?</Accordion.Trigger>
+                <Accordion defaultValue={["wrapped"]}>
+                  <Accordion.Item value="plan">
+                    <Accordion.Trigger>What is included in the workspace plan?</Accordion.Trigger>
                     <Accordion.Panel className={cn("text-sm leading-7", text.medium)}>
-                      A component library that owns its visual language and lets Base UI own the
-                      behavioural one.
+                      Unlimited projects, shared components and the full theme.
                     </Accordion.Panel>
                   </Accordion.Item>
-                  <Accordion.Item value="motion">
-                    <Accordion.Trigger>How does motion work?</Accordion.Trigger>
+                  <Accordion.Item value="wrapped">
+                    <Accordion.Trigger>
+                      A section whose own label wraps across more than one line, which the row has to
+                      lay out
+                    </Accordion.Trigger>
                     <Accordion.Panel className={cn("text-sm leading-7", text.medium)}>
-                      One module owns every transition, and a component names the intent it needs
-                      instead of writing a duration.
-                    </Accordion.Panel>
-                  </Accordion.Item>
-                  <Accordion.Item value="styling">
-                    <Accordion.Trigger>How is it styled?</Accordion.Trigger>
-                    <Accordion.Panel className={cn("text-sm leading-7", text.medium)}>
-                      The published stylesheet is self-contained and scoped, so a consumer needs no
-                      Tailwind installation.
+                      Invoices are issued on the first working day of each month.
                     </Accordion.Panel>
                   </Accordion.Item>
                   <Accordion.Item value="locked" disabled>
                     <Accordion.Trigger>A section that cannot be opened</Accordion.Trigger>
-                    <Accordion.Panel>Unreachable.</Accordion.Panel>
+                    <Accordion.Panel>Contact the workspace owner to change the plan.</Accordion.Panel>
                   </Accordion.Item>
                 </Accordion>
               </Specimen>
@@ -724,53 +600,48 @@ export default function Home() {
                 <Collapsible>
                   <Collapsible.Trigger>Advanced options</Collapsible.Trigger>
                   <Collapsible.Panel className={cn("text-sm leading-7", text.medium)}>
-                    The same row and the same panel as an accordion item, at the scope of one
-                    region: nothing else in the page holds its state.
+                    Send a copy of every deployment to the workspace owners.
                   </Collapsible.Panel>
                 </Collapsible>
               </Specimen>
             </div>
           </ShowcaseSection>
 
-          <ShowcaseSection id="surfaces">
+          <ShowcaseSection id="display">
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
-              <Specimen title="Cards & badges">
+              <Specimen title="Cards">
                 <div className="grid gap-3 sm:grid-cols-2">
                   <Card variant="secondary"><div className="font-medium">Neutral card</div><p className={cn("mt-2 text-sm leading-6", text.medium)}>Body copy goes here.</p></Card>
                   <Card variant="primary"><div className="font-medium">Tonal card</div><p className={cn("mt-2 text-sm leading-6", text.medium)}>Body copy goes here.</p></Card>
                 </div>
-                <div className="mt-4 flex flex-wrap gap-2">
+              </Specimen>
+
+              <Specimen title="Badges">
+                <div className="flex flex-wrap gap-2">
                   <Badge variant="primary">Primary</Badge>
-                  <Badge variant="success" icon={<Check className="size-3.5" />}>Ready</Badge>
+                  <Badge variant="secondary">Neutral</Badge>
+                  <Badge variant="success" icon={<Check />}>Ready</Badge>
                   <Badge variant="warning">Warning</Badge>
                   <Badge variant="danger">Danger</Badge>
-                  <Badge variant="secondary">Neutral</Badge>
                 </div>
               </Specimen>
 
-              <Specimen title="Avatar & tooltip">
-                <div className="flex items-center gap-5">
-                  <Avatar src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg" alt="Example avatar" size="sm" />
-                  <Avatar src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg" alt="Example rounded avatar" size="md" shape="rounded" />
-                  <Tooltip content="Acrylic tooltip"><Button appearance="tonal" variant="secondary">Hover or focus</Button></Tooltip>
+              <Specimen title="Avatar">
+                <div className="flex flex-wrap items-end gap-5">
+                  <Avatar src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg" alt="Small avatar" size="sm" />
+                  <Avatar src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg" alt="Rounded avatar" size="md" shape="rounded" />
+                  <Avatar src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg" alt="Large avatar" size="lg" />
                 </div>
               </Specimen>
 
-              <Specimen title="Dialog">
-                <Button appearance="tonal" variant="secondary" onClick={() => setDialogOpen(true)}>Open dialog</Button>
+              <Specimen title="Table">
+                <Table headers={["Project", "Owner", "Status"]} rows={[
+                  ["Design system", "Ana", <Badge key="design" variant="success">Live</Badge>],
+                  ["Marketing site", "Bruno", <Badge key="marketing" variant="primary">In review</Badge>],
+                  ["Documentation", "Chen", <Badge key="docs" variant="secondary">Draft</Badge>],
+                ]} />
               </Specimen>
             </div>
-          </ShowcaseSection>
-
-          <ShowcaseSection id="data">
-            <Specimen title="Table" className="mt-6">
-              <Table headers={["Component", "Role", "Status"]} rows={[
-                ["Select", "Custom selection", <Badge key="select" variant="success">Ready</Badge>],
-                ["Dialog", "Focused overlay", <Badge key="dialog" variant="success">Ready</Badge>],
-                ["Table", "Dense information", <Badge key="table" variant="secondary">Quiet</Badge>],
-                ["Input", "Form control", <Badge key="input" variant="primary">Core</Badge>],
-              ]} />
-            </Specimen>
           </ShowcaseSection>
 
           <ShowcaseSection id="floating">
@@ -818,21 +689,19 @@ export default function Home() {
                 </Menu>
               </Specimen>
 
-              <Specimen title="Combobox">
-                <div className="space-y-4">
-                  <Field label="Project">
-                    <Combobox options={comboboxOptions} defaultValue="dashboard" />
-                  </Field>
-                  <Field label="No results">
-                    <Combobox options={comboboxOptions} defaultInputValue="Nothing matches this query" />
-                  </Field>
+              <Specimen title="Tooltip">
+                <div className="flex flex-wrap items-center gap-3">
+                  <Tooltip content="Creates a copy in the same workspace">
+                    <Button appearance="tonal" variant="secondary">Duplicate project</Button>
+                  </Tooltip>
                 </div>
               </Specimen>
 
-              <Specimen title="Alert dialog">
-                <Button appearance="filled" variant="danger" icon={<Trash2 />} onClick={() => setAlertOpen(true)}>
-                  Delete project
-                </Button>
+              <Specimen title="Dialog & alert dialog">
+                <div className="flex flex-wrap items-center gap-3">
+                  <Button appearance="tonal" variant="secondary" onClick={() => setDialogOpen(true)}>Open dialog</Button>
+                  <Button appearance="filled" variant="danger" icon={<Trash2 />} onClick={() => setAlertOpen(true)}>Delete project</Button>
+                </div>
               </Specimen>
 
               <Specimen title="Sheet">
@@ -847,7 +716,7 @@ export default function Home() {
                 <CodeBlock language="tsx">{'<Button appearance="filled">Save</Button>'}</CodeBlock>
               </Specimen>
               <Specimen title="Markdown">
-                <Markdown>{`## Example\nSherick UI keeps **dense information quiet** and gives floating UI more depth.\n\n- Predictable controls\n- Soft hierarchy\n- [Accessible interactions](#)\n\n> Expression should clarify hierarchy, not decorate every surface.\n\nUse \`Button\` for primary actions, and reach for a fenced block when the code carries its own hierarchy:\n\n\`\`\`ts\nconst surface = material.matte;\nconst action = shape.pill;\n\`\`\``}</Markdown>
+                <Markdown>{`## Workspace settings\nEverything in this project is **shared with the team** and versioned together.\n\n- Invite members from the workspace settings\n- Pin a deployment to keep it live\n- [Read the changelog](#)\n\n> Changes are reviewed before they reach production.\n\nReach for a fenced block when the code carries its own hierarchy:\n\n\`\`\`ts\nconst workspace = createWorkspace({ name: "Sherick UI" });\n\`\`\``}</Markdown>
               </Specimen>
             </div>
           </ShowcaseSection>
@@ -1080,30 +949,6 @@ function ToastSpecimen() {
       >
         Danger + action
       </Button>
-    </div>
-  );
-}
-
-/* The two toast states the optical section compares: a settled status mark and the loading mark it
-   becomes, so the stack can be raised and read beside the status surfaces above. */
-function OpticalToastSpecimen() {
-  const toast = useToast();
-
-  return (
-    <div className="flex flex-wrap gap-3">
-      <Button
-        appearance="tonal"
-        variant="secondary"
-        onClick={() =>
-          toast.add({
-            type: "warning",
-            title: "Quota almost reached",
-            description: "Eighty per cent of the monthly budget is used.",
-          })
-        }
-      >
-        Status mark
-      </Button>
       <Button
         appearance="tonal"
         variant="secondary"
@@ -1115,7 +960,7 @@ function OpticalToastSpecimen() {
           })
         }
       >
-        Loading mark
+        Loading
       </Button>
     </div>
   );
