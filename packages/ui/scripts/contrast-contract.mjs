@@ -88,7 +88,7 @@ export const stateAlphas = {
     neutralRest: 0.56,
   },
   /** The matte ladder a field and a selection mark use. */
-  field: { quiet: 0.42, card: 0.78, markRest: 0.72, control: 0.66, hover: 0.82, engaged: 0.90 },
+  field: { quiet: 0.42, card: 0.78, control: 0.66, hover: 0.82, engaged: 0.90 },
 };
 
 const SEMANTIC = ["primary", "danger", "warning", "success"];
@@ -123,7 +123,8 @@ export const contrastCompositions = (variables, alphas = stateAlphas) => {
     "matte card (surface 0.78)": composite(surface, FIELD.card, canvas),
     "chip at rest (surface-high 0.56)": composite(surfaceHigh, TINT.neutralRest, canvas),
     "field (surface-high 0.66)": composite(surfaceHigh, FIELD.control, canvas),
-    "selection mark at rest (surface-high 0.72)": composite(surfaceHigh, FIELD.markRest, canvas),
+    /* An empty mark sits in the *opaque* neutral well, the same one a Switch's track sits in. */
+    "empty mark well (surface-high)": surfaceHigh,
     "field hover (surface-high 0.82)": composite(surfaceHigh, FIELD.hover, canvas),
     "engaged field (surface-high 0.90)": composite(surfaceHigh, FIELD.engaged, canvas),
     "acrylic sheet (surface-float 0.86)": composite(surfaceFloat, 0.86, canvas),
@@ -132,10 +133,21 @@ export const contrastCompositions = (variables, alphas = stateAlphas) => {
   };
   const surfaceEntries = Object.entries(surfaces);
 
-  /* Where a *tinted control* can sit. The field steps are excluded: a tonal control is never placed
-     inside a field — the controls that do live there (a combobox's trailing parts, a field's submit
-     control) are foreground-only and are covered by the compositions that cross every surface. */
-  const controlEntries = surfaceEntries.filter(([where]) => !where.includes("field"));
+  /* Where a *tinted control* can actually sit: the page, inside a card, in a well, or on a floating
+     sheet. The field steps are not among them — a tonal control is never placed inside a field, and
+     the controls that do live there (a combobox's trailing parts, a field's submit control) are
+     foreground-only — and neither is an empty mark's well, which holds nothing but its own mark.
+     Both are still *surfaces* for the roles that do answer to them. */
+  const controlEntries = surfaceEntries.filter(([where]) =>
+    [
+      "canvas",
+      "quiet well (surface 0.42)",
+      "matte card (surface 0.78)",
+      "acrylic sheet (surface-float 0.86)",
+      "acrylic dense / tooltip (surface-float 0.90)",
+      "hero sheet / dialog (surface-overlay 0.90)",
+    ].includes(where)
+  );
 
   /** The opaque neutral fill a `secondary` control takes, and the groove a value control runs in. */
   const neutralFill = surfaceHigh;

@@ -36,7 +36,7 @@ the whole dark neutral ladder, is unchanged.
 | `--sui-warning` | caution | `0.53 0.13 75` → **`0.388 0.082 75`** | `0.82 0.12 80` (unchanged) |
 | `--sui-success` | confirmation | `0.50 0.12 160` → **`0.381 0.086 160`** | `0.75 0.10 160` → **`0.769 0.100 160`** |
 | `--sui-ink-muted` | supporting copy, descriptions, placeholders | `0.50 0.018 260` → **`0.480 0.018 260`** | `0.76 0.014 255` (unchanged) |
-| `--sui-detail` | **non-text** furniture (was `--sui-ink-faint`, the third text step) | `0.63 0.016 258` → **`0.608 0.016 258`** | `0.60 0.014 256` (unchanged) |
+| `--sui-detail` | **non-text** furniture (was `--sui-ink-faint`, the third text step) | `0.63 0.016 258` → **`0.600 0.016 258`** | `0.60 0.014 256` (unchanged) |
 
 Chroma moves only where sRGB cannot hold the authored value at the new lightness — a deeper blue in
 light mode and a lighter one in dark mode cannot carry 0.17 and 0.15. The authored *chroma* is

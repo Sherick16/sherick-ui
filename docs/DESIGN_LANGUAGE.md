@@ -338,13 +338,20 @@ A 1px ring that traces a filled object is still a drawn border. Therefore:
   only, which is why no border appears and disappears as a user interacts;
 - `edge.rule` needs its direction supplied at the call site (`border-t`, `border-l`);
 - **one boundary is the exception, and it is not a hairline.** A selection mark at rest — an
-  unchecked box, an unselected radio, a segmented track — has no fill of its own to identify it:
-  measured from rendered pixels, the matte step and the recessed lip carry about 1.1:1 against the
-  surface around them, and WCAG asks 3:1 of the information that identifies a component. It takes
-  the non-text `detail` tone as a 2px rim drawn inside the mark, from `selectable.rest`. The rim is
-  a *detail* cue rather than a structural edge, it is re-coloured to the fill once the mark holds a
-  value, and it is 2px because a 1px line lands between device pixels on a 1x display and blends
-  away. Nothing else may take a rim on this reasoning.
+  unchecked box, an unselected radio — is *empty*: it has no content of its own to identify it, and
+  measured from rendered pixels the matte step and the recessed lip carry about 1.1:1 against the
+  surface around them, where WCAG asks 3:1 of the information that identifies a component. Such a
+  mark takes two things from `selectable.mark`: the **well** it sits in — the same *opaque* neutral
+  step a `Switch`'s track sits in, so the family reads as one object and the interior is a surface
+  rather than a hole — and a 2px rim in the non-text `detail` tone drawn inside it. The rim is the
+  part that carries the requirement, because that well is still only about 1.2–1.5:1 from the surface
+  around it; it is a *detail* cue rather than a structural edge, it is re-coloured to the fill once
+  the mark holds a value, and it is 2px because a 1px line lands between device pixels on a 1x
+  display and blends away.
+  **A groove does not take it.** A segmented track, a switch track and a tab list are containers
+  whose *labelled children* identify them — the labels are the information, and they clear AA — so a
+  rim around one is a drawn edge around a container rather than furniture, and the same argument
+  that keeps `edge` off a filled control keeps it off here.
 
 **Do:** use a hairline to separate sibling parts inside one surface.
 **Do not** draw a rim around a filled control, outline a card for emphasis, or express an
@@ -492,7 +499,8 @@ field is what compresses.
 **Selection is a recessed surface that fills.** A switch track, a checkbox box, a radio
 circle and a slider groove are one object at four sizes: `selectable.surface` gives them
 the recessed depth of a groove and a non-spatial tone response, `selectable.rest` is the
-neutral matte step they hold until they are selected, and `selectable.selected` /
+neutral matte step a *groove* holds until something in it is selected, `selectable.mark` is the
+well and the rim an *empty* mark needs to be identifiable at all (§8), and `selectable.selected` /
 `selectable.indeterminate` are the accent they take once they are — keyed on the
 primitive's own selection attribute, so an uncontrolled control is styled from the same
 source of truth as a controlled one. Selection never changes their depth: tone carries it,

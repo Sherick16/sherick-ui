@@ -462,6 +462,18 @@ test("a resting selection mark draws its boundary in the non-text detail tone", 
     expect(rim.style, `${name} draws a boundary`).not.toBe("none");
     expect(rim.width, `${name}'s boundary is visible on a 1x display`).toBeGreaterThanOrEqual(2);
     expect(rim.colour, `${name} draws it in the detail tone`).toBe(rim.detail);
+    /* And it sits in the *opaque* neutral well rather than a fraction of it: the same well a
+       Switch's track sits in, so the two read as one object instead of one being a hole and the
+       other a fill. Both resolve `--sui-surface-high`, and this reads what is painted. */
+    const well = await locator.evaluate((element) => {
+      const probe = document.createElement("div");
+      probe.style.color = "oklch(var(--sui-surface-high))";
+      document.body.appendChild(probe);
+      const neutral = getComputedStyle(probe).color;
+      probe.remove();
+      return { painted: getComputedStyle(element).backgroundColor, neutral };
+    });
+    expect(well.painted, `${name} sits in the neutral well`).toBe(well.neutral);
   }
 
   /* The rim belongs to the resting fill: a mark that holds a value is identified by that fill. */

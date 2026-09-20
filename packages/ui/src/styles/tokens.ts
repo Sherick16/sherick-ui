@@ -10,7 +10,9 @@ export const lightTokens = {
   /* The detail role is non-text furniture: it carries a mark, a rail or a gutter, and it is not a
      third step of the text ladder. It answers to the 3:1 non-text requirement wherever it carries
      meaning; anything a reader must read uses `ink` or `ink-muted`. */
-  "detail": "0.608 0.016 258",
+  /* The rim an empty mark draws sits in the opaque neutral well, so it answers to that surface too:
+     a step deeper than the matte steps need, and the same value in both themes. */
+  "detail": "0.600 0.016 258",
   "primary": "0.422 0.139 255",
   "primary-strong": "0.402 0.143 257",
   "primary-soft": "0.91 0.035 255",
