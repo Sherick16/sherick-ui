@@ -4,10 +4,10 @@ import { type VariantProps, cva } from "class-variance-authority";
 import { cn } from "@/libs/utils";
 import { motionActivitySpin } from "./ui.motion";
 
-/* The root is `shrink-0` because a Spinner is a **mark**: a control that puts one in a row with a
-   label is substituting it for an icon, and a mark that shrank under a long label would change
-   the control's own balance as it entered and left the loading state. */
-const spinnerVariants = cva("flex shrink-0 flex-col items-center justify-center", {
+/* The mark's box belongs to the slot a control puts around it, not to this component: a labelled
+   Spinner (`children` renders beside the loader) has to be able to shrink in a narrow row, so the
+   non-shrinking half lives in the slot. */
+const spinnerVariants = cva("flex flex-col items-center justify-center", {
   variants: {
     show: {
       true: "flex",

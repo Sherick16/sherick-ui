@@ -76,14 +76,16 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           className
         )}
       >
-        {/* A loading mark is a **mark**: it takes the same 20px slot a leading icon does, so
-            switching the button into and out of its loading state never changes the control's width
-            or its balance. The spinner's own artwork is lighter than an icon's, and that is the
-            artwork's business rather than a correction to make here. */}
+        {/* A mark occupies one slot whatever is inside it. The slot is a fixed 20px box, so a nested
+            node — a wrapped mark, a status dot — cannot change the control's width, and the loading
+            mark lands in the box the icon had. `[&>svg]` normalizes direct SVG artwork; sizing nested
+            artwork is the caller's business, as §17 says. */}
         {loading ? (
-          <Spinner size="small" className={cn("size-5")} />
+          <span className={cn("inline-flex size-5 shrink-0 items-center justify-center")}>
+            <Spinner size="small" className={cn("size-5")} />
+          </span>
         ) : icon ? (
-          <span className={cn("inline-flex shrink-0 items-center [&>svg]:size-5")} aria-hidden="true">
+          <span className={cn("inline-flex size-5 shrink-0 items-center justify-center [&>svg]:size-5")} aria-hidden="true">
             {icon}
           </span>
         ) : null}

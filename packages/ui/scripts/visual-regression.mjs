@@ -114,6 +114,9 @@ const specimens = {
   "button.tonal.primary": h(Button, {}, "Continue"),
   "button.text": h(Button, { appearance: "text", variant: "secondary" }, "Skip"),
   "button.icon": h(Button, { icon: h(Download) }, "Sync"),
+  /* A nested node is a mark a direct-SVG selector cannot size, so it is the case the fixed slot
+     exists for — and the case this fixture used before the slot was fixed. */
+  "button.icon.nested": h(Button, { icon: h(Spinner, { size: "small" }) }, "Sync"),
   "button.size.sm": h(Button, { size: "sm" }, "Small"),
   "button.size.md": h(Button, { size: "md" }, "Medium"),
   "button.size.lg": h(Button, { size: "lg" }, "Large"),
@@ -175,6 +178,7 @@ const specimens = {
   "icon-button.ghost": h(IconButton, { appearance: "ghost", variant: "secondary", icon: h(SearchIcon), "aria-label": "Search" }),
   "icon-button.acrylic": h(IconButton, { appearance: "acrylic", variant: "secondary", icon: h(Download), "aria-label": "Download" }),
   "icon-button.disabled": h(IconButton, { disabled: true, icon: h(Heart), "aria-label": "Favorite" }),
+  "icon-button.nested": h(IconButton, { icon: h("span", null, "+"), "aria-label": "Add" }),
   "input.default": h(Input, { label: "Project name", placeholder: "Sherick UI" }),
   "input.required": h(Input, { label: "Email", required: true, name: "email", type: "email" }),
   "input.error": h(Input, { label: "Invalid", error: true, placeholder: "Required value" }),

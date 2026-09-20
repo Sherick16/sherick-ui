@@ -67,9 +67,15 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
           className
         )}
       >
-        {/* The mark keeps one slot at both states: a loading spinner is the icon's substitute, so it
-            renders at the same 20px the icon does rather than at the spinner's own default size. */}
-        {loading ? <Spinner size="small" className={cn("size-5")} /> : icon ?? null}
+        {/* The mark occupies one slot at both states: a fixed 20px box, so a nested icon node cannot
+            change the mark's size and the loading spinner lands in the box the icon had. */}
+        {loading ? (
+          <Spinner size="small" className={cn("size-5")} />
+        ) : icon ? (
+          <span className={cn("inline-flex size-5 shrink-0 items-center justify-center [&>svg]:size-5")} aria-hidden="true">
+            {icon}
+          </span>
+        ) : null}
       </Button>
     );
   }

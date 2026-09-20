@@ -73,7 +73,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
           <Field.Label className={cn("mb-2 text-sm font-medium", text.high)}>
             {label}
             {required && (
-              <span className={cn("ml-1 text-sherick-danger")} aria-hidden="true">
+              <span className={cn("ms-1 text-sherick-danger")} aria-hidden="true">
                 *
               </span>
             )}

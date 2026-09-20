@@ -122,7 +122,7 @@ export const Chip = forwardRef<HTMLElement, ChipProps>(
         {icon && (
           <span
             className={cn(
-              "inline-flex shrink-0 items-center [&>svg]:size-4",
+              "inline-flex size-4 shrink-0 items-center justify-center [&>svg]:size-4",
               !isToggle && tone.text[variant]
             )}
             aria-hidden="true"

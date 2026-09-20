@@ -1043,17 +1043,21 @@ component's.
 A control's target and the ink it shows are two objects, and the target is never traded for the
 mark:
 
-- the **target keeps its geometry**. Its size, its position, its hit area and its focus ring do
-  not move so a glyph can look better centred;
-- the **mark inside it** is what moves. A dismiss or close control whose visible ink is much
-  smaller than its target lets the mark's own box sit where the eye expects it, while the target
-  stays exactly where the pointer found it;
+- the **target keeps its size and its concentricity**. A correction never shrinks a target, never
+  moves one under a pointer that is already on it, and never drifts the mark inside it: a mark that
+  no longer sits at the centre of its own target is a mark whose state layer and focus ring no
+  longer surround it, which is a worse defect than the one being corrected. What moves is the
+  **whole control** — mark, state layer, ring and hit area together;
+- **placing a control belongs to the surface's anatomy.** A chip gives its dismiss control's target
+  padding back at its end edge; a header sets its close control on the title's first line. In both
+  the surface is placing the control, and the control keeps its size, its concentricity and its
+  pointer-answerable area while it moves;
 - **padding that exists only to enlarge a target is compensated at the edge, and whitespace
   inside a mark's own artwork is not.** The six pixels a chip's dismiss control holds around its
-  glyph are target padding, so the chip gives them back at its end edge. The two units of empty
-  viewBox a chevron ships with are the artwork's, so a chevron is placed by its box and never
-  nudged so its ink meets a line of text. Artwork with unusual internal whitespace is the
-  artwork's responsibility.
+  glyph are target padding, so they are given back at the end edge. The two units of empty viewBox
+  a chevron ships with are the artwork's, so a chevron is placed by its box and never nudged so its
+  ink meets a line of text. Artwork with unusual internal whitespace is the artwork's
+  responsibility.
 
 ### Icon slots are geometry, not content
 
@@ -1061,9 +1065,12 @@ A slot is a decision, not an accident of whatever was passed in:
 
 - the slot fixes its mark's **box size** and holds it (`shrink-0`), so swapping one mark for
   another — an icon for a loading mark, a tick for a dash — cannot change the control's width or
-  its balance;
-- the artwork is sized by the **slot's own contract** (`[&>svg]:size-*`) rather than by every call
-  site, so all the marks in one control are one size;
+  its balance. The box is the contract: a `ReactNode` mark is centred in it whatever it is, and it
+  is the slot — not the mark — that owns the geometry;
+- direct SVG artwork is sized by the **slot's own contract** (`[&>svg]:size-*`) rather than by
+  every call site, so all the marks in one control are one size. Artwork nested inside another node
+  is the caller's to size, as its internal whitespace is: the slot centres it and does not reach
+  into it;
 - a slot aligns its **box**, not the ink inside it, which is what lets a row of controls agree with
   each other.
 
@@ -1075,7 +1082,7 @@ The two ends of a control are not obliged to share one number:
 - a control with a **leading mark** measures its start padding to the mark's box, and one with a
   **trailing affordance** measures its end padding to the affordance's box, so both ends read at
   the same distance even though one holds a 20px mark and the other a 28px target;
-- the asymmetry is always written on a **logical** property (`ps`/`pe`, `ms`/`me`, `start`/`end`),
+- a correction writes its own asymmetry on a **logical** property (`ps`/`pe`, `ms`/`me`,
   so a right-to-left page is the same design rather than a second one;
 - a control that owns a **trailing cluster** — a combobox field and its two parts — places that
   cluster with its own inline padding rather than pinning it to a physical edge, so the cluster

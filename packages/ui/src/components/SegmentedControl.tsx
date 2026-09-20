@@ -96,7 +96,7 @@ export const SegmentedControl = forwardRef<HTMLDivElement, SegmentedControlProps
           >
             {option.icon && (
               <span
-                className={cn("inline-flex shrink-0 items-center [&>svg]:size-4")}
+                className={cn("inline-flex size-4 shrink-0 items-center justify-center [&>svg]:size-4")}
                 aria-hidden="true"
               >
                 {option.icon}

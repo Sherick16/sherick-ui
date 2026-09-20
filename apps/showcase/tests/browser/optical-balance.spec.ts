@@ -17,17 +17,35 @@ const openShowcase = async (page: Page, section: string) => {
   return page.locator(`#${section}`);
 };
 
-/* The distance from the control's own box to its surface's inline **end** edge, read from the
-   rendered direction rather than from the test's. */
-const endInset = (control: Locator) =>
+/** The box of a control's mark **slot** — its first child — not of the artwork inside it. */
+const slotBox = (control: Locator) =>
   control.evaluate((element) => {
-    const box = element.parentElement;
-    if (!box) throw new Error("the control has no surface");
-    const surfaceBox = box.getBoundingClientRect();
-    const controlBox = element.getBoundingClientRect();
-    return getComputedStyle(element).direction === "rtl"
-      ? controlBox.left - surfaceBox.left
-      : surfaceBox.right - controlBox.right;
+    const slot = element.firstElementChild;
+    if (!slot) throw new Error("the control has a mark slot");
+    const rect = slot.getBoundingClientRect();
+    return { width: rect.width, height: rect.height };
+  });
+
+/** A chip's dismiss target, the visible mark inside it, and the chip's own leading content. */
+const chipGeometry = (dismiss: Locator) =>
+  dismiss.evaluate((button) => {
+    const chip = button.parentElement;
+    if (!chip) throw new Error("a dismiss control belongs to a chip");
+    const mark = button.querySelector("svg");
+    const leading = chip.firstElementChild;
+    if (!mark || !leading) throw new Error("a chip has leading content and its dismiss control a mark");
+
+    const chipBox = chip.getBoundingClientRect();
+    const targetBox = button.getBoundingClientRect();
+    const markBox = mark.getBoundingClientRect();
+    const leadingBox = leading.getBoundingClientRect();
+    const rtl = getComputedStyle(button).direction === "rtl";
+
+    return {
+      target: { width: targetBox.width, height: targetBox.height },
+      markInset: rtl ? markBox.left - chipBox.left : chipBox.right - markBox.right,
+      leadingInset: rtl ? chipBox.right - leadingBox.right : leadingBox.left - chipBox.left,
+    };
   });
 
 test("a loading mark takes the slot its icon had, without changing the control", async ({ page }) => {
@@ -43,10 +61,12 @@ test("a loading mark takes the slot its icon had, without changing the control",
   expect(busyButton?.width, "entering the loading state must not resize the control").toBe(idleButton?.width);
   expect(busyButton?.height).toBe(idleButton?.height);
 
-  const idleMark = await idle.locator("svg").first().boundingBox();
-  const busyMark = await busy.locator("svg").first().boundingBox();
-  expect(busyMark?.width, "a loading mark is the same mark").toBe(idleMark?.width);
-  expect(busyMark?.height).toBe(idleMark?.height);
+  const idleSlot = await slotBox(idle);
+  const busySlot = await slotBox(busy);
+  expect(busySlot.width, "a loading mark is the same mark").toBe(idleSlot.width);
+  expect(busySlot.height).toBe(idleSlot.height);
+  expect(idleSlot.width, "the slot owns its own box").toBeCloseTo(20, 1);
+  expect(idleSlot.height).toBeCloseTo(20, 1);
 
   // The icon-only control is the same rule with no label to hide behind.
   const iconIdle = await section.getByRole("button", { name: "Notifications", exact: true }).boundingBox();
@@ -60,18 +80,25 @@ test("a chip's dismiss mark keeps its target and its edge distance", async ({ pa
   const dismiss = section.getByRole("button", { name: "Remove Platform" });
   await expect(dismiss).toBeVisible();
 
-  const target = await dismiss.boundingBox();
-  expect(target?.width, "a dismiss control clears the 24px pointer minimum").toBeGreaterThanOrEqual(24);
-  expect(target?.height).toBeGreaterThanOrEqual(24);
+  const leftToRight = await chipGeometry(dismiss);
+  expect(leftToRight.target.width, "a dismiss control clears the 24px pointer minimum").toBeGreaterThanOrEqual(24);
+  expect(leftToRight.target.height).toBeGreaterThanOrEqual(24);
+  /* The visible mark — not the target's box — sits at the inset the chip's own leading content
+     uses. Without the compensation the mark is six pixels further in. */
+  expect(
+    Math.abs(leftToRight.markInset - leftToRight.leadingInset),
+    "the visible mark sits at the inset the chip's leading content uses",
+  ).toBeLessThanOrEqual(2);
 
-  const leftToRight = await endInset(dismiss);
   await page.evaluate(() => {
     document.documentElement.dir = "rtl";
   });
-  const rightToLeft = await endInset(dismiss);
-
-  expect(leftToRight).toBeGreaterThan(0);
-  expect(rightToLeft, "the compensation is a logical margin, so RTL mirrors it").toBeCloseTo(leftToRight, 0);
+  const rightToLeft = await chipGeometry(dismiss);
+  expect(rightToLeft.markInset, "the compensation is a logical margin, so RTL mirrors it").toBeCloseTo(
+    leftToRight.markInset,
+    0,
+  );
+  expect(Math.abs(rightToLeft.markInset - rightToLeft.leadingInset)).toBeLessThanOrEqual(2);
 });
 
 test("a field's embedded mark follows the writing direction", async ({ page }) => {
@@ -79,6 +106,17 @@ test("a field's embedded mark follows the writing direction", async ({ page }) =
   const field = section.getByPlaceholder("Search components").locator("..");
   const submit = field.getByRole("button", { name: "Submit search" });
   await expect(submit).toBeVisible();
+
+  const endInset = (control: Locator) =>
+    control.evaluate((element) => {
+      const surface = element.parentElement;
+      if (!surface) throw new Error("the control has no surface");
+      const surfaceBox = surface.getBoundingClientRect();
+      const controlBox = element.getBoundingClientRect();
+      return getComputedStyle(element).direction === "rtl"
+        ? controlBox.left - surfaceBox.left
+        : surfaceBox.right - controlBox.right;
+    });
 
   const leftToRight = await endInset(submit);
   await page.evaluate(() => {
@@ -121,7 +159,7 @@ test("a status mark and a dismissal hold the first line of copy that wraps", asy
   expect(Math.abs(geometry.dismissCentre - geometry.firstLineCentre)).toBeLessThanOrEqual(1);
 });
 
-test("a toast's dismissal is not clipped by the stack that owns the overflow", async ({ page }) => {
+test("a toast's dismissal keeps its ring inside the stack that clips it", async ({ page }) => {
   const section = await openShowcase(page, "feedback");
   await section.getByRole("button", { name: "Warning", exact: true }).click();
 
@@ -132,15 +170,26 @@ test("a toast's dismissal is not clipped by the stack that owns the overflow", a
   const dismiss = toast.getByRole("button", { name: "Dismiss", exact: true });
   await expect(dismiss).toBeVisible();
 
-  /* The root clips its own content, so every edge of the 44px target — and the inset ring it
-     wears — has to stay inside it. */
-  const clearance = await toast.evaluate((root) => {
-    const button = root.querySelector('button[aria-label="Dismiss"]');
-    if (!button) throw new Error("the toast has its own dismissal control");
+  // One keyboard press first, so the platform reports the scripted focus as visible.
+  await page.keyboard.press("Tab");
+  await dismiss.focus();
+
+  const ring = await dismiss.evaluate((button) => {
+    const style = getComputedStyle(button);
+    const root = button.closest("div[class*='overflow-hidden']");
+    if (!root) throw new Error("a toast's dismissal lives inside the clipped stack root");
     const outer = root.getBoundingClientRect();
     const inner = button.getBoundingClientRect();
-    return [inner.top - outer.top, inner.left - outer.left, outer.right - inner.right, outer.bottom - inner.bottom];
+    return {
+      focusVisible: button.matches(":focus-visible"),
+      shadow: style.boxShadow,
+      outlineColor: style.outlineColor,
+      clearance: [inner.top - outer.top, inner.left - outer.left, outer.right - inner.right, outer.bottom - inner.bottom],
+    };
   });
 
-  expect(Math.min(...clearance)).toBeGreaterThanOrEqual(0);
+  expect(ring.focusVisible, "the ring only exists while the dismissal is visibly focused").toBe(true);
+  expect(ring.shadow, "the visible ring is drawn inside the target").toContain("inset");
+  expect(ring.outlineColor, "and nothing is painted outside the target the stack clips").toBe("rgba(0, 0, 0, 0)");
+  expect(Math.min(...ring.clearance)).toBeGreaterThanOrEqual(0);
 });

@@ -155,10 +155,10 @@ export const DialogDismiss = ({ label, className }: DialogDismissProps) => (
       stateLayer.quiet,
       state.enabled,
       /* The mark is centred on the header's first line: the title's line box starts at the header's
-         `pt-5` and is 28px tall, so a 44px target centred on it sits at `top-3` rather than `top-4`.
-         Written after the state layer, which is `relative` itself, so `tailwind-merge` keeps this
-         position. */
-      "group absolute right-4 top-3 z-10 inline-flex items-center justify-center",
+         `pt-5` and is 28px tall, so a 44px target centred on it sits at `top-3` rather than `top-4`,
+         and it is placed on the logical end so it follows the writing direction. Written after the
+         state layer, which is `relative` itself, so `tailwind-merge` keeps this position. */
+      "group absolute end-4 top-3 z-10 inline-flex items-center justify-center",
       className
     )}
   >

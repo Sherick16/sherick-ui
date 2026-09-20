@@ -961,7 +961,13 @@ function MotionSpecimen() {
             Region
             <ChevronDown className={cn("size-3.5", motionOrient, on.disclose && "rotate-180")} aria-hidden="true" />
           </button>
-          <div className={cn("overflow-hidden", motionDisclose)} style={{ height: on.disclose ? 32 : 0 }}>
+          {/* The clipped panel is hidden from assistive technology while it is closed: a region that is
+              only `height: 0` is still read out and still reachable. */}
+          <div
+            aria-hidden={!on.disclose}
+            className={cn("overflow-hidden", motionDisclose)}
+            style={{ height: on.disclose ? 32 : 0 }}
+          >
             <div className={cn("px-2 pt-1 text-xs leading-5", text.medium)}>Panel content</div>
           </div>
         </div>
@@ -1045,10 +1051,18 @@ function DirectDriver() {
       aria-valuemax={100}
       aria-valuenow={Math.round(position)}
       onKeyDown={(event) => {
-        const step = event.key === "ArrowRight" ? 50 : event.key === "ArrowLeft" ? -50 : 0;
-        if (step === 0) return;
+        const keys: Record<string, number> = {
+          ArrowRight: 50,
+          ArrowUp: 50,
+          ArrowLeft: -50,
+          ArrowDown: -50,
+        };
+        const step = keys[event.key];
+        if (step === undefined && event.key !== "Home" && event.key !== "End") return;
         event.preventDefault();
-        setPosition((current) => Math.min(100, Math.max(0, settle(current) + step)));
+        setPosition((current) =>
+          event.key === "Home" ? 0 : event.key === "End" ? 100 : Math.min(100, Math.max(0, settle(current) + step))
+        );
       }}
       onPointerDown={(event) => {
         event.currentTarget.setPointerCapture(event.pointerId);
