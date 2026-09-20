@@ -94,8 +94,8 @@ export const stateAlphas = {
      the other way round in each theme is a deliberate bounce. `tone` names the lighting value and
      `alpha` the rung's alpha; the composition below is what makes those numbers a promise. */
   well: {
-    light: { tone: "light-bottom", alpha: 0.66 },
-    dark: { tone: "light-top", alpha: 0.45 },
+    light: { tone: "light-bottom", alpha: 0.62 },
+    dark: { tone: "light-top", alpha: 0.40 },
   },
 };
 

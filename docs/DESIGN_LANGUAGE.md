@@ -95,8 +95,8 @@ pressed insets stay physically related.
 `--sui-light-top` (the highlight color) and `--sui-light-bottom` (the shade color) are
 the two values the elevation ladder composites from: `raised`, `floating`, `control`,
 `recessed` and `well` are all built out of them, so re-tuning that pair re-lights every
-shadow, highlight and pressed inset at once. They differ in **strength, never in kind**: a
-well is the recessed recipe with the same two soft walls at the same offsets, deeper.
+shadow, highlight and pressed inset at once. They differ in **depth, never in kind**: `well` is
+`recessed` with the wall the light makes legible drawn deeper, and its opposite wall left alone.
 
 Depth is also what identifies a mark that has **no fill step to spare**. A wide groove reads
 from its own tone, and a mark the size of a glyph has none: the deepest neutral step in the
@@ -107,8 +107,10 @@ inverts which wall is legible too: the *shaded* wall above carries it in light m
 mark can sit on (`bun run test` measures exactly that composition, and the rendered walls clear
 it as well). The opposite wall stays a bounce in each theme.
 
-The strength is the **minimum that clears the requirement**, deliberately: two wells of the same
-system should differ in depth, not in character. Nothing draws a line around the mark — a stroke
+Exactly one wall carries it, and at the **least strength that clears the requirement** — measured,
+not felt: the shaded wall clears 3:1 in light mode and the lit wall in dark mode, and the other wall
+is `recessed`'s own. A well should read as a *deeper* groove, not as a more dramatic one, so the
+strength is spent on the boundary rather than on the whole interior. Nothing draws a line around the mark — a stroke
 tracing all four sides of a matte control is not part of this language, and beside a `Switch`,
 which draws none, it looks like exactly what it is. If a design wants an empty mark to sit at
 *exactly* the recessed depth of a groove, then its tone has to carry the requirement instead, and
@@ -174,7 +176,7 @@ Depth is chosen by **anatomy**, never by state.
 | `raised` | a manipulated control lifted a hair above its own track | tactile tonal controls (tonal `Button`, `IconButton`) | passive surfaces, table rows, menu rows |
 | `control` | the resting half of the tactile pair | a part the user moves — a switch thumb, a selected segment | wide surfaces, or a whole segmented control |
 | `recessed` | the other half of the pair | grooves, tracks and wells, which are sunk by definition | raised or resting controls |
-| `well` | the **same recipe as `recessed`**, one rung stronger: a soft shade at one end, a soft light at the other, same offsets and same blur, no drawn edge anywhere | the *small* sunk mark whose entire identity is its depth — an empty checkbox box, an unselected radio circle | anything with a fill step to spare; a groove, a track, a field or a card, all of which read from their own tone |
+| `well` | the recessed recipe with **one** of its walls made deeper — a soft shade above in light mode, a soft light below in dark mode — while the opposite wall stays exactly as `recessed` draws it; no drawn edge anywhere | the *small* sunk mark whose entire identity is its depth — an empty checkbox box, an unselected radio circle | anything with a fill step to spare; a groove, a track, a field or a card, all of which read from their own tone |
 | `floating` | a surface that genuinely sits above the application | acrylic overlays: menus, tooltips, dialogs | matte surfaces sitting on the page |
 
 The tactile pair (`control` / `recessed`) is deliberately shallower than the tonal

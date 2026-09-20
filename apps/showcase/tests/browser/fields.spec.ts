@@ -478,9 +478,9 @@ test("a resting selection mark is identified by the depth of its well", async ({
     for (const layer of mark.well) {
       expect(mark.shadow, `${name} is sunk to the well rung`).toContain(layer);
     }
-    for (const layer of mark.recessed) {
-      expect(mark.shadow, `${name} is not left at the shallow groove rung`).not.toContain(layer);
-    }
+    /* The two rungs share the shallow wall — a well is a groove one wall deeper, not a different
+       shadow — so what proves the depth is that the *deep* wall is the well's and not the groove's. */
+    expect(mark.shadow, `${name} is not left at the shallow groove rung`).not.toContain(mark.recessed[0]);
     expect(mark.fill, `${name} sits in the neutral well`).toBe(mark.neutral);
     /* And nothing draws a line around it: the same object a `Switch`'s track is, and a switch draws
        none. A stroke tracing all four sides of a matte control is not part of this language. */
