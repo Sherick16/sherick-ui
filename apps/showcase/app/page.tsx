@@ -491,7 +491,7 @@ export default function Home() {
               </Specimen>
 
               <Specimen title="Tabs">
-                <Tabs className="overflow-x-auto" tabs={[
+                <Tabs tabs={[
                   { id: "one", label: "Overview", content: <p className={cn("text-sm", text.medium)}>Overview content</p> },
                   { id: "two", label: "Activity", content: <p className={cn("text-sm", text.medium)}>Activity content</p> },
                   { id: "three", label: "Members", content: <p className={cn("text-sm", text.medium)}>Members content</p> },

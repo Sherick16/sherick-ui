@@ -362,7 +362,14 @@ export const material = {
   matte: "bg-sherick-surface/[0.78] text-sherick-ink",
   matteHigh: "bg-sherick-surface-high/[0.72] text-sherick-ink",
   control: "bg-sherick-surface-high/[0.66] text-sherick-ink placeholder:text-sherick-ink-muted",
-  controlError: "bg-sherick-danger/[0.075] text-sherick-ink placeholder:text-sherick-danger/[0.72]",
+  /* The invalid fill carries its placeholder at the *full* danger tone, not at a fraction of it. A
+     placeholder is text, so it answers to the same 4.5:1 the copy beside it does, and a partial
+     opacity of an accent is a different colour from the accent: the 72%-opacity placeholder
+     measured 2.8–3.0:1 light and 3.4–3.9:1 dark on this fill, while the token it was mixed from
+     measures 4.1–4.7:1 light and 5.2–6.2:1 dark on it. There is no dimmer step of a semantic tone
+     that is still readable, and a normal field's placeholder is `ink-muted` at full strength
+     already — so the error form is the same rule, in the tone the field is in. */
+  controlError: "bg-sherick-danger/[0.075] text-sherick-ink placeholder:text-sherick-danger",
   handle: "bg-sherick-ink-muted text-sherick-canvas",
   acrylic:
     "bg-sherick-surface-float/[var(--sui-glass-fill)] bg-[image:var(--sui-glass-gradient)] text-sherick-ink backdrop-blur-[var(--sui-glass-blur)] backdrop-saturate-[var(--sui-glass-saturation)] backdrop-brightness-[var(--sui-glass-brightness)]",
@@ -518,13 +525,19 @@ export const list = {
    component maps its own primitive's panel variable onto, because the measured geometry is
    anatomy and only the interpolation is temporal. */
 export const disclosure = {
-  /* The row: the same object `list.option` is, because a disclosure header is scanned and
-     activated the same way a selectable row is. The chevron the component puts in it is the
-     disclosure's own affordance and turns in place under `motionOrient`. */
+  /* The row: a full-width row in a stacked group, activated like a selectable row. Its own focus
+     indicator is the shared inset ring, because an offset one drawn outside the row would land on
+     the divider or the panel beside it rather than around the row it belongs to — which is the same
+     reason a segment inside a track takes the inset form. A collection row is the one row that is
+     not this: the primitive gives its active row real DOM focus and the row shows the navigation
+     highlight instead, so a row in a list publishes its own focus treatment through the state
+     layer. The chevron the component puts in the row is the disclosure's own affordance and turns
+     in place under `motionOrient`. */
   trigger: /* @__PURE__ */ cx(
     "group flex w-full items-center justify-between gap-4 px-4 py-3 text-left text-sm outline-none",
     shape.control,
     motionFeedback,
+    focusRingInset,
     text.high,
     stateLayer.quiet,
     state.enabled,

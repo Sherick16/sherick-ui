@@ -304,10 +304,16 @@ Consequences a consumer can rely on:
 
 The automated accessibility gate excludes the `color-contrast` rule because of this gap; the
 reason, the numbers and the removal condition are recorded in
-[`DESIGN_LANGUAGE.md`](DESIGN_LANGUAGE.md) §14 and [`VERIFICATION.md`](VERIFICATION.md).
-Closing the gap means changing the authored accent and the three-step text ladder, which is a
-visual-language decision tracked separately from component work. Raising the bar here is a
-breaking change to the visual language, not a patch.
+[`DESIGN_LANGUAGE.md`](DESIGN_LANGUAGE.md) §14 and [`VERIFICATION.md`](VERIFICATION.md). The exact
+failing pairings are measured from the published tokens by `bun run test`, so the record cannot
+drift from the artifact. Closing the gap means changing the authored accent and the three-step text
+ladder, which is a visual-language decision tracked separately from component work. Raising the bar
+here is a breaking change to the visual language, not a patch.
+
+The complete proposed replacement palette — every token in both themes, the ratios behind each
+value, the affected components and states, and the alternative directions — is
+[`PALETTE_PROPOSAL.md`](PALETTE_PROPOSAL.md). It is a proposal for review: none of its values are
+in force, and this limitation stands until that decision is taken.
 
 ## What keeps the architecture frozen
 

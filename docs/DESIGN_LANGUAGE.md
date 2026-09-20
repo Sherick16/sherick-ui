@@ -978,6 +978,13 @@ Do not "fix" a failing contrast measurement inside a component by darkening that
 label: the roles above are the shared primitives, and a local color is exactly the kind of
 rule §16 forbids inventing locally.
 
+The gap is measured from the published tokens in both themes by `bun run test`, which records the
+exact failing pairings (see [`VERIFICATION.md`](VERIFICATION.md)) rather than relying on a scan.
+The complete proposed replacement palette — every token, both themes, the ratios behind each value,
+and the alternative directions with their trade-offs — is [`PALETTE_PROPOSAL.md`](PALETTE_PROPOSAL.md).
+**That document is a proposal, not part of this language**: none of its values are in force until
+this section and §10 are rewritten with them.
+
 ---
 
 ## 15. Theming

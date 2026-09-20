@@ -75,6 +75,52 @@ test("the dialog opens without widening the page at the narrow viewport", async 
   expect(errors).toEqual([]);
 });
 
+test("a tab row wider than its container scrolls inside itself, not in the page", async ({
+  page,
+  errors,
+}) => {
+  await openFixture(page);
+
+  const list = page.getByRole("tablist", { name: "Narrow sections" });
+  const scroller = list.locator("xpath=..");
+
+  const geometry = await scroller.evaluate((element) => {
+    const box = element.getBoundingClientRect();
+    return {
+      overflowX: getComputedStyle(element).overflowX,
+      width: box.width,
+      scrollWidth: element.scrollWidth,
+      clientWidth: element.clientWidth,
+    };
+  });
+
+  /* The row is wider than the space it was given, so the difference belongs to the scroller the
+     tab row owns; the page keeps its own width, and no consumer has to remember a wrapper. */
+  expect(geometry.overflowX).toBe("auto");
+  expect(geometry.scrollWidth).toBeGreaterThan(geometry.clientWidth);
+
+  const narrow = await page.getByTestId("narrow-container").evaluate((element) => element.clientWidth);
+  expect(
+    geometry.width,
+    `the tab scroller is ${geometry.width}px wide inside a ${narrow}px column`
+  ).toBeLessThanOrEqual(narrow);
+
+  /* The shared ring is drawn 5px outside a tab — a 2px outline at a 3px offset — and the scroller
+     clips at the track's own box, so the track's padding is what keeps the ring from being cut
+     off on the tab the scroll has pushed to an edge. */
+  const room = await list.evaluate((element) => {
+    const listBox = element.getBoundingClientRect();
+    const tabBox = element.querySelector('[role="tab"]')!.getBoundingClientRect();
+    return { above: tabBox.top - listBox.top, below: listBox.bottom - tabBox.bottom };
+  });
+  expect(room.above, "the ring's 5px has room above a tab").toBeGreaterThanOrEqual(5);
+  expect(room.below, "and below it").toBeGreaterThanOrEqual(5);
+
+  await assertNoPageOverflow(page, "narrow tab row");
+
+  expect(errors).toEqual([]);
+});
+
 test("controls stay contained when the document direction is RTL", async ({ page, errors }) => {
 
   await openFixture(page);

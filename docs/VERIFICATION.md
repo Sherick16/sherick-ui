@@ -59,7 +59,17 @@ Both consume `sherick-ui` through package exports after the library build.
 - every class name an authored recipe renders has a rule in the published `styles.css`. The
   stylesheet compiler reads class names as literal text, so a name assembled when the recipe is
   evaluated compiles to nothing and that step of the recipe silently disappears — which is how every
-  state layer once shipped without its hover rule.
+  state layer once shipped without its hover rule;
+- the **contrast contract** of the published tokens: `bun run test` measures every pairing the
+  design language requires to be readable — each text step against each surface a component
+  composites over, a tinted control's label against its own tint, an on-colour against its strong
+  fill, the selected mark against its selection tint, the error placeholder against an invalid
+  field, and the focus indicator against every surface — in both themes, from the values in
+  `dist/theme.css`. The pairings that do not yet meet WCAG AA are listed explicitly as the recorded
+  palette gap (see `docs/DESIGN_LANGUAGE.md` §14), and the list is exact in both directions: a new
+  failing pairing fails the check, and a listed pairing that starts passing fails it too. This is
+  the layer the axe scan cannot be: `@axe-core/playwright`'s `color-contrast` rule does not evaluate
+  `::placeholder` text at all.
 
 ## Packed-package consumer checks
 
@@ -331,9 +341,11 @@ ordinary desktop browser tests cannot see:
 - **narrow viewport** — at a 320px viewport the page renders no page-level horizontal
   overflow, and controls measured inside a deliberately narrow wrapper (`narrow-container`)
   stay within that wrapper. A fixed preferred width such as the old `min-w-64` on Input,
-  Textarea, Search or Select would overflow the container and fail here. `Tabs` is exercised
-  inside its documented `overflow-x-auto` wrapper, where a segmented control scrolls rather
-  than widening the page.
+  Textarea, Search or Select would overflow the container and fail here. A row that is wider
+  than the space it was given owns that difference itself rather than handing it to the page:
+  `Tabs` scrolls its own track inside itself, exactly as `Table` scrolls its own grid and a
+  segmented control is wrapped by the fixture, so nothing needs a consumer-side workaround to
+  stay inside a 320px viewport.
 - **RTL** — the same page is re-verified with `document.documentElement.dir = "rtl"` set at
   test time, so direction-sensitive layout, overflow and control ordering are checked without
   a separate fixture. The fixture avoids anything meaningless under RTL, which is why it is a

@@ -101,6 +101,57 @@ test("keyboard activation opens a section", async ({ page, errors }) => {
   expect(errors).toEqual([]);
 });
 
+test("a disclosure row paints the shared focus ring when the keyboard reaches it", async ({
+  page,
+  errors,
+}) => {
+  /* A disclosure row is a full-width button inside a stacked group rather than a collection row,
+     so it has no navigation highlight to stand in as its focus indicator: the row itself has to
+     paint one. A ring is painted when the row actually carries one: the recipes suppress the user
+     agent's outline with a transparent one, so a solid outline style on its own proves nothing, and
+     the inset form paints through the row's own box-shadow rather than an outline outside it. The
+     shadow is read with the transition removed, so what is measured is the state and not the fade
+     the feedback recipe would otherwise be part-way through — which is also the state a
+     reduced-motion reader gets, and the reason the ring is the inset form: an offset ring drawn
+     outside the row would land on the divider or the panel beside it instead of around the row it
+     belongs to. */
+  await page.emulateMedia({ reducedMotion: "reduce" });
+
+  const ring = (locator: Locator) =>
+    locator.evaluate((element) => {
+      const style = getComputedStyle(element);
+      const layers = style.boxShadow.split(/,\s*(?![^()]*\))/);
+      const spread = (layer: string) => {
+        const widths = [...layer.matchAll(/(-?[\d.]+)px/g)].map((match) => Number.parseFloat(match[1]));
+        return widths.length === 4 ? widths[3] : 0;
+      };
+      const inset = layers.filter((layer) => /inset/.test(layer) && spread(layer) > 0);
+      return { painted: inset.length > 0, outline: style.outlineColor, ring: inset.join(" | ") };
+    });
+
+  /* A pointer press focuses the row without the keyboard's ring: the row does not announce itself
+     to a pointer, exactly as a button does not. */
+  const second = page.getByRole("button", { name: "Second section" });
+  await second.click();
+  expect((await ring(second)).painted, "a pointer press is not a keyboard focus").toBe(false);
+
+  const details = page.getByRole("button", { name: "Details" });
+  await details.focus();
+  await page.keyboard.press("Shift+Tab");
+  await page.keyboard.press("Tab");
+
+  const focused = await ring(details);
+  expect(focused.outline, "the outside of the row is left alone").toBe("rgba(0, 0, 0, 0)");
+  expect(focused.painted, "keyboard focus paints the shared inset ring").toBe(true);
+  expect(focused.ring, "at the ring's own width").toContain("2px");
+
+  /* The ring follows the keyboard away with the focus. */
+  await page.keyboard.press("Shift+Tab");
+  expect((await ring(details)).painted, "and it leaves when focus does").toBe(false);
+
+  expect(errors).toEqual([]);
+});
+
 test("the group's own line is inset, at the lightest role, and yields to the section beside it", async ({
   page,
   errors,
