@@ -126,6 +126,11 @@ not a routine refresh to make a red gate green.
 - shared overlay shell and motion recipes, including the presence recipes and the reduced-motion
   neutralization they carry;
 
+Its specimens render real Lucide marks rather than a one-character placeholder, because what the
+gate pins is a slot with its own size, whitespace and optical weight; and the multiline cases it
+carries — a wrapped alert, a wrapped radio label — pin the anatomy a component gives a mark beside
+copy that wraps.
+
 This is a deterministic **style-contract** regression gate, not a pixel/browser visual test.
 
 ## Browser integration and visual regression
@@ -181,6 +186,11 @@ The showcase browser suite also verifies:
   be sized to the value it produces; and each promise state (`loading`, `success`, `error`) is
   asserted on the mark it renders, since those states are set by the primitive rather than chosen
   by a caller;
+- the optical-balance specimens (`optical-balance.spec.ts`): a loading mark occupies the slot its
+  icon had without changing the control's width, a chip's dismiss control keeps a target that
+  clears the pointer minimum while its visible edge distance survives a writing-direction flip, and
+  a wrapped alert's status mark and its dismissal are both centred on the first line rather than on
+  the middle of the block;
 - an anchored surface placed on each side of its trigger, asserting the resolved origin and the
   direction of its travel rather than only that it appeared;
 - the motion invariants (`motion.spec.ts`, below);

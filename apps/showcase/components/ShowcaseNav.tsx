@@ -11,6 +11,7 @@ import { cn, focusRing, motionFeedback, shape, text } from "sherick-ui/dev";
 */
 export const showcaseSections = [
   { id: "design-language", title: "Design language", nav: "Design language" },
+  { id: "optical-balance", title: "Optical balance", nav: "Optical balance" },
   { id: "buttons", title: "Buttons", nav: "Buttons" },
   { id: "fields", title: "Fields", nav: "Fields" },
   { id: "selection", title: "Selection & navigation", nav: "Selection" },

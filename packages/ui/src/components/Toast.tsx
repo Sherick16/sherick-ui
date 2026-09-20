@@ -12,7 +12,7 @@ import Button from "./Button";
 import { Spinner } from "./Spinner";
 import {
   density,
-  focusRing,
+  focusRingInset,
   overlay,
   shape,
   stacking,
@@ -288,8 +288,11 @@ export const ToastViewport = ({ position = "bottom-end", className }: ToastViewp
                   "data-[behind]:opacity-0 data-[expanded]:opacity-100"
                 )}
               >
+                {/* The status mark is a first-line mark: the slot takes the height of whichever line
+                    comes first — the title when there is one, the description otherwise — so the mark
+                    is centred on that line and a wrapped toast never pulls it into the middle. */}
                 {mark ? (
-                  <span className={cn("mt-0.5 inline-flex shrink-0 items-center")}>{mark}</span>
+                  <span className={cn("inline-flex shrink-0 items-center", toast.title ? "h-5" : "h-6")}>{mark}</span>
                 ) : null}
                 <div className={cn("flex min-w-0 flex-1 flex-col gap-0.5")}>
                   {toast.title ? (
@@ -318,11 +321,16 @@ export const ToastViewport = ({ position = "bottom-end", className }: ToastViewp
                   className={cn(
                     density.target,
                     shape.circle,
-                    "group -me-1 -mt-1 inline-flex shrink-0 items-center justify-center",
+                    /* A first-line affordance again: the 44px target is offset to the first line's centre,
+                       and the padding that makes it a target rather than a mark is pulled back at the
+                       surface's end edge. Its ring is the inset one, because the stack clips its own root
+                       and an outward ring would be cut off at the top of a titled toast. */
+                    "group -me-2 inline-flex shrink-0 items-center justify-center",
+                    toast.title ? "-mt-3" : "-mt-2.5",
                     text.medium,
                     "hover:text-sherick-ink",
                     motionFeedback,
-                    focusRing,
+                    focusRingInset,
                     stateLayer.quiet,
                     state.enabled
                   )}

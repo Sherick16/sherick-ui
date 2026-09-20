@@ -14,6 +14,10 @@
 */
 
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
+/* Real icons, not a placeholder dot: this gate exists to pin the anatomy a component gives its
+   marks, and a one-character placeholder has no viewBox whitespace, no stroke weight and no
+   optical size to pin. These are the icons the showcase uses for the same controls. */
+import { AlignCenter, AlignLeft, Bell, Check, Download, Heart, Search as SearchIcon } from "lucide-react";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -109,7 +113,7 @@ const specimens = {
   "button.tonal": h(Button, { appearance: "tonal", variant: "secondary" }, "Cancel"),
   "button.tonal.primary": h(Button, {}, "Continue"),
   "button.text": h(Button, { appearance: "text", variant: "secondary" }, "Skip"),
-  "button.icon": h(Button, { icon: h(Spinner, { size: "small" }) }, "Sync"),
+  "button.icon": h(Button, { icon: h(Download) }, "Sync"),
   "button.size.sm": h(Button, { size: "sm" }, "Small"),
   "button.size.md": h(Button, { size: "md" }, "Medium"),
   "button.size.lg": h(Button, { size: "lg" }, "Large"),
@@ -118,11 +122,17 @@ const specimens = {
   "alert.primary": h(Alert, {}, "A useful piece of information."),
   "alert.danger.closeable": h(Alert, { variant: "danger", closeable: true }, "Something needs your attention."),
   "alert.success": h(Alert, { variant: "success" }, "Changes were saved."),
+  /* The first-line mark and the first-line dismissal control, pinned where the copy actually wraps. */
+  "alert.multiline": h(
+    Alert,
+    { variant: "warning", closeable: true },
+    "Review these settings before continuing. A long piece of copy wraps across several lines, so the status mark and the dismiss control both have to hold the first readable line rather than drift to the middle of the block."
+  ),
   "avatar.circle.sm": h(Avatar, { src: "/avatar.png", alt: "Example avatar", size: "sm" }),
   "avatar.rounded.md": h(Avatar, { src: "/avatar.png", alt: "Example avatar", shape: "rounded" }),
   "badge.primary": h(Badge, {}, "Primary"),
   "badge.secondary": h(Badge, { variant: "secondary" }, "Neutral"),
-  "badge.success.icon": h(Badge, { variant: "success", icon: h("span", null, "·") }, "Ready"),
+  "badge.success.icon": h(Badge, { variant: "success", icon: h(Check) }, "Ready"),
   "card.secondary": h(Card, {}, "Neutral card"),
   "card.primary": h(Card, { variant: "primary" }, "Tonal card"),
   "code-block.block": h(CodeBlock, { language: "tsx" }, '<Button appearance="filled">Save</Button>'),
@@ -161,10 +171,10 @@ const specimens = {
   ),
   "select.trigger": h(Select, { options: [{ label: "Design system", value: "design" }], value: "design", onValueChange: noop }),
   "select.disabled": h(Select, { options: [{ label: "Design system", value: "design" }], disabled: true }),
-  "icon-button.tonal": h(IconButton, { icon: h("span", null, "·"), "aria-label": "Notifications" }),
-  "icon-button.ghost": h(IconButton, { appearance: "ghost", variant: "secondary", icon: h("span", null, "·"), "aria-label": "Search" }),
-  "icon-button.acrylic": h(IconButton, { appearance: "acrylic", variant: "secondary", icon: h("span", null, "·"), "aria-label": "Download" }),
-  "icon-button.disabled": h(IconButton, { disabled: true, icon: h("span", null, "·"), "aria-label": "Favorite" }),
+  "icon-button.tonal": h(IconButton, { icon: h(Bell), "aria-label": "Notifications" }),
+  "icon-button.ghost": h(IconButton, { appearance: "ghost", variant: "secondary", icon: h(SearchIcon), "aria-label": "Search" }),
+  "icon-button.acrylic": h(IconButton, { appearance: "acrylic", variant: "secondary", icon: h(Download), "aria-label": "Download" }),
+  "icon-button.disabled": h(IconButton, { disabled: true, icon: h(Heart), "aria-label": "Favorite" }),
   "input.default": h(Input, { label: "Project name", placeholder: "Sherick UI" }),
   "input.required": h(Input, { label: "Email", required: true, name: "email", type: "email" }),
   "input.error": h(Input, { label: "Invalid", error: true, placeholder: "Required value" }),
@@ -197,6 +207,17 @@ const specimens = {
     options: [
       { value: "production", label: "Production" },
       { value: "preview", label: "Preview" },
+    ],
+  }),
+  /* A label that wraps: the mark holds the first line instead of centring on the whole block. */
+  "radio-group.wrapped": h(RadioGroup, {
+    defaultValue: "cluster",
+    options: [
+      { value: "production", label: "Production" },
+      {
+        value: "cluster",
+        label: "Shared cluster, which is a long enough label to wrap across more than one line",
+      },
     ],
   }),
   "number-field": h(NumberField, { defaultValue: 4, min: 1, max: 10 }),
@@ -233,11 +254,12 @@ const specimens = {
      deterministic one. */
   "chip.toggle.rest": h(Chip, { value: "design" }, "Design"),
   "chip.toggle.selected": h(Chip, { value: "design", defaultChecked: true }, "Design"),
-  "chip.toggle.icon": h(Chip, { value: "code", variant: "success", icon: h("span", null, "·") }, "Code"),
+  "chip.toggle.icon": h(Chip, { value: "code", variant: "success", icon: h(Check) }, "Code"),
   "chip.toggle.disabled": h(Chip, { value: "design", disabled: true }, "Design"),
   "chip.tag": h(Chip, { variant: "warning" }, "Beta"),
-  "chip.tag.icon": h(Chip, { variant: "success", icon: h("span", null, "·") }, "Ready"),
+  "chip.tag.icon": h(Chip, { variant: "success", icon: h(Check) }, "Ready"),
   "chip.tag.dismissible": h(Chip, { onRemove: noop }, "Platform"),
+  "chip.tag.dismissible.icon": h(Chip, { variant: "success", icon: h(Check), onRemove: noop }, "Ready"),
   "chip-group": h(
     ChipGroup,
     { "aria-label": "Filters", defaultValue: ["design"] },
@@ -275,8 +297,8 @@ const specimens = {
     "aria-label": "Alignment",
     defaultValue: "start",
     options: [
-      { value: "start", label: "Start", icon: h("span", null, "·") },
-      { value: "center", label: "Center", icon: h("span", null, "·") },
+      { value: "start", label: "Start", icon: h(AlignLeft) },
+      { value: "center", label: "Center", icon: h(AlignCenter) },
     ],
   }),
   "progress.determinate": h(Progress, { value: 40, label: "Uploading", showValue: true, locale: "en-US" }),

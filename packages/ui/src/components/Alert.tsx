@@ -48,15 +48,25 @@ export const Alert = ({
     <div
       role={variant === "danger" || variant === "warning" ? "alert" : "status"}
       className={cn(
-        "flex items-center gap-3 px-4 py-3.5",
+        "flex items-start gap-3 px-4 py-3.5",
         shape.surface,
         tone.soft[variant],
         text.high,
         className
       )}
     >
-      <Icon aria-hidden="true" className={cn("size-5 shrink-0", tone.text[variant])} />
+      {/* The status mark is a **first-line** mark: an alert's copy wraps, and a mark centred on the
+          whole block would drift to the middle of it. The slot takes the first line's own height
+          (`leading-6`), so the icon is centred on the line it belongs to with no offset. */}
+      <span className={cn("flex h-6 shrink-0 items-center")} aria-hidden="true">
+        <Icon className={cn("size-5", tone.text[variant])} />
+      </span>
       <div className={cn("min-w-0 flex-1 text-sm leading-6")}>{children}</div>
+      {/* The dismissal is a first-line affordance too: a 44px target is taller than the line it belongs
+          to, so it is offset to that line's centre rather than centred on the block. Its own target
+          padding is then pulled back at the surface's end edge — that padding exists to make the target
+          big, and it is not allowed to read as a trailing void — while the target keeps the geometry the
+          pointer found. */}
       {closeable && (
         <Button
           type="button"
@@ -66,7 +76,7 @@ export const Alert = ({
             setIsVisible(false);
           }}
           className={cn(
-            "group ml-1 inline-flex shrink-0 items-center justify-center",
+            "group -me-2 -mt-2.5 inline-flex shrink-0 items-center justify-center",
             density.target,
             shape.circle,
             focusRingInset,

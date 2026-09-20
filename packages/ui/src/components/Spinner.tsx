@@ -4,7 +4,10 @@ import { type VariantProps, cva } from "class-variance-authority";
 import { cn } from "@/libs/utils";
 import { motionActivitySpin } from "./ui.motion";
 
-const spinnerVariants = cva("flex-col items-center justify-center", {
+/* The root is `shrink-0` because a Spinner is a **mark**: a control that puts one in a row with a
+   label is substituting it for an icon, and a mark that shrank under a long label would change
+   the control's own balance as it entered and left the loading state. */
+const spinnerVariants = cva("flex shrink-0 flex-col items-center justify-center", {
   variants: {
     show: {
       true: "flex",

@@ -76,8 +76,12 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           className
         )}
       >
+        {/* A loading mark is a **mark**: it takes the same 20px slot a leading icon does, so
+            switching the button into and out of its loading state never changes the control's width
+            or its balance. The spinner's own artwork is lighter than an icon's, and that is the
+            artwork's business rather than a correction to make here. */}
         {loading ? (
-          <Spinner size="small" />
+          <Spinner size="small" className={cn("size-5")} />
         ) : icon ? (
           <span className={cn("inline-flex shrink-0 items-center [&>svg]:size-5")} aria-hidden="true">
             {icon}

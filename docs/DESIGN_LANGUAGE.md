@@ -1007,10 +1007,11 @@ If a genuinely new visual rule is required:
    `packages/ui/src/styles/tokens.ts`;
 3. then consume the primitive in the component.
 
-Not every local decision is a visual rule. **Layout, spacing, component-specific
-padding, intrinsic dimensions, responsive arrangement and content typography are the
-component's own anatomy** — decide them inside the component, exactly as `Button`'s
-size paddings are decided. They are not promoted into global primitives, and "could this
+Not every local decision is a visual rule. **Layout, spacing, component-specific padding,
+intrinsic dimensions, responsive arrangement, content typography and the small optical
+corrections its own geometry needs are the component's own anatomy** — decide them inside
+the component, exactly as `Button`'s size paddings are decided. They are not promoted into
+global primitives, and "could this
 be a primitive?" is not a reason to add one. The prohibition covers the visual system
 itself: color and tone roles, material recipes, elevation and shadows, semantic shape
 roles, structural edges and rims, state treatments, focus treatment, and motion timing,
@@ -1028,7 +1029,106 @@ required widget behavior, document that gap before introducing local infrastruct
 
 ---
 
-## 17. The showcase
+## 17. Optical balance
+
+Geometry is the starting point; **perceived balance is the acceptance criterion**. A part is
+placed by what the eye reads, and the eye does not read box arithmetic: a mark carries its own
+padding and its own whitespace, and copy that wraps has more than one centre. This section is the
+vocabulary that rule is stated in. A component still decides its own anatomy — the numbers belong
+where the geometry that causes them lives — but the reasoning is the language's, not each
+component's.
+
+### The visible mark and the interaction target
+
+A control's target and the ink it shows are two objects, and the target is never traded for the
+mark:
+
+- the **target keeps its geometry**. Its size, its position, its hit area and its focus ring do
+  not move so a glyph can look better centred;
+- the **mark inside it** is what moves. A dismiss or close control whose visible ink is much
+  smaller than its target lets the mark's own box sit where the eye expects it, while the target
+  stays exactly where the pointer found it;
+- **padding that exists only to enlarge a target is compensated at the edge, and whitespace
+  inside a mark's own artwork is not.** The six pixels a chip's dismiss control holds around its
+  glyph are target padding, so the chip gives them back at its end edge. The two units of empty
+  viewBox a chevron ships with are the artwork's, so a chevron is placed by its box and never
+  nudged so its ink meets a line of text. Artwork with unusual internal whitespace is the
+  artwork's responsibility.
+
+### Icon slots are geometry, not content
+
+A slot is a decision, not an accident of whatever was passed in:
+
+- the slot fixes its mark's **box size** and holds it (`shrink-0`), so swapping one mark for
+  another — an icon for a loading mark, a tick for a dash — cannot change the control's width or
+  its balance;
+- the artwork is sized by the **slot's own contract** (`[&>svg]:size-*`) rather than by every call
+  site, so all the marks in one control are one size;
+- a slot aligns its **box**, not the ink inside it, which is what lets a row of controls agree with
+  each other.
+
+### Two ends, one perceived distance
+
+The two ends of a control are not obliged to share one number:
+
+- a **text-only** control is symmetric, because symmetric inline padding is what centers its label;
+- a control with a **leading mark** measures its start padding to the mark's box, and one with a
+  **trailing affordance** measures its end padding to the affordance's box, so both ends read at
+  the same distance even though one holds a 20px mark and the other a 28px target;
+- the asymmetry is always written on a **logical** property (`ps`/`pe`, `ms`/`me`, `start`/`end`),
+  so a right-to-left page is the same design rather than a second one;
+- a control that owns a **trailing cluster** — a combobox field and its two parts — places that
+  cluster with its own inline padding rather than pinning it to a physical edge, so the cluster
+  stays at the field's end whichever way the page reads.
+
+### Multiline copy holds its first line
+
+A status mark or an affordance beside copy that can wrap aligns to the **first readable line**,
+not to the centre of the block; a one-line row is the degenerate case of the same rule, so the two
+never disagree:
+
+- the row lays its parts out from the top (`items-start`) and the mark's slot takes the **first
+  line's own height**, so the mark is centred on that line with no magic offset and a row that has
+  not wrapped is unchanged;
+- a target taller than the line it belongs to — a 44px dismissal beside a 24px line — is offset by
+  the difference between them, because that difference is the geometry, and a number chosen by feel
+  would drift the moment the line height changed;
+- which line is first is a fact the component owns: a toast with a title aligns its mark and its
+  dismissal to the title's line, and the same toast without one aligns them to the description's.
+
+**The rule is about a mark that belongs to a line, not about one that owns a row.** A disclosure
+chevron is the affordance of the whole region its row opens, so it stays centred on the row when the
+row's label wraps; a status icon, a field's embedded mark and a dismissal all belong to the first
+line and follow it. Which of the two an affordance is, is a fact about what it does rather than
+about where it sits.
+
+### A state substitution keeps the slot it replaces
+
+A control that swaps its mark for a state — an icon for a loading spinner — renders the substitute
+at the **same size the slot had**, so entering and leaving the state neither shrinks the mark nor
+changes the control's width. The substitute's own ink may still be lighter than the icon's; that
+is the artwork's business, as above.
+
+### Corrections are small, contextual and tied to a fact
+
+An optical correction is a consequence of a component's own anatomy — a line height, a target
+size, the padding a dismiss control owns — and it is written down beside that anatomy:
+
+- it is **not** a global offset token, a blanket `translate-y-px` or a per-theme number: the
+  library has no `--optical-offset` and should not grow one, because one number cannot be right
+  for a 16px glyph beside a 24px line and a 28px target beside a 14px one;
+- where a part already carries a transform for its state or motion — a disclosure chevron's
+  rotation, a selection mark's arrival — an optical adjustment is never stacked onto that same
+  node: it moves a nested element or it is not made;
+- focus, hit-area and interaction-boundary geometry are never a correction's subject.
+
+If several components genuinely end up with the same slot or the same correction, that is the
+point at which the smallest useful recipe is extracted; until then the decision stays where its
+anatomy lives.
+
+---
+
+## 18. The showcase
 
 > **The development showcase demonstrates the system; it does not explain it. Design
 > rationale belongs in this document.**

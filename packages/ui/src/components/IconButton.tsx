@@ -67,7 +67,9 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
           className
         )}
       >
-        {loading ? <Spinner size="small" /> : icon ?? null}
+        {/* The mark keeps one slot at both states: a loading spinner is the icon's substitute, so it
+            renders at the same 20px the icon does rather than at the spinner's own default size. */}
+        {loading ? <Spinner size="small" className={cn("size-5")} /> : icon ?? null}
       </Button>
     );
   }

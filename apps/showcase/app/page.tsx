@@ -305,6 +305,143 @@ export default function Home() {
             </div>
           </ShowcaseSection>
 
+          {/* One comparison section for optical balance: every specimen here is a control whose
+              internal geometry was decided by eye rather than by its own box arithmetic, so a
+              regression shows up as a mark that drifts, shrinks or leaves a trailing void. */}
+          <ShowcaseSection id="optical-balance">
+            <div className="mt-6 grid gap-4 xl:grid-cols-2">
+              <Specimen title="Label, leading mark and trailing action">
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <Chip variant="warning">Beta</Chip>
+                  <Chip variant="success" icon={<Check />}>Ready</Chip>
+                  <Chip onRemove={() => undefined}>Platform</Chip>
+                  <Chip variant="success" icon={<Check />} onRemove={() => undefined}>Ready</Chip>
+                </div>
+                <div className="mt-4 flex flex-wrap items-center gap-3">
+                  <Button appearance="tonal" variant="secondary" size="sm">Text only</Button>
+                  <Button appearance="tonal" variant="secondary" size="sm" icon={<Download />}>Leading mark</Button>
+                </div>
+                <div className="mt-4 flex flex-wrap items-center gap-2">
+                  <Badge variant="secondary">Text only</Badge>
+                  <Badge variant="success" icon={<Check />}>Leading mark</Badge>
+                </div>
+              </Specimen>
+
+              <Specimen title="A loading mark keeps its slot">
+                <div className="flex flex-wrap items-center gap-3">
+                  <Button appearance="tonal" variant="secondary" icon={<Download />}>Download</Button>
+                  <Button appearance="tonal" variant="secondary" icon={<Download />} loading>Download</Button>
+                  <IconButton appearance="tonal" variant="secondary" icon={<Bell />} aria-label="Notification mark" />
+                  <IconButton appearance="tonal" variant="secondary" icon={<Bell />} aria-label="Notification loading" loading />
+                </div>
+                <div className="mt-4 space-y-4">
+                  <Search onSearch={() => undefined} placeholder="Embedded mark" />
+                  <Search onSearch={() => undefined} placeholder="Embedded loading mark" loading />
+                </div>
+              </Specimen>
+
+              <Specimen title="A status mark holds the first line">
+                <div className="space-y-3">
+                  <Alert variant="primary">A useful piece of information.</Alert>
+                  <Alert variant="warning" closeable>
+                    Review these settings before continuing. Copy that wraps across several lines keeps
+                    its status mark and its dismiss control on the first readable line instead of
+                    drifting to the middle of the block.
+                  </Alert>
+                </div>
+                <div className="mt-5">
+                  <RadioGroup
+                    label="Deployment target"
+                    defaultValue="cluster"
+                    options={[
+                      { value: "production", label: "Production" },
+                      {
+                        value: "cluster",
+                        label: "Shared cluster, whose label is long enough to wrap across more than one line",
+                      },
+                    ]}
+                  />
+                </div>
+              </Specimen>
+
+              <Specimen title="Trailing affordances">
+                <div className="space-y-4">
+                  <Select options={selectOptions} defaultValue="design" aria-label="Trailing chevron" />
+                  <Combobox options={comboboxOptions} defaultValue="design" />
+                  <NumberField defaultValue={4} min={1} max={10} aria-label="Plus and minus marks" />
+                </div>
+              </Specimen>
+
+              <Specimen title="Selection marks">
+                <div className="flex flex-wrap items-center gap-6">
+                  <StateLabel label="Checked"><Checkbox defaultChecked aria-label="Checked mark" /></StateLabel>
+                  <StateLabel label="Indeterminate"><Checkbox indeterminate aria-label="Indeterminate mark" /></StateLabel>
+                </div>
+                <div className="mt-5 flex flex-col items-start gap-5">
+                  <SegmentedControl
+                    aria-label="Text segments"
+                    defaultValue="day"
+                    options={[
+                      { value: "day", label: "Day" },
+                      { value: "week", label: "Week" },
+                      { value: "month", label: "Month" },
+                    ]}
+                  />
+                  <SegmentedControl
+                    aria-label="Icon segments"
+                    defaultValue="start"
+                    options={[
+                      { value: "start", label: "Start", icon: <AlignLeft className="size-4" /> },
+                      { value: "center", label: "Center", icon: <AlignCenter className="size-4" /> },
+                    ]}
+                  />
+                  <ToggleGroup aria-label="Icon-only segments" multiple defaultValue={["left"]}>
+                    <ToggleGroup.Item value="left" aria-label="Align left"><AlignLeft className="size-4" /></ToggleGroup.Item>
+                    <ToggleGroup.Item value="center" aria-label="Align center"><AlignCenter className="size-4" /></ToggleGroup.Item>
+                  </ToggleGroup>
+                </div>
+              </Specimen>
+
+              <Specimen title="Disclosure chevrons">
+                <Accordion defaultValue={["wrapped"]}>
+                  <Accordion.Item value="plain">
+                    <Accordion.Trigger>A row that fits on one line</Accordion.Trigger>
+                    <Accordion.Panel className={cn("text-sm leading-7", text.medium)}>Panel content.</Accordion.Panel>
+                  </Accordion.Item>
+                  <Accordion.Item value="wrapped">
+                    <Accordion.Trigger>
+                      A row whose label wraps across more than one line, which is the case the chevron
+                      slot has to survive
+                    </Accordion.Trigger>
+                    <Accordion.Panel className={cn("text-sm leading-7", text.medium)}>Panel content.</Accordion.Panel>
+                  </Accordion.Item>
+                </Accordion>
+                <div className="mt-5">
+                  <Collapsible>
+                    <Collapsible.Trigger>Advanced options</Collapsible.Trigger>
+                    <Collapsible.Panel className={cn("text-sm leading-7", text.medium)}>Panel content.</Collapsible.Panel>
+                  </Collapsible>
+                </div>
+              </Specimen>
+
+              <Specimen title="Dismissal on a floating surface">
+                <Button appearance="tonal" variant="secondary" onClick={() => setDialogOpen(true)}>
+                  Open dialog
+                </Button>
+                <div className="mt-5">
+                  <SheetSpecimen />
+                </div>
+              </Specimen>
+
+              <Specimen title="Toast status and loading">
+                <ToastProvider>
+                  <OpticalToastSpecimen />
+                  <ToastViewport />
+                </ToastProvider>
+              </Specimen>
+            </div>
+          </ShowcaseSection>
+
           <ShowcaseSection id="buttons">
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
               <Specimen title="Appearances">
@@ -942,6 +1079,43 @@ function ToastSpecimen() {
         }
       >
         Danger + action
+      </Button>
+    </div>
+  );
+}
+
+/* The two toast states the optical section compares: a settled status mark and the loading mark it
+   becomes, so the stack can be raised and read beside the status surfaces above. */
+function OpticalToastSpecimen() {
+  const toast = useToast();
+
+  return (
+    <div className="flex flex-wrap gap-3">
+      <Button
+        appearance="tonal"
+        variant="secondary"
+        onClick={() =>
+          toast.add({
+            type: "warning",
+            title: "Quota almost reached",
+            description: "Eighty per cent of the monthly budget is used.",
+          })
+        }
+      >
+        Status mark
+      </Button>
+      <Button
+        appearance="tonal"
+        variant="secondary"
+        onClick={() =>
+          void toast.promise(new Promise<void>((resolve) => setTimeout(resolve, 1600)), {
+            loading: "Uploading assets",
+            success: "Assets uploaded",
+            error: "Upload failed",
+          })
+        }
+      >
+        Loading mark
       </Button>
     </div>
   );
