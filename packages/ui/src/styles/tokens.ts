@@ -34,13 +34,14 @@ export const lightTokens = {
   "elevation-raised": "0 1px 2px oklch(var(--sui-light-bottom) / 0.16), 0 4px 13px oklch(var(--sui-light-bottom) / 0.09)",
   "elevation-floating": "0 16px 40px oklch(var(--sui-light-bottom) / 0.20), inset 0 1px 0 oklch(var(--sui-light-top) / 0.70)",
   "elevation-control": "0 1px 2px oklch(var(--sui-light-bottom) / 0.19), inset 0 1px 0 oklch(var(--sui-light-top) / 0.55)",
-  /* The recessed rung, and the deeper rung a *small* well takes. A wide groove, a track and a field
-     are shallow by nature and their edges are read from their own fill; a mark the size of a
-     glyph has no fill step to spare (the tightest step the neutral ladder has measures about 1.3:1
-     against the surface around it), so its depth is what says what it is. Same light, one rung
-     further down: a shaded upper wall, a soft interior gradient, and the lit lower bounce. */
+  /* The recessed rung, and the deeper rung a *small* well takes. Same recipe, same two soft walls at
+     the same offsets and blur — a well differs from a groove in *depth*, never in kind. It is deeper
+     because a wide groove and a track are read from their own fill and a mark the size of a glyph has
+     no fill step to spare: the tightest step this neutral ladder has measures about 1.3:1 against the
+     surface around it, so its depth is what says what it is. The strength is the least that clears
+     3:1 once rendered, so the two rungs look as alike as they can and still be legible. */
   "elevation-recessed": "inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.22), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.50)",
-  "elevation-well": "inset 0 2px 0 oklch(var(--sui-light-bottom) / 0.62), inset 0 4px 6px oklch(var(--sui-light-bottom) / 0.20), inset 0 -2px 0 oklch(var(--sui-light-top) / 0.50)",
+  "elevation-well": "inset 0 3px 5px oklch(var(--sui-light-bottom) / 0.66), inset 0 -3px 5px oklch(var(--sui-light-top) / 0.62)",
   "glass-fill": "0.86",
   "glass-blur": "28px",
   "glass-saturation": "1.06",
@@ -100,7 +101,7 @@ export const darkTokens = {
   /* Dark mode inverts the light, so it inverts which wall of a sunk mark is legible: the shade tone
      is darker than the surface here and cannot outline anything, and the lit lower wall is the wall
      that reads. Same rung, same recipe shape, the other end of the same model. */
-  "elevation-well": "inset 0 2px 0 oklch(var(--sui-light-bottom) / 0.50), inset 0 4px 6px oklch(var(--sui-light-bottom) / 0.40), inset 0 -2px 0 oklch(var(--sui-light-top) / 0.45)",
+  "elevation-well": "inset 0 3px 5px oklch(var(--sui-light-bottom) / 0.42), inset 0 -3px 5px oklch(var(--sui-light-top) / 0.45)",
   "glass-fill": "0.90",
   "glass-blur": "32px",
   "glass-saturation": "1.10",
