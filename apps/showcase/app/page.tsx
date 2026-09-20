@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   AlignCenter,
   AlignLeft,
@@ -8,6 +8,7 @@ import {
   ArrowUpRight,
   Bell,
   Check,
+  ChevronDown,
   Download,
   Ellipsis,
   Heart,
@@ -68,7 +69,17 @@ import {
   elevation,
   focusRing,
   material,
+  motionActivityIndeterminate,
+  motionActivityPulse,
+  motionActivitySpin,
+  motionArrive,
+  motionDirect,
+  motionDisclose,
   motionFeedback,
+  motionOrient,
+  motionPresenceAnchored,
+  motionRelocate,
+  motionTactile,
   shape,
   state,
   stateLayer,
@@ -112,7 +123,6 @@ const applyTheme = (theme: ThemeMode) => {
 export default function Home() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [switchOn, setSwitchOn] = useState(true);
-  const [motionSwitch, setMotionSwitch] = useState(false);
   const [selection, setSelection] = useState("design");
   const [alertOpen, setAlertOpen] = useState(false);
   const [filters, setFilters] = useState<string[]>(["design"]);
@@ -255,22 +265,7 @@ export default function Home() {
               </Specimen>
 
               <Specimen title="Motion">
-                <div className="space-y-4">
-                  <div className="flex flex-wrap items-center gap-4">
-                    <span className={cn("w-20 text-xs font-medium", text.high)}>Press</span>
-                    <Input placeholder="Hover, focus or type" className="w-56" />
-                  </div>
-                  <div className="flex flex-wrap items-center gap-4">
-                    <span className={cn("w-20 text-xs font-medium", text.high)}>Release</span>
-                    <Switch checked={motionSwitch} onCheckedChange={setMotionSwitch} aria-label="Release motion" />
-                  </div>
-                  <div className="flex flex-wrap items-center gap-4">
-                    <span className={cn("w-20 text-xs font-medium", text.high)}>Overlay</span>
-                    <Tooltip content="Overlay">
-                      <IconButton variant="secondary" icon={<Bell />} aria-label="Overlay" />
-                    </Tooltip>
-                  </div>
-                </div>
+                <MotionSpecimen />
               </Specimen>
 
               <Specimen title="Density">
@@ -853,6 +848,237 @@ function Swatch({ label, className }: { label: string; className: string }) {
 
 function StateLabel({ label, children }: { label: string; children: React.ReactNode }) {
   return <div className="flex items-center gap-2"><div>{children}</div><span className={cn("text-sm", text.medium)}>{label}</span></div>;
+}
+
+/* One intent per stage. A stage is a minimal mark carrying a recipe's classes rather than a
+   second copy of a component: each component already demonstrates its own motion where it is
+   specimened, and what a reader cannot see there is one intent at a time with its name beside it.
+   Every stage is reversible by hand, so both directions of its recipe are visible. */
+function MotionSpecimen() {
+  const [on, setOn] = useState<Record<string, boolean>>({});
+  const toggle = (intent: string) => setOn((current) => ({ ...current, [intent]: !current[intent] }));
+
+  return (
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+      {/* Feedback is the one intent a click cannot show: it is the response to a pointer being on a
+          surface or a keyboard landing on it, so the stage is hovered or focused rather than
+          toggled, and nothing about it travels. */}
+      <MotionStage label="feedback">
+        <button
+          type="button"
+          className={cn(
+            "flex h-9 items-center px-3 text-xs",
+            shape.control,
+            focusRing,
+            motionFeedback,
+            material.matteHigh,
+            text.medium,
+            state.enabled,
+            "hover:bg-sherick-surface-high/[0.82] hover:text-sherick-ink",
+            "focus-visible:bg-sherick-surface-high/[0.82] focus-visible:text-sherick-ink"
+          )}
+        >
+          Hover or focus
+        </button>
+      </MotionStage>
+
+      <MotionStage label="tactile">
+        <button
+          type="button"
+          className={cn(
+            "flex h-9 items-center px-3 text-xs font-medium",
+            shape.control,
+            focusRing,
+            motionTactile,
+            elevation.raised,
+            state.recess,
+            tone.tonal.secondary,
+            text.high,
+            state.enabled
+          )}
+        >
+          Hold
+        </button>
+      </MotionStage>
+
+      <MotionStage label="arrive">
+        <button
+          type="button"
+          onClick={() => toggle("arrive")}
+          aria-label="Toggle the arriving mark"
+          aria-pressed={on.arrive ?? false}
+          className={cn("flex size-7 items-center justify-center", shape.mark, elevation.recessed, material.matteHigh, focusRing, state.enabled)}
+        >
+          {/* The two states a primitive publishes around a mark: while it leaves, `data-ending-style`
+              holds it at the exit geometry, and clearing that attribute is the arrival. */}
+          <span
+            aria-hidden="true"
+            data-ending-style={on.arrive ? undefined : ""}
+            className={cn("size-4", shape.circle, tone.strong.primary, motionArrive)}
+          />
+        </button>
+      </MotionStage>
+
+      <MotionStage label="orient">
+        <button
+          type="button"
+          onClick={() => toggle("orient")}
+          aria-label="Turn the affordance"
+          aria-pressed={on.orient ?? false}
+          className={cn("flex size-7 items-center justify-center", shape.circle, material.matteHigh, text.high, focusRing, state.enabled)}
+        >
+          <ChevronDown className={cn("size-4", motionOrient, on.orient && "rotate-180")} aria-hidden="true" />
+        </button>
+      </MotionStage>
+
+      <MotionStage label="relocate">
+        <button
+          type="button"
+          onClick={() => toggle("relocate")}
+          aria-label="Move the mark between its destinations"
+          aria-pressed={on.relocate ?? false}
+          className={cn("relative block h-8 w-16", shape.pill, elevation.recessed, material.matteHigh, focusRing, state.enabled)}
+        >
+          <span
+            aria-hidden="true"
+            className={cn("absolute left-1 top-1 size-6", shape.circle, elevation.control, material.handle, motionRelocate, on.relocate && "translate-x-9")}
+          />
+        </button>
+      </MotionStage>
+
+      <MotionStage label="direct">
+        <DirectDriver />
+      </MotionStage>
+
+      <MotionStage label="disclose">
+        <div className="w-32">
+          <button
+            type="button"
+            onClick={() => toggle("disclose")}
+            aria-expanded={on.disclose ?? false}
+            className={cn("flex h-8 w-full items-center justify-between px-2 text-xs", shape.row, stateLayer.quiet, text.high, focusRing, state.enabled)}
+          >
+            Region
+            <ChevronDown className={cn("size-3.5", motionOrient, on.disclose && "rotate-180")} aria-hidden="true" />
+          </button>
+          <div className={cn("overflow-hidden", motionDisclose)} style={{ height: on.disclose ? 32 : 0 }}>
+            <div className={cn("px-2 pt-1 text-xs leading-5", text.medium)}>Panel content</div>
+          </div>
+        </div>
+      </MotionStage>
+
+      <MotionStage label="presence">
+        <div className="relative flex flex-col items-center">
+          <button
+            type="button"
+            onClick={() => toggle("presence")}
+            aria-expanded={on.presence ?? false}
+            className={cn("relative z-10 flex h-8 items-center px-3 text-xs", shape.control, material.matteHigh, text.high, focusRing, state.enabled)}
+          >
+            Anchor
+          </button>
+          {/* Base publishes the anchor edge as `--transform-origin`; a stage has no positioner, so it
+              declares one, and the attribute it toggles is the one a primitive writes while an
+              anchored surface enters. */}
+          <div
+            aria-hidden="true"
+            data-ending-style={on.presence ? undefined : ""}
+            className={cn(
+              "mt-1 flex h-8 items-center px-3 text-xs",
+              "[--transform-origin:top]",
+              shape.control,
+              material.acrylicDense,
+              elevation.floating,
+              text.high,
+              motionPresenceAnchored
+            )}
+          >
+            Surface
+          </div>
+        </div>
+      </MotionStage>
+
+      <MotionStage label="activity">
+        <div className="flex items-center gap-3">
+          <span aria-hidden="true" className={cn("size-4 rounded-full border-2 border-sherick-ink-faint border-t-transparent", motionActivitySpin)} />
+          <span aria-hidden="true" className={cn("h-4 w-10", shape.pill, material.matteHigh, motionActivityPulse)} />
+          <span aria-hidden="true" className={cn("relative block h-1.5 w-10 overflow-hidden", shape.pill, elevation.recessed, material.matteHigh)}>
+            <span className={cn("absolute inset-y-0 w-1/2", shape.pill, tone.strong.primary, motionActivityIndeterminate)} />
+          </span>
+        </div>
+      </MotionStage>
+    </div>
+  );
+}
+
+function MotionStage({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-2">
+      <div className={cn("flex h-24 items-center justify-center px-3", shape.control, material.canvas)}>{children}</div>
+      <div className={cn("text-xs font-medium", text.high)}>{label}</div>
+    </div>
+  );
+}
+
+/* `direct` is the one intent a still stage cannot fake: while the pointer owns the geometry the
+   positional transition is removed, and the mark settles to the nearest destination on release. */
+function DirectDriver() {
+  const track = useRef<HTMLDivElement | null>(null);
+  const [position, setPosition] = useState(50);
+  const [dragging, setDragging] = useState(false);
+
+  const settle = (value: number) => Math.round(value / 50) * 50;
+
+  const fromPointer = (clientX: number) => {
+    const box = track.current?.getBoundingClientRect();
+    if (!box || box.width === 0) return 50;
+    return Math.min(100, Math.max(0, ((clientX - box.left) / box.width) * 100));
+  };
+
+  return (
+    <div
+      ref={track}
+      role="slider"
+      tabIndex={0}
+      aria-label="Position"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={Math.round(position)}
+      onKeyDown={(event) => {
+        const step = event.key === "ArrowRight" ? 50 : event.key === "ArrowLeft" ? -50 : 0;
+        if (step === 0) return;
+        event.preventDefault();
+        setPosition((current) => Math.min(100, Math.max(0, settle(current) + step)));
+      }}
+      onPointerDown={(event) => {
+        event.currentTarget.setPointerCapture(event.pointerId);
+        setDragging(true);
+        setPosition(fromPointer(event.clientX));
+      }}
+      onPointerMove={(event) => {
+        if (dragging) setPosition(fromPointer(event.clientX));
+      }}
+      onPointerUp={(event) => {
+        if (!dragging) return;
+        event.currentTarget.releasePointerCapture(event.pointerId);
+        setDragging(false);
+        setPosition((current) => settle(current));
+      }}
+      onPointerCancel={() => {
+        setDragging(false);
+        setPosition((current) => settle(current));
+      }}
+      className={cn("relative flex h-8 w-28 touch-none select-none items-center", shape.control, focusRing, state.enabled)}
+    >
+      <span aria-hidden="true" className={cn("mx-2.5 h-1.5 flex-1", shape.pill, elevation.recessed, material.matteHigh)} />
+      <span
+        aria-hidden="true"
+        data-dragging={dragging ? "" : undefined}
+        className={cn("absolute top-1/2 size-5 [translate:-50%_-50%]", shape.pill, elevation.control, material.handle, motionDirect)}
+        style={{ insetInlineStart: `calc(0.625rem + (100% - 1.25rem) * ${position / 100})` }}
+      />
+    </div>
+  );
 }
 
 function SheetSpecimen() {
