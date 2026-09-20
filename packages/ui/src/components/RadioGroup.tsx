@@ -73,7 +73,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
           <Field.Label className={cn("mb-2 text-sm font-medium", text.high)}>
             {label}
             {required && (
-              <span className={cn("ml-1 text-sherick-danger")} aria-hidden="true">
+              <span className={cn("ms-1 text-sherick-danger")} aria-hidden="true">
                 *
               </span>
             )}
@@ -104,32 +104,41 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
                 state.disabledRow
               )}
             >
-              <Field.Label className={cn("flex flex-1 items-center gap-3")}>
-                <Radio.Root
-                  value={option.value}
-                  disabled={option.disabled}
-                  className={cn(
-                    "group relative flex size-6 shrink-0 items-center justify-center outline-none"
-                  )}
-                >
-                  <span
-                    aria-hidden="true"
+              {/* The row itself is the label, so the whole row stays the pointer target. Inside it the
+                  mark and the copy are one first-line group: a wrapped label then aligns the radio to
+                  its first line instead of centring it on the block, while a one-line row is still
+                  centred in the row's own density height. The copy declares its own line height —
+                  `density.normal` sets the type step but no leading, and this package ships no reset —
+                  so the mark's 24px slot and the line it is centred on are the same 24px whatever
+                  line height a host happens to inherit. */}
+              <Field.Label className={cn("flex flex-1 items-center")}>
+                <span className={cn("flex w-full items-start gap-3")}>
+                  <Radio.Root
+                    value={option.value}
+                    disabled={option.disabled}
                     className={cn(
-                      "flex size-6 items-center justify-center",
-                      shape.circle,
-                      selectable.surface,
-                      selectable.rest,
-                      selectable.selected,
-                      stateLayer.track,
-                      groupFocusRing
+                      "group relative flex size-6 shrink-0 items-center justify-center outline-none"
                     )}
                   >
-                    <Radio.Indicator className={cn("flex items-center justify-center", motionArrive)}>
-                      <span className={cn("block size-2.5", shape.circle, "bg-current")} />
-                    </Radio.Indicator>
-                  </span>
-                </Radio.Root>
-                <span className={cn(text.high)}>{option.label}</span>
+                    <span
+                      aria-hidden="true"
+                      className={cn(
+                        "flex size-6 items-center justify-center",
+                        shape.circle,
+                        selectable.surface,
+                        selectable.rest,
+                        selectable.selected,
+                        stateLayer.track,
+                        groupFocusRing
+                      )}
+                    >
+                      <Radio.Indicator className={cn("flex items-center justify-center", motionArrive)}>
+                        <span className={cn("block size-2.5", shape.circle, "bg-current")} />
+                      </Radio.Indicator>
+                    </span>
+                  </Radio.Root>
+                  <span className={cn(text.high, "leading-6")}>{option.label}</span>
+                </span>
               </Field.Label>
             </Field.Item>
           ))}

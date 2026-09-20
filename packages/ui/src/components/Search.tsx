@@ -116,7 +116,7 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
           disabled={disabled}
           aria-busy={loading || undefined}
           className={cn(
-            "w-full bg-transparent py-3 pl-5 pr-12 text-inherit outline-none placeholder:text-sherick-ink-muted",
+            "w-full bg-transparent py-3 ps-5 pe-12 text-inherit outline-none placeholder:text-sherick-ink-muted",
             density.normal,
             shape.control,
             disabled ? state.disabledDescendant : state.text,
@@ -138,9 +138,15 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
             tone.text[variant],
             !submitDisabled && stateLayer.quiet,
             submitDisabled ? state.disabledDescendant : state.enabled,
-            /* After the state layer, which is `relative` itself: `tailwind-merge` keeps the last
-               class in a conflicting group, so the control's own position has to be written last. */
-            "group absolute right-1.5 inline-flex items-center justify-center"
+            /* After the state layer, which is `relative` itself: `tailwind-merge` keeps the last class in
+               a conflicting group, so the control's own position has to be written last.
+               The embedded mark is already balanced where it stands: a 20px glyph centred in the 44px
+               target lands its box 18px from the field's end edge, within the 20px the field's own
+               leading padding gives the typed text — so the mark, and the target it lives in, are left
+               exactly where they were. What the field does own is the inset itself, and it is written
+               on the logical end (`pe-12` reserves the target's room, `end-1.5` places it) so a
+               right-to-left page puts the submit control on its own leading edge. */
+            "group absolute end-1.5 inline-flex items-center justify-center"
           )}
         >
           {/* The target stays exactly where the pointer found it; the mark inside it carries the

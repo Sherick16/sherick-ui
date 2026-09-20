@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   AlignCenter,
   AlignLeft,
@@ -8,6 +8,7 @@ import {
   ArrowUpRight,
   Bell,
   Check,
+  ChevronDown,
   Download,
   Ellipsis,
   Heart,
@@ -68,7 +69,17 @@ import {
   elevation,
   focusRing,
   material,
+  motionActivityIndeterminate,
+  motionActivityPulse,
+  motionActivitySpin,
+  motionArrive,
+  motionDirect,
+  motionDisclose,
   motionFeedback,
+  motionOrient,
+  motionPresenceAnchored,
+  motionRelocate,
+  motionTactile,
   shape,
   state,
   stateLayer,
@@ -112,7 +123,6 @@ const applyTheme = (theme: ThemeMode) => {
 export default function Home() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [switchOn, setSwitchOn] = useState(true);
-  const [motionSwitch, setMotionSwitch] = useState(false);
   const [selection, setSelection] = useState("design");
   const [alertOpen, setAlertOpen] = useState(false);
   const [filters, setFilters] = useState<string[]>(["design"]);
@@ -255,22 +265,7 @@ export default function Home() {
               </Specimen>
 
               <Specimen title="Motion">
-                <div className="space-y-4">
-                  <div className="flex flex-wrap items-center gap-4">
-                    <span className={cn("w-20 text-xs font-medium", text.high)}>Press</span>
-                    <Input placeholder="Hover, focus or type" className="w-56" />
-                  </div>
-                  <div className="flex flex-wrap items-center gap-4">
-                    <span className={cn("w-20 text-xs font-medium", text.high)}>Release</span>
-                    <Switch checked={motionSwitch} onCheckedChange={setMotionSwitch} aria-label="Release motion" />
-                  </div>
-                  <div className="flex flex-wrap items-center gap-4">
-                    <span className={cn("w-20 text-xs font-medium", text.high)}>Overlay</span>
-                    <Tooltip content="Overlay">
-                      <IconButton variant="secondary" icon={<Bell />} aria-label="Overlay" />
-                    </Tooltip>
-                  </div>
-                </div>
+                <MotionSpecimen />
               </Specimen>
 
               <Specimen title="Density">
@@ -313,15 +308,17 @@ export default function Home() {
                   <Button appearance="tonal" variant="secondary">Tonal</Button>
                   <Button appearance="text" variant="secondary">Text</Button>
                   <Button appearance="tonal" variant="danger" icon={<Trash2 />}>Delete</Button>
-                  <IconButton appearance="tonal" variant="secondary" icon={<Bell />} aria-label="Tonal icon button" />
                 </div>
               </Specimen>
 
               <Specimen title="States">
-                <div className="flex flex-wrap items-center gap-3">
-                  <Button loading>Saving</Button>
-                  <Button disabled>Disabled</Button>
-                  <Button className="outline outline-2 outline-sherick-focus outline-offset-[3px]">Focus-visible</Button>
+                {/* A loading button keeps its label, so the two states sit beside each other and the
+                    control can be compared without it moving. */}
+                <div className="flex flex-wrap items-center gap-6">
+                  <StateLabel label="Rest"><Button icon={<Download />}>Export</Button></StateLabel>
+                  <StateLabel label="Loading"><Button icon={<Download />} loading>Export</Button></StateLabel>
+                  <StateLabel label="Disabled"><Button disabled>Disabled</Button></StateLabel>
+                  <StateLabel label="Focus"><Button className="outline outline-2 outline-sherick-focus outline-offset-[3px]">Focus-visible</Button></StateLabel>
                 </div>
               </Specimen>
 
@@ -338,6 +335,7 @@ export default function Home() {
                   <Tooltip content="Notifications"><IconButton icon={<Bell />} aria-label="Notifications" /></Tooltip>
                   <Tooltip content="Search"><IconButton appearance="ghost" variant="secondary" icon={<SearchIcon />} aria-label="Search" /></Tooltip>
                   <Tooltip content="Download"><IconButton appearance="acrylic" variant="secondary" icon={<Download />} aria-label="Download" /></Tooltip>
+                  <IconButton icon={<Bell />} loading aria-label="Saving notifications" />
                   <IconButton disabled icon={<Heart />} aria-label="Disabled favorite" />
                 </div>
               </Specimen>
@@ -371,40 +369,36 @@ export default function Home() {
 
               <Specimen title="Select">
                 <div className="space-y-4">
+                  <Select options={selectOptions} aria-label="Empty project type" />
                   <Select options={selectOptions} value={selection} onValueChange={(next) => setSelection(next ?? "")} aria-label="Project type" />
                   <Select options={selectOptions} disabled aria-label="Disabled project type" />
                 </div>
               </Specimen>
 
-              <Specimen title="Field">
-                <div className="space-y-6">
-                  <Field label="Notifications" description="Sent for every production deployment.">
-                    <Checkbox defaultChecked />
+              <Specimen title="Combobox">
+                <div className="space-y-4">
+                  <Field label="Project">
+                    <Combobox options={comboboxOptions} defaultValue="dashboard" />
                   </Field>
-                  <Field label="Seats" description="Between 1 and 10." required error="Choose between 1 and 10 seats.">
+                  <Field label="No results">
+                    <Combobox options={comboboxOptions} defaultInputValue="Nothing matches this query" />
+                  </Field>
+                  <Field label="Disabled">
+                    <Combobox options={comboboxOptions} defaultValue="design" disabled />
+                  </Field>
+                </div>
+              </Specimen>
+
+              <Specimen title="Field & validation">
+                <div className="space-y-5">
+                  <Field label="Quantity" description="Between 1 and 10.">
                     <NumberField min={1} max={10} defaultValue={4} />
                   </Field>
-                </div>
-              </Specimen>
-
-              <Specimen title="Number field">
-                <div className="space-y-4">
-                  <Field label="Quantity">
-                    <NumberField placeholder="0" />
+                  <Field label="Seats" required error="Choose between 1 and 10 seats.">
+                    <NumberField min={1} max={10} defaultValue={10} />
                   </Field>
-                  <Field label="Constrained">
-                    <NumberField min={1} max={10} step={1} defaultValue={4} />
-                  </Field>
-                </div>
-              </Specimen>
-
-              <Specimen title="Slider">
-                <div className="space-y-6">
-                  <Field label="Budget">
-                    <Slider defaultValue={40} />
-                  </Field>
-                  <Field label="Disabled budget">
-                    <Slider defaultValue={65} disabled />
+                  <Field label="Locked" description="Owned by the workspace.">
+                    <NumberField defaultValue={4} disabled />
                   </Field>
                 </div>
               </Specimen>
@@ -429,7 +423,8 @@ export default function Home() {
                   options={[
                     { value: "production", label: "Production" },
                     { value: "preview", label: "Preview" },
-                    { value: "cluster", label: "Shared cluster", disabled: true },
+                    { value: "cluster", label: "Shared cluster, whose label is long enough to wrap across more than one line" },
+                    { value: "edge", label: "Edge", disabled: true },
                   ]}
                 />
               </Specimen>
@@ -439,6 +434,17 @@ export default function Home() {
                   <StateLabel label="On"><Switch checked={switchOn} onCheckedChange={setSwitchOn} aria-label="On" /></StateLabel>
                   <StateLabel label="Off"><Switch checked={false} onCheckedChange={() => undefined} aria-label="Off" /></StateLabel>
                   <StateLabel label="Disabled"><Switch checked disabled aria-label="Disabled" /></StateLabel>
+                </div>
+              </Specimen>
+
+              <Specimen title="Slider">
+                <div className="space-y-6">
+                  <Field label="Budget">
+                    <Slider defaultValue={40} />
+                  </Field>
+                  <Field label="Disabled budget">
+                    <Slider defaultValue={65} disabled />
+                  </Field>
                 </div>
               </Specimen>
 
@@ -452,16 +458,13 @@ export default function Home() {
                   <div className="flex flex-wrap items-center gap-2.5">
                     <Chip variant="success" icon={<Check />}>Ready</Chip>
                     <Chip variant="warning">Beta</Chip>
+                    <Chip icon={<Check />} onRemove={() => undefined}>Verified</Chip>
                     <Chip onRemove={() => undefined}>Platform</Chip>
-                    <Chip onRemove={() => undefined}>Design system</Chip>
                   </div>
                 </div>
               </Specimen>
 
               <Specimen title="Segmented control">
-                {/* Each control hugs its own content, and they are separate objects rather than one
-                    pair, so they stack: a plain block column would leave the two inline-flex
-                    tracks on one line with nothing between them. */}
                 <div className="flex flex-col items-start gap-5">
                   <SegmentedControl
                     aria-label="Range"
@@ -473,7 +476,15 @@ export default function Home() {
                       { value: "month", label: "Month" },
                     ]}
                   />
-                  <ToggleGroup aria-label="Text alignment" multiple value={alignment} onValueChange={setAlignment}>
+                  <SegmentedControl
+                    aria-label="Text alignment"
+                    defaultValue="start"
+                    options={[
+                      { value: "start", label: "Start", icon: <AlignLeft className="size-4" /> },
+                      { value: "center", label: "Center", icon: <AlignCenter className="size-4" /> },
+                    ]}
+                  />
+                  <ToggleGroup aria-label="Text format" multiple value={alignment} onValueChange={setAlignment}>
                     <ToggleGroup.Item value="left" aria-label="Align left"><AlignLeft className="size-4" /></ToggleGroup.Item>
                     <ToggleGroup.Item value="center" aria-label="Align center"><AlignCenter className="size-4" /></ToggleGroup.Item>
                     <ToggleGroup.Item value="right" aria-label="Align right" disabled><AlignRight className="size-4" /></ToggleGroup.Item>
@@ -484,28 +495,28 @@ export default function Home() {
               <Specimen title="Tabs">
                 <Tabs className="overflow-x-auto" tabs={[
                   { id: "one", label: "Overview", content: <p className={cn("text-sm", text.medium)}>Overview content</p> },
-                  { id: "two", label: "Motion", content: <p className={cn("text-sm", text.medium)}>Motion content</p> },
-                  { id: "three", label: "Density", content: <p className={cn("text-sm", text.medium)}>Density content</p> },
+                  { id: "two", label: "Activity", content: <p className={cn("text-sm", text.medium)}>Activity content</p> },
+                  { id: "three", label: "Members", content: <p className={cn("text-sm", text.medium)}>Members content</p> },
                 ]} />
               </Specimen>
 
               <Specimen title="Navigation groups">
                 <div className={cn("flex max-w-xs flex-col gap-4")}>
                   <NavGroup
-                    title="Components"
-                    activeHref="#fields"
-                    items={[
-                      { label: "Buttons", href: "#buttons" },
-                      { label: "Fields", href: "#fields" },
-                      { label: "Feedback", href: "#feedback" },
-                    ]}
-                  />
-                  <NavGroup
                     title="Foundations"
                     activeHref="#design-language"
                     items={[
                       { label: "Design language", href: "#design-language" },
-                      { label: "Surfaces", href: "#surfaces" },
+                      { label: "Display", href: "#display" },
+                    ]}
+                  />
+                  <NavGroup
+                    title="Controls"
+                    activeHref="#fields"
+                    items={[
+                      { label: "Buttons", href: "#buttons" },
+                      { label: "Fields", href: "#fields" },
+                      { label: "Selection", href: "#selection" },
                     ]}
                   />
                 </div>
@@ -520,7 +531,10 @@ export default function Home() {
                   <Alert variant="primary">A useful piece of information.</Alert>
                   <Alert variant="success">Changes were saved successfully.</Alert>
                   <Alert variant="warning">Review these settings before continuing.</Alert>
-                  <Alert variant="danger" closeable>Something needs your attention.</Alert>
+                  <Alert variant="danger" closeable>
+                    The connection dropped before the file was sent. Retry the upload, or split the
+                    file and add each part to the workspace again.
+                  </Alert>
                 </div>
               </Specimen>
 
@@ -554,31 +568,25 @@ export default function Home() {
           <ShowcaseSection id="disclosure">
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
               <Specimen title="Accordion">
-                <Accordion multiple defaultValue={["foundation", "motion"]}>
-                  <Accordion.Item value="foundation">
-                    <Accordion.Trigger>What is Sherick UI?</Accordion.Trigger>
+                <Accordion defaultValue={["wrapped"]}>
+                  <Accordion.Item value="plan">
+                    <Accordion.Trigger>What is included in the workspace plan?</Accordion.Trigger>
                     <Accordion.Panel className={cn("text-sm leading-7", text.medium)}>
-                      A component library that owns its visual language and lets Base UI own the
-                      behavioural one.
+                      Unlimited projects, shared components and the full theme.
                     </Accordion.Panel>
                   </Accordion.Item>
-                  <Accordion.Item value="motion">
-                    <Accordion.Trigger>How does motion work?</Accordion.Trigger>
+                  <Accordion.Item value="wrapped">
+                    <Accordion.Trigger>
+                      A section whose own label wraps across more than one line, which the row has to
+                      lay out
+                    </Accordion.Trigger>
                     <Accordion.Panel className={cn("text-sm leading-7", text.medium)}>
-                      One module owns every transition, and a component names the intent it needs
-                      instead of writing a duration.
-                    </Accordion.Panel>
-                  </Accordion.Item>
-                  <Accordion.Item value="styling">
-                    <Accordion.Trigger>How is it styled?</Accordion.Trigger>
-                    <Accordion.Panel className={cn("text-sm leading-7", text.medium)}>
-                      The published stylesheet is self-contained and scoped, so a consumer needs no
-                      Tailwind installation.
+                      Invoices are issued on the first working day of each month.
                     </Accordion.Panel>
                   </Accordion.Item>
                   <Accordion.Item value="locked" disabled>
                     <Accordion.Trigger>A section that cannot be opened</Accordion.Trigger>
-                    <Accordion.Panel>Unreachable.</Accordion.Panel>
+                    <Accordion.Panel>Contact the workspace owner to change the plan.</Accordion.Panel>
                   </Accordion.Item>
                 </Accordion>
               </Specimen>
@@ -587,53 +595,48 @@ export default function Home() {
                 <Collapsible>
                   <Collapsible.Trigger>Advanced options</Collapsible.Trigger>
                   <Collapsible.Panel className={cn("text-sm leading-7", text.medium)}>
-                    The same row and the same panel as an accordion item, at the scope of one
-                    region: nothing else in the page holds its state.
+                    Send a copy of every deployment to the workspace owners.
                   </Collapsible.Panel>
                 </Collapsible>
               </Specimen>
             </div>
           </ShowcaseSection>
 
-          <ShowcaseSection id="surfaces">
+          <ShowcaseSection id="display">
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
-              <Specimen title="Cards & badges">
+              <Specimen title="Cards">
                 <div className="grid gap-3 sm:grid-cols-2">
                   <Card variant="secondary"><div className="font-medium">Neutral card</div><p className={cn("mt-2 text-sm leading-6", text.medium)}>Body copy goes here.</p></Card>
                   <Card variant="primary"><div className="font-medium">Tonal card</div><p className={cn("mt-2 text-sm leading-6", text.medium)}>Body copy goes here.</p></Card>
                 </div>
-                <div className="mt-4 flex flex-wrap gap-2">
+              </Specimen>
+
+              <Specimen title="Badges">
+                <div className="flex flex-wrap gap-2">
                   <Badge variant="primary">Primary</Badge>
-                  <Badge variant="success" icon={<Check className="size-3.5" />}>Ready</Badge>
+                  <Badge variant="secondary">Neutral</Badge>
+                  <Badge variant="success" icon={<Check />}>Ready</Badge>
                   <Badge variant="warning">Warning</Badge>
                   <Badge variant="danger">Danger</Badge>
-                  <Badge variant="secondary">Neutral</Badge>
                 </div>
               </Specimen>
 
-              <Specimen title="Avatar & tooltip">
-                <div className="flex items-center gap-5">
-                  <Avatar src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg" alt="Example avatar" size="sm" />
-                  <Avatar src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg" alt="Example rounded avatar" size="md" shape="rounded" />
-                  <Tooltip content="Acrylic tooltip"><Button appearance="tonal" variant="secondary">Hover or focus</Button></Tooltip>
+              <Specimen title="Avatar">
+                <div className="flex flex-wrap items-end gap-5">
+                  <Avatar src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg" alt="Small avatar" size="sm" />
+                  <Avatar src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg" alt="Rounded avatar" size="md" shape="rounded" />
+                  <Avatar src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg" alt="Large avatar" size="lg" />
                 </div>
               </Specimen>
 
-              <Specimen title="Dialog">
-                <Button appearance="tonal" variant="secondary" onClick={() => setDialogOpen(true)}>Open dialog</Button>
+              <Specimen title="Table">
+                <Table headers={["Project", "Owner", "Status"]} rows={[
+                  ["Design system", "Ana", <Badge key="design" variant="success">Live</Badge>],
+                  ["Marketing site", "Bruno", <Badge key="marketing" variant="primary">In review</Badge>],
+                  ["Documentation", "Chen", <Badge key="docs" variant="secondary">Draft</Badge>],
+                ]} />
               </Specimen>
             </div>
-          </ShowcaseSection>
-
-          <ShowcaseSection id="data">
-            <Specimen title="Table" className="mt-6">
-              <Table headers={["Component", "Role", "Status"]} rows={[
-                ["Select", "Custom selection", <Badge key="select" variant="success">Ready</Badge>],
-                ["Dialog", "Focused overlay", <Badge key="dialog" variant="success">Ready</Badge>],
-                ["Table", "Dense information", <Badge key="table" variant="secondary">Quiet</Badge>],
-                ["Input", "Form control", <Badge key="input" variant="primary">Core</Badge>],
-              ]} />
-            </Specimen>
           </ShowcaseSection>
 
           <ShowcaseSection id="floating">
@@ -681,21 +684,19 @@ export default function Home() {
                 </Menu>
               </Specimen>
 
-              <Specimen title="Combobox">
-                <div className="space-y-4">
-                  <Field label="Project">
-                    <Combobox options={comboboxOptions} defaultValue="dashboard" />
-                  </Field>
-                  <Field label="No results">
-                    <Combobox options={comboboxOptions} defaultInputValue="Nothing matches this query" />
-                  </Field>
+              <Specimen title="Tooltip">
+                <div className="flex flex-wrap items-center gap-3">
+                  <Tooltip content="Creates a copy in the same workspace">
+                    <Button appearance="tonal" variant="secondary">Duplicate project</Button>
+                  </Tooltip>
                 </div>
               </Specimen>
 
-              <Specimen title="Alert dialog">
-                <Button appearance="filled" variant="danger" icon={<Trash2 />} onClick={() => setAlertOpen(true)}>
-                  Delete project
-                </Button>
+              <Specimen title="Dialog & alert dialog">
+                <div className="flex flex-wrap items-center gap-3">
+                  <Button appearance="tonal" variant="secondary" onClick={() => setDialogOpen(true)}>Open dialog</Button>
+                  <Button appearance="filled" variant="danger" icon={<Trash2 />} onClick={() => setAlertOpen(true)}>Delete project</Button>
+                </div>
               </Specimen>
 
               <Specimen title="Sheet">
@@ -710,7 +711,7 @@ export default function Home() {
                 <CodeBlock language="tsx">{'<Button appearance="filled">Save</Button>'}</CodeBlock>
               </Specimen>
               <Specimen title="Markdown">
-                <Markdown>{`## Example\nSherick UI keeps **dense information quiet** and gives floating UI more depth.\n\n- Predictable controls\n- Soft hierarchy\n- [Accessible interactions](#)\n\n> Expression should clarify hierarchy, not decorate every surface.\n\nUse \`Button\` for primary actions, and reach for a fenced block when the code carries its own hierarchy:\n\n\`\`\`ts\nconst surface = material.matte;\nconst action = shape.pill;\n\`\`\``}</Markdown>
+                <Markdown>{`## Workspace settings\nEverything in this project is **shared with the team** and versioned together.\n\n- Invite members from the workspace settings\n- Pin a deployment to keep it live\n- [Read the changelog](#)\n\n> Changes are reviewed before they reach production.\n\nReach for a fenced block when the code carries its own hierarchy:\n\n\`\`\`ts\nconst workspace = createWorkspace({ name: "Sherick UI" });\n\`\`\``}</Markdown>
               </Specimen>
             </div>
           </ShowcaseSection>
@@ -849,6 +850,251 @@ function StateLabel({ label, children }: { label: string; children: React.ReactN
   return <div className="flex items-center gap-2"><div>{children}</div><span className={cn("text-sm", text.medium)}>{label}</span></div>;
 }
 
+/* One intent per stage. A stage is a minimal mark carrying a recipe's classes rather than a
+   second copy of a component: each component already demonstrates its own motion where it is
+   specimened, and what a reader cannot see there is one intent at a time with its name beside it.
+   Every stage is reversible by hand, so both directions of its recipe are visible. */
+function MotionSpecimen() {
+  const [on, setOn] = useState<Record<string, boolean>>({});
+  const toggle = (intent: string) => setOn((current) => ({ ...current, [intent]: !current[intent] }));
+
+  return (
+    <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+      {/* Feedback is the one intent a click cannot show: it is the response to a pointer being on a
+          surface or a keyboard landing on it, so the stage is hovered or focused rather than
+          toggled, and nothing about it travels. */}
+      <MotionStage label="feedback">
+        <button
+          type="button"
+          className={cn(
+            "flex h-9 items-center px-3 text-xs",
+            shape.control,
+            focusRing,
+            motionFeedback,
+            material.matteHigh,
+            text.medium,
+            state.enabled,
+            "hover:bg-sherick-surface-high/[0.82] hover:text-sherick-ink",
+            "focus-visible:bg-sherick-surface-high/[0.82] focus-visible:text-sherick-ink"
+          )}
+        >
+          Hover or focus
+        </button>
+      </MotionStage>
+
+      <MotionStage label="tactile">
+        <button
+          type="button"
+          className={cn(
+            "flex h-9 items-center px-3 text-xs font-medium",
+            shape.control,
+            focusRing,
+            motionTactile,
+            elevation.raised,
+            state.recess,
+            tone.tonal.secondary,
+            text.high,
+            state.enabled
+          )}
+        >
+          Hold
+        </button>
+      </MotionStage>
+
+      <MotionStage label="arrive">
+        <button
+          type="button"
+          onClick={() => toggle("arrive")}
+          aria-label="Toggle the arriving mark"
+          aria-pressed={on.arrive ?? false}
+          className={cn("flex size-7 items-center justify-center", shape.mark, elevation.recessed, material.matteHigh, focusRing, state.enabled)}
+        >
+          {/* The two states a primitive publishes around a mark: while it leaves, `data-ending-style`
+              holds it at the exit geometry, and clearing that attribute is the arrival. */}
+          <span
+            aria-hidden="true"
+            data-ending-style={on.arrive ? undefined : ""}
+            className={cn("size-4", shape.circle, tone.strong.primary, motionArrive)}
+          />
+        </button>
+      </MotionStage>
+
+      <MotionStage label="orient">
+        <button
+          type="button"
+          onClick={() => toggle("orient")}
+          aria-label="Turn the affordance"
+          aria-pressed={on.orient ?? false}
+          className={cn("flex size-7 items-center justify-center", shape.circle, material.matteHigh, text.high, focusRing, state.enabled)}
+        >
+          <ChevronDown className={cn("size-4", motionOrient, on.orient && "rotate-180")} aria-hidden="true" />
+        </button>
+      </MotionStage>
+
+      <MotionStage label="relocate">
+        <button
+          type="button"
+          onClick={() => toggle("relocate")}
+          aria-label="Move the mark between its destinations"
+          aria-pressed={on.relocate ?? false}
+          className={cn("relative block h-8 w-16", shape.pill, elevation.recessed, material.matteHigh, focusRing, state.enabled)}
+        >
+          <span
+            aria-hidden="true"
+            className={cn("absolute left-1 top-1 size-6", shape.circle, elevation.control, material.handle, motionRelocate, on.relocate && "translate-x-9")}
+          />
+        </button>
+      </MotionStage>
+
+      <MotionStage label="direct">
+        <DirectDriver />
+      </MotionStage>
+
+      <MotionStage label="disclose">
+        <div className="w-32">
+          <button
+            type="button"
+            onClick={() => toggle("disclose")}
+            aria-expanded={on.disclose ?? false}
+            className={cn("flex h-8 w-full items-center justify-between px-2 text-xs", shape.row, stateLayer.quiet, text.high, focusRing, state.enabled)}
+          >
+            Region
+            <ChevronDown className={cn("size-3.5", motionOrient, on.disclose && "rotate-180")} aria-hidden="true" />
+          </button>
+          {/* The clipped panel is hidden from assistive technology while it is closed: a region that is
+              only `height: 0` is still read out and still reachable. */}
+          <div
+            aria-hidden={!on.disclose}
+            className={cn("overflow-hidden", motionDisclose)}
+            style={{ height: on.disclose ? 32 : 0 }}
+          >
+            <div className={cn("px-2 pt-1 text-xs leading-5", text.medium)}>Panel content</div>
+          </div>
+        </div>
+      </MotionStage>
+
+      <MotionStage label="presence">
+        <div className="relative flex flex-col items-center">
+          <button
+            type="button"
+            onClick={() => toggle("presence")}
+            aria-expanded={on.presence ?? false}
+            className={cn("relative z-10 flex h-8 items-center px-3 text-xs", shape.control, material.matteHigh, text.high, focusRing, state.enabled)}
+          >
+            Anchor
+          </button>
+          {/* Base publishes the anchor edge as `--transform-origin`; a stage has no positioner, so it
+              declares one, and the attribute it toggles is the one a primitive writes while an
+              anchored surface enters. */}
+          <div
+            aria-hidden="true"
+            data-ending-style={on.presence ? undefined : ""}
+            className={cn(
+              "mt-1 flex h-8 items-center px-3 text-xs",
+              "[--transform-origin:top]",
+              shape.control,
+              material.acrylicDense,
+              elevation.floating,
+              text.high,
+              motionPresenceAnchored
+            )}
+          >
+            Surface
+          </div>
+        </div>
+      </MotionStage>
+
+      <MotionStage label="activity">
+        <div className="flex items-center gap-3">
+          <span aria-hidden="true" className={cn("size-4 rounded-full border-2 border-sherick-ink-faint border-t-transparent", motionActivitySpin)} />
+          <span aria-hidden="true" className={cn("h-4 w-10", shape.pill, material.matteHigh, motionActivityPulse)} />
+          <span aria-hidden="true" className={cn("relative block h-1.5 w-10 overflow-hidden", shape.pill, elevation.recessed, material.matteHigh)}>
+            <span className={cn("absolute inset-y-0 w-1/2", shape.pill, tone.strong.primary, motionActivityIndeterminate)} />
+          </span>
+        </div>
+      </MotionStage>
+    </div>
+  );
+}
+
+function MotionStage({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex flex-col gap-2">
+      <div className={cn("flex h-24 items-center justify-center px-3", shape.control, material.canvas)}>{children}</div>
+      <div className={cn("text-xs font-medium", text.high)}>{label}</div>
+    </div>
+  );
+}
+
+/* `direct` is the one intent a still stage cannot fake: while the pointer owns the geometry the
+   positional transition is removed, and the mark settles to the nearest destination on release. */
+function DirectDriver() {
+  const track = useRef<HTMLDivElement | null>(null);
+  const [position, setPosition] = useState(50);
+  const [dragging, setDragging] = useState(false);
+
+  const settle = (value: number) => Math.round(value / 50) * 50;
+
+  const fromPointer = (clientX: number) => {
+    const box = track.current?.getBoundingClientRect();
+    if (!box || box.width === 0) return 50;
+    return Math.min(100, Math.max(0, ((clientX - box.left) / box.width) * 100));
+  };
+
+  return (
+    <div
+      ref={track}
+      role="slider"
+      tabIndex={0}
+      aria-label="Position"
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={Math.round(position)}
+      onKeyDown={(event) => {
+        const keys: Record<string, number> = {
+          ArrowRight: 50,
+          ArrowUp: 50,
+          ArrowLeft: -50,
+          ArrowDown: -50,
+        };
+        const step = keys[event.key];
+        if (step === undefined && event.key !== "Home" && event.key !== "End") return;
+        event.preventDefault();
+        setPosition((current) =>
+          event.key === "Home" ? 0 : event.key === "End" ? 100 : Math.min(100, Math.max(0, settle(current) + step))
+        );
+      }}
+      onPointerDown={(event) => {
+        event.currentTarget.setPointerCapture(event.pointerId);
+        setDragging(true);
+        setPosition(fromPointer(event.clientX));
+      }}
+      onPointerMove={(event) => {
+        if (dragging) setPosition(fromPointer(event.clientX));
+      }}
+      onPointerUp={(event) => {
+        if (!dragging) return;
+        event.currentTarget.releasePointerCapture(event.pointerId);
+        setDragging(false);
+        setPosition((current) => settle(current));
+      }}
+      onPointerCancel={() => {
+        setDragging(false);
+        setPosition((current) => settle(current));
+      }}
+      className={cn("relative flex h-8 w-28 touch-none select-none items-center", shape.control, focusRing, state.enabled)}
+    >
+      <span aria-hidden="true" className={cn("mx-2.5 h-1.5 flex-1", shape.pill, elevation.recessed, material.matteHigh)} />
+      <span
+        aria-hidden="true"
+        data-dragging={dragging ? "" : undefined}
+        className={cn("absolute top-1/2 size-5 [translate:-50%_-50%]", shape.pill, elevation.control, material.handle, motionDirect)}
+        style={{ insetInlineStart: `calc(0.625rem + (100% - 1.25rem) * ${position / 100})` }}
+      />
+    </div>
+  );
+}
+
 function SheetSpecimen() {
   const [side, setSide] = useState<DrawerSide>("bottom");
   const [open, setOpen] = useState(false);
@@ -942,6 +1188,19 @@ function ToastSpecimen() {
         }
       >
         Danger + action
+      </Button>
+      <Button
+        appearance="tonal"
+        variant="secondary"
+        onClick={() =>
+          void toast.promise(new Promise<void>((resolve) => setTimeout(resolve, 1600)), {
+            loading: "Uploading assets",
+            success: "Assets uploaded",
+            error: "Upload failed",
+          })
+        }
+      >
+        Loading
       </Button>
     </div>
   );

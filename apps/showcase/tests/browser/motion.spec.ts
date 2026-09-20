@@ -888,6 +888,10 @@ test("a switch thumb relocates in place without overshooting", async ({ page, er
 test("a relocated indicator is mid-travel in the middle of its own motion", async ({ page, errors }) => {
   await openFixture(page);
   const indicator = page.getByRole("tablist").locator(":scope > span");
+  /* The primitive measures both destinations after hydration and publishes them on the indicator.
+     Waiting for that measurement is waiting for the state the assertions read, rather than racing
+     it: an indicator that has not been measured has no `left` at all. */
+  await expect(indicator).toHaveAttribute("style", /--active-tab-left/);
 
   const leftAt = (fraction: number) =>
     indicator.evaluate((element, f) => {

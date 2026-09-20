@@ -16,8 +16,7 @@ export const showcaseSections = [
   { id: "selection", title: "Selection & navigation", nav: "Selection" },
   { id: "feedback", title: "Feedback", nav: "Feedback" },
   { id: "disclosure", title: "Disclosure", nav: "Disclosure" },
-  { id: "surfaces", title: "Surfaces & overlays", nav: "Surfaces" },
-  { id: "data", title: "Data display", nav: "Data" },
+  { id: "display", title: "Display", nav: "Display" },
   { id: "floating", title: "Floating surfaces", nav: "Floating" },
   { id: "content", title: "Content", nav: "Content" },
 ] as const;

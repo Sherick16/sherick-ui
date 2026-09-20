@@ -4,7 +4,10 @@ import { type VariantProps, cva } from "class-variance-authority";
 import { cn } from "@/libs/utils";
 import { motionActivitySpin } from "./ui.motion";
 
-const spinnerVariants = cva("flex-col items-center justify-center", {
+/* The mark's box belongs to the slot a control puts around it, not to this component: a labelled
+   Spinner (`children` renders beside the loader) has to be able to shrink in a narrow row, so the
+   non-shrinking half lives in the slot. */
+const spinnerVariants = cva("flex flex-col items-center justify-center", {
   variants: {
     show: {
       true: "flex",

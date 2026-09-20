@@ -135,7 +135,12 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(({
       <BaseCombobox.InputGroup
         className={({ open, disabled: fieldDisabled }) =>
           cn(
-            "flex w-full items-center pl-5 pr-2",
+            /* The field's own inline padding is what places the trailing cluster, and it is set on the
+               logical ends so the cluster stays at the field's end in either writing direction. The
+               20px a mark's box then sits from the edge — 12px of padding plus the 8px each `density.part`
+               holds around its 20px glyph — is the same 20px the input's own leading padding uses, so the
+               field reads with one inset at both ends. */
+            "flex w-full items-center ps-5 pe-3",
             density.normal,
             shape.control,
             material.control,

@@ -12,7 +12,7 @@ export interface DialogHeaderProps {
 
 export const DialogHeader = ({ children, className }: DialogHeaderProps) => {
   return (
-    <div className={cn("pt-5 pb-2 pl-6 pr-16 sm:pl-7", className)}>
+    <div className={cn("pt-5 pb-2 ps-6 pe-16 sm:ps-7", className)}>
       <BaseDialog.Title className={cn("text-xl font-semibold tracking-[-0.02em]", text.high)}>
         {children}
       </BaseDialog.Title>

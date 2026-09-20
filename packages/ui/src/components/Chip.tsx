@@ -122,7 +122,7 @@ export const Chip = forwardRef<HTMLElement, ChipProps>(
         {icon && (
           <span
             className={cn(
-              "inline-flex shrink-0 items-center [&>svg]:size-4",
+              "inline-flex size-4 shrink-0 items-center justify-center [&>svg]:size-4",
               !isToggle && tone.text[variant]
             )}
             aria-hidden="true"
@@ -209,7 +209,12 @@ export const Chip = forwardRef<HTMLElement, ChipProps>(
             onKeyDown={keepOwnKeys}
             onClick={onRemove}
             className={cn(
-              "group inline-flex size-7 shrink-0 items-center justify-center",
+              /* The visible X is placed by the mark's own box, so the dismiss control's target padding —
+                 the 6px of it on each side of a 16px glyph in this 28px target — is compensated at the
+                 chip's end edge instead of reading as a trailing void. `size-7` plus `hitArea` keeps the
+                 pointer target clear of the 24px minimum while the visible mark sits at the same edge
+                 distance as the chip's leading content. */
+              "group -me-1.5 inline-flex size-7 shrink-0 items-center justify-center",
               shape.circle,
               text.medium,
               "hover:text-sherick-ink",

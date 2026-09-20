@@ -52,7 +52,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {label && (
           <Field.Label className={cn("mb-2 text-sm font-medium", text.high)}>
             {label}
-            {required && <span className={cn("ml-1 text-sherick-danger")} aria-hidden="true">*</span>}
+            {required && <span className={cn("ms-1 text-sherick-danger")} aria-hidden="true">*</span>}
           </Field.Label>
         )}
         <BaseInput

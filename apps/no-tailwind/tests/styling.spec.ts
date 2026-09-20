@@ -194,3 +194,29 @@ test("theme tokens and KaTeX assets are present without consumer styling infrast
   expect(katexFont.toLowerCase()).toContain("katex");
   expect(errors).toEqual([]);
 });
+
+test("a nested icon node keeps the mark slot and the target size", async ({ page }) => {
+  const errors = runtimeErrors(page);
+
+  /* The fixture passes a text node as the icon, which no SVG-only selector can size: the slot
+     has to own its own box for the mark to stay 20px and the target to stay 44px. */
+  const add = page.getByRole("button", { name: "Add" });
+  await expect(add).toBeVisible();
+
+  const geometry = await add.evaluate((button) => {
+    const slot = button.firstElementChild;
+    if (!slot) throw new Error("the icon button has a mark slot");
+    const target = button.getBoundingClientRect();
+    const mark = slot.getBoundingClientRect();
+    return {
+      target: { width: target.width, height: target.height },
+      mark: { width: mark.width, height: mark.height },
+    };
+  });
+
+  expect(geometry.mark.width, "the slot owns its own box").toBeCloseTo(20, 1);
+  expect(geometry.mark.height).toBeCloseTo(20, 1);
+  expect(geometry.target.width).toBeGreaterThanOrEqual(44);
+  expect(geometry.target.height).toBeGreaterThanOrEqual(44);
+  expect(errors).toEqual([]);
+});

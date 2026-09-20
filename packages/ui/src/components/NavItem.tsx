@@ -39,7 +39,7 @@ const NavItem = ({ children, icon, className, href, active = false, ...props }: 
     {...props}
   >
     {icon && (
-      <span className={cn("inline-flex shrink-0 items-center [&>svg]:size-5")} aria-hidden="true">
+      <span className={cn("inline-flex size-5 shrink-0 items-center justify-center [&>svg]:size-5")} aria-hidden="true">
         {icon}
       </span>
     )}
