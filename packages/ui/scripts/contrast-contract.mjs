@@ -89,6 +89,14 @@ export const stateAlphas = {
   },
   /** The matte ladder a field and a selection mark use. */
   field: { quiet: 0.42, card: 0.78, control: 0.66, hover: 0.82, engaged: 0.90 },
+  /* The wall of an empty mark's well that the light makes legible, as `elevation-well` draws it:
+     the *shade* wall above in light mode, the *lit* wall below in dark mode, and the same value
+     the other way round in each theme is a deliberate bounce. `tone` names the lighting value and
+     `alpha` the rung's alpha; the composition below is what makes those numbers a promise. */
+  well: {
+    light: { tone: "light-bottom", alpha: 0.62 },
+    dark: { tone: "light-top", alpha: 0.45 },
+  },
 };
 
 const SEMANTIC = ["primary", "danger", "warning", "success"];
@@ -103,10 +111,11 @@ const opaqueFill = (name) => (name === "primary" ? "primary-strong" : name);
  * @param {Record<string, string>} variables the `--sui-*` values of one theme
  * @returns {Array<{id: string, requirement: number, note: string, checks: Array<[string, number[], number[]]>}>}
  */
-export const contrastCompositions = (variables, alphas = stateAlphas) => {
+export const contrastCompositions = (variables, alphas = stateAlphas, theme = "light") => {
   const STATE = alphas.state;
   const TINT = alphas.tint;
   const FIELD = alphas.field;
+  const WELL = alphas.well[theme];
   const colour = (name) => oklchToSrgb(variables[`--sui-${name}`]);
 
   const canvas = colour("canvas");
@@ -310,6 +319,12 @@ export const contrastCompositions = (variables, alphas = stateAlphas) => {
   );
   add("a mark on the opaque neutral fill", WCAG_NON_TEXT, "an unchecked Switch's thumb is `currentColor` over the track's opaque neutral fill", [["unchecked switch thumb", colour("ink"), neutralFill]]);
   add(
+    "the wall the light makes legible on an empty mark's well",
+    WCAG_NON_TEXT,
+    "an unchecked box, an unselected radio: a mark with no content of its own is identified by its depth, and this is the wall of that well that carries it — the shaded one above in light mode, the lit one below in dark mode, exactly as `elevation-well` draws them. The opposite wall is a deliberate bounce and is not a boundary.",
+    surfaceEntries.map(([where, base]) => [where, composite(colour(WELL.tone), WELL.alpha, surfaceHigh), base])
+  );
+  add(
     "the detail role on the surfaces it is permitted on",
     WCAG_NON_TEXT,
     "non-text furniture that still carries meaning: gutters, rails, secondary graphical detail, a status mark's frame",
@@ -361,7 +376,7 @@ export const contrastCompositions = (variables, alphas = stateAlphas) => {
  */
 export const measureContrast = (themes, alphas = stateAlphas) =>
   Object.entries(themes).flatMap(([theme, variables]) =>
-    contrastCompositions(variables, alphas).map(({ id, requirement, note, checks }) => {
+    contrastCompositions(variables, alphas, theme).map(({ id, requirement, note, checks }) => {
       const worst = checks.reduce(
         (lowest, [where, foreground, background]) => {
           const ratio = contrastRatio(foreground, background);

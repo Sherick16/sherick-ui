@@ -89,13 +89,24 @@ pressed insets stay physically related.
 | --- | --- |
 | an upper edge catches light | `inset 0 1px 0` highlights, brighter acrylic tops |
 | a lower edge falls into shade | shadows offset straight down (`0 Y`), acrylic gradients run top → bottom |
-| a recessed surface inverts it | the upper lip is shaded, the lower lip catches a faint bounce |
+| a recessed surface inverts it | the upper lip is shaded, the lower lip catches a faint bounce; how *deep* the recess is decides which of the two walls is legible, and the other stays a bounce |
 | a structural edge is drawn | `--sui-edge`, a shade-tinted hairline |
 
 `--sui-light-top` (the highlight color) and `--sui-light-bottom` (the shade color) are
-the two values the elevation ladder composites from: `raised`, `floating`, `control` and
-`recessed` are all built out of them, so re-tuning that pair re-lights every shadow,
-highlight and pressed inset at once.
+the two values the elevation ladder composites from: `raised`, `floating`, `control`,
+`recessed` and `well` are all built out of them, so re-tuning that pair re-lights every
+shadow, highlight and pressed inset at once.
+
+Depth is also what identifies a mark that has **no fill step to spare**. A wide groove reads
+from its own tone, and a mark the size of a glyph has none: the deepest neutral step in the
+palette is about 1.3:1 against the surface around it, so tone alone cannot carry it. `well` is
+the answer — the same light, one rung further down — and because dark mode inverts the light it
+inverts which wall is legible too: the *shaded* wall above carries it in light mode and the
+*lit* wall below carries it in dark mode, each measuring at or above 3:1 against every surface a
+mark can sit on (`bun run test` measures exactly that composition). The opposite wall stays a
+bounce in each theme, and nothing draws a line around the mark: a stroke tracing all four sides
+of a matte control is not part of this language, and read next to a `Switch` — which draws
+none — it looks like exactly what it is.
 
 The acrylic recipes are a **separate** token family (`--sui-glass-*`), calibrated per
 theme rather than composited from those two values. They follow the same directional
@@ -146,7 +157,7 @@ only softens what is left.
 
 ## 5. Elevation — how far a surface sits off the page
 
-Primitives: `flat`, `raised`, `floating`, `control`, `recessed`.
+Primitives: `flat`, `raised`, `floating`, `control`, `recessed`, `well`.
 
 Depth is chosen by **anatomy**, never by state.
 
@@ -156,6 +167,7 @@ Depth is chosen by **anatomy**, never by state.
 | `raised` | a manipulated control lifted a hair above its own track | tactile tonal controls (tonal `Button`, `IconButton`) | passive surfaces, table rows, menu rows |
 | `control` | the resting half of the tactile pair | a part the user moves — a switch thumb, a selected segment | wide surfaces, or a whole segmented control |
 | `recessed` | the other half of the pair | grooves, tracks and wells, which are sunk by definition | raised or resting controls |
+| `well` | the same light one rung further down — a shaded upper wall, a soft interior gradient, a lit lower bounce | the *small* sunk mark whose entire identity is its depth — an empty checkbox box, an unselected radio circle | anything with a fill step to spare; a groove, a track, a field or a card, all of which read from their own tone |
 | `floating` | a surface that genuinely sits above the application | acrylic overlays: menus, tooltips, dialogs | matte surfaces sitting on the page |
 
 The tactile pair (`control` / `recessed`) is deliberately shallower than the tonal
@@ -337,21 +349,14 @@ A 1px ring that traces a filled object is still a drawn border. Therefore:
 - fields add no line at all — their hover, focus, engaged and error states are tonality
   only, which is why no border appears and disappears as a user interacts;
 - `edge.rule` needs its direction supplied at the call site (`border-t`, `border-l`);
-- **one boundary is the exception, and it is not a hairline.** A selection mark at rest — an
-  unchecked box, an unselected radio — is *empty*: it has no content of its own to identify it, and
-  measured from rendered pixels the matte step and the recessed lip carry about 1.1:1 against the
-  surface around them, where WCAG asks 3:1 of the information that identifies a component. Such a
-  mark takes two things from `selectable.mark`: the **well** it sits in — the same *opaque* neutral
-  step a `Switch`'s track sits in, so the family reads as one object and the interior is a surface
-  rather than a hole — and a 2px rim in the non-text `detail` tone drawn inside it. The rim is the
-  part that carries the requirement, because that well is still only about 1.2–1.5:1 from the surface
-  around it; it is a *detail* cue rather than a structural edge, it is re-coloured to the fill once
-  the mark holds a value, and it is 2px because a 1px line lands between device pixels on a 1x
-  display and blends away.
-  **A groove does not take it.** A segmented track, a switch track and a tab list are containers
-  whose *labelled children* identify them — the labels are the information, and they clear AA — so a
-  rim around one is a drawn edge around a container rather than furniture, and the same argument
-  that keeps `edge` off a filled control keeps it off here.
+- **an empty mark is identified by its depth, not by a line.** A checkbox box or a radio circle at
+  rest is the one thing in the family with no content at all, and the neutral ladder cannot carry it
+  either: the deepest step the palette has measures about 1.3:1 against the surface around it, where
+  WCAG asks 3:1 of the information that identifies a component. A stroke tracing all four sides would
+  answer that on paper and be a drawn border in fact — the one thing this section exists to prevent,
+  and it reads as foreign next to a `Switch`, which has no such line. The mark is **sunk one rung
+  deeper instead** (§5), and its depth is what says what it is. There is no exception to the rule
+  above: nothing in the library draws a rim around a filled or matte control.
 
 **Do:** use a hairline to separate sibling parts inside one surface.
 **Do not** draw a rim around a filled control, outline a card for emphasis, or express an
@@ -498,9 +503,10 @@ field is what compresses.
 
 **Selection is a recessed surface that fills.** A switch track, a checkbox box, a radio
 circle and a slider groove are one object at four sizes: `selectable.surface` gives them
-the recessed depth of a groove and a non-spatial tone response, `selectable.rest` is the
-neutral matte step a *groove* holds until something in it is selected, `selectable.mark` is the
-well and the rim an *empty* mark needs to be identifiable at all (§8), and `selectable.selected` /
+the recessed depth of a groove and a non-spatial tone response, `selectable.markSurface` is the
+same object one rung deeper — the `well` of a mark whose identity *is* its depth (§5) —
+`selectable.rest` is the neutral matte step a *groove* holds until something in it is selected,
+`selectable.mark` is the well fill an *empty* mark sits in, and `selectable.selected` /
 `selectable.indeterminate` are the accent they take once they are — keyed on the
 primitive's own selection attribute, so an uncontrolled control is styled from the same
 source of truth as a controlled one. Selection never changes their depth: tone carries it,

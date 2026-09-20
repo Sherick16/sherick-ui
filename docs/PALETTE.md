@@ -62,7 +62,8 @@ Every composition the language permits is measured in both themes; this is the s
 | `tone.text.success` on its own tint, through hover and press | 3.41 → **5.42** | 4.14 → **4.81** |
 | `danger` in the error fills (the invalid-field placeholder) | 4.13 → **6.08** | ok |
 | on-colour on its strong fill, through the filled states | 3.16–3.68 → **4.65–4.95** | 3.67 → **4.51** |
-| the detail role on the surfaces it is permitted on | 2.84 → **3.10** | ok |
+| the detail role on the surfaces it is permitted on | 2.84 → **3.16** | ok |
+| the wall the light makes legible on an empty mark's well | — → **3.60** | — → **4.08** |
 | the focus indicator (outer and inset, over every fill) | 4.53 → **6.90** | ok |
 
 Compositions passing, out of the contract's full matrix: **light 52/57 → 57/57**, **dark 52/57 →

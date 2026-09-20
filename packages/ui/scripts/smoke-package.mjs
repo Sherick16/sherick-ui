@@ -193,6 +193,7 @@ for (const token of [
   "--sui-elevation-floating",
   "--sui-elevation-control",
   "--sui-elevation-recessed",
+  "--sui-elevation-well",
   "--sui-glass-fill",
   "--sui-glass-dense-fill",
   "--sui-glass-gradient",

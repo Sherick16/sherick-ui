@@ -118,6 +118,10 @@ export const elevation = {
   floating: "shadow-sherick-floating",
   control: "shadow-sherick-control",
   recessed: "shadow-sherick-recessed",
+  /* One rung further down: the well of a mark the size of a glyph, whose whole identity is its
+     depth. A wide groove reads from its fill; a 24px well has no fill step to spare, so its shaded
+     upper wall and its lit lower wall are what say what it is. See `selectable.markSurface`. */
+  well: "shadow-sherick-well",
 } as const;
 
 /* Shape — semantic corner roles, never an arbitrary radius. Softness grows with
@@ -639,31 +643,23 @@ export const tone = {
    ticked, which is why the second attribute stands beside the first. */
 export const selectable = {
   surface: /* @__PURE__ */ cx("relative", elevation.recessed, motionFeedback),
+  /* The same object one rung deeper, for a mark whose identity is its depth. */
+  markSurface: /* @__PURE__ */ cx("relative", elevation.well, motionFeedback),
   /* The resting fill a *groove* holds — a segmented control's track, a tab list — and nothing more.
      A groove that holds labelled segments is identified by those segments, exactly as a tab list is
      identified by its labels, so it takes no boundary of its own. */
   rest: /* @__PURE__ */ cx(material.matteHigh, text.medium),
   /* An *empty mark* — an unchecked box, an unselected radio — is the one thing in the family with
-     no content at all: nothing inside it says what it is, and measured from rendered pixels the
-     matte step and the recessed lip carry about 1.1:1 against the surface around them, where WCAG
-     asks 3:1 of the information that identifies a component. Two things fix that together.
-     First the well: the mark sits in the *opaque* neutral step, the same well a `Switch`'s track
-     sits in, so the family reads as one object and the interior is a surface rather than a hole.
-     Then the boundary, because that well is still only about 1.2–1.5:1 from the surface around it:
-     a 2px rim in the non-text `detail` tone, drawn *inside* the mark, which is the only rim the
-     language permits (§8).
-     A pseudo-element rather than a border or an outline: a border would grow a mark in a
-     content-box flow (the library ships no reset and cannot assume the host sets `border-box`), and
-     an outline is already spoken for by the focus ring, which would replace the rim exactly while
-     the keyboard is on the control. It takes `rounded-[inherit]` so it follows whatever shape role
-     the mark is given, it is 2px because a 1px line lands between device pixels on a 1x display and
-     blends away, and it sits above the state layer so it stays crisp while the pointer is on the
-     mark. */
-  mark: /* @__PURE__ */ cx(
-    "bg-sherick-surface-high",
-    text.medium,
-    "after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:border-2 after:border-sherick-detail after:content-['']"
-  ),
+     no content at all: nothing inside it says what it is. It takes the fill a `Switch`'s track takes,
+     so the interior is a surface rather than a hole, but that *cannot* be what identifies it: the
+     tightest neutral step this palette has measures about 1.3:1 against the surface around it, where
+     WCAG asks 3:1.
+     So the mark is **sunk deeper** instead — `markSurface` — and its depth is what identifies it: a
+     shaded upper wall and a lit lower wall, which is the same light the whole system is built from,
+     read one rung further down. See the elevation recipes in `tokens.ts`, and §5 of the design
+     language. No rim: a stroke tracing all four sides of a matte control is not part of this
+     language, and the mark now reads as the switch's own well does, only deeper. */
+  mark: /* @__PURE__ */ cx("bg-sherick-surface-high", text.medium),
   /* A filled mark is identified by its own fill, so its rim takes that fill and disappears. */
   selected:
     "group-data-[checked]:bg-sherick-primary-strong group-data-[checked]:text-sherick-on-primary group-data-[checked]:after:border-sherick-primary-strong",

@@ -65,8 +65,8 @@ Both consume `sherick-ui` through package exports after the library build.
   the values in `dist/theme.css` — each text role against each surface a component composites over,
   a semantic foreground on its own tint and through its hover and pressed states, an on-colour on its
   strong fill through the filled states, the marks that carry a selection, the error placeholder, the
-  non-text `detail` role, and the focus indicator against every surface and every fill an inset ring
-  is drawn over. **Every composition is pass or fail: there is no allowlist.** One module owns the
+  non-text `detail` role, the wall of an empty mark's well that the light makes legible, and the focus
+  indicator against every surface and every fill an inset ring is drawn over. **Every composition is pass or fail: there is no allowlist.** One module owns the
   colour math and one owns the description of the compositions; the same module is what the palette
   was solved against, so the numbers in `docs/PALETTE.md` are the numbers this gate measures. This is
   the layer the axe scan cannot be: a scan only sees the states a fixture happens to be in, and

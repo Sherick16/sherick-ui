@@ -79,7 +79,7 @@ export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(
           className={cn(
             "flex size-6 shrink-0 items-center justify-center",
             shape.mark,
-            selectable.surface,
+            selectable.markSurface,
             selectable.mark,
             selectable.selected,
             selectable.indeterminate,

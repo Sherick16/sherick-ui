@@ -425,18 +425,19 @@ test("NumberField types, steps and stops at its bounds", async ({ page, errors }
   expect(errors).toEqual([]);
 });
 
-/* An unchecked box and an unselected radio have no fill of their own to identify them: the matte
-   step and the recessed lip sit within a couple of percent of the surface around them, which is
-   well under the 3:1 WCAG asks of the information that identifies a component. What closes that gap
-   is the shared non-text detail rim, so this reads the *rendered* rim — its width, and the colour it
-   actually paints — against the theme's own resolved tokens rather than against a class name. */
-test("a resting selection mark draws its boundary in the non-text detail tone", async ({ page, errors }) => {
+/* An unchecked box and an unselected radio have no content of their own, and the neutral ladder
+   cannot identify them either: the deepest step in the palette measures about 1.3:1 against the
+   surface around it, where WCAG asks 3:1. What identifies them is the *depth* of the well they sit
+   in (`elevation-well`), so this reads the rendered depth — the mark's own shadow must be the well
+   rung, and its fill must be the neutral step a `Switch`'s track sits in — rather than a class name
+   or a stroke that no longer exists. The contrast of the wall that carries the requirement is the
+   contrast contract's job, not this test's. */
+test("a resting selection mark is identified by the depth of its well", async ({ page, errors }) => {
   await page.goto("/verification/interactions");
   await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
 
-  const readRim = (locator: ReturnType<Page["locator"]>) =>
+  const readMark = (locator: ReturnType<Page["locator"]>) =>
     locator.evaluate((element) => {
-      const rim = getComputedStyle(element, "::after");
       const resolved = (name: string) => {
         const probe = document.createElement("div");
         probe.style.color = `oklch(var(${name}))`;
@@ -445,41 +446,46 @@ test("a resting selection mark draws its boundary in the non-text detail tone", 
         probe.remove();
         return value;
       };
+      /* A lighting recipe's layers are separated by `", "` and none of them contains a comma of its
+         own, so a layer can be read off without parsing colour syntax. */
+      const layersOf = (value: string) => {
+        const probe = document.createElement("div");
+        probe.style.boxShadow = value;
+        document.body.appendChild(probe);
+        const shadow = getComputedStyle(probe).boxShadow;
+        probe.remove();
+        return shadow.split(", ");
+      };
+      const style = getComputedStyle(element);
       return {
-        width: Number.parseFloat(rim.borderTopWidth),
-        colour: rim.borderTopColor,
-        detail: resolved("--sui-detail"),
-        style: rim.borderTopStyle,
+        shadow: style.boxShadow,
+        well: layersOf("var(--sui-elevation-well)"),
+        recessed: layersOf("var(--sui-elevation-recessed)"),
+        fill: style.backgroundColor,
+        neutral: resolved("--sui-surface-high"),
+        rim: getComputedStyle(element, "::after").borderTopWidth,
       };
     });
 
   for (const [name, locator] of [
-    ["an unchecked box", page.locator('button[role="checkbox"][aria-checked="false"] span[aria-hidden="true"]').first()],
+    ["an unchecked box", page.locator('button[role="checkbox"][aria-checked="false"]:not([data-disabled]) span[aria-hidden="true"]').first()],
     ["an unselected radio", page.locator('[role="radio"][aria-checked="false"] span[aria-hidden="true"]').first()],
   ] as const) {
     await locator.scrollIntoViewIfNeeded();
-    const rim = await readRim(locator);
-    expect(rim.style, `${name} draws a boundary`).not.toBe("none");
-    expect(rim.width, `${name}'s boundary is visible on a 1x display`).toBeGreaterThanOrEqual(2);
-    expect(rim.colour, `${name} draws it in the detail tone`).toBe(rim.detail);
-    /* And it sits in the *opaque* neutral well rather than a fraction of it: the same well a
-       Switch's track sits in, so the two read as one object instead of one being a hole and the
-       other a fill. Both resolve `--sui-surface-high`, and this reads what is painted. */
-    const well = await locator.evaluate((element) => {
-      const probe = document.createElement("div");
-      probe.style.color = "oklch(var(--sui-surface-high))";
-      document.body.appendChild(probe);
-      const neutral = getComputedStyle(probe).color;
-      probe.remove();
-      return { painted: getComputedStyle(element).backgroundColor, neutral };
-    });
-    expect(well.painted, `${name} sits in the neutral well`).toBe(well.neutral);
+    const mark = await readMark(locator);
+    /* The mark's own computed shadow carries Tailwind's ring plumbing on top, so the rung is read as
+       the lighting layers it is made of: the well's, not the shallower groove's. */
+    for (const layer of mark.well) {
+      expect(mark.shadow, `${name} is sunk to the well rung`).toContain(layer);
+    }
+    for (const layer of mark.recessed) {
+      expect(mark.shadow, `${name} is not left at the shallow groove rung`).not.toContain(layer);
+    }
+    expect(mark.fill, `${name} sits in the neutral well`).toBe(mark.neutral);
+    /* And nothing draws a line around it: the same object a `Switch`'s track is, and a switch draws
+       none. A stroke tracing all four sides of a matte control is not part of this language. */
+    expect(mark.rim, `${name} carries no drawn edge`).toBe("0px");
   }
-
-  /* The rim belongs to the resting fill: a mark that holds a value is identified by that fill. */
-  const checked = page.locator('button[role="checkbox"][aria-checked="true"] span[aria-hidden="true"]').first();
-  const checkedRim = await readRim(checked);
-  expect(checkedRim.colour, "a filled mark's rim takes its own fill").not.toBe(checkedRim.detail);
 
   expect(errors).toEqual([]);
 });
