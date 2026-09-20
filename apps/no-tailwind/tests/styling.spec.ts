@@ -218,5 +218,19 @@ test("a nested icon node keeps the mark slot and the target size", async ({ page
   expect(geometry.mark.height).toBeCloseTo(20, 1);
   expect(geometry.target.width).toBeGreaterThanOrEqual(44);
   expect(geometry.target.height).toBeGreaterThanOrEqual(44);
+
+  /* The non-shrinking half lives in the slot, not in `Spinner` itself: a *labelled* spinner is a
+     mark and a label, and it has to be allowed to shrink in a narrow row. So the slot holds its
+     box, and the status wrapper stays shrinkable. */
+  const shrink = await Promise.all([
+    add.evaluate((button) => getComputedStyle(button.firstElementChild as Element).flexShrink),
+    page
+      .getByRole("status")
+      .first()
+      .evaluate((element) => getComputedStyle(element).flexShrink),
+  ]);
+  expect(shrink[0], "the mark slot refuses to shrink").toBe("0");
+  expect(shrink[1], "a labelled spinner is allowed to").not.toBe("0");
+
   expect(errors).toEqual([]);
 });

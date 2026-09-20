@@ -73,8 +73,6 @@ import {
   motionActivityPulse,
   motionActivitySpin,
   motionArrive,
-  motionDirect,
-  motionDisclose,
   motionFeedback,
   motionOrient,
   motionPresenceAnchored,
@@ -850,10 +848,16 @@ function StateLabel({ label, children }: { label: string; children: React.ReactN
   return <div className="flex items-center gap-2"><div>{children}</div><span className={cn("text-sm", text.medium)}>{label}</span></div>;
 }
 
-/* One intent per stage. A stage is a minimal mark carrying a recipe's classes rather than a
-   second copy of a component: each component already demonstrates its own motion where it is
-   specimened, and what a reader cannot see there is one intent at a time with its name beside it.
-   Every stage is reversible by hand, so both directions of its recipe are visible. */
+/* One intent per stage, and every stage is reversible by hand so both directions of its recipe are
+   visible. A stage carries a recipe's classes on a minimal mark wherever an intent can be shown
+   that way — each component already demonstrates its own motion where it is specimened, and what a
+   reader cannot see there is one intent at a time with its name beside it.
+   Two intents cannot be shown that way, because they belong to a *widget* rather than to a mark: a
+   direct manipulation needs a part the pointer can actually drag, and a disclosure needs a
+   measured region and a trigger relationship. Those two stages use the real component, because the
+   alternative is a second slider and a second disclosure with their own contracts to get wrong —
+   and this page is not a fixture for behaviour, which the motion suite covers against the
+   verification fixture. */
 function MotionSpecimen() {
   const [on, setOn] = useState<Record<string, boolean>>({});
   const toggle = (intent: string) => setOn((current) => ({ ...current, [intent]: !current[intent] }));
@@ -947,38 +951,33 @@ function MotionSpecimen() {
       </MotionStage>
 
       <MotionStage label="direct">
-        <DirectDriver />
+        {/* The one intent a mark cannot demonstrate. Pointer-driven geometry belongs to the part the
+            pointer is on, and showing that honestly means the part has to *be* draggable: a mark that
+            fakes it is a second slider, with its own keyboard contract to get wrong. The real control
+            owns the drag and writes the range's geometry directly, which is exactly the intent. */}
+        <Slider label="Position" defaultValue={40} className="w-32" />
       </MotionStage>
 
       <MotionStage label="disclose">
+        {/* And a mark cannot disclose anything either: a region that only shrinks to `height: 0` is
+            still a region, and its trigger needs the relationship, the measured height and the
+            hidden state that go with one. The real disclosure supplies all three. */}
         <div className="w-32">
-          <button
-            type="button"
-            onClick={() => toggle("disclose")}
-            aria-expanded={on.disclose ?? false}
-            className={cn("flex h-8 w-full items-center justify-between px-2 text-xs", shape.row, stateLayer.quiet, text.high, focusRing, state.enabled)}
-          >
-            Region
-            <ChevronDown className={cn("size-3.5", motionOrient, on.disclose && "rotate-180")} aria-hidden="true" />
-          </button>
-          {/* The clipped panel is hidden from assistive technology while it is closed: a region that is
-              only `height: 0` is still read out and still reachable. */}
-          <div
-            aria-hidden={!on.disclose}
-            className={cn("overflow-hidden", motionDisclose)}
-            style={{ height: on.disclose ? 32 : 0 }}
-          >
-            <div className={cn("px-2 pt-1 text-xs leading-5", text.medium)}>Panel content</div>
-          </div>
+          <Collapsible>
+            <Collapsible.Trigger>Region</Collapsible.Trigger>
+            <Collapsible.Panel>Panel content</Collapsible.Panel>
+          </Collapsible>
         </div>
       </MotionStage>
 
       <MotionStage label="presence">
         <div className="relative flex flex-col items-center">
+          {/* A toggle, not a disclosure: the surface it reveals is decorative and `aria-hidden`, so
+              the trigger announces its own state rather than claiming a region it does not control. */}
           <button
             type="button"
             onClick={() => toggle("presence")}
-            aria-expanded={on.presence ?? false}
+            aria-pressed={on.presence ?? false}
             className={cn("relative z-10 flex h-8 items-center px-3 text-xs", shape.control, material.matteHigh, text.high, focusRing, state.enabled)}
           >
             Anchor
@@ -1028,73 +1027,6 @@ function MotionStage({ label, children }: { label: string; children: React.React
 
 /* `direct` is the one intent a still stage cannot fake: while the pointer owns the geometry the
    positional transition is removed, and the mark settles to the nearest destination on release. */
-function DirectDriver() {
-  const track = useRef<HTMLDivElement | null>(null);
-  const [position, setPosition] = useState(50);
-  const [dragging, setDragging] = useState(false);
-
-  const settle = (value: number) => Math.round(value / 50) * 50;
-
-  const fromPointer = (clientX: number) => {
-    const box = track.current?.getBoundingClientRect();
-    if (!box || box.width === 0) return 50;
-    return Math.min(100, Math.max(0, ((clientX - box.left) / box.width) * 100));
-  };
-
-  return (
-    <div
-      ref={track}
-      role="slider"
-      tabIndex={0}
-      aria-label="Position"
-      aria-valuemin={0}
-      aria-valuemax={100}
-      aria-valuenow={Math.round(position)}
-      onKeyDown={(event) => {
-        const keys: Record<string, number> = {
-          ArrowRight: 50,
-          ArrowUp: 50,
-          ArrowLeft: -50,
-          ArrowDown: -50,
-        };
-        const step = keys[event.key];
-        if (step === undefined && event.key !== "Home" && event.key !== "End") return;
-        event.preventDefault();
-        setPosition((current) =>
-          event.key === "Home" ? 0 : event.key === "End" ? 100 : Math.min(100, Math.max(0, settle(current) + step))
-        );
-      }}
-      onPointerDown={(event) => {
-        event.currentTarget.setPointerCapture(event.pointerId);
-        setDragging(true);
-        setPosition(fromPointer(event.clientX));
-      }}
-      onPointerMove={(event) => {
-        if (dragging) setPosition(fromPointer(event.clientX));
-      }}
-      onPointerUp={(event) => {
-        if (!dragging) return;
-        event.currentTarget.releasePointerCapture(event.pointerId);
-        setDragging(false);
-        setPosition((current) => settle(current));
-      }}
-      onPointerCancel={() => {
-        setDragging(false);
-        setPosition((current) => settle(current));
-      }}
-      className={cn("relative flex h-8 w-28 touch-none select-none items-center", shape.control, focusRing, state.enabled)}
-    >
-      <span aria-hidden="true" className={cn("mx-2.5 h-1.5 flex-1", shape.pill, elevation.recessed, material.matteHigh)} />
-      <span
-        aria-hidden="true"
-        data-dragging={dragging ? "" : undefined}
-        className={cn("absolute top-1/2 size-5 [translate:-50%_-50%]", shape.pill, elevation.control, material.handle, motionDirect)}
-        style={{ insetInlineStart: `calc(0.625rem + (100% - 1.25rem) * ${position / 100})` }}
-      />
-    </div>
-  );
-}
-
 function SheetSpecimen() {
   const [side, setSide] = useState<DrawerSide>("bottom");
   const [open, setOpen] = useState(false);

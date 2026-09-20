@@ -269,6 +269,8 @@ behaviour is verified above, with the preference emulated by the browser.
 id and target selector. axe runs on four representative reachable states rather than scanning
 the workbench indiscriminately:
 
+- `/` — the showcase itself, which is where the interactive specimens live and therefore the only
+  place some states appear at all (a motion stage holding a real control, the toast stack);
 - `/verification/core` in its default state;
 - `/verification/interactions` in its default state;
 - the initially-open dialog at `/verification/dialog`;

@@ -79,7 +79,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
             id={id}
             className={({ open }) =>
               cn(
-                "group flex w-full items-center justify-between gap-3 px-5 py-3 text-left",
+                "group flex w-full items-center justify-between gap-3 px-5 py-3 text-start",
                 density.normal,
                 shape.control,
                 material.control,

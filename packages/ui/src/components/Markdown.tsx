@@ -15,10 +15,13 @@ const components: Components = {
   h3: ({ className, ...props }) => <h3 className={cn("mb-2 mt-6 text-xl font-medium first:mt-0", text.high, className)} {...props} />,
   p: ({ className, ...props }) => <p className={cn("my-3 leading-7", text.high, className)} {...props} />,
   a: ({ className, ...props }) => <a className={cn("font-medium underline decoration-sherick-primary/[0.35] underline-offset-4 hover:decoration-sherick-primary", tone.text.primary, className)} {...props} />,
-  ul: ({ className, ...props }) => <ul className={cn("my-4 list-disc space-y-2 pl-6", text.high, className)} {...props} />,
-  ol: ({ className, ...props }) => <ol className={cn("my-4 list-decimal space-y-2 pl-6", text.high, className)} {...props} />,
-  li: ({ className, ...props }) => <li className={cn("pl-1 leading-7 marker:text-sherick-primary", className)} {...props} />,
-  blockquote: ({ className, ...props }) => <blockquote className={cn("my-5 px-4 py-2", shape.control, "rounded-l-none border-l-2 border-sherick-primary/[0.45]", tone.soft.primary, text.medium, className)} {...props} />,
+  /* Every asymmetry a reader meets is a *writing-direction* asymmetry: a list indents from its own
+     start edge, a quote's rule is drawn on that same edge, and both follow the document rather than
+     the page. §17 states it as a rule, so nothing here may name a physical side. */
+  ul: ({ className, ...props }) => <ul className={cn("my-4 list-disc space-y-2 ps-6", text.high, className)} {...props} />,
+  ol: ({ className, ...props }) => <ol className={cn("my-4 list-decimal space-y-2 ps-6", text.high, className)} {...props} />,
+  li: ({ className, ...props }) => <li className={cn("ms-1 leading-7 marker:text-sherick-primary", className)} {...props} />,
+  blockquote: ({ className, ...props }) => <blockquote className={cn("my-5 px-4 py-2", shape.control, "rounded-s-none border-s-2 border-sherick-primary/[0.45]", tone.soft.primary, text.medium, className)} {...props} />,
   hr: ({ className, ...props }) => <hr className={cn("my-7 h-0 border-0 border-t", edge.rule, className)} {...props} />,
   strong: ({ className, ...props }) => <strong className={cn("font-semibold", text.high, className)} {...props} />,
   /* A fenced block reaches `code` wrapped in `pre`, which would nest a second `pre`
