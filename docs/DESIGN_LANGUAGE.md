@@ -336,7 +336,15 @@ A 1px ring that traces a filled object is still a drawn border. Therefore:
 - matte controls carry **no rim**: they are separated by tone and by light alone;
 - fields add no line at all — their hover, focus, engaged and error states are tonality
   only, which is why no border appears and disappears as a user interacts;
-- `edge.rule` needs its direction supplied at the call site (`border-t`, `border-l`).
+- `edge.rule` needs its direction supplied at the call site (`border-t`, `border-l`);
+- **one boundary is the exception, and it is not a hairline.** A selection mark at rest — an
+  unchecked box, an unselected radio, a segmented track — has no fill of its own to identify it:
+  measured from rendered pixels, the matte step and the recessed lip carry about 1.1:1 against the
+  surface around them, and WCAG asks 3:1 of the information that identifies a component. It takes
+  the non-text `detail` tone as a 2px rim drawn inside the mark, from `selectable.rest`. The rim is
+  a *detail* cue rather than a structural edge, it is re-coloured to the fill once the mark holds a
+  value, and it is 2px because a 1px line lands between device pixels on a 1x display and blends
+  away. Nothing else may take a rim on this reasoning.
 
 **Do:** use a hairline to separate sibling parts inside one surface.
 **Do not** draw a rim around a filled control, outline a card for emphasis, or express an
@@ -379,13 +387,22 @@ to stay proportional to its own height. A control-sized row keeps `control` at b
 ### Surfaces and text
 
 Canvas plus three surface levels (`--sui-surface`, `--sui-surface-high`,
-`--sui-surface-float`) carry structure. Three text steps carry emphasis and no more:
+`--sui-surface-float`) carry structure. **Two** text steps carry emphasis, and one non-text tone
+carries furniture:
 
-| Text step | Carries | Should not be used for |
-| --- | --- | --- |
-| `text.high` | labels and values | dimmed furniture |
-| `text.medium` | supporting copy | primary labels, where it would soften hierarchy |
-| `text.low` | the dimmest furniture — gutters, hints, token names | anything a user must read to act |
+| Role | Recipe | Carries | Should not be used for |
+| --- | --- | --- | --- |
+| high | `text.high` | labels and values | dimmed furniture |
+| medium | `text.medium` | supporting copy, descriptions, placeholders, hints, line numbers | primary labels, where it would soften hierarchy |
+| detail | `detail.mark` / `detail.fill` | **non-text** furniture — a rail, a gutter, a mark's frame, secondary graphical detail | anything a reader has to read |
+
+There is deliberately no third text step, and the language says so rather than leaving a trap.
+A third step would have to sit between `medium` and the lightest surface a component composites
+over; measured against those surfaces, the value that clears 4.5:1 is at or above `ink-muted`'s
+own lightness, so a third *readable* step cannot exist as a distinct step at this surface range.
+What used to be `text.low` / `--sui-ink-faint` is therefore `detail`: a non-text tone that answers
+to the 3:1 WCAG asks of non-text information, sits visibly below `text.medium`, and is never a
+foreground for text.
 
 A surface level is a **tone, not a depth**. Depth comes from the elevation ladder.
 
@@ -577,7 +594,15 @@ Everything else is shared, and that sharing is the point:
 
 - **hover and keyboard highlight are one tone at one strength.** A row composes `quiet` and
   `activeRow` together, so a row under the pointer and a row under the arrow keys read as the
-  same thing happening;
+  same thing happening — the pointer and the keyboard both say *which row you are on*;
+- **the keyboard gets a second, separate signal.** Which row the pointer is on and which row the
+  keyboard will act on are two different questions, and a 5% highlight cannot answer the second one
+  on its own. A row therefore also takes the shared inset ring, gated on `:focus-visible`: Base gives
+  the active row real DOM focus, and the platform reports that focus as visible when the keyboard put
+  it there and not when a pointer did. So a pointer that opens a list and moves over a row gets the
+  highlight and no ring, a keyboard that opens one and steps down it gets both, a selected row keeps
+  its selection tint under the ring, and a disabled-but-navigable row still shows where the
+  navigation is while saying it cannot be used;
 - **selection is a tint of the sheet** (`tone.selected`), never the opaque accent. The one
   primary fill in a view belongs to the primary action, not to a row that happens to be chosen;
 - **a destructive command wears its tone on its own label**, and its hover and highlight are
@@ -943,47 +968,39 @@ handle that the pointer is already moving keeps its ring for the keyboard.
 - Color is never the only carrier of meaning: a semantic state also carries an icon, a
   label or a position.
 
-### Known contrast gap (pre-release)
+### The contrast contract
 
-The authored default palette does **not** meet WCAG AA text contrast, and this is a known,
-measured, deliberately recorded limitation rather than an oversight in a component. It is
-not fixed by the palette, because closing it means changing the brand accent and collapsing
-the three-step text ladder defined in §10 — a visual-language decision, tracked separately
-from component work.
+The authored palette meets WCAG AA. What that means is not a claim but a measurement: every
+composition the language permits — each text role against each surface a component composites
+over, a semantic foreground on its own tint and through its hover and pressed states, an on-colour
+on its strong fill through the filled states, the marks that carry a selection, the error
+placeholder, the non-text tones, and the focus indicator against every surface and every fill an
+inset ring is drawn over — is measured from the published token values in both themes by
+`bun run test`, with no allowlist. See [`VERIFICATION.md`](VERIFICATION.md) for the gate and
+[`PALETTE.md`](PALETTE.md) for the values and the record of how they were chosen.
 
-Measured with axe-core 4.13 against the rendered fixtures (the automated gate excludes only
-`color-contrast`; see `docs/VERIFICATION.md`):
+Three properties of the palette are load-bearing for that result, and they are what a future
+change has to keep:
 
-| Pair | Light | Dark |
-| --- | --- | --- |
-| `tone.text.primary` on `tone.tonal.primary` (`primary` / 0.12) | 3.82–4.51 | 4.53–5.94 |
-| `tone.text.primary` on `tone.selected.primary` (`primary` / 0.22) | 3.69–3.88 | 4.36–4.87 |
-| `text.low` on the page canvas | 3.16 | 4.54 |
-| `text.low` on `surface-high` | 2.80 | 3.52 |
+- **the accents are deep enough in light mode and light enough in dark mode to survive their own
+  state layers.** A tonal control's label is the accent over a 9–12% tint of itself, and hover and
+  press composite the accent over that fill again (0.09/0.15 for a tinted control, 0.05/0.09 for a
+  text one, 0.18/0.26 for an opaque fill). The resting value is not the binding one; the pressed
+  state is;
+- **`primary`, `primary-strong` and `focus` move as one family.** The accent a label takes on a
+  tint, the opaque fill that marks priority, and the ring are one hue at three depths, and a
+  change to one of them is a change to all three;
+- **there are two text steps and a non-text tone**, per §10. A third readable step cannot exist at
+  these surfaces, and the tone that was pretending to be one is `detail`.
 
-Consequences that follow from this gap, and the rules they impose:
+Colour is never the only carrier of meaning, and the contrast of a semantic tone is not what makes
+a state legible on its own: a state also carries an icon, a label, a position or a border. That
+rule still holds, and it is now backed rather than leaned on.
 
-- **`tone.text.primary` is not an AA foreground on a primary tint.** A primary tonal control
-  or primary soft surface carries its label at roughly 3.8–4.4:1. Treat these as decorative
-  emphasis, not as the only way a user learns something they must act on.
-- **`text.low` is furniture, not copy.** §10 already restricts it to gutters, hints and token
-  names; because it measures 2.8–3.2:1 in light mode it must never carry information a user
-  needs in order to act, and it must not be the only place a value, label or error appears.
-- **Anything that must be readable uses `text.high` or `text.medium`**, both of which clear
-  AA on every authored surface in both themes.
-- A consumer that needs AA throughout can already retune `--sui-primary` and `--sui-ink-faint`
-  at the document root; that is an ordinary supported theme override, not a fork.
-
-Do not "fix" a failing contrast measurement inside a component by darkening that component's
-label: the roles above are the shared primitives, and a local color is exactly the kind of
-rule §16 forbids inventing locally.
-
-The gap is measured from the published tokens in both themes by `bun run test`, which records the
-exact failing pairings (see [`VERIFICATION.md`](VERIFICATION.md)) rather than relying on a scan.
-The complete proposed replacement palette — every token, both themes, the ratios behind each value,
-and the alternative directions with their trade-offs — is [`PALETTE_PROPOSAL.md`](PALETTE_PROPOSAL.md).
-**That document is a proposal, not part of this language**: none of its values are in force until
-this section and §10 are rewritten with them.
+Do not "fix" a contrast measurement inside a component by darkening that component's label: the
+roles above are the shared primitives, and a local color is exactly the kind of rule §16 forbids
+inventing locally. When a pairing legitimately cannot be legible, the language changes — the role,
+the tint, or the state step — and then the whole set is re-measured.
 
 ---
 

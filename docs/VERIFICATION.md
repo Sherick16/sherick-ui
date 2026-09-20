@@ -60,16 +60,17 @@ Both consume `sherick-ui` through package exports after the library build.
   stylesheet compiler reads class names as literal text, so a name assembled when the recipe is
   evaluated compiles to nothing and that step of the recipe silently disappears — which is how every
   state layer once shipped without its hover rule;
-- the **contrast contract** of the published tokens: `bun run test` measures every pairing the
-  design language requires to be readable — each text step against each surface a component
-  composites over, a tinted control's label against its own tint, an on-colour against its strong
-  fill, the selected mark against its selection tint, the error placeholder against an invalid
-  field, and the focus indicator against every surface — in both themes, from the values in
-  `dist/theme.css`. The pairings that do not yet meet WCAG AA are listed explicitly as the recorded
-  palette gap (see `docs/DESIGN_LANGUAGE.md` §14), and the list is exact in both directions: a new
-  failing pairing fails the check, and a listed pairing that starts passing fails it too. This is
-  the layer the axe scan cannot be: `@axe-core/playwright`'s `color-contrast` rule does not evaluate
-  `::placeholder` text at all.
+- the **contrast contract** of the published tokens (`scripts/contrast-contract.mjs`, run from
+  `scripts/smoke-package.mjs`): every composition the design language permits, in both themes, from
+  the values in `dist/theme.css` — each text role against each surface a component composites over,
+  a semantic foreground on its own tint and through its hover and pressed states, an on-colour on its
+  strong fill through the filled states, the marks that carry a selection, the error placeholder, the
+  non-text `detail` role, and the focus indicator against every surface and every fill an inset ring
+  is drawn over. **Every composition is pass or fail: there is no allowlist.** One module owns the
+  colour math and one owns the description of the compositions; the same module is what the palette
+  was solved against, so the numbers in `docs/PALETTE.md` are the numbers this gate measures. This is
+  the layer the axe scan cannot be: a scan only sees the states a fixture happens to be in, and
+  `@axe-core/playwright`'s `color-contrast` rule does not evaluate `::placeholder` text at all.
 
 ## Packed-package consumer checks
 
@@ -141,7 +142,11 @@ gate pins is a slot with its own size, whitespace and optical weight; and the mu
 carries — a wrapped alert, a wrapped radio label — pin the anatomy a component gives a mark beside
 copy that wraps.
 
-This is a deterministic **style-contract** regression gate, not a pixel/browser visual test.
+This is a deterministic **style-contract** regression gate, not a pixel/browser visual test. It is
+also the repository's **palette gate**: the token blocks it records pin every `--sui-*` value in both
+themes, so a colour change cannot pass unreviewed. (The browser screenshots below are a
+layout/styling-distribution gate by contrast — they compare pixels with a tolerance, and a
+palette-only change is inside that tolerance.)
 
 ## Browser integration and visual regression
 
@@ -201,6 +206,18 @@ The showcase browser suite also verifies:
   clears the pointer minimum while its visible edge distance survives a writing-direction flip, and
   a wrapped alert's status mark and its dismissal are both centred on the first line rather than on
   the middle of the block;
+- a collection row's two signals (`floating-surfaces.spec.ts`): a pointer that opens a Menu and moves
+  over a row gets the navigation highlight and **no** ring, a keyboard that opens the same menu and
+  steps down it gets both, and a disabled-but-navigable row keeps the ring that says where the
+  navigation is. Every claim is read from the rendered `::before` opacity, `:focus-visible` and
+  `box-shadow` — never from a class name;
+- a resting selection mark's boundary (`fields.spec.ts`): an unchecked box and an unselected radio
+  paint the shared `detail` rim, at a width that survives a 1x display and in the theme's own
+  resolved `--sui-detail` colour, while a filled mark's rim takes its fill and disappears. The 3:1
+  ratio itself is the contrast contract's job, not this test's;
+- a navigation group's heading level (`interactions.spec.ts`): the fixture asks for level 2 and gets
+  a level-2 heading with no level-3 heading left behind, and its rows are links with `aria-current`
+  on the current one — a reusable navigation group choosing its own level was the defect;
 - an anchored surface placed on each side of its trigger, asserting the resolved origin and the
   direction of its travel rather than only that it appeared;
 - the motion invariants (`motion.spec.ts`, below);
@@ -275,9 +292,9 @@ behaviour is verified above, with the preference emulated by the browser.
 
 `apps/showcase/tests/browser/accessibility.spec.ts` runs axe-core through
 `@axe-core/playwright`'s `AxeBuilder` restricted to `["wcag2a", "wcag2aa", "wcag21a",
-"wcag21aa"]`, and asserts `results.violations` is empty with a message naming every violation
-id and target selector. axe runs on four representative reachable states rather than scanning
-the workbench indiscriminately:
+"wcag21aa"]` — every rule in the tag set, `color-contrast` included — and asserts
+`results.violations` is empty with a message naming every violation id and target selector. axe runs
+on representative reachable states rather than scanning the workbench indiscriminately:
 
 - `/` — the showcase itself, which is where the interactive specimens live and therefore the only
   place some states appear at all (a motion stage holding a real control, the toast stack);
@@ -298,34 +315,45 @@ tree below it has run its effects, which React flushes parent-last — and not f
 selector such as `[aria-labelledby]`, which any unrelated component on the page can satisfy while
 the component under test is still bare. The wait is the state, not a timeout.
 
-**One combination is asserted directly instead of scanned, and it is tracked as an upstream
-risk.** With a Combobox listbox open, Base UI's combobox focus manager marks the document around
-the popup `aria-hidden` without `inert`, and axe reports `aria-hidden-focus` against that page
-content. The markup is Base's, not Sherick's, and Sherick does not patch a base primitive's ARIA.
-That state is therefore verified with direct assertions — `role="listbox"`, `role="option"`,
-`aria-selected`, `aria-disabled` and the input's `aria-activedescendant` — while the closed
-fixture still runs the full axe scan over the same control, its `Field` label, description and
-error relationships. A modal Menu, an open AlertDialog and the closed Combobox are all scanned
-normally.
+**One combination is asserted directly instead of scanned, and it is a demonstrated upstream
+gap.** With an editable Combobox's listbox open, axe reports `aria-hidden-focus` — 37 nodes on the
+interactions fixture — because the page around the popup is marked `aria-hidden` while remaining
+focusable.
 
-Those assertions are **not** equivalent to scanning the open state, and they are not recorded as
-if they were: the behavior comes from Base's shared modal/focus infrastructure and has been
-reported against Base itself. It is a dependency risk to settle before the stable `2.0.0` — an
-upstream fix, or an explicit decision that an open listbox may hide the rest of the page from
-assistive technology.
+Where it comes from, read from the installed Base UI rather than inferred:
 
-**One rule is excluded, deliberately and for a recorded reason.** `color-contrast` is
-disabled for this run because the authored default palette does not meet WCAG AA text
-contrast. The measured gap, the token pairs it affects and the rules it imposes are recorded
-in `docs/DESIGN_LANGUAGE.md` §14 (Known contrast gap) and re-stated in `docs/RELEASE.md` as a
-known pre-release limitation. Closing it means retuning authored accent and text-step tokens —
-a palette decision with its own baselines — so it is tracked separately rather than smuggled
-into a hardening change.
+- a Combobox that renders its `Input` **outside** the popup (the editable combobox pattern this
+  package uses) gets `initialFocus: false` from Base's own default, because focus has to stay in the
+  input so typing keeps working (`combobox/popup/ComboboxPopup.mjs`, `computedDefaultInitialFocus`);
+- that makes `isUntrappedTypeableCombobox` true, and Base's floating focus manager then passes
+  `ariaHidden: modal || isUntrappedTypeableCombobox` — i.e. `true` regardless of `modal`
+  (`floating-ui-react/components/FloatingFocusManager.mjs`);
+- the same condition is what *skips* the focus guards ("guards are not rendered, but `aria-hidden`
+  is still applied"), so the page outside is hidden from assistive technology while focus is still
+  free to leave the popup;
+- Base's `markOthers` **supports** an `inert` option; `FloatingFocusManager` never passes it.
 
-Every other rule in the tag set stays enabled, and excluding one rule removes exactly one
-class of coverage: a *new* contrast regression is not caught here. When the palette gap is
-closed, delete the exclusion. Do not extend the exclusion to a second rule, and do not
-disable a rule to make a red run green — a genuine markup defect is fixed in the markup.
+So the missing `inert` is Base's to add. It cannot be fixed from here without changing what the
+component is: the two shapes that avoid it are a combobox whose input renders *inside* the popup
+(a different control anatomy, and a different visual contract) or one that hands focus to the popup
+(which stops the field being editable while open). `@base-ui/react@1.8.0` is the latest published
+version and there is no newer dist-tag, so there is no dependency update to take either.
+
+The state is therefore covered by **direct behavioural assertions** — `role="listbox"`,
+`role="option"`, `aria-selected`, `aria-disabled`, the input's `aria-activedescendant`, and the
+active row's own highlight — while the *closed* Combobox runs the full axe scan over the same
+control and its `Field` label, description and error relationships, and a modal Menu, an open
+AlertDialog and a Select opened inside a dialog are all scanned in their open states.
+
+**Those assertions are not equivalent to scanning the open state**, and they are not recorded as if
+they were. It remains a dependency risk to settle before the stable `2.0.0`: an upstream fix, or an
+explicit decision that an open listbox may hide the rest of the page from assistive technology.
+
+**No rule is excluded.** The scan runs the WCAG A/AA tag set as it is
+(`wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`), `color-contrast` included, and it is the contrast
+contract in `bun run test` — not this scan — that keeps the theme able to satisfy it: a scan can only
+see the states a fixture happens to be in, it does not evaluate `::placeholder` text at all, and a
+node it cannot measure is a node a regression can hide in.
 
 **What this layer does not replace.** axe proves that rendered markup has no detectable
 violation; it proves nothing about whether a control behaves correctly. Keyboard traversal,

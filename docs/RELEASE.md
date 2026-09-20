@@ -103,7 +103,8 @@ The root `sherick-ui` export is:
   `DrawerDescriptionProps`, `DrawerFooterProps`, `DrawerSide`, `MenuProps`, `MenuTriggerProps`,
   `MenuContentProps`, `MenuItemProps`, `MenuSeparatorProps`, `PopoverProps`, `PopoverContentProps`,
   `TooltipProps`, `TableProps`, `TabsProps`, `Tab`, `NavGroupProps`, `NavGroupItem`,
-  `NavItemProps`, `DividerProps`, `DividerWeight`, `ToastProviderProps`, `ToastViewportProps`,
+  `NavGroupHeadingLevel`, `NavItemProps`, `DividerProps`, `DividerWeight`, `ToastProviderProps`,
+  `ToastViewportProps`,
   `ToastOptions`, `ToastActionOptions`, `ToastUpdateOptions`, `ToastPromiseOptions`, `ToastType`,
   `ToastPosition`, `ToastManager`) and the shared `Variant`,
   `OverlaySide` and `OverlayAlign` types.
@@ -281,39 +282,36 @@ The mechanism, measured rather than inferred:
   depends on — a shell recipe genuinely bundles material, elevation and shape — so that is left as a
   separate, deliberate change rather than folded into this one.
 
-## Known accessibility limitation: default palette text contrast
+## Accessibility: the authored palette meets AA
 
-The authored default palette does not meet WCAG AA text contrast. This is a recorded,
-pre-release limitation, not an undiscovered bug.
+There is no longer a recorded contrast limitation, and no allowlist anywhere in the gate.
 
-- The primary accent used as a foreground on its own tint measures roughly **3.8–4.4:1**
-  (light) and **4.4–4.9:1** (dark) instead of the required 4.5:1. It affects
-  `tone.text.primary` on `tone.tonal.primary` and `tone.selected.primary`, which is how a
-  primary tonal `Button`, `IconButton` or selected segment renders its label.
-- The dimmest text step, `text.low`, measures **2.8–3.2:1** (light) and **3.5–4.5:1** (dark)
-  on the authored surfaces.
-- `text.high` and `text.medium` clear AA on every authored surface in both themes.
+The authored palette meets WCAG AA, measured rather than asserted: `bun run test` runs a contrast
+contract over the values in the published `dist/theme.css`, in both themes, covering every
+composition the design language permits — each text role against each surface a component composites
+over, a semantic foreground on its own tint and through its hover and pressed states, an on-colour on
+its strong fill through the filled states, the marks that carry a selection, the error placeholder,
+the non-text tones, and the focus indicator against every surface and every fill an inset ring is
+drawn over. Every composition is simply pass or fail.
 
-Consequences a consumer can rely on:
+The browser gate runs axe-core over the WCAG A/AA tag set with **no rule excluded**, including
+`color-contrast`. The contract exists because a scan cannot see all of it: axe does not evaluate
+`::placeholder` text, and a node it cannot measure is a node a regression can hide in.
 
-- treat primary-on-primary-tint text as emphasis rather than the only carrier of something
-  a user must act on;
-- never place information a user needs in `text.low`;
-- retune `--sui-primary` and `--sui-ink-faint` at the document root if the application
-  requires AA throughout — that is an ordinary supported theme override.
+Two consequences a consumer should know about:
 
-The automated accessibility gate excludes the `color-contrast` rule because of this gap; the
-reason, the numbers and the removal condition are recorded in
-[`DESIGN_LANGUAGE.md`](DESIGN_LANGUAGE.md) §14 and [`VERIFICATION.md`](VERIFICATION.md). The exact
-failing pairings are measured from the published tokens by `bun run test`, so the record cannot
-drift from the artifact. Closing the gap means changing the authored accent and the three-step text
-ladder, which is a visual-language decision tracked separately from component work. Raising the bar
-here is a breaking change to the visual language, not a patch.
+- **there are two text roles, `text.high` and `text.medium`, and both clear 4.5:1** on every surface
+  the library composites over. The dimmest tone is `detail`, which is a **non-text** role: a rail, a
+  gutter, a mark's frame. Nothing readable uses it.
+- **the accents are one step deeper in light mode and one step lighter in dark mode** than the
+  `1.x` line's, because a tonal control's label has to survive being composited over its own tint
+  again while the control is hovered or pressed. Consumers who had retuned only the two tokens the old
+  limitation mentioned — `--sui-primary` and `--sui-ink-faint` — should re-check their override;
+  `--sui-ink-faint` no longer exists and its role is `--sui-detail`.
 
-The complete proposed replacement palette — every token in both themes, the ratios behind each
-value, the affected components and states, and the alternative directions — is
-[`PALETTE_PROPOSAL.md`](PALETTE_PROPOSAL.md). It is a proposal for review: none of its values are
-in force, and this limitation stands until that decision is taken.
+The values, the compositions that constrained them and the alternatives that were measured and
+rejected are recorded in [`PALETTE.md`](PALETTE.md); the rules themselves are
+[`DESIGN_LANGUAGE.md`](DESIGN_LANGUAGE.md) §10 and §14.
 
 ## What keeps the architecture frozen
 

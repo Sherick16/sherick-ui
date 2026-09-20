@@ -7,6 +7,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import selectorParser from "postcss-selector-parser";
 import postcss from "postcss";
 import ts from "typescript";
+import { formatContrastReport, measureContrast } from "./contrast-contract.mjs";
 
 const packageRoot = fileURLToPath(new URL("..", import.meta.url));
 const library = await import("../dist/esm/index.js");
@@ -224,164 +225,21 @@ assert.match(stylesCss, /KaTeX_Main-Regular/);
 assert.match(stylesCss, /@media \(forced-colors: active\)/);
 assert.match(stylesCss, /:where\(\.sui-scope\)\s*\{/,
   "Tailwind runtime plumbing must initialize only explicitly owned nodes");
-assert.match(stylesCss, /:where\(\.sui-scope\)\s*\{/,
-  "Tailwind runtime plumbing must initialize only explicitly owned nodes");
 
 /* ---------------------------------------------------------------------------------------------
    Contrast contract.
 
-   Every pairing the design language requires to be readable is measured from the published token
-   values, in both themes: text against each surface a component composites over, a tinted control's
-   label against its own tint, a filled control's on-colour against its fill, and the focus
-   indicator against every surface. WCAG AA asks 4.5:1 of text and 3:1 of the parts of a control
-   that identify it.
-
-   The automated axe scan cannot cover all of this: it does not evaluate `::placeholder` text, and
-   a node it cannot measure is a node a regression can hide in. What it *does* cover is checked in
-   the browser suite; what can be checked deterministically is checked here, against the artifact
-   the package actually publishes.
-
-   The authored palette does not meet the text requirement for the pairs in `recordedContrastGaps`
-   yet. That gap is recorded in `docs/DESIGN_LANGUAGE.md` §14 and `docs/RELEASE.md`, and closing it
-   is a palette decision rather than a component defect, so exactly those entries are allowed and
-   nothing else. The record is exact in both directions: a new failing pair fails this check, and a
-   pair that starts passing fails it too, so it cannot outlive the gap it describes. Delete it whole
-   when the palette lands.
+   `scripts/contrast-contract.mjs` owns the colour math and the description of the compositions the
+   design system renders; this runs it against the values the package actually publishes. Every
+   composition is simply pass or fail — there is no allowlist, and a regression here is a regression
+   in the published theme.
    --------------------------------------------------------------------------------------------- */
-const oklchChannels = (value) => {
-  const [lightness, chroma, hue] = value.split(/\s+/).map(Number);
-  const radians = (hue * Math.PI) / 180;
-  const a = chroma * Math.cos(radians);
-  const b = chroma * Math.sin(radians);
-  const l = (lightness + 0.3963377774 * a + 0.2158037573 * b) ** 3;
-  const m = (lightness - 0.1055613458 * a - 0.0638541728 * b) ** 3;
-  const s = (lightness - 0.0894841775 * a - 1.291485548 * b) ** 3;
-  return [
-    4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
-    -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
-    -0.0041960863 * l - 0.7034186147 * m + 1.707614701 * s,
-  ];
-};
-/** A token value as an encoded sRGB triple, which is the space a browser composites in. */
-const encodedColor = (value) =>
-  oklchChannels(value).map((channel) => {
-    const encoded = channel <= 0.0031308 ? 12.92 * channel : 1.055 * Math.max(channel, 0) ** (1 / 2.4) - 0.055;
-    return Math.min(1, Math.max(0, encoded));
-  });
-const relativeLuminance = ([red, green, blue]) => {
-  const linear = (channel) => (channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4);
-  return 0.2126 * linear(red) + 0.7152 * linear(green) + 0.0722 * linear(blue);
-};
-const contrastRatio = (foreground, background) => {
-  const [lighter, darker] = [relativeLuminance(foreground), relativeLuminance(background)].sort((a, b) => b - a);
-  return (lighter + 0.05) / (darker + 0.05);
-};
-/** A translucent fill composited over the surface it sits on. */
-const composited = (top, alpha, bottom) => top.map((channel, index) => channel * alpha + bottom[index] * (1 - alpha));
-
-const contrastSurfaces = (variables) => {
-  const token = (name) => encodedColor(variables[`--sui-${name}`]);
-  const canvas = token("canvas");
-  const surface = token("surface");
-  const high = token("surface-high");
-  const float = token("surface-float");
-  return {
-    canvas,
-    "surface 0.42": composited(surface, 0.42, canvas),
-    "surface 0.78": composited(surface, 0.78, canvas),
-    "surface-high 0.56": composited(high, 0.56, canvas),
-    "surface-high 0.66": composited(high, 0.66, canvas),
-    "surface-high 0.72": composited(high, 0.72, canvas),
-    "surface-high 0.82": composited(high, 0.82, canvas),
-    "surface-high 0.90": composited(high, 0.9, canvas),
-    "surface-float 0.86": composited(float, 0.86, canvas),
-    "surface-float 0.90": composited(float, 0.9, canvas),
-    "surface-overlay 0.90": composited(token("surface-overlay"), 0.9, canvas),
-  };
-};
-
-const measureContrast = (variables) => {
-  const token = (name) => encodedColor(variables[`--sui-${name}`]);
-  const surfaces = Object.entries(contrastSurfaces(variables));
-  const nestedAndEngaged = surfaces.filter(([name]) => /surface-high 0\.(56|66|72|82|90)/.test(name));
-  const tinted = (name, alpha) => surfaces.map(([surface, base]) => [surface, composited(token(name), alpha, base)]);
-
-  const pairs = [
-    ["text.high on every authored surface", 4.5, surfaces.map(([where, bg]) => [where, token("ink"), bg])],
-    ["text.medium on every authored surface", 4.5, surfaces.map(([where, bg]) => [where, token("ink-muted"), bg])],
-    ["text.low on every authored surface", 4.5, surfaces.map(([where, bg]) => [where, token("ink-faint"), bg])],
-    ["tone.text.primary on tone.tonal.primary", 4.5, tinted("primary", 0.12).map(([where, bg]) => [where, token("primary"), bg])],
-    ["tone.text.danger on tone.soft.danger", 4.5, tinted("danger", 0.09).map(([where, bg]) => [where, token("danger"), bg])],
-    ["tone.text.warning on tone.soft.warning", 4.5, tinted("warning", 0.09).map(([where, bg]) => [where, token("warning"), bg])],
-    ["tone.text.success on tone.soft.success", 4.5, tinted("success", 0.09).map(([where, bg]) => [where, token("success"), bg])],
-    [
-      "semantic copy in a nested or engaged field",
-      4.5,
-      nestedAndEngaged.flatMap(([where, bg]) =>
-        ["danger", "warning", "success"].map((role) => [`${role} on ${where}`, token(role), bg])
-      ),
-    ],
-    ["the selected mark on tone.selected.primary", 3, tinted("primary", 0.22).map(([where, bg]) => [where, token("primary"), bg])],
-    [
-      "an on-colour on its strong fill",
-      4.5,
-      [
-        ["primary", "primary-strong"],
-        ["danger", "danger"],
-        ["warning", "warning"],
-        ["success", "success"],
-      ].map(([role, fill]) => [`on-${role} on ${fill}`, token(`on-${role}`), token(fill)]),
-    ],
-    [
-      "the error placeholder on the invalid field",
-      4.5,
-      ["canvas", "surface 0.78"].flatMap((base) =>
-        [0.075, 0.13].map((alpha) => [
-          `danger on its ${alpha} fill over ${base}`,
-          token("danger"),
-          composited(token("danger"), alpha, contrastSurfaces(variables)[base]),
-        ])
-      ),
-    ],
-    ["the focus indicator on every authored surface", 3, surfaces.map(([where, bg]) => [where, token("focus"), bg])],
-  ];
-
-  return pairs.map(([name, target, checks]) => {
-    const worst = checks.reduce(
-      (lowest, [where, foreground, background]) => {
-        const ratio = contrastRatio(foreground, background);
-        return ratio < lowest.ratio ? { ratio, where } : lowest;
-      },
-      { ratio: Number.POSITIVE_INFINITY, where: "" }
-    );
-    return { name, target, ratio: worst.ratio, where: worst.where, pass: worst.ratio >= target };
-  });
-};
-
-const recordedContrastGaps = [
-  "dark:text.low on every authored surface",
-  "light:semantic copy in a nested or engaged field",
-  "light:text.low on every authored surface",
-  "light:the error placeholder on the invalid field",
-  "light:tone.text.danger on tone.soft.danger",
-  "light:tone.text.primary on tone.tonal.primary",
-  "light:tone.text.success on tone.soft.success",
-  "light:tone.text.warning on tone.soft.warning",
-];
-
-const measuredContrast = [
-  ...measureContrast(lightVariables).map((pair) => ({ theme: "light", ...pair })),
-  ...measureContrast(darkVariables).map((pair) => ({ theme: "dark", ...pair })),
-];
+const contrastResults = measureContrast({ light: lightVariables, dark: darkVariables });
+const contrastFailures = contrastResults.filter((result) => !result.pass);
 assert.deepEqual(
-  measuredContrast.filter((pair) => !pair.pass).map((pair) => `${pair.theme}:${pair.name}`).sort(),
-  [...recordedContrastGaps].sort(),
-  `contrast against the published tokens:\n${measuredContrast
-    .map(
-      (pair) =>
-        `  ${pair.pass ? "ok  " : "FAIL"} ${pair.theme}:${pair.name} — ${pair.ratio.toFixed(2)}:1 on ${pair.where} (target ${pair.target})`
-    )
-    .join("\n")}`
+  contrastFailures.map((result) => `${result.theme}:${result.id}`),
+  [],
+  `contrast against the published tokens:\n${formatContrastReport(contrastResults)}`
 );
 
 const stylesRoot = postcss.parse(stylesCss);

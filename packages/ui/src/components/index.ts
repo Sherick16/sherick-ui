@@ -61,7 +61,7 @@ export type { DialogDescriptionProps } from "./DialogDescription";
 export type { DialogFooterProps } from "./DialogFooter";
 export type { DialogHeaderProps } from "./DialogHeader";
 export type { MenuContentProps, MenuItemProps, MenuProps, MenuSeparatorProps } from "./Menu";
-export type { NavGroupItem, NavGroupProps } from "./NavGroup";
+export type { NavGroupHeadingLevel, NavGroupItem, NavGroupProps } from "./NavGroup";
 export type { NavItemProps } from "./NavItem";
 export type { PopoverContentProps, PopoverProps } from "./Popover";
 export type { ProgressProps } from "./Progress";

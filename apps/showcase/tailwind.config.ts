@@ -9,7 +9,7 @@ const colorNames = [
   "surface-overlay",
   "ink",
   "ink-muted",
-  "ink-faint",
+  "detail",
   "primary",
   "primary-strong",
   "primary-soft",

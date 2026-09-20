@@ -96,3 +96,22 @@ test("a combobox names itself through `id`, and its callbacks keep Base's event 
 
   expect(errors).toEqual([]);
 });
+
+/* A reusable navigation group cannot know where it sits in the host document's heading hierarchy,
+   so the level is the consumer's to choose — and the default is only a default. */
+test("a navigation group takes the heading level its document needs", async ({ page, errors }) => {
+  await page.goto("/verification/interactions");
+  await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
+
+  /* The fixture places its group under the page's own h1, so it asks for level 2. */
+  await expect(page.getByRole("heading", { level: 2, name: "Sections" })).toHaveCount(1);
+  await expect(page.getByRole("heading", { level: 3, name: "Sections" })).toHaveCount(0);
+
+  /* The rows it labels are destinations, not controls: each one is a link, and the current one says
+     so on itself rather than by tone alone. */
+  const group = page.getByTestId("nav-group");
+  await expect(group.getByRole("link")).toHaveCount(3);
+  await expect(group.getByRole("link", { name: "Current section" })).toHaveAttribute("aria-current", "page");
+
+  expect(errors).toEqual([]);
+});

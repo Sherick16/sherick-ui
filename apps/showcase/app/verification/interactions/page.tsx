@@ -135,6 +135,7 @@ export default function VerificationInteractionsPage() {
             emphasis and `aria-current` together rather than by colour alone. */}
         <div data-testid="nav-group" className="max-w-xs">
           <NavGroup
+            headingLevel={2}
             title="Sections"
             activeHref="#nav-group-current"
             items={[

@@ -3,8 +3,8 @@ import { expect, test, type Page } from "./fixtures";
 
 const WCAG_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"];
 
-/* Every other rule is enabled as normal, so a regression names both the broken rule and
-   where it lives. */
+/* Every rule in the tag set is enabled: the gate has no authored-palette exception, and the
+   contrast contract in `bun run test` is what keeps the theme able to satisfy it. */
 const expectNoA11yViolations = async (page: Page) => {
   /* Base UI wires every generated ARIA relationship on the client: the server-rendered shell
      carries none of them, so a field that is named a moment later looks unnamed to a scan that
@@ -13,17 +13,7 @@ const expectNoA11yViolations = async (page: Page) => {
      component on the page could satisfy while the component under test is still bare. */
   await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
 
-  const results = await new AxeBuilder({ page })
-    .withTags(WCAG_TAGS)
-    /* `color-contrast` is excluded deliberately, not to make a red run green. The default
-       palette does not meet WCAG AA text contrast, and closing that gap means retuning
-       authored token values and the documented text hierarchy — a palette decision that
-       does not belong in a hardening change. The measured gap, its token pairs and the
-       follow-up decision are recorded in docs/DESIGN_LANGUAGE.md §14 and docs/RELEASE.md.
-       Structural rules — names, roles, relationships, focus visibility, form semantics —
-       stay fully enforced here. */
-    .disableRules(["color-contrast"])
-    .analyze();
+  const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
   const summary = results.violations
     .map(
       (violation) =>

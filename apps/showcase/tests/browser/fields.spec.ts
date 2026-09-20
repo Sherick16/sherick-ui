@@ -1,4 +1,4 @@
-import { expect, test } from "./fixtures";
+import { expect, test, type Page } from "./fixtures";
 
 test.beforeEach(async ({ page }) => {
   await page.goto("/verification/interactions");
@@ -421,6 +421,53 @@ test("NumberField types, steps and stops at its bounds", async ({ page, errors }
     (element) => getComputedStyle(element, "::before").opacity
   );
   expect(Number(restingLayerOpacity)).toBe(0);
+
+  expect(errors).toEqual([]);
+});
+
+/* An unchecked box and an unselected radio have no fill of their own to identify them: the matte
+   step and the recessed lip sit within a couple of percent of the surface around them, which is
+   well under the 3:1 WCAG asks of the information that identifies a component. What closes that gap
+   is the shared non-text detail rim, so this reads the *rendered* rim — its width, and the colour it
+   actually paints — against the theme's own resolved tokens rather than against a class name. */
+test("a resting selection mark draws its boundary in the non-text detail tone", async ({ page, errors }) => {
+  await page.goto("/verification/interactions");
+  await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
+
+  const readRim = (locator: ReturnType<Page["locator"]>) =>
+    locator.evaluate((element) => {
+      const rim = getComputedStyle(element, "::after");
+      const resolved = (name: string) => {
+        const probe = document.createElement("div");
+        probe.style.color = `oklch(var(${name}))`;
+        document.body.appendChild(probe);
+        const value = getComputedStyle(probe).color;
+        probe.remove();
+        return value;
+      };
+      return {
+        width: Number.parseFloat(rim.borderTopWidth),
+        colour: rim.borderTopColor,
+        detail: resolved("--sui-detail"),
+        style: rim.borderTopStyle,
+      };
+    });
+
+  for (const [name, locator] of [
+    ["an unchecked box", page.locator('button[role="checkbox"][aria-checked="false"] span[aria-hidden="true"]').first()],
+    ["an unselected radio", page.locator('[role="radio"][aria-checked="false"] span[aria-hidden="true"]').first()],
+  ] as const) {
+    await locator.scrollIntoViewIfNeeded();
+    const rim = await readRim(locator);
+    expect(rim.style, `${name} draws a boundary`).not.toBe("none");
+    expect(rim.width, `${name}'s boundary is visible on a 1x display`).toBeGreaterThanOrEqual(2);
+    expect(rim.colour, `${name} draws it in the detail tone`).toBe(rim.detail);
+  }
+
+  /* The rim belongs to the resting fill: a mark that holds a value is identified by that fill. */
+  const checked = page.locator('button[role="checkbox"][aria-checked="true"] span[aria-hidden="true"]').first();
+  const checkedRim = await readRim(checked);
+  expect(checkedRim.colour, "a filled mark's rim takes its own fill").not.toBe(checkedRim.detail);
 
   expect(errors).toEqual([]);
 });

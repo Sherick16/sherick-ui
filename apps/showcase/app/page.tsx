@@ -65,6 +65,7 @@ import { CodeBlock, Markdown } from "sherick-ui/content";
 import {
   cn,
   density,
+  detail,
   edge,
   elevation,
   focusRing,
@@ -239,7 +240,12 @@ export default function Home() {
                   <div className="space-y-2">
                     <p className={cn("text-sm", text.high)}>High emphasis</p>
                     <p className={cn("text-sm", text.medium)}>Medium emphasis</p>
-                    <p className={cn("text-sm", text.low)}>Low emphasis</p>
+                    {/* The dimmest tone is furniture rather than a third text step: it draws a rail,
+                        a gutter or a mark's frame, and never a line anyone has to read. */}
+                    <div className={cn("flex items-center gap-3 py-1")}>
+                      <span aria-hidden="true" className={cn("h-0 w-10 border-t-2", detail.mark)} />
+                      <span className={cn("text-xs", text.medium)}>Detail — a non-text tone</span>
+                    </div>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     <Badge variant="primary">Soft primary</Badge>
@@ -257,7 +263,7 @@ export default function Home() {
                   <Tile label="Hover" className={cn(material.control, "bg-sherick-surface-high/[0.82]", text.high)} />
                   <Tile label="Pressed" className={cn(material.control, text.high, stateLayer.tonal, "before:opacity-[0.15]")} />
                   <Tile label="Selected" className={cn(shape.control, tone.selected.primary)} />
-                  <Tile label="Disabled" className={cn(material.control, state.disabled)} />
+                  <Tile label="Disabled" disabled className={cn(material.control, state.disabled)} />
                   <Tile label="Focus" className={cn(material.control, text.high, "outline outline-2 outline-sherick-focus outline-offset-[3px]")} />
                 </div>
               </Specimen>
@@ -826,15 +832,30 @@ function Specimen({ title, className = "", children }: { title: string; classNam
   );
 }
 
-function Tile({ label, caption, className, testId }: { label?: string; caption?: string; className?: string; testId?: string }) {
+function Tile({
+  label,
+  caption,
+  className,
+  testId,
+  disabled = false,
+}: {
+  label?: string;
+  caption?: string;
+  className?: string;
+  testId?: string;
+  /** A specimen of the disabled state is an inactive control, so it is rendered as one. */
+  disabled?: boolean;
+}) {
+  const Surface = disabled ? "button" : "div";
   return (
     <div className="flex flex-col gap-2">
-      <div
-        data-testid={label ? `tile-${label.toLowerCase().replace(/\s+/g, "-")}` : undefined}
+      <Surface
+        {...(disabled ? { type: "button" as const, disabled: true } : {})}
+        data-testid={testId ?? (label ? `tile-${label.toLowerCase().replace(/\s+/g, "-")}` : undefined)}
         className={cn("flex min-h-20 items-center justify-center px-4 text-sm", shape.control, className)}
       >
         {label}
-      </div>
+      </Surface>
       {caption ? <div className={cn("text-xs font-medium", text.high)}>{caption}</div> : null}
     </div>
   );
@@ -1005,7 +1026,7 @@ function MotionSpecimen() {
 
       <MotionStage label="activity">
         <div className="flex items-center gap-3">
-          <span aria-hidden="true" className={cn("size-4 rounded-full border-2 border-sherick-ink-faint border-t-transparent", motionActivitySpin)} />
+          <span aria-hidden="true" className={cn("size-4 rounded-full border-2 border-sherick-detail border-t-transparent", motionActivitySpin)} />
           <span aria-hidden="true" className={cn("h-4 w-10", shape.pill, material.matteHigh, motionActivityPulse)} />
           <span aria-hidden="true" className={cn("relative block h-1.5 w-10 overflow-hidden", shape.pill, elevation.recessed, material.matteHigh)}>
             <span className={cn("absolute inset-y-0 w-1/2", shape.pill, tone.strong.primary, motionActivityIndeterminate)} />

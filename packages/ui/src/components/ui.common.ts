@@ -462,13 +462,28 @@ export const overlay = {
   sheet: /* @__PURE__ */ cx(shape.sheet, material.acrylicHero, elevation.floating),
 } as const;
 
-/* Text hierarchy — three steps, no more. High emphasis carries labels and values,
-   medium emphasis carries supporting copy, low emphasis carries the dimmest
-   furniture such as gutters and hints. */
+/* Text hierarchy — two roles, because only two can carry readable text. High emphasis carries
+   labels and values, medium emphasis carries supporting copy, descriptions and placeholders. Both
+   clear 4.5:1 on every surface the library composites over, in both themes.
+   
+   There is deliberately no third text step. A third step would have to sit between `medium` and
+   the dimmest tone a surface allows, and at these surfaces the value that clears 4.5:1 collapses
+   into `ink-muted` — a step that measures the same as the one above it is not a hierarchy, it is a
+   role pretending to be one. The dimmest tone is a *non-text* role instead (see `detail` below). */
 export const text = {
   high: "text-sherick-ink",
   medium: "text-sherick-ink-muted",
-  low: "text-sherick-ink-faint",
+} as const;
+
+/* Detail — the non-text furniture tone: a gutter, a rail, a mark's frame, secondary graphical
+   detail that carries meaning without being read. It answers to the 3:1 non-text requirement on
+   every surface it is permitted on, and it is never a foreground for text: a hint, a placeholder,
+   a line number or any other readable step uses `text.medium`. */
+export const detail = {
+  /** A mark's own frame, or a rail drawn as a line. */
+  mark: "border-sherick-detail",
+  /** The same tone as a block, for a gutter or a rail with thickness. */
+  fill: "bg-sherick-detail",
 } as const;
 
 /* A list surface — the sheet a collection of rows sits in, and the two row densities it can
@@ -493,11 +508,22 @@ export const text = {
    performed", never "cannot be found". */
 export const list = {
   sheet: "max-w-[var(--available-width)] max-h-[var(--available-height)] overflow-y-auto",
-  /* A row in a selection list: one line, read one at a time and chosen. */
+  /* A row in a selection list: one line, read one at a time and chosen.
+     The row carries two separate things that both have to be visible. Its *navigation highlight*
+     is the state layer — one tone shared with the pointer, because a row under the pointer and a
+     row under the arrow keys are the same thing happening. Its *focus treatment* is the shared
+     inset ring, and it is gated on `:focus-visible`, which is what separates the two cases: Base
+     gives the active row real DOM focus, and the platform reports that focus as visible when the
+     keyboard put it there and not when a pointer did. So a pointer that opens a list and moves
+     over a row gets the highlight and no ring, a keyboard that opens one and steps down it gets
+     both, a selected row keeps its selection tint under the ring, and a disabled-but-navigable
+     row still shows where the navigation is while saying it cannot be used. The ring is inset
+     because the row lives inside the sheet it belongs to, as a segment does in its track. */
   option: /* @__PURE__ */ cx(
     "flex w-full items-center justify-between gap-4 px-4 py-3 text-left text-sm outline-none",
     shape.control,
     motionFeedback,
+    focusRingInset,
     text.high,
     stateLayer.quiet,
     stateLayer.activeRow,
@@ -511,6 +537,7 @@ export const list = {
     "flex w-full items-center gap-3 px-3 py-2 text-left text-sm outline-none",
     shape.row,
     motionFeedback,
+    focusRingInset,
     text.high,
     stateLayer.quiet,
     stateLayer.activeRow,
@@ -612,9 +639,26 @@ export const tone = {
    ticked, which is why the second attribute stands beside the first. */
 export const selectable = {
   surface: /* @__PURE__ */ cx("relative", elevation.recessed, motionFeedback),
-  rest: /* @__PURE__ */ cx(material.matteHigh, text.medium),
+  /* The resting fill cannot identify the control by itself. Measured from rendered pixels, the
+     matte step and the recessed lip carry about 1.1:1 against the surface around them — the fill
+     step and the light both sit within a couple of percent of their neighbours, which is the
+     whole point of the matte ladder and nowhere near the 3:1 WCAG asks of the information that
+     identifies a component.
+     The cue that closes the gap is the non-text `detail` tone drawn as a rim *inside* the box, as
+     a pseudo-element rather than a border or an outline: a border would grow a mark in a
+     content-box flow (the library ships no reset and cannot assume the host sets `border-box`),
+     and an outline is already spoken for by the focus ring, which would replace the rim exactly
+     while the keyboard is on the control. The pseudo-element takes `rounded-[inherit]` so it
+     follows every shape role the mark is given, and it sits above the state layer so the rim
+     stays crisp while the pointer is on the mark. */
+  rest: /* @__PURE__ */ cx(
+    material.matteHigh,
+    text.medium,
+    "after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:border-2 after:border-sherick-detail after:content-['']"
+  ),
+  /* A filled mark is identified by its own fill, so its rim takes that fill and disappears. */
   selected:
-    "group-data-[checked]:bg-sherick-primary-strong group-data-[checked]:text-sherick-on-primary",
+    "group-data-[checked]:bg-sherick-primary-strong group-data-[checked]:text-sherick-on-primary group-data-[checked]:after:border-sherick-primary-strong",
   indeterminate:
-    "group-data-[indeterminate]:bg-sherick-primary-strong group-data-[indeterminate]:text-sherick-on-primary",
+    "group-data-[indeterminate]:bg-sherick-primary-strong group-data-[indeterminate]:text-sherick-on-primary group-data-[indeterminate]:after:border-sherick-primary-strong",
 } as const;
