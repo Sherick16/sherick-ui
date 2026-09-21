@@ -9,7 +9,6 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "test:browser": "playwright test",
-    "test:browser:dev": "PLAYWRIGHT_BASE_URL=http://127.0.0.1:3000 playwright test",
     "lint": "eslint ."
   },
   "dependencies": {

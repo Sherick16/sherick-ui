@@ -158,10 +158,9 @@ palette-only change is inside that tolerance.)
 
 `bun run test:browser` runs two browser suites.
 
-For focused iteration, `bun --filter @sherick-ui/showcase test:browser:dev` points Playwright at the
-already-running `next dev` server (`bun run dev`, :3000) and skips its own production server, so a
-single spec can be re-run without rebuilding the showcase. `bun run test:browser` remains the gate:
-it builds and serves the production artifact, and only that run is verification.
+For focused iteration, `bunx playwright test <spec> -g "<name>"` (from `apps/showcase`) reuses the
+already-built production server, so a test-only change needs no rebuild. `bun run test:browser`
+remains the gate, and `bun run verify` is the run that builds the artifact it serves.
 
 ### Next showcase
 
