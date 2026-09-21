@@ -78,7 +78,7 @@ const PopoverContent = ({
       >
         <BasePopover.Popup
           className={cn(
-            "w-max max-w-[min(24rem,var(--available-width))] max-h-[var(--available-height)] overflow-y-auto p-5",
+            "w-max max-w-[min(24rem,var(--available-width))] max-h-[var(--available-height)] overflow-y-auto p-5 [overflow-wrap:anywhere]",
             overlay.popup,
             motionPresenceAnchored,
             className

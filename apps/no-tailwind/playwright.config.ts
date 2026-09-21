@@ -5,6 +5,11 @@ export default defineConfig({
   timeout: 30_000,
   fullyParallel: false,
   workers: 1,
+  projects: [
+    { name: "chromium", use: { browserName: "chromium" } },
+    { name: "firefox", testMatch: /hostile\.spec\.ts/, use: { browserName: "firefox" } },
+    { name: "webkit", testMatch: /hostile\.spec\.ts/, use: { browserName: "webkit", launchOptions: { executablePath: process.env.WEBKIT_EXECUTABLE_PATH } } },
+  ],
   use: {
     baseURL: "http://127.0.0.1:4173",
     browserName: "chromium",

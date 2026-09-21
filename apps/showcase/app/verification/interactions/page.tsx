@@ -33,7 +33,7 @@ import {
   useToast,
   type DrawerSide,
 } from "sherick-ui";
-import { BaseDirectionProvider } from "sherick-ui/dev";
+import { DirectionProvider } from "sherick-ui";
 
 const projectOptions = [
   { label: "Design system", value: "design" },
@@ -428,7 +428,7 @@ export default function VerificationInteractionsPage() {
             declare the direction to Base and rely on the document's `dir` for the CSS, which is
             the pair a real right-to-left application sets; the browser suite drives both. */}
         {(["ltr", "rtl"] as const).map((direction) => (
-          <BaseDirectionProvider key={direction} direction={direction}>
+          <DirectionProvider key={direction} direction={direction}>
             <div data-testid={`logical-sides-${direction}`} className="flex flex-wrap items-center gap-4">
               {(["inline-start", "inline-end"] as const).map((side) => (
                 <Popover key={side}>
@@ -449,7 +449,7 @@ export default function VerificationInteractionsPage() {
                 </Popover>
               ))}
             </div>
-          </BaseDirectionProvider>
+          </DirectionProvider>
         ))}
 
         <div className="flex flex-wrap items-center gap-4">

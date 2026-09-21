@@ -10,6 +10,7 @@ import React, {
 import { cn } from "@/libs/utils";
 import {
   density,
+  fieldLayout,
   focusRing,
   material,
   shape,
@@ -44,7 +45,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
   }, ref) => {
     return (
       <Field.Root
-        className={cn("flex w-full flex-col", className)}
+        className={cn(fieldLayout, className)}
         name={name}
         disabled={disabled}
         invalid={error}
@@ -65,7 +66,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           onValueChange={onValueChange}
           className={cn(
             density.normal,
-            "w-full px-5 py-3",
+            "min-w-0 w-full px-5 py-3",
             shape.control,
             motionFeedback,
             focusRing,

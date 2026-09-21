@@ -140,7 +140,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(({
                20px a mark's box then sits from the edge — 12px of padding plus the 8px each `density.part`
                holds around its 20px glyph — is the same 20px the input's own leading padding uses, so the
                field reads with one inset at both ends. */
-            "group/field flex w-full items-center ps-5 pe-3",
+            "group/field flex min-w-0 w-full items-center ps-5 pe-3",
             density.normal,
             shape.control,
             material.control,

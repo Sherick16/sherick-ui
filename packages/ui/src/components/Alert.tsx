@@ -48,7 +48,7 @@ export const Alert = ({
     <div
       role={variant === "danger" || variant === "warning" ? "alert" : "status"}
       className={cn(
-        "flex items-start gap-3 px-4 py-3.5",
+        "flex min-w-0 items-start gap-3 px-4 py-3.5 [overflow-wrap:anywhere]",
         shape.control,
         tone.soft[variant],
         text.high,

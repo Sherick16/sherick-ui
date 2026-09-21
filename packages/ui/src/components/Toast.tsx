@@ -244,7 +244,8 @@ export const ToastProvider = ({ children, manager, ...props }: ToastProviderProp
 /**
  * The stack, and the only place a toast is rendered. Put one inside `ToastProvider` at the root of
  * the application: `useToast().add(...)` raises a toast, and this renders every toast the manager
- * is holding.
+ * is holding. Base provides F6 entry and focus restoration; the live region remains available
+ * while a modal is open. Keep the keyboard shortcut discoverable without reimplementing it.
  */
 export const ToastViewport = ({ position = "bottom-end", className }: ToastViewportProps) => {
   const { toasts } = BaseToast.useToastManager();
@@ -253,9 +254,10 @@ export const ToastViewport = ({ position = "bottom-end", className }: ToastViewp
   return (
     <BaseToast.Portal>
       <BaseToast.Viewport
+        aria-keyshortcuts="F6"
         className={cn(
-          "fixed flex w-[calc(100vw-2rem)] flex-col sm:w-[22.5rem]",
-          stacking.float,
+          "fixed flex w-[calc(100%-3rem)] flex-col sm:w-[22.5rem]",
+          stacking.notification,
           geometry.viewport,
           className
         )}
@@ -299,7 +301,7 @@ export const ToastViewport = ({ position = "bottom-end", className }: ToastViewp
                   what a peek is. */}
               <BaseToast.Content
                 className={cn(
-                  "flex items-start gap-3 p-4",
+                  "flex max-h-[calc(100dvh-3rem)] items-start gap-3 overflow-y-auto overscroll-contain p-4 [overflow-wrap:anywhere]",
                   motionFeedback,
                   "data-[behind]:opacity-0 data-[expanded]:opacity-100"
                 )}

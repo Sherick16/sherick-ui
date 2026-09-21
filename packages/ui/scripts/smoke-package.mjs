@@ -33,6 +33,7 @@ for (const exportName of [
   "Collapsible",
   "Combobox",
   "Dialog",
+  "DirectionProvider",
   "Divider",
   "Drawer",
   "Field",

@@ -330,3 +330,16 @@ The architecture stays frozen as long as these three things stay true:
 If any one of them stops being true, the freeze described in
 [`ARCHITECTURE.md`](ARCHITECTURE.md) no longer holds and this document must be revised with
 it.
+
+## Phase C additions
+
+The core barrel also exports `DirectionProvider` and `DirectionProviderProps`: a DOM-free
+provider accepting `direction: "ltr" | "rtl"` and `children`. RTL applications pair it with
+`<html dir="rtl">`; changing locale updates both. It delegates to the existing behavior
+substrate rather than implementing directional keyboard navigation locally. Consumers do not
+import Base UI or the removed workbench-only `BaseDirectionProvider` export. Drawer sides
+remain physical and CodeBlock remains LTR.
+
+The stress pass adds no package subpath, theme system or motion owner. Notification stacking
+is now explicit in the design language because the persistent toast portal can precede the
+modal that raises a notification. See `docs/HOSTILE_LAYOUT.md` for the evidence and limits.

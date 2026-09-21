@@ -10,7 +10,7 @@ import {
   useToast, type DrawerSide,
 } from "sherick-ui";
 import { CodeBlock } from "sherick-ui/content";
-import { BaseDirectionProvider } from "sherick-ui/dev";
+import { DirectionProvider } from "sherick-ui";
 
 const options = [
   { value: "one", label: "Workspace" },
@@ -29,7 +29,7 @@ export default function VisualConsistencyPage() {
   const [side, setSide] = useState<DrawerSide>("right");
   const [sheet, setSheet] = useState(false);
   return (
-    <BaseDirectionProvider direction={direction}>
+    <DirectionProvider direction={direction}>
       <ToastProvider>
         {/* A locale change mounts a fresh catalog: Base owns layout measurements, including tabs. */}
         <main key={direction} dir={direction} className="min-h-screen space-y-10 bg-sherick-canvas p-6 text-sherick-ink sm:p-10">
@@ -103,7 +103,7 @@ export default function VisualConsistencyPage() {
         </main>
         <ToastViewport />
       </ToastProvider>
-    </BaseDirectionProvider>
+    </DirectionProvider>
   );
 }
 

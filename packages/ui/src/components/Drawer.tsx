@@ -84,21 +84,18 @@ const DrawerTrigger = ({ ...props }: DrawerTriggerProps) => <BaseDialog.Trigger 
  */
 const DrawerContent = ({ children, className }: DrawerContentProps) => {
   const side = useContext(SideContext);
-  const popupRef = useRef<HTMLDivElement | null>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null);
 
   return (
-    /* The sheet focuses its own surface rather than its first control: a sheet's content is read
-       before it is acted on, and its close control is not the reason it opened. */
+    /* Focus the reading region, so native PageDown/Space scroll the sheet before a control
+       has been visited. Base still owns initial focus and the focus trap. */
     <DialogSurface
       attachment={side}
       className={cn(className)}
-      popupRef={popupRef}
-      initialFocus={popupRef}
+      initialFocus={contentRef}
     >
       <DialogDismiss label="Close" />
-      {/* The sheet scrolls as one region rather than growing: its own edge is clamped to the
-          viewport, so a long sheet is read by scrolling it. */}
-      <div className={cn("flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain")}>
+      <div ref={contentRef} tabIndex={-1} className={cn("flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain outline-none")}>
         {children}
       </div>
     </DialogSurface>
@@ -123,7 +120,7 @@ const DrawerDescription = ({ children, className }: DrawerDescriptionProps) => (
 
 /* Actions stay on the sheet's own surface: no divider, no second layer. */
 const DrawerFooter = ({ children, className }: DrawerFooterProps) => (
-  <div className={cn("mt-auto flex items-center justify-end gap-3 px-6 pb-6 pt-4 sm:px-7", className)}>
+  <div className={cn("mt-auto flex flex-wrap items-center justify-end gap-3 px-6 pb-6 pt-4 sm:px-7", className)}>
     {children}
   </div>
 );

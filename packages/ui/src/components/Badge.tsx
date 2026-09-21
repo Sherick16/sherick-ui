@@ -20,7 +20,7 @@ const Badge = ({
     <span
       {...props}
       className={cn(
-        "inline-flex min-h-7 items-center justify-center gap-1.5 px-3 py-1 text-xs font-semibold",
+        "inline-flex min-h-7 min-w-0 max-w-full items-center justify-center gap-1.5 px-3 py-1 text-xs font-semibold",
         shape.pill,
         tone.soft[variant],
         text.high,
@@ -34,7 +34,7 @@ const Badge = ({
           {icon}
         </span>
       )}
-      {children}
+      <span className={cn("min-w-0 truncate")}>{children}</span>
     </span>
   );
 };

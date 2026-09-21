@@ -24,7 +24,7 @@ const Tooltip = ({ children, content, className, position = "bottom" }: TooltipP
           <BaseTooltip.Positioner side={position} sideOffset={8} className={cn(stacking.float)}>
             <BaseTooltip.Popup
               className={cn(
-                "w-max max-w-64 whitespace-normal px-3 py-2 text-xs leading-5",
+                "w-max max-w-[min(16rem,var(--available-width))] whitespace-normal px-3 py-2 text-xs leading-5 [overflow-wrap:anywhere]",
                 overlay.tooltip,
                 text.high,
                 motionPresenceTooltip

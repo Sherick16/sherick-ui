@@ -116,18 +116,15 @@ export default function VerificationResponsivePage() {
             <Chip value="code">Code</Chip>
           </ChipGroup>
 
-          {/* A segmented control never wraps, so the wrapper scrolls it rather than the page. */}
-          <div className="overflow-x-auto">
-            <SegmentedControl
-              aria-label="Narrow range"
-              defaultValue="week"
-              options={[
-                { value: "day", label: "Day" },
-                { value: "week", label: "Week" },
-                { value: "month", label: "Month" },
-              ]}
-            />
-          </div>
+          <SegmentedControl
+            aria-label="Narrow range"
+            defaultValue="week"
+            options={[
+              { value: "day", label: "Day" },
+              { value: "week", label: "Week" },
+              { value: "month", label: "Month" },
+            ]}
+          />
 
           <Progress value={40} label="Narrow progress" locale="en-US" />
 
