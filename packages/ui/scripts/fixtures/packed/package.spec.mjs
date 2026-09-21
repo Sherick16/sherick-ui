@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 
 // Register before navigation: a post-hydration listener would miss the package defect.
 let errors;
@@ -35,7 +36,7 @@ test("no-reset CSS, consumer ownership, and className overrides", async ({ page 
   })).toEqual(["96px", "0px", "0px", "0px", "static", "visible", "1"]);
   await override.hover();
   await expect.poll(() => style(override, "opacity")).toBe("0.5");
-  const select = page.getByRole("combobox", { name: "Project" });
+  const select = page.getByRole("combobox", { name: "Project", exact: true });
   expect(await style(select, "padding")).toBe("0px");
   expect(await style(select, "borderRadius")).toBe("0px");
   expect(await style(page.locator("#slider-root"), "width")).toBe("180px");
@@ -44,6 +45,28 @@ test("no-reset CSS, consumer ownership, and className overrides", async ({ page 
   await expect(page.getByRole("checkbox", { name: "Accept" })).not.toBeChecked();
   await page.getByRole("switch", { name: "Enabled" }).click();
   await expect(page.getByRole("switch", { name: "Enabled" })).not.toBeChecked();
+});
+
+test("packed editable Combobox isolates hidden content without becoming modal", async ({ page }) => {
+  const searchable = page.getByRole("combobox", { name: "Search project" });
+  const outsideButton = page.locator("#primary");
+  await expect(outsideButton).toHaveAttribute("tabindex", "0");
+
+  await searchable.click();
+  await expect(page.getByRole("option", { name: "Dashboard" })).toBeVisible();
+  await expect(outsideButton).toHaveAttribute("tabindex", "-1");
+  const results = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+    .analyze();
+  expect(results.violations).toEqual([]);
+
+  await page.keyboard.press("Escape");
+  await expect(outsideButton).toHaveAttribute("tabindex", "0");
+
+  await searchable.click();
+  await expect(page.getByRole("option", { name: "Dashboard" })).toBeVisible();
+  await outsideButton.click();
+  await expect(page.getByRole("option", { name: "Dashboard" })).toHaveCount(0);
 });
 
 test("document themes and overrides reach styled portals", async ({ page }) => {
@@ -71,12 +94,12 @@ test("document themes and overrides reach styled portals", async ({ page }) => {
   expect(await dialog.evaluate(el => getComputedStyle(el).getPropertyValue("--sui-surface-overlay").trim())).toBe("0.4 0.1 145");
   await page.locator("#portal-primary").click();
   await expect(dialog).toBeHidden();
-  await page.getByRole("combobox", { name: "Project" }).click();
+  await page.getByRole("combobox", { name: "Project", exact: true }).click();
   const option = page.getByRole("option", { name: "Two" });
   await expect(option).toBeVisible();
   expect(await style(option, "borderRadius")).not.toBe("0px");
   await option.click();
-  await expect(page.getByRole("combobox", { name: "Project" })).toHaveText("Two");
+  await expect(page.getByRole("combobox", { name: "Project", exact: true })).toHaveText("Two");
   await page.getByRole("button", { name: "Popup", exact: true }).click();
   await expect(page.getByText("Package popup")).toBeVisible();
   await page.keyboard.press("Escape");

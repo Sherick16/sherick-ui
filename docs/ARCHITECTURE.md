@@ -15,6 +15,31 @@ Application workspaces consume `sherick-ui`; library source must never import Ne
 
 The showcase consumes `sherick-ui` through package exports. Its only privileged surface is `sherick-ui/dev`, an explicitly unstable development-only export that hands the workbench the shared visual and motion recipes plus the `cn()` helper; production consumers must not depend on that subpath.
 
+### Audited Base UI dependency
+
+Base UI remains the sole owner of generic widget mechanics, but the exact implementation is now part
+of the publishable artifact. `@base-ui/react@1.8.0` has an upstream editable-Combobox isolation
+defect ([mui/base-ui#5528](https://github.com/mui/base-ui/issues/5528)): its floating focus manager
+applies `aria-hidden` around an open non-modal listbox without taking focusable descendants out of
+sequential navigation. Sherick carries a version-specific Bun patch to Base's existing `markOthers`
+authority. When that authority applies `aria-hidden`, the patch temporarily sets focusable descendants
+to `tabindex="-1"`, restores their original values on balanced cleanup, and deliberately does not use
+`inert`, so outside pointer interaction remains available.
+
+This is a dependency patch, not a second focus manager or a component-local state mirror. Components
+still import Base primitives directly from their public subpaths, and Base still owns open state, focus,
+ARIA isolation, dismissal and popup lifecycle. The patch ports the `inertOthers` behavior of the
+`aria-hidden` implementation Base's utility was derived from.
+
+A workspace-only patch would not protect npm consumers. The package therefore declares Base UI as a
+bundled dependency. Publication stages the patched package and its runtime dependency closure inside
+the tarball; `test:packed` verifies the installed nested copy, its license, both patched ESM/CommonJS
+modules, clean dependency trees, and open-listbox behavior under React 18, React 19, Vite and Next.
+`scripts/stage-bundled-base-ui.mjs` exists only to turn Bun's dependency-store symlink into npm's
+bundleable directory during packing, then restores the link. The patch and bundling may be removed
+only after a released Base UI version passes the same exclusion-free axe, tab restoration and
+non-modal pointer tests.
+
 ## Build and client boundaries
 
 The library build starts at `packages/ui/src/index.ts` plus the `src/content.ts` rich-content boundary and the development-only `src/dev.ts`, and emits preserved ESM/CJS modules. Rollup does not add a package-wide `"use client"` banner. Source modules that genuinely require a client boundary retain their own directive; passive components remain server-usable.

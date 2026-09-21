@@ -1,17 +1,31 @@
 import assert from "node:assert/strict";
 import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const fixtureRoot = fileURLToPath(new URL("./fixtures/packed/", import.meta.url));
 const require = createRequire(new URL("../../../apps/no-tailwind/package.json", import.meta.url));
 const playwrightVersion = require("@playwright/test/package.json").version;
 
+const showcaseRequire = createRequire(new URL("../../../apps/showcase/package.json", import.meta.url));
+const axeVersion = JSON.parse(
+  await readFile(join(dirname(showcaseRequire.resolve("@axe-core/playwright")), "..", "package.json")),
+).version;
 export async function verifyConsumers({ consumerDir, work, tarball, run }) {
   // Browser tools are fixture dependencies, not library dependencies. Match the repository's
   // installed runner so the normal `playwright install` bootstrap also supplies this browser.
-  run("npm", ["install", "--no-audit", "--no-fund", `@playwright/test@${playwrightVersion}`], consumerDir);
+  run(
+    "npm",
+    [
+      "install",
+      "--no-audit",
+      "--no-fund",
+      `@playwright/test@${playwrightVersion}`,
+      `@axe-core/playwright@${axeVersion}`,
+    ],
+    consumerDir,
+  );
   const bin = (dir, name) => join(dir, "node_modules", ".bin", name);
   await cp(join(fixtureRoot, "App.jsx"), join(consumerDir, "App.jsx"));
   await cp(join(fixtureRoot, "host.css"), join(consumerDir, "host.css"));
@@ -27,7 +41,7 @@ import "../host.css";
 import "sherick-ui/styles.css";
 createRoot(document.getElementById("root")).render(<App />);
 `);
-  await writeFile(join(consumerDir, "index.html"), '<!doctype html><html dir="rtl"><head><title>Packed</title></head><body><div id="root"></div><script type="module" src="/src/main.jsx"></script></body></html>');
+  await writeFile(join(consumerDir, "index.html"), '<!doctype html><html lang="en" dir="rtl"><head><title>Packed</title></head><body><div id="root"></div><script type="module" src="/src/main.jsx"></script></body></html>');
   await writeFile(join(consumerDir, "playwright.config.mjs"), `export default {
   testDir: "./tests", workers: 1, use: { baseURL: "http://127.0.0.1:4317" },
   webServer: { command: "node node_modules/vite/bin/vite.js preview --host 127.0.0.1 --port 4317 --strictPort", url: "http://127.0.0.1:4317", reuseExistingServer: false }
@@ -76,7 +90,7 @@ export const invalidRef = <Button ref={React.createRef<HTMLInputElement>()}>Inva
     name: "packed-react18", private: true, type: "module", dependencies: {
       "sherick-ui": `file:${tarball}`, react: "18.0.0", "react-dom": "18.0.0",
       "@types/react": "18.3.27", "@types/react-dom": "18.3.7", typescript: "5.9.3",
-      vite: "7.1.7", "@playwright/test": playwrightVersion,
+      vite: "7.1.7", "@playwright/test": playwrightVersion, "@axe-core/playwright": axeVersion,
     },
   }));
   for (const file of ["esm.mjs", "cjs.cjs", "consumer.tsx", "public-types.tsx", "commonjs.cts", "App.jsx", "host.css", "src", "tests", "public", "index.html", "vite.config.mjs", "playwright.config.mjs"]) {
@@ -94,7 +108,8 @@ export const invalidRef = <Button ref={React.createRef<HTMLInputElement>()}>Inva
   await mkdir(join(consumerDir, "app"));
   await writeFile(join(consumerDir, "app", "layout.jsx"), `import "../host.css";
 import "sherick-ui/styles.css";
-export default function Layout({ children }) { return <html dir="rtl"><body>{children}</body></html>; }
+export const metadata = { title: "Packed" };
+export default function Layout({ children }) { return <html lang="en" dir="rtl"><body>{children}</body></html>; }
 `);
   await writeFile(join(consumerDir, "app", "page.jsx"), `import { Card, Badge, Table } from "sherick-ui";
 import App from "../App.jsx";

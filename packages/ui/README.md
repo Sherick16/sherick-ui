@@ -214,6 +214,10 @@ Base UI owns generic interaction and accessibility mechanics when it provides th
 
 Base UI is internal infrastructure. Consumers never import `@base-ui/react` to use Sherick UI, and Base UI's own props, DOM structure and generated IDs are not part of this package's compatibility promise.
 
+The package tarball includes the exact audited Base UI implementation. This carries the temporary
+editable-Combobox isolation patch into installed npm consumers while leaving Base UI — not a Sherick
+wrapper — responsible for focus, ARIA isolation, dismissal and popup lifecycle.
+
 Tailwind is not a runtime integration surface. It is internal authoring/build infrastructure: the package ships no Tailwind preset, declares no Tailwind peer dependency and requires no package-content scanning. Component CSS is generated inside this package and scoped internally; `.sui-scope` is private implementation detail, not a consumer class or theming hook.
 
 Themes are document-level. Overlays portal to `document.body`, so root-level `--sui-*` variables apply to Dialog, Select and Tooltip surfaces; nested theme islands are not a supported contract.

@@ -108,11 +108,19 @@ components is intentional, not an accidental dependency on the development entry
 
 ## Tarball review
 
-The inspected `sherick-ui-2.0.0-alpha.1.tgz` contained 279 files, 1,097,247 compressed bytes and
+The Phase D `sherick-ui-2.0.0-alpha.1.tgz` contained 279 files, 1,097,247 compressed bytes and
 2,848,494 unpacked bytes. It includes ESM/CJS builds, five declaration artifacts, intentional
 source-bearing maps, two CSS files, math fonts/license, package metadata, README and LICENSE.
 No source tree, tests, fixtures, visual baselines, build scripts, tsbuildinfo or repository
 configuration was included. Rich content has no misleading CJS build.
+
+Phase E deliberately changes that packaging result to carry the Combobox accessibility fix to
+consumers: the inspected artifact contains 4,130 files, 3,203,443 compressed bytes and 14,257,772
+unpacked bytes. The additional files are exactly the bundled `@base-ui/react@1.8.0` package and its
+runtime dependency closure, including their licenses and declarations. Sherick source, tests, fixtures
+and build scripts remain excluded. Application bundle output is unchanged in kind and still passes the
+existing raw/gzip/brotli budgets; this is an installation-artifact increase, not permission to raise a
+runtime size budget.
 
 ## Documentation and verification
 
@@ -136,6 +144,7 @@ Validation:
 Local execution logs: `/tmp/sherick-phase-d-verify.log` and
 `/tmp/sherick-phase-d-clean-verify.log`. The latter is the clean-state acceptance run.
 
-Existing stable-release limitations remain recorded in `VERIFICATION.md` and `RELEASE.md`,
-including the upstream open-editable-Combobox accessibility gap. This package pass does not
-claim every browser/React patch version or physical-device behavior was tested.
+At this Phase D checkpoint, the open editable-Combobox accessibility gap still remained. Phase E
+subsequently resolved it with a version-specific Base UI patch bundled into the tarball; the current
+evidence and retirement condition live in `VERIFICATION.md` and `RELEASE.md`. Neither phase claims
+every browser/React patch version or physical-device behavior was tested.

@@ -1,0 +1,140 @@
+diff --git a/floating-ui-react/utils/markOthers.js b/floating-ui-react/utils/markOthers.js
+index c813f114e8b5fa6f2cd9076170b4c26354a9e404..c9a71d52894e24179475b30c20d84d10c5dc9258 100644
+--- a/floating-ui-react/utils/markOthers.js
++++ b/floating-ui-react/utils/markOthers.js
+@@ -20,6 +20,47 @@ const uncontrolledElementsSets = {
+ };
+ let markerCounterMap = new WeakMap();
+ let lockCount = 0;
++
++// `aria-hidden` removes a subtree from the accessibility tree but not from sequential focus.
++// Keep non-modal pointer interaction available while preventing focus from entering hidden content.
++const focusableSelector = ['a[href]', 'area[href]', 'input:not([disabled])', 'select:not([disabled])', 'textarea:not([disabled])', 'button:not([disabled])', 'iframe', 'audio[controls]', 'video[controls]', '[contenteditable]:not([contenteditable="false"])', '[tabindex]'].join(',');
++const focusRestoreMap = new WeakMap();
++function removeFromTabOrder(node) {
++  const targets = [];
++  if (node.matches?.(focusableSelector)) {
++    targets.push(node);
++  }
++  if (node.querySelectorAll) {
++    targets.push(...node.querySelectorAll(focusableSelector));
++  }
++  const restore = [];
++  targets.forEach(element => {
++    const tabIndex = element.getAttribute('tabindex');
++    if (tabIndex === '-1') {
++      return;
++    }
++    restore.push([element, tabIndex]);
++    element.setAttribute('tabindex', '-1');
++  });
++  return restore;
++}
++function restoreTabOrder(node) {
++  const restore = focusRestoreMap.get(node);
++  if (!restore) {
++    return;
++  }
++  focusRestoreMap.delete(node);
++  restore.forEach(([element, tabIndex]) => {
++    if (element.getAttribute('tabindex') !== '-1') {
++      return;
++    }
++    if (tabIndex === null) {
++      element.removeAttribute('tabindex');
++    } else {
++      element.setAttribute('tabindex', tabIndex);
++    }
++  });
++}
+ function getUncontrolledElementsSet(controlAttribute) {
+   return uncontrolledElementsSets[controlAttribute];
+ }
+@@ -105,6 +146,9 @@ function applyAttributeToOthers(uncorrectedAvoidElements, body, ariaHidden, iner
+       if (!alreadyHidden) {
+         node.setAttribute(controlAttribute, controlAttribute === 'inert' ? '' : 'true');
+       }
++      if (controlAttribute === 'aria-hidden' && counterValue === 1 && !alreadyHidden) {
++        focusRestoreMap.set(node, removeFromTabOrder(node));
++      }
+     });
+   }
+   if (mark) {
+@@ -129,6 +173,7 @@ function applyAttributeToOthers(uncorrectedAvoidElements, body, ariaHidden, iner
+             element.removeAttribute(controlAttribute);
+           }
+           uncontrolledElementsSet?.delete(element);
++          restoreTabOrder(element);
+         }
+       });
+     }
+diff --git a/floating-ui-react/utils/markOthers.mjs b/floating-ui-react/utils/markOthers.mjs
+index 2c7e806b36fa33782c61adf58cd6aa420e69374d..da71f6a8e7a36bb378d37d48b060aa88db1100dd 100644
+--- a/floating-ui-react/utils/markOthers.mjs
++++ b/floating-ui-react/utils/markOthers.mjs
+@@ -13,6 +13,47 @@ const uncontrolledElementsSets = {
+ };
+ let markerCounterMap = new WeakMap();
+ let lockCount = 0;
++
++// `aria-hidden` removes a subtree from the accessibility tree but not from sequential focus.
++// Keep non-modal pointer interaction available while preventing focus from entering hidden content.
++const focusableSelector = ['a[href]', 'area[href]', 'input:not([disabled])', 'select:not([disabled])', 'textarea:not([disabled])', 'button:not([disabled])', 'iframe', 'audio[controls]', 'video[controls]', '[contenteditable]:not([contenteditable="false"])', '[tabindex]'].join(',');
++const focusRestoreMap = new WeakMap();
++function removeFromTabOrder(node) {
++  const targets = [];
++  if (node.matches?.(focusableSelector)) {
++    targets.push(node);
++  }
++  if (node.querySelectorAll) {
++    targets.push(...node.querySelectorAll(focusableSelector));
++  }
++  const restore = [];
++  targets.forEach(element => {
++    const tabIndex = element.getAttribute('tabindex');
++    if (tabIndex === '-1') {
++      return;
++    }
++    restore.push([element, tabIndex]);
++    element.setAttribute('tabindex', '-1');
++  });
++  return restore;
++}
++function restoreTabOrder(node) {
++  const restore = focusRestoreMap.get(node);
++  if (!restore) {
++    return;
++  }
++  focusRestoreMap.delete(node);
++  restore.forEach(([element, tabIndex]) => {
++    if (element.getAttribute('tabindex') !== '-1') {
++      return;
++    }
++    if (tabIndex === null) {
++      element.removeAttribute('tabindex');
++    } else {
++      element.setAttribute('tabindex', tabIndex);
++    }
++  });
++}
+ function getUncontrolledElementsSet(controlAttribute) {
+   return uncontrolledElementsSets[controlAttribute];
+ }
+@@ -98,6 +139,9 @@ function applyAttributeToOthers(uncorrectedAvoidElements, body, ariaHidden, iner
+       if (!alreadyHidden) {
+         node.setAttribute(controlAttribute, controlAttribute === 'inert' ? '' : 'true');
+       }
++      if (controlAttribute === 'aria-hidden' && counterValue === 1 && !alreadyHidden) {
++        focusRestoreMap.set(node, removeFromTabOrder(node));
++      }
+     });
+   }
+   if (mark) {
+@@ -122,6 +166,7 @@ function applyAttributeToOthers(uncorrectedAvoidElements, body, ariaHidden, iner
+             element.removeAttribute(controlAttribute);
+           }
+           uncontrolledElementsSet?.delete(element);
++          restoreTabOrder(element);
+         }
+       });
+     }

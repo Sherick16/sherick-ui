@@ -21,5 +21,8 @@
     "test:browser": "bun --filter @sherick-ui/showcase test:browser && bun --filter @sherick-ui/no-tailwind test:browser",
     "visual": "bun --filter sherick-ui visual",
     "verify": "bun run lint && bun run test:motion && bun --filter sherick-ui typecheck && bun --filter sherick-ui build && bun --filter @sherick-ui/showcase typecheck && bun --filter @sherick-ui/no-tailwind typecheck && bun --filter @sherick-ui/showcase build && bun --filter @sherick-ui/no-tailwind build && bun run test && bun run test:bundle && bun run test:packed && bun run visual && bun run test:browser"
+  },
+  "patchedDependencies": {
+    "@base-ui/react@1.8.0": "patches/@base-ui%2Freact@1.8.0.patch"
   }
 }

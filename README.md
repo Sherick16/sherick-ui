@@ -247,7 +247,11 @@ const { Markdown } = await import("sherick-ui/content");
 
 ## Behavioral foundation
 
-`@base-ui/react` is a direct Sherick UI runtime dependency. Components import the relevant Base primitive directly from public subpaths such as `@base-ui/react/dialog` or `@base-ui/react/select`; Sherick UI does not maintain a parallel generic headless layer.
+`@base-ui/react` is Sherick UI's direct behavioral dependency. Components import the relevant Base
+primitive from public subpaths such as `@base-ui/react/dialog` or `@base-ui/react/select`; Sherick UI
+does not maintain a parallel generic headless layer. The exact audited Base UI implementation is
+bundled inside the package tarball so the editable-Combobox isolation patch reaches every consumer
+rather than existing only in this workspace.
 
 When Base UI provides the primitive, it owns keyboard navigation, roving focus, focus trapping/restoration, generated accessibility relationships, composite-control form participation, portals, anchored positioning/collision handling, outside interaction/Escape dismissal and popup lifecycle. Passive semantics such as cards, badges, navigation links and tables remain native HTML rather than being forced through a headless abstraction.
 

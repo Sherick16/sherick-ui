@@ -174,13 +174,49 @@ for (const theme of THEMES) {
     await page.keyboard.press("Escape");
     expect(errors).toEqual([]);
   });
+
+  test(`an open Combobox has no automatically detectable WCAG A/AA violations (${theme})`, async ({
+    page,
+    errors,
+  }) => {
+    await gotoTheme(page, theme, "/verification/interactions");
+    const searchable = page.getByRole("combobox", { name: "Combobox project" });
+    await searchable.click();
+    await expect(page.getByRole("option", { name: "Design system" })).toBeVisible();
+
+    await expectNoA11yViolations(page, theme);
+
+    expect(errors).toEqual([]);
+  });
 }
 
-/* An open Combobox listbox is asserted directly rather than scanned, and the divergence is
-   recorded in docs/VERIFICATION.md: Base UI's combobox focus manager marks the page around an
-   open listbox `aria-hidden` without `inert`, which axe reports as `aria-hidden-focus` on page
-   content Sherick does not own. The listbox relationships Sherick is responsible for are checked
-   here instead. */
+test("an open Combobox removes hidden content from tab order and restores it on close", async ({
+  page,
+  errors,
+}) => {
+  await page.goto("/verification/interactions");
+  const searchable = page.getByRole("combobox", { name: "Combobox project" });
+  const outsideButton = page.getByTestId("menu-plain-trigger");
+  await expect(outsideButton).toHaveAttribute("tabindex", "0");
+
+  await searchable.click();
+  await expect(page.getByRole("option", { name: "Design system" })).toBeVisible();
+  await expect(outsideButton).toHaveAttribute("tabindex", "-1");
+
+  await page.keyboard.press("Escape");
+  await expect(outsideButton).toHaveAttribute("tabindex", "0");
+
+  /* Removing a control from sequential focus must not make a non-modal popup inert: outside
+     pointer interaction remains available and closes the list before running the clicked action. */
+  await searchable.click();
+  await expect(page.getByRole("option", { name: "Design system" })).toBeVisible();
+  await outsideButton.click();
+  await expect(page.getByRole("option", { name: "Design system" })).toHaveCount(0);
+  await expect(page.getByRole("menuitem", { name: "Plain action" })).toBeVisible();
+
+  expect(errors).toEqual([]);
+});
+
 test("an open Combobox publishes its own listbox relationships", async ({ page, errors }) => {
   await page.goto("/verification/interactions");
 

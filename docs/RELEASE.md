@@ -206,8 +206,9 @@ subpath is a breaking change.
   builds interaction, focus, portal, positioning, dismissal and ARIA mechanics on. Consumers
   must not import Base UI to use Sherick UI, and Base UI internals — its props, its DOM
   structure, its generated IDs — are **not covered by this package's compatibility
-  promise**. Sherick's components own the public API; upgrading behavior normally means
-  Sherick upgrading Base UI, not consumers depending on it.
+  promise**. Sherick's components own the public API. The exact patched implementation is currently
+  bundled into the tarball so installation cannot substitute the unpatched `1.8.0` artifact; upgrading
+  behavior still means Sherick upgrading and re-verifying Base UI, not consumers depending on it.
 - **Tailwind CSS is internal authoring/build infrastructure.** It is not a consumer contract:
   the package ships no Tailwind preset, declares no Tailwind peer dependency, and requires no
   package-content scanning. Sherick UI compiles its own component CSS ahead of time.
@@ -315,27 +316,39 @@ on consumer install, publish the prerelease under `latest`, or move stable `2.0.
 
 ## Release-readiness classifications
 
-### Stable-release blocker: editable Combobox isolation
+### Resolved stable-release blocker: editable Combobox isolation
 
-The current public `Combobox` prevents `2.0.0` from shipping. This was reproduced against the
-packed implementation and `@base-ui/react@1.8.0`: opening the editable listbox on the interactions
-fixture produces axe's serious `aria-hidden-focus` violation on 37 outside nodes. Base's focus
-manager marks content around the popup `aria-hidden="true"` while leaving that content in sequential
-focus navigation. A keyboard user can therefore move focus into content a screen reader cannot
-perceive.
+The original blocker was reproduced against `@base-ui/react@1.8.0` and the packed implementation:
+opening the editable listbox on the interactions fixture produced axe's serious
+`aria-hidden-focus` violation on 37 outside nodes. Base's floating focus manager marked content
+around the popup `aria-hidden="true"` while leaving that content in sequential focus navigation, so
+keyboard focus could enter content a screen reader could not perceive. The defect is tracked as
+[mui/base-ui#5528](https://github.com/mui/base-ui/issues/5528).
 
-The behavior is owned by Base UI's floating focus manager, is still present on Base UI `master`,
-and is tracked upstream as [mui/base-ui#5528](https://github.com/mui/base-ui/issues/5528). Sherick
-cannot correct it without taking ownership of focus/isolation behavior that belongs to the
-dependency. The exact resolution is either:
+The blocker is resolved without removing or making the editable Combobox modal. A version-specific
+Bun patch extends Base UI's own `markOthers` isolation authority: focusable descendants of a subtree
+newly hidden with `aria-hidden` receive `tabindex="-1"`; balanced cleanup restores each original
+value. Pre-existing `tabindex` values and nested isolation counters are preserved. The patch does not
+use `inert`, so pointer interaction outside the non-modal listbox still dismisses it and runs the
+clicked action.
 
-1. upgrade to a released Base UI version that keeps the editable input usable, preserves the
-   non-modal pointer contract, and removes `aria-hidden` outside content from sequential keyboard
-   focus; then run the full open-state axe scan with no exclusion; or
-2. remove `Combobox` and its types from the stable public contract before `2.0.0`.
+Because a workspace patch alone would disappear for consumers, `@base-ui/react` and its runtime
+closure are bundled inside the published tarball. The packed-package gate checks the installed nested
+Base UI version, license and patched ESM/CommonJS modules before exercising the editable Combobox
+from the tarball in React 18 and React 19 Vite builds and the React 19 Next build.
 
-Direct listbox/option/active-descendant assertions remain useful regression coverage, but they are
-not equivalent to an accessibility scan and do not waive this blocker.
+The browser contract now includes exclusion-free open-state axe scans in both themes, direct
+listbox/option/active-descendant assertions, removal and restoration of outside sequential focus,
+Escape dismissal, and preserved outside pointer interaction. The patch may be retired only when a
+released Base UI version passes the same gates. No component API was removed or changed.
+
+The Phase E acceptance run completed with the frozen lockfile:
+`WEBKIT_EXECUTABLE_PATH=/tmp/sherick-webkit bun run verify` passed 204 showcase tests (with the two
+opt-in review captures skipped), all 96 no-Tailwind Chromium/Firefox/WebKit tests, all 15
+packed-consumer tests, and every lint, type, motion, bundle-budget, package-smoke and visual-contract
+gate. `npm publish --dry-run --access public --tag alpha` also completed against the staged tarball
+and restored Bun's workspace link afterward. These automated results do not replace the manual checks
+below, and the eventual stable-version commit still requires the exact-commit rerun described above.
 
 ### Accepted stable limitations
 
