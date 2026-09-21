@@ -1,5 +1,16 @@
 # Sherick UI — agent instructions
 
+## Branch and delivery hygiene
+
+Before changing an existing branch or PR, fetch and rebase it onto `origin/main` — or, at minimum,
+review `git log --oneline origin/main..HEAD` and the commits main has that the branch lacks. A stale
+base hides work main has already done, including recorded known failures and restructuring of the
+tests you are about to touch.
+
+A requested change on a branch is not complete until it is committed and pushed (unless the user
+says otherwise). Do not update a PR description ahead of the branch: confirm the PR head SHA moved
+before claiming delivery in the body.
+
 ## Design language (mandatory)
 
 Before any work that creates, changes or reviews reusable UI — a component, variant,

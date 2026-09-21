@@ -1,9 +1,9 @@
 import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "./fixtures";
 
-/* WCAG A/AA plus the WCAG 2.2 target-size rule (`wcag22aa`, SC 2.5.8), which axe enables from
-   4.13. The library explicitly designs around the 24px pointer minimum, so it belongs in the
-   automated set. */
+/* WCAG A/AA plus the WCAG 2.2 target-size rule (`wcag22aa`, SC 2.5.8). Axe 4.13 still ships
+   `target-size` disabled by default, so the tag set selects it but does not run it: the scan turns it
+   on explicitly and asserts it executed. The library designs around the 24px pointer minimum. */
 const WCAG_TAGS = ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"];
 const THEMES = ["light", "dark"] as const;
 type Theme = (typeof THEMES)[number];
@@ -40,7 +40,14 @@ const expectNoA11yViolations = async (page: Page, theme: Theme) => {
     return getComputedStyle(document.body).color === expected;
   });
 
-  const results = await new AxeBuilder({ page }).withTags(WCAG_TAGS).analyze();
+  const results = await new AxeBuilder({ page })
+    .options({
+      runOnly: { type: "tag", values: WCAG_TAGS },
+      /* Axe 4.13 still ships `target-size` disabled, and `AxeBuilder.options()` replaces the whole
+         option object, so the tag filter and the enabling override are set together. */
+      rules: { "target-size": { enabled: true } },
+    })
+    .analyze();
   const summary = results.violations
     .map(
       (violation) =>
@@ -51,6 +58,13 @@ const expectNoA11yViolations = async (page: Page, theme: Theme) => {
     .join("\n");
 
   expect(results.violations, `axe violations in ${theme}:\n${summary}`).toEqual([]);
+
+  /* A rule that never ran produces no result at all, so an empty `violations` array is not proof
+     the target-size check executed: require it in one of the buckets that only hold rules that ran. */
+  const targetSizeRan = [...results.passes, ...results.incomplete, ...results.violations].some(
+    (result) => result.id === "target-size"
+  );
+  expect(targetSizeRan, `the target-size rule did not execute in ${theme}`).toBe(true);
 };
 
 /* The showcase is a page of interactive specimens, and it is the only place some states appear at

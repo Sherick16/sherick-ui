@@ -158,6 +158,11 @@ palette-only change is inside that tolerance.)
 
 `bun run test:browser` runs two browser suites.
 
+For focused iteration, `bun --filter @sherick-ui/showcase test:browser:dev` points Playwright at the
+already-running `next dev` server (`bun run dev`, :3000) and skips its own production server, so a
+single spec can be re-run without rebuilding the showcase. `bun run test:browser` remains the gate:
+it builds and serves the production artifact, and only that run is verification.
+
 ### Next showcase
 
 The existing reviewed Chromium snapshots remain the visual baseline for:
@@ -300,9 +305,12 @@ behaviour is verified above, with the preference emulated by the browser.
 
 `apps/showcase/tests/browser/accessibility.spec.ts` runs axe-core through
 `@axe-core/playwright`'s `AxeBuilder` restricted to `["wcag2a", "wcag2aa", "wcag21a",
-"wcag21aa", "wcag22aa"]` — every rule in the tag set, `color-contrast` and the WCAG 2.2 target
-size included — and asserts `results.violations` is empty with a message naming every violation id
-and target selector. axe runs in both authored themes (the platform colour scheme is emulated
+"wcag21aa", "wcag22aa"]` — every rule in the tag set, `color-contrast` included — and asserts
+`results.violations` is empty with a message naming every violation id and target selector. The WCAG
+2.2 target-size rule is still disabled by default in axe-core 4.13, so the scan enables it explicitly
+in the same option object as the tag filter and asserts the rule appears in axe's results — that is
+what proves it actually executed rather than being silently skipped. axe runs in both authored
+themes (the platform colour scheme is emulated
 before the document loads, so no state is read mid-theme-switch) on representative reachable states
 rather than scanning the workbench indiscriminately:
 

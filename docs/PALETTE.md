@@ -66,8 +66,9 @@ Every composition the language permits is measured in both themes; this is the s
 | the wall the light makes legible on an empty mark's well | — → **3.60** | — → **4.08** |
 | the focus indicator (outer and inset, over every fill) | 4.53 → **6.90** | ok |
 
-Compositions passing, out of the contract's full matrix: **light 52/57 → 57/57**, **dark 52/57 →
-57/57**.
+The palette clears every composition the contract measures, in both themes. The matrix has grown
+since the original proposal — the `CodeBlock` syntax palette and the namespace token were added to
+it — so this record deliberately states no total: `bun run test` prints the exact set it measured.
 
 ## What was rejected, and what it cost
 
