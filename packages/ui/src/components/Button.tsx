@@ -58,7 +58,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         disabled={isDisabled}
         aria-busy={loading || undefined}
         className={cn(
-          "inline-flex items-center justify-center gap-2 font-medium tracking-[-0.01em]",
+          "relative inline-flex min-w-0 max-w-full items-center justify-center gap-2 font-medium tracking-[-0.01em]",
           shape.pill,
           sizeMap[size],
           motionTactile,
@@ -81,7 +81,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             mark lands in the box the icon had. `[&>svg]` normalizes direct SVG artwork; sizing nested
             artwork is the caller's business, as §17 says. */}
         {loading ? (
-          <span className={cn("inline-flex size-5 shrink-0 items-center justify-center")}>
+          <span className={cn("inline-flex size-5 shrink-0 items-center justify-center", !icon && "absolute")}>
             <Spinner size="small" className={cn("size-5")} />
           </span>
         ) : icon ? (
@@ -89,7 +89,8 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             {icon}
           </span>
         ) : null}
-        <span>{children}</span>
+        {/* Retain one label subtree and its accessible name while the spinner occupies its footprint. */}
+        <span className={cn("min-w-0 [overflow-wrap:anywhere]", loading && !icon && "opacity-0")}>{children}</span>
       </BaseButton>
     );
   }

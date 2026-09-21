@@ -81,6 +81,8 @@ assert.equal(typeof Dialog, "object");
 assert.equal(typeof Dialog.Header, "function");
 assert.equal(typeof Dialog.Content, "function");
 assert.equal(typeof Select, "object");
+assert.equal(typeof root.DirectionProvider, "function");
+assert.equal(renderToStaticMarkup(React.createElement(root.DirectionProvider, { direction: "rtl" }, "content")), "content");
 
 /* Wave B publishes four floating surfaces through the same barrel. Each is one component with
    attached parts, and each must survive the packed build rather than only the workspace. */

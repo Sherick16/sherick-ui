@@ -101,7 +101,7 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
         name={name}
         form={form}
         inputRef={inputRef}
-        className={cn("w-full", className)}
+        className={cn("min-w-0 w-full", className)}
       >
         <BaseNumberField.Group
           className={({ disabled: fieldDisabled }) => cn(

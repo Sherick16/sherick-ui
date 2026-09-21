@@ -19,7 +19,7 @@ export const Card = ({
   return (
     <div
       className={cn(
-        "p-6",
+        "min-w-0 p-6 [overflow-wrap:anywhere]",
         shape.surface,
         tone.soft[variant],
         text.high,

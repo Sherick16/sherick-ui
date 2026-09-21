@@ -23,6 +23,14 @@ That is the full styling integration. Consumers do not need Tailwind, a Sherick 
 
 Tailwind is private authoring/build infrastructure inside the Sherick UI repository. The published package ships finished, scoped CSS and initializes the Tailwind runtime custom properties it needs inside that private scope, so shadows, rings, transforms and backdrop filters work even when the consumer has no Tailwind preflight.
 
+## Writing direction
+
+For an RTL application, set `<html dir="rtl">` and wrap the React tree with
+`<DirectionProvider direction="rtl">` imported from `sherick-ui`. Keep both values in
+sync when changing locale. The provider adds no DOM; it gives keyboard navigation and
+portaled positioning the same direction as CSS. Consumers never import Base UI.
+`Drawer` sides remain physical; `CodeBlock` source remains left-to-right.
+
 ## Themes
 
 Theme selection is CSS-only:

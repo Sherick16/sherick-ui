@@ -7,6 +7,7 @@ import React, { forwardRef, type ComponentProps, type ReactNode, type Ref } from
 import { cn } from "@/libs/utils";
 import {
   density,
+  fieldLayout,
   groupFocusRing,
   selectable,
   shape,
@@ -68,7 +69,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
     return (
       // The group owns the field scope its options are labelled in. Base UI scopes each
       // option's label to its own `Field.Item`, which has to sit inside a `Field.Root`.
-      <Field.Root className={cn("flex w-full flex-col", className)}>
+      <Field.Root className={cn(fieldLayout, className)}>
         {label && (
           <Field.Label className={cn("mb-2 text-sm font-medium", text.high)}>
             {label}
@@ -111,7 +112,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
                   `density.normal` sets the type step but no leading, and this package ships no reset —
                   so the mark's 24px slot and the line it is centred on are the same 24px whatever
                   line height a host happens to inherit. */}
-              <Field.Label className={cn("flex flex-1 items-center")}>
+              <Field.Label className={cn("flex min-w-0 flex-1 items-center")}>
                 <span className={cn("flex w-full items-start gap-3")}>
                   <Radio.Root
                     value={option.value}
@@ -137,7 +138,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
                       </Radio.Indicator>
                     </span>
                   </Radio.Root>
-                  <span className={cn(text.high, "leading-6")}>{option.label}</span>
+                  <span className={cn(text.high, "min-w-0 leading-6")}>{option.label}</span>
                 </span>
               </Field.Label>
             </Field.Item>

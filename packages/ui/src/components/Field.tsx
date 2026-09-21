@@ -3,7 +3,7 @@
 import { Field as BaseField } from "@base-ui/react/field";
 import React, { forwardRef, type ComponentProps, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { text } from "./ui.common";
+import { fieldLayout, text } from "./ui.common";
 
 export interface FieldProps
   extends Omit<ComponentProps<typeof BaseField.Root>, "children" | "className" | "ref"> {
@@ -48,7 +48,7 @@ export const Field = forwardRef<HTMLDivElement, FieldProps>(
         {...rootProps}
         ref={ref}
         invalid={Boolean(error) || invalid}
-        className={cn("flex w-full flex-col", className)}
+        className={cn(fieldLayout, className)}
       >
         {label && (
           <BaseField.Label className={cn("mb-2 text-sm font-medium", text.high)}>

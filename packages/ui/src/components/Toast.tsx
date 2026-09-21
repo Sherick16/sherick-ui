@@ -254,8 +254,8 @@ export const ToastViewport = ({ position = "bottom-end", className }: ToastViewp
     <BaseToast.Portal>
       <BaseToast.Viewport
         className={cn(
-          "fixed flex w-[calc(100vw-2rem)] flex-col sm:w-[22.5rem]",
-          stacking.float,
+          "fixed flex w-[calc(100%-3rem)] flex-col sm:w-[22.5rem]",
+          stacking.notification,
           geometry.viewport,
           className
         )}
@@ -299,7 +299,7 @@ export const ToastViewport = ({ position = "bottom-end", className }: ToastViewp
                   what a peek is. */}
               <BaseToast.Content
                 className={cn(
-                  "flex items-start gap-3 p-4",
+                  "flex max-h-[calc(100dvh-3rem)] items-start gap-3 overflow-y-auto overscroll-contain p-4 [overflow-wrap:anywhere]",
                   motionFeedback,
                   "data-[behind]:opacity-0 data-[expanded]:opacity-100"
                 )}

@@ -55,7 +55,7 @@ export const Tabs = ({
         if (typeof nextValue !== "string") return;
         onValueChange?.(nextValue);
       }}
-      className={cn("w-full", className)}
+      className={cn("min-w-0 w-full [overflow-wrap:anywhere]", className)}
     >
       {/* A tab row that cannot fit where it was placed scrolls inside itself rather than widening
          the page. The row is the content that is wider than its container, so owning that overflow

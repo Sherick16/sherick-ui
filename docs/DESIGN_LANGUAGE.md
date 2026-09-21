@@ -312,7 +312,7 @@ is not is a surface that looks like it moved the wrong way.
 
 ### Stacking
 
-Every floating surface shares one stacking level (`stacking.float`), and **document order decides**
+Every interaction surface shares one stacking level (`stacking.float`), and **document order decides**
 between them. That is not a shortcut, it is the rule Base UI's portals already implement: a popup's
 portal is nested *inside* the portal of the surface it was opened from and appended last, so the
 innermost — the one opened last — is later in the document and paints on top.
@@ -326,6 +326,13 @@ each one is opened after the surface it covers.
 
 The level exists to clear the application's own content, not to rank Sherick's surfaces against
 each other.
+
+Application notifications are the exception: `stacking.notification` keeps the persistent
+`ToastViewport` above interaction surfaces. Its portal may have mounted before a dialog even
+when the notification was raised from inside that dialog; portal order cannot express that event.
+Use this level only for the application toast stack, never to rank menus, popovers or dialogs.
+For example, a save notification remains readable over its modal editor; a Select inside that
+editor still uses `stacking.float` and Base's nested portal order.
 
 ---
 
@@ -874,8 +881,8 @@ for the edge and `data-side` for which edge that is — so one recipe serves a `
 way it is actually placed. A **logical** side resolves against the writing direction: `inline-start`
 takes the popup to the anchor's physical left on a left-to-right page and its physical right on a
 right-to-left one, and the four pixels of travel change sign with it, because they always move
-*toward* the anchor. The direction is declared twice — `dir` for CSS and Base UI's
-`DirectionProvider` for the placement — exactly as `apps/showcase` does for its logical-side
+*toward* the anchor. The direction is declared twice — document `dir` for CSS and Sherick's
+public `DirectionProvider` (delegating to Base UI) for keyboard behavior and placement — exactly as `apps/showcase` does for its logical-side
 specimens; the physical sides never depend on it. A tooltip is the same model on the local settle timing; a modal
 surface is anchored to the viewport, has no side and never bounces; a scrim animates opacity
 only, because a blur or a filter is never animated.
@@ -1228,3 +1235,21 @@ mark or a dismiss control — because a section of their own would make a proper
 library shares look like a feature of it. A property like optical balance is a rule in this
 document and a state of every control, never a section of the page. A component may appear as
 *content* inside another section (a popover's body, a table cell), but it is specimened once.
+
+## 19. Constrained layout and content
+
+Components yield their automatic minimum width in flex/grid composition. `fieldLayout` owns
+the labelled-field column: it shrinks with its container and wraps explanatory copy, including
+unbroken identifiers. Native text inputs retain single-line editing/scrolling. Disclosures and
+readable surfaces also wrap copy; a badge, chip, navigation row or selection-list value may
+truncate within its bounded slot. Do not truncate explanatory body copy to hide overflow.
+
+Tabs, toggle/segmented tracks, tables and code wells own inherently wide content through local
+scrolling. Consumers still own application grid columns and explicit fixed-width children, but
+must not need a scrolling wrapper around a standard track. Code remains unwrapped and LTR.
+
+Modal centering must yield to a reachable scroll origin when content exceeds the viewport.
+Toast content may scroll at the dynamic viewport limit; it is never sized from the height its
+primitive measures. Tooltip content is a short supplemental hint, not a long document or an
+interactive form; use Popover for those. A loading Button without an icon overlays its spinner
+on the retained label footprint; icon-bearing buttons substitute within their existing slot.

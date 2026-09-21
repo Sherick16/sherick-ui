@@ -72,7 +72,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
             a `Select` trigger's own active state is suppressed by the primitive, while a press on
             it still activates this element as its ancestor. The trigger itself is the field's
             surface, so it takes the tone. */}
-        <div className={cn("relative block w-full", motionTactile, className)}>
+        <div className={cn("relative block min-w-0 w-full", motionTactile, className)}>
           <BaseSelect.Trigger
             {...triggerProps}
             ref={ref}

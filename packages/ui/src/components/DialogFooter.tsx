@@ -11,7 +11,7 @@ export const DialogFooter = ({ children, className }: DialogFooterProps) => {
   return (
     <div
       className={cn(
-        "mt-auto flex items-center justify-end gap-3 px-6 pb-5 pt-1 sm:px-7",
+        "mt-auto flex flex-wrap items-center justify-end gap-3 px-6 pb-5 pt-1 sm:px-7",
         className
       )}
     >

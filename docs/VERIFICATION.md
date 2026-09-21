@@ -447,6 +447,12 @@ The Vite fixture verifies:
 - theme variables load;
 - a deliberately Tailwind-looking consumer element (`flex absolute rounded-full px-6 text-sm`) remains untouched, proving generic package utilities do not leak globally.
 
+The `/hostile` public-API fixture adds a three-engine composition matrix (Chromium, Firefox,
+WebKit): narrow grid/flex parents, long text, local scrolling, short/edge/nested overlays, RTL,
+touch targets, loading/validation and reflow. See [`HOSTILE_LAYOUT.md`](HOSTILE_LAYOUT.md) for
+the scenarios, fixes and the distinction between simulated reflow/viewport reduction and
+manual zoom or physical-device coverage. The existing consumer tests remain Chromium-only.
+
 All browser tests fail on page errors or error-level console output.
 
 ## CI order
@@ -455,7 +461,7 @@ The normal immutable CI path is:
 
 ```bash
 bun install --frozen-lockfile
-bunx playwright install --with-deps chromium
+bunx playwright install --with-deps chromium firefox webkit
 bun run verify
 ```
 

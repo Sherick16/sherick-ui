@@ -146,7 +146,7 @@ export const Chip = forwardRef<HTMLElement, ChipProps>(
           disabled={disabled}
           className={(toggleState) =>
             cn(
-              "inline-flex max-w-full items-center gap-1.5 px-4 py-1.5 font-medium",
+              "inline-flex min-w-0 max-w-full items-center gap-1.5 px-4 py-1.5 font-medium",
               density.compact,
               shape.control,
               motionTactile,
@@ -193,7 +193,7 @@ export const Chip = forwardRef<HTMLElement, ChipProps>(
         {...(chipProps as HTMLAttributes<HTMLSpanElement>)}
         ref={setRef}
         className={cn(
-          "inline-flex max-w-full items-center gap-1.5 px-4 py-1.5 font-medium",
+          "inline-flex min-w-0 max-w-full items-center gap-1.5 px-4 py-1.5 font-medium",
           density.compact,
           shape.control,
           tone.tonal[variant],

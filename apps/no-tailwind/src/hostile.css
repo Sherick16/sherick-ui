@@ -1,0 +1,9 @@
+/* Deliberately ordinary consumer layout: no overflow clipping, min-width fixes,
+   package selectors, or Tailwind. The library is a direct grid/flex child. */
+.hostile-page { margin: 16px; }
+.hostile-page h1 { font-size: 1.5rem; }
+.hostile-grid { display: grid; grid-template-columns: 1fr; width: min(100%, 220px); gap: 24px; }
+.hostile-stack { display: flex; flex-direction: column; gap: 16px; margin-block: 24px; }
+.hostile-row { display: flex; align-items: center; gap: 24px; }
+.hostile-anchor { display: flex; flex-direction: column; gap: 12px; width: 180px; margin-block: 24px; }
+.hostile-flex { display: flex; align-items: end; width: min(100%, 220px); gap: 8px; margin-block: 16px; }

@@ -32,7 +32,7 @@ export const ChipGroup = forwardRef<HTMLDivElement, ChipGroupProps>(
         {...groupProps}
         ref={ref}
         multiple={multiple}
-        className={cn("flex flex-wrap items-center gap-2", className)}
+        className={cn("flex min-w-0 flex-wrap items-center gap-2", className)}
       >
         {children}
       </BaseToggleGroup>

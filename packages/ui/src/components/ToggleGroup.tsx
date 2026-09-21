@@ -104,7 +104,7 @@ const ToggleGroup = forwardRef<HTMLDivElement, ToggleGroupProps>(
         {...groupProps}
         ref={ref}
         className={cn(
-          "relative inline-flex items-center gap-1 p-1",
+          "relative inline-flex min-w-0 max-w-full items-center gap-1 overflow-x-auto p-1",
           "data-[orientation=vertical]:flex-col data-[orientation=vertical]:items-stretch",
           shape.control,
           /* The same selection well a switch, a checkbox, a radio and a slider groove sit in. */

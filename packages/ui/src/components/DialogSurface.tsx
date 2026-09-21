@@ -45,31 +45,31 @@ const attachmentLayout: Record<
   { viewport: string; popup: string; from: string; presence: string }
 > = {
   center: {
-    viewport: "min-h-full items-center justify-center overflow-y-auto p-4 sm:p-8",
-    popup: "max-w-lg",
+    viewport: "min-h-full items-start justify-center overflow-y-auto p-4 sm:p-8",
+    popup: "my-auto max-w-lg shrink-0",
     from: "",
     presence: motionPresenceModal,
   },
   bottom: {
     viewport: "items-end justify-center overflow-hidden",
-    popup: "flex max-h-[85vh] flex-col rounded-b-none",
+    popup: "flex max-h-[85dvh] flex-col rounded-b-none",
     from: "[--sui-sheet-from-y:100%]",
     presence: motionPresenceSheet,
   },
   top: {
     viewport: "items-start justify-center overflow-hidden",
-    popup: "flex max-h-[85vh] flex-col rounded-t-none",
+    popup: "flex max-h-[85dvh] flex-col rounded-t-none",
     from: "[--sui-sheet-from-y:-100%]",
     presence: motionPresenceSheet,
   },
   left: {
-    viewport: "items-stretch justify-start overflow-hidden",
+    viewport: "items-stretch justify-start overflow-hidden rtl:flex-row-reverse",
     popup: "flex w-full max-w-[min(28rem,90vw)] flex-col rounded-l-none",
     from: "[--sui-sheet-from-x:-100%]",
     presence: motionPresenceSheet,
   },
   right: {
-    viewport: "items-stretch justify-end overflow-hidden",
+    viewport: "items-stretch justify-end overflow-hidden rtl:flex-row-reverse",
     popup: "flex w-full max-w-[min(28rem,90vw)] flex-col rounded-r-none",
     from: "[--sui-sheet-from-x:100%]",
     presence: motionPresenceSheet,
@@ -109,7 +109,7 @@ export const DialogSurface = ({
           initialFocus={initialFocus}
           tabIndex={-1}
           className={cn(
-            "relative w-full outline-none",
+            "relative min-w-0 w-full outline-none [overflow-wrap:anywhere]",
             geometry.from,
             shell,
             /* The attachment's own sizing and its squared edge come after the shell: `cn` keeps the

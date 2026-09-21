@@ -28,6 +28,7 @@ const components: Components = {
      inside the code surface and inherit the browser's monospace block styling. The
      block wrapper is dropped so `CodeBlock` owns the whole treatment. */
   pre: ({ children }) => <>{children}</>,
+  table: ({ children }) => <div className={cn("min-w-0 overflow-x-auto [overflow-wrap:normal]")}><table className={cn("w-full")}>{children}</table></div>,
   /* Without `inline` (removed in react-markdown 9), a block is a fenced one: it carries
      a `language-*` class or, when the fence is bare, the trailing newline markdown
      always leaves on the last line. Anything else is an inline chip. */
@@ -48,13 +49,15 @@ export interface MarkdownProps {
 
 const Markdown = ({ children }: MarkdownProps) => {
   return (
-    <ReactMarkdown
-      components={components}
-      remarkPlugins={[remarkGfm, remarkMath]}
-      rehypePlugins={[rehypeKatex]}
-    >
-      {children}
-    </ReactMarkdown>
+    <div className={cn("min-w-0 [overflow-wrap:anywhere]")}>
+      <ReactMarkdown
+        components={components}
+        remarkPlugins={[remarkGfm, remarkMath]}
+        rehypePlugins={[rehypeKatex]}
+      >
+        {children}
+      </ReactMarkdown>
+    </div>
   );
 };
 

@@ -9,6 +9,7 @@ import React, {
 import { cn } from "@/libs/utils";
 import {
   density,
+  fieldLayout,
   focusRing,
   material,
   shape,
@@ -46,7 +47,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
   }, ref) => {
     return (
       <Field.Root
-        className={cn("flex w-full flex-col", className)}
+        className={cn(fieldLayout, className)}
         name={name}
         disabled={disabled}
         invalid={error}
@@ -67,7 +68,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           defaultValue={defaultValue}
           onValueChange={onValueChange}
           className={cn(
-            "w-full resize-y",
+            "min-w-0 w-full resize-y",
             density.normal,
             "min-h-28 px-5 py-4",
             shape.control,

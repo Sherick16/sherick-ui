@@ -328,7 +328,7 @@ export const stateLayer = {
    least as tall as that floor — which this library's own `density.normal` rhythm is, and a 40px
    table row is not. */
 export const hitArea =
-  "relative after:pointer-events-auto after:absolute after:-inset-2.5 after:content-['']";
+  "relative after:pointer-events-auto after:absolute after:inset-[min(0px,calc((100%-2.75rem)/2))] after:content-['']";
 
 /* Material — fill only. No material carries elevation or a rim: the same matte
    fill appears flat in a card, lifted on a button and recessed in a groove.
@@ -413,7 +413,7 @@ export const density = {
 
 /* Stacking level — where anything that floats sits relative to the application.
 
-   One level, deliberately. Base UI nests a popup's portal *inside* the portal of the surface it
+   One interaction level, deliberately. Base UI nests a popup's portal *inside* the portal of the surface it
    was opened from, and appends it last, so document order already says which floating surface is
    on top: the innermost — the one opened last — wins. A scale that ranked surfaces by kind would
    fight that, and it cannot be right: a popup opened from inside a dialog is the innermost
@@ -424,6 +424,8 @@ export const density = {
    each other. */
 export const stacking = {
   float: "z-50",
+  /* A persistent app notification portal predates the modal it reports on. */
+  notification: "z-[60]",
 } as const;
 
 /* Floating overlay shells.
@@ -566,16 +568,11 @@ export const disclosure = {
      reason a segment inside a track takes the inset form. The chevron the component puts in the
      row is the disclosure's own affordance and turns in place under `motionOrient`. */
   trigger: /* @__PURE__ */ cx(
-    "group flex w-full items-center justify-between gap-4 px-4 py-3 text-start text-sm outline-none",
-    shape.control,
-    motionFeedback,
-    focusRingInset,
-    text.high,
-    stateLayer.quiet,
-    state.enabled,
-    state.effectiveDisabled
+    "group [overflow-wrap:anywhere]",
+    list.option,
+    state.enabled
   ),
-  panel: /* @__PURE__ */ cx("h-[var(--sui-disclose-height)] overflow-hidden text-sm leading-7", text.medium, motionDisclose),
+  panel: /* @__PURE__ */ cx("h-[var(--sui-disclose-height)] overflow-hidden text-sm leading-7 [overflow-wrap:anywhere]", text.medium, motionDisclose),
 } as const;
 
 /* Tone hierarchy — the color roles a surface can take, in rising strength:
@@ -715,3 +712,7 @@ export const recipeAlphas = {
     invalidFocus: fillAlpha(state.field.invalidFocusWithin, "field.invalidFocus"),
   },
 } as const;
+
+/* A labelled field is a shrinkable column. Its explanatory copy wraps, including identifiers;
+   the input itself keeps its native single-line scrolling behavior. */
+export const fieldLayout = "flex min-w-0 w-full flex-col [overflow-wrap:anywhere]";
