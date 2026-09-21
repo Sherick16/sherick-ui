@@ -3,7 +3,14 @@
 ## Scope and evidence
 
 Reviewed the production-built catalog against `DESIGN_LANGUAGE.md`, starting from `5ed76ff`.
-This was a rendered review, not a source-only normalization pass. No subagents were used.
+This was a rendered review, not a source-only normalization pass.
+
+**Method deviation.** The brief asked for the inspection to be fanned out by visual concern and
+then synthesized across the tracks. It was not: the review ran as a single sequential pass, with
+no subagents, and that is how a sibling inconsistency below was missed — `Alert` still
+compensated only its top edge after `Toast`'s identical defect had been fixed in this same PR.
+External review caught it. The follow-up therefore re-checked the rule across the library
+instead of patching the one component it was reported against.
 
 The showcase covers every public component family; `/verification/visual-consistency` adds
 same-content sibling comparisons and real overlay triggers. Review captures cover both themes,
@@ -83,7 +90,9 @@ The refresh also records already-landed palette and settled Switch rendering tha
 screenshots predated; those are not new palette edits in this pass. Both Dialog screenshots
 remain unchanged. Screenshot tolerance and accessibility rules were not relaxed.
 
-## Follow-up: one-line toast balance
+## Follow-ups: the one-line rule and its siblings
+
+### One-line toast balance
 
 A reported one-line toast exposed excess bottom space from the 44px dismiss target. Its
 top-only negative margin left 12px below title-only copy and 10px below description-only copy.
@@ -96,8 +105,47 @@ Twenty-four new cases in `toast.spec.ts` cover six content forms in both themes 
 focus and dismissal. Before the fix all eight single-line cases failed (28px/26px below versus
 16px above); the sixteen multiline/action cases passed. After the fix all 24 passed, and the
 full toast/optical-balance suite passed all 40 checks. Before/after captures were inspected.
-The deterministic refresh adds the two symmetric margin utilities and removes the unused
-top-only utility; no browser screenshot baseline or token changed for this follow-up.
+
+### The same rule had not reached `Alert`
+
+`Alert` carried the identical defect: `py-3.5` (14px), a `leading-6` copy line (24px) and the
+same 44px dismissal, compensated only on the top (`-me-2 -mt-2.5`). A one-line alert therefore
+read at 14px above and 24px below — the same 10px of extra bottom space, in the sibling
+component that shares the rule.
+
+`Alert` now gives its excess back on both vertical edges (`-my-2.5`), so a one-line alert
+resolves to its copy's height. The 44×44 target, its mark's concentricity and first-line
+alignment are unchanged, and the target still reaches into the surface's own padding rather
+than shrinking to fit the line.
+
+A new case in `optical-balance.spec.ts` sits beside the existing wrapped first-line test and
+asserts that the copy occupies exactly one line, that the insets above and below are equal and
+equal the surface's own padding, that the surface's height is the copy plus that padding, that
+the target is 44×44, and that the dismissal stays centred on the first line. It was validated
+against the defect first: reverting only the class reproduces 14px above / 24px below and fails
+the case, while the existing wrapped and multiline cases still pass either way.
+
+**Why it is the last one.** Every other 44px `density.target` in the library is positioned
+rather than in flow — `DialogDismiss` and `Search`'s submit control are absolutely placed
+inside a padded surface — so none of them can size a content row, and `Toast` was already
+fixed. Re-checking the library for an in-flow, first-line, oversized target found no third
+instance. The showcase now carries one closeable alert at each extent, compact and wrapped.
+
+The deterministic refresh removes the now-unused top-only utility and moves the two closeable
+alert specimens to the symmetric one; no browser screenshot baseline or token changed for
+either follow-up.
+
+### A flaky direction-flip read
+
+One `bun run verify` run failed on `a document's own asymmetry follows the writing direction`:
+the flipped read returned the pre-flip list padding (24px/0px instead of 0px/24px). The flip
+itself is sound — a probe confirmed the swapped padding is observable in the same turn once
+the browser is idle, and the test passed 15/15 in isolation — but a loaded browser can still
+hand the previous direction to the next read. The test now awaits the swap it asserts instead
+of assuming it, which removes only the timing assumption: the assertions still require the flip
+to have happened. This predates the alert change and is unrelated to it (the assertion reads
+the content section's list, while the alert lives in the feedback section); it was hardened
+because it reddened the gate.
 
 ## Verification and release gate
 
@@ -105,10 +153,10 @@ Final `bun run verify`: **passed**. This includes lint, temporal ownership, work
 library/Next/Vite production builds, package and contrast checks, unchanged bundle budgets,
 packed-tarball consumer verification, the deterministic style contract, and both browser suites:
 
-- Showcase: **200 passed**, two opt-in review captures skipped in ordinary CI.
+- Showcase: **201 passed**, two opt-in review captures skipped in ordinary CI.
 - No-Tailwind consumer: **6 passed**.
 - The opt-in light/dark rendered reviews also passed separately and their captures were inspected.
-- Deterministic contract: 93 specimens, 26 overlay recipes, 560 scoped rules, four token blocks.
+- Deterministic contract: 93 specimens, 26 overlay recipes, 559 scoped rules, four token blocks.
 
 The polish/verification gate is green; this is **not stable-release clearance**. Existing risks in
 `VERIFICATION.md` remain: Base UI's open editable Combobox accessibility isolation gap, and the
