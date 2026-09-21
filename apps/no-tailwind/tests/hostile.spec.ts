@@ -126,6 +126,7 @@ for (const kind of ["select", "combobox", "menu", "popover", "tooltip"]) {
       await noPageOverflow(page);
       await page.keyboard.press("Escape");
       await page.mouse.move(310, 180);
+      await expect(surface).toHaveCount(0); // Finish Base's exit before moving/reopening the anchor.
     }
   });
 }
@@ -232,17 +233,60 @@ test("drawer's reading surface accepts keyboard scrolling on open", async ({ pag
   await expect.poll(() => scroller.evaluate(el => el.scrollTop)).toBeGreaterThan(before);
 });
 
-test("a toast raised inside a modal is not painted beneath its scrim", async ({ page }) => {
-  await page.getByRole("button", { name: "Open stress dialog", exact: true }).click();
-  await page.getByRole("button", { name: "Notify inside overlay" }).click();
-  const toast = page.locator('[role="dialog"]').filter({ hasText: "Modal notification" });
-  await expect(toast).toBeVisible();
-  expect(await toast.evaluate(el => { const r = el.getBoundingClientRect(); return el.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2)); })).toBe(true);
-  await toast.hover(); // Base exposes collapsed-toast controls on engagement.
-  await toast.getByRole("button", { name: "Dismiss", exact: true }).click();
-  await expect(toast).toHaveCount(0);
-  await expect(page.getByRole("button", { name: "Close dialog", exact: true })).toBeVisible();
-});
+for (const kind of ["dialog", "drawer"]) {
+  test(`notification accessibility and keyboard actions while ${kind} is open`, async ({ page }) => {
+    await page.getByRole("button", { name: `Open stress ${kind}`, exact: true }).click();
+    const notify = page.getByRole("button", { name: "Notify inside overlay" });
+    await notify.scrollIntoViewIfNeeded();
+    await notify.focus();
+    await page.keyboard.press("Enter");
+    const viewport = page.getByRole("region", { name: "Notifications", exact: true });
+    await expect(viewport).toBeAttached(); // The positioned stack has absolutely positioned children.
+    expect(await viewport.evaluate(el => el.closest('[aria-hidden="true"], [inert]') !== null)).toBe(false);
+    // The live region and named toast are exposed even before keyboard engagement.
+    const toast = page.getByRole("dialog", { name: "Modal notification", exact: true });
+    await expect(toast).toBeVisible();
+    const modal = page.getByRole("dialog").filter({ has: notify });
+    await page.keyboard.press("Tab");
+    expect(await modal.evaluate(el => el.contains(document.activeElement))).toBe(true);
+    await page.keyboard.press("Shift+Tab");
+    await expect(notify).toBeFocused();
+    await page.keyboard.press("F6");
+    await expect(viewport).toBeFocused();
+    await expect(viewport).toHaveAttribute("data-expanded", "");
+    await expect(viewport).toHaveAttribute("aria-keyshortcuts", "F6");
+    await expect(toast).toBeVisible();
+    expect(await toast.evaluate(el => el.closest('[aria-hidden="true"], [inert]') !== null)).toBe(false);
+    expect(await toast.evaluate(el => { const r = el.getBoundingClientRect(); return el.contains(document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2)); })).toBe(true);
+    await page.keyboard.press("Tab");
+    await expect(toast).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(toast.getByRole("button", { name: "Undo modal change" })).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(page.getByText("Modal change undone", { exact: true })).toBeVisible();
+    await expect(modal).toBeVisible();
+    await page.keyboard.press("Tab");
+    await expect(toast.getByRole("button", { name: "Dismiss", exact: true })).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(notify).toBeFocused();
+    await page.keyboard.press("F6");
+    await expect(viewport).toBeFocused();
+    await page.keyboard.press("Shift+Tab");
+    await expect(notify).toBeFocused();
+    await page.keyboard.press("F6");
+    await expect(viewport).toBeFocused();
+    await page.keyboard.press("Tab");
+    await page.keyboard.press("Tab");
+    await page.keyboard.press("Tab");
+    await expect(toast.getByRole("button", { name: "Dismiss", exact: true })).toBeFocused();
+    await page.keyboard.press("Enter");
+    await expect(toast).toHaveCount(0);
+    await expect(notify).toBeFocused();
+    await page.keyboard.press("Escape");
+    await expect(modal).toHaveCount(0);
+    await expect(page.getByRole("button", { name: `Open stress ${kind}`, exact: true })).toBeFocused();
+  });
+}
 
 test.describe("coarse pointer", () => {
   test.use({ hasTouch: true });

@@ -151,7 +151,10 @@ one name:
   `close` and `promise`, with `title`, `description`, `type`, `timeout`, `priority`, `actionProps`
   and the two lifecycle callbacks — rather than the primitive's whole option set; `promise()`
   reports one promise through one toast, and its loading, success and error states each carry a
-  mark and a tone;
+  mark and a tone. **F6** enters the notification stack, including while a Dialog or Drawer is
+  open; **Tab** reaches each toast's action and dismissal. **Shift+Tab** from the viewport, or
+  Tab past the final control, returns to the previous control. Ordinary modal Tab navigation
+  remains inside the modal; notification access uses the primitive's dedicated shortcut;
 - **navigation** — `NavGroup` is a titled group of `NavGroupItem`s that brings no surface of its
   own, so a navigation column reads as one region rather than a card holding cards. `NavItem` is a
   row the densest density step sizes, whose current destination takes the lightest accent tint and

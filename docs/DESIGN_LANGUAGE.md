@@ -334,6 +334,13 @@ Use this level only for the application toast stack, never to rank menus, popove
 For example, a save notification remains readable over its modal editor; a Select inside that
 editor still uses `stacking.float` and Base's nested portal order.
 
+Painting above a modal is permitted only with equivalent accessible interaction. Base's toast
+viewport is a live region (exempt from modal `aria-hidden` isolation), and its F6 shortcut
+enters the stack while ordinary Tab navigation stays within the modal. Tab reaches toast
+actions and dismissal; leaving the stack restores the previous focus. Sherick advertises F6
+through `aria-keyshortcuts` and keeps those behaviors with Base, not a local focus exemption
+or portal reparenting mechanism. The hostile suite verifies this contract for Dialog and Drawer.
+
 ---
 
 ## 8. Edge — structural lines

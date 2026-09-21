@@ -84,6 +84,23 @@ component branches. Native text metrics and scrollbar geometry vary; assertions 
 and relative geometry instead of screenshot equality across engines. Collapsed-toast controls
 are exposed on engagement by Base UI, not by adding another local focus manager.
 
+### Toast/modal accessibility review follow-up
+
+The pointer-only toast/modal check was insufficient evidence. It is now replaced by Dialog
+and Drawer regressions that raise an actionable toast, verify the live region and named toast
+have no `aria-hidden="true"`/`inert` ancestor, and use actual keyboard events to enter the stack,
+activate Undo, reach and activate Dismiss, and restore focus. Ordinary Tab stays inside the
+modal; F6 enters notifications; Tab past the final control or Shift+Tab from the viewport
+returns to the previous modal control. Closing the modal still restores its original trigger.
+
+The proposed isolation failure did not reproduce against the installed Base UI 1.8.0.
+`floating-ui-react/utils/markOthers.mjs` explicitly adds `[aria-live]` elements to its keep set;
+`toast/viewport/ToastViewport.mjs` supplies that live region and the global F6 handler. The
+modal's call to `markOthers` alone does not imply that notifications are hidden or unreachable.
+Sherick now advertises the existing shortcut with `aria-keyshortcuts="F6"` and documents it.
+No portal reparenting, modal-focus exemption, ARIA removal or local key handler was needed.
+These DOM/focus tests are not a substitute for the manual screen-reader checks noted below.
+
 Reflow tests reduce the CSS viewport to the space left at 200%/400% zoom; they do not drive a
 browser's zoom UI. Root-font scaling is a separate test. Coarse-pointer emulation is not a
 physical phone, and shrinking the viewport is not a real soft keyboard. Actual mobile keyboards,
@@ -97,7 +114,7 @@ engines; no browser is silently skipped when unavailable.
 
 ## 7. Regression evidence
 
-The new suite has 29 scenarios per engine (87 executions). It checks containment, actual
+The new suite has 30 scenarios per engine (90 executions). It checks containment, actual
 scroll movement, reachable endpoints, pointer interception, keyboard effects, focus restoration
 and accessible names—not just whether a component mounted. Existing Chromium suites retain
 contrast, optical balance, focus, forced-colors, motion/interruption, CSS isolation, consumer
@@ -113,7 +130,7 @@ the intended layout, hit-area and loading-mark changes only.
 - package/style/contrast checks; bundle and tree-shaking budgets; packed ESM/CommonJS/SSR/CSS checks;
 - deterministic style contract;
 - showcase: **201 passed**, two optional visual-review artifact captures skipped;
-- no-Tailwind consumer: **93 passed** (87 hostile executions plus six existing Chromium tests).
+- no-Tailwind consumer: **96 passed** (90 hostile executions plus six existing Chromium tests).
 
 The supported CI command remains `bun run verify` after browser installation. Bundle budgets
 were **not increased**: reusing `list.option` for the disclosure row removed duplicated recipe

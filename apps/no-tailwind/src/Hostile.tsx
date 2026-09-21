@@ -17,13 +17,15 @@ const tabs = ["Overview", "Permissions and access", "Recent activity"].map((labe
 
 function NestedControls() {
   const toast = useToast();
+  const [undone, setUndone] = useState(false);
   return <div className="hostile-stack">
     <Select aria-label="Nested select" options={options} defaultValue="long" />
     <Field label="Nested combobox"><Combobox options={options} /></Field>
     <Popover><Popover.Trigger render={<Button>Nested popover</Button>} /><Popover.Content><Input label="Popover field" /></Popover.Content></Popover>
     <Menu><Menu.Trigger render={<Button>Nested menu</Button>} /><Menu.Content><Menu.Item>Nested command</Menu.Item></Menu.Content></Menu>
     <Tooltip content="Nested hint"><Button>Nested tooltip</Button></Tooltip>
-    <Button onClick={() => toast.add({ title: "Modal notification", description: "Saved while editing", timeout: 0 })}>Notify inside overlay</Button>
+    <Button onClick={() => toast.add({ title: "Modal notification", description: "Saved while editing", timeout: 0, actionProps: { children: "Undo modal change", onClick: () => setUndone(true) } })}>Notify inside overlay</Button>
+    {undone && <p>Modal change undone</p>}
     <Tabs tabs={tabs} ariaLabel="Nested tabs" />
     <Accordion><Accordion.Item value="form"><Accordion.Trigger>{long}</Accordion.Trigger><Accordion.Panel><Textarea label="Disclosed notes" /></Accordion.Panel></Accordion.Item></Accordion>
     {Array.from({ length: 8 }, (_, i) => <Input key={i} label={`Form field ${i}`} />)}
