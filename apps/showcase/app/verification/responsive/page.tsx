@@ -100,16 +100,16 @@ export default function VerificationResponsivePage() {
             <Combobox options={projectOptions} defaultValue="design" />
           </Field>
 
-          <div className="overflow-x-auto">
-            <Tabs
-              ariaLabel="Narrow sections"
-              tabs={[
-                { id: "overview", label: "Overview", content: "Overview panel" },
-                { id: "behavior", label: "Behavior", content: "Behavior panel" },
-                { id: "themes", label: "Themes", content: "Themes panel" },
-              ]}
-            />
-          </div>
+          {/* A tab row owns its own horizontal overflow, so it is placed here the way an
+              application places it: no wrapper, and still no page-level scroll at 320px. */}
+          <Tabs
+            ariaLabel="Narrow sections"
+            tabs={[
+              { id: "overview", label: "Overview", content: "Overview panel" },
+              { id: "behavior", label: "Behavior", content: "Behavior panel" },
+              { id: "themes", label: "Themes", content: "Themes panel" },
+            ]}
+          />
 
           <ChipGroup aria-label="Narrow filters" defaultValue={["design"]}>
             <Chip value="design">Design</Chip>

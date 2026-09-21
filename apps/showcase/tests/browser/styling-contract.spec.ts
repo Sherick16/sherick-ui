@@ -185,15 +185,44 @@ test("forced-colors preserves canonical focus and important state boundaries", a
   await expect(checkedSwitch).toHaveAttribute("aria-checked", "true");
   expect(await checkedSwitch.evaluate((element) => getComputedStyle(element).outlineStyle)).not.toBe("none");
 
-  // A selected checkbox, a selected radio and a slider thumb all carry their meaning in
-  // tone or depth alone, both of which forced colors removes.
-  for (const selected of [
-    page.getByRole("checkbox", { name: "Torture checkbox" }),
-    page.getByRole("radio", { name: "Alpha" }),
-  ]) {
-    await expect(selected).toHaveAttribute("aria-checked", "true");
-    expect(await selected.evaluate((element) => getComputedStyle(element).outlineStyle)).not.toBe("none");
+  // A mark's identity is carried by tone or depth alone, both of which forced colors removes, so
+  // both a selected and a *resting* checkbox and radio need an authored boundary. The resting
+  // boundary is CanvasText — component identity rather than selection — while the focus ring
+  // still wins while the control is focused.
+  const marks = [
+    { name: "a checked checkbox", locator: page.getByRole("checkbox", { name: "Torture checkbox" }), checked: "true" },
+    { name: "an unchecked checkbox", locator: page.getByRole("checkbox", { name: "Torture unchecked checkbox" }), checked: "false" },
+    { name: "a checked radio", locator: page.getByRole("radio", { name: "Alpha" }), checked: "true" },
+    { name: "an unchecked radio", locator: page.getByRole("radio", { name: "Beta" }), checked: "false" },
+  ];
+  const canvasText = await page.evaluate(() => {
+    const probe = document.createElement("div");
+    probe.style.color = "CanvasText";
+    document.body.appendChild(probe);
+    const value = getComputedStyle(probe).color;
+    probe.remove();
+    return value;
+  });
+  for (const mark of marks) {
+    await expect(mark.locator, `${mark.name} should be ${mark.checked}`).toHaveAttribute("aria-checked", mark.checked);
+    const outline = await mark.locator.evaluate((element) => {
+      const style = getComputedStyle(element);
+      return { style: style.outlineStyle, color: style.outlineColor };
+    });
+    expect(outline.style, `${mark.name} needs a forced-colors boundary`).not.toBe("none");
+    if (mark.checked === "false") {
+      expect(outline.color, `${mark.name} should use CanvasText, not Highlight`).toBe(canvasText);
+    }
   }
+
+  // A focused resting mark still shows the canonical focus ring rather than losing it to the
+  // resting boundary the rule above draws: while the keyboard is on the control the boundary is
+  // excluded, and the ring is polled because the outline settles on the motion layer.
+  const focusedUnchecked = page.getByRole("checkbox", { name: "Torture unchecked checkbox" });
+  await focusedUnchecked.focus();
+  await expect
+    .poll(async () => parseFloat(await focusedUnchecked.evaluate((element) => getComputedStyle(element).outlineWidth)))
+    .toBeGreaterThanOrEqual(2);
 
   const thumb = page.getByRole("slider", { name: "Torture slider" }).locator("..");
   expect(await thumb.evaluate((element) => getComputedStyle(element).borderStyle)).not.toBe("none");

@@ -135,6 +135,7 @@ export default function VerificationInteractionsPage() {
             emphasis and `aria-current` together rather than by colour alone. */}
         <div data-testid="nav-group" className="max-w-xs">
           <NavGroup
+            headingLevel={2}
             title="Sections"
             activeHref="#nav-group-current"
             items={[
@@ -468,7 +469,7 @@ export default function VerificationInteractionsPage() {
           <span data-testid="alert-state">{alertOpen ? "open" : "closed"}</span>
           <span data-testid="alert-outcome">{alertOutcome}</span>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-4">
           <Button appearance="filled" onClick={() => setDialogOpen(true)}>
             Open dialog
           </Button>
@@ -763,6 +764,18 @@ function ToastFixture({ onAction }: { onAction: (value: string) => void }) {
         }}
       >
         Raise failing toast
+      </Button>
+      {/* A toast's own title is what Base labels the dialog with, so a toast raised with only a
+          description has to be named by what it reports instead. */}
+      <Button
+        onClick={() =>
+          toast.add({
+            type: "warning",
+            description: "Raised without a title.",
+          })
+        }
+      >
+        Raise untitled toast
       </Button>
       <Button onClick={() => toast.close()}>Close toasts</Button>
     </div>

@@ -145,6 +145,25 @@ test.describe("Popover", () => {
   });
 });
 
+/** What a row renders: its navigation highlight, whether the platform calls its focus visible, and
+ *  whether it is painting a ring — read from the rendered `::before` opacity and `box-shadow`. */
+const ringOf = (locator: Locator) =>
+  locator.evaluate((element) => {
+    const before = getComputedStyle(element, "::before");
+    const style = getComputedStyle(element);
+    const insetSpreads = style.boxShadow
+      .split(/,\s*(?![^()]*\))/)
+      .filter((layer) => /inset/.test(layer))
+      .map((layer) => [...layer.matchAll(/(-?[\d.]+)px/g)].map((match) => Number.parseFloat(match[1])))
+      .filter((widths) => widths.length === 4)
+      .map((widths) => widths[3]);
+    return {
+      highlighted: Number(before.opacity) > 0,
+      focusVisible: element.matches(":focus-visible"),
+      ring: insetSpreads.some((spread) => spread > 0) ? "ringed" : "none",
+    };
+  });
+
 test.describe("Menu", () => {
   const item = (page: Page, name: string | RegExp) => page.getByRole("menuitem", { name });
   const menu = (page: Page) => page.getByRole("menu");
@@ -187,6 +206,46 @@ test.describe("Menu", () => {
     await expect(item(page, "Delete")).toHaveAttribute("data-highlighted", "");
     await page.keyboard.press("Enter");
     await expect(page.getByTestId("menu-action")).toHaveText("delete");
+
+    expect(errors).toEqual([]);
+  });
+
+  /* A collection row answers two different questions and must answer them differently: which row
+     the pointer is on, and which row the keyboard will act on. Base gives the active row real DOM
+     focus either way, so the distinction the platform draws is `:focus-visible` — and these are the
+     rendered states, read from the row's own box-shadow rather than from its class list. */
+  test("a highlighted row rings for the keyboard and not for the pointer", async ({ page, errors }) => {
+    await openFixture(page);
+
+    /* the pointer opens the list and moves over a row: highlight only */
+    await openMenu(page);
+    await item(page, /Archive every deployment/).hover();
+    const hovered = await ringOf(item(page, /Archive every deployment/));
+    expect(hovered.highlighted, "the pointer's row carries the navigation highlight").toBe(true);
+    expect(hovered.focusVisible, "and the platform does not call a pointer's focus visible").toBe(false);
+    expect(hovered.ring, "so it carries no keyboard ring").toBe("none");
+
+    await page.keyboard.press("Escape");
+    await expect(menu(page)).toHaveCount(0);
+
+    /* the keyboard opens the same list and steps down it: highlight and ring */
+    const opener = page.getByRole("button", { name: "Open menu" });
+    await opener.focus();
+    await page.keyboard.press("Enter");
+    await expect(item(page, "Rename")).toBeVisible();
+    await page.keyboard.press("Home");
+
+    const focused = await ringOf(item(page, "Rename"));
+    expect(focused.focusVisible).toBe(true);
+    expect(focused.ring).toBe("ringed");
+
+    /* including a row that cannot be activated: it stays reachable, and it still shows where the
+       navigation is rather than disappearing into the disabled tone */
+    await page.keyboard.press("ArrowDown");
+    const disabled = await ringOf(item(page, "Duplicate"));
+    expect(await item(page, "Duplicate").getAttribute("data-disabled")).toBe("");
+    expect(disabled.focusVisible, "a disabled command is still navigable").toBe(true);
+    expect(disabled.ring, "and still shows the ring that says the keyboard is on it").toBe("ringed");
 
     expect(errors).toEqual([]);
   });

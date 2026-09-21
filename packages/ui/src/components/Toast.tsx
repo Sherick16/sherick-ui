@@ -175,6 +175,21 @@ const toastMark = (type: string | undefined): ReactNode => {
   }
 };
 
+/* A toast is a dialog, and a dialog has to be named. Base names it from the `Toast.Title` part,
+   so a toast raised with only a description would publish an unnamed dialog — a role with no
+   accessible name. The state it reports names it instead in that case, which is what an
+   assistive technology has left to announce; the description is still what it reads out, because
+   Base points the toast's own `aria-describedby` at it. A toast raised with a title is untouched.
+   The copy is this package's, like every other name the library gives a control it renders. */
+const toastTypeName: Record<string, string> = {
+  info: "Information",
+  success: "Success",
+  warning: "Warning",
+  danger: "Error",
+  error: "Error",
+  loading: "Working",
+};
+
 /* Where the stack sits, where a toast rests inside the viewport, and which way it grows. A stack
    anchored to the bottom grows upward and a toast leaves downward, so one signed factor carries
    both the resting offset and the edge a new toast arrives from. The horizontal inset is
@@ -252,6 +267,7 @@ export const ToastViewport = ({ position = "bottom-end", className }: ToastViewp
             <BaseToast.Root
               key={toast.id}
               toast={toast}
+              aria-label={toast.title ? undefined : toastTypeName[String(toast.type ?? "")] ?? "Notification"}
               className={cn(
                 /* The stack's own geometry: each toast is anchored to the same viewport corner,
                    sits one shortened step behind the one in front of it, and the stack clamps every

@@ -118,6 +118,10 @@ export const elevation = {
   floating: "shadow-sherick-floating",
   control: "shadow-sherick-control",
   recessed: "shadow-sherick-recessed",
+  /* One rung further down: the well of a mark the size of a glyph, whose whole identity is its
+     depth. A wide groove reads from its fill; a 24px well has no fill step to spare, so one wall
+     of the well is deepened and that boundary is what says what it is. See `selectable.markSurface`. */
+  well: "shadow-sherick-well",
 } as const;
 
 /* Shape — semantic corner roles, never an arbitrary radius. Softness grows with
@@ -362,7 +366,14 @@ export const material = {
   matte: "bg-sherick-surface/[0.78] text-sherick-ink",
   matteHigh: "bg-sherick-surface-high/[0.72] text-sherick-ink",
   control: "bg-sherick-surface-high/[0.66] text-sherick-ink placeholder:text-sherick-ink-muted",
-  controlError: "bg-sherick-danger/[0.075] text-sherick-ink placeholder:text-sherick-danger/[0.72]",
+  /* The invalid fill carries its placeholder at the *full* danger tone, not at a fraction of it. A
+     placeholder is text, so it answers to the same 4.5:1 the copy beside it does, and a partial
+     opacity of an accent is a different colour from the accent: the 72%-opacity placeholder
+     measured 2.8–3.0:1 light and 3.4–3.9:1 dark on this fill, while the token it was mixed from
+     measures 4.1–4.7:1 light and 5.2–6.2:1 dark on it. There is no dimmer step of a semantic tone
+     that is still readable, and a normal field's placeholder is `ink-muted` at full strength
+     already — so the error form is the same rule, in the tone the field is in. */
+  controlError: "bg-sherick-danger/[0.075] text-sherick-ink placeholder:text-sherick-danger",
   handle: "bg-sherick-ink-muted text-sherick-canvas",
   acrylic:
     "bg-sherick-surface-float/[var(--sui-glass-fill)] bg-[image:var(--sui-glass-gradient)] text-sherick-ink backdrop-blur-[var(--sui-glass-blur)] backdrop-saturate-[var(--sui-glass-saturation)] backdrop-brightness-[var(--sui-glass-brightness)]",
@@ -455,13 +466,28 @@ export const overlay = {
   sheet: /* @__PURE__ */ cx(shape.sheet, material.acrylicHero, elevation.floating),
 } as const;
 
-/* Text hierarchy — three steps, no more. High emphasis carries labels and values,
-   medium emphasis carries supporting copy, low emphasis carries the dimmest
-   furniture such as gutters and hints. */
+/* Text hierarchy — two roles, because only two can carry readable text. High emphasis carries
+   labels and values, medium emphasis carries supporting copy, descriptions and placeholders. Both
+   clear 4.5:1 on every surface the library composites over, in both themes.
+   
+   There is deliberately no third text step. A third step would have to sit between `medium` and
+   the dimmest tone a surface allows, and at these surfaces the value that clears 4.5:1 collapses
+   into `ink-muted` — a step that measures the same as the one above it is not a hierarchy, it is a
+   role pretending to be one. The dimmest tone is a *non-text* role instead (see `detail` below). */
 export const text = {
   high: "text-sherick-ink",
   medium: "text-sherick-ink-muted",
-  low: "text-sherick-ink-faint",
+} as const;
+
+/* Detail — the non-text furniture tone: a gutter, a rail, a mark's frame, secondary graphical
+   detail that carries meaning without being read. It answers to the 3:1 non-text requirement on
+   every surface it is permitted on, and it is never a foreground for text: a hint, a placeholder,
+   a line number or any other readable step uses `text.medium`. */
+export const detail = {
+  /** A mark's own frame, or a rail drawn as a line. */
+  mark: "border-sherick-detail",
+  /** The same tone as a block, for a gutter or a rail with thickness. */
+  fill: "bg-sherick-detail",
 } as const;
 
 /* A list surface — the sheet a collection of rows sits in, and the two row densities it can
@@ -486,11 +512,22 @@ export const text = {
    performed", never "cannot be found". */
 export const list = {
   sheet: "max-w-[var(--available-width)] max-h-[var(--available-height)] overflow-y-auto",
-  /* A row in a selection list: one line, read one at a time and chosen. */
+  /* A row in a selection list: one line, read one at a time and chosen.
+     The row carries two separate things that both have to be visible. Its *navigation highlight*
+     is the state layer — one tone shared with the pointer, because a row under the pointer and a
+     row under the arrow keys are the same thing happening. Its *focus treatment* is the shared
+     inset ring, and it is gated on `:focus-visible`, which is what separates the two cases: Base
+     gives the active row real DOM focus, and the platform reports that focus as visible when the
+     keyboard put it there and not when a pointer did. So a pointer that opens a list and moves
+     over a row gets the highlight and no ring, a keyboard that opens one and steps down it gets
+     both, a selected row keeps its selection tint under the ring, and a disabled-but-navigable
+     row still shows where the navigation is while saying it cannot be used. The ring is inset
+     because the row lives inside the sheet it belongs to, as a segment does in its track. */
   option: /* @__PURE__ */ cx(
     "flex w-full items-center justify-between gap-4 px-4 py-3 text-left text-sm outline-none",
     shape.control,
     motionFeedback,
+    focusRingInset,
     text.high,
     stateLayer.quiet,
     stateLayer.activeRow,
@@ -504,6 +541,7 @@ export const list = {
     "flex w-full items-center gap-3 px-3 py-2 text-left text-sm outline-none",
     shape.row,
     motionFeedback,
+    focusRingInset,
     text.high,
     stateLayer.quiet,
     stateLayer.activeRow,
@@ -518,13 +556,19 @@ export const list = {
    component maps its own primitive's panel variable onto, because the measured geometry is
    anatomy and only the interpolation is temporal. */
 export const disclosure = {
-  /* The row: the same object `list.option` is, because a disclosure header is scanned and
-     activated the same way a selectable row is. The chevron the component puts in it is the
-     disclosure's own affordance and turns in place under `motionOrient`. */
+  /* The row: a full-width row in a stacked group, activated like a selectable row. Its own focus
+     indicator is the shared inset ring, because an offset one drawn outside the row would land on
+     the divider or the panel beside it rather than around the row it belongs to — which is the same
+     reason a segment inside a track takes the inset form. A collection row is the one row that is
+     not this: the primitive gives its active row real DOM focus and the row shows the navigation
+     highlight instead, so a row in a list publishes its own focus treatment through the state
+     layer. The chevron the component puts in the row is the disclosure's own affordance and turns
+     in place under `motionOrient`. */
   trigger: /* @__PURE__ */ cx(
     "group flex w-full items-center justify-between gap-4 px-4 py-3 text-left text-sm outline-none",
     shape.control,
     motionFeedback,
+    focusRingInset,
     text.high,
     stateLayer.quiet,
     state.enabled,
@@ -599,9 +643,74 @@ export const tone = {
    ticked, which is why the second attribute stands beside the first. */
 export const selectable = {
   surface: /* @__PURE__ */ cx("relative", elevation.recessed, motionFeedback),
+  /* The same object one rung deeper, for a mark whose identity is its depth. */
+  markSurface: /* @__PURE__ */ cx("relative", elevation.well, motionFeedback),
+  /* The resting fill a *groove* holds — a segmented control's track, a tab list — and nothing more.
+     A groove that holds labelled segments is identified by those segments, exactly as a tab list is
+     identified by its labels, so it takes no boundary of its own. */
   rest: /* @__PURE__ */ cx(material.matteHigh, text.medium),
+  /* An *empty mark* — an unchecked box, an unselected radio — is the one thing in the family with
+     no content at all: nothing inside it says what it is. It takes the fill a `Switch`'s track takes,
+     so the interior is a surface rather than a hole, but that *cannot* be what identifies it: the
+     tightest neutral step this palette has measures about 1.3:1 against the surface around it, where
+     WCAG asks 3:1.
+     So the mark is **sunk deeper** instead — `markSurface` — and its depth is what identifies it:
+     one wall deepened a rung further than `recessed` draws it (the shaded wall above in light mode,
+     the lit wall below in dark mode), which is the same light the whole system is built from. See
+     the elevation recipes in `tokens.ts`, and §5 of the design language. No rim: a stroke tracing
+     all four sides of a matte control is not part of this language, and the mark now reads as the
+     switch's own well does, only deeper. */
+  mark: /* @__PURE__ */ cx("bg-sherick-surface-high", text.medium),
+  /* A filled mark is identified by its own fill. */
   selected:
     "group-data-[checked]:bg-sherick-primary-strong group-data-[checked]:text-sherick-on-primary",
   indeterminate:
     "group-data-[indeterminate]:bg-sherick-primary-strong group-data-[indeterminate]:text-sherick-on-primary",
+} as const;
+
+/* The authored alphas the contrast contract measures. They are derived from the class names above
+   rather than restated, so a change to a state step, a tint strength or the field ladder moves the
+   measurement with it: `scripts/smoke-package.mjs` passes this model to
+   `scripts/contrast-contract.mjs`, and the same module proves every class here has a rule in the
+   published stylesheet. */
+const recipeAlpha = (recipe: string, pattern: RegExp, label: string) => {
+  const match = recipe.match(pattern);
+  if (!match) throw new Error(`recipe alpha missing for ${label}`);
+  return Number(match[1]);
+};
+const stateAlpha = (recipe: string, label: string) =>
+  recipeAlpha(recipe, /opacity-\[(0?\.\d+)\]/, label);
+const fillAlpha = (recipe: string, label: string) => recipeAlpha(recipe, /\/\[(0?\.\d+)\]/, label);
+
+export const recipeAlphas = {
+  state: {
+    quiet: { hover: stateAlpha(hoverQuiet, "state.quiet.hover"), press: stateAlpha(pressQuiet, "state.quiet.press") },
+    tonal: { hover: stateAlpha(hoverTonal, "state.tonal.hover"), press: stateAlpha(pressTonal, "state.tonal.press") },
+    filled: { hover: stateAlpha(hoverFilled, "state.filled.hover"), press: stateAlpha(pressFilled, "state.filled.press") },
+  },
+  tint: {
+    soft: {
+      primary: fillAlpha(tone.soft.primary, "tint.soft.primary"),
+      danger: fillAlpha(tone.soft.danger, "tint.soft.danger"),
+      warning: fillAlpha(tone.soft.warning, "tint.soft.warning"),
+      success: fillAlpha(tone.soft.success, "tint.soft.success"),
+    },
+    selected: {
+      primary: fillAlpha(tone.selected.primary, "tint.selected.primary"),
+      danger: fillAlpha(tone.selected.danger, "tint.selected.danger"),
+      warning: fillAlpha(tone.selected.warning, "tint.selected.warning"),
+      success: fillAlpha(tone.selected.success, "tint.selected.success"),
+    },
+    neutralRest: fillAlpha(tone.tonal.secondary, "tint.neutralRest"),
+  },
+  field: {
+    quiet: fillAlpha(material.matteQuiet, "field.quiet"),
+    card: fillAlpha(material.matte, "field.card"),
+    control: fillAlpha(material.control, "field.control"),
+    hover: fillAlpha(state.field.hover, "field.hover"),
+    engaged: fillAlpha(state.field.engaged, "field.engaged"),
+    invalid: fillAlpha(state.field.invalid, "field.invalid"),
+    invalidHover: fillAlpha(state.field.invalidHover, "field.invalidHover"),
+    invalidFocus: fillAlpha(state.field.invalidFocusWithin, "field.invalidFocus"),
+  },
 } as const;

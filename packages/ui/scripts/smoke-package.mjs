@@ -7,6 +7,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import selectorParser from "postcss-selector-parser";
 import postcss from "postcss";
 import ts from "typescript";
+import { formatContrastReport, measureContrast } from "./contrast-contract.mjs";
 
 const packageRoot = fileURLToPath(new URL("..", import.meta.url));
 const library = await import("../dist/esm/index.js");
@@ -192,6 +193,7 @@ for (const token of [
   "--sui-elevation-floating",
   "--sui-elevation-control",
   "--sui-elevation-recessed",
+  "--sui-elevation-well",
   "--sui-glass-fill",
   "--sui-glass-dense-fill",
   "--sui-glass-gradient",
@@ -224,6 +226,25 @@ assert.match(stylesCss, /KaTeX_Main-Regular/);
 assert.match(stylesCss, /@media \(forced-colors: active\)/);
 assert.match(stylesCss, /:where\(\.sui-scope\)\s*\{/,
   "Tailwind runtime plumbing must initialize only explicitly owned nodes");
+
+/* ---------------------------------------------------------------------------------------------
+   Contrast contract.
+
+   `scripts/contrast-contract.mjs` owns the colour math and the description of the compositions the
+   design system renders; this runs it against the values the package actually publishes. Every
+   composition is simply pass or fail — there is no allowlist, and a regression here is a regression
+   in the published theme.
+   --------------------------------------------------------------------------------------------- */
+/* The alpha steps are derived from the recipes the package just built, so the contract measures the
+   steps the UI renders rather than a second handwritten copy. */
+const { recipeAlphas } = await import("../dist/esm/dev.js");
+const contrastResults = measureContrast({ light: lightVariables, dark: darkVariables }, recipeAlphas);
+const contrastFailures = contrastResults.filter((result) => !result.pass);
+assert.deepEqual(
+  contrastFailures.map((result) => `${result.theme}:${result.id}`),
+  [],
+  `contrast against the published tokens:\n${formatContrastReport(contrastResults)}`
+);
 
 const stylesRoot = postcss.parse(stylesCss);
 const isInKeyframes = (rule) => {

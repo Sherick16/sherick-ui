@@ -116,17 +116,22 @@ const CodeBlock = ({ inline = false, className, language = "text", children }: C
             style={style}
           >
             <code className={cn("inline-block min-w-full")}>
-              {tokens.map((line, i) => (
-                <span key={i} {...getLineProps({ line })} className={cn("block", getLineProps({ line }).className)}>
-                  <span className={cn("mr-4 inline-block w-4 select-none text-right", text.low)}>
-                    {i + 1}
+              {tokens.map((line, i) => {
+                const lineProps = getLineProps({ line });
+                return (
+                  <span key={i} {...lineProps} className={cn("block", lineProps.className)}>
+                    {/* Line numbers are text, so they take a text role: the dimmest tone in the
+                        library is furniture, not a readable step. */}
+                    <span className={cn("mr-4 inline-block w-4 select-none text-right", text.medium)}>
+                      {i + 1}
+                    </span>
+                    {line.map((token, key) => {
+                      const tokenProps = getTokenProps({ token });
+                      return <span key={key} {...tokenProps} className={cn(tokenProps.className)} />;
+                    })}
                   </span>
-                  {line.map((token, key) => {
-                    const tokenProps = getTokenProps({ token });
-                    return <span key={key} {...tokenProps} className={cn(tokenProps.className)} />;
-                  })}
-                </span>
-              ))}
+                );
+              })}
             </code>
           </pre>
         )}

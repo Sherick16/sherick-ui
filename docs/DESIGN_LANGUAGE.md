@@ -89,13 +89,33 @@ pressed insets stay physically related.
 | --- | --- |
 | an upper edge catches light | `inset 0 1px 0` highlights, brighter acrylic tops |
 | a lower edge falls into shade | shadows offset straight down (`0 Y`), acrylic gradients run top → bottom |
-| a recessed surface inverts it | the upper lip is shaded, the lower lip catches a faint bounce |
+| a recessed surface inverts it | the upper lip is shaded, the lower lip catches a faint bounce; how *deep* the recess is decides which of the two walls is legible, and the other stays a bounce |
 | a structural edge is drawn | `--sui-edge`, a shade-tinted hairline |
 
 `--sui-light-top` (the highlight color) and `--sui-light-bottom` (the shade color) are
-the two values the elevation ladder composites from: `raised`, `floating`, `control` and
-`recessed` are all built out of them, so re-tuning that pair re-lights every shadow,
-highlight and pressed inset at once.
+the two values the elevation ladder composites from: `raised`, `floating`, `control`,
+`recessed` and `well` are all built out of them, so re-tuning that pair re-lights every
+shadow, highlight and pressed inset at once. They differ in **depth, never in kind**: `well` is
+`recessed` with the wall the light makes legible drawn deeper, and its opposite wall left alone.
+
+Depth is also what identifies a mark that has **no fill step to spare**. A wide groove reads
+from its own tone, and a mark the size of a glyph has none: the deepest neutral step in the
+palette is about 1.3:1 against the surface around it, so tone alone cannot carry it. `well` is
+the answer — the same light, one rung further down — and because dark mode inverts the light it
+inverts which wall is legible too: the *shaded* wall above carries it in light mode and the
+*lit* wall below carries it in dark mode, each measuring at or above 3:1 against every surface a
+mark can sit on (`bun run test` measures exactly that composition, and the rendered walls clear
+it as well). The opposite wall stays a bounce in each theme.
+
+Exactly one wall carries it, and at the **least strength that clears the requirement** — measured,
+not felt: the shaded wall clears 3:1 in light mode and the lit wall in dark mode, and the other wall
+is `recessed`'s own. A well should read as a *deeper* groove, not as a more dramatic one, so the
+strength is spent on the boundary rather than on the whole interior. Nothing draws a line around the mark — a stroke
+tracing all four sides of a matte control is not part of this language, and beside a `Switch`,
+which draws none, it looks like exactly what it is. If a design wants an empty mark to sit at
+*exactly* the recessed depth of a groove, then its tone has to carry the requirement instead, and
+that is a palette decision: the neutral ladder would need a step about 3:1 from the surface around
+it, which today it does not have.
 
 The acrylic recipes are a **separate** token family (`--sui-glass-*`), calibrated per
 theme rather than composited from those two values. They follow the same directional
@@ -146,7 +166,7 @@ only softens what is left.
 
 ## 5. Elevation — how far a surface sits off the page
 
-Primitives: `flat`, `raised`, `floating`, `control`, `recessed`.
+Primitives: `flat`, `raised`, `floating`, `control`, `recessed`, `well`.
 
 Depth is chosen by **anatomy**, never by state.
 
@@ -156,6 +176,7 @@ Depth is chosen by **anatomy**, never by state.
 | `raised` | a manipulated control lifted a hair above its own track | tactile tonal controls (tonal `Button`, `IconButton`) | passive surfaces, table rows, menu rows |
 | `control` | the resting half of the tactile pair | a part the user moves — a switch thumb, a selected segment | wide surfaces, or a whole segmented control |
 | `recessed` | the other half of the pair | grooves, tracks and wells, which are sunk by definition | raised or resting controls |
+| `well` | the recessed recipe with **one** of its walls made deeper — a soft shade above in light mode, a soft light below in dark mode — while the opposite wall stays exactly as `recessed` draws it; no drawn edge anywhere | the *small* sunk mark whose entire identity is its depth — an empty checkbox box, an unselected radio circle | anything with a fill step to spare; a groove, a track, a field or a card, all of which read from their own tone |
 | `floating` | a surface that genuinely sits above the application | acrylic overlays: menus, tooltips, dialogs | matte surfaces sitting on the page |
 
 The tactile pair (`control` / `recessed`) is deliberately shallower than the tonal
@@ -336,7 +357,15 @@ A 1px ring that traces a filled object is still a drawn border. Therefore:
 - matte controls carry **no rim**: they are separated by tone and by light alone;
 - fields add no line at all — their hover, focus, engaged and error states are tonality
   only, which is why no border appears and disappears as a user interacts;
-- `edge.rule` needs its direction supplied at the call site (`border-t`, `border-l`).
+- `edge.rule` needs its direction supplied at the call site (`border-t`, `border-l`);
+- **an empty mark is identified by its depth, not by a line.** A checkbox box or a radio circle at
+  rest is the one thing in the family with no content at all, and the neutral ladder cannot carry it
+  either: the deepest step the palette has measures about 1.3:1 against the surface around it, where
+  WCAG asks 3:1 of the information that identifies a component. A stroke tracing all four sides would
+  answer that on paper and be a drawn border in fact — the one thing this section exists to prevent,
+  and it reads as foreign next to a `Switch`, which has no such line. The mark is **sunk one rung
+  deeper instead** (§5), and its depth is what says what it is. There is no exception to the rule
+  above: nothing in the library draws a rim around a filled or matte control.
 
 **Do:** use a hairline to separate sibling parts inside one surface.
 **Do not** draw a rim around a filled control, outline a card for emphasis, or express an
@@ -379,13 +408,22 @@ to stay proportional to its own height. A control-sized row keeps `control` at b
 ### Surfaces and text
 
 Canvas plus three surface levels (`--sui-surface`, `--sui-surface-high`,
-`--sui-surface-float`) carry structure. Three text steps carry emphasis and no more:
+`--sui-surface-float`) carry structure. **Two** text steps carry emphasis, and one non-text tone
+carries furniture:
 
-| Text step | Carries | Should not be used for |
-| --- | --- | --- |
-| `text.high` | labels and values | dimmed furniture |
-| `text.medium` | supporting copy | primary labels, where it would soften hierarchy |
-| `text.low` | the dimmest furniture — gutters, hints, token names | anything a user must read to act |
+| Role | Recipe | Carries | Should not be used for |
+| --- | --- | --- | --- |
+| high | `text.high` | labels and values | dimmed furniture |
+| medium | `text.medium` | supporting copy, descriptions, placeholders, hints, line numbers | primary labels, where it would soften hierarchy |
+| detail | `detail.mark` / `detail.fill` | **non-text** furniture — a rail, a gutter, a mark's frame, secondary graphical detail | anything a reader has to read |
+
+There is deliberately no third text step, and the language says so rather than leaving a trap.
+A third step would have to sit between `medium` and the lightest surface a component composites
+over; measured against those surfaces, the value that clears 4.5:1 is at or above `ink-muted`'s
+own lightness, so a third *readable* step cannot exist as a distinct step at this surface range.
+What used to be `text.low` / `--sui-ink-faint` is therefore `detail`: a non-text tone that answers
+to the 3:1 WCAG asks of non-text information, sits visibly below `text.medium`, and is never a
+foreground for text.
 
 A surface level is a **tone, not a depth**. Depth comes from the elevation ladder.
 
@@ -474,8 +512,10 @@ field is what compresses.
 
 **Selection is a recessed surface that fills.** A switch track, a checkbox box, a radio
 circle and a slider groove are one object at four sizes: `selectable.surface` gives them
-the recessed depth of a groove and a non-spatial tone response, `selectable.rest` is the
-neutral matte step they hold until they are selected, and `selectable.selected` /
+the recessed depth of a groove and a non-spatial tone response, `selectable.markSurface` is the
+same object one rung deeper — the `well` of a mark whose identity *is* its depth (§5) —
+`selectable.rest` is the neutral matte step a *groove* holds until something in it is selected,
+`selectable.mark` is the well fill an *empty* mark sits in, and `selectable.selected` /
 `selectable.indeterminate` are the accent they take once they are — keyed on the
 primitive's own selection attribute, so an uncontrolled control is styled from the same
 source of truth as a controlled one. Selection never changes their depth: tone carries it,
@@ -577,7 +617,15 @@ Everything else is shared, and that sharing is the point:
 
 - **hover and keyboard highlight are one tone at one strength.** A row composes `quiet` and
   `activeRow` together, so a row under the pointer and a row under the arrow keys read as the
-  same thing happening;
+  same thing happening — the pointer and the keyboard both say *which row you are on*;
+- **the keyboard gets a second, separate signal.** Which row the pointer is on and which row the
+  keyboard will act on are two different questions, and a 5% highlight cannot answer the second one
+  on its own. A row therefore also takes the shared inset ring, gated on `:focus-visible`: Base gives
+  the active row real DOM focus, and the platform reports that focus as visible when the keyboard put
+  it there and not when a pointer did. So a pointer that opens a list and moves over a row gets the
+  highlight and no ring, a keyboard that opens one and steps down it gets both, a selected row keeps
+  its selection tint under the ring, and a disabled-but-navigable row still shows where the
+  navigation is while saying it cannot be used;
 - **selection is a tint of the sheet** (`tone.selected`), never the opaque accent. The one
   primary fill in a view belongs to the primary action, not to a row that happens to be chosen;
 - **a destructive command wears its tone on its own label**, and its hover and highlight are
@@ -943,40 +991,39 @@ handle that the pointer is already moving keeps its ring for the keyboard.
 - Color is never the only carrier of meaning: a semantic state also carries an icon, a
   label or a position.
 
-### Known contrast gap (pre-release)
+### The contrast contract
 
-The authored default palette does **not** meet WCAG AA text contrast, and this is a known,
-measured, deliberately recorded limitation rather than an oversight in a component. It is
-not fixed by the palette, because closing it means changing the brand accent and collapsing
-the three-step text ladder defined in §10 — a visual-language decision, tracked separately
-from component work.
+The authored palette meets WCAG AA. What that means is not a claim but a measurement: every
+composition the language permits — each text role against each surface a component composites
+over, a semantic foreground on its own tint and through its hover and pressed states, an on-colour
+on its strong fill through the filled states, the marks that carry a selection, the error
+placeholder, the non-text tones, and the focus indicator against every surface and every fill an
+inset ring is drawn over — is measured from the published token values in both themes by
+`bun run test`, with no allowlist. See [`VERIFICATION.md`](VERIFICATION.md) for the gate and
+[`PALETTE.md`](PALETTE.md) for the values and the record of how they were chosen.
 
-Measured with axe-core 4.13 against the rendered fixtures (the automated gate excludes only
-`color-contrast`; see `docs/VERIFICATION.md`):
+Three properties of the palette are load-bearing for that result, and they are what a future
+change has to keep:
 
-| Pair | Light | Dark |
-| --- | --- | --- |
-| `tone.text.primary` on `tone.tonal.primary` (`primary` / 0.12) | 3.82–4.51 | 4.53–5.94 |
-| `tone.text.primary` on `tone.selected.primary` (`primary` / 0.22) | 3.69–3.88 | 4.36–4.87 |
-| `text.low` on the page canvas | 3.16 | 4.54 |
-| `text.low` on `surface-high` | 2.80 | 3.52 |
+- **the accents are deep enough in light mode and light enough in dark mode to survive their own
+  state layers.** A tonal control's label is the accent over a 9–12% tint of itself, and hover and
+  press composite the accent over that fill again (0.09/0.15 for a tinted control, 0.05/0.09 for a
+  text one, 0.18/0.26 for an opaque fill). The resting value is not the binding one; the pressed
+  state is;
+- **`primary`, `primary-strong` and `focus` move as one family.** The accent a label takes on a
+  tint, the opaque fill that marks priority, and the ring are one hue at three depths, and a
+  change to one of them is a change to all three;
+- **there are two text steps and a non-text tone**, per §10. A third readable step cannot exist at
+  these surfaces, and the tone that was pretending to be one is `detail`.
 
-Consequences that follow from this gap, and the rules they impose:
+Colour is never the only carrier of meaning, and the contrast of a semantic tone is not what makes
+a state legible on its own: a state also carries an icon, a label, a position or a border. That
+rule still holds, and it is now backed rather than leaned on.
 
-- **`tone.text.primary` is not an AA foreground on a primary tint.** A primary tonal control
-  or primary soft surface carries its label at roughly 3.8–4.4:1. Treat these as decorative
-  emphasis, not as the only way a user learns something they must act on.
-- **`text.low` is furniture, not copy.** §10 already restricts it to gutters, hints and token
-  names; because it measures 2.8–3.2:1 in light mode it must never carry information a user
-  needs in order to act, and it must not be the only place a value, label or error appears.
-- **Anything that must be readable uses `text.high` or `text.medium`**, both of which clear
-  AA on every authored surface in both themes.
-- A consumer that needs AA throughout can already retune `--sui-primary` and `--sui-ink-faint`
-  at the document root; that is an ordinary supported theme override, not a fork.
-
-Do not "fix" a failing contrast measurement inside a component by darkening that component's
-label: the roles above are the shared primitives, and a local color is exactly the kind of
-rule §16 forbids inventing locally.
+Do not "fix" a contrast measurement inside a component by darkening that component's label: the
+roles above are the shared primitives, and a local color is exactly the kind of rule §16 forbids
+inventing locally. When a pairing legitimately cannot be legible, the language changes — the role,
+the tint, or the state step — and then the whole set is re-measured.
 
 ---
 

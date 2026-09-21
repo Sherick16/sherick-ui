@@ -125,8 +125,8 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
                       className={cn(
                         "flex size-6 items-center justify-center",
                         shape.circle,
-                        selectable.surface,
-                        selectable.rest,
+                        selectable.markSurface,
+                        selectable.mark,
                         selectable.selected,
                         stateLayer.track,
                         groupFocusRing

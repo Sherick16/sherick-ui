@@ -43,7 +43,7 @@ const options = [
 const Specimen = ({ intent, note, children }: { intent: string; note: string; children: React.ReactNode }) => (
   <section className="space-y-4">
     <div className="space-y-1">
-      <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-sherick-ink-faint">{intent}</h2>
+      <h2 className="font-mono text-xs uppercase tracking-[0.14em] text-sherick-ink-muted">{intent}</h2>
       <p className="text-sm text-sherick-ink-muted">{note}</p>
     </div>
     <div className="flex flex-wrap items-center gap-4 rounded-[1.25rem] bg-sherick-surface/[0.55] p-5">{children}</div>

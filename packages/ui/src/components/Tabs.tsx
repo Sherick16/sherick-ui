@@ -56,46 +56,56 @@ export const Tabs = ({
       }}
       className={cn("w-full", className)}
     >
-      <BaseTabs.List
-        aria-label={ariaLabel}
-        className={cn(
-          "relative flex min-w-max bg-sherick-surface/[0.72] p-1.5",
-          shape.pill,
-          elevation.recessed
-        )}
-      >
-        <BaseTabs.Indicator
+      {/* A tab row that cannot fit where it was placed scrolls inside itself rather than widening
+         the page. The row is the content that is wider than its container, so owning that overflow
+         here is the same thing `Table` does, and it is what keeps a 320px-wide reader from having
+         to pan the whole page sideways to reach the third tab — no consumer wrapper to know
+         about, and nothing about the shape of the control changes. The scroller wraps the track
+         and not the whole control, so the region an application placed the tabs in still owns the
+         horizontal axis of everything below it, and the track keeps its own content width so the
+         pill still scrolls as one object. */}
+      <div className={cn("overflow-x-auto")}>
+        <BaseTabs.List
+          aria-label={ariaLabel}
           className={cn(
-            "absolute left-[var(--active-tab-left)] top-[var(--active-tab-top)] h-[var(--active-tab-height)] w-[var(--active-tab-width)]",
+            "relative flex min-w-max bg-sherick-surface/[0.72] p-1.5",
             shape.pill,
-            tone.selected[variant],
-            elevation.control,
-            motionRelocate
+            elevation.recessed
           )}
-        />
+        >
+          <BaseTabs.Indicator
+            className={cn(
+              "absolute left-[var(--active-tab-left)] top-[var(--active-tab-top)] h-[var(--active-tab-height)] w-[var(--active-tab-width)]",
+              shape.pill,
+              tone.selected[variant],
+              elevation.control,
+              motionRelocate
+            )}
+          />
 
-        {tabs.map((tab) => (
-          <BaseTabs.Tab
-            key={tab.id}
-            value={tab.id}
-            disabled={tab.disabled}
-            className={({ active, disabled }) =>
-              cn(
-                "relative z-10 min-h-12 min-w-28 flex-1 whitespace-nowrap px-7 py-3 text-sm font-medium",
-                shape.pill,
-                motionTactile,
-                focusRing,
-                active
-                  ? text.high
-                  : cn(text.medium, !disabled && "hover:text-sherick-ink", !disabled && stateLayer.quiet),
-                disabled && state.disabled
-              )
-            }
-          >
-            {tab.label}
-          </BaseTabs.Tab>
-        ))}
-      </BaseTabs.List>
+          {tabs.map((tab) => (
+            <BaseTabs.Tab
+              key={tab.id}
+              value={tab.id}
+              disabled={tab.disabled}
+              className={({ active, disabled }) =>
+                cn(
+                  "relative z-10 min-h-12 min-w-28 flex-1 whitespace-nowrap px-7 py-3 text-sm font-medium",
+                  shape.pill,
+                  motionTactile,
+                  focusRing,
+                  active
+                    ? text.high
+                    : cn(text.medium, !disabled && "hover:text-sherick-ink", !disabled && stateLayer.quiet),
+                  disabled && state.disabled
+                )
+              }
+            >
+              {tab.label}
+            </BaseTabs.Tab>
+          ))}
+        </BaseTabs.List>
+      </div>
 
       {tabs.map((tab) => (
         <BaseTabs.Panel key={tab.id} value={tab.id} className={cn("mt-5")}>

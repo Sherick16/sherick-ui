@@ -75,6 +75,7 @@ export default function ThemeTorturePage() {
         <Switch checked onCheckedChange={() => undefined} variant="success" aria-label="Success switch" />
 
         <Checkbox defaultChecked aria-label="Torture checkbox" />
+        <Checkbox aria-label="Torture unchecked checkbox" />
 
         <RadioGroup
           aria-label="Torture radio"

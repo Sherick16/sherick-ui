@@ -39,6 +39,26 @@ test("the stack is one polite live region and every toast is named by its own ti
   expect(errors).toEqual([]);
 });
 
+test("a toast raised without a title is still a named dialog", async ({ page, errors }) => {
+  /* A toast is a dialog, and Base names it from the `Toast.Title` part it renders — so a toast
+     raised with only a description would publish a role with no accessible name. What it reports
+     names it in that case, and the description stays the thing it reads out. The two assertions
+     are what keep the two paths distinct: the labelled-by is Base's when a title exists, and the
+     name is the viewport's when it does not. */
+  await raise(page, "Raise untitled toast");
+
+  const toast = toastNamed(page, "Warning");
+  await expect(toast).toBeVisible();
+  /* Base's own labelled-by points at a title that does not exist, so it is absent rather than
+     empty, and the name comes from the viewport instead. */
+  await expect(toast).not.toHaveAttribute("aria-labelledby", /.+/);
+  await expect(toast).toHaveAccessibleName("Warning");
+  await expect(toast).toHaveAttribute("aria-describedby", /.+/);
+  await expect(toast).toContainText("Raised without a title.");
+
+  expect(errors).toEqual([]);
+});
+
 test("a toast leaves through its own control and with the whole stack", async ({ page, errors }) => {
   await raise(page, "Raise toast");
   await expect(toasts(page)).toHaveCount(1);
