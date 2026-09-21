@@ -16,6 +16,8 @@ import {
 import { motionRelocate, motionTactile } from "./ui.motion";
 import { Variant } from "./ui.types";
 
+type TabsChangeDetails = Parameters<NonNullable<BaseTabs.Root.Props["onValueChange"]>>[1];
+
 export interface Tab {
   id: string;
   label: string;
@@ -29,7 +31,8 @@ export interface TabsProps {
   className?: string;
   value?: string;
   defaultValue?: string;
-  onValueChange?: (tabId: string) => void;
+  /** Base's value-change event details are passed through unchanged. */
+  onValueChange?: (tabId: string, eventDetails: TabsChangeDetails) => void;
   ariaLabel?: string;
 }
 
@@ -51,9 +54,9 @@ export const Tabs = ({
     <BaseTabs.Root
       value={value}
       defaultValue={value === undefined ? uncontrolledDefault : undefined}
-      onValueChange={(nextValue) => {
+      onValueChange={(nextValue, eventDetails) => {
         if (typeof nextValue !== "string") return;
-        onValueChange?.(nextValue);
+        onValueChange?.(nextValue, eventDetails);
       }}
       className={cn("min-w-0 w-full [overflow-wrap:anywhere]", className)}
     >

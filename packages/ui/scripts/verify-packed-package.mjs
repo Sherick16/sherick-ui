@@ -373,21 +373,30 @@ const buttonProps: ButtonProps = { children: "Save", appearance: "filled" };
 const selectProps: SelectProps = {
   options: [{ label: "Design", value: "design" }],
   defaultValue: "design",
+  onValueChange(_value, eventDetails) {
+    void eventDetails.reason;
+  },
 };
 const inputProps: InputProps = {
   label: "Name",
   description: "Helper",
   error: true,
   errorMessage: "Invalid",
-  onValueChange() {},
+  onValueChange(_value, eventDetails) {
+    void eventDetails.reason;
+  },
 };
 const searchProps: SearchProps = {
   onSearch() {},
-  onValueChange() {},
+  onValueChange(_value, eventDetails) {
+    void eventDetails.reason;
+  },
 };
 const switchProps: SwitchProps = {
   checked: true,
-  onCheckedChange() {},
+  onCheckedChange(_checked, eventDetails) {
+    void eventDetails.reason;
+  },
   name: "enabled",
   value: "yes",
 };
@@ -396,15 +405,24 @@ const switchProps: SwitchProps = {
 const uncontrolledSwitchProps: SwitchProps = { defaultChecked: true, onCheckedChange() {} };
 const tabsProps: TabsProps = {
   value: "one",
-  onValueChange() {},
+  onValueChange(_value, eventDetails) {
+    void eventDetails.reason;
+  },
   tabs: [{ id: "one", label: "One", content: "Panel" }],
 };
-const dialogProps: DialogProps = { defaultOpen: true, onOpenChange() {}, children: null };
+const dialogProps: DialogProps = {
+  defaultOpen: true,
+  onOpenChange(_open, eventDetails) {
+    void eventDetails.reason;
+  },
+  children: null,
+};
 const comboboxProps: ComboboxProps = {
   options: [{ label: "Design", value: "design", disabled: false }],
   value: "design",
-  onValueChange(value: string | null) {
+  onValueChange(value: string | null, eventDetails) {
     void value;
+    void eventDetails.reason;
   },
 };
 const comboboxOption: ComboboxOption = { label: "Design", value: "design" };
@@ -552,7 +570,11 @@ export const fixture = (
   <>
     <Button {...buttonProps} />
     <Input {...inputProps} onChange={(event) => void event.currentTarget.value} />
-    <Textarea label="Body" onChange={(event) => void event.currentTarget.value} />
+    <Textarea
+      label="Body"
+      onChange={(event) => void event.currentTarget.value}
+      onValueChange={(_value, eventDetails) => void eventDetails.reason}
+    />
     <Search {...searchProps} />
     <Select {...selectProps} />
     <Combobox {...comboboxProps} />

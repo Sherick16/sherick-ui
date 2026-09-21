@@ -167,8 +167,8 @@ packed-tarball consumer verification, the deterministic style contract, and both
 - The opt-in light/dark rendered reviews also passed separately and their captures were inspected.
 - Deterministic contract: 93 specimens, 26 overlay recipes, 559 scoped rules, four token blocks.
 
-The polish/verification gate is green; this is **not stable-release clearance**. Existing risks in
-`VERIFICATION.md` remain: Base UI's open editable Combobox accessibility isolation gap, and the
-recorded CodeBlock server/client Prism hydration mismatch. This pass does not resolve or conceal
-either. Browser evidence here is Chromium, not a new Firefox/WebKit certification. No package was
-published; delivery stays on the prerelease development line.
+The polish/verification gate was green, but it was **not stable-release clearance**. Phase D later
+resolved the CodeBlock server/client Prism hydration mismatch and added Firefox/WebKit gate coverage.
+The Base UI open editable Combobox isolation defect remains the stable-release blocker; its current
+evidence and exact release condition live in `RELEASE.md`. The counts above are the point-in-time
+Phase B evidence, not the current Phase E gate totals. No package was published in this phase.

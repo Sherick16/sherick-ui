@@ -60,6 +60,20 @@ Custom themes override the documented `--sui-*` CSS variables at document/root l
 
 `styles.css` includes both component styling and the generated light/dark/system token defaults. `theme.css` is also exported separately for token-only consumers.
 
+## Runtime and browser support
+
+Sherick UI supports React and React DOM 18 or 19 and the current and previous stable major releases
+of Chrome, Edge, Firefox and Safari. The core package has ESM and CommonJS entries; the rich-content
+subpath is ESM-only.
+
+### Current prerelease blocker
+
+Stable `2.0.0` must not ship until the editable `Combobox` popup no longer leaves outside,
+`aria-hidden` content in sequential keyboard navigation, or until `Combobox` is removed from the
+stable public contract. The behavior is in Base UI's popup isolation implementation and is tracked
+as `mui/base-ui#5528`. Direct keyboard assertions pass but do not replace an open-state axe scan.
+The repository's `docs/RELEASE.md` records the exact evidence and release condition.
+
 ## Usage
 
 ```tsx
@@ -115,6 +129,10 @@ The package publishes these subpaths:
 - `sherick-ui/dev` — development-only recipes for this repository's workbench. Unstable and unsupported; do not depend on it.
 
 The names above are canonical. There are no compatibility aliases: `ActionButton`, `Dropdown`, `Modal`, `TabGroup` and their prop types are gone, as are the deprecated `Select.selected`, `Select.onSelect`, `Tabs.defaultTabId`, `Tabs.onTabChange`, `Dialog.onClose` and `Table.variant` props. The `onChange` props on `Input`, `Textarea` and `Switch` are no longer Sherick callbacks — `Input` and `Textarea` pass through native `onChange`, and boolean state goes through `Switch.onCheckedChange`.
+
+Controlled callbacks keep Base UI's `(nextValue, eventDetails)` signature. This includes `Input`,
+`Textarea`, `Search`, `Select`, `Switch`, `Tabs`, `Dialog` and `Combobox`; consumers that do not need
+the event details may ignore the second argument.
 
 The viewport-owning surfaces differ in what they own. `Dialog` composes as
 `Dialog.Header`, `Dialog.Description`, `Dialog.Content` and `Dialog.Footer`; `AlertDialog` is the
