@@ -489,3 +489,89 @@ test("a resting selection mark is identified by the depth of its well", async ({
 
   expect(errors).toEqual([]);
 });
+
+/* The contrast contract measures the well's *authored* alpha against the neutral fill; it cannot
+   see what the blurred inset shadow actually paints. This reads real pixels from the rendered
+   mark: the most extreme pixel of the well, against the surface just outside it, must clear the
+   3:1 WCAG asks of the cue that identifies an empty mark. */
+test("a resting selection mark's well clears 3:1 as rendered", async ({ page, errors }) => {
+  await page.goto("/verification/interactions");
+  await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
+
+  const readPixels = async (clip: { x: number; y: number; width: number; height: number }) => {
+    const buffer = await page.screenshot({ clip });
+    const dataUrl = `data:image/png;base64,${buffer.toString("base64")}`;
+    return page.evaluate(async (url) => {
+      const image = new Image();
+      image.src = url;
+      await image.decode();
+      const canvas = document.createElement("canvas");
+      canvas.width = image.naturalWidth;
+      canvas.height = image.naturalHeight;
+      const context = canvas.getContext("2d");
+      if (!context) throw new Error("2d context unavailable");
+      context.drawImage(image, 0, 0);
+      const { data, width, height } = context.getImageData(0, 0, canvas.width, canvas.height);
+      return { width, height, data: Array.from(data) };
+    }, dataUrl);
+  };
+
+  const measure = async (locator: ReturnType<Page["locator"]>, theme: "light" | "dark") => {
+    await page.evaluate((nextTheme) => {
+      document.documentElement.dataset.sherickTheme = nextTheme;
+    }, theme);
+    await locator.scrollIntoViewIfNeeded();
+    const box = await locator.boundingBox();
+    expect(box, "the mark has no box").not.toBeNull();
+
+    const margin = 8;
+    const region = await readPixels({
+      x: Math.round((box?.x ?? 0) - margin),
+      y: Math.round((box?.y ?? 0) - margin),
+      width: Math.round((box?.width ?? 0) + margin * 2),
+      height: Math.round((box?.height ?? 0) + margin * 2),
+    });
+    const pixel = (x: number, y: number) => {
+      const index = (y * region.width + x) * 4;
+      return [region.data[index], region.data[index + 1], region.data[index + 2]] as [number, number, number];
+    };
+    const linear = (value: number) => {
+      const channel = value / 255;
+      return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
+    };
+    const luminance = ([red, green, blue]: [number, number, number]) =>
+      0.2126 * linear(red) + 0.7152 * linear(green) + 0.0722 * linear(blue);
+    const contrast = (a: [number, number, number], b: [number, number, number]) => {
+      const [high, low] = [luminance(a), luminance(b)].sort((x, y) => y - x);
+      return (high + 0.05) / (low + 0.05);
+    };
+
+    /* The surface just outside the mark, sampled above its top edge where neither the well nor its
+       inset shadow can reach. */
+    const outside = pixel(Math.floor(margin + (box?.width ?? 0) / 2), margin - 3);
+    let worst = 0;
+    for (let y = margin; y < region.height - margin; y += 1) {
+      for (let x = margin; x < region.width - margin; x += 1) {
+        worst = Math.max(worst, contrast(pixel(x, y), outside));
+      }
+    }
+    return worst;
+  };
+
+  const marks = [
+    [
+      "an unchecked box",
+      page.locator('button[role="checkbox"][aria-checked="false"]:not([data-disabled]) span[aria-hidden="true"]').first(),
+    ],
+    ["an unselected radio", page.locator('[role="radio"][aria-checked="false"] span[aria-hidden="true"]').first()],
+  ] as const;
+
+  for (const [name, locator] of marks) {
+    for (const theme of ["light", "dark"] as const) {
+      const ratio = await measure(locator, theme);
+      expect(ratio, `${name} well in ${theme} must clear 3:1`).toBeGreaterThanOrEqual(3);
+    }
+  }
+
+  expect(errors).toEqual([]);
+});

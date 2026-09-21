@@ -235,7 +235,10 @@ assert.match(stylesCss, /:where\(\.sui-scope\)\s*\{/,
    composition is simply pass or fail — there is no allowlist, and a regression here is a regression
    in the published theme.
    --------------------------------------------------------------------------------------------- */
-const contrastResults = measureContrast({ light: lightVariables, dark: darkVariables });
+/* The alpha steps are derived from the recipes the package just built, so the contract measures the
+   steps the UI renders rather than a second handwritten copy. */
+const { recipeAlphas } = await import("../dist/esm/dev.js");
+const contrastResults = measureContrast({ light: lightVariables, dark: darkVariables }, recipeAlphas);
 const contrastFailures = contrastResults.filter((result) => !result.pass);
 assert.deepEqual(
   contrastFailures.map((result) => `${result.theme}:${result.id}`),

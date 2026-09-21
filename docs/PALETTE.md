@@ -112,6 +112,9 @@ gate uses.
 ## What kept its value
 
 The surfaces (`canvas`, `surface`, `surface-high`, `surface-float`, `surface-overlay`), every
-`on-*` colour, `outline`, `scrim`, `edge`, the `--sui-light-*` pair, the elevation ladder, the glass
-family and the code well are exactly as they were. `focus` and `primary` are the same value in each
-theme, as they were, and `primary-strong` stays one step deeper than both.
+`on-*` colour, `outline`, `scrim`, `edge`, the `--sui-light-*` pair, the rest of the elevation
+ladder, the glass family and the code well are exactly as they were. `elevation-well` is the one
+rung that was added — the well of an empty selection mark — and `--sui-code-comment` was retuned in
+both themes so the published syntax palette clears 4.5:1 on the code well. `focus` and `primary`
+are the same value in each theme, as they were, and `primary-strong` stays one step deeper than
+both.

@@ -50,6 +50,18 @@ export const oklchToSrgb = (value) => {
   });
 };
 
+/** A token value as encoded sRGB: bare OKLCH (`L C H`), wrapped `oklch(...)`, or `#rrggbb`. */
+const hexToSrgb = (value) => {
+  const hex = value.trim().replace(/^#/, "");
+  const expanded = hex.length === 3 ? [...hex].map((character) => character + character).join("") : hex;
+  return [0, 2, 4].map((index) => parseInt(expanded.slice(index, index + 2), 16) / 255);
+};
+export const parseColour = (value) => {
+  const trimmed = value.trim();
+  if (trimmed.startsWith("#")) return hexToSrgb(trimmed);
+  return oklchToSrgb(trimmed.replace(/^oklch\(/, "").replace(/\)$/, ""));
+};
+
 const relativeLuminance = ([red, green, blue]) => {
   const linear = (channel) => (channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4);
   return 0.2126 * linear(red) + 0.7152 * linear(green) + 0.0722 * linear(blue);
@@ -70,34 +82,11 @@ export const WCAG_NON_TEXT = 3;
    The alphas the recipes actually use
    --------------------------------------------------------------------------------------------- */
 
-/* The authored alphas these compositions are built from — the design language's state steps (§11),
-   the tint strengths (§10) and the matte ladder (§4). They are exported so the measured sensitivity
-   of the palette to them is inspectable: a label-bearing fill answers to 4.5:1 in every state, and
-   how much of that the palette carries and how much a state step carries is a visible trade-off. */
-export const stateAlphas = {
-  /** `stateLayer.*` — a `::before` in `currentColor` over the control's own fill. */
-  state: {
-    quiet: { hover: 0.05, press: 0.09 },
-    tonal: { hover: 0.09, press: 0.15 },
-    filled: { hover: 0.18, press: 0.26 },
-  },
-  /** `tone.soft.*` / `tone.tonal.*`, `tone.selected.*`, and the neutral rest fill. */
-  tint: {
-    soft: { primary: 0.12, danger: 0.09, warning: 0.09, success: 0.09 },
-    selected: { primary: 0.22, danger: 0.16, warning: 0.16, success: 0.16 },
-    neutralRest: 0.56,
-  },
-  /** The matte ladder a field and a selection mark use. */
-  field: { quiet: 0.42, card: 0.78, control: 0.66, hover: 0.82, engaged: 0.90 },
-  /* The wall of an empty mark's well that the light makes legible, as `elevation-well` draws it:
-     the *shade* wall above in light mode, the *lit* wall below in dark mode, and the same value
-     the other way round in each theme is a deliberate bounce. `tone` names the lighting value and
-     `alpha` the rung's alpha; the composition below is what makes those numbers a promise. */
-  well: {
-    light: { tone: "light-bottom", alpha: 0.62 },
-    dark: { tone: "light-top", alpha: 0.40 },
-  },
-};
+/* The contrast model does not restate the authored alphas. `contrastCompositions` is given the
+   state, tint and field steps from `recipeAlphas` — which `ui.common.ts` derives from the
+   published recipes — and it reads the acrylic fills and the identifying wall of `elevation-well`
+   from the theme variables themselves. A recipe change therefore moves the measurement with it
+   instead of leaving a second handwritten copy behind. */
 
 const SEMANTIC = ["primary", "danger", "warning", "success"];
 /** The opaque fill each semantic role takes: `primary` has a deeper fill token, the others are their own fill. */
@@ -111,12 +100,23 @@ const opaqueFill = (name) => (name === "primary" ? "primary-strong" : name);
  * @param {Record<string, string>} variables the `--sui-*` values of one theme
  * @returns {Array<{id: string, requirement: number, note: string, checks: Array<[string, number[], number[]]>}>}
  */
-export const contrastCompositions = (variables, alphas = stateAlphas, theme = "light") => {
+export const contrastCompositions = (variables, alphas) => {
   const STATE = alphas.state;
   const TINT = alphas.tint;
   const FIELD = alphas.field;
-  const WELL = alphas.well[theme];
-  const colour = (name) => oklchToSrgb(variables[`--sui-${name}`]);
+  const colour = (name) => parseColour(variables[`--sui-${name}`]);
+
+  /* The identifying wall of `elevation-well`. The design rule is that a well deepens exactly one
+     of `recessed`'s two walls, so the layer with the greatest alpha is the wall the contract
+     measures, and its tone comes from the same token rather than from a second list. The rendered
+     proof that this wall clears 3:1 as painted lives in the browser suite; this is the authored
+     model. */
+  const WELL = (() => {
+    const token = String(variables["--sui-elevation-well"] ?? "");
+    const walls = [...token.matchAll(/var\(--sui-([a-z-]+)\)\s*\/\s*([\d.]+)/g)].map(([, tone, alpha]) => ({ tone, alpha: Number(alpha) }));
+    if (walls.length === 0) throw new Error("elevation-well has no measurable wall");
+    return walls.reduce((deepest, wall) => (wall.alpha > deepest.alpha ? wall : deepest));
+  })();
 
   const canvas = colour("canvas");
   const surface = colour("surface");
@@ -125,20 +125,32 @@ export const contrastCompositions = (variables, alphas = stateAlphas, theme = "l
   const surfaceOverlay = colour("surface-overlay");
 
   /* Every surface a component composites a fill over. An *opaque fill* is not a surface: the neutral
-     fill a `secondary` control takes is listed where it is actually used. */
+     fill a `secondary` control takes is listed where it is actually used. The acrylic fills are read
+     from the theme's own `--sui-glass-*` / `--sui-overlay-fill` values; the code well is the
+     `material.matte` shell a `CodeBlock` wears with its own `bg-sherick-canvas/[0.28]` code fill
+     over it. */
+  const ACRYLIC = "acrylic sheet";
+  const ACRYLIC_DENSE = "acrylic dense / tooltip";
+  const HERO_SHEET = "hero sheet / dialog";
+  const CODE_WELL = "code well";
+  const acrylicFill = Number(variables["--sui-glass-fill"]);
+  const acrylicDenseFill = Number(variables["--sui-glass-dense-fill"]);
+  const overlayFill = Number(variables["--sui-overlay-fill"]);
+  const codeWell = composite(canvas, 0.28, composite(surface, FIELD.card, canvas));
   const surfaces = {
     canvas,
-    "quiet well (surface 0.42)": composite(surface, FIELD.quiet, canvas),
-    "matte card (surface 0.78)": composite(surface, FIELD.card, canvas),
-    "chip at rest (surface-high 0.56)": composite(surfaceHigh, TINT.neutralRest, canvas),
-    "field (surface-high 0.66)": composite(surfaceHigh, FIELD.control, canvas),
+    "quiet well": composite(surface, FIELD.quiet, canvas),
+    "matte card": composite(surface, FIELD.card, canvas),
+    "chip at rest": composite(surfaceHigh, TINT.neutralRest, canvas),
+    "field": composite(surfaceHigh, FIELD.control, canvas),
     /* An empty mark sits in the *opaque* neutral well, the same one a Switch's track sits in. */
-    "empty mark well (surface-high)": surfaceHigh,
-    "field hover (surface-high 0.82)": composite(surfaceHigh, FIELD.hover, canvas),
-    "engaged field (surface-high 0.90)": composite(surfaceHigh, FIELD.engaged, canvas),
-    "acrylic sheet (surface-float 0.86)": composite(surfaceFloat, 0.86, canvas),
-    "acrylic dense / tooltip (surface-float 0.90)": composite(surfaceFloat, 0.9, canvas),
-    "hero sheet / dialog (surface-overlay 0.90)": composite(surfaceOverlay, 0.9, canvas),
+    "empty mark well": surfaceHigh,
+    "field hover": composite(surfaceHigh, FIELD.hover, canvas),
+    "engaged field": composite(surfaceHigh, FIELD.engaged, canvas),
+    [CODE_WELL]: codeWell,
+    [ACRYLIC]: composite(surfaceFloat, acrylicFill, canvas),
+    [ACRYLIC_DENSE]: composite(surfaceFloat, acrylicDenseFill, canvas),
+    [HERO_SHEET]: composite(surfaceOverlay, overlayFill, canvas),
   };
   const surfaceEntries = Object.entries(surfaces);
 
@@ -148,14 +160,7 @@ export const contrastCompositions = (variables, alphas = stateAlphas, theme = "l
      foreground-only — and neither is an empty mark's well, which holds nothing but its own mark.
      Both are still *surfaces* for the roles that do answer to them. */
   const controlEntries = surfaceEntries.filter(([where]) =>
-    [
-      "canvas",
-      "quiet well (surface 0.42)",
-      "matte card (surface 0.78)",
-      "acrylic sheet (surface-float 0.86)",
-      "acrylic dense / tooltip (surface-float 0.90)",
-      "hero sheet / dialog (surface-overlay 0.90)",
-    ].includes(where)
+    ["canvas", "quiet well", "matte card", ACRYLIC, ACRYLIC_DENSE, HERO_SHEET].includes(where)
   );
 
   /** The opaque neutral fill a `secondary` control takes, and the groove a value control runs in. */
@@ -176,15 +181,15 @@ export const contrastCompositions = (variables, alphas = stateAlphas, theme = "l
     "text.medium on an invalid or engaged field",
     WCAG_TEXT,
     "a field's placeholder while the field's own error ladder is in effect",
-    ["canvas", "matte card (surface 0.78)"].flatMap((where) =>
-      [0.075, 0.13].map((alpha) => [`${where} + danger ${alpha}`, colour("ink-muted"), tint("danger", alpha, surfaces[where])])
+    ["canvas", "matte card"].flatMap((where) =>
+      [FIELD.invalid, FIELD.invalidFocus].map((alpha) => [`${where} + danger ${alpha}`, colour("ink-muted"), tint("danger", alpha, surfaces[where])])
     )
   );
   add(
     "text on a data row under the pointer",
     WCAG_TEXT,
     "a Table row is read rather than activated, and answers the pointer with an ink tint over its own quiet fill",
-    ["ink", "ink-muted"].map((role) => [`${role} on a hovered row`, colour(role), composite(colour("ink"), 0.05, groove)])
+    ["ink", "ink-muted"].map((role) => [`${role} on a hovered row`, colour(role), composite(colour("ink"), STATE.quiet.hover, groove)])
   );
   add(
     "text.high on a semantic tint [soft]",
@@ -197,6 +202,21 @@ export const contrastCompositions = (variables, alphas = stateAlphas, theme = "l
     WCAG_TEXT,
     "a selected row, segment or chip: the label is the high text step over the selection tint",
     SEMANTIC.flatMap((role) => controlEntries.map(([where, base]) => [`${where} + ${role} selected`, colour("ink"), tint(role, TINT.selected[role], base)]))
+  );
+
+  /* -- the code well, which is text on its own surface --------------------------------------- */
+  const CODE_ROLES = ["text", "comment", "string", "number", "keyword", "function", "tag"];
+  add(
+    "the code syntax palette on the code well",
+    WCAG_TEXT,
+    "a CodeBlock's plain text and every Prism syntax role, read against the well its own matte shell and its `bg-sherick-canvas/[0.28]` fill composite to",
+    CODE_ROLES.map((role) => [`code.${role}`, colour(`code-${role}`), surfaces[CODE_WELL]])
+  );
+  add(
+    "a Prism namespace token on the code well",
+    WCAG_TEXT,
+    "the namespace role carries `opacity: 0.7` and no colour of its own, so it renders as code text faded toward the well",
+    [["namespace (code-text at 0.7)", composite(colour("code-text"), 0.7, surfaces[CODE_WELL]), surfaces[CODE_WELL]]]
   );
 
   /* -- semantic foregrounds ---------------------------------------------------------------- */
@@ -235,7 +255,7 @@ export const contrastCompositions = (variables, alphas = stateAlphas, theme = "l
       `tone.text.${role} on the floating sheets, through the tonal states`,
       WCAG_TEXT,
       "an acrylic IconButton, and a Toast's own mark on the sheet it arrived on",
-      ["acrylic sheet (surface-float 0.86)", "acrylic dense / tooltip (surface-float 0.90)"].flatMap((where) =>
+      [ACRYLIC, ACRYLIC_DENSE].flatMap((where) =>
         [["at rest", 0], ["hovered", STATE.tonal.hover], ["pressed", STATE.tonal.press]].map(([state, alpha]) => [
           `${where} ${state}`,
           fg,
@@ -289,15 +309,15 @@ export const contrastCompositions = (variables, alphas = stateAlphas, theme = "l
     "tone.text.danger in the error fills",
     WCAG_TEXT,
     "the error placeholder, and error copy sitting on the invalid field's own fill",
-    ["canvas", "matte card (surface 0.78)"].flatMap((where) =>
-      [0.075, 0.13].map((alpha) => [`${where} + danger ${alpha}`, colour("danger"), tint("danger", alpha, surfaces[where])])
+    ["canvas", "matte card"].flatMap((where) =>
+      [FIELD.invalid, FIELD.invalidFocus].map((alpha) => [`${where} + danger ${alpha}`, colour("danger"), tint("danger", alpha, surfaces[where])])
     )
   );
   add(
     "a destructive command's label through its highlight",
     WCAG_TEXT,
     "a Menu's danger row: the label is the accent and the row's highlight is a quiet step of that same accent",
-    ["acrylic sheet (surface-float 0.86)", "hero sheet / dialog (surface-overlay 0.90)"].flatMap((where) =>
+    [ACRYLIC, HERO_SHEET].flatMap((where) =>
       [["at rest", 0], ["hovered", STATE.quiet.hover], ["highlighted", STATE.quiet.press]].map(([state, alpha]) => [
         `${where} ${state}`,
         colour("danger"),
@@ -313,7 +333,7 @@ export const contrastCompositions = (variables, alphas = stateAlphas, theme = "l
     "a Slider's handle is a matte fill inside a recessed groove, and takes the accent while the pointer is on it",
     [
       ["at rest on the page", colour("ink-muted"), groove],
-      ["at rest inside a card", colour("ink-muted"), composite(surface, FIELD.quiet, surfaces["matte card (surface 0.78)"])],
+      ["at rest inside a card", colour("ink-muted"), composite(surface, FIELD.quiet, surfaces["matte card"])],
       ["while engaged", colour("primary-strong"), groove],
     ]
   );
@@ -321,7 +341,7 @@ export const contrastCompositions = (variables, alphas = stateAlphas, theme = "l
   add(
     "the wall the light makes legible on an empty mark's well",
     WCAG_NON_TEXT,
-    "an unchecked box, an unselected radio: a mark with no content of its own is identified by its depth, and this is the wall of that well that carries it — the shaded one above in light mode, the lit one below in dark mode, exactly as `elevation-well` draws them. The opposite wall is a deliberate bounce and is not a boundary.",
+    "an unchecked box, an unselected radio: a mark with no content of its own is identified by its depth, and this is the wall of that well that carries it — the shaded one above in light mode, the lit one below in dark mode, exactly as `elevation-well` draws them. That the authored alpha clears 3:1 as painted is measured from rendered pixels in the browser suite; the opposite wall is a deliberate bounce and is not a boundary.",
     surfaceEntries.map(([where, base]) => [where, composite(colour(WELL.tone), WELL.alpha, surfaceHigh), base])
   );
   add(
@@ -349,7 +369,7 @@ export const contrastCompositions = (variables, alphas = stateAlphas, theme = "l
       `the focus indicator over a highlighted ${role} row` ,
       WCAG_NON_TEXT,
       "the inset ring on a collection row while the row is highlighted: the row's highlight is a quiet step of its own label colour, which on a destructive command is the accent",
-      ["acrylic sheet (surface-float 0.86)", "hero sheet / dialog (surface-overlay 0.90)"].flatMap((where) =>
+      [ACRYLIC, HERO_SHEET].flatMap((where) =>
         [["hovered", STATE.quiet.hover], ["highlighted", STATE.quiet.press]].map(([state, alpha]) => [
           `${where} ${state}` ,
           colour("focus"),
@@ -374,9 +394,9 @@ export const contrastCompositions = (variables, alphas = stateAlphas, theme = "l
  * @param {{light: Record<string, string>, dark: Record<string, string>}} themes
  * @returns {Array<{theme: string, id: string, requirement: number, note: string, ratio: number, where: string, pass: boolean}>}
  */
-export const measureContrast = (themes, alphas = stateAlphas) =>
+export const measureContrast = (themes, alphas) =>
   Object.entries(themes).flatMap(([theme, variables]) =>
-    contrastCompositions(variables, alphas, theme).map(({ id, requirement, note, checks }) => {
+    contrastCompositions(variables, alphas).map(({ id, requirement, note, checks }) => {
       const worst = checks.reduce(
         (lowest, [where, foreground, background]) => {
           const ratio = contrastRatio(foreground, background);

@@ -217,13 +217,22 @@ output.append(
   /* A control whose selection is carried by tone or depth alone needs a boundary once forced
      colors flattens both: a checked switch, checkbox or radio, the selected tab, and a pressed
      toggle button — a chip or a segment. */
-  :where(.${SUI_SCOPE_CLASS})[role="switch"][aria-checked="true"],
-  :where(.${SUI_SCOPE_CLASS})[role="tab"][aria-selected="true"],
-  :where(.${SUI_SCOPE_CLASS})[role="checkbox"][aria-checked="true"],
-  :where(.${SUI_SCOPE_CLASS})[role="checkbox"][aria-checked="mixed"],
-  :where(.${SUI_SCOPE_CLASS})[role="radio"][aria-checked="true"],
-  :where(.${SUI_SCOPE_CLASS})[aria-pressed="true"] {
+  :where(.${SUI_SCOPE_CLASS})[role="switch"][aria-checked="true"]:not(:focus-visible),
+  :where(.${SUI_SCOPE_CLASS})[role="tab"][aria-selected="true"]:not(:focus-visible),
+  :where(.${SUI_SCOPE_CLASS})[role="checkbox"][aria-checked="true"]:not(:focus-visible),
+  :where(.${SUI_SCOPE_CLASS})[role="checkbox"][aria-checked="mixed"]:not(:focus-visible),
+  :where(.${SUI_SCOPE_CLASS})[role="radio"][aria-checked="true"]:not(:focus-visible),
+  :where(.${SUI_SCOPE_CLASS})[aria-pressed="true"]:not(:focus-visible) {
     outline: 1px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  /* A *resting* mark is identified by the depth of its well, which forced colors flattens, so an
+     unchecked box and an unselected radio need a boundary of their own. It is CanvasText rather
+     than Highlight: this is component identity, not selection. */
+  :where(.${SUI_SCOPE_CLASS})[role="checkbox"][aria-checked="false"]:not(:focus-visible),
+  :where(.${SUI_SCOPE_CLASS})[role="radio"][aria-checked="false"]:not(:focus-visible) {
+    outline: 1px solid CanvasText;
     outline-offset: -2px;
   }
 
@@ -242,11 +251,9 @@ output.append(
     border: 1px solid CanvasText;
   }
 
-  /* Last, because it has to win. It shares its specificity with the selected-state outlines
-     above — a :where() wrapper contributes nothing, and a pseudo-class and an attribute
-     selector are worth the same — so the later declaration is the one that applies. Focus is the
-     transient state and the one a keyboard user cannot afford to lose: a focused control shows
-     the focus ring, and the boundary that marks its selection returns when focus moves on. */
+  /* A focused control shows the canonical focus ring rather than its material or selection
+     boundary: the rules above all exclude :focus-visible, so while the keyboard is on the
+     control this is the only outline in play, and the boundary returns when focus moves on. */
   :where(.${SUI_SCOPE_CLASS}):focus-visible {
     outline: 2px solid Highlight;
     outline-offset: 2px;

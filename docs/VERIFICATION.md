@@ -65,12 +65,18 @@ Both consume `sherick-ui` through package exports after the library build.
   the values in `dist/theme.css` — each text role against each surface a component composites over,
   a semantic foreground on its own tint and through its hover and pressed states, an on-colour on its
   strong fill through the filled states, the marks that carry a selection, the error placeholder, the
-  non-text `detail` role, the wall of an empty mark's well that the light makes legible, and the focus
-  indicator against every surface and every fill an inset ring is drawn over. **Every composition is pass or fail: there is no allowlist.** One module owns the
-  colour math and one owns the description of the compositions; the same module is what the palette
-  was solved against, so the numbers in `docs/PALETTE.md` are the numbers this gate measures. This is
-  the layer the axe scan cannot be: a scan only sees the states a fixture happens to be in, and
-  `@axe-core/playwright`'s `color-contrast` rule does not evaluate `::placeholder` text at all.
+  non-text `detail` role, the `CodeBlock` syntax palette and a Prism namespace token on the code
+  well, the wall of an empty mark's well that the light makes legible, and the focus indicator
+  against every surface and every fill an inset ring is drawn over. **Every composition is pass or
+  fail: there is no allowlist.** One module owns the colour math and one owns the description of the
+  compositions; the state, tint and field alphas it measures are derived from the published recipes,
+  the acrylic fills and the well wall are read from the theme tokens, and the same module proves
+  every recipe class has a published rule. The same module is what the palette was solved against,
+  so the numbers in `docs/PALETTE.md` are the numbers this gate measures. The well's rendered
+  contrast is not modelled here: the browser suite reads the pixels the inset shadow actually
+  paints. This is also the layer the axe scan cannot be: a scan only sees the states a fixture
+  happens to be in, and `@axe-core/playwright`'s `color-contrast` rule does not evaluate
+  `::placeholder` text at all.
 
 ## Packed-package consumer checks
 
@@ -211,10 +217,12 @@ The showcase browser suite also verifies:
   steps down it gets both, and a disabled-but-navigable row keeps the ring that says where the
   navigation is. Every claim is read from the rendered `::before` opacity, `:focus-visible` and
   `box-shadow` — never from a class name;
-- a resting selection mark's boundary (`fields.spec.ts`): an unchecked box and an unselected radio
-  paint the shared `detail` rim, at a width that survives a 1x display and in the theme's own
-  resolved `--sui-detail` colour, while a filled mark's rim takes its fill and disappears. The 3:1
-  ratio itself is the contrast contract's job, not this test's;
+- a resting selection mark's boundary (`fields.spec.ts`): an unchecked box and an unselected radio are
+  identified by the depth of their `elevation-well`, read from the rendered shadow layers, while a
+  filled mark's own fill identifies it. A second assertion reads the *rendered pixels* of the well
+  against the surface just outside it and requires that cue to clear 3:1 — the part of the
+  requirement the analytical contract cannot see through the blur. The authored model still lives in
+  the contrast contract;
 - a navigation group's heading level (`interactions.spec.ts`): the fixture asks for level 2 and gets
   a level-2 heading with no level-3 heading left behind, and its rows are links with `aria-current`
   on the current one — a reusable navigation group choosing its own level was the defect;
@@ -292,20 +300,28 @@ behaviour is verified above, with the preference emulated by the browser.
 
 `apps/showcase/tests/browser/accessibility.spec.ts` runs axe-core through
 `@axe-core/playwright`'s `AxeBuilder` restricted to `["wcag2a", "wcag2aa", "wcag21a",
-"wcag21aa"]` — every rule in the tag set, `color-contrast` included — and asserts
-`results.violations` is empty with a message naming every violation id and target selector. axe runs
-on representative reachable states rather than scanning the workbench indiscriminately:
+"wcag21aa", "wcag22aa"]` — every rule in the tag set, `color-contrast` and the WCAG 2.2 target
+size included — and asserts `results.violations` is empty with a message naming every violation id
+and target selector. axe runs in both authored themes (the platform colour scheme is emulated
+before the document loads, so no state is read mid-theme-switch) on representative reachable states
+rather than scanning the workbench indiscriminately:
 
 - `/` — the showcase itself, which is where the interactive specimens live and therefore the only
   place some states appear at all (a motion stage holding a real control, the toast stack);
 - `/verification/core` in its default state;
 - `/verification/interactions` in its default state;
+- `/verification/rich-content`, which renders the published `CodeBlock` and `Markdown`;
 - the initially-open dialog at `/verification/dialog`;
 - a Select opened inside the dialog on `/verification/interactions`.
 
 The same spec adds direct assertions axe cannot make: accessible names on icon-only controls,
 `aria-busy` on the loading Search, and a visible keyboard focus ring on the core `Primary`
 button (`outline-style` other than `none`, `outline-width` at least `2px`).
+
+The `rich-content` fixture also renders a real `CodeBlock`; the one recoverable React hydration
+mismatch that component currently logs (a server/client Prism grammar difference, pre-existing and
+unrelated to the accessibility contract) is filtered from that fixture's unexpected-error
+assertion, while its axe scan runs on the rendered result.
 
 Every scan waits for hydration before it runs. Base UI generates its ARIA wiring in effects, so
 the server-rendered shell of a field is briefly a control with a `<label for>` and no
@@ -350,7 +366,7 @@ they were. It remains a dependency risk to settle before the stable `2.0.0`: an 
 explicit decision that an open listbox may hide the rest of the page from assistive technology.
 
 **No rule is excluded.** The scan runs the WCAG A/AA tag set as it is
-(`wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`), `color-contrast` included, and it is the contrast
+(`wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa`), `color-contrast` included, and it is the contrast
 contract in `bun run test` — not this scan — that keeps the theme able to satisfy it: a scan can only
 see the states a fixture happens to be in, it does not evaluate `::placeholder` text at all, and a
 node it cannot measure is a node a regression can hide in.

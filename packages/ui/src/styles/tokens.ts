@@ -10,8 +10,6 @@ export const lightTokens = {
   /* The detail role is non-text furniture: it carries a mark, a rail or a gutter, and it is not a
      third step of the text ladder. It answers to the 3:1 non-text requirement wherever it carries
      meaning; anything a reader must read uses `ink` or `ink-muted`. */
-  /* The rim an empty mark draws sits in the opaque neutral well, so it answers to that surface too:
-     a step deeper than the matte steps need, and the same value in both themes. */
   "detail": "0.600 0.016 258",
   "primary": "0.422 0.139 255",
   "primary-strong": "0.402 0.143 257",
@@ -61,7 +59,7 @@ export const lightTokens = {
   "overlay-fill": "0.9",
   "scrim-blur": "6px",
   "code-text": "oklch(0.30 0.018 260)",
-  "code-comment": "oklch(0.56 0.015 255)",
+  "code-comment": "oklch(0.54 0.015 255)",
   "code-string": "oklch(0.48 0.11 235)",
   "code-number": "oklch(0.52 0.14 55)",
   "code-keyword": "oklch(0.50 0.15 305)",
@@ -121,7 +119,7 @@ export const darkTokens = {
   "overlay-fill": "0.965",
   "scrim-blur": "6px",
   "code-text": "#e2e8f0",
-  "code-comment": "#64748b",
+  "code-comment": "#7a8aa3",
   "code-string": "#a5d6ff",
   "code-number": "#f97316",
   "code-keyword": "#c084fc",

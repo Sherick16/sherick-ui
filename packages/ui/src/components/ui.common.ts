@@ -119,8 +119,8 @@ export const elevation = {
   control: "shadow-sherick-control",
   recessed: "shadow-sherick-recessed",
   /* One rung further down: the well of a mark the size of a glyph, whose whole identity is its
-     depth. A wide groove reads from its fill; a 24px well has no fill step to spare, so its shaded
-     upper wall and its lit lower wall are what say what it is. See `selectable.markSurface`. */
+     depth. A wide groove reads from its fill; a 24px well has no fill step to spare, so one wall
+     of the well is deepened and that boundary is what says what it is. See `selectable.markSurface`. */
   well: "shadow-sherick-well",
 } as const;
 
@@ -654,15 +654,63 @@ export const selectable = {
      so the interior is a surface rather than a hole, but that *cannot* be what identifies it: the
      tightest neutral step this palette has measures about 1.3:1 against the surface around it, where
      WCAG asks 3:1.
-     So the mark is **sunk deeper** instead — `markSurface` — and its depth is what identifies it: a
-     shaded upper wall and a lit lower wall, which is the same light the whole system is built from,
-     read one rung further down. See the elevation recipes in `tokens.ts`, and §5 of the design
-     language. No rim: a stroke tracing all four sides of a matte control is not part of this
-     language, and the mark now reads as the switch's own well does, only deeper. */
+     So the mark is **sunk deeper** instead — `markSurface` — and its depth is what identifies it:
+     one wall deepened a rung further than `recessed` draws it (the shaded wall above in light mode,
+     the lit wall below in dark mode), which is the same light the whole system is built from. See
+     the elevation recipes in `tokens.ts`, and §5 of the design language. No rim: a stroke tracing
+     all four sides of a matte control is not part of this language, and the mark now reads as the
+     switch's own well does, only deeper. */
   mark: /* @__PURE__ */ cx("bg-sherick-surface-high", text.medium),
-  /* A filled mark is identified by its own fill, so its rim takes that fill and disappears. */
+  /* A filled mark is identified by its own fill. */
   selected:
-    "group-data-[checked]:bg-sherick-primary-strong group-data-[checked]:text-sherick-on-primary group-data-[checked]:after:border-sherick-primary-strong",
+    "group-data-[checked]:bg-sherick-primary-strong group-data-[checked]:text-sherick-on-primary",
   indeterminate:
-    "group-data-[indeterminate]:bg-sherick-primary-strong group-data-[indeterminate]:text-sherick-on-primary group-data-[indeterminate]:after:border-sherick-primary-strong",
+    "group-data-[indeterminate]:bg-sherick-primary-strong group-data-[indeterminate]:text-sherick-on-primary",
+} as const;
+
+/* The authored alphas the contrast contract measures. They are derived from the class names above
+   rather than restated, so a change to a state step, a tint strength or the field ladder moves the
+   measurement with it: `scripts/smoke-package.mjs` passes this model to
+   `scripts/contrast-contract.mjs`, and the same module proves every class here has a rule in the
+   published stylesheet. */
+const recipeAlpha = (recipe: string, pattern: RegExp, label: string) => {
+  const match = recipe.match(pattern);
+  if (!match) throw new Error(`recipe alpha missing for ${label}`);
+  return Number(match[1]);
+};
+const stateAlpha = (recipe: string, label: string) =>
+  recipeAlpha(recipe, /opacity-\[(0?\.\d+)\]/, label);
+const fillAlpha = (recipe: string, label: string) => recipeAlpha(recipe, /\/\[(0?\.\d+)\]/, label);
+
+export const recipeAlphas = {
+  state: {
+    quiet: { hover: stateAlpha(hoverQuiet, "state.quiet.hover"), press: stateAlpha(pressQuiet, "state.quiet.press") },
+    tonal: { hover: stateAlpha(hoverTonal, "state.tonal.hover"), press: stateAlpha(pressTonal, "state.tonal.press") },
+    filled: { hover: stateAlpha(hoverFilled, "state.filled.hover"), press: stateAlpha(pressFilled, "state.filled.press") },
+  },
+  tint: {
+    soft: {
+      primary: fillAlpha(tone.soft.primary, "tint.soft.primary"),
+      danger: fillAlpha(tone.soft.danger, "tint.soft.danger"),
+      warning: fillAlpha(tone.soft.warning, "tint.soft.warning"),
+      success: fillAlpha(tone.soft.success, "tint.soft.success"),
+    },
+    selected: {
+      primary: fillAlpha(tone.selected.primary, "tint.selected.primary"),
+      danger: fillAlpha(tone.selected.danger, "tint.selected.danger"),
+      warning: fillAlpha(tone.selected.warning, "tint.selected.warning"),
+      success: fillAlpha(tone.selected.success, "tint.selected.success"),
+    },
+    neutralRest: fillAlpha(tone.tonal.secondary, "tint.neutralRest"),
+  },
+  field: {
+    quiet: fillAlpha(material.matteQuiet, "field.quiet"),
+    card: fillAlpha(material.matte, "field.card"),
+    control: fillAlpha(material.control, "field.control"),
+    hover: fillAlpha(state.field.hover, "field.hover"),
+    engaged: fillAlpha(state.field.engaged, "field.engaged"),
+    invalid: fillAlpha(state.field.invalid, "field.invalid"),
+    invalidHover: fillAlpha(state.field.invalidHover, "field.invalidHover"),
+    invalidFocus: fillAlpha(state.field.invalidFocusWithin, "field.invalidFocus"),
+  },
 } as const;
