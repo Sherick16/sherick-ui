@@ -167,7 +167,7 @@ export const Chip = forwardRef<HTMLElement, ChipProps>(
                     !toggleState.disabled && "hover:text-sherick-ink"
                   ),
               !toggleState.disabled && stateLayer.tonal,
-              elevation.raised,
+              !toggleState.disabled && elevation.raised,
               !toggleState.disabled && state.recess,
               className
             )

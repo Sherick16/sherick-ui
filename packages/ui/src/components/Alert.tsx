@@ -49,7 +49,7 @@ export const Alert = ({
       role={variant === "danger" || variant === "warning" ? "alert" : "status"}
       className={cn(
         "flex items-start gap-3 px-4 py-3.5",
-        shape.control,
+        shape.surface,
         tone.soft[variant],
         text.high,
         className

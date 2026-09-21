@@ -16,7 +16,7 @@ import { motionDisclose, motionFeedback, motionStateLayer } from "./ui.motion";
      stateLayer the composited hover/press overlay (quiet, tonal, filled, track, activeRow)
      disclosure one expandable region and its row (trigger, panel)
      tone       its color role                     (text, soft, tonal, selected, strong)
-     text       the readable emphasis ladder       (high, medium)
+     text       the three-step emphasis ladder     (high, medium, low)
      density    how tightly it is packed           (compact, normal, prominent, target)
      overlay    floating shells                    (menu, tooltip, popup, toast, sheet, dialog)
     focusRing  the one focus language             (focusRing, focusRingInset, focusRingHeld, focusRingWithin, groupFocusRing)
@@ -187,9 +187,6 @@ export const edge = {
   rule: edgeTone.rule,
 } as const;
 
-const effectiveDisabled =
-  "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-45 disabled:cursor-not-allowed disabled:opacity-45";
-
 /* Interaction states:
      rest       the material, at whatever elevation its anatomy calls for
      hover      one tonality step, never a change in depth or a new border
@@ -210,15 +207,14 @@ export const state = {
   /* The same step, keyed on the primitive's own markers rather than on a Sherick prop: Base marks
      an effectively disabled control — including one disabled by the field around it — with
      `data-disabled`, and a part that disables itself at a bound carries `disabled` as well. */
-  effectiveDisabled,
+  effectiveDisabled:
+    "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-45 disabled:cursor-not-allowed disabled:opacity-45",
   /* A row whose control is disabled by any means — its own option, its group, or the field around
      it — dims from the control's own marker rather than from a Sherick prop. */
   disabledRow: "has-[[data-disabled]]:cursor-not-allowed has-[[data-disabled]]:opacity-45",
   /* A control nested inside a disabled composite. The composite already applied the opacity step,
      and a second one would dim the field unevenly; this carries only the disabled cursor. */
   disabledDescendant: "cursor-not-allowed",
-  /* A part dims independently at a bound, but never a second time inside a disabled field. */
-  disabledPart: /* @__PURE__ */ cx(effectiveDisabled, "group-data-[disabled]/field:opacity-100"),
   /* A part the pointer is engaging — the handle of a value control. It sits matte and settled at
      rest and takes its accent, a little larger, while the pointer is on it. Drag covers the case
      where the pointer has been captured and left the control. */
@@ -248,7 +244,6 @@ export const state = {
        so neither ladder has to be conditional. */
     invalid: "data-[invalid]:bg-sherick-danger/[0.075]",
     invalidHover: "data-[invalid]:hover:bg-sherick-danger/[0.10]",
-    invalidEngaged: "data-[invalid]:bg-sherick-danger/[0.13]",
     invalidFocusWithin: "data-[invalid]:focus-within:bg-sherick-danger/[0.13]",
   },
 } as const;
@@ -449,8 +444,8 @@ export const overlay = {
      When not to use it: a list of options that are chosen rather than performed, or a
      surface holding structured content, wants `popup`. */
   menu: /* @__PURE__ */ cx(shape.control, material.acrylic, elevation.floating),
-  /* A short hint is a compact sheet, not a capsule button. */
-  tooltip: /* @__PURE__ */ cx(shape.row, material.acrylicDense, elevation.floating),
+  /* A tooltip is anchored like the others, and reads its edge the same way. */
+  tooltip: /* @__PURE__ */ cx(shape.prominent, material.acrylicDense, elevation.floating),
   /* A toast is a floating status surface that arrives on its own and leaves on its own. It
      holds a line or two of copy rather than being read as a page, so it takes the compact
      floating corner rather than the wide sheet a popup is.
@@ -505,7 +500,8 @@ export const detail = {
    list only ever grows to its content. A row is flat — depth never announces a state —
    and one row step of `stateLayer.quiet` plus `stateLayer.activeRow` carries both its hover and
    its keyboard highlight, so an option and a command are highlighted by the same tone at the
-   same strength. Keyboard focus adds the shared inset ring independently of that highlight.
+   same strength. That highlight *is* the row's focus indicator — Base gives the active row real
+   DOM focus, so the row suppresses the user agent's own ring and shows the highlight instead.
    Selection is a tint of the sheet through `tone.selected` and never the opaque
    accent, which belongs to the one primary action in the view rather than to a row that happens
    to be chosen.
@@ -528,7 +524,7 @@ export const list = {
      row still shows where the navigation is while saying it cannot be used. The ring is inset
      because the row lives inside the sheet it belongs to, as a segment does in its track. */
   option: /* @__PURE__ */ cx(
-    "flex w-full items-center justify-between gap-4 px-4 py-3 text-start text-sm outline-none",
+    "flex w-full items-center justify-between gap-4 px-4 py-3 text-left text-sm outline-none",
     shape.control,
     motionFeedback,
     focusRingInset,
@@ -542,7 +538,7 @@ export const list = {
      command's corner proportional to its own height, so its highlight nests in the tighter
      sheet the menu is. */
   command: /* @__PURE__ */ cx(
-    "flex w-full items-center gap-3 px-3 py-2 text-start text-sm outline-none",
+    "flex w-full items-center gap-3 px-3 py-2 text-left text-sm outline-none",
     shape.row,
     motionFeedback,
     focusRingInset,
@@ -563,10 +559,13 @@ export const disclosure = {
   /* The row: a full-width row in a stacked group, activated like a selectable row. Its own focus
      indicator is the shared inset ring, because an offset one drawn outside the row would land on
      the divider or the panel beside it rather than around the row it belongs to — which is the same
-     reason a segment inside a track takes the inset form. The chevron the component puts in the
-     row is the disclosure's own affordance and turns in place under `motionOrient`. */
+     reason a segment inside a track takes the inset form. A collection row is the one row that is
+     not this: the primitive gives its active row real DOM focus and the row shows the navigation
+     highlight instead, so a row in a list publishes its own focus treatment through the state
+     layer. The chevron the component puts in the row is the disclosure's own affordance and turns
+     in place under `motionOrient`. */
   trigger: /* @__PURE__ */ cx(
-    "group flex w-full items-center justify-between gap-4 px-4 py-3 text-start text-sm outline-none",
+    "group flex w-full items-center justify-between gap-4 px-4 py-3 text-left text-sm outline-none",
     shape.control,
     motionFeedback,
     focusRingInset,
@@ -575,7 +574,7 @@ export const disclosure = {
     state.enabled,
     state.effectiveDisabled
   ),
-  panel: /* @__PURE__ */ cx("h-[var(--sui-disclose-height)] overflow-hidden text-sm leading-7", text.medium, motionDisclose),
+  panel: /* @__PURE__ */ cx("h-[var(--sui-disclose-height)] overflow-hidden", motionDisclose),
 } as const;
 
 /* Tone hierarchy — the color roles a surface can take, in rising strength:

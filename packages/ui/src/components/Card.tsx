@@ -1,6 +1,6 @@
 import React, { type HTMLAttributes, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { shape, text, tone } from "./ui.common";
+import { shape, tone } from "./ui.common";
 import { Variant } from "./ui.types";
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
@@ -22,7 +22,6 @@ export const Card = ({
         "p-6",
         shape.surface,
         tone.soft[variant],
-        text.high,
         className
       )}
       {...props}

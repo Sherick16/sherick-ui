@@ -59,7 +59,7 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
           (isTonal || isAcrylic) && !isDisabled && stateLayer.tonal,
           appearance === "ghost" && "bg-transparent",
           appearance === "ghost" && !isDisabled && stateLayer.quiet,
-          isTonal && elevation.raised,
+          isTonal && !isDisabled && elevation.raised,
           isTonal && !isDisabled && state.recess,
           isAcrylic && material.acrylicDense,
           isAcrylic && elevation.floating,

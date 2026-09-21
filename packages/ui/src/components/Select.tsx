@@ -77,7 +77,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
             {...triggerProps}
             ref={ref}
             id={id}
-            className={({ open, disabled: fieldDisabled }) =>
+            className={({ open }) =>
               cn(
                 "group flex w-full items-center justify-between gap-3 px-5 py-3 text-start",
                 density.normal,
@@ -85,14 +85,10 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                 material.control,
                 motionFeedback,
                 focusRingHeld,
-                !fieldDisabled && !open && state.field.hover,
-                !fieldDisabled && state.field.focus,
+                !disabled && state.field.hover,
+                !disabled && state.field.focus,
                 open && state.field.engaged,
-                state.field.invalid,
-                !fieldDisabled && !open && state.field.invalidHover,
-                !fieldDisabled && state.field.invalidFocusWithin,
-                open && state.field.invalidEngaged,
-                fieldDisabled ? state.disabled : state.enabled
+                disabled ? state.disabled : state.enabled
               )
             }
           >
@@ -127,12 +123,12 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
             <BaseSelect.Popup
               className={cn(
                 list.sheet,
-                "w-max min-w-[var(--anchor-width)] p-2",
+                "w-max min-w-[var(--anchor-width)] space-y-1 p-2",
                 overlay.popup,
                 motionPresenceAnchored
               )}
             >
-              <BaseSelect.List className={cn("space-y-1")}>
+              <BaseSelect.List>
                 {options.map((option) => (
                   <BaseSelect.Item
                     key={option.value}

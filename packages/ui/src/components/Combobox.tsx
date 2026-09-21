@@ -86,7 +86,7 @@ export interface ComboboxProps {
    a read-only combobox still opens and browses, only its value is fixed. The clear control is
    handed its own `disabled` for that case because Base itself refuses to clear a read-only
    control; nothing here has to be derived from Sherick's props. */
-const partClassName = `inline-flex shrink-0 items-center justify-center ${density.part} ${shape.circle} ${text.medium} [&>svg]:size-5 ${motionFeedback} ${stateLayer.quiet} ${state.enabled} ${state.disabledPart} [&:not([data-disabled]):not(:disabled)]:hover:text-sherick-ink`;
+const partClassName = `inline-flex shrink-0 items-center justify-center ${density.part} ${shape.circle} ${text.medium} [&>svg]:size-5 ${motionFeedback} ${stateLayer.quiet} ${state.enabled} ${state.effectiveDisabled} [&:not([data-disabled]):not(:disabled)]:hover:text-sherick-ink`;
 
 /**
  * A text field that filters a list of options and selects one of them. It is the searchable
@@ -140,18 +140,17 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(({
                20px a mark's box then sits from the edge — 12px of padding plus the 8px each `density.part`
                holds around its 20px glyph — is the same 20px the input's own leading padding uses, so the
                field reads with one inset at both ends. */
-            "group/field flex w-full items-center ps-5 pe-3",
+            "flex w-full items-center ps-5 pe-3",
             density.normal,
             shape.control,
             material.control,
             motionTactile,
             focusRingWithin,
-            !fieldDisabled && !open && state.field.hover,
+            !fieldDisabled && state.field.hover,
             !fieldDisabled && state.field.focusWithin,
             open && state.field.engaged,
             state.field.invalid,
-            open && state.field.invalidEngaged,
-            !fieldDisabled && !open && state.field.invalidHover,
+            !fieldDisabled && state.field.invalidHover,
             !fieldDisabled && state.field.invalidFocusWithin,
             fieldDisabled ? state.disabled : state.text,
             className
