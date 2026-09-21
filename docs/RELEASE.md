@@ -89,6 +89,7 @@ The root `sherick-ui` export is:
   `NavGroup`, `NavItem`, `Divider`;
 - **Toasts**: `ToastProvider`, `ToastViewport`, `useToast`, `createToastManager`, and the
   `createToastManager()` factory for a manager that lives outside the React tree;
+- **Writing direction**: `DirectionProvider`;
 - the matching prop types (`AccordionProps`, `AccordionItemProps`, `AccordionTriggerProps`,
   `AccordionPanelProps`, `AccordionHeadingLevel`, `CollapsibleProps`, `CollapsibleTriggerProps`,
   `CollapsiblePanelProps`, `ButtonProps`, `ButtonAppearance`, `ButtonSize`, `IconButtonProps`,
@@ -101,10 +102,10 @@ The root `sherick-ui` export is:
   `DialogHeaderProps`, `DialogDescriptionProps`, `DialogContentProps`, `DialogFooterProps`,
   `DrawerProps`, `DrawerTriggerProps`, `DrawerContentProps`, `DrawerHeaderProps`,
   `DrawerDescriptionProps`, `DrawerFooterProps`, `DrawerSide`, `MenuProps`, `MenuTriggerProps`,
-  `MenuContentProps`, `MenuItemProps`, `MenuSeparatorProps`, `PopoverProps`, `PopoverContentProps`,
+  `MenuContentProps`, `MenuItemProps`, `MenuSeparatorProps`, `PopoverProps`, `PopoverTriggerProps`, `PopoverContentProps`,
   `TooltipProps`, `TableProps`, `TabsProps`, `Tab`, `NavGroupProps`, `NavGroupItem`,
   `NavGroupHeadingLevel`, `NavItemProps`, `DividerProps`, `DividerWeight`, `ToastProviderProps`,
-  `ToastViewportProps`,
+  `ToastViewportProps`, `DirectionProviderProps`,
   `ToastOptions`, `ToastActionOptions`, `ToastUpdateOptions`, `ToastPromiseOptions`, `ToastType`,
   `ToastPosition`, `ToastManager`) and the shared `Variant`,
   `OverlaySide` and `OverlayAlign` types.
@@ -343,3 +344,16 @@ remain physical and CodeBlock remains LTR.
 The stress pass adds no package subpath, theme system or motion owner. Notification stacking
 is now explicit in the design language because the persistent toast portal can precede the
 modal that raises a notification. See `docs/HOSTILE_LAYOUT.md` for the evidence and limits.
+
+## Phase D publication corrections
+
+The five-subpath architecture is unchanged. Root and dev now publish module-correct `.d.ts` /
+`.d.cts` declarations; source maps embed source text. `MenuTriggerProps` and `PopoverTriggerProps`
+are exported. `Select.className` targets its visible trigger; Slider div attributes target its
+root while handle labeling stays on the thumb. These are prerelease corrections, not aliases.
+
+The complete stylesheet no longer assumes a host reset: its native-control/border-box baseline
+is restricted to Sherick-owned nodes. Global keyframes and math font names are namespaced, and
+the copied math assets carry their license. Prism manual mode prevents document-wide highlighting
+before React hydration. Packed React 18/19 Vite and Next fixtures guard these contracts; no bundle
+budget was increased. `prepack`, rather than consumer installation, owns the Bun build.

@@ -2,6 +2,13 @@
   "name": "sherick-ui",
   "version": "2.0.0-alpha.1",
   "description": "A reusable React component library inspired by Material 3 Expressive.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Sherick16/sherick-ui.git",
+    "directory": "packages/ui"
+  },
+  "homepage": "https://github.com/Sherick16/sherick-ui#readme",
+  "bugs": "https://github.com/Sherick16/sherick-ui/issues",
   "keywords": [
     "react",
     "ui",
@@ -29,18 +36,28 @@
   ],
   "exports": {
     ".": {
-      "types": "./dist/types/index.d.ts",
-      "import": "./dist/esm/index.js",
-      "require": "./dist/cjs/index.cjs"
+      "import": {
+        "types": "./dist/types/index.d.ts",
+        "default": "./dist/esm/index.js"
+      },
+      "require": {
+        "types": "./dist/types/index.d.cts",
+        "default": "./dist/cjs/index.cjs"
+      }
     },
     "./content": {
       "types": "./dist/types/content.d.ts",
       "import": "./dist/esm/content.js"
     },
     "./dev": {
-      "types": "./dist/types/dev.d.ts",
-      "import": "./dist/esm/dev.js",
-      "require": "./dist/cjs/dev.cjs"
+      "import": {
+        "types": "./dist/types/dev.d.ts",
+        "default": "./dist/esm/dev.js"
+      },
+      "require": {
+        "types": "./dist/types/dev.d.cts",
+        "default": "./dist/cjs/dev.cjs"
+      }
     },
     "./styles.css": "./dist/styles.css",
     "./theme.css": "./dist/theme.css"
@@ -48,7 +65,7 @@
   "scripts": {
     "dev:watch": "bun scripts/build-styles.ts && rollup -c -w",
     "build": "bun run clean && bun scripts/build-styles.ts && rollup -c",
-    "prepare": "bun run build",
+    "prepack": "bun run build",
     "typecheck": "tsc --noEmit",
     "test": "node scripts/smoke-package.mjs",
     "test:packed": "node scripts/verify-packed-package.mjs",

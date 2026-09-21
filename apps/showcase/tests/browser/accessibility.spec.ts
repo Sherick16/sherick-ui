@@ -70,11 +70,7 @@ const expectNoA11yViolations = async (page: Page, theme: Theme) => {
 /* The showcase is a page of interactive specimens, and it is the only place some states appear at
    all — a motion stage with a real control in it, the toast stack, an open drawer. Scanning it is
    what keeps a specimen from being the one thing no gate looks at.
-   It is also the one fixture with a **recorded** console error: the page hydrates with a mismatch
-   that regenerates its tree on the client (React 418, a pre-existing `Markdown`/`CodeBlock`
-   grammar difference that reproduces on `main`), so the claim here is narrowed to "no *new*
-   console error" rather than dropped. */
-const RECORDED_CONSOLE_ERRORS = [/Minified React error #418/, /Hydration failed/];
+   The content renderer must hydrate without replacing React-owned or host-owned markup. */
 
 for (const theme of THEMES) {
   test(`the showcase itself has no automatically detectable WCAG A/AA violations (${theme})`, async ({
@@ -86,10 +82,7 @@ for (const theme of THEMES) {
 
     await expectNoA11yViolations(page, theme);
 
-    const unexpected = errors.filter(
-      (error) => !RECORDED_CONSOLE_ERRORS.some((pattern) => pattern.test(error))
-    );
-    expect(unexpected, "the showcase may only report its recorded hydration mismatch").toEqual([]);
+    expect(errors).toEqual([]);
   });
 
   test(`core verification fixture has no automatically detectable WCAG A/AA violations (${theme})`, async ({
@@ -126,12 +119,7 @@ for (const theme of THEMES) {
 
     await expectNoA11yViolations(page, theme);
 
-    /* Markdown/CodeBlock currently log a recoverable React hydration mismatch between the server
-       and client Prism grammar — a pre-existing condition unrelated to the accessibility contract.
-       The axe scan above still runs on the rendered result; anything other than that known
-       recovery fails here. */
-    const unexpected = errors.filter((error) => !/Hydration failed|Minified React error #418/.test(error));
-    expect(unexpected, `unexpected page errors:\n${unexpected.join("\n")}`).toEqual([]);
+    expect(errors).toEqual([]);
   });
 
   test(`initially-open dialog has no automatically detectable WCAG A/AA violations (${theme})`, async ({

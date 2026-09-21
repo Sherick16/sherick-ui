@@ -192,6 +192,7 @@ test("theme tokens and KaTeX assets are present without consumer styling infrast
   await expect(page.locator(".katex").first()).toBeVisible();
   const katexFont = await page.locator(".katex").first().evaluate((element) => getComputedStyle(element).fontFamily);
   expect(katexFont.toLowerCase()).toContain("katex");
+  await expect(page.locator("pre.prism-code .token.keyword").first()).toBeVisible();
   expect(errors).toEqual([]);
 });
 

@@ -21,6 +21,8 @@ The library build starts at `packages/ui/src/index.ts` plus the `src/content.ts`
 
 The library TypeScript configs contain no Next plugin or generated `.next` types. Application workspaces own their framework-specific TypeScript configuration.
 
+Root and dev exports pair ESM `.d.ts` with CommonJS `.d.cts` under matching import/require conditions. Rich content remains ESM-only. Source maps embed their source text because source files are not published. `prepack` builds publication artifacts; consumer installation does not require Bun or any repository build tool.
+
 ## Styling architecture
 
 `docs/DESIGN_LANGUAGE.md` is the visual authority. Its implementation has four distinct owners:
@@ -42,6 +44,8 @@ The package publishes:
 `styles.css` is generated without Tailwind preflight/reset and contains no unscoped generic utility selectors. Component rules are scoped with the private `.sui-scope` marker through zero-specificity `:where(...)` selectors. The marker exists only to isolate package CSS and is not a supported consumer styling hook.
 
 Because Sherick compiles Tailwind utilities ahead of time without shipping preflight, `styles.css` also initializes Tailwind's shadow/ring/transform/filter plumbing variables inside the private scope. These are implementation variables, not visual tokens, and never escape into consumer DOM.
+
+The compiler also supplies border-box geometry and zero native borders, plus inherited form-control fonts and neutral native padding/backgrounds, **only on explicitly owned nodes**. This is not a reset of the document or consumer descendants. Utilities override this zero-specificity baseline. The compiler namespaces global keyframe and KaTeX font-family names without changing motion recipes; bundled math assets retain the KaTeX license.
 
 Every independently portaled styled subtree must establish the same scope. Dialog, Select and Tooltip therefore remain styled when Base UI portals them outside trigger ancestry. New portaled components follow the same rule.
 
@@ -215,3 +219,7 @@ The persistent ToastViewport is not a nested interaction portal: its mount order
 a modal even when the toast is raised inside it. The design language therefore distinguishes
 application notifications from the shared interaction stacking plane. This is a visual recipe
 correction, not a local dismissal stack or portal manager.
+
+## Phase D publication findings
+
+The packed consumer matrix found and fixed CJS declaration-format mismatch, omitted trigger prop exports, Select class overrides landing on its wrapper, Slider root attributes landing on its thumb, host-reset assumptions, global keyframe/font collisions, and source maps without source text. Prism's automatic document scan also rewrote React/host code before hydration; CodeBlock now uses Prism's native manual mode, and the hydration-error allowlists are removed. No subpath, dependency boundary, theme system, motion owner or size budget changed.

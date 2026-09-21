@@ -61,12 +61,15 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
       label,
       className,
       thumbClassName,
-      ...thumbProps
+      "aria-label": ariaLabel,
+      "aria-labelledby": ariaLabelledby,
+      ...rootProps
     },
     ref
   ) => {
     return (
       <BaseSlider.Root
+        {...rootProps}
         value={value}
         defaultValue={defaultValue}
         onValueChange={onValueChange}
@@ -105,7 +108,8 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
             {/* A compact capsule rather than a dot: taller than the groove, and narrow enough that
                 the range's tail lands behind it. */}
             <BaseSlider.Thumb
-              {...thumbProps}
+              aria-label={ariaLabel}
+              aria-labelledby={ariaLabelledby}
               ref={ref}
               data-sui-slider-thumb=""
               className={cn(

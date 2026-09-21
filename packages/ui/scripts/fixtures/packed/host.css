@@ -1,0 +1,16 @@
+/* Deliberately no reset, preflight, box-sizing or native-control normalization. */
+body { margin: 24px; font-family: monospace; }
+main { display: grid; gap: 16px; }
+.w-24 { width: 96px; }
+.min-w-0 { min-width: 0; }
+.rounded-none { border-radius: 0; }
+.static { position: static; }
+.overflow-visible { overflow: visible; }
+.p-0 { padding: 0; }
+.opacity-100 { opacity: 1; }
+.hover\:opacity-50:hover { opacity: .5; }
+.consumer-skeleton { height: 20px; }
+@keyframes spin { to { transform: translateX(123px); } }
+@keyframes pulse { to { opacity: .123; } }
+#host-spin { animation: spin 1s linear infinite; }
+#host-pulse { animation: pulse 1s linear infinite; }

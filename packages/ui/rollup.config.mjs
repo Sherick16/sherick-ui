@@ -29,6 +29,7 @@ const plugins = () => [
       noEmit: false,
       declaration: false,
       sourceMap: true,
+      inlineSources: true,
       allowJs: false,
     },
   }),
@@ -52,16 +53,19 @@ const bundle = (input, dir, format, entryFileNames) => ({
   external,
 });
 
-const declarations = (input, file) => ({
+const declarations = (input, file, commonjs = false) => ({
   input,
-  output: [{ file, format: "esm" }],
+  output: [
+    { file, format: "esm" },
+    ...(commonjs ? [{ file: file.replace(/\.d\.ts$/, ".d.cts"), format: "esm" }] : []),
+  ],
   plugins: [dts({ tsconfig: "./tsconfig.build.dts.json" })],
 });
 
 export default [
   bundle(esmEntries, "dist/esm", "esm", "[name].js"),
   bundle(cjsEntries, "dist/cjs", "cjs", "[name].cjs"),
-  declarations("src/index.ts", "dist/types/index.d.ts"),
+  declarations("src/index.ts", "dist/types/index.d.ts", true),
   declarations("src/content.ts", "dist/types/content.d.ts"),
-  declarations("src/dev.ts", "dist/types/dev.d.ts"),
+  declarations("src/dev.ts", "dist/types/dev.d.ts", true),
 ];

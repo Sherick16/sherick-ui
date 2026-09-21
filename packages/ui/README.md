@@ -7,7 +7,7 @@ The published stable line is `1.0.x` and is frozen. New work ships as `2.0.0-alp
 ## Installation
 
 ```bash
-bun add sherick-ui
+npm install sherick-ui@alpha
 ```
 
 Import the complete stylesheet once near your application root. Load framework/Tailwind/reset CSS first, then Sherick UI:
@@ -22,6 +22,8 @@ The order matters when the host also uses Tailwind: Sherick ships a precompiled 
 That is the full styling integration. Consumers do not need Tailwind, a Sherick preset, package content scanning, or any other Sherick-specific CSS build configuration.
 
 Tailwind is private authoring/build infrastructure inside the Sherick UI repository. The published package ships finished, scoped CSS and initializes the Tailwind runtime custom properties it needs inside that private scope, so shadows, rings, transforms and backdrop filters work even when the consumer has no Tailwind preflight.
+
+No host reset is required: native controls and border-box geometry are normalized only on Sherick-owned nodes. Keyframes and math font families are namespaced; unrelated host elements and consumer children remain untouched.
 
 ## Writing direction
 
@@ -106,7 +108,7 @@ export function Example() {
 
 The package publishes these subpaths:
 
-- `sherick-ui` — the core component barrel: `Accordion`, `Alert`, `AlertDialog`, `Avatar`, `Badge`, `Button`, `Card`, `Checkbox`, `Chip`, `ChipGroup`, `Collapsible`, `Combobox`, `Dialog`, `Divider`, `Drawer`, `Field`, `IconButton`, `Input`, `Menu`, `NavGroup`, `NavItem`, `NumberField`, `Popover`, `Progress`, `RadioGroup`, `Search`, `SegmentedControl`, `Select`, `Skeleton`, `Slider`, `Spinner`, `Switch`, `Table`, `Tabs`, `Textarea`, `ToastProvider`, `ToastViewport`, `ToggleGroup`, `Tooltip`, `useToast`, `createToastManager`, plus their prop types and the shared `Variant` type.
+- `sherick-ui` — the core component barrel: `Accordion`, `Alert`, `AlertDialog`, `Avatar`, `Badge`, `Button`, `Card`, `Checkbox`, `Chip`, `ChipGroup`, `Collapsible`, `Combobox`, `Dialog`, `DirectionProvider`, `Divider`, `Drawer`, `Field`, `IconButton`, `Input`, `Menu`, `NavGroup`, `NavItem`, `NumberField`, `Popover`, `Progress`, `RadioGroup`, `Search`, `SegmentedControl`, `Select`, `Skeleton`, `Slider`, `Spinner`, `Switch`, `Table`, `Tabs`, `Textarea`, `ToastProvider`, `ToastViewport`, `ToggleGroup`, `Tooltip`, `useToast`, `createToastManager`, plus their prop types and the shared `Variant` type.
 - `sherick-ui/content` — the rich-content boundary, **ESM only**: `Markdown`, `CodeBlock` and their prop types.
 - `sherick-ui/styles.css` — the complete component stylesheet.
 - `sherick-ui/theme.css` — token-only theme output.

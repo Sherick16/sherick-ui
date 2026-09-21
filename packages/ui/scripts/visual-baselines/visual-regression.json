@@ -182,6 +182,17 @@
     }
   },
   "utilities": {
+    ":where(.sui-scope),\n  :where(.sui-scope)::before,\n  :where(.sui-scope)::after": [
+      "border-color: currentColor",
+      "border-style: solid",
+      "border-width: 0",
+      "box-sizing: border-box"
+    ],
+    ":where(.sui-scope):where(button, input, textarea, select)": [
+      "background-color: transparent",
+      "font: inherit",
+      "padding: 0"
+    ],
     ":where(.sui-scope)": [
       "--tw-backdrop-blur:  ",
       "--tw-backdrop-brightness:  ",
@@ -637,11 +648,11 @@
     ":where(.sui-scope).transform": [
       "transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))"
     ],
-    "@keyframes pulse | 50%": [
+    "@keyframes sherick-pulse | 50%": [
       "opacity: .5"
     ],
     ":where(.sui-scope).animate-pulse": [
-      "animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite"
+      "animation: sherick-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite"
     ],
     "@keyframes sherick-indeterminate | 0%": [
       "transform: translateX(calc(-100% * var(--sui-indeterminate-direction, 1)))"
@@ -652,11 +663,11 @@
     ":where(.sui-scope).animate-sherick-indeterminate": [
       "animation: sherick-indeterminate var(--sui-duration-activity) linear infinite"
     ],
-    "@keyframes spin | to": [
+    "@keyframes sherick-spin | to": [
       "transform: rotate(360deg)"
     ],
     ":where(.sui-scope).animate-spin": [
-      "animation: spin 1s linear infinite"
+      "animation: sherick-spin 1s linear infinite"
     ],
     ":where(.sui-scope).cursor-not-allowed": [
       "cursor: not-allowed"

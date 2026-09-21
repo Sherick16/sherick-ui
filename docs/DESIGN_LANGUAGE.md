@@ -21,6 +21,14 @@ exists once a recipe is evaluated — a variant fragment glued to a suffix, `${v
 class names, and write one out in full wherever a variant prefix would otherwise be assembled by
 hand. A recipe that renders a class `styles.css` has no rule for fails the package check.
 
+**A host reset is not part of the language.** The private CSS compiler establishes border-box
+geometry and removes native control rims only on explicitly Sherick-owned nodes, then the named
+recipes supply their surface, edge and state. For example, a bare-document `Input` is rimless and
+a `Divider` has its authored solid hairline. This baseline must not normalize a consumer button
+or arbitrary children inside a `Card`. Global animation and math-font names are compiler-prefixed
+so the language cannot replace a host's `spin`, `pulse` or KaTeX font. Timing and appearance remain
+owned by the existing motion and visual recipes, not by these isolation mechanics.
+
 Sherick UI deliberately keeps **visual design** separate from **widget mechanics**.
 `@base-ui/react` is the behavioral and accessibility substrate wherever it provides the
 primitive: keyboard navigation, focus management, semantic relationships, form
