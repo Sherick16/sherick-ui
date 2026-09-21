@@ -201,6 +201,7 @@ for (const kind of ["dialog", "drawer"]) {
     await page.setViewportSize({ width: 320, height: 300 });
     await select.click();
     await expect(page.getByRole("listbox")).toBeVisible();
+    await expect(option).toBeFocused();
     await page.keyboard.press("Escape");
     await expect(modal).toBeVisible();
     await expect(select).toBeFocused();
