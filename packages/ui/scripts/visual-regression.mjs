@@ -60,6 +60,7 @@ const {
   Chip,
   ChipGroup,
   Collapsible,
+  Combobox,
   Divider,
   Drawer,
   Field,
@@ -100,6 +101,11 @@ const h = React.createElement;
 const noop = () => undefined;
 const inDialogContext = (child) => h(BaseDialog.Root, { open: true }, child);
 
+const comboboxOptions = [
+  { label: "Design system", value: "design" },
+  { label: "Dashboard", value: "dashboard" },
+  { label: "Marketing site", value: "marketing", disabled: true },
+];
 
 const specimens = {
   "button.filled": h(Button, { appearance: "filled" }, "Save"),
@@ -245,6 +251,8 @@ const specimens = {
   "textarea.default": h(Textarea, { label: "Notes", placeholder: "Describe what you want to build…" }),
   "textarea.error": h(Textarea, { label: "Invalid notes", error: true }),
   "tooltip.trigger": h(Tooltip, { content: "Hint" }, h(Button, { appearance: "tonal" }, "Hover")),
+  "combobox.default": h(Combobox, { options: comboboxOptions, value: "design", onValueChange: noop }),
+  "combobox.disabled": h(Combobox, { options: comboboxOptions, value: "design", disabled: true }),
   /* The toggle family, and the two shapes a progress bar can take. A progress specimen pins its
      locale, because the formatted value it renders is a locale decision and this gate is a
      deterministic one. */

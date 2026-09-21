@@ -85,7 +85,7 @@ The root `sherick-ui` export is:
 - **Actions and feedback**: `Button`, `IconButton`, `Alert`, `AlertDialog`, `Avatar`, `Badge`,
   `Card`, `Chip`, `ChipGroup`, `Progress`, `SegmentedControl`, `Skeleton`, `Spinner`;
 - **Forms and value controls**: `Field`, `Input`, `Textarea`, `Search`, `NumberField`, `Select`,
-  `Checkbox`, `RadioGroup`, `Slider`, `Switch`, `ToggleGroup`;
+  `Combobox`, `Checkbox`, `RadioGroup`, `Slider`, `Switch`, `ToggleGroup`;
 - **Surfaces and overlays**: `Dialog`, `Drawer`, `Menu`, `Popover`, `Tooltip`, `Table`, `Tabs`,
   `NavGroup`, `NavItem`, `Divider`;
 - **Toasts**: `ToastProvider`, `ToastViewport`, `useToast`, and `createToastManager()` for a
@@ -98,7 +98,7 @@ The root `sherick-ui` export is:
   `CardProps`, `ChipProps`, `ChipGroupProps`, `ProgressProps`, `SegmentedControlProps`,
   `SegmentedControlOption`, `SkeletonProps`, `SpinnerProps`, `FieldProps`, `InputProps`,
   `TextareaProps`, `SearchProps`, `NumberFieldProps`, `SelectProps`, `SelectOption`,
-  `CheckboxProps`, `RadioGroupProps`, `RadioGroupOption`,
+  `ComboboxProps`, `ComboboxOption`, `CheckboxProps`, `RadioGroupProps`, `RadioGroupOption`,
   `SliderProps`, `SwitchProps`, `ToggleGroupProps`, `ToggleGroupItemProps`, `DialogProps`,
   `DialogHeaderProps`, `DialogDescriptionProps`, `DialogContentProps`, `DialogFooterProps`,
   `DrawerProps`, `DrawerTriggerProps`, `DrawerContentProps`, `DrawerHeaderProps`,
@@ -315,23 +315,27 @@ on consumer install, publish the prerelease under `latest`, or move stable `2.0.
 
 ## Release-readiness classifications
 
-### Resolved stable-release blocker: editable Combobox isolation
+### Stable-release blocker: editable Combobox isolation
 
-The editable `Combobox` was removed from the package, public types, documentation examples,
-showcase and verification fixtures before `2.0.0`. This is an intentional prerelease contract
-correction, not a deprecation: stable `2.x` does not include `Combobox`, `ComboboxProps` or
-`ComboboxOption`.
+The current public `Combobox` prevents `2.0.0` from shipping. This was reproduced against the
+packed implementation and `@base-ui/react@1.8.0`: opening the editable listbox on the interactions
+fixture produces axe's serious `aria-hidden-focus` violation on 37 outside nodes. Base's focus
+manager marks content around the popup `aria-hidden="true"` while leaving that content in sequential
+focus navigation. A keyboard user can therefore move focus into content a screen reader cannot
+perceive.
 
-The removed implementation was reproduced against the packed artifact and
-`@base-ui/react@1.8.0`: opening its editable listbox produced axe's serious
-`aria-hidden-focus` violation on 37 outside nodes. Base's floating focus manager marked content
-around the popup `aria-hidden="true"` while leaving it in sequential focus navigation. The same
-behavior remains tracked as [mui/base-ui#5528](https://github.com/mui/base-ui/issues/5528).
+The behavior is owned by Base UI's floating focus manager, is still present on Base UI `master`,
+and is tracked upstream as [mui/base-ui#5528](https://github.com/mui/base-ui/issues/5528). Sherick
+cannot correct it without taking ownership of focus/isolation behavior that belongs to the
+dependency. The exact resolution is either:
 
-A future searchable selection control may be added only after its released behavioral foundation
-passes the full open-state axe scan without exclusions while preserving editable input and
-non-modal pointer behavior. It will be evaluated as a new API; the removed prerelease shape does
-not reserve a stable compatibility contract.
+1. upgrade to a released Base UI version that keeps the editable input usable, preserves the
+   non-modal pointer contract, and removes `aria-hidden` outside content from sequential keyboard
+   focus; then run the full open-state axe scan with no exclusion; or
+2. remove `Combobox` and its types from the stable public contract before `2.0.0`.
+
+Direct listbox/option/active-descendant assertions remain useful regression coverage, but they are
+not equivalent to an accessibility scan and do not waive this blocker.
 
 ### Accepted stable limitations
 

@@ -156,6 +156,11 @@ test("portaled Wave B surfaces remain scoped and styled", async ({ page }) => {
   expect(await menuItem.evaluate((element) => getComputedStyle(element).borderRadius)).not.toBe("0px");
   await page.keyboard.press("Escape");
 
+  await page.getByRole("combobox", { name: "Portaled combobox" }).click();
+  const option = page.getByRole("option", { name: "Dashboard" });
+  await expect(option).toBeVisible();
+  expect(await option.evaluate((element) => getComputedStyle(element).borderRadius)).not.toBe("0px");
+  await page.keyboard.press("Escape");
 
   /* The alert dialog is a surface of its own with its own role, styled by package CSS alone. */
   await page.getByRole("button", { name: "Open portaled alert" }).click();

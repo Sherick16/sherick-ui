@@ -136,6 +136,6 @@ Validation:
 Local execution logs: `/tmp/sherick-phase-d-verify.log` and
 `/tmp/sherick-phase-d-clean-verify.log`. The latter is the clean-state acceptance run.
 
-This package pass did not yet resolve the open editable-Combobox accessibility gap it recorded.
-Final release work subsequently removed that prerelease API from the stable contract. This report
-does not claim every browser/React patch version or physical-device behavior was tested.
+Existing stable-release limitations remain recorded in `VERIFICATION.md` and `RELEASE.md`,
+including the upstream open-editable-Combobox accessibility gap. This package pass does not
+claim every browser/React patch version or physical-device behavior was tested.

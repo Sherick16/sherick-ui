@@ -4,7 +4,7 @@ import { useState, type ReactNode } from "react";
 import { Check, Download, Heart } from "lucide-react";
 import {
   Accordion, Alert, AlertDialog, Badge, Button, Card, Checkbox, Chip, Collapsible,
-  Dialog, Drawer, Field, IconButton, Input, Menu, NavGroup, NavItem,
+  Combobox, Dialog, Drawer, Field, IconButton, Input, Menu, NavGroup, NavItem,
   NumberField, Popover, RadioGroup, Search, SegmentedControl, Select, Slider,
   Switch, Table, Tabs, Textarea, ToastProvider, ToastViewport, ToggleGroup, Tooltip,
   useToast, type DrawerSide,
@@ -51,10 +51,11 @@ export default function VisualConsistencyPage() {
               const disabled = state === "Disabled";
               const readOnly = state === "Read only";
               const error = state === "Invalid";
-              return <div key={state} data-field-state={state} className="grid grid-cols-1 items-start gap-4 md:grid-cols-3 xl:grid-cols-5">
+              return <div key={state} data-field-state={state} className="grid grid-cols-1 items-start gap-4 md:grid-cols-3 xl:grid-cols-6">
                 <Input label={`${state} input`} defaultValue="Workspace" disabled={disabled} readOnly={readOnly} error={error} />
                 <Textarea label={`${state} notes`} defaultValue="Workspace notes with a second readable line." disabled={disabled} readOnly={readOnly} error={error} />
                 <Field label={`${state} select`} disabled={disabled} invalid={error}><Select options={options} defaultValue="one" readOnly={readOnly} /></Field>
+                <Field label={`${state} combobox`} disabled={disabled} invalid={error}><Combobox options={options} defaultValue="one" readOnly={readOnly} /></Field>
                 <Field label={`${state} number`} disabled={disabled} invalid={error}><NumberField defaultValue={3} min={1} max={10} readOnly={readOnly} /></Field>
                 <Search aria-label={`${state} search`} defaultValue="Workspace" disabled={disabled} readOnly={readOnly} loading={error} onSearch={() => undefined} className="mt-7" />
               </div>;
@@ -90,6 +91,7 @@ export default function VisualConsistencyPage() {
               <Tooltip content="Workspace hint"><Button>Hint</Button></Tooltip>
               <Menu><Menu.Trigger render={<Button>Commands</Button>} /><Menu.Content><Menu.Item>Workspace</Menu.Item><Menu.Item>Personal projects</Menu.Item><Menu.Item disabled>Unavailable</Menu.Item><Menu.Separator /><Menu.Item variant="danger">Delete</Menu.Item></Menu.Content></Menu>
               <Field label="Options"><Select options={options} defaultValue="one" /></Field>
+              <Field label="Filtered options"><Combobox options={options} defaultValue="one" /></Field>
               <Popover><Popover.Trigger render={<Button>Details</Button>} /><Popover.Content><p className="text-sm">Workspace details</p><Input label="Owner" defaultValue="Design team" /></Popover.Content></Popover>
               <Button onClick={() => setDialog(true)}>Dialog</Button><Button onClick={() => setAlert(true)}>Confirmation</Button><RaiseToast />
             </div>

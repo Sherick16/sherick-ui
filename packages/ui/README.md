@@ -66,19 +66,33 @@ Sherick UI supports React and React DOM 18 or 19 and the current and previous st
 of Chrome, Edge, Firefox and Safari. The core package has ESM and CommonJS entries; the rich-content
 subpath is ESM-only.
 
+### Current prerelease blocker
+
+Stable `2.0.0` must not ship until the editable `Combobox` popup no longer leaves outside,
+`aria-hidden` content in sequential keyboard navigation, or until `Combobox` is removed from the
+stable public contract. The behavior is in Base UI's popup isolation implementation and is tracked
+as `mui/base-ui#5528`. Direct keyboard assertions pass but do not replace an open-state axe scan.
+The repository's `docs/RELEASE.md` records the exact evidence and release condition.
 
 ## Usage
 
 ```tsx
-import { Button, Dialog, Field, Input, Menu, Select } from "sherick-ui";
+import { Button, Combobox, Dialog, Field, Input, Menu, Select } from "sherick-ui";
 import "sherick-ui/styles.css";
 
 export function Example() {
   return (
     <>
       <Input label="Email" name="email" type="email" required />
+      <Select
+        options={[
+          { label: "Design system", value: "design" },
+          { label: "Dashboard", value: "dashboard" },
+        ]}
+        defaultValue="design"
+      />
       <Field label="Project">
-        <Select
+        <Combobox
           options={[
             { label: "Design system", value: "design" },
             { label: "Dashboard", value: "dashboard" },
@@ -108,7 +122,7 @@ export function Example() {
 
 The package publishes these subpaths:
 
-- `sherick-ui` — the core component barrel: `Accordion`, `Alert`, `AlertDialog`, `Avatar`, `Badge`, `Button`, `Card`, `Checkbox`, `Chip`, `ChipGroup`, `Collapsible`, `Dialog`, `DirectionProvider`, `Divider`, `Drawer`, `Field`, `IconButton`, `Input`, `Menu`, `NavGroup`, `NavItem`, `NumberField`, `Popover`, `Progress`, `RadioGroup`, `Search`, `SegmentedControl`, `Select`, `Skeleton`, `Slider`, `Spinner`, `Switch`, `Table`, `Tabs`, `Textarea`, `ToastProvider`, `ToastViewport`, `ToggleGroup`, `Tooltip`, `useToast`, `createToastManager`, plus their prop types and the shared `Variant` type.
+- `sherick-ui` — the core component barrel: `Accordion`, `Alert`, `AlertDialog`, `Avatar`, `Badge`, `Button`, `Card`, `Checkbox`, `Chip`, `ChipGroup`, `Collapsible`, `Combobox`, `Dialog`, `DirectionProvider`, `Divider`, `Drawer`, `Field`, `IconButton`, `Input`, `Menu`, `NavGroup`, `NavItem`, `NumberField`, `Popover`, `Progress`, `RadioGroup`, `Search`, `SegmentedControl`, `Select`, `Skeleton`, `Slider`, `Spinner`, `Switch`, `Table`, `Tabs`, `Textarea`, `ToastProvider`, `ToastViewport`, `ToggleGroup`, `Tooltip`, `useToast`, `createToastManager`, plus their prop types and the shared `Variant` type.
 - `sherick-ui/content` — the rich-content boundary, **ESM only**: `Markdown`, `CodeBlock` and their prop types.
 - `sherick-ui/styles.css` — the complete component stylesheet.
 - `sherick-ui/theme.css` — token-only theme output.
@@ -117,17 +131,19 @@ The package publishes these subpaths:
 The names above are canonical. There are no compatibility aliases: `ActionButton`, `Dropdown`, `Modal`, `TabGroup` and their prop types are gone, as are the deprecated `Select.selected`, `Select.onSelect`, `Tabs.defaultTabId`, `Tabs.onTabChange`, `Dialog.onClose` and `Table.variant` props. The `onChange` props on `Input`, `Textarea` and `Switch` are no longer Sherick callbacks — `Input` and `Textarea` pass through native `onChange`, and boolean state goes through `Switch.onCheckedChange`.
 
 Controlled callbacks keep Base UI's `(nextValue, eventDetails)` signature. This includes `Input`,
-`Textarea`, `Search`, `Select`, `Switch`, `Tabs` and `Dialog`; consumers that do not need the event
-details may ignore the second argument.
+`Textarea`, `Search`, `Select`, `Switch`, `Tabs`, `Dialog` and `Combobox`; consumers that do not need
+the event details may ignore the second argument.
 
 The viewport-owning surfaces differ in what they own. `Dialog` composes as
 `Dialog.Header`, `Dialog.Description`, `Dialog.Content` and `Dialog.Footer`; `AlertDialog` is the
 destructive confirmation, with `title`, `description`, `confirmLabel`, `onConfirm` and `onCancel`
 — `onCancel` runs for every user cancellation, the cancel action and Escape alike — and it is
-always modal and never dismisses on an outside press. `Popover` and `Menu` anchor to the element
-that opened them through `Popover.Trigger`/`Popover.Content` and
-`Menu.Trigger`/`Menu.Content`/`Menu.Item`/`Menu.Separator`. `Select` takes `options` and a `value`
-and composes with `Field` for label, description and error relationships.
+always modal and never dismisses on an outside press. `Popover`, `Menu` and `Combobox` anchor to
+the element that opened them: `Popover.Trigger`/`Popover.Content`,
+`Menu.Trigger`/`Menu.Content`/`Menu.Item`/`Menu.Separator`, and a `Combobox` that takes `options`
+and a `value` the way `Select` does. Label a `Combobox` with `Field`, and drop it into `Select`'s
+place when the list needs to be searchable; a `readOnly` Combobox still opens and browses, it just
+cannot change its value.
 
 These components compose Base UI primitives, and Base UI stays internal: the parts above accept the
 capabilities this package documents rather than the primitive's complete prop set, so a Base

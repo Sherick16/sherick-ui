@@ -38,13 +38,14 @@ for (const theme of ["light", "dark"] as const) {
         await page.keyboard.press("Escape");
         await expect(surface).toBeHidden();
       }
-      const selectionList = overlays.getByRole("combobox", {name: "Options", exact: true});
-      await selectionList.click();
-      await expect(page.getByRole("listbox")).toBeVisible();
-      await expect(page.getByRole("listbox")).toHaveCSS("opacity", "1");
-      await capture("Options" + suffix);
-      await page.keyboard.press("Escape");
-      await expect(page.getByRole("listbox")).toBeHidden();
+      for (const name of ["Options", "Filtered options"]) {
+        await overlays.getByRole("combobox", {name, exact: true}).click();
+        await expect(page.getByRole("listbox")).toBeVisible();
+        await expect(page.getByRole("listbox")).toHaveCSS("opacity", "1");
+        await capture(name + suffix);
+        await page.keyboard.press("Escape");
+        await expect(page.getByRole("listbox")).toBeHidden();
+      }
       await overlays.getByRole("button", {name:"Hint",exact:true}).hover();
       await expect(page.getByText("Workspace hint", {exact:true})).toBeVisible();
       await expect(page.getByText("Workspace hint", {exact:true})).toHaveCSS("opacity", "1");
@@ -85,6 +86,7 @@ const layer = (control: Locator) => control.evaluate(el => Number(getComputedSty
 const fieldSurfaces = (page: Page, state: string) => [
   page.getByRole("textbox", {name:`${state} input`,exact:true}),
   page.getByRole("combobox", {name:`${state} select`,exact:true}),
+  page.getByRole("combobox", {name:`${state} combobox`,exact:true}).locator(".."),
   page.getByRole("textbox", {name:`${state} number`,exact:true}).locator(".."),
   page.getByRole("textbox", {name:`${state} search`,exact:true}).locator(".."),
 ];
@@ -103,7 +105,7 @@ for (const theme of ["light", "dark"] as const) {
         expect(sibling.fontSize).toBe(defaults[0].fontSize);
         expect(sibling.fill).toBe(defaults[0].fill);
       }
-      const invalid = await Promise.all(fieldSurfaces(page, "Invalid").slice(0,3).map(style));
+      const invalid = await Promise.all(fieldSurfaces(page, "Invalid").slice(0,4).map(style));
       for (const sibling of invalid) expect(sibling.fill).toBe(invalid[0].fill);
       expect(invalid[0].fill).not.toBe(defaults[0].fill);
       const disabled = fieldSurfaces(page, "Disabled");
@@ -122,18 +124,24 @@ for (const theme of ["light", "dark"] as const) {
       expect(errors).toEqual([]);
     });
 
-    test("an engaged invalid Select keeps one tone while open and hovered", async ({page}) => {
-      const control = page.getByRole("combobox", {name: "Invalid select", exact: true});
-      const rest = (await style(control)).fill;
-      await control.click();
-      await expect(page.getByRole("listbox")).toBeVisible();
-      await page.mouse.move(0, 0);
-      const engaged = (await style(control)).fill;
-      expect(engaged).not.toBe(rest);
-      await control.hover();
-      expect((await style(control)).fill).toBe(engaged);
-      await page.keyboard.press("Escape");
-      await expect(page.getByRole("listbox")).toBeHidden();
+    test("engaged invalid fields keep one tone while open and hovered", async ({page}) => {
+      const fills: string[] = [];
+      for (const name of ["Invalid select", "Invalid combobox"]) {
+        const control = page.getByRole("combobox", {name, exact:true});
+        const surface = name.endsWith("select") ? control : control.locator("..");
+        const rest = (await style(surface)).fill;
+        await control.click();
+        await expect(page.getByRole("listbox")).toBeVisible();
+        await page.mouse.move(0, 0);
+        const engaged = (await style(surface)).fill;
+        expect(engaged).not.toBe(rest);
+        await control.hover();
+        expect((await style(surface)).fill).toBe(engaged);
+        fills.push(engaged);
+        await page.keyboard.press("Escape");
+        await expect(page.getByRole("listbox")).toBeHidden();
+      }
+      expect(fills[0]).toBe(fills[1]);
     });
 
     test("narrow RTL siblings stay contained and toast actions follow their copy", async ({page}) => {
@@ -185,15 +193,20 @@ for (const theme of ["light", "dark"] as const) {
       expect((await style(controls[0])).shadow).toContain("inset");
     });
 
-    test("selection lists keep their row rhythm; menu rules follow the content band", async ({page}) => {
-      await page.getByRole("combobox", {name: "Options", exact: true}).click();
-      const rows = page.getByRole("option");
-      await expect(rows).toHaveCount(3);
-      const first = (await rows.nth(0).boundingBox())!;
-      const second = (await rows.nth(1).boundingBox())!;
-      expect(second.y - first.y - first.height).toBeGreaterThan(0);
-      await page.keyboard.press("Escape");
-      await expect(page.getByRole("listbox")).toBeHidden();
+    test("selection lists share their row rhythm; menu rules follow the content band", async ({page}) => {
+      const gaps: number[] = [];
+      for (const name of ["Options","Filtered options"]) {
+        await page.getByRole("combobox", {name,exact:true}).click();
+        const rows = page.getByRole("option");
+        await expect(rows).toHaveCount(3);
+        const first = (await rows.nth(0).boundingBox())!;
+        const second = (await rows.nth(1).boundingBox())!;
+        gaps.push(second.y - first.y - first.height);
+        await page.keyboard.press("Escape");
+        await expect(page.getByRole("listbox")).toBeHidden();
+      }
+      expect(gaps[0]).toBe(gaps[1]);
+      expect(gaps[0]).toBeGreaterThan(0);
       await page.getByRole("button", {name:"Commands",exact:true}).click();
       const menu = page.getByRole("menu");
       const rule = menu.getByRole("separator");
@@ -241,8 +254,8 @@ for (const theme of ["light", "dark"] as const) {
 
     test("disabled composite fields do not compress under a held pointer", async ({page}) => {
       await page.emulateMedia({reducedMotion:"no-preference"});
-      for (const control of [fieldSurfaces(page,"Disabled")[1]]) {
-        const target = control;
+      for (const control of fieldSurfaces(page,"Disabled").slice(1,3)) {
+        const target = control.getByRole("combobox").or(control.and(page.locator('[role="combobox"]')));
         const box = (await control.boundingBox())!;
         await page.mouse.move(box.x + box.width/2,box.y + box.height/2);
         await page.mouse.down();

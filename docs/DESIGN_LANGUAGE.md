@@ -259,7 +259,7 @@ depth or a corner.
 | Recipe | Shell | Composes |
 | --- | --- | --- |
 | `overlay.scrim` | the plane behind a surface that owns the viewport | a scrim fill plus a backdrop blur — no material, elevation or shape of its own |
-| `overlay.popup` | an anchored surface with room to breathe: a selection list (`Select`) or structured content (`Popover`) | `shape.surface` + `material.acrylic` + `elevation.floating` |
+| `overlay.popup` | an anchored surface with room to breathe: a selection list (`Select`, `Combobox`) or structured content (`Popover`) | `shape.surface` + `material.acrylic` + `elevation.floating` |
 | `overlay.menu` | a compact command list | `shape.control` + `material.acrylic` + `elevation.floating` |
 | `overlay.tooltip` | a compact hint, not a capsule control | `shape.row` + `material.acrylicDense` + `elevation.floating` |
 | `overlay.toast` | a floating status surface | `shape.prominent` + `material.acrylic` + `elevation.floating` |
@@ -538,8 +538,10 @@ focus, focus-within, engaged and their error counterparts. A control that reads 
 validity from the field it sits in rather than from a prop takes the same error ladder
 through `state.field.invalid*`, which is one tonality keyed on the field's own
 `data-invalid` attribute and deliberately outranks the prop-keyed step it overlaps.
-The tone is the whole of a plain text field's response. A `Select` also takes the tactile press in
-§12 because it is a control the user presses; its field wrapper is what compresses.
+The tone is the whole of a plain text field's response, and a field that opens a list — a
+`Select` trigger, an editable `Combobox` field — adds the tactile press in §12 to it, because it
+is a control the user presses as well as a place text goes. Both forms press identically: the
+field is what compresses.
 
 **Selection is a recessed surface that fills.** A switch track, a checkbox box, a radio
 circle and a slider groove are one object at four sizes: `selectable.surface` gives them
@@ -632,9 +634,9 @@ announce selection, or let a tag spring, raise or tint under the pointer.
 
 ### Collection rows
 
-A **collection row** is one line in a list the user scans — a `Select` option or a `Menu` command.
-It is its own small system inside the one above, because the same object appears at two densities
-and has to behave identically at both:
+A **collection row** is one line in a list the user scans — a `Select` option, a `Combobox`
+option, a `Menu` command. It is its own small system inside the one above, because the same
+object appears at two densities and has to behave identically at both:
 
 | Entry | Carries |
 | --- | --- |
@@ -750,8 +752,8 @@ library has nine intents, and one module owns the timing behind all of them
 | --- | --- | --- | --- |
 | `feedback` | a non-spatial state response | `motionFeedback` | hover, focus, a field's tone, a row's highlight, a filled surface |
 | `tactile` | a temporary physical answer to activation | `motionTactile`, `motionInkPress` | a button, an icon button, a stepper, a navigation row, a field that opens a list |
-| `arrive` | a meaningful subordinate part appears or leaves | `motionArrive` | a checkbox tick, a radio dot, the selected mark in a `Select` |
-| `orient` | a persistent affordance changes orientation in place | `motionOrient` | the disclosure chevron of a `Select`, an `Accordion` row or a `Collapsible` |
+| `arrive` | a meaningful subordinate part appears or leaves | `motionArrive` | a checkbox tick, a radio dot, the selected mark in a `Select` or `Combobox` |
+| `orient` | a persistent affordance changes orientation in place | `motionOrient` | the disclosure chevron of a `Select`, a `Combobox`, an `Accordion` row or a `Collapsible` |
 | `relocate` | a persistent object travels between stable destinations | `motionRelocate` | a tab indicator, a switch thumb |
 | `direct` | the pointer owns the geometry | `motionDirect` | a slider's handle and the fill it carries |
 | `disclose` | in-flow content expands and collapses | `motionDisclose` | the measured region of an `Accordion` item or a `Collapsible` |
@@ -803,16 +805,29 @@ A press travels about two pixels at the size of the ink it moves, and the compac
 because a 20px glyph inside a 44px target would never register two pixels of its own movement —
 not because a smaller control deserves a livelier animation.
 
-**A field that opens a list is a control, and presses like one.** A `Select` answers a press with
-one recipe, one amplitude and one timing:
+**A field that opens a list is a control, and presses like one.** A `Select`'s trigger and an
+editable `Combobox`'s field are the same control in two forms, and the whole field answers a press
+in both — one recipe, one amplitude, one timing, so pressing either reads as the same physical
+event:
 
 ```
 Select      press → whole field compresses → the list grows out of it
+Combobox    press → whole field compresses → the list grows out of it
 ```
 
-The wrapper carries the compression because Base suppresses the trigger's own active state, while
-a press on that descendant still activates its ancestor. The trigger keeps tone and orientation;
-the field is the only spatial owner. Plain text fields open nothing, so they stay feedback-only.
+The field is the element that carries it because a press activates the whole chain: a descendant
+being pressed is what makes the field itself match `:active`, which is also why a `Select` can
+compress at all — the primitive suppresses the trigger's own active state, and its field's wrapper
+is the only element left to answer. Composition follows from there:
+
+- the field's **own affordances** — a clear control, a disclosure control — answer with tone alone,
+  because a second compression nested inside the field's would read as two events for one press;
+- **typing and focus** never match, so the field is perfectly still while it is used as a text
+  field;
+- a press that **places a caret or drags across a word** is the same press, and the field compresses
+  for it too. That is accepted rather than special-cased: telling it apart would take pointer
+  bookkeeping or an interaction state machine inside a component, for a case that reads as one
+  interaction either way. A plain `Input` or `Textarea` opens nothing, so it stays feedback-only.
 
 **A target the pointer is already on never moves.** A control whose visible ink is much smaller
 than its target — a stepper, a dismiss control, a close control — compresses the *mark*, not the
@@ -838,8 +853,9 @@ Opening a `Select` is therefore one dominant motion and one supporting motion, n
 - supporting: the chevron's orientation;
 - non-spatial: the trigger's tone.
 
-A `Select` press follows the same ownership rule: the field wrapper compresses and the trigger
-inside it answers with tone — one field-level compression, not nested motion.
+A press works the same way: when a control inside a composite field is pressed, the field is the
+manipulated object and the control inside it answers with tone — one field-level compression, not
+a control compressing inside a field that compresses too.
 
 One recipe may carry several of those events on one node when the primitive reports them on that
 node. A toast's transform is its arrival, its place in the stack and the drag the pointer owns,
@@ -848,8 +864,8 @@ not three recipes composed, which is why an interrupted stack retargets from wha
 instead of restarting.
 
 There is no staggering, no per-row entrance, no label choreography and no generic layout
-animation: tab panels switch immediately, and a surface whose content changes height changes
-height.
+animation: filtering a `Combobox` replaces the list immediately, tab panels switch
+immediately, and a surface whose content changes height changes height.
 
 **Stable boundaries stay stable.** A checkbox box, a radio circle and a switch track are the
 control's identity, so their geometry never scales, translates or springs. The press is
@@ -875,9 +891,9 @@ instead of restarting from a keyframe's `from`. For the same reason no component
 exit timer; Base keeps the node mounted until the transition it started has finished.
 
 Anchored surfaces read their direction from what the primitive resolved — `--transform-origin`
-for the edge and `data-side` for which edge that is — so one recipe serves a `Select`, a `Menu`, a
-`Popover` and a `Tooltip`, and a popup flipped by collision enters the way it is actually placed.
-A **logical** side resolves against the writing direction: `inline-start`
+for the edge and `data-side` for which edge that is — so one recipe serves a `Select`, a
+`Combobox`, a `Menu`, a `Popover` and a `Tooltip`, and a popup flipped by collision enters the
+way it is actually placed. A **logical** side resolves against the writing direction: `inline-start`
 takes the popup to the anchor's physical left on a left-to-right page and its physical right on a
 right-to-left one, and the four pixels of travel change sign with it, because they always move
 *toward* the anchor. The direction is declared twice — document `dir` for CSS and Sherick's
@@ -924,6 +940,7 @@ type step**, so controls of one density share a rhythm.
 | `normal` | 3rem | 0.95rem | the default rhythm |
 | `prominent` | 3.5rem | 1.125rem | the largest step, still compact by consumer-app standards |
 | `target` | 2.75rem square | inherits | the minimum interactive target for an icon-only control that stands on its own |
+| `part` | 2.75rem tall, 2.25rem wide | inherits | one control **inside** a composite field — the trailing controls a `Combobox` owns |
 
 Composite parts do not inflate their field's density: a 44px stepper fits inside the normal 48px
 field, just as a search submit does. Unfilled embedded controls use the quiet state layer, not the
@@ -935,14 +952,21 @@ padding is written with the component rather than in these tokens. `Button` is t
 worked example: its `sm` / `md` / `lg` sizes are `density.compact` + `px-4 py-2`,
 `density.normal` + `px-6 py-3` and `density.prominent` + `px-8 py-4`.
 
+**`part` is the one step below the floor, and it is not a loose target.** A composite field
+is the target: the pointer is already in it, and the two controls at its trailing edge are
+gripped as one cluster rather than as two buttons beside a field — at the full width each one
+reads as a separate control. So a part keeps the floor's *height*, because it has to sit in
+the field's row, and takes only the width its own glyph needs. It still clears the 24px
+pointer-target minimum WCAG AA asks for.
 
 The library targets dense desktop and product UI, so even the prominent step stays
 compact. Body copy, headings and labels are content rather than controls and set their
 own type.
 
-**Do:** use `target` for a control that is the whole target of its own action.
+**Do:** use `target` for a control that is the whole target of its own action, and `part`
+only for a control that is one part of a composite field.
 **Do not** invent a fourth size step, scale a control by transform, derive a button's
-inline padding from a field's, or shrink an embedded control below the established target steps.
+inline padding from a field's, or reach for `part` to make a standalone control denser.
 
 ---
 
@@ -960,7 +984,7 @@ inline padding from a field's, or shrink an embedded control below the establish
   native `select` shows, and it is the only focus indication the field has left once the list has
   taken over.
 - `focusRingWithin` is the same ring for a value control whose focus lives in a borderless input
-  **inside** it — a search field or number field. It follows **visible** focus.
+  **inside** it — a combobox field, a search field, a number field. It follows **visible** focus.
 - `groupFocusRing` draws it from the wrapping control instead of the track it contains.
 
 The whole rule, in one line: **the ring says where the keyboard will act**, so it appears when focus
@@ -972,11 +996,13 @@ local preference:
 
 | Control | Ring |
 | --- | --- |
-| a text field — `Input`, `Textarea`, `Search`, `NumberField` | **whenever it is focused**, pointer or keyboard: a focused text field is always `:focus-visible` |
+| a text field — `Input`, `Textarea`, `Search`, `NumberField`, an editable `Combobox` | **whenever it is focused**, pointer or keyboard: a focused text field is always `:focus-visible` |
 | a `Select` trigger | **whenever it holds focus or its list is open** (`focusRingHeld`): a select hands the DOM focus to its list, so the ring follows the field's engagement — exactly as a native `select` does |
 | a slider handle, a button, an icon button, a nav row, a menu item | **keyboard focus only**: a press, and a drag, already answer visibly |
 
-A handle that the pointer is already moving keeps its ring for the keyboard.
+That is what keeps a select trigger and an editable combobox field identical in every state —
+neither ringed at rest, both ringed the moment either is used, both losing it together — while a
+handle that the pointer is already moving keeps its ring for the keyboard.
 - Fields use the outer ring only. No inner rim is added, so focus reads as one ring,
   never two.
 - Where Base UI provides the widget primitive, Base UI owns roles, ARIA relationships,
@@ -1151,7 +1177,10 @@ The two ends of a control are not obliged to share one number:
   — so a right-to-left page is the same design rather than a second one, and a physical side
   (`left-4`, `pl-6` …) is a defect rather than a shortcut. The one surface this does not describe
   is a **code well**: source code is read left to right whatever the document says, so `CodeBlock`
-  declares its own direction and the gutter inside it is physical on purpose.
+  declares its own direction and the gutter inside it is physical on purpose;
+- a control that owns a **trailing cluster** — a combobox field and its two parts — places that
+  cluster with its own inline padding rather than pinning it to a physical edge, so the cluster
+  stays at the field's end whichever way the page reads.
 
 ### Multiline copy holds its first line
 

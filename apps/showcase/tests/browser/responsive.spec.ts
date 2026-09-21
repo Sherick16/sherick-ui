@@ -2,7 +2,8 @@ import { expect, test, type Locator, type Page } from "./fixtures";
 
 const NARROW_VIEWPORT = { width: 320, height: 800 };
 
-/* The measured field controls must be laid out within the narrow wrapper they sit in. */
+/* The measured field controls: native inputs, the textarea, the Select trigger and the
+   Wave A/B family. Each must be laid out within the narrow wrapper it sits in. */
 const fieldControls = (page: Page): Array<[string, Locator]> => [
   ["narrow project name", page.getByRole("textbox", { name: "Narrow project name" })],
   ["narrow notes", page.getByRole("textbox", { name: "Narrow notes" })],
@@ -13,6 +14,7 @@ const fieldControls = (page: Page): Array<[string, Locator]> => [
   ["narrow budget", page.getByRole("slider", { name: "Narrow budget" })],
   ["narrow seats", page.getByRole("textbox", { name: "Narrow seats" })],
   ["narrow seats stepper", page.getByRole("button", { name: "Increase" })],
+  ["narrow combobox", page.getByRole("combobox", { name: "Narrow combobox" })],
 ];
 
 const openFixture = async (page: Page) => {
@@ -171,8 +173,8 @@ test("anchored popups stay inside a narrow viewport with long labels", async ({ 
     expect(metrics.overflow, `${name} overflows its own sheet by ${metrics.overflow}px`).toBeLessThanOrEqual(1);
   };
 
-  await page.getByRole("combobox", { name: "Long option select" }).click();
-  await assertContained("long select popup", page.getByRole("option", { name: /A project name long enough/ }));
+  await page.getByRole("combobox", { name: "Long option combobox" }).click();
+  await assertContained("combobox popup", page.getByRole("option", { name: /A project name long enough/ }));
   await page.keyboard.press("Escape");
 
   /* A control's own list follows the control, and is clamped to the viewport rather than to its

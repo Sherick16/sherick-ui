@@ -102,7 +102,7 @@ for (const side of ["left", "right", "top", "bottom"]) {
   });
 }
 
-for (const kind of ["select", "menu", "popover", "tooltip"]) {
+for (const kind of ["select", "combobox", "menu", "popover", "tooltip"]) {
   test(`${kind} collision and content near each corner`, async ({ page }) => {
     await page.setViewportSize({ width: 320, height: 360 });
     for (const corner of ["top-left", "top-right", "bottom-left", "bottom-right"]) {
@@ -110,7 +110,7 @@ for (const kind of ["select", "menu", "popover", "tooltip"]) {
         el.style.cssText = `position:fixed;${corner.includes("top") ? "top" : "bottom"}:4px;${corner.includes("left") ? "left" : "right"}:4px;width:180px;margin:0`;
         Array.from(el.children).forEach(child => { (child as HTMLElement).style.display = ""; });
       }, corner);
-      const trigger = page.getByRole(kind === "select" ? "combobox" : "button", { name: `Edge ${kind}`, exact: true });
+      const trigger = page.getByRole(kind === "select" || kind === "combobox" ? "combobox" : "button", { name: `Edge ${kind}`, exact: true });
       await trigger.evaluate(el => {
         let root = el as HTMLElement;
         while (root.parentElement?.dataset.testid !== "edge-anchor") root = root.parentElement!;
@@ -118,7 +118,7 @@ for (const kind of ["select", "menu", "popover", "tooltip"]) {
       });
       if (kind === "tooltip") await trigger.hover();
       else await trigger.click();
-      const surface = kind === "select" ? page.getByRole("listbox").locator("..")
+      const surface = kind === "select" || kind === "combobox" ? page.getByRole("listbox").locator("..")
         : kind === "tooltip" ? page.getByTestId("stress-tooltip").locator("..") : page.getByRole(kind === "menu" ? "menu" : "dialog");
       await expect(surface).toBeVisible();
       await inViewport(surface, page);
@@ -193,17 +193,16 @@ for (const kind of ["dialog", "drawer"]) {
     await page.setViewportSize({ width: 320, height: 640 });
     await page.getByRole("button", { name: `Open stress ${kind}`, exact: true }).click();
     const modal = page.getByRole("dialog").first();
-    const select = modal.getByRole("combobox", { name: "Nested select", exact: true });
-    await select.click();
+    const combo = modal.getByRole("combobox", { name: "Nested combobox", exact: true });
+    await combo.fill("Project 2");
     const option = page.getByRole("option", { name: "Project 23", exact: true });
     await option.click();
-    await expect(select).toHaveText("Project 23");
+    await expect(combo).toHaveValue("Project 23");
     await page.setViewportSize({ width: 320, height: 300 });
-    await select.click();
-    await expect(page.getByRole("listbox")).toBeVisible();
+    await combo.click();
     await page.keyboard.press("Escape");
     await expect(modal).toBeVisible();
-    await expect(select).toBeFocused();
+    await expect(combo).toBeFocused();
     const popover = modal.getByRole("button", { name: "Nested popover", exact: true });
     await popover.click();
     const input = page.getByRole("textbox", { name: "Popover field" });

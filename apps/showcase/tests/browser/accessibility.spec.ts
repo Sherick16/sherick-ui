@@ -176,6 +176,32 @@ for (const theme of THEMES) {
   });
 }
 
+/* An open Combobox listbox is asserted directly rather than scanned, and the divergence is
+   recorded in docs/VERIFICATION.md: Base UI's combobox focus manager marks the page around an
+   open listbox `aria-hidden` without `inert`, which axe reports as `aria-hidden-focus` on page
+   content Sherick does not own. The listbox relationships Sherick is responsible for are checked
+   here instead. */
+test("an open Combobox publishes its own listbox relationships", async ({ page, errors }) => {
+  await page.goto("/verification/interactions");
+
+  const searchable = page.getByRole("combobox", { name: "Combobox project" });
+  await searchable.click();
+
+  const listbox = page.getByRole("listbox");
+  await expect(listbox).toBeVisible();
+
+  await expect(page.getByRole("option", { name: "Design system" })).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByRole("option", { name: "Dashboard" })).toHaveAttribute("aria-selected", "false");
+
+  await searchable.fill("dash");
+  await page.keyboard.press("ArrowDown");
+  const active = await searchable.getAttribute("aria-activedescendant");
+  expect(active, "navigating the listbox must expose the active option on the input").toBeTruthy();
+  await expect(page.locator(`[id="${active}"]`)).toHaveAttribute("data-highlighted", "");
+  await expect(page.locator(`[id="${active}"]`)).toHaveText("Dashboard");
+
+  expect(errors).toEqual([]);
+});
 
 test("icon-only controls expose accessible names", async ({ page, errors }) => {
   await page.goto("/verification/dialog");

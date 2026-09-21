@@ -31,6 +31,7 @@ for (const exportName of [
   "Chip",
   "ChipGroup",
   "Collapsible",
+  "Combobox",
   "Dialog",
   "DirectionProvider",
   "Divider",
@@ -72,7 +73,6 @@ for (const removed of [
   "TabGroup",
   "Markdown",
   "CodeBlock",
-  "Combobox",
 ]) {
   assert.equal(library[removed], undefined, `${removed} must not remain on the root barrel`);
 }
@@ -104,6 +104,8 @@ for (const propType of [
   "MenuTriggerProps",
   "PopoverTriggerProps",
   "DirectionProviderProps",
+  "ComboboxProps",
+  "ComboboxOption",
   "ChipProps",
   "ChipGroupProps",
   "ToggleGroupProps",
@@ -424,6 +426,7 @@ const serverSurfaces = [
   ["AlertDialog", { defaultOpen: true, title: "Delete project?", confirmLabel: "Delete" }],
   ["Popover", { defaultOpen: true }],
   ["Menu", { defaultOpen: true }],
+  ["Combobox", { options: [{ label: "Design system", value: "design" }] }],
 ];
 for (const [componentName, props] of serverSurfaces) {
   for (const open of [false, true]) {

@@ -177,9 +177,11 @@ of Chrome, Edge, Firefox and Safari. The core package has ESM and CommonJS entri
 `sherick-ui/content` is ESM-only. The precise compatibility and semver policy is recorded in
 [`docs/RELEASE.md`](docs/RELEASE.md).
 
-Automated browser coverage includes axe scans plus keyboard and focus assertions. Release-readiness
-classifications and the remaining manual pre-publish checks are recorded in
-[`docs/RELEASE.md`](docs/RELEASE.md).
+Automated browser coverage includes axe scans plus keyboard and focus assertions. The current alpha
+still has one stable-release blocker: opening the editable `Combobox` can leave outside,
+`aria-hidden` content keyboard-focusable because of Base UI's popup isolation behavior. The exact
+evidence and release condition are recorded in [`docs/RELEASE.md`](docs/RELEASE.md); stable `2.0.0`
+must not ship with that unresolved behavior.
 
 ## Components
 
@@ -189,7 +191,7 @@ The public package exports:
 - Alert, Avatar, Badge and Card
 - Divider
 - Field, Input, Search, Textarea and NumberField
-- Select
+- Select and Combobox
 - Checkbox, RadioGroup and Slider
 - Dialog (with `Dialog.Header`, `Dialog.Description`, `Dialog.Content` and `Dialog.Footer`), AlertDialog and Drawer
 - Menu and Popover

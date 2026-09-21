@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {
   Accordion, Alert, AlertDialog, Badge, Button, Card, Checkbox, Chip, ChipGroup,
-  Collapsible, Dialog, DirectionProvider, Drawer, Field, Input, Menu, NavGroup, NavItem,
+  Collapsible, Combobox, Dialog, DirectionProvider, Drawer, Field, Input, Menu, NavGroup, NavItem,
   NumberField, Popover, Progress, RadioGroup, Search, SegmentedControl, Select,
   Slider, Switch, Table, Tabs, Textarea, ToastProvider, ToastViewport, ToggleGroup,
   Tooltip, useToast,
@@ -20,6 +20,7 @@ function NestedControls() {
   const [undone, setUndone] = useState(false);
   return <div className="hostile-stack">
     <Select aria-label="Nested select" options={options} defaultValue="long" />
+    <Field label="Nested combobox"><Combobox options={options} /></Field>
     <Popover><Popover.Trigger render={<Button>Nested popover</Button>} /><Popover.Content><Input label="Popover field" /></Popover.Content></Popover>
     <Menu><Menu.Trigger render={<Button>Nested menu</Button>} /><Menu.Content><Menu.Item>Nested command</Menu.Item></Menu.Content></Menu>
     <Tooltip content="Nested hint"><Button>Nested tooltip</Button></Tooltip>
@@ -58,6 +59,7 @@ function Surfaces() {
     <AlertDialog open={alert} onOpenChange={setAlert} title={long} description={long.repeat(8)} confirmLabel="Confirm this unusually long operation" cancelLabel="Return without making changes" />
     <div className="hostile-anchor" data-testid="edge-anchor">
       <Select aria-label="Edge select" options={options} />
+      <Field label="Edge combobox"><Combobox options={options} /></Field>
       <Menu><Menu.Trigger render={<Button>Edge menu</Button>} /><Menu.Content>{options.map(o => <Menu.Item key={o.value}>{o.label}</Menu.Item>)}</Menu.Content></Menu>
       <Popover><Popover.Trigger render={<Button>Edge popover</Button>} /><Popover.Content><Input label="Floating field" /><p>{token}</p><p>{long.repeat(8)}</p><Button>Last popover action</Button></Popover.Content></Popover>
       <Tooltip content={<span data-testid="stress-tooltip">{token}</span>}><Button>Edge tooltip</Button></Tooltip>
@@ -77,6 +79,7 @@ export default function Hostile() {
       <Textarea label={long} defaultValue={token} />
       <Search aria-label="Stress search" defaultValue={token} onSearch={() => undefined} />
       <Select aria-label="Stress select" options={options} defaultValue="long" />
+      <Field label="Stress combobox"><Combobox options={options} defaultValue="long" /></Field>
       <NumberField aria-label="Stress number" defaultValue={123456789} />
       <Field label={token} description={token}><Input aria-label="Field input" /></Field>
       <Button>{token}</Button>
@@ -104,6 +107,7 @@ export default function Hostile() {
       <div className="hostile-flex"><Input label="Flex input" /><Button>Go</Button></div>
       <div className="hostile-flex"><Search aria-label="Flex search" onSearch={() => undefined} /><Button>Go</Button></div>
       <div className="hostile-flex"><Select aria-label="Flex select" options={options} /><Button>Go</Button></div>
+      <div className="hostile-flex"><Field label="Flex combobox"><Combobox options={options} /></Field><Button>Go</Button></div>
       <div className="hostile-flex"><NumberField aria-label="Flex number" /><Button>Go</Button></div>
     </section>
     <div className="hostile-stack" data-testid="state-controls">

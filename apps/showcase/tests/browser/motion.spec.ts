@@ -355,6 +355,45 @@ test("Select carries tactile, orientation, arrival and anchored presence", async
   expect(errors).toEqual([]);
 });
 
+test("Combobox matches Select and filtering does not choreograph the list", async ({ page, errors }) => {
+  /* Addressed by its label rather than by role: while the listbox is open Base marks the page
+     around it `aria-hidden`, so a role locator stops resolving exactly when the query has to be
+     typed into it. */
+  const input = page.getByLabel("Combobox project").and(page.locator('input[role="combobox"]'));
+
+  /* The primitive hides its trigger from the accessibility tree while the list is open, so the
+     trigger and its chevron are addressed by their own attributes. */
+  const trigger = page.locator('button[aria-label="Show options"]').first();
+  const chevron = trigger.locator("svg");
+
+  expect((await motionOf(chevron)).property).toBe("transform");
+  expect((await motionOf(chevron)).transform).toBe("none");
+
+  await trigger.click();
+  const popup = page.locator(".sui-scope.shadow-sherick-floating");
+  await expect(popup).toBeVisible();
+  await expectDuration(page, popup, "--sui-duration-overlay");
+
+  /* Orientation: the same affordance reaches the open orientation it reaches in `Select`. */
+  await expect.poll(async () => (await motionOf(chevron)).transform).not.toBe("none");
+
+  /* A row answers with tone only, in both families. */
+  const row = page.getByRole("option", { name: "Dashboard" });
+  const rowMotion = await motionOf(row);
+  expect(rowMotion.property).not.toContain("transform");
+  expect(rowMotion.property).not.toContain("height");
+
+  /* Filtering replaces the rows immediately: no stagger, no row entrance, no height dance. */
+  await input.fill("dash");
+  await expect(page.getByRole("option", { name: "Design system" })).toHaveCount(0);
+  await expect(page.getByRole("option")).toHaveCount(1);
+  expect((await motionOf(page.getByRole("option"))).property).not.toContain("height");
+
+  await page.keyboard.press("Escape");
+  await expect(page.getByRole("option")).toHaveCount(0);
+
+  expect(errors).toEqual([]);
+});
 
 test("Menu items answer with tone and the sheet carries the presence", async ({ page, errors }) => {
   await page.getByRole("button", { name: "Open menu" }).click();
@@ -497,7 +536,8 @@ test("reduced motion drops every spatial entrance and keeps the state response",
   const still = (transform: string) => transform === "none" || transform.replace(/\s+/g, "") === "matrix(1,0,0,1,0,0)";
   expect(recorded.every((entry) => still(entry.transform)), "no reduced entrance travels").toBe(true);
 
-  /* A press is spatial, so reduced motion removes the compression while keeping the tone. */
+  /* A press is spatial, so reduced motion removes the compression while keeping the tone that
+     reports it — measured on both forms of the same field. */
   const reducedSelect = page.getByRole("combobox", { name: "Project type", exact: true });
   const reducedSelectField = reducedSelect.locator("xpath=..");
   const reducedPress = await pressDelta(page, reducedSelect, reducedSelectField);
@@ -507,6 +547,11 @@ test("reduced motion drops every spatial entrance and keeps the state response",
 
   await expect(page.getByTestId("popover-reason")).not.toHaveText("");
 
+  const reducedCombobox = page.locator('input[role="combobox"]').first();
+  const reducedComboboxField = reducedCombobox.locator("xpath=..");
+  const reducedComboboxPress = await pressDelta(page, reducedCombobox, reducedComboboxField);
+  expect(reducedComboboxPress.pressedScale, "the combobox field does not compress either").toBe(1);
+  await page.keyboard.press("Escape");
   await page.locator("body").click({ position: { x: 4, y: 4 } });
 
   /* The response to an event is not motion: a control still reports hover. */
@@ -622,6 +667,7 @@ test("the anchored family opens with one shared entrance geometry", async ({ pag
      same physics, and only the anchor resolution — side, origin, travel direction — may differ. */
   const cases: { name: string; open: () => Promise<void> }[] = [
     { name: "select", open: () => page.getByRole("combobox", { name: "Select", exact: true }).click() },
+    { name: "combobox", open: () => page.locator('[aria-label="Show options"]').first().click() },
     { name: "menu", open: () => page.getByRole("button", { name: "Open menu", exact: true }).click() },
     { name: "popover", open: () => page.getByTestId("lab-popover-trigger").click() },
     { name: "dialog", open: () => page.getByRole("button", { name: "Dialog", exact: true }).click() },
@@ -639,7 +685,7 @@ test("the anchored family opens with one shared entrance geometry", async ({ pag
   const reference = geometry.select;
   expect(reference.scale, "the reference surface must grow visibly").toBe(0.94);
 
-  for (const name of ["menu", "popover"]) {
+  for (const name of ["combobox", "menu", "popover"]) {
     expect(geometry[name].scale, `${name} must grow like Select`).toBe(reference.scale);
     expect(geometry[name].translateY, `${name} must travel like Select`).toBe(reference.translateY);
     expect(geometry[name].side, `${name} must resolve the same side`).toBe(reference.side);
@@ -690,17 +736,89 @@ test("a press moves a control by the amplitude its role owns", async ({ page, er
 });
 
 
-test("Select's field owns its press geometry", async ({ page, errors }) => {
+test("Select and Combobox are the same control in two forms", async ({ page, errors }) => {
+  /* The same physical event has to produce the same response, measured as geometry rather than
+     inferred from a class name: a press on a select's trigger and a press on an editable
+     combobox's field both compress the *whole field*, by the same amount, through the same recipe
+     and the same timing. */
   await openLab(page);
-  const trigger = page.getByRole("combobox", { name: "Select", exact: true });
-  const field = trigger.locator("xpath=..");
-  expect((await motionOf(field)).property, "the field is what presses").toContain("transform");
-  await expectDuration(page, field, "--sui-duration-release");
-  expect((await motionOf(trigger)).property, "the trigger itself only carries tone").not.toContain("transform");
+  const selectTrigger = page.getByRole("combobox", { name: "Select", exact: true });
+  const selectField = selectTrigger.locator("xpath=..");
+  expect((await motionOf(selectField)).property, "the field is what presses").toContain("transform");
+  await expectDuration(page, selectField, "--sui-duration-release");
+  expect((await motionOf(selectTrigger)).property, "the trigger itself only carries tone").not.toContain("transform");
+  const selectPress = await pressDelta(page, selectTrigger, selectField);
 
-  const press = await pressDelta(page, trigger, field);
-  expect(press.pressedScale, "a select compresses its whole field").toBe(0.96);
-  expect(press.restWidth - press.pressedWidth).toBeGreaterThan(10);
+  await openLab(page);
+  const comboboxInput = page.locator('input[role="combobox"]').first();
+  const comboboxField = comboboxInput.locator("xpath=..");
+  expect((await motionOf(comboboxField)).property, "the field is what presses").toContain("transform");
+  await expectDuration(page, comboboxField, "--sui-duration-release");
+  const comboboxPress = await pressDelta(page, comboboxInput, comboboxField);
+
+  expect(selectPress.pressedScale, "a select compresses its whole field").toBe(0.96);
+  expect(comboboxPress.pressedScale, "and the combobox reaches the same scale on the same press").toBe(0.96);
+  expect(comboboxPress.compressionPercent, "the amplitudes match").toBeCloseTo(selectPress.compressionPercent, 1);
+  expect(comboboxPress.restWidth).toBeCloseTo(selectPress.restWidth, 0);
+  expect(comboboxPress.restWidth - comboboxPress.pressedWidth).toBeGreaterThan(10);
+
+  /* The field's own affordances add nothing: they answer with tone, because a second compression
+     nested inside the field's would read as two events for one press. Their measured box still
+     shrinks with the field around them, so the assertion is about their own geometry. */
+  await page.locator("body").click({ position: { x: 4, y: 4 } });
+  await openLab(page);
+  const disclosure = page.locator('[aria-label="Show options"]').first();
+  const fieldOfDisclosure = disclosure.locator("xpath=..");
+  const disclosurePress = await pressDelta(page, disclosure, disclosure, fieldOfDisclosure);
+  expect(disclosurePress.pressedScale, "the disclosure control does not deform itself").toBe(1);
+  expect(disclosurePress.alsoScale, "the field it sits in takes the press").toBe(0.96);
+
+  /* And once the press has completed, the field is a text field: typing does not move it. */
+  await openLab(page);
+  const field = page.locator('input[role="combobox"]').first().locator("xpath=..");
+  const atRest = await field.boundingBox();
+  await comboboxInput.click();
+  await comboboxInput.fill("dash");
+  await expect(comboboxInput).toHaveValue("dash");
+  /* The settle is awaited on the field's own box rather than on `scaleOf`, which is read rounded
+     to three decimals: it reports `1` a moment before the layout box has actually finished
+     returning, and the equality below is exact. */
+  await expect
+    .poll(() => field.boundingBox(), { message: "typing does not move the field" })
+    .toEqual(atRest);
+  expect(await scaleOf(field), "typing is not a press").toBe(1);
+
+  expect(errors).toEqual([]);
+});
+
+test("a press inside a field's text is the same press", async ({ page, errors }) => {
+  /* A caret click and a drag across a word activate the field's ancestor chain exactly as a press
+     on its disclosure control does, so the field compresses for them too. That is deliberate:
+     telling the two apart would take pointer bookkeeping or an interaction state machine inside a
+     component, and one press is one press. What must stay still is the field used *as a text
+     field* — typing and focus, asserted above. */
+  await openLab(page);
+  const input = page.locator('input[role="combobox"]').first();
+  const field = input.locator("xpath=..");
+  const atRest = await field.boundingBox();
+  const textBox = await input.boundingBox();
+  if (!atRest || !textBox) throw new Error("the field has no box");
+
+  await page.mouse.move(textBox.x + 12, textBox.y + textBox.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(textBox.x + 90, textBox.y + textBox.height / 2, { steps: 5 });
+  await page.waitForTimeout(320);
+  expect(await scaleOf(field), "pressing the text presses the field").toBe(0.96);
+
+  await page.mouse.up();
+  await page.keyboard.press("Escape");
+  /* The same rounded read: await the box the assertion is about, then confirm the scale it is
+     painted at. */
+  await expect
+    .poll(() => field.boundingBox(), { message: "with the field back at rest" })
+    .toEqual(atRest);
+  expect(await scaleOf(field), "and it settles back").toBe(1);
+
   expect(errors).toEqual([]);
 });
 
@@ -814,27 +932,55 @@ test("a relocated indicator is mid-travel in the middle of its own motion", asyn
 });
 
 test("a value control looks ringed while it is being used, and only then", async ({ page, errors }) => {
+  /* A select trigger and an editable combobox field are the same control in two forms, and the
+     ring is the one part of that pair the platform treats differently: a focused text field always
+     matches `:focus-visible`, while a button does not. The rule the library states instead is that
+     a control which *holds a value* wears the ring while it holds focus or while its surface is
+     open — so the two are ringed in exactly the same states. */
   await openLab(page);
-  const select = page.getByRole("combobox", { name: "Select", exact: true });
 
-  expect(await paintedRing(select), "at rest it is not ringed").toBe("none");
-  await select.click();
-  await expect(select).toHaveAttribute("data-popup-open", "");
-  expect(await paintedRing(select), "it is ringed while its list is open").toBe("ringed");
+  const ringOf = paintedRing;
+
+  const selectTrigger = page.getByRole("combobox", { name: "Select", exact: true });
+  const comboboxField = page.locator('input[role="combobox"]').first().locator("xpath=..");
+
+  expect(await ringOf(selectTrigger), "at rest, neither is ringed").toBe("none");
+  expect(await ringOf(comboboxField), "at rest, neither is ringed").toBe("none");
+
+  /* used by pointer */
+  await selectTrigger.click();
+  await expect(selectTrigger).toHaveAttribute("data-popup-open", "");
+  expect(await ringOf(selectTrigger), "a select is ringed while its list is open").toBe("ringed");
   await page.keyboard.press("Escape");
   await expect(page.getByRole("option")).toHaveCount(0);
-  expect(await paintedRing(select), "it stays ringed while it holds focus").toBe("ringed");
+  expect(await ringOf(selectTrigger), "and it stays ringed while it holds focus").toBe("ringed");
+
   await page.locator("body").click({ position: { x: 4, y: 4 } });
-  expect(await paintedRing(select), "it loses the ring when focus moves away").toBe("none");
+  expect(await ringOf(selectTrigger), "and loses it when focus moves away").toBe("none");
+
+  const input = page.locator('input[role="combobox"]').first();
+  await input.click();
+  expect(await ringOf(comboboxField), "a combobox field is ringed while its list is open").toBe("ringed");
+  await page.keyboard.press("Escape");
+  expect(await ringOf(comboboxField), "and it stays ringed while it holds focus").toBe("ringed");
+  await page.locator("body").click({ position: { x: 4, y: 4 } });
+  expect(await ringOf(comboboxField), "and loses it when focus moves away").toBe("none");
+
+  /* keyboard focus rings both, and a plain button keeps the quieter rule: it does not announce
+     itself to a pointer. */
+  await page.keyboard.press("Tab");
+  await input.focus();
+  expect(await ringOf(comboboxField)).toBe("ringed");
 
   const button = page.getByRole("button", { name: "Filled", exact: true });
   await button.click();
-  expect(await paintedRing(button), "a button is not ringed by a pointer press").toBe("none");
+  expect(await ringOf(button), "a button is not ringed by a pointer press").toBe("none");
   await page.keyboard.press("Tab");
   await button.focus();
   await page.keyboard.press("Shift+Tab");
   await page.keyboard.press("Tab");
-  expect(await paintedRing(button), "and is ringed by keyboard focus").toBe("ringed");
+  expect(await ringOf(button), "and is ringed by keyboard focus").toBe("ringed");
+
   expect(errors).toEqual([]);
 });
 
@@ -869,6 +1015,13 @@ test("a slider handle rings for the keyboard, not for a drag", async ({ page, er
   await page.waitForTimeout(200);
   expect(await paintedRing(thumb), "keyboard focus rings it").toBe("ringed");
 
+  /* and the fields are untouched: a text field rings the moment it is used */
+  await page.locator("body").click({ position: { x: 4, y: 4 } });
+  await page.waitForTimeout(300);
+  const comboboxField = page.locator('input[role="combobox"]').first().locator("xpath=..");
+  await page.locator('input[role="combobox"]').first().click();
+  expect(await paintedRing(comboboxField), "a field still rings on a pointer press").toBe("ringed");
+  await page.keyboard.press("Escape");
 
   expect(errors).toEqual([]);
 });

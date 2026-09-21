@@ -75,9 +75,15 @@ export const motionInkPress =
    travel, presence and activity in the library is one of these names plus its owner's own target
    geometry. */
 
-/* A Select's wrapper takes `motionTactile` because Base suppresses the trigger's own active
-   state. A press on the descendant still activates the wrapper, so the field is the one spatial
-   owner and the trigger itself stays still. */
+/* A field that opens a list — a `Select`'s trigger, an editable `Combobox`'s field — takes
+   `motionTactile` as a whole, which is what makes the two forms of the same control press
+   identically. The *field* is the element that carries the compression in both: a press activates
+   the whole chain, so a descendant being pressed is what makes the field itself match `:active`
+   (and a select trigger's own active state is suppressed by the primitive, so its field's wrapper
+   is the only element left to carry it). Typing, focus and hover never match it, so the field is
+   perfectly still while it is used as a text field; a press that places a caret or drags across a
+   word is the same press the field already answers, and distinguishing it would take pointer
+   bookkeeping inside a component for a case that reads as one interaction either way. */
 
 /** A meaningful subordinate part arrives. Spring is reserved for this intent: a mark is
  *  made by overshooting the position it lands in. It leaves without the overshoot, and
@@ -162,7 +168,7 @@ const modalFrom = /* @__PURE__ */ cx(
   "motion-reduce:data-[ending-style]:transform-none",
 );
 
-/** An anchored surface: `Select`, `Menu` and `Popover`. It grows out of the edge
+/** An anchored surface: `Select`, `Combobox`, `Menu` and `Popover`. It grows out of the edge
  *  it is attached to, enters on the overlay timing, and leaves on the shorter exit.
  *
  *  The grow is the motion's signature and the four pixels of travel only support it, so the

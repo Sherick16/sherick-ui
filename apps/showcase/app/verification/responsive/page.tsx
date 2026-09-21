@@ -6,6 +6,7 @@ import {
   Checkbox,
   Chip,
   ChipGroup,
+  Combobox,
   Dialog,
   Field,
   Input,
@@ -95,6 +96,9 @@ export default function VerificationResponsivePage() {
 
           <NumberField aria-label="Narrow seats" defaultValue={3} min={1} max={10} />
 
+          <Field label="Narrow combobox">
+            <Combobox options={projectOptions} defaultValue="design" />
+          </Field>
 
           {/* A tab row owns its own horizontal overflow, so it is placed here the way an
               application places it: no wrapper, and still no page-level scroll at 320px. */}
@@ -151,6 +155,9 @@ export default function VerificationResponsivePage() {
                 options={projectOptions}
                 defaultValue="design"
               />
+              <Field label="Narrow dialog combobox">
+                <Combobox options={projectOptions} defaultValue="design" />
+              </Field>
             </div>
           </Dialog.Content>
           <Dialog.Footer>
@@ -184,8 +191,8 @@ export default function VerificationResponsivePage() {
               <p className="text-sm">Anchored to the edges of a narrow viewport.</p>
             </Popover.Content>
           </Popover>
-          <Field label="Long option select">
-            <Select options={longOptions} defaultValue="long" />
+          <Field label="Long option combobox">
+            <Combobox options={longOptions} defaultValue="long" />
           </Field>
         </div>
       </section>
