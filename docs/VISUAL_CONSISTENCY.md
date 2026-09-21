@@ -135,17 +135,26 @@ The deterministic refresh removes the now-unused top-only utility and moves the 
 alert specimens to the symmetric one; no browser screenshot baseline or token changed for
 either follow-up.
 
-### A flaky direction-flip read
+### Flaky waits hardened
 
-One `bun run verify` run failed on `a document's own asymmetry follows the writing direction`:
-the flipped read returned the pre-flip list padding (24px/0px instead of 0px/24px). The flip
-itself is sound — a probe confirmed the swapped padding is observable in the same turn once
-the browser is idle, and the test passed 15/15 in isolation — but a loaded browser can still
-hand the previous direction to the next read. The test now awaits the swap it asserts instead
-of assuming it, which removes only the timing assumption: the assertions still require the flip
-to have happened. This predates the alert change and is unrelated to it (the assertion reads
-the content section's list, while the alert lives in the feedback section); it was hardened
-because it reddened the gate.
+Two tests asserted something exact without waiting for the condition that makes it exact, and each
+reddened the gate once. Neither is a product defect; both waits were widened to the assertion they
+precede, so neither masks anything.
+
+**A direction-flip read.** `a document's own asymmetry follows the writing direction` flipped the
+document and compared the geometry in the same turn. The flip itself is sound — a probe confirmed
+the swapped padding is observable in the same turn once the browser is idle, and the test passed
+15/15 in isolation — but a loaded browser can still hand the previous direction to the next read,
+which the test then reported as a missing swap (24px/0px instead of 0px/24px). It now awaits the
+swap it asserts.
+
+**A settle measured through a rounded read.** `motion.spec.ts` awaited a press settling with
+`expect.poll(() => scaleOf(...)).toBe(1)` and then compared `boundingBox()` for exact equality.
+`scaleOf` reads the scale through `toFixed(3)`, so it reports `1` for anything from 0.9995 up — a
+fraction of a pixel before the box has actually finished returning. CI caught the window: the
+field was still at scale 0.99966 (352px wide, read as 351.91px) after the poll had already passed.
+Both occurrences now await the box the assertion is about and confirm the scale afterwards, so the
+exact comparison is no longer racing a looser wait.
 
 ## Verification and release gate
 

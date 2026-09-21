@@ -780,8 +780,13 @@ test("Select and Combobox are the same control in two forms", async ({ page, err
   await comboboxInput.click();
   await comboboxInput.fill("dash");
   await expect(comboboxInput).toHaveValue("dash");
-  await expect.poll(() => scaleOf(field), { message: "typing is not a press" }).toBe(1);
-  expect(await field.boundingBox(), "typing does not move the field").toEqual(atRest);
+  /* The settle is awaited on the field's own box rather than on `scaleOf`, which is read rounded
+     to three decimals: it reports `1` a moment before the layout box has actually finished
+     returning, and the equality below is exact. */
+  await expect
+    .poll(() => field.boundingBox(), { message: "typing does not move the field" })
+    .toEqual(atRest);
+  expect(await scaleOf(field), "typing is not a press").toBe(1);
 
   expect(errors).toEqual([]);
 });
@@ -807,8 +812,12 @@ test("a press inside a field's text is the same press", async ({ page, errors })
 
   await page.mouse.up();
   await page.keyboard.press("Escape");
-  await expect.poll(() => scaleOf(field), { message: "and it settles back" }).toBe(1);
-  expect(await field.boundingBox(), "with the field back at rest").toEqual(atRest);
+  /* The same rounded read: await the box the assertion is about, then confirm the scale it is
+     painted at. */
+  await expect
+    .poll(() => field.boundingBox(), { message: "with the field back at rest" })
+    .toEqual(atRest);
+  expect(await scaleOf(field), "and it settles back").toBe(1);
 
   expect(errors).toEqual([]);
 });
