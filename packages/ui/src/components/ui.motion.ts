@@ -54,8 +54,10 @@ export const motionFeedback =
  *  size of the ink it moves. A control whose visible ink is far smaller than the target it is
  *  aimed at takes `motionInkPress` on that ink instead, so the target itself never moves. The
  *  interpolation and the compression are neutralised together under reduced motion. */
+/* Base may disable the surface itself or the value control inside a Select wrapper.
+   Neither is a pressable surface. Timing and amplitude are otherwise unchanged. */
 export const motionTactile =
-  "transition-[background-color,color,box-shadow,transform,opacity] duration-release ease-release active:duration-press active:ease-press active:scale-[0.96] motion-reduce:transition-none motion-reduce:active:scale-100";
+  "transition-[background-color,color,box-shadow,transform,opacity] duration-release ease-release active:duration-press active:ease-press motion-safe:[&:not([data-disabled],:disabled,:has(>[role=combobox][data-disabled]))]:active:scale-[0.96] motion-reduce:transition-none";
 
 /** The spatial half of a compact press, applied to the *mark* rather than to the control.
  *

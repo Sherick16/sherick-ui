@@ -64,8 +64,10 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(({
       inputRef={inputRef}
       onCheckedChange={onCheckedChange}
       className={cn(
-        "group inline-flex min-h-12 min-w-14 items-center justify-center rounded-full outline-none",
-        disabled ? state.disabled : state.enabled,
+        "group inline-flex min-h-12 min-w-14 items-center justify-center outline-none",
+        shape.pill,
+        state.enabled,
+        state.effectiveDisabled,
         className
       )}
     >
@@ -83,13 +85,13 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(({
           tone.strong.secondary,
           text.medium,
           tone.strongChecked[variant],
-          !disabled && stateLayer.track
+          stateLayer.track
         )}
       >
         <BaseSwitch.Thumb
           className={cn(
-            "absolute left-1 top-1/2 h-5 w-5 -translate-y-1/2 bg-current",
-            "group-data-[checked]:h-6 group-data-[checked]:w-6 group-data-[checked]:translate-x-5",
+            "absolute start-1 top-1/2 h-5 w-5 -translate-y-1/2 bg-current",
+            "group-data-[checked]:h-6 group-data-[checked]:w-6 group-data-[checked]:translate-x-5 rtl:group-data-[checked]:-translate-x-5",
             shape.circle,
             elevation.control,
             motionRelocate

@@ -239,8 +239,7 @@ and do not re-tune a sheet's blur to make it "pop".
 ## 7. Floating shells — the overlay recipes
 
 Primitives: `overlay.scrim`, `overlay.popup`, `overlay.menu`, `overlay.tooltip`, `overlay.toast`,
- `overlay.sheet`, `overlay.dialog`.
- `overlay.dialog`.
+`overlay.sheet`, `overlay.dialog`.
 
 An overlay is a **composition**, not a new material. A shell recipe bundles the floating
 surface's standard **material + elevation + shape**, so every floating surface in the library
@@ -253,6 +252,9 @@ depth or a corner.
 | --- | --- | --- |
 | `overlay.scrim` | the plane behind a surface that owns the viewport | a scrim fill plus a backdrop blur — no material, elevation or shape of its own |
 | `overlay.popup` | an anchored surface with room to breathe: a selection list (`Select`, `Combobox`) or structured content (`Popover`) | `shape.surface` + `material.acrylic` + `elevation.floating` |
+| `overlay.menu` | a compact command list | `shape.control` + `material.acrylic` + `elevation.floating` |
+| `overlay.tooltip` | a compact hint, not a capsule control | `shape.row` + `material.acrylicDense` + `elevation.floating` |
+| `overlay.toast` | a floating status surface | `shape.prominent` + `material.acrylic` + `elevation.floating` |
 | `overlay.sheet` | a surface that owns the viewport and is attached to one edge of it (`Drawer`) | `shape.sheet` + `material.acrylicHero` + `elevation.floating` |
 | `overlay.dialog` | a surface that owns the viewport with no edge to attach to (`Dialog`, `AlertDialog`) | `shape.expressive` + `material.acrylicHero` + `elevation.floating` |
 
@@ -382,9 +384,9 @@ size of the object and the emphasis it carries.
 | --- | --- | --- | --- |
 | `control` | 1.25rem | ordinary controls, dense data regions — fields, rows, options, chips, segments, tables | large surfaces |
 | `mark` | 0.625rem | a compact square selection mark — the `Checkbox` box | anything the size of a field, which wants `control`; a full-width row, which wants `row`; a round mark, which is `circle` |
-| `row` | 0.875rem | a row at command density — a row in a list that is scanned rather than read | anything the size of a field or larger, which wants `control` and up; a compact square, which wants `mark` |
+| `row` | 0.875rem | command-density rows, compact segments and short tooltip hints | anything the size of a field or larger, which wants `control` and up; a compact square, which wants `mark` |
 | `prominent` | 1.5rem | prominent controls, compact floating surfaces | small inline controls |
-| `surface` | 1.75rem | large surfaces — cards, menus, panels | buttons |
+| `surface` | 1.75rem | large surfaces — cards, selection sheets, panels | buttons and compact command menus |
 | `sheet` | 1.25rem | a surface attached to one edge of the viewport — the exposed corners of a `Drawer` sheet | a free-floating surface, which is what `prominent`, `surface` and `expressive` are for |
 | `expressive` | 2rem | an expressive surface that owns the viewport — a `Dialog`, tightened so it reads as a focused surface rather than a pillowy one | anything smaller than a dialog, and anything attached to an edge, which wants `sheet` |
 | `pill` | full | fully rounded controls whose width follows their content, and the fully rounded form of a compact part at either ratio — a value control's capsule handle | a wide button with a fixed width |
@@ -392,14 +394,20 @@ size of the object and the emphasis it carries.
 
 **Do:** hold one role across a whole component family, so a switch and a segmented
 control read as the same object at two scales.
-**Do not** substitute a numeric radius, or mix two adjacent steps inside one surface.
+**Do not** substitute a numeric radius, or assign different roles to equivalent siblings.
 
 A role is chosen by the object's own extent, not by how important it feels. `control`'s
 radius is right for anything the size of a field; on a 24px square or a 36px command row
 it reaches the object's half-extent and the object stops being a rounded rectangle at all
 and becomes a capsule. That is why a compact object takes a tighter step than `control`:
 `mark` for a square that has to stay a square, `row` for a full-width row whose corner has
-to stay proportional to its own height. A control-sized row keeps `control` at both ends.
+to stay proportional to its own height. A control-sized row keeps `control` at both ends. A tooltip's short hint takes `row` too:
+`prominent` turns a single-line hint into a capsule, even though it is a sheet rather than a
+button. An inline alert takes `control`, not the card-sized `surface` corner.
+
+Nested tracks leave room for their contents: compact toggle segments take `row` inside a
+`control` track; normal-sized tabs take `control` inside `prominent`. A tab track is not a
+content-width pill. These are existing shape roles, not new radii or theme-dependent offsets.
 
 ---
 
@@ -475,7 +483,7 @@ One language, applied the same way everywhere:
 | hover | one tonality step — a state layer over the fill, or a step up the surface ladder | depth, a new border, a size change |
 | pressed | a raised control returning to the recessed depth of its own track (`state.recess`), plus the tactile compression the motion system owns; a flat control stays flat and presses through the state layer's active step and the same compression | a color swap alone |
 | selected | a selected tone; depth comes from anatomy — a segment inside a groove is raised, a row in a list stays flat | depth alone |
-| disabled | 45% opacity, no pointer affordance, no interactive state at all | grey-on-grey colouring that breaks theme |
+| disabled | 45% opacity applied **once**, no pointer affordance, no interactive state at all; resting elevation is preserved | grey-on-grey colouring that breaks theme, or flattening a raised object |
 | focus | the shared focus ring | any other indicator |
 
 How far a press travels is **motion amplitude**, not a state this table owns: it belongs with
@@ -498,6 +506,9 @@ state, so it fades on the feedback recipe rather than snapping.
 | `filled` | 0.18 / 0.26 | opaque accent fills |
 | `track` | 0.18 / 0.26 | a switch track, where hover and press arrive from the wrapping button via `group-*` |
 | `activeRow` | 0.05 | a collection row highlighted by keyboard or pointer navigation, from Base UI's `data-highlighted`. It pairs with `quiet` on the same row, so highlight and hover are the same tone at the same strength — asserted on the rendered layer in the browser suite. It is deliberately *not* gated on the disabled marker: a disabled row stays navigable and has to show where the navigation is |
+
+A selected or current control still answers hover and press over its held tint. Tabs, navigation
+rows and segments do not lose feedback just because they already hold the active destination.
 
 Fields are a single borderless family: a matte `surface-high` fill that steps up once on
 :hover and once more while engaged, no ring and no lift. `state.field.*` covers hover,
@@ -551,7 +562,8 @@ members of the system rather than local styling:
 | `enabled` / `text` | the pointer affordance — `cursor-pointer` for a control with a hit area of its own, `cursor-text` for a text field |
 | `rowHover` | the quiet scan feedback for a data row that is read rather than activated (`Table`): an ink tint, not a state layer, because a data row owns no fill to composite over |
 | `disabled` / `disabledDescendant` | the disabled step, and its cursor-only variant for a control nested in a composite that has already applied the 45% opacity |
-| `disabledAttribute` | the same disabled step keyed on the native attribute, for a control that decides its own disabled state — a number field's stepper at its bound |
+| `effectiveDisabled` | the disabled step keyed on the primitive's native or `data-disabled` marker, including disability inherited from a Field |
+| `disabledPart` | an independently disabled composite part dims at a bound or in read-only mode; inside an already disabled `group/field`, it keeps full local opacity so the composite dims only once |
 | `engaged` | a part the pointer is on sits matte and settles back from it: a value control's handle takes its accent and a little size while hovered or dragged, so the accent marks the range and the pointer marks the handle. It is target geometry, not timing: `motionDirect` owns how it transitions, and while the pointer owns the position the handle's own travel is not interpolated at all |
 
 **Do:** let tonality carry hover; let a raised control recess while it is held; let a
@@ -662,6 +674,11 @@ An expandable region is also a small system, because the same object appears at 
 | --- | --- |
 | `disclosure.trigger` | the row that opens the region: the same object `list.option` is, because a disclosure header is scanned and activated the same way a selectable row is |
 | `disclosure.panel` | the measured region: it is clipped to the height its primitive reports, and the height is the only thing `motionDisclose` moves |
+
+Panel copy defaults to the supporting-copy step (`text.medium`, small type, readable line-height),
+not larger or stronger type than its trigger. Collection and disclosure rows align to the logical
+start, and selection lists share the same inter-row gap. A menu divider stops at the rows' content
+band, just as an accordion's does.
 
 The two are one definition, not two designs that drift: an accordion item's row and a standalone
 disclosure's row are the same object, and only the state contract behind them differs — a group
@@ -902,6 +919,10 @@ type step**, so controls of one density share a rhythm.
 | `prominent` | 3.5rem | 1.125rem | the largest step, still compact by consumer-app standards |
 | `target` | 2.75rem square | inherits | the minimum interactive target for an icon-only control that stands on its own |
 | `part` | 2.75rem tall, 2.25rem wide | inherits | one control **inside** a composite field — the trailing controls a `Combobox` owns |
+
+Composite parts do not inflate their field's density: a 44px stepper fits inside the normal 48px
+field, just as a search submit does. Unfilled embedded controls use the quiet state layer, not the
+tonal-button layer.
 
 Anatomy owns **padding**, not density: a button is gripped at its ends, a field holds
 text, and neither is derived from the other — one density can carry two paddings, so

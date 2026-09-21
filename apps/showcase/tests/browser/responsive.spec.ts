@@ -105,16 +105,23 @@ test("a tab row wider than its container scrolls inside itself, not in the page"
     `the tab scroller is ${geometry.width}px wide inside a ${narrow}px column`
   ).toBeLessThanOrEqual(narrow);
 
-  /* The shared ring is drawn 5px outside a tab — a 2px outline at a 3px offset — and the scroller
-     clips at the track's own box, so the track's padding is what keeps the ring from being cut
-     off on the tab the scroll has pushed to an edge. */
-  const room = await list.evaluate((element) => {
-    const listBox = element.getBoundingClientRect();
-    const tabBox = element.querySelector('[role="tab"]')!.getBoundingClientRect();
-    return { above: tabBox.top - listBox.top, below: listBox.bottom - tabBox.bottom };
+  /* A tab nests inside a scrolling track. Its shared inset ring remains inside the target even
+     at the track's scrolled edge, without reserving extra space for an outer outline. */
+  await page.keyboard.press("Tab");
+  const lastTab = list.getByRole("tab").last();
+  await lastTab.scrollIntoViewIfNeeded();
+  await lastTab.focus();
+  const focus = await lastTab.evaluate((element) => {
+    const css = getComputedStyle(element);
+    const box = element.getBoundingClientRect();
+    const clip = element.closest('[role="tablist"]')!.parentElement!.getBoundingClientRect();
+    return { visible: element.matches(":focus-visible"), shadow: css.boxShadow,
+      left: box.left, right: box.right, clipLeft: clip.left, clipRight: clip.right };
   });
-  expect(room.above, "the ring's 5px has room above a tab").toBeGreaterThanOrEqual(5);
-  expect(room.below, "and below it").toBeGreaterThanOrEqual(5);
+  expect(focus.visible).toBe(true);
+  expect(focus.shadow).toContain("inset");
+  expect(focus.left, JSON.stringify(focus)).toBeGreaterThanOrEqual(focus.clipLeft);
+  expect(focus.right, JSON.stringify(focus)).toBeLessThanOrEqual(focus.clipRight);
 
   await assertNoPageOverflow(page, "narrow tab row");
 

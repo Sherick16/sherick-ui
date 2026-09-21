@@ -317,19 +317,18 @@ export const ToastViewport = ({ position = "bottom-end", className }: ToastViewp
                   {toast.description ? (
                     <BaseToast.Description className={cn("text-sm leading-6", text.medium)} />
                   ) : null}
+                  {toast.actionProps ? (
+                    /* Actions follow the copy instead of squeezing it between three controls.
+                       Give back the small text button's start padding, moving the whole target. */
+                    <BaseToast.Action
+                      render={
+                        <Button appearance="text" variant="primary" size="sm" className={cn("-ms-4 mt-2 self-start")}>
+                          {toast.actionProps.children}
+                        </Button>
+                      }
+                    />
+                  ) : null}
                 </div>
-                {toast.actionProps ? (
-                  /* The action is the one control in a toast that does something, so it is a
-                     `Button` in its text appearance. The action's label and handler are Base's;
-                     only where it sits is the toast's. */
-                  <BaseToast.Action
-                    render={
-                      <Button appearance="text" variant="primary" size="sm">
-                        {toast.actionProps.children}
-                      </Button>
-                    }
-                  />
-                ) : null}
                 {/* The stack has a close control of its own, so a toast can always be dismissed
                     without reaching for the action it happens to carry. */}
                 <BaseToast.Close

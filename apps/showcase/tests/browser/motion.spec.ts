@@ -121,15 +121,17 @@ const pressDelta = async (page: Page, press: Locator, measured: Locator, alsoMea
      mid-transition scale whenever the browser is busy, which reports a coincidence as a
      measurement. The element that compresses is the one the press propagates to, which is a
      co-measured field when the press target is an affordance inside it; the compression counts as
-     settled once a transform is applied and nothing is animating it, and at rest the transform is
-     `none`, so this cannot pass early. */
+     settled once a transform is applied and nothing is animating it. Under reduced motion a
+     press deliberately applies no transform at all; the geometry assertions below still prove
+     that no compression occurred. */
   const compressing = alsoMeasured ?? measured;
   await expect
     .poll(
       () =>
         compressing.evaluate((element) => {
           const transform = getComputedStyle(element).transform;
-          return transform !== "none" && element.getAnimations().length === 0;
+          const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          return (reduced || transform !== "none") && element.getAnimations().length === 0;
         }),
       { message: "the press lands and settles" }
     )

@@ -173,6 +173,30 @@ The existing reviewed Chromium snapshots remain the visual baseline for:
 
 Those screenshots are immutable: a difference is a styling-distribution defect unless explicitly proven otherwise.
 
+The visual-consistency pass deliberately updates only the two core screenshots: Tabs now uses
+the shared recessed track with nested corner roles, and Switch mirrors its thumb in RTL. The
+review also accepts the already-landed palette and settled-thumb rendering visible against the
+older pixel baselines; no token value changed in this pass. The Dialog screenshots are unchanged.
+The findings and deliberate differences are recorded in [VISUAL_CONSISTENCY.md](VISUAL_CONSISTENCY.md).
+
+`visual-consistency.spec.ts` adds both-theme rendered assertions for sibling field density, invalid
+engagement, inherited disability without double opacity, loading/resting depth, held-state feedback,
+list rhythm, nested corners, logical alignment, disabled compression and narrow RTL/toast anatomy.
+The original narrow Tabs test now verifies an actual inset keyboard ring at the scrolled edge
+instead of assuming the old outer ring's 5px clearance.
+
+For repeatable human review (not a replacement for the immutable screenshot gate):
+
+```bash
+# After building the library and showcase
+cd apps/showcase
+VISUAL_REVIEW=1 bunx playwright test visual-consistency.spec.ts -g "rendered review"
+```
+
+This opt-in pair writes sibling bands, real open overlays, four Drawer sides, narrow RTL specimens
+and every showcase section to the Playwright output directory. Normal CI skips only these two
+artifact-producing reviews; the both-theme invariant tests always run.
+
 The showcase browser suite also verifies:
 
 - field description/error relationships;
