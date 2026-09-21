@@ -49,7 +49,7 @@ export const Alert = ({
       role={variant === "danger" || variant === "warning" ? "alert" : "status"}
       className={cn(
         "flex items-start gap-3 px-4 py-3.5",
-        shape.surface,
+        shape.control,
         tone.soft[variant],
         text.high,
         className
@@ -63,10 +63,12 @@ export const Alert = ({
       </span>
       <div className={cn("min-w-0 flex-1 text-sm leading-6")}>{children}</div>
       {/* The dismissal is a first-line affordance too: a 44px target is taller than the line it belongs
-          to, so it is offset to that line's centre rather than centred on the block. Its own target
-          padding is then pulled back at the surface's end edge — that padding exists to make the target
-          big, and it is not allowed to read as a trailing void — while the target keeps the geometry the
-          pointer found. */}
+          to, so it is offset to that line and gives its excess back on **both** vertical edges — a
+          top-only offset would leave the target's remaining 10px as extra space under a single line of
+          copy, letting the target rather than the copy size the surface. Its target padding is
+          likewise pulled back at the surface's end edge: that padding exists to make the target big,
+          and it is not allowed to read as a trailing void. The target keeps the geometry the pointer
+          found. */}
       {closeable && (
         <Button
           type="button"
@@ -76,7 +78,7 @@ export const Alert = ({
             setIsVisible(false);
           }}
           className={cn(
-            "group -me-2 -mt-2.5 inline-flex shrink-0 items-center justify-center",
+            "group -me-2 -my-2.5 inline-flex shrink-0 items-center justify-center",
             density.target,
             shape.circle,
             focusRingInset,

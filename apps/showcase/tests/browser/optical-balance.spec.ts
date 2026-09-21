@@ -175,6 +175,70 @@ test("a status mark and a dismissal hold the first line of copy that wraps", asy
   expect(Math.abs(geometry.dismissCentre - geometry.firstLineCentre)).toBeLessThanOrEqual(1);
 });
 
+test("a one-line alert is sized by its copy, not by its dismissal target", async ({ page }) => {
+  const section = await openShowcase(page, "feedback");
+  const alert = section.getByRole("status").filter({ hasText: "Changes were saved successfully." });
+  await expect(alert).toBeVisible();
+
+  /* The dismissal is 44px tall where the line it belongs to is 24px. It gives that excess back on
+     both vertical edges, so a one-line alert resolves to the copy's own height instead of holding
+     an extra 10px of the target underneath it. */
+  const geometry = await alert.evaluate((element) => {
+    const mark = element.querySelector("span");
+    const copy = element.querySelector("div");
+    const dismiss = element.querySelector("button");
+    if (!mark || !copy || !dismiss) throw new Error("an alert has a mark, a copy and a dismissal");
+
+    const range = document.createRange();
+    range.selectNodeContents(copy);
+    const lines = range.getClientRects();
+    const first = lines[0];
+    if (!first) throw new Error("the alert copy has a first line");
+
+    const centre = (box: DOMRect) => box.top + box.height / 2;
+    const style = getComputedStyle(element);
+    const box = element.getBoundingClientRect();
+    const copyBox = copy.getBoundingClientRect();
+    const target = dismiss.getBoundingClientRect();
+    return {
+      lines: lines.length,
+      height: box.height,
+      copyHeight: copyBox.height,
+      padding: [parseFloat(style.paddingTop), parseFloat(style.paddingBottom)],
+      above: copyBox.top - box.top,
+      below: box.bottom - copyBox.bottom,
+      firstLineCentre: centre(first),
+      dismissCentre: centre(target),
+      target: { width: target.width, height: target.height },
+      targetReach: copyBox.top - target.top,
+    };
+  });
+
+  expect(geometry.lines, "the specimen has to be one line for this to mean anything").toBe(1);
+  expect(geometry.above, "a one-line alert is inset the same above and below its copy").toBeCloseTo(
+    geometry.below,
+    0,
+  );
+  expect(geometry.above, "and that inset is the surface's own vertical padding").toBeCloseTo(
+    geometry.padding[0],
+    0,
+  );
+  expect(geometry.padding[0], "the two edges agree with each other").toBeCloseTo(geometry.padding[1], 0);
+  expect(
+    geometry.height,
+    "the surface is sized by its copy rather than by the taller target inside it",
+  ).toBeCloseTo(geometry.copyHeight + geometry.padding[0] + geometry.padding[1], 0);
+  expect(geometry.target, "the dismissal keeps the geometry the pointer found").toEqual({
+    width: 44,
+    height: 44,
+  });
+  expect(
+    geometry.targetReach,
+    "which is why it reaches into the surface's padding rather than shrinking",
+  ).toBeGreaterThan(0);
+  expect(Math.abs(geometry.dismissCentre - geometry.firstLineCentre)).toBeLessThanOrEqual(1);
+});
+
 test("a toast's dismissal keeps its ring inside the stack that clips it", async ({ page }) => {
   const section = await openShowcase(page, "feedback");
   await section.getByRole("button", { name: "Warning", exact: true }).click();
@@ -236,6 +300,15 @@ test("a document's own asymmetry follows the writing direction", async ({ page }
   await page.evaluate(() => {
     document.documentElement.dir = "rtl";
   });
+
+  /* Flipping the document is a layout change. It is normally observable in the same turn, but a
+     loaded browser can still hand the previous direction to the next read, which is a race the
+     assertions below would report as a missing swap. Awaiting the swap here removes only that
+     timing assumption: every assertion still requires the flip to have happened. */
+  await expect
+    .poll(async () => (await sides()).listPadding, { message: "the flip reaches the list indent" })
+    .toEqual([leftToRight.listPadding[1], leftToRight.listPadding[0]]);
+
   const rightToLeft = await sides();
 
   /* Each pair is asymmetric on one side only, and the flip moves that side rather than duplicating

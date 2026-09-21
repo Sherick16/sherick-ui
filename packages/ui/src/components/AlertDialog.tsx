@@ -70,7 +70,8 @@ const AlertDialog = forwardRef<HTMLDivElement, AlertDialogProps>(({
       <DialogSurface className={cn(className)} popupRef={ref}>
         <DialogHeader>{title}</DialogHeader>
         {description ? <DialogDescription>{description}</DialogDescription> : null}
-        <DialogFooter>
+        {/* Unlike a content-bearing dialog, this description has no padded body below it. */}
+        <DialogFooter className={cn("pt-4")}>
           <BaseAlertDialog.Close
             render={
               <Button appearance="text" variant="secondary" onClick={onCancel}>

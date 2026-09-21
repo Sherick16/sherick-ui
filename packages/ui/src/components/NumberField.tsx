@@ -50,8 +50,9 @@ const stepperClassName = cn(
   shape.circle,
   motionFeedback,
   tone.text.secondary,
-  stateLayer.tonal,
-  state.effectiveDisabled
+  stateLayer.quiet,
+  state.enabled,
+  state.disabledPart
 );
 
 /* The target stays exactly where the pointer found it — a 44px target that shrank while held would
@@ -103,25 +104,25 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
         className={cn("w-full", className)}
       >
         <BaseNumberField.Group
-          className={cn(
-            "group flex w-full items-center gap-1 p-1.5",
+          className={({ disabled: fieldDisabled }) => cn(
+            // The 44px targets fit the normal 48px field without inflating its density.
+            "group/field flex w-full items-center gap-1 px-1.5 py-0.5",
             density.normal,
             shape.control,
             motionFeedback,
             focusRingWithin,
             material.control,
-            state.effectiveDisabled,
-            state.field.hover,
-            state.field.focusWithin,
             state.field.invalid,
-            state.field.invalidHover,
-            state.field.invalidFocusWithin,
-            state.text
+            !fieldDisabled && state.field.hover,
+            !fieldDisabled && state.field.focusWithin,
+            !fieldDisabled && state.field.invalidHover,
+            !fieldDisabled && state.field.invalidFocusWithin,
+            fieldDisabled ? state.disabled : state.text
           )}
         >
           <BaseNumberField.Decrement className={cn(stepperClassName)}>
             <span className={cn(stepperIconClassName)}>
-              <Minus aria-hidden="true" className={cn("size-4")} />
+              <Minus aria-hidden="true" className={cn("size-5")} />
             </span>
           </BaseNumberField.Decrement>
           <BaseNumberField.Input
@@ -135,7 +136,7 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
           />
           <BaseNumberField.Increment className={cn(stepperClassName)}>
             <span className={cn(stepperIconClassName)}>
-              <Plus aria-hidden="true" className={cn("size-4")} />
+              <Plus aria-hidden="true" className={cn("size-5")} />
             </span>
           </BaseNumberField.Increment>
         </BaseNumberField.Group>

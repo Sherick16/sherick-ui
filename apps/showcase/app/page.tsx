@@ -533,7 +533,7 @@ export default function Home() {
               <Specimen title="Alerts">
                 <div className="space-y-3">
                   <Alert variant="primary">A useful piece of information.</Alert>
-                  <Alert variant="success">Changes were saved successfully.</Alert>
+                  <Alert variant="success" closeable>Changes were saved successfully.</Alert>
                   <Alert variant="warning">Review these settings before continuing.</Alert>
                   <Alert variant="danger" closeable>
                     The connection dropped before the file was sent. Retry the upload, or split the

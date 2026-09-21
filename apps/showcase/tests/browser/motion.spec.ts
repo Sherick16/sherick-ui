@@ -121,15 +121,17 @@ const pressDelta = async (page: Page, press: Locator, measured: Locator, alsoMea
      mid-transition scale whenever the browser is busy, which reports a coincidence as a
      measurement. The element that compresses is the one the press propagates to, which is a
      co-measured field when the press target is an affordance inside it; the compression counts as
-     settled once a transform is applied and nothing is animating it, and at rest the transform is
-     `none`, so this cannot pass early. */
+     settled once a transform is applied and nothing is animating it. Under reduced motion a
+     press deliberately applies no transform at all; the geometry assertions below still prove
+     that no compression occurred. */
   const compressing = alsoMeasured ?? measured;
   await expect
     .poll(
       () =>
         compressing.evaluate((element) => {
           const transform = getComputedStyle(element).transform;
-          return transform !== "none" && element.getAnimations().length === 0;
+          const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+          return (reduced || transform !== "none") && element.getAnimations().length === 0;
         }),
       { message: "the press lands and settles" }
     )
@@ -778,8 +780,13 @@ test("Select and Combobox are the same control in two forms", async ({ page, err
   await comboboxInput.click();
   await comboboxInput.fill("dash");
   await expect(comboboxInput).toHaveValue("dash");
-  await expect.poll(() => scaleOf(field), { message: "typing is not a press" }).toBe(1);
-  expect(await field.boundingBox(), "typing does not move the field").toEqual(atRest);
+  /* The settle is awaited on the field's own box rather than on `scaleOf`, which is read rounded
+     to three decimals: it reports `1` a moment before the layout box has actually finished
+     returning, and the equality below is exact. */
+  await expect
+    .poll(() => field.boundingBox(), { message: "typing does not move the field" })
+    .toEqual(atRest);
+  expect(await scaleOf(field), "typing is not a press").toBe(1);
 
   expect(errors).toEqual([]);
 });
@@ -805,8 +812,12 @@ test("a press inside a field's text is the same press", async ({ page, errors })
 
   await page.mouse.up();
   await page.keyboard.press("Escape");
-  await expect.poll(() => scaleOf(field), { message: "and it settles back" }).toBe(1);
-  expect(await field.boundingBox(), "with the field back at rest").toEqual(atRest);
+  /* The same rounded read: await the box the assertion is about, then confirm the scale it is
+     painted at. */
+  await expect
+    .poll(() => field.boundingBox(), { message: "with the field back at rest" })
+    .toEqual(atRest);
+  expect(await scaleOf(field), "and it settles back").toBe(1);
 
   expect(errors).toEqual([]);
 });

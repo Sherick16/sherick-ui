@@ -33,7 +33,8 @@ const NavItem = ({ children, icon, className, href, active = false, ...props }: 
       focusRing,
       active
         ? cn(tone.tonal.primary, text.high, "font-medium")
-        : cn(text.medium, "hover:text-sherick-ink", stateLayer.quiet),
+        : cn(text.medium, "hover:text-sherick-ink"),
+      stateLayer.quiet,
       className
     )}
     {...props}
