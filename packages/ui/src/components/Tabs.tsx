@@ -5,7 +5,8 @@ import React, { type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import {
   elevation,
-  focusRing,
+  focusRingInset,
+  selectable,
   shape,
   state,
   stateLayer,
@@ -63,20 +64,21 @@ export const Tabs = ({
          about, and nothing about the shape of the control changes. The scroller wraps the track
          and not the whole control, so the region an application placed the tabs in still owns the
          horizontal axis of everything below it, and the track keeps its own content width so the
-         pill still scrolls as one object. */}
+         track still scrolls as one object. */}
       <div className={cn("overflow-x-auto")}>
         <BaseTabs.List
           aria-label={ariaLabel}
           className={cn(
-            "relative flex min-w-max bg-sherick-surface/[0.72] p-1.5",
-            shape.pill,
-            elevation.recessed
+            "relative flex min-w-max p-1",
+            shape.prominent,
+            selectable.surface,
+            selectable.rest
           )}
         >
           <BaseTabs.Indicator
             className={cn(
               "absolute left-[var(--active-tab-left)] top-[var(--active-tab-top)] h-[var(--active-tab-height)] w-[var(--active-tab-width)]",
-              shape.pill,
+              shape.control,
               tone.selected[variant],
               elevation.control,
               motionRelocate
@@ -91,12 +93,11 @@ export const Tabs = ({
               className={({ active, disabled }) =>
                 cn(
                   "relative z-10 min-h-12 min-w-28 flex-1 whitespace-nowrap px-7 py-3 text-sm font-medium",
-                  shape.pill,
+                  shape.control,
                   motionTactile,
-                  focusRing,
-                  active
-                    ? text.high
-                    : cn(text.medium, !disabled && "hover:text-sherick-ink", !disabled && stateLayer.quiet),
+                  focusRingInset,
+                  active ? text.high : cn(text.medium, !disabled && "hover:text-sherick-ink"),
+                  !disabled && stateLayer.quiet,
                   disabled && state.disabled
                 )
               }

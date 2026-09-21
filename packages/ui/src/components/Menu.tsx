@@ -139,7 +139,7 @@ MenuItem.displayName = "MenuItem";
    renders: the menu uses the public divider rather than re-deriving a line. The margin is the
    menu's own spacing between parts. */
 const MenuSeparator = ({ className }: MenuSeparatorProps) => (
-  <Divider className={cn("my-1", className)} />
+  <Divider className={cn("mx-3 my-1 w-auto", className)} />
 );
 
 const Menu = (({ children, open, defaultOpen, onOpenChange }: MenuProps) => {

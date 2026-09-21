@@ -70,7 +70,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           appearance === "tonal" && !isDisabled && stateLayer.tonal,
           appearance === "text" && tone.text[variant],
           appearance === "text" && !isDisabled && stateLayer.quiet,
-          isTactile && elevation.raised,
+          appearance === "tonal" && elevation.raised,
           isTactile && state.recess,
           isDisabled ? state.disabled : state.enabled,
           className

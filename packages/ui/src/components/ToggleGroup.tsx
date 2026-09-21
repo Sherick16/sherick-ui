@@ -58,7 +58,7 @@ const ToggleGroupItem = forwardRef<HTMLButtonElement, ToggleGroupItemProps>(
           cn(
             "relative inline-flex items-center justify-center gap-2 whitespace-nowrap px-5 py-2 font-medium",
             density.compact,
-            shape.control,
+            shape.row,
             motionTactile,
             /* The ring is drawn inside: an offset one around a segment collides with its
                neighbours in the same track. */
@@ -66,7 +66,7 @@ const ToggleGroupItem = forwardRef<HTMLButtonElement, ToggleGroupItemProps>(
             state.enabled,
             state.effectiveDisabled,
             toggleState.pressed
-              ? cn(tone.selected[variant], elevation.control, state.recess)
+              ? cn(tone.selected[variant], elevation.control, !toggleState.disabled && state.recess)
               : cn(text.medium, !toggleState.disabled && "hover:text-sherick-ink"),
             /* A held segment still answers the pointer: hover is one tonality step over whatever
                fill it holds, and selection is not a reason to stop responding. */
