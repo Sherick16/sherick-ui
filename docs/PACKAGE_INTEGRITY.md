@@ -115,12 +115,12 @@ No source tree, tests, fixtures, visual baselines, build scripts, tsbuildinfo or
 configuration was included. Rich content has no misleading CJS build.
 
 Phase E deliberately changes that packaging result to carry the Combobox accessibility fix to
-consumers: the inspected artifact contains 4,130 files, 3,203,443 compressed bytes and 14,257,772
+consumers: the inspected artifact contains 4,129 files, 3,203,654 compressed bytes and 14,258,961
 unpacked bytes. The additional files are exactly the bundled `@base-ui/react@1.8.0` package and its
-runtime dependency closure, including their licenses and declarations. Sherick source, tests, fixtures
-and build scripts remain excluded. Application bundle output is unchanged in kind and still passes the
-existing raw/gzip/brotli budgets; this is an installation-artifact increase, not permission to raise a
-runtime size budget.
+runtime dependency closure, including their licenses and declarations; transient Bun store tags are
+removed during staging. Sherick source, tests, fixtures and build scripts remain excluded. Application
+bundle output is unchanged in kind and still passes the existing raw/gzip/brotli budgets; this is an
+installation-artifact increase, not permission to raise a runtime size budget.
 
 ## Documentation and verification
 

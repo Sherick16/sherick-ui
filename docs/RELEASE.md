@@ -187,11 +187,12 @@ Theming is CSS-only and document-level:
 ## Runtime baseline
 
 - **React**: `react` and `react-dom` `^18.0.0 || ^19.0.0` are the supported peer range.
-- **Browsers**: the current and previous stable major releases of Chrome, Edge, Firefox and
-  Safari. CI executes the current Playwright Chromium, Firefox and WebKit engines. The package
-  ships ES2019-level syntax and no legacy/ES5 bundle. The browser window rolls forward with
-  browser releases; dropping a browser family or requiring a capability outside that window is a
-  breaking change.
+- **Browsers**: the automated compatibility baseline is the Chromium, Firefox and WebKit engine
+  versions shipped by the repository's pinned Playwright release. That baseline rolls forward when
+  Playwright is deliberately updated. Chrome, Edge and Safari distribution builds, and previous browser
+  majors, are not separately certified; the shipping-browser and physical-device checks below remain
+  manual. Dropping one of the three engine families or requiring a capability absent from this baseline
+  is a breaking change. The package ships ES2019-level syntax and no legacy/ES5 bundle.
 - **Node/module formats**: the core and `dev` entries provide ESM and CommonJS. The core entries
   need no declared Node floor beyond support for the shipped syntax. `sherick-ui/content` is ESM
   only; CommonJS consumers reach it with dynamic `import()`. The package therefore declares no
@@ -326,11 +327,13 @@ keyboard focus could enter content a screen reader could not perceive. The defec
 [mui/base-ui#5528](https://github.com/mui/base-ui/issues/5528).
 
 The blocker is resolved without removing or making the editable Combobox modal. A version-specific
-Bun patch extends Base UI's own `markOthers` isolation authority: focusable descendants of a subtree
-newly hidden with `aria-hidden` receive `tabindex="-1"`; balanced cleanup restores each original
-value. Pre-existing `tabindex` values and nested isolation counters are preserved. The patch does not
-use `inert`, so pointer interaction outside the non-modal listbox still dismisses it and runs the
-clicked action.
+Bun patch extends Base UI's own `markOthers` isolation authority. It uses Base's existing tabbability
+model rather than a partial selector, temporarily writes `tabindex="-1"`, and observes each hidden
+subtree for the full isolation lifetime. Controls mounted later or made focusable while hidden are
+therefore suppressed too; balanced cleanup disconnects the observer and restores the latest intended
+values. Pre-existing values and nested isolation counters are preserved. The patch does not use
+`inert`, so pointer interaction outside the non-modal listbox still dismisses it and runs the clicked
+action.
 
 Because a workspace patch alone would disappear for consumers, `@base-ui/react` and its runtime
 closure are bundled inside the published tarball. The packed-package gate checks the installed nested
@@ -338,9 +341,10 @@ Base UI version, license and patched ESM/CommonJS modules before exercising the 
 from the tarball in React 18 and React 19 Vite builds and the React 19 Next build.
 
 The browser contract now includes exclusion-free open-state axe scans in both themes, direct
-listbox/option/active-descendant assertions, removal and restoration of outside sequential focus,
-Escape dismissal, and preserved outside pointer interaction. The patch may be retired only when a
-released Base UI version passes the same gates. No component API was removed or changed.
+listbox/option/active-descendant assertions, lifetime coverage for newly mounted controls, changed
+focusability and native `<summary>`, restoration after Escape, and preserved outside pointer
+interaction. The patch may be retired only when a released Base UI version passes the same gates. No
+component API was removed or changed.
 
 The Phase E acceptance run completed with the frozen lockfile:
 `WEBKIT_EXECUTABLE_PATH=/tmp/sherick-webkit bun run verify` passed 204 showcase tests (with the two
@@ -360,7 +364,7 @@ These are explicit contract boundaries, not unresolved defects:
   physical and source code remains LTR;
 - compact-label truncation, short non-interactive tooltip content, and surrounding clearance for
   expanded small-mark hit areas follow the constraints in `HOSTILE_LAYOUT.md`;
-- the package targets the evergreen browser window above and does not ship a legacy bundle.
+- the package targets the pinned three-engine browser baseline above and does not ship a legacy bundle.
 
 ### Manual pre-publish checks
 

@@ -710,11 +710,13 @@ export const fixture = (
     "floating-ui-react/utils/markOthers.js",
     "floating-ui-react/utils/markOthers.mjs",
   ]) {
-    assert.match(
-      await readFile(join(bundledBaseRoot, modulePath), "utf8"),
-      /focusRestoreMap/,
-      `${modulePath} must contain the editable Combobox isolation patch`,
-    );
+    const source = await readFile(join(bundledBaseRoot, modulePath), "utf8");
+    for (const marker of ["focusRestoreMap", "MutationObserver", "isTabbable"]) {
+      assert.ok(
+        source.includes(marker),
+        `${modulePath} must contain the editable Combobox isolation patch marker ${marker}`,
+      );
+    }
   }
 
   /* A prerelease must never publish under `latest`, and a stable version must — otherwise
@@ -741,6 +743,10 @@ export const fixture = (
       !["package.json", "README.md", "LICENSE"].includes(path),
   );
   assert.deepEqual(unexpected, [], `unexpected file published in the tarball: ${unexpected.join(", ")}`);
+  assert.ok(
+    !publishedPaths.some((path) => path.split("/").some((part) => part.startsWith(".bun-tag-"))),
+    "Bun dependency-store metadata must not be published",
+  );
   for (const path of publishedPaths.filter(
     (path) => path.startsWith("dist/") && path.endsWith(".map"),
   )) {

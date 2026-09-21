@@ -62,17 +62,19 @@ Custom themes override the documented `--sui-*` CSS variables at document/root l
 
 ## Runtime and browser support
 
-Sherick UI supports React and React DOM 18 or 19 and the current and previous stable major releases
-of Chrome, Edge, Firefox and Safari. The core package has ESM and CommonJS entries; the rich-content
-subpath is ESM-only.
+Sherick UI supports React and React DOM 18 or 19. Its automated browser baseline is the Chromium,
+Firefox and WebKit versions shipped by the repository's pinned Playwright release. Chrome, Edge and
+Safari distribution builds and previous browser majors are not separately certified. The core package
+has ESM and CommonJS entries; the rich-content subpath is ESM-only.
 
-### Current prerelease blocker
+### Editable Combobox isolation
 
-Stable `2.0.0` must not ship until the editable `Combobox` popup no longer leaves outside,
-`aria-hidden` content in sequential keyboard navigation, or until `Combobox` is removed from the
-stable public contract. The behavior is in Base UI's popup isolation implementation and is tracked
-as `mui/base-ui#5528`. Direct keyboard assertions pass but do not replace an open-state axe scan.
-The repository's `docs/RELEASE.md` records the exact evidence and release condition.
+The editable `Combobox` blocker is resolved by a version-specific patch to Base UI's own isolation
+utility. The patch uses Base's tabbability model, observes hidden subtrees for the full open lifetime,
+restores prior values on close and preserves non-modal outside pointer interaction. The audited Base UI
+package is bundled so installed npm consumers receive the same fix. It may be retired only after a
+released Base UI version passes the same axe, live-mutation, restoration and pointer-interaction gates.
+The repository's `docs/RELEASE.md` records the complete evidence and release condition.
 
 ## Usage
 

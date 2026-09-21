@@ -379,11 +379,12 @@ the editable input while applying `aria-hidden` around the portaled listbox, but
 controls from sequential focus. The cause is tracked as
 [mui/base-ui#5528](https://github.com/mui/base-ui/issues/5528).
 
-The exact `@base-ui/react@1.8.0` dependency is patched at Base's own `markOthers` authority. For a
-subtree newly hidden with `aria-hidden`, focusable descendants temporarily receive
-`tabindex="-1"`; cleanup restores their previous values, and Base's existing counters keep nested
-opens balanced. `inert` is deliberately not used because this popup remains non-modal and outside
-pointer interaction must keep working.
+The exact `@base-ui/react@1.8.0` dependency is patched at Base's own `markOthers` authority. It uses
+Base's existing tabbability model rather than a partial selector and observes each subtree newly hidden
+with `aria-hidden` for the complete isolation lifetime. Existing, newly mounted and newly focusable
+controls temporarily receive `tabindex="-1"`; cleanup disconnects the observer and restores the latest
+intended values, while Base's existing counters keep nested opens balanced. `inert` is deliberately not
+used because this popup remains non-modal and outside pointer interaction must keep working.
 
 The showcase accessibility suite now proves all of the following:
 
@@ -391,16 +392,19 @@ The showcase accessibility suite now proves all of the following:
   tag set in light and dark themes;
 - a representative outside control moves from its original `tabindex` to `-1` while the list is open
   and returns to its original value after Escape;
-- clicking that outside control still dismisses the list and runs the clicked control, proving the
-  fix did not turn the popup modal;
+- a button mounted after opening, an element made focusable while hidden and native `<summary>` all
+  move out of sequential focus and restore their intended values on close;
+- clicking an outside control still dismisses the list and runs the clicked control, proving the fix
+  did not turn the popup modal;
 - `role="listbox"`, option selection, disabled options, `aria-activedescendant` and the highlighted
   row remain asserted directly because a green axe result does not prove behavior.
 
 The package boundary repeats the open-state contract against the actual tarball. `test:packed` checks
 that npm installed the patched Base UI copy nested in `sherick-ui`, then opens and scans the editable
-Combobox, checks tab removal/restoration and outside pointer dismissal in the React 18 and React 19
-Vite consumers and the React 19 Next consumer. This prevents a workspace-only patch from producing a
-green repository while npm consumers receive the defective upstream implementation.
+Combobox and repeats the existing, newly mounted, newly focusable, native `<summary>`, restoration and
+outside-pointer assertions in the React 18 and React 19 Vite consumers and the React 19 Next consumer.
+This prevents a workspace-only patch from producing a green repository while npm consumers receive the
+defective upstream implementation.
 
 **No rule is excluded.** The scan runs the WCAG A/AA tag set as it is
 (`wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa`), `color-contrast` included, and it is the contrast

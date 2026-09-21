@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { cp, lstat, mkdir, readFile, realpath, rename, rm } from "node:fs/promises";
+import { cp, lstat, mkdir, readFile, readdir, realpath, rename, rm } from "node:fs/promises";
 import { basename, dirname, join, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -23,6 +23,17 @@ async function pathStat(path) {
   }
 }
 
+async function removeBunMetadata(root) {
+  for (const entry of await readdir(root, { withFileTypes: true })) {
+    const path = join(root, entry.name);
+    if (entry.name.startsWith(".bun-tag-")) {
+      await rm(path, { force: true });
+    } else if (entry.isDirectory()) {
+      await removeBunMetadata(path);
+    }
+  }
+}
+
 async function assertPatched(packagePath) {
   const manifest = JSON.parse(await readFile(join(packagePath, "package.json"), "utf8"));
   assert.equal(manifest.name, "@base-ui/react");
@@ -30,11 +41,12 @@ async function assertPatched(packagePath) {
 
   for (const modulePath of patchedModules) {
     const source = await readFile(join(packagePath, modulePath), "utf8");
-    assert.match(
-      source,
-      /focusRestoreMap/,
-      `${modulePath} must contain the editable Combobox isolation patch`,
-    );
+    for (const marker of ["focusRestoreMap", "MutationObserver", "isTabbable"]) {
+      assert.ok(
+        source.includes(marker),
+        `${modulePath} must contain the editable Combobox isolation patch marker ${marker}`,
+      );
+    }
   }
 }
 
@@ -78,6 +90,7 @@ export async function stageBundledBaseUi() {
   const backupStat = await pathStat(backup);
   if (backupStat) {
     assert.ok(backupStat.isSymbolicLink(), `${backup} must be the saved Bun dependency link`);
+    await removeBunMetadata(target);
     await assertPatched(target);
     return;
   }
@@ -91,6 +104,7 @@ export async function stageBundledBaseUi() {
   try {
     await cp(source, target, { recursive: true, dereference: true });
     await copyDependencyClosure(source, target);
+    await removeBunMetadata(target);
     await assertPatched(target);
   } catch (error) {
     await rm(target, { recursive: true, force: true });

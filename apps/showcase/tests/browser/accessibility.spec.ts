@@ -190,21 +190,47 @@ for (const theme of THEMES) {
   });
 }
 
-test("an open Combobox removes hidden content from tab order and restores it on close", async ({
+test("an open Combobox preserves tab-order isolation for its full open lifetime", async ({
   page,
   errors,
 }) => {
   await page.goto("/verification/interactions");
   const searchable = page.getByRole("combobox", { name: "Combobox project" });
   const outsideButton = page.getByTestId("menu-plain-trigger");
+  const mutableTarget = page.getByTestId("combobox-focusability-target");
+  const nativeSummary = page.getByTestId("combobox-native-summary");
+  const lateButton = page.getByTestId("combobox-late-button");
   await expect(outsideButton).toHaveAttribute("tabindex", "0");
 
   await searchable.click();
   await expect(page.getByRole("option", { name: "Design system" })).toBeVisible();
   await expect(outsideButton).toHaveAttribute("tabindex", "-1");
 
+  await outsideButton.evaluate((button) => {
+    const hiddenRoot = button.closest('[aria-hidden="true"]');
+    if (!hiddenRoot) throw new Error("Outside button is not inside Combobox isolation");
+    const fixture = document.createElement("div");
+    fixture.dataset.testid = "combobox-live-isolation";
+    fixture.innerHTML = `
+      <div data-testid="combobox-focusability-target">Becomes focusable while hidden</div>
+      <details><summary data-testid="combobox-native-summary">Native summary</summary></details>
+      <button data-testid="combobox-late-button">Mounted while hidden</button>
+    `;
+    hiddenRoot.append(fixture);
+  });
+  await expect(nativeSummary).toHaveAttribute("tabindex", "-1");
+  await expect(lateButton).toHaveAttribute("tabindex", "-1");
+
+  await mutableTarget.evaluate((element) => {
+    element.tabIndex = 0;
+  });
+  await expect(mutableTarget).toHaveAttribute("tabindex", "-1");
+
   await page.keyboard.press("Escape");
   await expect(outsideButton).toHaveAttribute("tabindex", "0");
+  await expect(mutableTarget).toHaveAttribute("tabindex", "0");
+  expect(await nativeSummary.getAttribute("tabindex")).toBeNull();
+  expect(await lateButton.getAttribute("tabindex")).toBeNull();
 
   /* Removing a control from sequential focus must not make a non-modal popup inert: outside
      pointer interaction remains available and closes the list before running the clicked action. */

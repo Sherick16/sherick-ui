@@ -22,14 +22,15 @@ of the publishable artifact. `@base-ui/react@1.8.0` has an upstream editable-Com
 defect ([mui/base-ui#5528](https://github.com/mui/base-ui/issues/5528)): its floating focus manager
 applies `aria-hidden` around an open non-modal listbox without taking focusable descendants out of
 sequential navigation. Sherick carries a version-specific Bun patch to Base's existing `markOthers`
-authority. When that authority applies `aria-hidden`, the patch temporarily sets focusable descendants
-to `tabindex="-1"`, restores their original values on balanced cleanup, and deliberately does not use
-`inert`, so outside pointer interaction remains available.
+authority. When that authority applies `aria-hidden`, the patch uses Base's own tabbability model to
+temporarily write `tabindex="-1"`. A subtree observer repeats that check for the complete isolation
+lifetime, so newly mounted controls, controls that become focusable and native cases such as
+`<summary>` remain suppressed. Balanced cleanup disconnects the observer and restores the latest
+intended values. `inert` is deliberately not used, so outside pointer interaction remains available.
 
 This is a dependency patch, not a second focus manager or a component-local state mirror. Components
 still import Base primitives directly from their public subpaths, and Base still owns open state, focus,
-ARIA isolation, dismissal and popup lifecycle. The patch ports the `inertOthers` behavior of the
-`aria-hidden` implementation Base's utility was derived from.
+ARIA isolation, dismissal and popup lifecycle.
 
 A workspace-only patch would not protect npm consumers. The package therefore declares Base UI as a
 bundled dependency. Publication stages the patched package and its runtime dependency closure inside
@@ -37,8 +38,8 @@ the tarball; `test:packed` verifies the installed nested copy, its license, both
 modules, clean dependency trees, and open-listbox behavior under React 18, React 19, Vite and Next.
 `scripts/stage-bundled-base-ui.mjs` exists only to turn Bun's dependency-store symlink into npm's
 bundleable directory during packing, then restores the link. The patch and bundling may be removed
-only after a released Base UI version passes the same exclusion-free axe, tab restoration and
-non-modal pointer tests.
+only after a released Base UI version passes the same exclusion-free axe, live-mutation, native
+tabbability, restoration and non-modal pointer tests.
 
 ## Build and client boundaries
 

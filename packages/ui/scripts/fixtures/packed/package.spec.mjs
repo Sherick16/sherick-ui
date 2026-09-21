@@ -55,6 +55,27 @@ test("packed editable Combobox isolates hidden content without becoming modal", 
   await searchable.click();
   await expect(page.getByRole("option", { name: "Dashboard" })).toBeVisible();
   await expect(outsideButton).toHaveAttribute("tabindex", "-1");
+  await outsideButton.evaluate((button) => {
+    const hiddenRoot = button.closest('[aria-hidden="true"]');
+    if (!hiddenRoot) throw new Error("Outside button is not inside Combobox isolation");
+    const fixture = document.createElement("div");
+    fixture.innerHTML = `
+      <div data-packed-focusability-target>Becomes focusable while hidden</div>
+      <details><summary data-packed-summary>Native summary</summary></details>
+      <button data-packed-late-button>Mounted while hidden</button>
+    `;
+    hiddenRoot.append(fixture);
+  });
+  const mutableTarget = page.locator("[data-packed-focusability-target]");
+  const nativeSummary = page.locator("[data-packed-summary]");
+  const lateButton = page.locator("[data-packed-late-button]");
+  await expect(nativeSummary).toHaveAttribute("tabindex", "-1");
+  await expect(lateButton).toHaveAttribute("tabindex", "-1");
+  await mutableTarget.evaluate((element) => {
+    element.tabIndex = 0;
+  });
+  await expect(mutableTarget).toHaveAttribute("tabindex", "-1");
+
   const results = await new AxeBuilder({ page })
     .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
     .analyze();
@@ -62,6 +83,9 @@ test("packed editable Combobox isolates hidden content without becoming modal", 
 
   await page.keyboard.press("Escape");
   await expect(outsideButton).toHaveAttribute("tabindex", "0");
+  await expect(mutableTarget).toHaveAttribute("tabindex", "0");
+  expect(await nativeSummary.getAttribute("tabindex")).toBeNull();
+  expect(await lateButton.getAttribute("tabindex")).toBeNull();
 
   await searchable.click();
   await expect(page.getByRole("option", { name: "Dashboard" })).toBeVisible();
