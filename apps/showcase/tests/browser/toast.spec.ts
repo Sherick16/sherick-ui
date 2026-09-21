@@ -267,3 +267,75 @@ test("a promise toast carries a mark in every state it can be in", async ({ page
 
   expect(errors).toEqual([]);
 });
+
+/* The dismissal is taller than the first text line. Its target must not dictate the content's
+   height: a one-line toast has the same space above and below its copy as a wrapped one. */
+for (const theme of ["light", "dark"] as const) {
+  for (const width of [1280, 375]) {
+    test.describe(`toast vertical balance ${theme} ${width}px`, () => {
+      test.use({ colorScheme: theme, reducedMotion: "reduce", viewport: { width, height: 900 } });
+
+      for (const specimen of [
+        { trigger: "Raise title-only toast", name: "Assets uploaded", multiline: false },
+        { trigger: "Raise untitled toast", name: "Warning", multiline: false },
+        { trigger: "Raise wrapped untitled toast", name: "Warning", multiline: true },
+        { trigger: "Raise toast", name: "Interactions toast", multiline: true },
+        { trigger: "Raise tall toast", name: "Tall toast", multiline: true },
+        { trigger: "Raise sticky toast", name: "Sticky toast", multiline: true },
+      ]) {
+        test(specimen.trigger, async ({ page, errors }, testInfo) => {
+          await raise(page, specimen.trigger);
+          const toast = toastNamed(page, specimen.name);
+          await expect(toast).toBeVisible();
+          await expect(toast).toHaveCSS("opacity", "1");
+          await toast.hover();
+          await expect(toast).toHaveAttribute("data-expanded");
+          const dismiss = toast.getByRole("button", { name: "Dismiss", exact: true });
+
+          if (process.env.VISUAL_REVIEW) {
+            await toast.screenshot({ path: testInfo.outputPath("toast.png") });
+          }
+
+          const geometry = await dismiss.evaluate((button) => {
+            const content = button.parentElement!;
+            const copy = button.previousElementSibling!;
+            const firstLine = copy.firstElementChild!;
+            const box = content.getBoundingClientRect();
+            const text = copy.getBoundingClientRect();
+            const target = button.getBoundingClientRect();
+            const firstLineHeight = parseFloat(getComputedStyle(firstLine).lineHeight);
+            const firstLineCentre = text.top + firstLineHeight / 2;
+            const mark = copy.previousElementSibling!.getBoundingClientRect();
+            return {
+              above: text.top - box.top,
+              below: box.bottom - text.bottom,
+              multiline: text.height > firstLineHeight,
+              targetWidth: target.width,
+              targetHeight: target.height,
+              targetOffset: target.top + target.height / 2 - firstLineCentre,
+              markOffset: mark.top + mark.height / 2 - firstLineCentre,
+              targetClearance: [target.top - box.top, box.bottom - target.bottom],
+            };
+          });
+
+          expect(geometry.above).toBe(16);
+          expect(geometry.below).toBe(geometry.above);
+          expect(geometry.multiline).toBe(specimen.multiline);
+          expect(geometry.targetWidth).toBe(44);
+          expect(geometry.targetHeight).toBe(44);
+          expect(geometry.targetOffset).toBe(0);
+          expect(geometry.markOffset).toBe(0);
+          expect(Math.min(...geometry.targetClearance)).toBeGreaterThanOrEqual(0);
+
+          await page.keyboard.press("Tab");
+          await dismiss.focus();
+          expect(await dismiss.evaluate(el => el.matches(":focus-visible"))).toBe(true);
+          expect(await dismiss.evaluate(el => getComputedStyle(el).boxShadow)).toContain("inset");
+          await dismiss.click();
+          await expect(toast).toBeHidden();
+          expect(errors).toEqual([]);
+        });
+      }
+    });
+  }
+}

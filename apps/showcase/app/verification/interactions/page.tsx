@@ -777,6 +777,20 @@ function ToastFixture({ onAction }: { onAction: (value: string) => void }) {
       >
         Raise untitled toast
       </Button>
+      <Button
+        onClick={() => toast.add({ type: "success", title: "Assets uploaded", timeout: 0 })}
+      >
+        Raise title-only toast
+      </Button>
+      <Button
+        onClick={() => toast.add({
+          type: "warning",
+          description: "Some assets could not be uploaded. Check your connection and try again.",
+          timeout: 0,
+        })}
+      >
+        Raise wrapped untitled toast
+      </Button>
       <Button onClick={() => toast.close()}>Close toasts</Button>
     </div>
   );

@@ -83,16 +83,32 @@ The refresh also records already-landed palette and settled Switch rendering tha
 screenshots predated; those are not new palette edits in this pass. Both Dialog screenshots
 remain unchanged. Screenshot tolerance and accessibility rules were not relaxed.
 
+## Follow-up: one-line toast balance
+
+A reported one-line toast exposed excess bottom space from the 44px dismiss target. Its
+top-only negative margin left 12px below title-only copy and 10px below description-only copy.
+Compensating both vertical margins keeps the content at 16px above and below without shrinking
+the target, moving its mark, or changing first-line alignment. Multiline and action toasts were
+already content-height-driven and remain unchanged.
+
+Twenty-four new cases in `toast.spec.ts` cover six content forms in both themes at 1280px and
+375px, including equal vertical spacing, intact targets, first-line alignment, inset keyboard
+focus and dismissal. Before the fix all eight single-line cases failed (28px/26px below versus
+16px above); the sixteen multiline/action cases passed. After the fix all 24 passed, and the
+full toast/optical-balance suite passed all 40 checks. Before/after captures were inspected.
+The deterministic refresh adds the two symmetric margin utilities and removes the unused
+top-only utility; no browser screenshot baseline or token changed for this follow-up.
+
 ## Verification and release gate
 
 Final `bun run verify`: **passed**. This includes lint, temporal ownership, workspace typechecks,
 library/Next/Vite production builds, package and contrast checks, unchanged bundle budgets,
 packed-tarball consumer verification, the deterministic style contract, and both browser suites:
 
-- Showcase: **176 passed**, two opt-in review captures skipped in ordinary CI.
+- Showcase: **200 passed**, two opt-in review captures skipped in ordinary CI.
 - No-Tailwind consumer: **6 passed**.
 - The opt-in light/dark rendered reviews also passed separately and their captures were inspected.
-- Deterministic contract: 93 specimens, 26 overlay recipes, 559 scoped rules, four token blocks.
+- Deterministic contract: 93 specimens, 26 overlay recipes, 560 scoped rules, four token blocks.
 
 The polish/verification gate is green; this is **not stable-release clearance**. Existing risks in
 `VERIFICATION.md` remain: Base UI's open editable Combobox accessibility isolation gap, and the

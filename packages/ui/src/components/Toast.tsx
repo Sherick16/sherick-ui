@@ -336,12 +336,12 @@ export const ToastViewport = ({ position = "bottom-end", className }: ToastViewp
                   className={cn(
                     density.target,
                     shape.circle,
-                    /* A first-line affordance again: the 44px target is offset to the first line's centre,
-                       and the padding that makes it a target rather than a mark is pulled back at the
-                       surface's end edge. Its ring is the inset one, because the stack clips its own root
-                       and an outward ring would be cut off at the top of a titled toast. */
+                    /* Centre the 44px target on the first line and give back its excess on BOTH
+                       vertical edges: a top-only offset leaves 10–12px below a one-line toast.
+                       The whole target stays intact, with an inset ring inside the clipped root.
+                       Its inline end padding is compensated separately. */
                     "group -me-2 inline-flex shrink-0 items-center justify-center",
-                    toast.title ? "-mt-3" : "-mt-2.5",
+                    toast.title ? "-my-3" : "-my-2.5",
                     text.medium,
                     "hover:text-sherick-ink",
                     motionFeedback,
