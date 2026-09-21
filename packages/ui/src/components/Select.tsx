@@ -25,13 +25,17 @@ export interface SelectOption {
   disabled?: boolean;
 }
 
+type SelectRootProps = BaseSelect.Root.Props<string>;
+type SelectChangeDetails = Parameters<NonNullable<SelectRootProps["onValueChange"]>>[1];
+
 export interface SelectProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "value" | "defaultValue"> {
   options: SelectOption[];
   variant?: Variant;
   value?: string | null;
   defaultValue?: string | null;
-  onValueChange?: (value: string | null) => void;
+  /** Base's value-change event details are passed through unchanged. */
+  onValueChange?: (value: string | null, eventDetails: SelectChangeDetails) => void;
   placeholder?: string;
   readOnly?: boolean;
   required?: boolean;
@@ -59,8 +63,8 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
         items={options}
         value={value}
         defaultValue={defaultValue ?? null}
-        onValueChange={(nextValue) => {
-          onValueChange?.(typeof nextValue === "string" ? nextValue : null);
+        onValueChange={(nextValue, eventDetails) => {
+          onValueChange?.(typeof nextValue === "string" ? nextValue : null, eventDetails);
         }}
         disabled={disabled}
         readOnly={readOnly}

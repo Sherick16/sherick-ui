@@ -25,7 +25,8 @@ export interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
   error?: boolean;
   errorMessage?: ReactNode;
   inputClassName?: string;
-  onValueChange?: (value: string) => void;
+  /** Base's value-change callback, event details included. */
+  onValueChange?: BaseInput.Props["onValueChange"];
 }
 
 const Input = forwardRef<HTMLInputElement, InputProps>(

@@ -19,7 +19,8 @@ export interface DialogProps {
   children: ReactNode;
   open?: boolean;
   defaultOpen?: boolean;
-  onOpenChange?: (open: boolean) => void;
+  /** Base's open-change callback, event details included. */
+  onOpenChange?: BaseDialog.Root.Props["onOpenChange"];
   className?: string;
 }
 
@@ -49,8 +50,8 @@ const Dialog = forwardRef<HTMLDivElement, DialogProps>(({
     <BaseDialog.Root
       open={open}
       defaultOpen={defaultOpen}
-      onOpenChange={(nextOpen) => {
-        onOpenChange?.(nextOpen);
+      onOpenChange={(nextOpen, eventDetails) => {
+        onOpenChange?.(nextOpen, eventDetails);
       }}
     >
       {/* The dialog focuses its own surface rather than the first control in it: a dialog's
