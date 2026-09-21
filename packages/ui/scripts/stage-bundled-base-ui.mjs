@@ -41,7 +41,13 @@ async function assertPatched(packagePath) {
 
   for (const modulePath of patchedModules) {
     const source = await readFile(join(packagePath, modulePath), "utf8");
-    for (const marker of ["focusRestoreMap", "MutationObserver", "isTabbable"]) {
+    for (const marker of [
+      "focusRestoreMap",
+      "MutationObserver",
+      "isTabbable",
+      "attributeOldValue",
+      "takeRecords",
+    ]) {
       assert.ok(
         source.includes(marker),
         `${modulePath} must contain the editable Combobox isolation patch marker ${marker}`,

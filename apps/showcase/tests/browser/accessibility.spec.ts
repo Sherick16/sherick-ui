@@ -200,6 +200,7 @@ test("an open Combobox preserves tab-order isolation for its full open lifetime"
   const mutableTarget = page.getByTestId("combobox-focusability-target");
   const nativeSummary = page.getByTestId("combobox-native-summary");
   const lateButton = page.getByTestId("combobox-late-button");
+  const explicitlyRemoved = page.getByTestId("combobox-explicit-negative");
   await expect(outsideButton).toHaveAttribute("tabindex", "0");
 
   await searchable.click();
@@ -215,22 +216,28 @@ test("an open Combobox preserves tab-order isolation for its full open lifetime"
       <div data-testid="combobox-focusability-target">Becomes focusable while hidden</div>
       <details><summary data-testid="combobox-native-summary">Native summary</summary></details>
       <button data-testid="combobox-late-button">Mounted while hidden</button>
+      <button data-testid="combobox-explicit-negative">Stops participating while hidden</button>
     `;
     hiddenRoot.append(fixture);
   });
   await expect(nativeSummary).toHaveAttribute("tabindex", "-1");
   await expect(lateButton).toHaveAttribute("tabindex", "-1");
+  await expect(explicitlyRemoved).toHaveAttribute("tabindex", "-1");
 
   await mutableTarget.evaluate((element) => {
     element.tabIndex = 0;
   });
   await expect(mutableTarget).toHaveAttribute("tabindex", "-1");
+  await explicitlyRemoved.evaluate((element) => {
+    element.tabIndex = -1;
+  });
 
   await page.keyboard.press("Escape");
   await expect(outsideButton).toHaveAttribute("tabindex", "0");
   await expect(mutableTarget).toHaveAttribute("tabindex", "0");
   expect(await nativeSummary.getAttribute("tabindex")).toBeNull();
   expect(await lateButton.getAttribute("tabindex")).toBeNull();
+  await expect(explicitlyRemoved).toHaveAttribute("tabindex", "-1");
 
   /* Removing a control from sequential focus must not make a non-modal popup inert: outside
      pointer interaction remains available and closes the list before running the clicked action. */

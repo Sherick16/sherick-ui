@@ -711,7 +711,13 @@ export const fixture = (
     "floating-ui-react/utils/markOthers.mjs",
   ]) {
     const source = await readFile(join(bundledBaseRoot, modulePath), "utf8");
-    for (const marker of ["focusRestoreMap", "MutationObserver", "isTabbable"]) {
+    for (const marker of [
+      "focusRestoreMap",
+      "MutationObserver",
+      "isTabbable",
+      "attributeOldValue",
+      "takeRecords",
+    ]) {
       assert.ok(
         source.includes(marker),
         `${modulePath} must contain the editable Combobox isolation patch marker ${marker}`,
