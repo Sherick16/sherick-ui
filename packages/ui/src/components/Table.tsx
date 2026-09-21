@@ -25,7 +25,7 @@ export const Table = ({
             {headers.map((header) => (
               <th
                 key={header}
-                className={cn("px-4 py-3 text-left text-sm font-medium", text.medium)}
+                className={cn("px-4 py-3 text-start text-sm font-medium", text.medium)}
               >
                 {header}
               </th>

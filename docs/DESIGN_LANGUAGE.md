@@ -1082,8 +1082,12 @@ The two ends of a control are not obliged to share one number:
 - a control with a **leading mark** measures its start padding to the mark's box, and one with a
   **trailing affordance** measures its end padding to the affordance's box, so both ends read at
   the same distance even though one holds a 20px mark and the other a 28px target;
-- a correction writes its own asymmetry on a **logical** property (`ps`/`pe`, `ms`/`me`,
-  so a right-to-left page is the same design rather than a second one;
+- **every asymmetry the library authors is logical.** A correction writes its own asymmetry on a
+  writing-direction property — `ps`/`pe`, `ms`/`me`, `text-start`/`text-end`, `border-s`/`border-e`
+  — so a right-to-left page is the same design rather than a second one, and a physical side
+  (`left-4`, `pl-6` …) is a defect rather than a shortcut. The one surface this does not describe
+  is a **code well**: source code is read left to right whatever the document says, so `CodeBlock`
+  declares its own direction and the gutter inside it is physical on purpose;
 - a control that owns a **trailing cluster** — a combobox field and its two parts — places that
   cluster with its own inline padding rather than pinning it to a physical edge, so the cluster
   stays at the field's end whichever way the page reads.

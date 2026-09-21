@@ -36,6 +36,26 @@ const expectNoA11yViolations = async (page: Page) => {
   expect(results.violations, `axe violations:\n${summary}`).toEqual([]);
 };
 
+/* The showcase is a page of interactive specimens, and it is the only place some states appear at
+   all — a motion stage with a real control in it, the toast stack, an open drawer. Scanning it is
+   what keeps a specimen from being the one thing no gate looks at.
+   It is also the one fixture with a **recorded** console error: the page hydrates with a mismatch
+   that regenerates its tree on the client (React 418). It is not this pass's defect and it is not
+   hidden — it reproduces on `main` before any of this branch's changes, and the tree it damages is
+   regenerated rather than left half-hydrated — so the claim here is narrowed to "no *new* console
+   error" rather than dropped. */
+const RECORDED_CONSOLE_ERRORS = [/Minified React error #418/];
+
+test("the showcase itself has no automatically detectable WCAG A/AA violations", async ({ page, errors }) => {
+  await page.goto("/");
+  await expect(page.getByRole("heading", { name: "Design language", exact: true })).toBeVisible();
+
+  await expectNoA11yViolations(page);
+
+  const unexpected = errors.filter((error) => !RECORDED_CONSOLE_ERRORS.some((pattern) => pattern.test(error)));
+  expect(unexpected, "the showcase may only report its recorded hydration mismatch").toEqual([]);
+});
+
 test("core verification fixture has no automatically detectable WCAG A/AA violations", async ({ page, errors }) => {
 
   await page.goto("/verification/core");

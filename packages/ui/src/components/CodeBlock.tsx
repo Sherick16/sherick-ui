@@ -101,7 +101,12 @@ const CodeBlock = ({ inline = false, className, language = "text", children }: C
         prism={Prism as typeof Prism}
       >
         {({ className: highlightClassName, style, tokens, getLineProps, getTokenProps }) => (
+          /* A code well is the one surface in the library that is **not** a writing-direction
+             surface: source code is read left to right whatever the document says, so the well
+             declares its own direction and its gutter is physical *inside* it. Everything else
+             asymmetric in this library is logical (§17). */
           <pre
+            dir="ltr"
             className={cn(
               "overflow-x-auto border-t px-4 py-4 text-sm leading-6",
               edge.rule,

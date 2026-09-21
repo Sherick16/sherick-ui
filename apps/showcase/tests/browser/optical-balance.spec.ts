@@ -107,25 +107,41 @@ test("a field's embedded mark follows the writing direction", async ({ page }) =
   const submit = field.getByRole("button", { name: "Submit search" });
   await expect(submit).toBeVisible();
 
-  const endInset = (control: Locator) =>
+  /* The mark, not the target's box: this stage is about where the *artwork* the reader sees ends up,
+     and measuring the button alone cannot tell a mark that followed the direction from one that
+     merely sits inside a target that did. Both are read, so the pair is checked too. */
+  const geometry = (control: Locator) =>
     control.evaluate((element) => {
       const surface = element.parentElement;
       if (!surface) throw new Error("the control has no surface");
+      const mark = element.querySelector("svg");
+      if (!mark) throw new Error("the control has a visible mark");
+      const rtl = getComputedStyle(element).direction === "rtl";
       const surfaceBox = surface.getBoundingClientRect();
-      const controlBox = element.getBoundingClientRect();
-      return getComputedStyle(element).direction === "rtl"
-        ? controlBox.left - surfaceBox.left
-        : surfaceBox.right - controlBox.right;
+      const targetBox = element.getBoundingClientRect();
+      const markBox = mark.getBoundingClientRect();
+      const endInset = (box: DOMRect) => (rtl ? box.left - surfaceBox.left : surfaceBox.right - box.right);
+      return {
+        target: { width: targetBox.width, height: targetBox.height, inset: endInset(targetBox) },
+        mark: { width: markBox.width, height: markBox.height, inset: endInset(markBox) },
+      };
     });
 
-  const leftToRight = await endInset(submit);
+  const leftToRight = await geometry(submit);
   await page.evaluate(() => {
     document.documentElement.dir = "rtl";
   });
-  const rightToLeft = await endInset(submit);
+  const rightToLeft = await geometry(submit);
 
-  expect(leftToRight).toBeGreaterThan(0);
-  expect(rightToLeft, "the submit control has to stay at the field's own end").toBeCloseTo(leftToRight, 0);
+  expect(leftToRight.mark.inset, "the mark sits inside the field, not at its edge").toBeGreaterThan(0);
+  expect(
+    leftToRight.mark.inset - leftToRight.target.inset,
+    "the mark is concentric with its own target, which is what keeps the ring around it",
+  ).toBeCloseTo((leftToRight.target.width - leftToRight.mark.width) / 2, 0);
+  expect(rightToLeft.mark.inset, "and the pair follows the writing direction").toBeCloseTo(
+    leftToRight.mark.inset,
+    0,
+  );
 });
 
 test("a status mark and a dismissal hold the first line of copy that wraps", async ({ page }) => {
@@ -192,4 +208,57 @@ test("a toast's dismissal keeps its ring inside the stack that clips it", async 
   expect(ring.shadow, "the visible ring is drawn inside the target").toContain("inset");
   expect(ring.outlineColor, "and nothing is painted outside the target the stack clips").toBe("rgba(0, 0, 0, 0)");
   expect(Math.min(...ring.clearance)).toBeGreaterThanOrEqual(0);
+});
+
+test("a document's own asymmetry follows the writing direction", async ({ page }) => {
+  const section = await openShowcase(page, "content");
+
+  /* A list indents from its own start edge and a quote draws its rule on that same edge. Both are
+     read as resolved geometry, and both are compared against themselves with the page flipped, so a
+     physical side cannot pass by being symmetric. */
+  const sides = () =>
+    section.evaluate((root) => {
+      const list = root.querySelector("ul");
+      const item = root.querySelector("li");
+      const quote = root.querySelector("blockquote");
+      if (!list || !item || !quote) throw new Error("the content section has a list and a quote");
+      const listStyle = getComputedStyle(list);
+      const itemStyle = getComputedStyle(item);
+      const quoteStyle = getComputedStyle(quote);
+      return {
+        listPadding: [listStyle.paddingLeft, listStyle.paddingRight],
+        itemMargin: [itemStyle.marginLeft, itemStyle.marginRight],
+        quoteBorder: [quoteStyle.borderLeftWidth, quoteStyle.borderRightWidth],
+      };
+    });
+
+  const leftToRight = await sides();
+  await page.evaluate(() => {
+    document.documentElement.dir = "rtl";
+  });
+  const rightToLeft = await sides();
+
+  /* Each pair is asymmetric on one side only, and the flip moves that side rather than duplicating
+     it: a physical property would keep the left value on the left and pass neither check. */
+  expect(leftToRight.listPadding[0], "the list indents from one side only").not.toBe(
+    leftToRight.listPadding[1],
+  );
+  expect(rightToLeft.listPadding, "and the indent follows the document").toEqual([
+    leftToRight.listPadding[1],
+    leftToRight.listPadding[0],
+  ]);
+  expect(leftToRight.itemMargin[0], "the item nudges off the marker on one side only").not.toBe(
+    leftToRight.itemMargin[1],
+  );
+  expect(rightToLeft.itemMargin, "and the nudge follows the document").toEqual([
+    leftToRight.itemMargin[1],
+    leftToRight.itemMargin[0],
+  ]);
+  expect(leftToRight.quoteBorder[0], "the quote's rule is drawn on one side only").not.toBe(
+    leftToRight.quoteBorder[1],
+  );
+  expect(rightToLeft.quoteBorder, "and the rule follows the document").toEqual([
+    leftToRight.quoteBorder[1],
+    leftToRight.quoteBorder[0],
+  ]);
 });
