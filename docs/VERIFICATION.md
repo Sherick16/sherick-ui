@@ -80,21 +80,21 @@ Both consume `sherick-ui` through package exports after the library build.
 
 ## Packed-package consumer checks
 
-`bun run test:packed` is the publication contract gate. It runs `npm pack`, installs the resulting tarball into a clean temporary consumer and verifies:
+`bun run test:packed` is the publication contract gate. It runs `npm pack` and installs the tarball into clean temporary npm consumers, never workspace links. Chromium must be installed with the repository Playwright bootstrap.
 
-- ESM package import;
-- CommonJS `require()`;
-- NodeNext TypeScript declaration resolution;
-- `sherick-ui/styles.css` and `sherick-ui/theme.css` resolution;
-- `sherick-ui/content` resolution in ESM and declarations, the guarantee that rich content is **not** reachable from the root export, and that the subpath advertises no `require` entry — a CommonJS consumer must reach it with `await import()`, and `require()` must fail with `ERR_PACKAGE_PATH_NOT_EXPORTED` rather than crash on an older runtime;
-- no published Tailwind preset and no Tailwind peer dependency;
-- server rendering of Dialog states;
-- representative Prism language highlighting for languages outside Prism's core set;
-- a rendered KaTeX equation from `Markdown`, so neither `remark-math` nor `rehype-katex` can be dropped without failing;
-- KaTeX font assets present in the tarball;
-- a real Vite production build that imports `sherick-ui/styles.css` with no Tailwind installation/configuration.
+- React 18.0.0 (the runtime peer floor, with React 18.3 typings) and React 19.3.0 each run ESM/SSR, CJS/SSR, declaration checks and a production Vite browser fixture;
+- TypeScript 5.9 checks NodeNext, Bundler and Node16 `.cts` consumers without `skipLibCheck`; Node16 deliberately catches CJS declarations incorrectly published as ESM even where newer NodeNext permits `require(esm)`;
+- every declared runtime export is compared with its installed ESM value; CJS root/dev exports are compared with ESM, and public trigger types, callback/ref types and removed API failures compile directly;
+- `content` remains ESM-only: CJS dynamic import succeeds and `require` fails with `ERR_PACKAGE_PATH_NOT_EXPORTED`;
+- a React 19 production Next App Router build uses passive root components on the server and interactive/content components in a client boundary, then asserts hydration without a console-error allowlist;
+- the same small browser fixture renders fields, selections, Dialog/Drawer, Popover, Toast, direction, icons and rich content using only host CSS followed by `styles.css`, without Tailwind or any host reset;
+- computed CSS proves native rims are absent, dividers are solid, portals are styled, light/dark/system/custom document themes propagate, unrelated host/nested utility-looking classes remain untouched, and width/radius/padding/position/overflow/opacity overrides survive merging;
+- host animation names and host code markup remain untouched, non-core Prism grammars survive production bundling, and namespaced KaTeX fonts load;
+- `theme.css` also runs alone on a plain HTML page;
+- the existing bundle-budget owner runs against the installed tarball, checking all eight graphs and the same unchanged size budgets;
+- npm validates both dependency trees, and tarball checks require source-bearing maps, math assets/license, finished JS/declarations/CSS and only intentional publication files.
 
-This layer exists specifically to catch publication problems that direct workspace imports can hide.
+`packages/ui/scripts/packed-consumers.mjs` and `scripts/fixtures/packed` are fixtures within this existing publication gate, not a second behavioral suite. `KEEP_PACKED_CONSUMERS=1 bun run test:packed` retains temporary consumers for diagnosis. This layer catches publication problems direct workspace imports can hide; it does not repeat Phase C's complete cross-browser behavior matrix.
 
 ## Bundle size and tree-shaking budgets
 
@@ -108,8 +108,8 @@ It is the **single owner of size budgets** in this repository. The budgets live 
 `packages/ui/scripts/bundle-budget.json`; the gate is `packages/ui/scripts/bundle-budget.mjs`.
 Nothing else records a size number, and no other layer re-implements a size check.
 
-Six runtime fixtures are bundled with esbuild — `button`, `form`, `overlay`, `toggles`,
-`barrel` and `content` — resolved through Node package self-reference exactly as a consumer bundler would,
+Eight runtime fixtures are bundled with esbuild — `button`, `form`, `overlay`, `disclosure`,
+`toast`, `toggles`, `barrel` and `content` — resolved through package exports (self-reference normally, or the installed tarball during `test:packed`),
 plus the published `dist/styles.css` and `dist/theme.css`. The gate fails when any
 rich-content module (prismjs, prism-react-renderer, react-markdown, remark-*, rehype-*,
 katex, or the micromark/mdast/hast/unified family) appears in the module graph of a
@@ -357,10 +357,10 @@ The same spec adds direct assertions axe cannot make: accessible names on icon-o
 `aria-busy` on the loading Search, and a visible keyboard focus ring on the core `Primary`
 button (`outline-style` other than `none`, `outline-width` at least `2px`).
 
-The `rich-content` fixture also renders a real `CodeBlock`; the one recoverable React hydration
-mismatch that component currently logs (a server/client Prism grammar difference, pre-existing and
-unrelated to the accessibility contract) is filtered from that fixture's unexpected-error
-assertion, while its axe scan runs on the rendered result.
+The `rich-content` fixture and showcase both require an empty runtime-error list. Phase D
+traced the previous hydration recovery to Prism's automatic document scan, disabled it through
+Prism's native manual mode, and removed the hydration-error filters. The packed Next fixture
+also asserts that unrelated host code markup is not rewritten.
 
 Every scan waits for hydration before it runs. Base UI generates its ARIA wiring in effects, so
 the server-rendered shell of a field is briefly a control with a `<label for>` and no

@@ -37,6 +37,10 @@ import {
 import { motionTactile } from "./ui.motion";
 import theme from "./prism-theme";
 
+// React owns the markup. Prism's automatic document scan otherwise rewrites it
+// before hydration (and also highlights unrelated consumer code blocks).
+Prism.manual = true;
+
 export interface CodeBlockProps {
   inline?: boolean;
   className?: string;

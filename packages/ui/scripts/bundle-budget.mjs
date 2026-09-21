@@ -17,11 +17,14 @@
 
 import assert from "node:assert/strict";
 import { readFile, writeFile } from "node:fs/promises";
+import { createRequire } from "node:module";
+import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { brotliCompressSync, gzipSync } from "node:zlib";
 import { build } from "esbuild";
 
-const packageRoot = fileURLToPath(new URL("..", import.meta.url));
+const packageRoot = process.env.SHERICK_CONSUMER_DIR ?? fileURLToPath(new URL("..", import.meta.url));
+const stylesheetRoot = dirname(createRequire(join(packageRoot, "package.json")).resolve("sherick-ui/styles.css"));
 const baselinePath = fileURLToPath(new URL("./bundle-budget.json", import.meta.url));
 const update = process.argv.includes("--update");
 
@@ -61,7 +64,7 @@ const fixtures = {
 
 const bundleFixture = async (source) => {
   const result = await build({
-    stdin: { contents: source, resolveDir: fileURLToPath(new URL("..", import.meta.url)), loader: "ts", sourcefile: "fixture.ts" },
+    stdin: { contents: source, resolveDir: packageRoot, loader: "ts", sourcefile: "fixture.ts" },
     bundle: true,
     write: false,
     format: "esm",
@@ -92,6 +95,15 @@ for (const [name, source] of Object.entries(fixtures)) {
   const brotli = brotliSize(contents);
   measured[name] = { raw: bytes, gzip, brotli, modules };
 
+  const sherickModules = included.filter((id) => resolve(id).startsWith(`${stylesheetRoot}/`));
+  assert.ok(sherickModules.length > 0, "fixture must include the resolved Sherick artifact");
+  assert.ok(!sherickModules.some((id) => /\/dev\.js$/.test(id)), "dev must not enter consumer bundles");
+  if (name === "button") {
+    const unrelated = sherickModules.filter((id) => /\/components\//.test(id) &&
+      !/\/(Button|Spinner|ui\.common|ui\.motion)\.js$/.test(id));
+    assert.deepEqual(unrelated, [], "Button must tree-shake unrelated Sherick components");
+  }
+
   if (name === "content") {
     for (const dependency of expectedRichContent) {
       assert.ok(
@@ -114,7 +126,6 @@ for (const [name, source] of Object.entries(fixtures)) {
   );
 }
 
-const stylesheetRoot = fileURLToPath(new URL("../dist", import.meta.url));
 for (const [file, name] of [["styles.css", "stylesCss"], ["theme.css", "themeCss"]]) {
   const contents = await readFile(`${stylesheetRoot}/${file}`);
   measured[name] = { raw: contents.length, gzip: gzipSize(contents), brotli: brotliSize(contents), modules: 0 };

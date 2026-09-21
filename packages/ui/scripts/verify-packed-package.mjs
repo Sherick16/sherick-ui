@@ -4,6 +4,7 @@ import { access, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promise
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { verifyConsumers } from "./packed-consumers.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const work = await mkdtemp(join(tmpdir(), "sherick-ui-packed-"));
@@ -13,7 +14,7 @@ const run = (command, args, cwd, options = {}) =>
     cwd,
     encoding: "utf8",
     stdio: options.capture ? "pipe" : "inherit",
-    env: { ...process.env, CI: "1" },
+    env: { ...process.env, CI: "1", NEXT_TELEMETRY_DISABLED: "1", ...options.env },
   });
 
 try {
@@ -56,7 +57,7 @@ try {
     )}\n`
   );
 
-  run("npm", ["install", "--ignore-scripts", "--no-audit", "--no-fund"], consumerDir);
+  run("npm", ["install", "--no-audit", "--no-fund"], consumerDir);
 
   const esmFixture = `
 import assert from "node:assert/strict";
@@ -67,10 +68,24 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { Button, Dialog, Select } from "sherick-ui";
 import * as root from "sherick-ui";
 import { CodeBlock } from "sherick-ui/content";
+import ts from "typescript";
 
 const dev = await import("sherick-ui/dev");
 assert.equal(typeof dev.cn, "function");
 assert.ok(dev.material, "dev recipe export should resolve");
+
+// Compare every declared runtime export with the actual installed module, not selected names.
+for (const [specifier, file] of [["sherick-ui", "index"], ["sherick-ui/content", "content"], ["sherick-ui/dev", "dev"]]) {
+  const path = fileURLToPath(new URL("../types/" + file + ".d.ts", import.meta.resolve(specifier)));
+  const program = ts.createProgram([path], { module: ts.ModuleKind.NodeNext, moduleResolution: ts.ModuleResolutionKind.NodeNext });
+  const checker = program.getTypeChecker();
+  const exports = checker.getExportsOfModule(checker.getSymbolAtLocation(program.getSourceFile(path)));
+  const values = exports.filter(symbol => {
+    const target = symbol.flags & ts.SymbolFlags.Alias ? checker.getAliasedSymbol(symbol) : symbol;
+    return target.flags & ts.SymbolFlags.Value;
+  }).map(symbol => symbol.name).sort();
+  assert.deepEqual(Object.keys(await import(specifier)).sort(), values, specifier + " runtime/declaration exports drifted");
+}
 
 for (const removed of ["ActionButton", "Dropdown", "Modal", "TabGroup", "Markdown", "CodeBlock"]) {
   assert.equal(root[removed], undefined, \`\${removed} must not be exported from the root barrel\`);
@@ -236,6 +251,10 @@ console.log("Packed ESM/SSR/Prism/CSS verification passed.");
 const assert = require("node:assert/strict");
 const fs = require("node:fs");
 const ui = require("sherick-ui");
+const dev = require("sherick-ui/dev");
+assert.equal(typeof dev.cn, "function");
+const React = require("react");
+assert.match(require("react-dom/server").renderToStaticMarkup(React.createElement(ui.Button, null, "CJS SSR")), /CJS SSR/);
 
 assert.ok(ui.Button, "CommonJS export missing Button");
 assert.ok(ui.Dialog, "CommonJS export missing Dialog");
@@ -273,6 +292,8 @@ assert.throws(
 );
 
 (async () => {
+  assert.deepEqual(Object.keys(await import("sherick-ui")).sort(), Object.keys(ui).sort());
+  assert.deepEqual(Object.keys(await import("sherick-ui/dev")).sort(), Object.keys(dev).sort());
   const content = await import("sherick-ui/content");
   assert.ok(content.Markdown, "dynamic import must resolve Markdown from CommonJS");
   assert.ok(content.CodeBlock, "dynamic import must resolve CodeBlock from CommonJS");
@@ -613,14 +634,6 @@ export const fixture = (
   await writeFile(join(consumerDir, "tsconfig.json"), `${JSON.stringify(tsconfig, null, 2)}\n`);
 
   await mkdir(join(consumerDir, "src"), { recursive: true });
-  await writeFile(
-    join(consumerDir, "index.html"),
-    '<!doctype html><html><body><div id="root"></div><script type="module" src="/src/main.jsx"></script></body></html>'
-  );
-  await writeFile(
-    join(consumerDir, "src", "main.jsx"),
-    'import React from "react"; import { createRoot } from "react-dom/client"; import { Button } from "sherick-ui"; import { Markdown } from "sherick-ui/content"; import "sherick-ui/styles.css"; createRoot(document.getElementById("root")).render(React.createElement("div", null, React.createElement(Button, null, "Packed"), React.createElement(Markdown, null, "# Packed")));'
-  );
   /* This consumer deliberately imports the optional rich-content subpath, so its single
      chunk is legitimately large. The warning limit is raised instead of code-splitting a
      fixture whose only job is to prove both entries build with no Tailwind present. */
@@ -631,15 +644,14 @@ export const fixture = (
 
   run(process.execPath, ["esm.mjs"], consumerDir);
   run(process.execPath, ["cjs.cjs"], consumerDir);
-  run(join(consumerDir, "node_modules", ".bin", "tsc"), ["-p", "tsconfig.json"], consumerDir);
-  run(join(consumerDir, "node_modules", ".bin", "vite"), ["build"], consumerDir);
+  await verifyConsumers({ consumerDir, work, tarball, run });
 
   const installedPackage = JSON.parse(
     await readFile(join(consumerDir, "node_modules", "sherick-ui", "package.json"), "utf8")
   );
   assert.equal(installedPackage.main, "dist/cjs/index.cjs");
   assert.equal(installedPackage.style, "dist/styles.css");
-  assert.equal(installedPackage.exports["."].require, "./dist/cjs/index.cjs");
+  assert.equal(installedPackage.exports["."].require.default, "./dist/cjs/index.cjs");
   assert.equal(installedPackage.exports["./content"].import, "./dist/esm/content.js");
   assert.equal(
     installedPackage.exports["./content"].require,
@@ -672,6 +684,11 @@ export const fixture = (
     (path) => !/^dist\//.test(path) && !["package.json", "README.md", "LICENSE"].includes(path)
   );
   assert.deepEqual(unexpected, [], `unexpected file published in the tarball: ${unexpected.join(", ")}`);
+  for (const path of publishedPaths.filter((path) => path.endsWith(".map"))) {
+    const map = JSON.parse(await readFile(join(consumerDir, "node_modules", "sherick-ui", path), "utf8"));
+    assert.ok(map.sources.every((_, index) => typeof map.sourcesContent?.[index] === "string"), `${path} must embed its unpublished sources`);
+  }
+  assert.ok(publishedPaths.includes("dist/KaTeX-LICENSE"), "redistributed KaTeX assets need their license");
   assert.ok(
     publishedPaths.some((path) => path === "dist/esm/content.js"),
     "the packed tarball must include the content subpath build"
@@ -699,5 +716,6 @@ export const fixture = (
 
   console.log(`Packed package verification passed: ${packed[0].filename}`);
 } finally {
-  await rm(work, { recursive: true, force: true });
+  if (process.env.KEEP_PACKED_CONSUMERS) console.log(`Packed consumer artifacts retained: ${work}`);
+  else await rm(work, { recursive: true, force: true });
 }

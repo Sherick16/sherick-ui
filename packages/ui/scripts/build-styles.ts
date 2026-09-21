@@ -135,9 +135,22 @@ const tailwindResult = await postcss([tailwindcss(tailwindConfig)]).process("@ta
   from: join(packageRoot, "src", "styles", "generated.css"),
 });
 const componentRoot = scopeUtilityRoot(postcss.parse(tailwindResult.css));
+// Keyframe names are document-global even when their consuming selectors are scoped.
+componentRoot.walkAtRules("keyframes", (rule) => {
+  const name = rule.params;
+  if (name.startsWith("sherick-")) return;
+  rule.params = `sherick-${name}`;
+  componentRoot.walkDecls(/^(animation|animation-name)$/, (declaration) => {
+    declaration.value = declaration.value.split(" ").map((part) => part === name ? rule.params : part).join(" ");
+  });
+});
 
 const katexPath = require.resolve("katex/dist/katex.min.css");
 const katexRoot = postcss.parse(await readFile(katexPath, "utf8"));
+// Font-family names are global too; keep bundled math fonts independent of a host's KaTeX.
+katexRoot.walkDecls(/^(font|font-family)$/, (declaration) => {
+  declaration.value = declaration.value.replaceAll("KaTeX_", "SherickKaTeX_");
+});
 // KaTeX still ships an obsolete IE/Edge legacy high-contrast override as !important.
 // Sherick provides a modern forced-colors contract below, so the legacy declaration is
 // intentionally dropped rather than weakening the package-wide no-!important invariant.
@@ -158,6 +171,20 @@ katexRoot.walkAtRules("font-face", (rule) => {
 // internal custom properties that are normally initialized by Tailwind preflight.
 // Sherick deliberately does not ship preflight, so initialize only those plumbing
 // variables on explicitly owned Sherick nodes. Consumer descendants are untouched.
+const ownedBaseline = `:where(.${SUI_SCOPE_CLASS}),
+  :where(.${SUI_SCOPE_CLASS})::before,
+  :where(.${SUI_SCOPE_CLASS})::after {
+  box-sizing: border-box;
+  border-width: 0;
+  border-style: solid;
+  border-color: currentColor;
+}
+  :where(.${SUI_SCOPE_CLASS}):where(button, input, textarea, select) {
+  font: inherit;
+  padding: 0;
+  background-color: transparent;
+}`;
+
 const tailwindRuntimeDefaults = `:where(.${SUI_SCOPE_CLASS}) {
   --tw-translate-x: 0;
   --tw-translate-y: 0;
@@ -197,6 +224,7 @@ const tailwindRuntimeDefaults = `:where(.${SUI_SCOPE_CLASS}) {
 const output = postcss.root();
 for (const fontFace of fontFaces) output.append(fontFace);
 output.append(postcss.parse(themeCss).nodes);
+output.append(postcss.parse(ownedBaseline).nodes);
 output.append(postcss.parse(tailwindRuntimeDefaults).nodes);
 // Scoped component and rich-content rules intentionally remain unlayered. Loading the
 // package stylesheet after host/framework CSS means both host preflight and duplicate
@@ -276,5 +304,6 @@ await writeFile(
 
 const katexDist = dirname(katexPath);
 await cp(join(katexDist, "fonts"), join(distDir, "fonts"), { recursive: true });
+await cp(join(katexDist, "..", "LICENSE"), join(distDir, "KaTeX-LICENSE"));
 
 console.log(`Built scoped Sherick UI CSS with explicit ownership marker .${SUI_SCOPE_CLASS}`);

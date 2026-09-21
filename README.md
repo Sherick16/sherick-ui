@@ -175,9 +175,14 @@ The public package exports:
 - Button and IconButton
 - Alert, Avatar, Badge and Card
 - Divider
-- Select
-- Input, Search and Textarea
-- Dialog (with `Dialog.Header`, `Dialog.Description`, `Dialog.Content` and `Dialog.Footer`)
+- Field, Input, Search, Textarea and NumberField
+- Select and Combobox
+- Checkbox, RadioGroup and Slider
+- Dialog (with `Dialog.Header`, `Dialog.Description`, `Dialog.Content` and `Dialog.Footer`), AlertDialog and Drawer
+- Menu and Popover
+- Accordion and Collapsible
+- ToastProvider, ToastViewport, useToast and createToastManager
+- DirectionProvider
 - NavGroup and NavItem
 - Skeleton and Spinner
 - Switch
@@ -251,7 +256,7 @@ bun run verify
 
 The private `apps/showcase` workbench includes `System`, `Light` and `Dark` controls so every component and state can be reviewed against all supported themes, and it links to the canonical design language from its heading.
 
-`bun run verify` covers source checks, ESM/CommonJS/declaration builds, the production Next showcase, a Tailwind-free Vite consumer, local styling-contract checks, a `npm pack` consumer install, size/tree-shaking budgets, deterministic style-contract snapshots and the Chromium browser suites (interaction, accessibility, responsive and visual regression). See [`docs/VERIFICATION.md`](docs/VERIFICATION.md) for the contract of each layer.
+`bun run verify` covers source checks, ESM/CommonJS/declaration builds, the production Next showcase, a Tailwind-free Vite consumer, local styling-contract checks, packed React 18/19 consumers with Vite/Next browser checks, size/tree-shaking budgets, deterministic style-contract snapshots, the full Chromium browser suites and the Firefox/WebKit smoke matrix. See [`docs/VERIFICATION.md`](docs/VERIFICATION.md) for the contract of each layer.
 
 The Next.js app in `apps/showcase` is a development/showcase surface only; the published component runtime does not depend on Next.js.
 

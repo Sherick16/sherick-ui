@@ -101,6 +101,9 @@ for (const propType of [
   "PopoverProps",
   "MenuProps",
   "MenuItemProps",
+  "MenuTriggerProps",
+  "PopoverTriggerProps",
+  "DirectionProviderProps",
   "ComboboxProps",
   "ComboboxOption",
   "ChipProps",
@@ -148,6 +151,13 @@ assert.equal(packageJson.peerDependencies.tailwindcss, undefined, "Tailwind must
 assert.deepEqual(packageJson.files, ["dist"], "the package should publish only finished artifacts");
 assert.ok(packageJson.sideEffects.includes("./dist/styles.css"));
 assert.ok(packageJson.sideEffects.includes("./dist/theme.css"));
+assert.deepEqual(Object.keys(packageJson.exports).sort(), [".", "./content", "./dev", "./styles.css", "./theme.css"]);
+for (const [subpath, file] of [[".", "index"], ["./dev", "dev"]]) {
+  assert.equal(packageJson.exports[subpath].import.types, `./dist/types/${file}.d.ts`);
+  assert.equal(packageJson.exports[subpath].require.types, `./dist/types/${file}.d.cts`);
+  assert.equal(await readFile(join(packageRoot, `dist/types/${file}.d.cts`), "utf8"),
+    await readFile(join(packageRoot, `dist/types/${file}.d.ts`), "utf8"));
+}
 
 const themeRoot = postcss.parse(themeCss);
 const collectVariables = (matches) => {
@@ -248,6 +258,12 @@ assert.deepEqual(
 );
 
 const stylesRoot = postcss.parse(stylesCss);
+stylesRoot.walkAtRules("keyframes", (rule) => {
+  assert.match(rule.params, /^sherick-/, "keyframe names must not collide with host animations");
+});
+stylesRoot.walkAtRules("font-face", (rule) => {
+  rule.walkDecls("font-family", (declaration) => assert.match(declaration.value, /^["']?SherickKaTeX_/));
+});
 const isInKeyframes = (rule) => {
   let parent = rule.parent;
   while (parent) {
