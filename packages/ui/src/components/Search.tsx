@@ -27,8 +27,7 @@ import { Spinner } from "./Spinner";
 
 export interface SearchProps extends InputHTMLAttributes<HTMLInputElement> {
   onSearch: (value: string) => void;
-  /** Base's value-change callback, event details included. */
-  onValueChange?: BaseInput.Props["onValueChange"];
+  onValueChange?: (value: string) => void;
   variant?: Variant;
   loading?: boolean;
   debounceMs?: number;
@@ -80,8 +79,8 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
       }, debounceMs);
     };
 
-    const handleValueChange: NonNullable<SearchProps["onValueChange"]> = (value, eventDetails) => {
-      onValueChange?.(value, eventDetails);
+    const handleValueChange = (value: string) => {
+      onValueChange?.(value);
       scheduleSearch(value);
     };
 

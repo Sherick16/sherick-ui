@@ -3,7 +3,6 @@
 import { Field } from "@base-ui/react/field";
 import React, {
   forwardRef,
-  type ComponentProps,
   type ReactNode,
   type TextareaHTMLAttributes,
 } from "react";
@@ -26,8 +25,7 @@ export interface TextareaProps
   error?: boolean;
   errorMessage?: ReactNode;
   textareaClassName?: string;
-  /** Base's value-change callback, event details included. */
-  onValueChange?: ComponentProps<typeof Field.Control>["onValueChange"];
+  onValueChange?: (value: string) => void;
 }
 
 const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(

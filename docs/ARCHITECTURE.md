@@ -59,7 +59,7 @@ Cascade ownership is deliberate:
 
 ## Motion architecture
 
-Motion is selected by **intent**, not by component. The canonical intents are `feedback`, `tactile`, `arrive`, `orient`, `relocate`, `direct`, `disclose`, `presence` and `activity`, and the dynamics below them (`swift`, `settle`, `spring`, `exit`, `continuous`) are the motion module's business alone. Components own target geometry — where a part ends up — but never a duration, a curve, a transition declaration or a keyframe. `motionDisclose` owns the measured height change shared by Accordion and Collapsible.
+Motion is selected by **intent**, not by component. The canonical intents are `feedback`, `tactile`, `arrive`, `orient`, `relocate`, `direct`, `disclose`, `presence` and `activity`, and the dynamics below them (`swift`, `settle`, `spring`, `exit`, `continuous`) are the motion module's business alone. Components own target geometry — where a part ends up — but never a duration, a curve, a transition declaration or a keyframe. `disclose` is a reserved semantic role with no recipe until a disclosure primitive exists.
 
 The architecture has four hard boundaries:
 
@@ -104,14 +104,14 @@ Base UI owns generic widget mechanics; Sherick UI exposes a small opinionated AP
 - a component built on a primitive that owns a queue or a lifecycle hands that ownership straight through instead of mirroring it. `Toast` publishes the provider, the viewport, the hook and the manager factory; the queue, the timer, the limit, the live region and the stack's state all stay Base's, and Sherick owns only the surface and how the stack moves. The handle it publishes is a **narrow view** of the primitive's manager, not a re-export of it: Base's own object also carries a subscriber channel for its store and add-options this renderer does not implement — a positioner for anchored toasts, a custom data bag, the primitive's internal presence state — and inheriting those would promise capabilities the package does not have. A capability the renderer does not implement is left out of the contract;
 - a contract this package owns **maps** the primitive's own enumerations rather than passing them through, because a value the renderer does not know fails silently. Base's `promise()` sets a toast's type to `loading`, `success` or `error`, which are states of one lifecycle rather than roles a caller picks; `Toast` carries a mark and a tone for each, so a promise toast is never a toast with no icon and no semantic tone.
 
-**Two field composition forms are intentional.** `Input` and `Textarea` retain their convenience
-`label` / `description` / `error` props and compose `Field.Root` internally. `Search` also composes a
-field internally because its submit control is part of one composite input. Selection and value
-controls (`Checkbox`, `Slider`, `NumberField`, `Select`, `Combobox`) compose through the exported
-`Field`, so consumers can place those controls in the same label/description/error anatomy. Both
-forms render Base Field parts and produce the same ARIA relationships. The convenience props and
-the exported `Field` composition are both part of the stable `2.x` contract; neither is a pending
-migration or compatibility shim.
+**Two field APIs, one intended end state.** `Input`, `Textarea` and `Search` compose `Field.Root`
+internally, so they take `label` / `description` / `error` as props; the selection and value
+controls (`Checkbox`, `Slider`, `NumberField`) compose through the exported `Field` instead, because
+they are one control among several in a form and label themselves the same way everything else
+does. Both paths render the same Base parts and produce the same ARIA relationships. The intended
+end state is the exported `Field` as the only label/error/required API, with the text controls
+migrating to it in a later change; until then the two coexist deliberately and this paragraph is the
+record of which one is leaving.
 
 Do not add generic controlled-state hooks, focus helpers, form mirrors or event-composition utilities to Sherick UI when Base UI already supplies the behavior.
 

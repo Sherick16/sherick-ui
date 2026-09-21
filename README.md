@@ -25,10 +25,8 @@ Tailwind) and the size-budget policy.
 ## Installation
 
 ```bash
-bun add sherick-ui@alpha
+bun add sherick-ui
 ```
-
-Until stable `2.0.0` is published, the untagged install resolves to the frozen `1.x` line.
 
 Import the complete stylesheet once near your application root. If the application has a framework stylesheet, Tailwind build or reset, load that first and Sherick UI second:
 
@@ -97,7 +95,7 @@ Or target a forced theme:
 }
 ```
 
-Core roles include the canvas/surface levels, two text roles plus a compact detail role, accent hierarchy, semantic states and their `on-*` colors, focus/scrim roles, structural edge tint, elevation ladder, acrylic recipes, motion and syntax-highlighting colors.
+Core roles include the canvas/surface levels, three-step text hierarchy, accent hierarchy, semantic states and their `on-*` colors, focus/scrim roles, structural edge tint, elevation ladder, acrylic recipes, motion and syntax-highlighting colors.
 
 Sherick UI's generated theme CSS is layered, so ordinary unlayered application CSS can override these variables without `!important` or selector escalation.
 
@@ -169,19 +167,6 @@ export function Example() {
 `Button` supports `filled`, `tonal` and `text` appearances plus `sm`, `md` and `lg` sizes. `IconButton` supports `tonal`, `ghost` and `acrylic` appearances. Semantic variants remain available for meaningful states such as danger or success rather than requiring every component to be chromatically loud.
 
 Components expose their relevant native HTML props and refs where appropriate. Base-backed interactive primitives delegate their generic widget semantics and accessibility mechanics to Base UI while retaining Sherick's visual language and focus treatment.
-
-## Runtime, browser and accessibility support
-
-Sherick UI supports React and React DOM 18 or 19 and the current and previous stable major releases
-of Chrome, Edge, Firefox and Safari. The core package has ESM and CommonJS entries;
-`sherick-ui/content` is ESM-only. The precise compatibility and semver policy is recorded in
-[`docs/RELEASE.md`](docs/RELEASE.md).
-
-Automated browser coverage includes axe scans plus keyboard and focus assertions. The current alpha
-still has one stable-release blocker: opening the editable `Combobox` can leave outside,
-`aria-hidden` content keyboard-focusable because of Base UI's popup isolation behavior. The exact
-evidence and release condition are recorded in [`docs/RELEASE.md`](docs/RELEASE.md); stable `2.0.0`
-must not ship with that unresolved behavior.
 
 ## Components
 
