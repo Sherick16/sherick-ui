@@ -31,7 +31,6 @@ import {
   Chip,
   ChipGroup,
   Collapsible,
-  Combobox,
   Dialog,
   Divider,
   Drawer,
@@ -100,11 +99,6 @@ const selectOptions = [
   { label: "Marketing site", value: "marketing" },
 ];
 
-const comboboxOptions = [
-  { label: "Design system", value: "design" },
-  { label: "Dashboard", value: "dashboard" },
-  { label: "Marketing site", value: "marketing", disabled: true },
-];
 
 type ThemeMode = "system" | "light" | "dark";
 
@@ -379,19 +373,6 @@ export default function Home() {
                 </div>
               </Specimen>
 
-              <Specimen title="Combobox">
-                <div className="space-y-4">
-                  <Field label="Project">
-                    <Combobox options={comboboxOptions} defaultValue="dashboard" />
-                  </Field>
-                  <Field label="No results">
-                    <Combobox options={comboboxOptions} defaultInputValue="Nothing matches this query" />
-                  </Field>
-                  <Field label="Disabled">
-                    <Combobox options={comboboxOptions} defaultValue="design" disabled />
-                  </Field>
-                </div>
-              </Specimen>
 
               <Specimen title="Field & validation">
                 <div className="space-y-5">
@@ -730,7 +711,7 @@ export default function Home() {
           <div className="space-y-5">
             <p>Overlay specimen content.</p>
             <Field label="Dialog project type">
-              <Combobox options={comboboxOptions} defaultValue="design" />
+              <Select options={selectOptions} defaultValue="design" />
             </Field>
           </div>
         </Dialog.Content>

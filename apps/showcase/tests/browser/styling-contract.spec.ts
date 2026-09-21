@@ -310,7 +310,7 @@ test("the Wave B family reads its semantics from the theme, not from local color
 
   /* A selected option holds the accent as a tint of the sheet, not as the opaque accent fill with
      its on-color, so a custom theme cannot make the two roles collapse into each other. */
-  await page.getByRole("combobox", { name: "Torture combobox" }).click();
+  await page.getByRole("combobox", { name: "Torture select" }).click();
   const selected = page.getByRole("option", { name: "Alpha" });
   await expect(selected).toHaveAttribute("aria-selected", "true");
 

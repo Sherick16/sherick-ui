@@ -156,9 +156,9 @@ export const contrastCompositions = (variables, alphas) => {
 
   /* Where a *tinted control* can actually sit: the page, inside a card, in a well, or on a floating
      sheet. The field steps are not among them — a tonal control is never placed inside a field, and
-     the controls that do live there (a combobox's trailing parts, a field's submit control) are
-     foreground-only — and neither is an empty mark's well, which holds nothing but its own mark.
-     Both are still *surfaces* for the roles that do answer to them. */
+     a field's embedded submit control is foreground-only — and neither is an empty mark's well,
+     which holds nothing but its own mark. Both are still *surfaces* for the roles that answer to
+     them. */
   const controlEntries = surfaceEntries.filter(([where]) =>
     ["canvas", "quiet well", "matte card", ACRYLIC, ACRYLIC_DENSE, HERO_SHEET].includes(where)
   );
@@ -266,7 +266,7 @@ export const contrastCompositions = (variables, alphas) => {
     add(
       `tone.text.${role} on its selected tint`,
       WCAG_NON_TEXT,
-      "the mark a Select or Combobox option carries, and a selected toggle's own mark",
+      "the mark a Select option carries, and a selected toggle's own mark",
       controlEntries.map(([where, base]) => [where, fg, tint(role, TINT.selected[role], base)])
     );
     add(

@@ -18,7 +18,7 @@ not showcase/Tailwind repair wrappers. `tests/hostile.spec.ts` exercises:
 - local scrolling of tabs, toggle/segmented tracks, tables, Markdown tables and code;
 - loading state geometry, accessible names and disabled state;
 - all four physically named Drawer sides in RTL, short modals, and reachable first/last actions;
-- Select, Combobox, Menu, Popover and Tooltip at all four viewport corners;
+- Select, Menu, Popover and Tooltip at all four viewport corners;
 - nested fields, popups and menus inside Dialog/Drawer, hit testing, Escape order and focus restoration;
 - a viewport reduction while editing, native Drawer PageDown, long toast content/actions,
   and notifications raised over an already open modal;
@@ -114,8 +114,8 @@ engines; no browser is silently skipped when unavailable.
 
 ## 7. Regression evidence
 
-The new suite has 30 scenarios per engine (90 executions). It checks containment, actual
-scroll movement, reachable endpoints, pointer interception, keyboard effects, focus restoration
+The current hostile-layout suite has 29 scenarios per engine (87 executions). It checks
+containment, actual scroll movement, reachable endpoints, pointer interception, keyboard effects, focus restoration
 and accessible names—not just whether a component mounted. Existing Chromium suites retain
 contrast, optical balance, focus, forced-colors, motion/interruption, CSS isolation, consumer
 class overrides and screenshot checks. Palette tokens, motion recipes and screenshot baselines
@@ -129,8 +129,8 @@ the intended layout, hit-area and loading-mark changes only.
 - lint; temporal-ownership policy; package and both consumers' typechecks/builds;
 - package/style/contrast checks; bundle and tree-shaking budgets; packed ESM/CommonJS/SSR/CSS checks;
 - deterministic style contract;
-- showcase: **201 passed**, two optional visual-review artifact captures skipped;
-- no-Tailwind consumer: **96 passed** (90 hostile executions plus six existing Chromium tests).
+- showcase: **188 passed**, two optional visual-review artifact captures skipped;
+- no-Tailwind consumer: **93 passed** (87 hostile executions plus six existing Chromium tests).
 
 The supported CI command remains `bun run verify` after browser installation. Bundle budgets
 were **not increased**: reusing `list.option` for the disclosure row removed duplicated recipe

@@ -63,7 +63,7 @@ export interface MenuSeparatorProps {
 
 /**
  * A surface of actions. Each item acts and the menu closes; nothing here holds a value, so a
- * value-selection surface is `Select` or `Combobox` rather than a menu. Base UI owns keyboard
+ * value-selection surface is `Select` rather than a menu. Base UI owns keyboard
  * navigation, typeahead, roving focus, Escape, outside dismissal and focus restoration; Sherick
  * UI owns the sheet, the row treatment and the tone an action reads in.
  *

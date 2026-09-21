@@ -121,7 +121,7 @@ for (const [name, parts] of [
     );
   }
 }
-assert.ok(root.Combobox, "ESM export missing Combobox");
+assert.equal(root.Combobox, undefined, "removed Combobox must not remain in the ESM root");
 for (const name of ["ToastProvider", "ToastViewport", "useToast", "createToastManager"]) {
   assert.equal(typeof root[name], "function", name + " must be a function");
 }
@@ -262,7 +262,7 @@ assert.ok(ui.Select, "CommonJS export missing Select");
 assert.ok(ui.Tabs, "CommonJS export missing Tabs");
 assert.ok(ui.Popover, "CommonJS export missing Popover");
 assert.ok(ui.Menu, "CommonJS export missing Menu");
-assert.ok(ui.Combobox, "CommonJS export missing Combobox");
+assert.equal(ui.Combobox, undefined, "removed Combobox must not remain in the CommonJS root");
 assert.ok(ui.Chip, "CommonJS export missing Chip");
 assert.ok(ui.ChipGroup, "CommonJS export missing ChipGroup");
 assert.ok(ui.Progress, "CommonJS export missing Progress");
@@ -313,7 +313,6 @@ import {
   Chip,
   ChipGroup,
   Collapsible,
-  Combobox,
   Dialog,
   Drawer,
   Input,
@@ -338,8 +337,6 @@ import {
   type ChipGroupProps,
   type ChipProps,
   type CollapsibleProps,
-  type ComboboxOption,
-  type ComboboxProps,
   type DialogProps,
   type DrawerProps,
   type DrawerSide,
@@ -417,15 +414,6 @@ const dialogProps: DialogProps = {
   },
   children: null,
 };
-const comboboxProps: ComboboxProps = {
-  options: [{ label: "Design", value: "design", disabled: false }],
-  value: "design",
-  onValueChange(value: string | null, eventDetails) {
-    void value;
-    void eventDetails.reason;
-  },
-};
-const comboboxOption: ComboboxOption = { label: "Design", value: "design" };
 const popoverProps: PopoverProps = { defaultOpen: true, onOpenChange() {}, children: null };
 const menuItemProps: MenuItemProps = { children: "Rename", variant: "danger" };
 const menuProps: MenuProps = { defaultOpen: true, onOpenChange() {}, children: null };
@@ -540,7 +528,6 @@ const toastPromiseOptions: ToastPromiseOptions<string> = {
   error: { title: "Failed", type: "danger" },
 };
 void alertProps;
-void comboboxOption;
 void skeletonProps;
 void spinnerProps;
 void chipToggleProps;
@@ -577,7 +564,6 @@ export const fixture = (
     />
     <Search {...searchProps} />
     <Select {...selectProps} />
-    <Combobox {...comboboxProps} />
     <Popover {...popoverProps}>
       <Popover.Content>Body</Popover.Content>
     </Popover>

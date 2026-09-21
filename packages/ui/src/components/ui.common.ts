@@ -61,11 +61,8 @@ import { motionDisclose, motionFeedback, motionStateLayer } from "./ui.motion";
    that is itself focusable and hands focus to the surface it opens, the second for one whose
    focus lives in a borderless input inside it. `focusRingHeld` follows *any* focus, because a
    select has no focus left to follow once its list has taken it; `focusRingWithin` follows
-   *visible* focus, so what a field does is what the platform does — a text field is
-   `:focus-visible` whenever it is focused, a range input only for the keyboard — and a select
-   trigger and an editable combobox field end up identical in every state: neither looks ringed at
-   rest, both look ringed the moment either is used, and both lose it together. `groupFocusRing`
-   draws it from the wrapping control instead of the track it contains. */
+   *visible* descendant focus, which Search and Slider use for their composite anatomy.
+   `groupFocusRing` draws it from the wrapping control instead of the track it contains. */
 export const focusRing =
   "focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-sherick-focus focus-visible:outline-offset-[3px]";
 
@@ -81,11 +78,9 @@ export const focusRingHeld =
   "focus:outline-none focus:outline focus:outline-2 focus:outline-sherick-focus focus:outline-offset-[3px] data-[popup-open]:outline data-[popup-open]:outline-2 data-[popup-open]:outline-sherick-focus data-[popup-open]:outline-offset-[3px]";
 
 /* The same ring for a value control whose focus lives in a borderless input inside it. It follows
-   **visible** focus rather than any focus, which is what makes a field and a slider differ for
-   the platform's reasons instead of by local say-so: a text field is `:focus-visible` whenever it
-   is focused, so a combobox or search field wears the ring the moment it is used, while a range
-   input is `:focus-visible` only for the keyboard, so a slider's handle saves its ring for the
-   keyboard and lets its own engagement answer the pointer. */
+   **visible** focus rather than any focus, which is what makes a text field and a slider differ
+   for the platform's reasons instead of by local say-so: a search input is `:focus-visible`
+   whenever it is focused, while a range input reserves visible focus for the keyboard. */
 export const focusRingWithin =
   "has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-sherick-focus has-[:focus-visible]:outline-offset-[3px]";
 
@@ -401,14 +396,6 @@ export const density = {
   prominent: "min-h-14 text-lg",
   /* Minimum interactive target for an icon-only control that stands on its own. */
   target: "min-h-11 min-w-11",
-  /* A control that is one part of a composite field — the trailing controls a Combobox owns. It
-     keeps the floor's height, because it has to sit in the field's row, and takes only the width
-     its glyph needs: the two of them are gripped as one cluster at the field's edge, and two full
-     squares there read as two controls beside a field rather than as parts of it.
-     The narrower step still clears the 24px pointer-target minimum WCAG AA asks for. It is below
-     this system's own 44px floor on purpose: that floor belongs to a control that is the whole
-     target of its own action, and this one is a part of a field the pointer is already in. */
-  part: "min-h-11 min-w-9",
 } as const;
 
 /* Stacking level — where anything that floats sits relative to the application.
@@ -439,7 +426,7 @@ export const stacking = {
 export const overlay = {
   /* The plane behind a surface that owns the viewport. */
   scrim: /* @__PURE__ */ cx("fixed inset-0", stacking.float, "bg-sherick-scrim/[0.38] backdrop-blur-[var(--sui-scrim-blur)]"),
-  /* An anchored surface with room to breathe: a selection list (Select, Combobox) or
+  /* An anchored surface with room to breathe: a selection list (Select) or
      structured content (Popover). It grows out of its trigger and carries the softer
      surface corner, because what it holds is read rather than scanned.
      When not to use it: a short list of commands wants `menu`, and a hint wants
@@ -498,8 +485,8 @@ export const detail = {
 } as const;
 
 /* A list surface — the sheet a collection of rows sits in, and the two row densities it can
-   hold. Select, Combobox and Menu all compose these, so an option and a command are the same
-   object at two densities instead of three independent designs.
+   hold. Select and Menu both compose these, so an option and a command are the same object at
+   two densities instead of two independent designs.
 
    The sheet never exceeds what the viewport leaves it, and scrolls inside itself rather than
    growing. Its width is the list's own decision: a control's list is never narrower than the

@@ -9,7 +9,6 @@ import {
   Chip,
   ChipGroup,
   Collapsible,
-  Combobox,
   Dialog,
   Drawer,
   Field,
@@ -46,16 +45,6 @@ const regionOptions = [
   { value: "apac", label: "Asia Pacific", disabled: true },
 ];
 
-const languageOptions = [
-  { label: "TypeScript", value: "ts" },
-  { label: "Rust", value: "rust" },
-  { label: "COBOL", value: "cobol", disabled: true },
-];
-
-const teamOptions = [
-  { label: "Platform", value: "platform" },
-  { label: "Design", value: "design" },
-];
 export default function VerificationInteractionsPage() {
   const [query, setQuery] = useState("initial");
   const [lastSearch, setLastSearch] = useState("");
@@ -71,8 +60,6 @@ export default function VerificationInteractionsPage() {
   const [popoverReason, setPopoverReason] = useState("");
   const [popoverOwner, setPopoverOwner] = useState("");
   const [menuAction, setMenuAction] = useState("");
-  const [comboboxValue, setComboboxValue] = useState<string | null>("design");
-  const [comboboxFormResult, setComboboxFormResult] = useState("");
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertOutcome, setAlertOutcome] = useState("");
   const [filters, setFilters] = useState<string[]>(["design"]);
@@ -335,62 +322,6 @@ export default function VerificationInteractionsPage() {
           <span data-testid="menu-action">{menuAction}</span>
         </div>
 
-        <Field label="Combobox project" description="Search or pick from the list.">
-          <Combobox
-            options={projectOptions}
-            value={comboboxValue}
-            onValueChange={setComboboxValue}
-          />
-        </Field>
-        <p data-testid="combobox-value">{comboboxValue ?? ""}</p>
-
-        <Field label="Combobox language" description="Some options cannot be chosen." error="Pick a language." required>
-          <Combobox options={languageOptions} required />
-        </Field>
-
-        <Field label="Disabled combobox">
-          <Combobox options={projectOptions} defaultValue="design" disabled />
-        </Field>
-
-        <Field label="Locked combobox" disabled>
-          <Combobox options={projectOptions} defaultValue="design" />
-        </Field>
-
-        {/* Read-only is not disabled: the value cannot change, but the list still opens and
-            browses — only clearing is unavailable. */}
-        <Field label="Read-only combobox">
-          <Combobox options={projectOptions} defaultValue="design" readOnly />
-        </Field>
-
-        <form
-          className="flex flex-wrap items-end gap-4"
-          onSubmit={(event) => {
-            event.preventDefault();
-            const data = new FormData(event.currentTarget);
-            setComboboxFormResult(
-              [...data.entries()]
-                .map(([key, value]) => `${key}=${String(value)}`)
-                .sort()
-                .join("&")
-            );
-          }}
-        >
-          <Field label="Combobox team" description="Submitted through the control's own hidden input.">
-            <Combobox name="team" options={teamOptions} defaultValue="platform" />
-          </Field>
-          <Button type="submit">Submit combobox</Button>
-        </form>
-        <p data-testid="combobox-form-result">{comboboxFormResult}</p>
-
-        {/* Base's combobox root drops props it does not destructure, so `id` has to reach the
-            input for a native `<label htmlFor>` to name the control. */}
-        <div className="flex flex-col gap-2">
-          <label htmlFor="combobox-by-id" className="text-sm font-medium">
-            Combobox by id
-          </label>
-          <Combobox id="combobox-by-id" options={projectOptions} />
-        </div>
-
         <div className="flex flex-wrap items-center gap-4">
           <Menu>
             <Menu.Trigger
@@ -491,9 +422,6 @@ export default function VerificationInteractionsPage() {
                 options={projectOptions}
                 defaultValue="design"
               />
-              <Field label="Dialog combobox">
-                <Combobox options={projectOptions} defaultValue="design" />
-              </Field>
               <Tooltip content="Helpful context">
                 <Button appearance="text">Help</Button>
               </Tooltip>

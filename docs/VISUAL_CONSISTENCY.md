@@ -23,12 +23,12 @@ coverage, not an exhaustive Cartesian product of every prop, theme and viewport.
 | Catalog band | Reviewed components |
 | --- | --- |
 | Actions | Button, IconButton; text/tonal/filled, icon/loading/disabled and size specimens |
-| Fields | Field, Input, Textarea, Search, NumberField, Select, Combobox |
+| Fields | Field, Input, Textarea, Search, NumberField, Select |
 | Selection and navigation | Checkbox, RadioGroup, Switch, Slider, Chip, ChipGroup, ToggleGroup, SegmentedControl, Tabs, NavItem, NavGroup |
 | Feedback | Alert, Progress, Spinner, Skeleton, ToastProvider/ToastViewport and toast actions |
 | Disclosure | Accordion, Collapsible, their open content, disabled rows and dividers |
 | Display and content | Card, Badge, Avatar, Table, Divider, CodeBlock, Markdown |
-| Floating | Tooltip, Menu, Popover, Dialog, AlertDialog, Drawer on all four sides; Select and Combobox lists |
+| Floating | Tooltip, Menu, Popover, Dialog, AlertDialog, Drawer on all four sides; Select lists |
 
 Local before/after artifacts from this review are under `/tmp/sherick-polish/before/` and
 `/tmp/sherick-polish/settled/`. These are disposable review evidence, not repository fixtures.
@@ -169,6 +169,6 @@ packed-tarball consumer verification, the deterministic style contract, and both
 
 The polish/verification gate was green, but it was **not stable-release clearance**. Phase D later
 resolved the CodeBlock server/client Prism hydration mismatch and added Firefox/WebKit gate coverage.
-The Base UI open editable Combobox isolation defect remains the stable-release blocker; its current
-evidence and exact release condition live in `RELEASE.md`. The counts above are the point-in-time
-Phase B evidence, not the current Phase E gate totals. No package was published in this phase.
+Final release work removed the editable Combobox whose Base UI popup isolation was the remaining
+stable blocker. The counts above are point-in-time Phase B evidence, not the current release-gate
+totals. No package was published in this phase.

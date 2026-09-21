@@ -57,6 +57,9 @@ test("nested Select consumes Escape before Dialog", async ({ page, errors }) => 
   const option = page.getByRole("option", { name: "Design system" });
   await expect(option).toBeVisible();
   expect(await isTopmost(option), "a popup opened from inside a dialog must sit above it").toBe(true);
+  await page.keyboard.press("Escape");
+  await expect(option).toHaveCount(0);
+  await expect(dialog).toBeVisible();
 
   /* A tooltip belongs to the dialog it was opened in, so it has to clear the dialog too. */
   await page.getByRole("button", { name: "Help" }).hover();
@@ -66,6 +69,9 @@ test("nested Select consumes Escape before Dialog", async ({ page, errors }) => 
   /* Park the pointer so the hint is gone before the dismissal order is exercised. */
   await page.mouse.move(2, 2);
   await expect(tooltip).toHaveCount(0);
+
+  await select.click();
+  await expect(option).toBeVisible();
 
   await page.keyboard.press("Escape");
   await expect(page.getByRole("option", { name: "Design system" })).toHaveCount(0);
@@ -77,13 +83,9 @@ test("nested Select consumes Escape before Dialog", async ({ page, errors }) => 
   expect(errors).toEqual([]);
 });
 
-test("a combobox names itself through `id`, and its callbacks keep Base's event details", async ({ page, errors }) => {
+test("public callbacks keep Base's event details", async ({ page, errors }) => {
   await page.goto("/verification/interactions");
 
-  /* Base drops props it does not destructure, so `id` only names the control if the component
-     forwards it to the input a native label can reach. */
-  const byId = page.getByRole("combobox", { name: "Combobox by id" });
-  await expect(byId).toHaveAttribute("id", "combobox-by-id");
 
   /* And a public callback is Base's callback: the event details arrive with the value. */
   await page.getByRole("button", { name: "Open popover" }).click();

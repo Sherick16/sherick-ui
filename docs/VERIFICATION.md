@@ -49,7 +49,8 @@ Both consume `sherick-ui` through package exports after the library build.
 - complete light/dark/system token output;
 - system dark and explicit dark generated from the same canonical values;
 - public `styles.css` / `theme.css` exports;
-- the canonical root export set, the absence of the removed aliases, and the `sherick-ui/content` boundary;
+- the canonical root export set, the absence of removed aliases and the removed prerelease
+  Combobox API, and the `sherick-ui/content` boundary;
 - absence of the old Tailwind preset/peer contract;
 - no Tailwind preflight/global element reset;
 - no `!important` in published package CSS;
@@ -216,9 +217,6 @@ The showcase browser suite also verifies:
 - a disabled collection row: navigation still reaches it and it still shows the highlight, while a
   held pointer press leaves its state layer exactly where hovering had left it — measured on the
   rendered `::before`, against an enabled row whose press does add a step;
-- a Combobox that is read-only (browsable, clear unavailable) and one disabled both by its own prop
-  and by the `Field` around it (both trailing parts marked and unavailable), since those parts
-  style themselves from the primitive's own markers;
 - a disclosure group (`disclosure.spec.ts`): the row is a button inside a heading, the region is
   reached through the role and the name it publishes, single-open closes the section before it, a
   disabled section stays closed, and the group's own `Divider` is inset to the band the row and the
@@ -278,9 +276,9 @@ because the subject is a physical contract rather than a pixel:
 - **a stable boundary stays still** — a checkbox box and a radio circle have byte-identical
   bounding boxes before, during and after the pointer press that changes what is inside them;
 - **a press really moves a control** — a full control compresses 4% of its own width under the
-  pointer, a compact control inside a larger target 12%, and a composite field 4% when one of its
-  own controls is pressed; and a field does not move at all while it is typed in or focused;
-- **the anchored family shares one entrance** — `Select`, `Combobox`, `Menu` and `Popover` are
+  pointer, a compact control inside a larger target 12%, and a Select field wrapper 4% when its
+  trigger is pressed;
+- **the anchored family shares one entrance** — `Select`, `Menu` and `Popover` are
   compared field by field at frame 0 of their own transitions: starting scale, travel, resolved
   side, transform origin, duration and curve. The starting geometry is read by pausing the
   transition and seeking it to zero, because a running animation outranks the cascade. A tooltip
@@ -299,10 +297,6 @@ because the subject is a physical contract rather than a pixel:
 - **a drag is never interpolated** — a slider handle's transition list contains its positional
   property while a step settles and does not contain it while the pointer owns the position,
   with the handle centre measured against the pointer;
-- **`Select` and `Combobox` agree** — the same trigger tactility, the same orientation recipe on
-  the chevron, the same anchored presence on the popup and the same arrival on the selected
-  mark, and filtering a list replaces its rows with no transform, height or opacity
-  choreography;
 - **consumer triggers are untouched** — a plain `<button>` handed to `Popover`/`Menu` as a
   trigger gains no authored motion before or after the surface opens;
 - **every tooltip edge resolves** — top, right, bottom and left each report their own resolved
@@ -370,39 +364,10 @@ tree below it has run its effects, which React flushes parent-last — and not f
 selector such as `[aria-labelledby]`, which any unrelated component on the page can satisfy while
 the component under test is still bare. The wait is the state, not a timeout.
 
-**One combination is asserted directly instead of scanned, and it is a demonstrated upstream
-gap.** With an editable Combobox's listbox open, axe reports `aria-hidden-focus` — 37 nodes on the
-interactions fixture — because the page around the popup is marked `aria-hidden` while remaining
-focusable.
-
-Where it comes from, read from the installed Base UI rather than inferred:
-
-- a Combobox that renders its `Input` **outside** the popup (the editable combobox pattern this
-  package uses) gets `initialFocus: false` from Base's own default, because focus has to stay in the
-  input so typing keeps working (`combobox/popup/ComboboxPopup.mjs`, `computedDefaultInitialFocus`);
-- that makes `isUntrappedTypeableCombobox` true, and Base's floating focus manager then passes
-  `ariaHidden: modal || isUntrappedTypeableCombobox` — i.e. `true` regardless of `modal`
-  (`floating-ui-react/components/FloatingFocusManager.mjs`);
-- the same condition is what *skips* the focus guards ("guards are not rendered, but `aria-hidden`
-  is still applied"), so the page outside is hidden from assistive technology while focus is still
-  free to leave the popup;
-- Base's `markOthers` **supports** an `inert` option; `FloatingFocusManager` never passes it.
-
-So the missing `inert` is Base's to add. It cannot be fixed from here without changing what the
-component is: the two shapes that avoid it are a combobox whose input renders *inside* the popup
-(a different control anatomy, and a different visual contract) or one that hands focus to the popup
-(which stops the field being editable while open). `@base-ui/react@1.8.0` is the latest published
-version and there is no newer dist-tag, so there is no dependency update to take either.
-
-The state is therefore covered by **direct behavioural assertions** — `role="listbox"`,
-`role="option"`, `aria-selected`, `aria-disabled`, the input's `aria-activedescendant`, and the
-active row's own highlight — while the *closed* Combobox runs the full axe scan over the same
-control and its `Field` label, description and error relationships, and a modal Menu, an open
-AlertDialog and a Select opened inside a dialog are all scanned in their open states.
-
-**Those assertions are not equivalent to scanning the open state**, and they are not recorded as if
-they were. It remains a dependency risk to settle before the stable `2.0.0`: an upstream fix, or an
-explicit decision that an open listbox may hide the rest of the page from assistive technology.
+The former open-editable-Combobox scan exception is gone. The affected prerelease component was
+removed from the public contract, fixtures and browser suites before `2.0.0`; `RELEASE.md` records
+the reproduced Base UI defect and the decision. No direct behavioural assertion substitutes for an
+axe scan of a public open state.
 
 **No rule is excluded.** The scan runs the WCAG A/AA tag set as it is
 (`wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa`), `color-contrast` included, and it is the contrast
@@ -442,7 +407,7 @@ styling change cannot silently satisfy them by shifting pixels.
 The Vite fixture verifies:
 
 - representative components render with package CSS alone;
-- Dialog, Select, Tooltip, Popover, Menu, Combobox and AlertDialog remain styled through portals;
+- Dialog, Select, Tooltip, Popover, Menu and AlertDialog remain styled through portals;
 - rich-content/KaTeX styling and fonts are present;
 - theme variables load;
 - a deliberately Tailwind-looking consumer element (`flex absolute rounded-full px-6 text-sm`) remains untouched, proving generic package utilities do not leak globally.

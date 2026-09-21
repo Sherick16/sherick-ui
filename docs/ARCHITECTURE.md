@@ -107,7 +107,7 @@ Base UI owns generic widget mechanics; Sherick UI exposes a small opinionated AP
 **Two field composition forms are intentional.** `Input` and `Textarea` retain their convenience
 `label` / `description` / `error` props and compose `Field.Root` internally. `Search` also composes a
 field internally because its submit control is part of one composite input. Selection and value
-controls (`Checkbox`, `Slider`, `NumberField`, `Select`, `Combobox`) compose through the exported
+controls (`Checkbox`, `Slider`, `NumberField`, `Select`) compose through the exported
 `Field`, so consumers can place those controls in the same label/description/error anatomy. Both
 forms render Base Field parts and produce the same ARIA relationships. The convenience props and
 the exported `Field` composition are both part of the stable `2.x` contract; neither is a pending

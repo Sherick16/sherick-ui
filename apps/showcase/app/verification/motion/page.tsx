@@ -6,7 +6,6 @@ import {
   AlertDialog,
   Button,
   Checkbox,
-  Combobox,
   Dialog,
   Field,
   IconButton,
@@ -100,17 +99,14 @@ export default function MotionLabPage() {
           ))}
         </div>
 
-        {/* The family that has to read as one physical idea: the same presence, five triggers. */}
+        {/* The family that has to read as one physical idea: the same presence, four triggers. */}
         <Specimen
           intent="anchored family"
-          note="The surface grows out of the anchor edge the primitive resolved. Compare Select with Combobox, and Menu with Popover."
+          note="The surface grows out of the anchor edge the primitive resolved. Compare Select, Menu, Popover and Tooltip."
         >
           <div className="grid w-full gap-6 sm:grid-cols-2">
             <Field label="Select">
               <Select options={options} defaultValue="design" />
-            </Field>
-            <Field label="Combobox">
-              <Combobox options={options} defaultValue="design" />
             </Field>
             <Field label="Menu">
               <Menu>
@@ -197,9 +193,7 @@ export default function MotionLabPage() {
         </Specimen>
 
         <Specimen intent="orient" note="A persistent affordance turns in place — the only rotation in the library.">
-          <p className="text-sm text-sherick-ink-muted">
-            Both chevrons above turn; open the Select and the Combobox to compare them.
-          </p>
+          <p className="text-sm text-sherick-ink-muted">Open the Select to watch its chevron turn.</p>
         </Specimen>
 
         <Specimen intent="relocate" note="A persistent object travels between stable destinations.">

@@ -9,7 +9,6 @@ import {
   Checkbox,
   Chip,
   ChipGroup,
-  Combobox,
   Dialog,
   Field,
   Menu,
@@ -149,9 +148,6 @@ export default function ThemeTorturePage() {
           </Popover.Content>
         </Popover>
 
-        <Field label="Torture combobox">
-          <Combobox options={options} defaultValue="alpha" />
-        </Field>
 
         <Button appearance="filled" variant="danger" onClick={() => setAlertOpen(true)}>
           Open torture alert

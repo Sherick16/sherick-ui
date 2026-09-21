@@ -12,7 +12,6 @@ import {
   Chip,
   ChipGroup,
   Collapsible,
-  Combobox,
   Dialog,
   Divider,
   Drawer,
@@ -184,9 +183,6 @@ function App() {
             <Menu.Item variant="danger">Delete</Menu.Item>
           </Menu.Content>
         </Menu>
-        <Field label="Portaled combobox">
-          <Combobox options={options} defaultValue="design" />
-        </Field>
       </section>
 
       <section className="section">
@@ -253,9 +249,6 @@ function App() {
         <Dialog.Description>Portaled styles must remain scoped and complete.</Dialog.Description>
         <Dialog.Content>
           <Select aria-label="Dialog project type" options={options} defaultValue="design" />
-          <Field label="Dialog combobox">
-            <Combobox options={options} defaultValue="design" />
-          </Field>
         </Dialog.Content>
         <Dialog.Footer>
           <Button appearance="filled" onClick={() => setDialogOpen(false)}>
