@@ -189,3 +189,91 @@ test("focused composite fields keep their engaged tone under the pointer", async
     expect(await css(row, "background-color")).toBe(focused);
   }
 });
+
+test("date text stays still and only the inset calendar affordance presses", async ({ page }) => {
+  for (const reducedMotion of ["no-preference", "reduce"] as const) {
+    await page.emulateMedia({ reducedMotion });
+    for (const name of ["Date", "Start", "End"]) {
+      const input = page.getByLabel(name, { exact: true });
+      const row = input.locator("xpath=ancestor::div[contains(@class, 'rounded-')][1]");
+      const trigger = page.getByRole("button", { name: `Open ${name}`, exact: true });
+      await input.scrollIntoViewIfNeeded();
+      const before = (await row.boundingBox())!;
+      await input.hover({ position: { x: 24, y: 20 } });
+      await page.mouse.down();
+      try {
+        // Sample held frames: text entry must never inherit the popup button's compression.
+        const transforms = await row.evaluate(element => new Promise<string[]>(resolve => {
+          const values: string[] = [];
+          const frame = () => {
+            values.push(getComputedStyle(element).transform);
+            if (values.length === 8) resolve(values); else requestAnimationFrame(frame);
+          };
+          requestAnimationFrame(frame);
+        }));
+        expect(new Set(transforms)).toEqual(new Set(["none"]));
+        expect((await row.boundingBox())!.width).toBeCloseTo(before.width, 1);
+        await expect(page.getByRole("dialog")).toHaveCount(0);
+      } finally { await page.mouse.up(); }
+      await trigger.hover();
+      const geometry = await trigger.evaluate(element => {
+        const box = element.getBoundingClientRect();
+        const layer = getComputedStyle(element, "::before");
+        return { width: box.width, height: box.height, layerWidth: parseFloat(layer.width), layerHeight: parseFloat(layer.height), top: parseFloat(layer.top), bottom: parseFloat(layer.bottom) };
+      });
+      expect(geometry.width).toBeGreaterThanOrEqual(36);
+      expect(geometry.height).toBeGreaterThanOrEqual(44);
+      expect(geometry.layerWidth).toBe(32);
+      expect(geometry.layerHeight).toBe(32);
+      expect(geometry.top).toBe(geometry.bottom);
+      const ink = trigger.locator("svg");
+      const width = (await ink.boundingBox())!.width;
+      await page.mouse.down();
+      try {
+        if (reducedMotion === "no-preference") {
+          await expect.poll(async () => (await ink.boundingBox())!.width).toBeLessThan(width - 1);
+        } else {
+          expect((await ink.boundingBox())!.width).toBeCloseTo(width, 1);
+        }
+        expect(await css(row, "transform")).toBe("none");
+        expect((await trigger.boundingBox())!.height).toBeCloseTo(geometry.height, 2);
+      } finally { await page.mouse.up(); }
+      await expect(page.getByRole("dialog")).toBeVisible();
+      await page.keyboard.press("Escape");
+      await expect(page.getByRole("dialog")).toHaveCount(0);
+      await expect(trigger).toBeFocused();
+    }
+  }
+});
+
+test("pagination and step tracks match the existing segmented and progress families", async ({ page }) => {
+  const pages = page.getByRole("navigation", { name: "Pages", exact: true });
+  const segments = page.getByLabel("Reference segments", { exact: true });
+  const tabs = page.getByRole("tablist", { name: "Reference tabs" });
+  const selected = pages.locator('[aria-current="page"]');
+  const segment = segments.getByRole("button", { name: "Two", exact: true });
+  for (const theme of ["light", "dark"]) {
+    await page.evaluate(value => { document.documentElement.dataset.sherickTheme = value; }, theme);
+    for (const property of ["background-color", "box-shadow"]) {
+      expect(await css(pages.getByRole("list"), property)).toBe(await css(segments, property));
+      expect(await css(pages.getByRole("list"), property)).toBe(await css(tabs, property));
+      expect(await css(selected, property)).toBe(await css(segment, property));
+    }
+    expect(await css(selected, "border-radius")).toBe(await css(segment, "border-radius"));
+    const workflow = page.getByRole("navigation", { name: "Workflow" });
+    const track = workflow.locator("[data-sui-step-track]").first();
+    const progress = page.getByRole("progressbar");
+    const progressTrack = progress.locator("[data-sui-progress-indicator]").locator("..").locator("..");
+    for (const property of ["height", "background-color", "box-shadow", "border-radius"]) {
+      expect(await css(track, property)).toBe(await css(progressTrack, property));
+    }
+    const fill = workflow.locator('[aria-current="step"] [data-sui-progress-indicator]');
+    expect(await css(fill, "background-color")).toBe(await css(progress.locator("[data-sui-progress-indicator]"), "background-color"));
+  }
+  const target = pages.getByRole("button", { name: "Page 3", exact: true });
+  const before = await css(target, "box-shadow");
+  await target.focus();
+  expect(await css(target, "box-shadow")).not.toBe(before);
+  await page.keyboard.press("Enter");
+  await expect(target).toHaveAttribute("aria-current", "page");
+});

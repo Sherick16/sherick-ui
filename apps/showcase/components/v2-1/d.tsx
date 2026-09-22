@@ -3,12 +3,10 @@
 import { useEffect, useState } from "react";
 import { FileUpload } from "sherick-ui";
 
-/* At rest, holding a selection under limits, disabled, and invalid. */
+/* Native selection, selected attachments, disabled and invalid fields. */
 
 const build = (name: string, type: string, bytes: number) =>
   new File([new Uint8Array(bytes)], name, { type, lastModified: 1 });
-
-const caption = "text-xs leading-5 text-sherick-ink-muted";
 
 export default function FileUploadSpecimen() {
   const [attachments, setAttachments] = useState<File[]>([]);
@@ -30,17 +28,14 @@ export default function FileUploadSpecimen() {
       <div className="flex flex-col gap-3">
         <FileUpload
           label="Design brief"
-          description="One PDF, up to 2 MB."
           accept=".pdf"
           maxSize={2 * 1024 * 1024}
         />
-        <p className={caption}>At rest · single file</p>
       </div>
 
       <div className="flex flex-col gap-3">
         <FileUpload
           label="Attachments"
-          description="Two files, up to 1 MB each."
           multiple
           accept=".pdf,image/*"
           maxSize={1024 * 1024}
@@ -50,7 +45,6 @@ export default function FileUploadSpecimen() {
           files={attachments}
           onFilesChange={setAttachments}
         />
-        <p className={caption}>Holding a selection · multiple, with limits</p>
       </div>
 
       <div className="flex flex-col gap-3">
@@ -62,7 +56,6 @@ export default function FileUploadSpecimen() {
           files={locked}
           onFilesChange={setLocked}
         />
-        <p className={caption}>Disabled · every path closed</p>
       </div>
 
       <div className="flex flex-col gap-3">
@@ -72,7 +65,6 @@ export default function FileUploadSpecimen() {
           error="Attach the signed contract."
           accept=".pdf"
         />
-        <p className={caption}>Invalid · its own error</p>
       </div>
     </div>
   );

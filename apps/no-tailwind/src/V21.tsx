@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {
   Breadcrumb, Button, Calendar, Command, CommandPalette, DatePicker, DateRangePicker,
-  DirectionProvider, FileUpload, Pagination, Stepper, TreeView,
+  DirectionProvider, FileUpload, Pagination, Progress, SegmentedControl, Stepper, Tabs, TreeView,
 } from "sherick-ui";
 
 const commands = [
@@ -33,6 +33,13 @@ export default function V21() {
         items={[{ value: "draft", label: "Draft", complete: true }, { value: "review", label: "Review" }]} />
       <TreeView label="Tree" defaultExpandedValues={["root"]}
         items={[{ value: "root", label: "Root", children: [{ value: "child", label: "Child" }] }]} />
+      <SegmentedControl aria-label="Reference segments" defaultValue="two"
+        options={[{ value: "one", label: "One" }, { value: "two", label: "Two" }]} />
+      <Tabs ariaLabel="Reference tabs" defaultValue="two" tabs={[
+        { id: "one", label: "One", content: "First panel" },
+        { id: "two", label: "Two", content: "Second panel" },
+      ]} />
+      <Progress label="Reference progress" value={60} />
     </div>
   </main></DirectionProvider>;
 }

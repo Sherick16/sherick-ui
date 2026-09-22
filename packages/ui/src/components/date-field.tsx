@@ -5,7 +5,7 @@ import { CalendarDays } from "lucide-react";
 import React, { useEffect, useRef, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import { density, focusRingWithin, material, overlay, shape, stacking, state, stateLayer, text } from "./ui.common";
-import { motionFeedback, motionPresenceAnchored, motionTactile } from "./ui.motion";
+import { motionFeedback, motionInkPress, motionPresenceAnchored } from "./ui.motion";
 
 /* The parts the two date pickers share.
    ====================================
@@ -31,7 +31,7 @@ export const dateFieldRowClassName = (disabled: boolean) =>
     density.normal,
     shape.control,
     material.control,
-    motionTactile,
+    motionFeedback,
     focusRingWithin,
     state.field.invalid,
     !disabled && state.field.hover,
@@ -47,11 +47,9 @@ export const dateFieldRowClassName = (disabled: boolean) =>
 export const dateInputClassName =
   "block w-[calc(100%+2.5rem)] min-w-0 bg-transparent py-3 text-inherit outline-none disabled:cursor-not-allowed";
 
-/* The trailing control of a composite field is a `part`: it keeps the field's row height and
-   takes only the width its glyph needs, because it is gripped as one cluster with the field
-   rather than as a button beside it. Its hover tone is gated on the native disabled state, so a
-   disabled field's trigger answers nothing. */
-const datePartClassName = `inline-flex shrink-0 items-center justify-center ${density.part} ${shape.circle} ${text.medium} [&>svg]:size-5 ${motionFeedback} ${stateLayer.quiet} ${state.enabled} ${state.disabledPart} [&:not([data-disabled]):not(:disabled)]:hover:text-sherick-ink`;
+/* The 36×44 target holds a concentric 32px hover surface, leaving air inside the 48px field.
+   Only the icon presses: the adjacent native text entry never activates this button. */
+const datePartClassName = `group inline-flex h-11 w-9 shrink-0 items-center justify-center ${density.part} ${shape.circle} ${text.medium} ${motionFeedback} ${stateLayer.quiet} before:inset-x-0.5 before:inset-y-1.5 ${state.enabled} ${state.disabledPart} [&:not([data-disabled]):not(:disabled)]:hover:text-sherick-ink`;
 
 export interface DateFieldTriggerProps {
   /** The control's accessible name. It has no visible label, so it has to be named. */
@@ -70,7 +68,9 @@ export const DateFieldTrigger = ({ label, disabled = false }: DateFieldTriggerPr
     disabled={disabled}
     render={<button type="button" aria-label={label} disabled={disabled} className={cn(datePartClassName)} />}
   >
-    <CalendarDays aria-hidden="true" />
+    <span className={cn("inline-flex size-5 items-center justify-center [&>svg]:size-5", !disabled && motionInkPress)}>
+      <CalendarDays aria-hidden="true" />
+    </span>
   </BasePopover.Trigger>
 );
 

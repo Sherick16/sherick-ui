@@ -192,6 +192,8 @@ Exports: `FileUpload`; `FileUploadProps`, `FileRejection`.
   Removing a focused row transfers focus to the next removal or picker. Clear removes all.
   Drag state uses an existing held tone, and disabled disables picker/drop/removal/clear
   with no hover treatment. One opacity step, no fabricated progress.
+  Successful changes are announced to screen readers only, not rendered as a visible log.
+  Rejections stay visible. The clear action uses the secondary tonal Button.
 - Focused evidence: chooser/drop parity, single/multiple/dedupe/reselection, mixed validation,
   max count, controlled rejection, disabled all paths, removal focus/live feedback and narrow
   filenames. No File constructor/read of browser globals during SSR.
@@ -213,8 +215,8 @@ Exports: `Stepper`; `StepperProps`, `StepperItem`.
   Current publishes `aria-current='step'`; complete has a check and accessible Complete
   text; other steps retain their ordered numbers. Current wins over complete visually.
   Disabled is meaningful only for interactive steps, and cannot activate.
-- Horizontal may wrap to avoid overflow; vertical wraps labels/descriptions. Logical
-  alignment/gaps; no giant connecting rail, custom elevation or animation layer.
+- Horizontal steps form one locally scrolling progress sequence; vertical wraps labels/descriptions.
+  Tracks reuse Progress's groove/fill recipes. No implied percentage or automatic completion.
 - Focused evidence: passive vs interactive semantics, current/complete state not color-only,
   disabled actions, controlled rejection, null/unknown current, many/long labels, RTL/narrow.
 - Excluded: validation state machine, panels, automatic completion, wizard forms, error state.
@@ -299,8 +301,9 @@ The wave composes the existing language rather than adding new tokens or recipes
 - Date fields show one calendar affordance. Native date entry is clipped only at its trailing
   browser affordance; the input type, editing, validity and form behavior remain native. Firefox
   exposes no picker-indicator pseudo-element, so a WebKit-only icon rule is insufficient.
-  The whole row receives field hover/focus feedback and tactile press. Base positions the popup
-  against the field (the shared endpoint group for ranges), not the small trailing icon.
+  The row receives non-spatial field hover/focus feedback; only the calendar glyph presses.
+  Its inset 32px hover surface stays inside the 48px field without reducing the 36×44 target.
+  Base positions the popup against the field (the shared endpoint group for ranges).
 - A completed calendar range is one continuous selected-tone band per week, with rounded outer
   endpoints and stronger endpoint text. Single dates and incomplete ranges keep their circular
   mark. The selection and focus targets never move.
@@ -309,15 +312,24 @@ The wave composes the existing language rather than adding new tokens or recipes
   Actions use pointer cursors and nonselectable labels; disabled rows retain Base's discoverable
   highlight without becoming actionable. The palette retains the shared acrylic dialog shell
   but uses a compact header. `placeholder` defaults to “Search commands…” and remains overridable.
-- Pagination groups its destinations on a flat `matteHigh` surface, retains the quieter current
-  navigation tint, and preserves 44px targets. Only number/glyph ink compresses on press.
+- Pagination shares ToggleGroup's recessed track, rounded-rectangle segments and raised selected
+  tint, with 44px targets and directional arrows. It scrolls locally instead of wrapping a
+  single sequence across rows. Only number/glyph ink compresses on press.
   Breadcrumb uses compact navigation typography and explicit native-link decoration ownership.
-- Horizontal steps use equal responsive columns, with a 32px mark above the label; vertical
-  steps align marks to the first line and join them with the existing structural hairline.
-  Descriptions are supporting copy. Neither target bounds nor focus boundaries compress.
-- TreeView and FileUpload already use the intended row/well language. Their visual review does
-  not justify a cosmetic rewrite. Showcase specimens size to content rather than stretching
-  these components into empty neighboring panels; the date family gets room for its grids.
+- Stepper divides Progress's groove into labelled stages, horizontal or vertical. Current has
+  a strong fill, completed a selected tint and check, pending an empty groove. Numbers and labels
+  stay plain text rather than isolated badges. Horizontal descriptions use the full content band;
+  vertical descriptions align beneath their labels. Neither track nor focus boundaries compress.
+  Long sequences scroll locally. Native focus can leave a partially visible target clipped, so
+  Pagination/Stepper use `scrollIntoView({block: 'nearest', inline: 'nearest'})` on focus to reveal
+  the whole target. This does not choose focus, alter Tab order or introduce keyboard handling.
+  A passive or wholly disabled horizontal track is itself keyboard-focusable for native scrolling;
+  passive stages still have no controls and disabled stages still cannot activate.
+- FileUpload is a compact matte chooser/drop row, followed by constraints and selected files.
+  Clear uses a real secondary tonal Button. Screen-reader announcements are visually hidden;
+  validation errors remain visible. Showcase captions no longer narrate internal selection state.
+- TreeView retains its row language. Showcase specimens size to content rather than stretching
+  into empty neighboring panels; the date family gets room for its grids.
 
 Screenshots must be inspected in addition to the deterministic style manifest. Computed classes,
 passing API tests and an updated manifest do not establish that the rendered anatomy is good.

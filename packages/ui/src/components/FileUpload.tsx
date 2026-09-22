@@ -2,7 +2,7 @@
 
 import { Button as BaseButton } from "@base-ui/react/button";
 import { Field } from "@base-ui/react/field";
-import { Upload, X } from "lucide-react";
+import { File as FileIcon, Upload, X } from "lucide-react";
 import React, {
   forwardRef,
   useEffect,
@@ -18,7 +18,6 @@ import { cn } from "@/libs/utils";
 import Button from "./Button";
 import {
   density,
-  elevation,
   fieldLayout,
   focusRingInset,
   focusRingWithin,
@@ -274,8 +273,15 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
       commit([], focus);
     };
 
+    const acceptedTypes = accept?.split(",").map((type) => {
+      const value = type.trim();
+      if (value.startsWith(".")) return value.slice(1).toUpperCase();
+      if (value === "image/*") return "Images";
+      if (value === "application/pdf") return "PDF";
+      return value;
+    }).filter(Boolean).join(", ");
     const hint = [
-      accept ? `Accepts ${accept}` : null,
+      acceptedTypes || null,
       limits.maxSize !== undefined ? `Up to ${formatBytes(limits.maxSize)} per file` : null,
       multiple
         ? limits.maxFiles !== undefined
@@ -286,8 +292,6 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
       .filter((part): part is string => part !== null)
       .join(" · ");
 
-    const status = announcement !== "" || rejections.length > 0;
-
     return (
       <Field.Root
         {...rootProps}
@@ -297,22 +301,17 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
       >
         <Field.Label className={cn("mb-2 text-sm font-medium", text.high)}>{label}</Field.Label>
 
-        {/* The zone is a native label around the picker, so the whole surface opens the chooser
-            with no JavaScript in the path, the keyboard reaches the same control the pointer does,
-            and a disabled picker refuses both the same way. It is the field's only well — sunk by
-            design (`elevation.recessed`) and quiet enough to sit back (`material.matteQuiet`) — and
-            it holds the wide panel corner its own extent allows (`shape.surface`). A file drag over
-            it takes the held tone. */}
+        {/* One compact chooser/drop surface. The native label retains picker and keyboard behavior;
+            the matte fill and quiet state layer make the affordance readable without a large well. */}
         <label
           className={cn(
-            "flex min-w-0 flex-col items-center gap-1.5 px-5 py-6 text-center",
-            shape.surface,
-            material.matteQuiet,
-            elevation.recessed,
+            "flex min-w-0 items-center gap-3 px-4 py-4 text-start",
+            shape.control,
+            material.matteHigh,
             motionFeedback,
             focusRingWithin,
             !disabled && state.enabled,
-            !disabled && stateLayer.tonal,
+            !disabled && stateLayer.quiet,
             !disabled && dragging && tone.selected.primary,
             disabled && state.disabled
           )}
@@ -321,26 +320,20 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
         >
-          {/* A slot fixes the mark's box: the icon cannot change the zone's geometry. */}
           <span
-            className={cn(
-              "inline-flex size-5 shrink-0 items-center justify-center [&>svg]:size-5",
-              text.medium
-            )}
+            className={cn("inline-flex size-5 shrink-0 items-center justify-center [&>svg]:size-5", text.medium)}
             aria-hidden="true"
           >
             <Upload />
           </span>
-
-          <span className={cn("text-sm font-medium", text.high)}>
-            {dragging ? (multiple ? "Drop files here" : "Drop the file here") : selectLabel}
-          </span>
-
-          {hint && (
-            <span id={hintId} className={cn("text-xs leading-5", text.medium)}>
-              {hint}
+          <span className={cn("flex min-w-0 flex-col gap-1")}>
+            <span className={cn("text-sm font-medium", text.high)}>
+              {dragging ? (multiple ? "Drop files here" : "Drop the file here") : selectLabel}
             </span>
-          )}
+            <span className={cn("text-xs leading-5", text.medium)}>
+              {multiple ? "or drag and drop files" : "or drag and drop a file"}
+            </span>
+          </span>
 
           {/* Uncontrolled by design, and never assigned a value: the selection is the component's
               own state, and the picker is only a way to ask the platform for files. */}
@@ -356,6 +349,12 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
           />
         </label>
 
+        {hint && (
+          <span id={hintId} className={cn("mt-2 text-xs leading-5", text.medium)}>
+            {hint}
+          </span>
+        )}
+
         {selected.length > 0 && (
           <div className={cn("mt-3 flex min-w-0 flex-col gap-2")}>
             <ul role="list" className={cn("m-0 flex min-w-0 list-none flex-col gap-1.5 p-0")}>
@@ -364,19 +363,18 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                 return (
                   <li
                     key={key}
-                    /* One selected file per row, on the quiet matte step: the list reports what was
-                       chosen and must not compete with the zone that chose it. A row that can wrap
-                       still places its removal control on the first readable line — the 44px target
-                       is offset by the difference between its own height and that line's, so its
-                       ink sits at the row's own end padding. */
+                    /* Filenames and dismissal align to the first line even when a name wraps. */
                     className={cn(
-                      "flex min-w-0 items-start gap-2 px-3 py-2",
+                      "flex min-w-0 items-start gap-3 px-3 py-3",
                       shape.control,
                       material.matteQuiet,
                       text.high,
                       motionFeedback
                     )}
                   >
+                    <span aria-hidden="true" className={cn("inline-flex h-6 w-5 shrink-0 items-center [&>svg]:size-5", text.medium)}>
+                      <FileIcon />
+                    </span>
                     <span className={cn("min-w-0 flex-1 text-sm leading-6 [overflow-wrap:anywhere]")}>
                       {file.name}
                     </span>
@@ -414,7 +412,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
               <Button
                 ref={clearRef}
                 type="button"
-                appearance="text"
+                appearance="tonal"
                 variant="secondary"
                 size="sm"
                 disabled={disabled}
@@ -438,10 +436,10 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
           </Field.Error>
         ) : null}
 
-        {/* Mounted whether or not it holds anything, so the region exists before its content
-            changes. It reports what the selection became — and every failure with its file. */}
-        <div role="status" className={cn(status && "mt-2 flex flex-col gap-1 text-xs leading-5")}>
-          {announcement !== "" && <span className={cn(text.medium)}>{announcement}</span>}
+        {/* Selection changes are live feedback for screen readers, not a visible activity log.
+            Rejections remain visible and are announced in the same mounted region. */}
+        <div role="status" className={cn(rejections.length > 0 && "mt-2 flex flex-col gap-1 text-xs leading-5")}>
+          {announcement !== "" && <span className={cn("sr-only")}>{announcement}</span>}
           {rejections.length > 0 && (
             <span key={attempt} className={cn("text-sherick-danger")}>
               {rejections.map((rejection) => rejection.message).join(" ")}

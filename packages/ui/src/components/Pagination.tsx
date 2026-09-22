@@ -1,15 +1,16 @@
 "use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import {
   forwardRef,
   useState,
   type ComponentPropsWithoutRef,
+  type FocusEvent,
   type MouseEvent,
   type ReactNode,
 } from "react";
 import { cn, cx } from "@/libs/utils";
-import { density, focusRing, material, shape, state, stateLayer, text, tone } from "./ui.common";
+import { density, elevation, focusRingInset, selectable, shape, state, stateLayer, text, tone } from "./ui.common";
 import { motionFeedback, motionInkPress } from "./ui.motion";
 
 export interface PaginationProps
@@ -77,20 +78,22 @@ const boundedItems = (count: number, current: number, siblings: number): Paginat
   return items;
 };
 
-/* One control at two proportions. A page is as wide as its own number, so it takes the role a
-   control whose width follows its content takes; a step is a square icon target, which is the role
-   `IconButton` gives every icon-only control. Both hold the accessible target floor — the two steps
-   are icon-only controls standing on their own, and a numbered page keeps the same height so the row
-   reads as one object — and both answer the pointer through the quiet layer every navigation surface
-   uses. A page stays flat: it is a destination that is read, not an object that is lifted. */
+/* Numbered segments share the recessed-track / raised-selection anatomy of ToggleGroup.
+   Native navigation still owns behavior; stable targets press only their number or arrow. */
 const controlBase = /* @__PURE__ */ cx(
   "inline-flex shrink-0 select-none items-center justify-center text-sm tabular-nums no-underline",
   density.target,
-  focusRing,
+  shape.row,
+  focusRingInset,
   motionFeedback,
   stateLayer.quiet,
-  text.high
+  text.medium
 );
+
+/* Native focus can leave a partly visible target clipped in a scrolling track. Reveal the
+   focused page with the platform primitive; tab order and focus remain entirely native. */
+const revealPage = (event: FocusEvent<HTMLElement>) =>
+  event.currentTarget.scrollIntoView({ block: "nearest", inline: "nearest" });
 
 /* A sequence of destinations, so it is a native `nav` around a native ordered list: the reader can
    count where they are in it, and assistive technology reads it as one numbered set rather than as a
@@ -173,8 +176,9 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
             <a
               href={href}
               aria-label={label}
-              className={cn(controlBase, "group", shape.circle, controlState(onBoundary))}
+              className={cn(controlBase, "group", controlState(onBoundary))}
               onClick={(event) => activateFromAnchor(event, page)}
+              onFocus={revealPage}
             >
               <span className={cn("inline-flex size-5 items-center justify-center [&>svg]:size-5", motionInkPress)}>{icon}</span>
             </a>
@@ -183,8 +187,9 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
               type="button"
               disabled={onBoundary || disabled}
               aria-label={label}
-              className={cn(controlBase, "group", shape.circle, controlState(onBoundary))}
+              className={cn(controlBase, "group", controlState(onBoundary))}
               onClick={() => activate(page)}
+              onFocus={revealPage}
             >
               <span className={cn("inline-flex size-5 items-center justify-center [&>svg]:size-5", !disabled && !onBoundary && motionInkPress)}>{icon}</span>
             </button>
@@ -207,12 +212,12 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
               aria-label={label}
               className={cn(
                 controlBase,
-                shape.pill,
                 "group px-3",
-                isCurrent && cn(tone.tonal.primary, "font-medium"),
+                isCurrent && cn(tone.selected.primary, elevation.control, "font-medium", !disabled && state.recess),
                 controlState(false)
               )}
               onClick={(event) => activateFromAnchor(event, page)}
+              onFocus={revealPage}
             >
               <span className={cn(motionInkPress)}>{page}</span>
             </a>
@@ -224,12 +229,12 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
               aria-label={label}
               className={cn(
                 controlBase,
-                shape.pill,
                 "group px-3",
-                isCurrent && cn(tone.tonal.primary, "font-medium"),
+                isCurrent && cn(tone.selected.primary, elevation.control, "font-medium", !disabled && state.recess),
                 controlState(false)
               )}
               onClick={() => activate(page)}
+              onFocus={revealPage}
             >
               <span className={cn(!disabled && motionInkPress)}>{page}</span>
             </button>
@@ -254,28 +259,31 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
         {...props}
         ref={ref}
         aria-label={ariaLabel ?? "Pagination"}
-        className={cn("flex min-w-0", disabled && state.disabled, className)}
+        tabIndex={props.tabIndex ?? (disabled ? 0 : undefined)}
+        className={cn(
+          "flex min-w-0 max-w-full overflow-x-auto",
+          disabled && cn(state.disabled, shape.control, focusRingInset),
+          className
+        )}
       >
-        {/* One numbered sequence of controls, so it is a list. `role="list"` restates the element's own
-            role rather than adding one: `list-none`, which removes a marker pagination does not want, is
-            also what makes Safari drop the list semantics. The row wraps rather than overflowing, so a
-            long set stays inside whatever column it was given and the two steps stay reachable. */}
+        {/* Like a segmented track, the sequence scrolls locally instead of breaking across rows.
+            The explicit list role preserves Safari's semantics after list-style is removed. */}
         <ol
           role="list"
-          className={cn("m-0 flex min-w-0 list-none flex-wrap items-center p-1", shape.control, material.matteHigh)}
+          className={cn("m-0 flex min-w-max list-none items-center gap-1 p-1", shape.control, selectable.surface, selectable.rest)}
         >
           {step(
             previousPage,
             previousLabel,
             previousBoundary,
-            <ChevronLeft aria-hidden="true" className={cn("rtl:-scale-x-100")} />
+            <ArrowLeft aria-hidden="true" className={cn("rtl:-scale-x-100")} />
           )}
           {items.map((item) => (typeof item === "number" ? pageControl(item) : gap(item)))}
           {step(
             nextPage,
             nextLabel,
             nextBoundary,
-            <ChevronRight aria-hidden="true" className={cn("rtl:-scale-x-100")} />
+            <ArrowRight aria-hidden="true" className={cn("rtl:-scale-x-100")} />
           )}
         </ol>
       </nav>

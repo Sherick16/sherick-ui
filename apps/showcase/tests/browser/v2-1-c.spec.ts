@@ -258,7 +258,7 @@ test("RTL mirrors the directional glyphs and leaves page identity alone", async 
   expect(errors).toEqual([]);
 });
 
-test("a narrow column wraps both families instead of widening the page", async ({ page, errors }) => {
+test("a narrow column scrolls the page track and wraps the breadcrumb without widening the page", async ({ page, errors }) => {
   await page.setViewportSize(NARROW_VIEWPORT);
   await openFixture(page);
 
@@ -278,23 +278,35 @@ test("a narrow column wraps both families instead of widening the page", async (
   await assertNoPageOverflow(page, "narrow navigation");
 
   const pagination = landmark(page, "Narrow pagination");
-  const boxes = await pagination.getByRole("button").evaluateAll((controls) =>
-    controls.map((control) => {
-      const box = control.getBoundingClientRect();
-      return { left: box.left, right: box.right, top: box.top };
-    })
-  );
+  const boxes = await pagination.getByRole("button").evaluateAll(controls => controls.map(control => {
+    const box = control.getBoundingClientRect();
+    return { top: Math.round(box.top), width: box.width, height: box.height };
+  }));
   expect(boxes.length).toBeGreaterThan(0);
+  expect(new Set(boxes.map(box => box.top)).size).toBe(1);
   for (const box of boxes) {
-    expect(box.left, "a control left the column").toBeGreaterThanOrEqual(container.left - 1);
-    expect(box.right, "a control left the column").toBeLessThanOrEqual(container.right + 1);
+    expect(box.width).toBeGreaterThanOrEqual(44);
+    expect(box.height).toBeGreaterThanOrEqual(44);
   }
-  /* It wraps rather than scrolling: the controls sit on more than one line. */
-  expect(new Set(boxes.map((box) => Math.round(box.top))).size, "the row did not wrap").toBeGreaterThan(1);
+  expect(await pagination.evaluate(element => element.scrollWidth > element.clientWidth)).toBe(true);
+  // Native focus must bring every offscreen target into view in either writing direction.
+  for (const direction of ["ltr", "rtl"]) {
+    await page.evaluate(value => { document.documentElement.dir = value; }, direction);
+    for (const control of await pagination.getByRole("button").all()) {
+      await control.focus();
+      await expect(control).toBeFocused();
+      const bounds = (await pagination.boundingBox())!;
+      const box = (await control.boundingBox())!;
+      expect(box.x).toBeGreaterThanOrEqual(bounds.x - 1);
+      expect(box.x + box.width).toBeLessThanOrEqual(bounds.x + bounds.width + 1);
+    }
+  }
 
   /* The trail yields too: a long label stays inside the column. */
-  const trail = await landmark(page, "Narrow breadcrumb").boundingBox();
-  expect((trail?.x ?? 0) + (trail?.width ?? 0)).toBeLessThanOrEqual(container.right + 1);
+  const trail = (await landmark(page, "Narrow breadcrumb").boundingBox())!;
+  const column = (await narrow.boundingBox())!;
+  expect(trail.x).toBeGreaterThanOrEqual(column.x - 1);
+  expect(trail.x + trail.width).toBeLessThanOrEqual(column.x + column.width + 1);
 
   expect(errors).toEqual([]);
 });
@@ -434,5 +446,20 @@ test("previous and next press the mark without shrinking their targets", async (
   } finally {
     await page.mouse.up();
   }
+  expect(errors).toEqual([]);
+});
+
+test("a disabled page track remains keyboard-scrollable without enabling destinations", async ({ page, errors }) => {
+  await page.setViewportSize(NARROW_VIEWPORT);
+  await openFixture(page);
+  const nav = landmark(page, "Disabled pagination");
+  await expect(nav).toHaveAttribute("tabindex", "0");
+  await nav.focus();
+  await expect(nav).toBeFocused();
+  expect(await nav.evaluate(element => getComputedStyle(element).boxShadow)).not.toBe("none");
+  await page.keyboard.press("ArrowRight");
+  await expect.poll(() => nav.evaluate(element => element.scrollLeft)).toBeGreaterThan(0);
+  for (const target of await nav.getByRole("button").all()) await expect(target).toBeDisabled();
+  await expect(currentPages(nav)).toHaveText("3");
   expect(errors).toEqual([]);
 });

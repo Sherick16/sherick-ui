@@ -72,7 +72,7 @@ test("the field names its picker and describes it with every limit", async ({ pa
 
   await expect(input).toHaveAccessibleName("Single document");
   await expect(input).toHaveAccessibleDescription(/A PDF up to 1 KB, one file\./);
-  await expect(input).toHaveAccessibleDescription(/Accepts \.pdf/);
+  await expect(input).toHaveAccessibleDescription(/PDF/);
   await expect(input).toHaveAccessibleDescription(/Up to 1 KB per file/);
   await expect(input).toHaveAccessibleDescription(/One file/);
 
@@ -461,7 +461,7 @@ test("a long filename wraps inside its row and the removal keeps its full target
   await expect(row).toHaveCount(1);
 
   const geometry = await row.evaluate((element) => {
-    const copy = element.firstElementChild as HTMLElement;
+    const copy = element.querySelector("span:not([aria-hidden])") as HTMLElement;
     const box = element.getBoundingClientRect();
     return {
       lineHeight: parseFloat(getComputedStyle(copy).lineHeight),
@@ -556,4 +556,27 @@ test("the removal mark presses inside an unchanged full-sized target", async ({ 
   expect(during!.height).toBeCloseTo(before!.height, 2);
   await page.mouse.move(0, 0);
   await page.mouse.up();
+});
+
+test("file changes are announced without a visible log; rejection and clear affordances stay visible", async ({ page, errors }) => {
+  await openHarness(page);
+  const field = page.getByTestId("v2-1-d-single");
+  await inputOf(field).setInputFiles(pickerFile("notes.pdf", 16));
+  const status = field.getByRole("status");
+  await expect(status).toContainText("Added 1 file.");
+  const message = status.getByText("Added 1 file.", { exact: true });
+  expect(await message.evaluate(element => getComputedStyle(element).clip)).toBe("rect(0px, 0px, 0px, 0px)");
+  expect((await status.boundingBox())!.height).toBe(0);
+  const clear = field.getByRole("button", { name: "Clear files", exact: true });
+  await expect(clear).toBeVisible();
+  const resting = await clear.evaluate(element => {
+    const css = getComputedStyle(element);
+    return { fill: css.backgroundColor, shadow: css.boxShadow };
+  });
+  expect(resting.fill).not.toBe("rgba(0, 0, 0, 0)");
+  expect(resting.shadow).not.toBe("none");
+  await inputOf(field).setInputFiles(pickerFile("notes.txt", 16, "text/plain"));
+  await expect(status.getByText("notes.txt is not an accepted file type.", { exact: true })).toBeVisible();
+  expect((await status.boundingBox())!.height).toBeGreaterThan(1);
+  expect(errors).toEqual([]);
 });

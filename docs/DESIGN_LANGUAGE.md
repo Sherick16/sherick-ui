@@ -428,8 +428,12 @@ to stay proportional to its own height. A control-sized row keeps `control` at b
 button. An inline alert takes `control`, not the card-sized `surface` corner.
 
 Nested tracks leave room for their contents: compact toggle segments take `row` inside a
-`control` track; normal-sized tabs take `control` inside `prominent`. A tab track is not a
-content-width pill. These are existing shape roles, not new radii or theme-dependent offsets.
+`control` track; normal-sized tabs take `control` inside `prominent`. Pagination takes the
+compact segmented anatomy too: `selectable.surface` + `selectable.rest` around `shape.row`
+page targets, with `tone.selected` + `elevation.control` on the current page. It is a segment
+in a track, not a flat navigation row or a circle floating in a tray. Directional arrows
+share the page targets' shape and rhythm. A tab track is not a content-width pill. These are
+existing shape roles, not new radii or theme-dependent offsets.
 
 ---
 
@@ -466,7 +470,7 @@ The color roles a surface can take, in rising strength:
 | `text` | foreground only | quiet rows and links | fills |
 | `soft` | a de-emphasized tinted surface | alerts, badges, quiet cards | primary actions |
 | `tonal` | a matte control fill at rest | tonal buttons, icon buttons, chips | surfaces that are not controls |
-| `selected` | the fill a selected control holds | menu options, the selected segment of a segmented control | hover — hover is a state layer, not this tone; a navigation destination, which is a place rather than something the user chose |
+| `selected` | the fill a selected control holds | menu options, the selected segment of a segmented control | hover — hover is a state layer, not this tone; an ungrouped navigation row, which is a place rather than a segment in a track |
 | `strong` | the opaque accent fill that marks priority | the one primary action in a view | multiple actions competing for priority |
 | `strongChecked` | the same fills, keyed on the control's own selection marker | a control that holds its selection in the primitive — a `Switch` | a control whose selection the application owns as a prop |
 
@@ -831,6 +835,12 @@ is the only element left to answer. Composition follows from there:
   for it too. That is accepted rather than special-cased: telling it apart would take pointer
   bookkeeping or an interaction state machine inside a component, for a case that reads as one
   interaction either way. A plain `Input` or `Textarea` opens nothing, so it stays feedback-only.
+
+A date field has a different activation boundary: its text edits a date, and only its named
+calendar button opens Sherick's popup. It therefore takes `motionFeedback` on the field and
+`motionInkPress` on the button's glyph. Do not compress text entry for an action it does not
+perform. The embedded button retains its full `density.part` target; its quiet state layer
+is concentric and inset inside the field, never a full-height oval touching the field's edges.
 
 **A target the pointer is already on never moves.** A control whose visible ink is much smaller
 than its target — a stepper, a dismiss control, a close control — compresses the *mark*, not the
@@ -1279,12 +1289,32 @@ unbroken identifiers. Native text inputs retain single-line editing/scrolling. D
 readable surfaces also wrap copy; a badge, chip, navigation row or selection-list value may
 truncate within its bounded slot. Do not truncate explanatory body copy to hide overflow.
 
-Tabs, toggle/segmented tracks, tables and code wells own inherently wide content through local
-scrolling. Consumers still own application grid columns and explicit fixed-width children, but
-must not need a scrolling wrapper around a standard track. Code remains unwrapped and LTR.
+Tabs, toggle/segmented tracks, pagination, horizontal step sequences, tables and code wells own
+inherently wide content through local scrolling. Consumers still own application grid columns
+and explicit fixed-width children, but must not need a scrolling wrapper around a standard track.
+Code remains unwrapped and LTR.
 
 Modal centering must yield to a reachable scroll origin when content exceeds the viewport.
 Toast content may scroll at the dynamic viewport limit; it is never sized from the height its
 primitive measures. Tooltip content is a short supplemental hint, not a long document or an
 interactive form; use Popover for those. A loading Button without an icon overlays its spinner
 on the retained label footprint; icon-bearing buttons substitute within their existing slot.
+
+### Discrete progress and file selection
+
+A Stepper is Progress divided into labelled stages: the same pill-shaped recessed groove
+(`elevation.recessed` + `material.matteQuiet`) and accent fill, not isolated numbered badges.
+Current holds the strong fill, completed holds the selected tint and a check, and pending
+stays an empty groove. Numbers and labels remain plain text. Each stage reports only its own
+explicit state; do not infer completion from position or invent fractional progress. Horizontal
+stages stay in one sequence; vertical stages turn the groove beside their wrapping copy.
+A press moves only the small number/check, never the track, label block or focus boundary.
+A passive or wholly disabled horizontal sequence gives its named scroll region a tab stop and
+the shared inset focus ring so the keyboard can read offscreen stages. The stages themselves
+remain noninteractive. Do not make passive steps into buttons just to make scrolling accessible.
+
+File selection is a compact matte affordance with leading artwork, an action label and drop
+guidance. Constraints appear once beneath it, selected files form quiet rows, and clearing
+the selection is a secondary **tonal Button**, not unbounded text. Native selection/removal
+announcements remain in a visually hidden live region; visible errors explain rejected files.
+Do not render an activity log or duplicate the constraints in showcase descriptions.

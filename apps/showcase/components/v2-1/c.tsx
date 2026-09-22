@@ -19,15 +19,15 @@ export default function NavigationSpecimen() {
     <div className="flex flex-col gap-10">
       <section className="flex flex-col gap-6">
         <div className="space-y-2">
-          <p className={label}>Uncontrolled · bounded set with a gap on each side</p>
+          <p className={label}>Pages</p>
           <Pagination count={12} defaultValue={5} onValueChange={setReportedPage} />
-          <span data-testid="reported-page" className={label}>
+          <span data-testid="reported-page" hidden>
             {reportedPage ?? "no activation yet"}
           </span>
         </div>
 
         <div className="space-y-2">
-          <p className={label}>Linked · controlled, custom page names</p>
+          <p className={label}>Linked pages</p>
           <Pagination
             aria-label="Linked pagination"
             count={9}
@@ -36,14 +36,14 @@ export default function NavigationSpecimen() {
             getPageHref={(page: number) => `#page-${page}`}
             getPageLabel={(page: number) => `Go to page ${page}`}
           />
-          <span data-testid="linked-page" className={label}>
+          <span data-testid="linked-page" hidden>
             {linkedPage}
           </span>
         </div>
 
-        <div className="flex flex-wrap items-start gap-10">
+        <div className="flex flex-wrap items-start gap-10 [&>div]:min-w-0 [&>div]:max-w-full">
           <div className="space-y-2">
-            <p className={label}>Empty · count 0</p>
+            <p className={label}>Empty</p>
             <Pagination aria-label="Empty pagination" count={0} />
           </div>
           <div className="space-y-2">
@@ -57,17 +57,17 @@ export default function NavigationSpecimen() {
         </div>
 
         <div className="space-y-2">
-          <p className={label}>Normalized · fractional count, out-of-range page, consumer-held value</p>
+          <p className={label}>Clamped value</p>
           <Pagination aria-label="Normalized pagination" count={4.9} value={999} />
         </div>
 
         <div className="space-y-2">
-          <p className={label}>Invalid · no page total</p>
+          <p className={label}>Invalid total</p>
           <Pagination aria-label="Invalid pagination" count={Number.NaN} />
         </div>
 
         <div className="space-y-2">
-          <p className={label}>Long · 1234 pages, two siblings, current in the middle</p>
+          <p className={label}>Large page set</p>
           <Pagination
             aria-label="Long pagination"
             count={1234}
@@ -85,7 +85,7 @@ export default function NavigationSpecimen() {
 
       <section className="flex flex-col gap-6">
         <div className="space-y-2">
-          <p className={label}>Trail · intermediate links, a bare label, a current item with an href</p>
+          <p className={label}>Breadcrumb</p>
           <Breadcrumb
             items={[
               { label: "Home", href: "#home" },
@@ -97,7 +97,7 @@ export default function NavigationSpecimen() {
         </div>
 
         <div className="space-y-2">
-          <p className={label}>Trail · custom link renderer</p>
+          <p className={label}>Custom links</p>
           <Breadcrumb
             aria-label="Rendered breadcrumb"
             items={[
@@ -111,13 +111,13 @@ export default function NavigationSpecimen() {
         </div>
 
         <div className="space-y-2">
-          <p className={label}>Trail · one place</p>
+          <p className={label}>One destination</p>
           <Breadcrumb aria-label="Single-item breadcrumb" items={[{ label: "Home", href: "#home" }]} />
         </div>
       </section>
 
       <section className="space-y-2">
-        <p className={label}>Narrow column · wrapping</p>
+        <p className={label}>Narrow column</p>
         <div data-testid="v21-narrow" style={{ width: 240 }} className="flex flex-col gap-5">
           <Pagination aria-label="Narrow pagination" count={12} defaultValue={5} />
           <Breadcrumb
