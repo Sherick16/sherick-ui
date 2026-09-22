@@ -245,8 +245,12 @@ The recorded v2.1 checkpoint measurements (raw / gzip / brotli bytes) are:
 - whole barrel: `460798 / 152841 / 125775` → `505021 / 168701 / 138120`;
 - component CSS: `115647 / 14135 / 11682` → `121436 / 14965 / 12343`.
 The other eight budget records are byte-for-byte unchanged.
-Subsequent forced-colors, mark-press and owned-list corrections were remeasured and remain
-within these allowances; no further budget baseline was changed.
+The later responsive refinement re-records **only component CSS**:
+`121436 / 14965 / 12343` → `125677 / 15832 / 13021`. The intentional increase funds scoped
+container-query layouts, compact pagination, flexible step/calendar anatomy and the intervening
+visual refinements. This replaces clipped controls rather than hiding their scrollbars; it adds
+no client-side measuring machinery. Tokens and shared motion are unchanged. All other nine budget
+records, the 5% tolerance and stale-shrink checks remain byte-for-byte unchanged.
 
 ## Accessibility: the authored palette meets AA
 

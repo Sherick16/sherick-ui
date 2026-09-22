@@ -1,7 +1,7 @@
 "use client";
 
 import { useDirection } from "@base-ui/react/direction-provider";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import React, {
   forwardRef,
   useCallback,
@@ -14,7 +14,7 @@ import React, {
   type KeyboardEvent,
 } from "react";
 import { cn } from "@/libs/utils";
-import { density, focusRingInset, shape, state, stateLayer, text, tone } from "./ui.common";
+import { density, elevation, focusRingInset, shape, state, stateLayer, text, tone } from "./ui.common";
 import { motionFeedback, motionInkPress, motionTactile } from "./ui.motion";
 import {
   addCalendarDays,
@@ -103,10 +103,9 @@ const navigationButtonClassName = `group inline-flex shrink-0 items-center justi
 /* A content-width text control, so its corner is the pill. */
 const todayButtonClassName = `inline-flex shrink-0 items-center justify-center px-4 ${density.compact} ${shape.pill} ${text.high} ${motionFeedback} ${motionTactile} ${focusRingInset} ${stateLayer.quiet}`;
 
-/* The visual mark of one day. A day is a compact square target, so its corner is the circle, and
-   it is flat: depth never announces hover or selection inside a grid. Its press is tone alone —
-   the day boundary is what the reader is aiming at, and it does not move. */
-const dayButtonClassName = `relative inline-flex size-10 shrink-0 select-none items-center justify-center text-sm tabular-nums ${shape.circle} ${motionFeedback} ${focusRingInset}`;
+/* A chosen day holds the same shallow surface as an option. The square target yields with its
+   column without changing the seven-day grid; selection and focus boundaries never compress. */
+const dayButtonClassName = `relative inline-flex aspect-square w-full max-w-10 select-none items-center justify-center text-sm tabular-nums ${shape.circle} ${motionFeedback} ${focusRingInset}`;
 
 /**
  * One month of a Gregorian calendar, navigated as a keyboard grid.
@@ -407,10 +406,9 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
     <div
       {...divProps}
       ref={ref}
-      /* A month grid is inherently seven columns wide. It keeps its own width and scrolls inside
-         itself rather than spilling into a parent that is narrower than the grid. */
+      /* Seven equal columns yield together in a narrow panel; no weekday is hidden offscreen. */
       className={cn(
-        "inline-flex w-max max-w-full flex-col overflow-x-auto",
+        "inline-flex w-[17.5rem] min-w-0 max-w-full flex-col",
         disabled && state.disabled,
         className
       )}
@@ -426,8 +424,8 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
             disabled ? state.disabledDescendant : atFirstMonth ? state.disabled : state.enabled
           )}
         >
-          <span className={cn("inline-flex", motionInkPress)}>
-            <ChevronLeft aria-hidden="true" className={cn("size-5", "[[dir=rtl]_&]:rotate-180")} />
+          <span className={cn("inline-flex", !disabled && !atFirstMonth && motionInkPress)}>
+            <ArrowLeft aria-hidden="true" className={cn("size-5 rtl:-scale-x-100")} />
           </span>
         </button>
 
@@ -450,8 +448,8 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
             disabled ? state.disabledDescendant : atLastMonth ? state.disabled : state.enabled
           )}
         >
-          <span className={cn("inline-flex", motionInkPress)}>
-            <ChevronRight aria-hidden="true" className={cn("size-5", "[[dir=rtl]_&]:rotate-180")} />
+          <span className={cn("inline-flex", !disabled && !atLastMonth && motionInkPress)}>
+            <ArrowRight aria-hidden="true" className={cn("size-5 rtl:-scale-x-100")} />
           </span>
         </button>
       </div>
@@ -472,7 +470,7 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
             setPendingDayFocus(null);
           }
         }}
-        className={cn("border-separate border-spacing-0")}
+        className={cn("w-full table-fixed border-separate border-spacing-0")}
       >
         <thead>
           <tr>
@@ -516,6 +514,11 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
                    A single selection is an endpoint of its own. */
                 const isEdge = !isRange || isRangeEdge(date);
                 const joinedRange = selected && isRange && Boolean(selectedRange.end) && selectedRange.start !== selectedRange.end;
+                /* Paint a single surface across this week's selected cells. Separate cell shadows
+                   make seams, and overlapping tints make endpoints a different accidental color. */
+                const bandLength = joinedRange && (columnIndex === 0 || row[columnIndex - 1] === null || date === selectedRange.start)
+                  ? row.slice(columnIndex).filter(day => day !== null && isSelectedDate(toCalendarDate({ year: view.year, month: view.month, day }))).length
+                  : 0;
 
                 return (
                   <td
@@ -525,13 +528,15 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
                     aria-current={isToday ? "date" : undefined}
                     className={cn("relative p-0 text-center align-middle")}
                   >
-                    {joinedRange && (
+                    {bandLength > 0 && (
                       <span
                         aria-hidden="true"
+                        data-sui-range-band=""
+                        style={{ width: `${bandLength * 100}%` }}
                         className={cn(
-                          "pointer-events-none absolute inset-y-1 inset-x-0",
-                          date === selectedRange.start && cn(shape.pill, "rounded-e-none"),
-                          date === selectedRange.end && cn(shape.pill, "rounded-s-none"),
+                          "pointer-events-none absolute inset-y-1 start-0",
+                          shape.pill,
+                          elevation.control,
                           invalid ? tone.selected.danger : tone.selected.primary
                         )}
                       />
@@ -552,7 +557,7 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
                         text.high,
                         isToday && `${tone.text.primary} underline underline-offset-4`,
                         selected && isEdge && "font-medium",
-                        selected && !joinedRange && (invalid ? tone.selected.danger : tone.selected.primary),
+                        selected && !joinedRange && cn(invalid ? tone.selected.danger : tone.selected.primary, elevation.control),
                         !disabled && !unavailable && `${stateLayer.quiet} ${state.enabled}`,
                         unavailable && !disabled && state.disabled,
                         disabled && state.disabledDescendant

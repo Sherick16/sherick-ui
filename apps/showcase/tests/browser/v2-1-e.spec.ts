@@ -2,7 +2,7 @@ import { expect, test, type Locator, type Page } from "./fixtures";
 
 /* The Stepper unit's browser fixture. It proves what the component contracts on — informative versus
    interactive semantics, which step is current, how completion is stated, what a disabled step and a
-   rejected change do, and that long sequences scroll locally instead of widening the page — through roles,
+   rejected change do, and that long sequences adapt instead of widening the page — through roles,
    accessible names, focus and geometry rather than through internal class names. */
 
 const openFixture = async (page: Page) => {
@@ -33,10 +33,9 @@ test("an informative list is text and an interactive one is native buttons", asy
   await expect(informative).toHaveCount(1);
   await expect(informative.getByText("Review")).toBeVisible();
 
-  /* Nothing to activate: informative steps are text. The containing track can focus for scrolling. */
-  await expect(informative.locator("button")).toHaveCount(0);
-  await expect(informative.locator("a, [tabindex]")).toHaveCount(0);
-  await expect(informative).toHaveAttribute("tabindex", "0");
+  /* Nothing to activate: informative steps and their container need no tab stops. */
+  await expect(informative.locator("button, a, [tabindex]")).toHaveCount(0);
+  await expect(informative).not.toHaveAttribute("tabindex");
 
   /* Every step of an interactive list is a real native button, the disabled one included. */
   await expect(interactive.getByRole("button")).toHaveCount(4);
@@ -200,7 +199,7 @@ test("vertical steps stack in one column while horizontal steps share a line", a
   expect(errors).toEqual([]);
 });
 
-test("many steps keep one locally scrolling sequence with wrapping labels at a narrow viewport", async ({ page, errors }) => {
+test("many steps become a readable vertical sequence in a narrow column", async ({ page, errors }) => {
   await page.setViewportSize({ width: 320, height: 900 });
   await openFixture(page);
 
@@ -218,8 +217,8 @@ test("many steps keep one locally scrolling sequence with wrapping labels at a n
     expect(box.left).toBeGreaterThanOrEqual(0);
   }
 
-  expect(new Set(itemBoxes.map(box => box.top)).size).toBe(1);
-  expect(await nav.evaluate(element => element.scrollWidth > element.clientWidth)).toBe(true);
+  expect(new Set(itemBoxes.map(box => box.top)).size).toBe(7);
+  expect(await nav.evaluate(element => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
   for (const direction of ["ltr", "rtl"]) {
     await page.evaluate(value => { document.documentElement.dir = value; }, direction);
     for (const target of await nav.getByRole("button").all()) {
@@ -307,16 +306,14 @@ test("step presses move only enabled ink and respect reduced motion", async ({ p
   expect(errors).toEqual([]);
 });
 
-test("passive and disabled progress tracks can be scrolled with the keyboard", async ({ page, errors }) => {
+test("passive and disabled steps stay fully readable without scroll tab stops", async ({ page, errors }) => {
   await page.setViewportSize({ width: 320, height: 900 });
   for (const name of ["Progress steps", "Locked progress"]) {
     const nav = page.getByRole("navigation", { name, exact: true });
-    await expect(nav).toHaveAttribute("tabindex", "0");
-    await nav.focus();
-    await expect(nav).toBeFocused();
-    expect(await nav.evaluate(element => getComputedStyle(element).boxShadow)).not.toBe("none");
-    await page.keyboard.press("ArrowRight");
-    await expect.poll(() => nav.evaluate(element => element.scrollLeft)).toBeGreaterThan(0);
+    await expect(nav).not.toHaveAttribute("tabindex");
+    expect(await nav.evaluate(element => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
+    const positions = await boxes(nav.locator("li"));
+    expect(new Set(positions.map(item => item.top)).size).toBe(positions.length);
   }
   await expect(page.getByRole("navigation", { name: "Progress steps" }).getByRole("button")).toHaveCount(0);
   for (const button of await page.getByRole("navigation", { name: "Locked progress" }).getByRole("button").all()) {

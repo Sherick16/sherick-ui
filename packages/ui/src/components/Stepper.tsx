@@ -3,7 +3,7 @@
 import { Check as CheckIcon } from "lucide-react";
 import React, { forwardRef, type ComponentProps, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { elevation, focusRing, focusRingInset, material, shape, state, stateLayer, text, tone } from "./ui.common";
+import { elevation, focusRing, material, shape, state, stateLayer, text, tone } from "./ui.common";
 import { motionFeedback, motionInkPress } from "./ui.motion";
 
 export interface StepperItem {
@@ -27,6 +27,7 @@ export interface StepperProps
    * without it the steps are informative text, and no focusable fake controls are rendered.
    */
   onValueChange?: (value: string) => void;
+  /** Horizontal when the container has room; otherwise the same sequence stacks vertically. */
   orientation?: "horizontal" | "vertical";
   disabled?: boolean;
 }
@@ -51,11 +52,14 @@ const Stepper = forwardRef<HTMLElement, StepperProps>(
     const interactive = onValueChange !== undefined;
     const listDisabled = interactive && disabled;
     const stack = orientation === "vertical";
-    const scrollOnly = !stack && items.length > 0 &&
-      (!interactive || listDisabled || items.every(item => item.disabled));
+    /* Native container queries adapt to a sidebar as well as a device. Longer sequences need
+       a wider content band before their labels share a line. No measuring or duplicate controls. */
+    const long = items.length > 4;
     const rowLayout = cn(
-      "min-w-0 w-full gap-3 px-2 py-2 text-start text-sm",
-      stack ? "grid grid-cols-[0.375rem_minmax(0,1fr)] gap-x-4" : "flex flex-col"
+      "grid min-w-0 w-full grid-cols-[0.375rem_minmax(0,1fr)] gap-x-4 gap-y-3 px-2 py-3 text-start text-sm",
+      !stack && (long
+        ? "[@container(min-width:64rem)]:grid-cols-1"
+        : "[@container(min-width:32rem)]:grid-cols-1")
     );
 
     return (
@@ -63,19 +67,19 @@ const Stepper = forwardRef<HTMLElement, StepperProps>(
         {...navProps}
         ref={ref}
         aria-label={ariaLabel ?? "Progress steps"}
-        tabIndex={navProps.tabIndex ?? (scrollOnly ? 0 : undefined)}
         className={cn(
-          "min-w-0 max-w-full overflow-x-auto p-1",
-          scrollOnly && cn(shape.control, focusRingInset),
+          "w-full min-w-0 max-w-full p-1 [container-type:inline-size]",
           listDisabled && state.disabled,
           className
         )}
       >
-        {/* One horizontal sequence, scrolling locally when needed rather than breaking its order
-            into an unrelated grid. Vertical steps wrap their copy within one column. */}
+        {/* The DOM order and controls never change when the arrangement changes. */}
         <ol
           role="list"
-          className={cn("m-0 flex list-none p-0", stack ? "flex-col" : "min-w-full")}
+          className={cn(
+            "m-0 flex list-none flex-col p-0",
+            !stack && (long ? "[@container(min-width:64rem)]:flex-row" : "[@container(min-width:32rem)]:flex-row")
+          )}
         >
           {items.map((item, index) => {
             const current = value !== null && item.value === value;
@@ -89,7 +93,10 @@ const Stepper = forwardRef<HTMLElement, StepperProps>(
                   data-sui-step-track=""
                   className={cn(
                     "relative overflow-hidden",
-                    stack ? "w-1.5 self-stretch" : "h-1.5 w-full",
+                    "w-1.5 self-stretch",
+                    !stack && (long
+                      ? "[@container(min-width:64rem)]:h-1.5 [@container(min-width:64rem)]:w-full"
+                      : "[@container(min-width:32rem)]:h-1.5 [@container(min-width:32rem)]:w-full"),
                     shape.pill,
                     elevation.recessed,
                     material.matteQuiet
@@ -128,7 +135,8 @@ const Stepper = forwardRef<HTMLElement, StepperProps>(
                   {item.description ? (
                     <span className={cn(
                       "text-xs leading-5 [overflow-wrap:anywhere]",
-                      stack ? "col-start-2" : "col-span-2",
+                      "col-start-2",
+                      !stack && (long ? "[@container(min-width:64rem)]:col-span-2" : "[@container(min-width:32rem)]:col-span-2"),
                       text.medium
                     )}>
                       {item.description}
@@ -143,7 +151,7 @@ const Stepper = forwardRef<HTMLElement, StepperProps>(
                 key={item.value}
                 aria-current={!interactive && current ? "step" : undefined}
                 className={cn(
-                  stack ? "min-w-0 w-full" : cn("flex-1", items.length > 3 ? "min-w-40" : "min-w-[6.25rem]"),
+                  "min-w-0 flex-1",
                   dimmed && state.disabled
                 )}
               >
@@ -153,7 +161,6 @@ const Stepper = forwardRef<HTMLElement, StepperProps>(
                     disabled={unavailable}
                     aria-current={current ? "step" : undefined}
                     onClick={() => onValueChange(item.value)}
-                    onFocus={event => event.currentTarget.scrollIntoView({ block: "nearest", inline: "nearest" })}
                     className={cn(
                       rowLayout,
                       shape.row,

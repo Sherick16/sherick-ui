@@ -391,9 +391,14 @@ test("a narrow container holds the grid without overflowing the page", async ({ 
   expect(wrapperBox).not.toBeNull();
   expect(gridBox).not.toBeNull();
 
-  // The grid is seven columns wide, so it scrolls inside the container it was given instead of
-  // widening it or spilling onto the page.
-  expect(gridBox!.width).toBeGreaterThan(wrapperBox!.width);
+  // Every weekday fits; the calendar adapts its equal columns rather than clipping the week.
+  expect(gridBox!.width).toBeLessThanOrEqual(wrapperBox!.width);
+  for (const day of await grid.locator("[data-day]").all()) {
+    const box = (await day.boundingBox())!;
+    expect(box.width).toBeGreaterThanOrEqual(24);
+    expect(box.x).toBeGreaterThanOrEqual(wrapperBox!.x);
+    expect(box.x + box.width).toBeLessThanOrEqual(wrapperBox!.x + wrapperBox!.width + 1);
+  }
   const containerOverflow = await wrapper.evaluate((element) => ({
     scrollWidth: element.scrollWidth,
     clientWidth: element.clientWidth,
@@ -813,4 +818,30 @@ test("relaxing date bounds cannot silently submit a previously rejected draft", 
   });
   await form.getByRole("button", { name: "Submit dynamic dates" }).click();
   await expect(page.getByTestId("dynamic-date-submits")).toHaveText('["2024-06-21/2024-06-10"]');
+});
+
+test("a multiweek range paints one raised band per week without tint or shadow seams", async ({ page, errors }) => {
+  const calendar = page.getByTestId("range-calendar");
+  for (const direction of ["ltr", "rtl"]) {
+    await calendar.evaluate((element, direction) => element.setAttribute("dir", direction), direction);
+    await calendar.getByRole("button", { name: "Friday, January 12, 2024", exact: true }).click();
+    await calendar.getByRole("button", { name: "Tuesday, January 23, 2024", exact: true }).click();
+    await expect(calendar.locator("[data-sui-range-band]")).toHaveCount(3);
+    await expect(calendar.getByRole("gridcell", { selected: true })).toHaveCount(12);
+    for (const row of await calendar.locator("tbody tr").all()) {
+      const cells = row.getByRole("gridcell", { selected: true });
+      const count = await cells.count();
+      if (!count) continue;
+      const band = row.locator("[data-sui-range-band]");
+      await expect(band).toHaveCount(1);
+      expect(await band.evaluate(element => getComputedStyle(element).boxShadow)).not.toBe("none");
+      const geometry = (await band.boundingBox())!;
+      const first = (await cells.first().boundingBox())!;
+      const last = (await cells.last().boundingBox())!;
+      expect(geometry.width).toBeCloseTo(first.width * count, 0);
+      expect(geometry.x).toBeCloseTo(Math.min(first.x, last.x), 0);
+      expect(geometry.x + geometry.width).toBeCloseTo(Math.max(first.x + first.width, last.x + last.width), 0);
+    }
+  }
+  expect(errors).toEqual([]);
 });

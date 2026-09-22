@@ -109,7 +109,7 @@ export const groupFocusRing =
                touchable; pressing it returns it to the track.
    - floating: a surface that genuinely sits above the application.
    - control:  the resting half of the tactile pair, for a part the user moves —
-               a switch thumb, a selected segment.
+               a switch thumb, a selected segment or a held option/date selection.
    - recessed: the other half of that pair: a groove, a track or a well, which is
                recessed by definition, and a raised control while it is held, which
                lands at the same depth.
@@ -200,8 +200,8 @@ const effectiveDisabled =
      pressed    a raised control returning to the recessed depth of its own track, plus
                 a slight compression; a flat control stays flat and a floating one keeps
                 its elevation
-     selected   a selected tone; depth comes from the component's anatomy — a
-                segment inside a groove is raised, a row in a list is not
+     selected   a held choice: selected tone plus control elevation on a segment,
+                option/tree row or date surface; never on mere navigation highlight
      disabled   45% opacity, no pointer affordance, no interactive state at all
      focus      the shared outer focus ring, visible on keyboard focus */
 export const state = {
@@ -509,8 +509,9 @@ export const detail = {
    The sheet never exceeds what the viewport leaves it, and scrolls inside itself rather than
    growing. Its width is the list's own decision: a control's list is never narrower than the
    control it came from and grows to fit its own content until the viewport clamp, and a command
-   list only ever grows to its content. A row is flat — depth never announces a state —
-   and one row step of `stateLayer.quiet` plus `stateLayer.activeRow` carries both its hover and
+   list only ever grows to its content. Unselected rows and commands stay flat; held options
+   compose `tone.selected` with `elevation.control`. One row step of `stateLayer.quiet` plus
+   `stateLayer.activeRow` carries both its hover and
    its keyboard highlight, so an option and a command are highlighted by the same tone at the
    same strength. Keyboard focus adds the shared inset ring independently of that highlight.
    Selection is a tint of the sheet through `tone.selected` and never the opaque

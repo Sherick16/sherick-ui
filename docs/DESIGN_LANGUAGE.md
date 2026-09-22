@@ -176,13 +176,14 @@ only softens what is left.
 
 Primitives: `flat`, `raised`, `floating`, `control`, `recessed`, `well`.
 
-Depth is chosen by **anatomy**, never by state.
+Depth follows **anatomy**. A held choice has a shallow control surface; transient hover and
+keyboard highlight never create one.
 
 | Elevation | Role | Should be used for | Should not be used for |
 | --- | --- | --- | --- |
 | `flat` | at rest on the page | passive matte surfaces; wider surfaces such as cards | a well that is sunk by design — that is `recessed` |
 | `raised` | a manipulated control lifted a hair above its own track | tactile tonal controls (tonal `Button`, `IconButton`) | passive surfaces, table rows, menu rows |
-| `control` | the resting half of the tactile pair | a part the user moves — a switch thumb, a selected segment | wide surfaces, or a whole segmented control |
+| `control` | the resting half of the tactile pair and the surface of a held choice | switch thumbs, selected segments, chosen option/tree rows, selected dates and continuous date-range bands | whole sheets, unselected rows, hover or keyboard highlight |
 | `recessed` | the other half of the pair | grooves, tracks and wells, which are sunk by definition | raised or resting controls |
 | `well` | the recessed recipe with **one** of its walls made deeper — a soft shade above in light mode, a soft light below in dark mode — while the opposite wall stays exactly as `recessed` draws it; no drawn edge anywhere | the *small* sunk mark whose entire identity is its depth — an empty checkbox box, an unselected radio circle | anything with a fill step to spare; a groove, a track, a field or a card, all of which read from their own tone |
 | `floating` | a surface that genuinely sits above the application | acrylic overlays: menus, tooltips, dialogs | matte surfaces sitting on the page |
@@ -193,9 +194,12 @@ surface.
 
 **Do:** let a control press back into the track beneath it — `state.recess` on a raised
 control, which lands at the same depth a groove sits at.
-**Do not** add depth *merely* to announce hover, selection or disabled: depth in this
-system comes from anatomy, so the selected segment of a segmented control is raised while
-the row it sits in a list stays flat.
+**Held choices share a surface:** `tone.selected` + `elevation.control`. Use it for a selected
+segment, a chosen Select/Combobox option, a selected tree row or a calendar selection. A continuous
+range is one raised band per week, not seven separately shadowed cells. A single date is one
+raised mark. Keep selection semantics and checks as well as depth; shadow is not the only signal.
+Do not raise hover, keyboard highlight, navigation-only current rows, commands or passive data.
+Checkbox/radio wells and value-control tracks retain their own anatomy, not a raised outer row.
 
 ---
 
@@ -508,7 +512,7 @@ One language, applied the same way everywhere:
 | rest | the material at whatever elevation the anatomy calls for | — |
 | hover | one tonality step — a state layer over the fill, or a step up the surface ladder | depth, a new border, a size change |
 | pressed | a raised control returning to the recessed depth of its own track (`state.recess`), plus the tactile compression the motion system owns; a flat control stays flat and presses through the state layer's active step and the same compression | a color swap alone |
-| selected | a selected tone; depth comes from anatomy — a segment inside a groove is raised, a row in a list stays flat | depth alone |
+| selected | `tone.selected` + `elevation.control` for held choices; checkbox/radio wells retain their own mark anatomy | depth alone, or raising a row merely highlighted for navigation |
 | disabled | 45% opacity applied **once**, no pointer affordance, no interactive state at all; resting elevation is preserved | grey-on-grey colouring that breaks theme, or flattening a raised object |
 | focus | the shared focus ring | any other indicator |
 
@@ -597,7 +601,7 @@ members of the system rather than local styling:
 
 **Do:** let tonality carry hover; let a raised control recess while it is held; let a
 flat or floating control press through the state layer's active step and the tactile compression.
-**Do not** use opacity for anything except disabled, or add depth to show a state.
+**Do not** use opacity for anything except disabled, or add depth to transient hover/highlight.
 
 ### Toggle buttons: chips and segments
 
@@ -680,8 +684,10 @@ Everything else is shared, and that sharing is the point:
   which row the navigation is on when it arrives there. Disabled means "cannot be chosen or
   performed", never "cannot be found", so `activeRow` is deliberately *not* gated on the marker.
 
-A row is **flat**: depth never announces hover, highlight or selection, because the row sits in
-a list rather than on the page.
+Unselected options and command rows are **flat**. A chosen option uses the shared held-choice
+surface (`tone.selected` + `elevation.control`); hover and keyboard highlight only overlay tone.
+An already selected disabled option retains its resting elevation. Tree selections follow the
+same rule on the direct row, never on the subtree. Command results do not hold a choice and stay flat.
 
 **A navigation row is not a collection row.** A destination list is scanned the way a list is, so
 it takes the same row: flat, the same `quiet` hover layer, the same `shape.row` corner proportional
@@ -744,8 +750,8 @@ The rule is:
   segmented track is recessed for the same static reason and takes each segment's own
   tactile compression as its press feedback. A track answers a press with tone only: the thumb
   moving is the physical event, and a track that also shrank would compete with it;
-- **selection** depth stays anatomy-dependent: the selected segment of a segmented
-  control is raised inside its recessed track, while a selected row in a list stays flat.
+- **held choices** keep their control elevation through hover and keyboard highlight. A selected
+  segment may recess on press; date/range boundaries and collection rows stay geometrically stable.
 
 ---
 
@@ -1289,10 +1295,13 @@ unbroken identifiers. Native text inputs retain single-line editing/scrolling. D
 readable surfaces also wrap copy; a badge, chip, navigation row or selection-list value may
 truncate within its bounded slot. Do not truncate explanatory body copy to hide overflow.
 
-Tabs, toggle/segmented tracks, pagination, horizontal step sequences, tables and code wells own
-inherently wide content through local scrolling. Consumers still own application grid columns
-and explicit fixed-width children, but must not need a scrolling wrapper around a standard track.
-Code remains unwrapped and LTR.
+Tabs, toggle/segmented tracks, tables and code wells own inherently wide content through local
+scrolling. Pagination and workflow steps instead **adapt their anatomy**: a narrow pager keeps
+previous/current/next and the total visible, and steps become a vertical sequence when the container
+cannot give their labels room. Never hide the next action behind a clipped track or shrink targets
+to pretend a desktop layout fits. Container width, not device or viewport alone, drives this choice:
+a 240px desktop sidebar and a phone column need the same treatment. Consumers still own application
+grid columns and explicit fixed-width children. Code remains unwrapped and LTR.
 
 Modal centering must yield to a reachable scroll origin when content exceeds the viewport.
 Toast content may scroll at the dynamic viewport limit; it is never sized from the height its
@@ -1307,11 +1316,11 @@ A Stepper is Progress divided into labelled stages: the same pill-shaped recesse
 Current holds the strong fill, completed holds the selected tint and a check, and pending
 stays an empty groove. Numbers and labels remain plain text. Each stage reports only its own
 explicit state; do not infer completion from position or invent fractional progress. Horizontal
-stages stay in one sequence; vertical stages turn the groove beside their wrapping copy.
+stages use equal, shrinkable columns when there is space, and turn into a vertical sequence in a
+narrow container. Longer sequences need more room before taking horizontal form. Vertical stages
+turn the groove beside their wrapping copy. All stages remain visible without horizontal scrolling.
 A press moves only the small number/check, never the track, label block or focus boundary.
-A passive or wholly disabled horizontal sequence gives its named scroll region a tab stop and
-the shared inset focus ring so the keyboard can read offscreen stages. The stages themselves
-remain noninteractive. Do not make passive steps into buttons just to make scrolling accessible.
+Passive stages stay text; do not add tab stops or fake controls to compensate for a rigid layout.
 
 File selection is a compact matte affordance with leading artwork, an action label and drop
 guidance. Constraints appear once beneath it, selected files form quiet rows, and clearing

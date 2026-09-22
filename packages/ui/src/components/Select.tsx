@@ -6,6 +6,7 @@ import { Check, ChevronDown } from "lucide-react";
 import { cn } from "@/libs/utils";
 import {
   density,
+  elevation,
   focusRingHeld,
   list,
   material,
@@ -144,7 +145,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                     value={option.value}
                     disabled={option.disabled}
                     className={({ selected: isSelected }) =>
-                      cn(list.option, isSelected && tone.selected[variant])
+                      cn(list.option, isSelected && cn(tone.selected[variant], elevation.control))
                     }
                   >
                     <BaseSelect.ItemText className={cn("min-w-0 flex-1 truncate")}>

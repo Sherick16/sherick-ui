@@ -264,16 +264,79 @@ test("pagination and step tracks match the existing segmented and progress famil
     const track = workflow.locator("[data-sui-step-track]").first();
     const progress = page.getByRole("progressbar");
     const progressTrack = progress.locator("[data-sui-progress-indicator]").locator("..").locator("..");
-    for (const property of ["height", "background-color", "box-shadow", "border-radius"]) {
+    expect(await css(track, "width")).toBe(await css(progressTrack, "height"));
+    for (const property of ["background-color", "box-shadow", "border-radius"]) {
       expect(await css(track, property)).toBe(await css(progressTrack, property));
     }
     const fill = workflow.locator('[aria-current="step"] [data-sui-progress-indicator]');
     expect(await css(fill, "background-color")).toBe(await css(progress.locator("[data-sui-progress-indicator]"), "background-color"));
   }
-  const target = pages.getByRole("button", { name: "Page 3", exact: true });
+  const target = pages.getByRole("button", { name: "Next page", exact: true });
   const before = await css(target, "box-shadow");
   await target.focus();
   expect(await css(target, "box-shadow")).not.toBe(before);
   await page.keyboard.press("Enter");
-  await expect(target).toHaveAttribute("aria-current", "page");
+  await expect(pages.getByRole("button", { name: "Page 3", exact: true })).toHaveAttribute("aria-current", "page");
+});
+
+test("phone, tablet and desktop columns adapt without clipping actions or steps", async ({ page }) => {
+  const root = page.getByTestId("no-tailwind-v21");
+  const column = root.locator(":scope > div");
+  const pages = page.getByRole("navigation", { name: "Pages", exact: true });
+  const workflow = page.getByRole("navigation", { name: "Workflow" });
+  // Content containment must not collapse a non-stretched grid item to zero width.
+  for (const component of [pages, workflow]) {
+    await component.evaluate(element => { element.style.justifySelf = "start"; });
+  }
+  for (const [viewport, width] of [[390, 240], [768, 420], [1024, 768], [1440, 240], [1440, 1100]]) {
+    await page.setViewportSize({ width: viewport, height: 1000 });
+    await column.evaluate((element, width) => { element.style.maxWidth = `${width}px`; element.style.width = `${width}px`; }, width);
+    for (const direction of ["ltr", "rtl"]) {
+      await root.evaluate((element, direction) => { element.setAttribute("dir", direction); }, direction);
+      for (const component of [pages, workflow]) {
+        expect(await component.evaluate(element => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
+        const bounds = (await component.boundingBox())!;
+        expect(bounds.width).toBeCloseTo(width, 0);
+        for (const target of await component.getByRole("button").all()) {
+          const box = (await target.boundingBox())!;
+          expect(box.x).toBeGreaterThanOrEqual(bounds.x - 1);
+          expect(box.x + box.width).toBeLessThanOrEqual(bounds.x + bounds.width + 1);
+          expect(box.height).toBeGreaterThanOrEqual(44);
+        }
+      }
+      const stages = await workflow.locator("li").evaluateAll(nodes => nodes.map(node => Math.round(node.getBoundingClientRect().top)));
+      expect(new Set(stages).size).toBe(width < 512 ? 2 : 1);
+      if (width < 512) await expect(pages.getByRole("button")).toHaveCount(3);
+      else expect(await pages.getByRole("button").count()).toBeGreaterThan(3);
+      const value = Number(await pages.locator('[aria-current="page"]').textContent());
+      await pages.getByRole("button", { name: "Next page" }).click();
+      await expect(pages.locator('[aria-current="page"]')).toHaveText(String(value + 1));
+      expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
+    }
+  }
+});
+
+test("dates hold control elevation, with one seamless surface for each selected week", async ({ page }) => {
+  for (const theme of ["light", "dark"]) {
+    await page.evaluate(theme => { document.documentElement.dataset.sherickTheme = theme; }, theme);
+    const reference = page.getByLabel("Reference segments", { exact: true }).getByRole("button", { name: "Two", exact: true });
+    const raised = await css(reference, "box-shadow");
+    await page.getByRole("button", { name: "Open Date", exact: true }).click();
+    const popup = page.getByRole("dialog", { name: "Date", exact: true });
+    await popup.getByRole("button", { name: "Next month", exact: true }).focus();
+    await popup.getByRole("button", { name: "Previous month", exact: true }).hover();
+    expect(await css(popup.locator('[aria-selected="true"] button'), "box-shadow")).toBe(raised);
+    expect(await popup.getByRole("button", { name: "Previous month", exact: true }).locator("svg path").count()).toBe(2);
+    await page.keyboard.press("Escape");
+    await page.getByRole("button", { name: "Open Start", exact: true }).click();
+    const range = page.getByRole("dialog", { name: "Date range", exact: true });
+    const band = range.locator("[data-sui-range-band]");
+    await expect(band).toHaveCount(1);
+    expect(await css(band, "box-shadow")).toBe(raised);
+    const cells = range.getByRole("gridcell", { selected: true });
+    await expect(cells).toHaveCount(3);
+    const cell = (await cells.first().boundingBox())!;
+    expect((await band.boundingBox())!.width).toBeCloseTo(cell.width * 3, 0);
+    await page.keyboard.press("Escape");
+  }
 });

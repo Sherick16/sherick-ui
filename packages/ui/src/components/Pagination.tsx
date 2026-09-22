@@ -5,7 +5,6 @@ import {
   forwardRef,
   useState,
   type ComponentPropsWithoutRef,
-  type FocusEvent,
   type MouseEvent,
   type ReactNode,
 } from "react";
@@ -90,11 +89,6 @@ const controlBase = /* @__PURE__ */ cx(
   text.medium
 );
 
-/* Native focus can leave a partly visible target clipped in a scrolling track. Reveal the
-   focused page with the platform primitive; tab order and focus remain entirely native. */
-const revealPage = (event: FocusEvent<HTMLElement>) =>
-  event.currentTarget.scrollIntoView({ block: "nearest", inline: "nearest" });
-
 /* A sequence of destinations, so it is a native `nav` around a native ordered list: the reader can
    count where they are in it, and assistive technology reads it as one numbered set rather than as a
    row of loose buttons.
@@ -178,7 +172,6 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
               aria-label={label}
               className={cn(controlBase, "group", controlState(onBoundary))}
               onClick={(event) => activateFromAnchor(event, page)}
-              onFocus={revealPage}
             >
               <span className={cn("inline-flex size-5 items-center justify-center [&>svg]:size-5", motionInkPress)}>{icon}</span>
             </a>
@@ -189,7 +182,6 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
               aria-label={label}
               className={cn(controlBase, "group", controlState(onBoundary))}
               onClick={() => activate(page)}
-              onFocus={revealPage}
             >
               <span className={cn("inline-flex size-5 items-center justify-center [&>svg]:size-5", !disabled && !onBoundary && motionInkPress)}>{icon}</span>
             </button>
@@ -204,7 +196,10 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
       const href = stepHref(page, false);
 
       return (
-        <li key={page} className={cn("flex")}>
+        <li key={page} className={cn(
+          "min-w-0 items-center gap-2",
+          isCurrent ? "flex" : "hidden [@container(min-width:32rem)]:flex"
+        )}>
           {href !== undefined ? (
             <a
               href={href}
@@ -212,12 +207,11 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
               aria-label={label}
               className={cn(
                 controlBase,
-                "group px-3",
+                "group shrink break-all px-3",
                 isCurrent && cn(tone.selected.primary, elevation.control, "font-medium", !disabled && state.recess),
                 controlState(false)
               )}
               onClick={(event) => activateFromAnchor(event, page)}
-              onFocus={revealPage}
             >
               <span className={cn(motionInkPress)}>{page}</span>
             </a>
@@ -229,15 +223,19 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
               aria-label={label}
               className={cn(
                 controlBase,
-                "group px-3",
+                "group shrink break-all px-3",
                 isCurrent && cn(tone.selected.primary, elevation.control, "font-medium", !disabled && state.recess),
                 controlState(false)
               )}
               onClick={() => activate(page)}
-              onFocus={revealPage}
             >
               <span className={cn(!disabled && motionInkPress)}>{page}</span>
             </button>
+          )}
+          {isCurrent && (
+            <span className={cn("min-w-0 break-all pe-2 text-sm tabular-nums [@container(min-width:32rem)]:hidden", text.medium)}>
+              <span aria-hidden="true">/ </span><span className={cn("sr-only")}>of </span>{pageCount}
+            </span>
           )}
         </li>
       );
@@ -247,7 +245,7 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
        so the numbers around it stay aligned, and it is hidden from assistive technology so a reader
        counts pages rather than controls. */
     const gap = (key: PaginationGap) => (
-      <li key={key} aria-hidden="true" className={cn("flex")}>
+      <li key={key} aria-hidden="true" className={cn("hidden [@container(min-width:32rem)]:flex")}>
         <span className={cn("inline-flex items-center justify-center", density.target, text.medium)}>
           …
         </span>
@@ -259,18 +257,17 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
         {...props}
         ref={ref}
         aria-label={ariaLabel ?? "Pagination"}
-        tabIndex={props.tabIndex ?? (disabled ? 0 : undefined)}
         className={cn(
-          "flex min-w-0 max-w-full overflow-x-auto",
-          disabled && cn(state.disabled, shape.control, focusRingInset),
+          "w-full min-w-0 max-w-full [container-type:inline-size] [contain-intrinsic-inline-size:14rem]",
+          disabled && state.disabled,
           className
         )}
       >
-        {/* Like a segmented track, the sequence scrolls locally instead of breaking across rows.
-            The explicit list role preserves Safari's semantics after list-style is removed. */}
+        {/* Compact columns show a complete previous/current/next control, never a clipped strip.
+            Extra-large page sets may wrap at wide widths; every visible target stays reachable. */}
         <ol
           role="list"
-          className={cn("m-0 flex min-w-max list-none items-center gap-1 p-1", shape.control, selectable.surface, selectable.rest)}
+          className={cn("m-0 flex w-fit max-w-full list-none flex-wrap items-center gap-1 p-1", shape.control, selectable.surface, selectable.rest)}
         >
           {step(
             previousPage,

@@ -101,8 +101,9 @@ test("empty, single, normalized and disabled paginations keep their own boundari
   /* Nothing in a disabled pagination can be reached or activated: every control is natively
      disabled, and the landmark is not where that state is announced. */
   const disabled = landmark(page, "Disabled pagination");
-  await expect(disabled.getByRole("button")).toHaveCount(7);
-  for (const control of await disabled.getByRole("button").all()) await expect(control).toBeDisabled();
+  await expect(disabled.getByRole("button")).toHaveCount(3);
+  await expect(disabled.locator("button")).toHaveCount(7);
+  for (const control of await disabled.locator("button").all()) await expect(control).toBeDisabled();
 
   const dim = await disabled.evaluate((element) => {
     const control = element.querySelector("button");
@@ -258,7 +259,7 @@ test("RTL mirrors the directional glyphs and leaves page identity alone", async 
   expect(errors).toEqual([]);
 });
 
-test("a narrow column scrolls the page track and wraps the breadcrumb without widening the page", async ({ page, errors }) => {
+test("a narrow column shows complete compact pagination and wrapping breadcrumbs", async ({ page, errors }) => {
   await page.setViewportSize(NARROW_VIEWPORT);
   await openFixture(page);
 
@@ -282,14 +283,15 @@ test("a narrow column scrolls the page track and wraps the breadcrumb without wi
     const box = control.getBoundingClientRect();
     return { top: Math.round(box.top), width: box.width, height: box.height };
   }));
-  expect(boxes.length).toBeGreaterThan(0);
+  expect(boxes).toHaveLength(3);
   expect(new Set(boxes.map(box => box.top)).size).toBe(1);
   for (const box of boxes) {
     expect(box.width).toBeGreaterThanOrEqual(44);
     expect(box.height).toBeGreaterThanOrEqual(44);
   }
-  expect(await pagination.evaluate(element => element.scrollWidth > element.clientWidth)).toBe(true);
-  // Native focus must bring every offscreen target into view in either writing direction.
+  expect(await pagination.evaluate(element => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
+  await expect(pagination).toContainText("of 12");
+  // Every compact target is visible in either writing direction, without scrolling to find it.
   for (const direction of ["ltr", "rtl"]) {
     await page.evaluate(value => { document.documentElement.dir = value; }, direction);
     for (const control of await pagination.getByRole("button").all()) {
@@ -449,16 +451,13 @@ test("previous and next press the mark without shrinking their targets", async (
   expect(errors).toEqual([]);
 });
 
-test("a disabled page track remains keyboard-scrollable without enabling destinations", async ({ page, errors }) => {
+test("disabled compact pagination stays fully visible without a scrolling tab stop", async ({ page, errors }) => {
   await page.setViewportSize(NARROW_VIEWPORT);
   await openFixture(page);
   const nav = landmark(page, "Disabled pagination");
-  await expect(nav).toHaveAttribute("tabindex", "0");
-  await nav.focus();
-  await expect(nav).toBeFocused();
-  expect(await nav.evaluate(element => getComputedStyle(element).boxShadow)).not.toBe("none");
-  await page.keyboard.press("ArrowRight");
-  await expect.poll(() => nav.evaluate(element => element.scrollLeft)).toBeGreaterThan(0);
+  await expect(nav).not.toHaveAttribute("tabindex");
+  expect(await nav.evaluate(element => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
+  await expect(nav.getByRole("button")).toHaveCount(3);
   for (const target of await nav.getByRole("button").all()) await expect(target).toBeDisabled();
   await expect(currentPages(nav)).toHaveText("3");
   expect(errors).toEqual([]);

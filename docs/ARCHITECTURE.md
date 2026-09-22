@@ -208,6 +208,15 @@ does not re-record the Button, form, overlay, disclosure, toast, toggle, content
 budgets. Tolerance and stale-shrink rules remain unchanged; rich-content exclusion and
 Button tree-shaking assertions still run for every measurement.
 
+The responsive refinement deliberately re-records **only `stylesCss`**. Native container queries
+replace clipped pagination/step tracks with compact navigation and vertical progress, with an
+intrinsic-size hint for shrink-to-fit pager parents. The calendar grid also yields without hiding
+weekdays. These scoped anatomy rules increase the complete stylesheet, not runtime behavior or
+consumer configuration. No measuring hook, new dependency, styling layer or motion system is added.
+Selected options/dates reuse existing control elevation under the revised design language. All
+JavaScript/theme budgets and the gate's tolerances remain unchanged; measured bytes are recorded
+in [the release size log](RELEASE.md#size-budgets).
+
 For styling, a new component should only need to:
 
 1. compose non-temporal recipes from `ui.common.ts` and semantic temporal recipes from `ui.motion.ts`;

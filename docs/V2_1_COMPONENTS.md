@@ -151,7 +151,7 @@ Exports: `Pagination`, `Breadcrumb`; `PaginationProps`, `BreadcrumbItem`, `Bread
   activate. `aria-current='page'` identifies exactly the current page. Deterministic bounded
   set: first/last/current+sibling pages; a single missing page is shown, larger gaps are
   noninteractive ellipses hidden from AT. Previous/next remain reachable in narrow layouts;
-  wrapping/local overflow never overflows the page. RTL mirrors directional glyphs, not
+  compact columns show previous/current/next plus the total without a scrolling strip. RTL mirrors directional glyphs, not
   numeric page identity. Native Tab/Enter/Space behavior, no roving-focus abstraction.
 - Breadcrumb is passive/server-usable. `BreadcrumbItem = {label:ReactNode; href?:string}`;
   `BreadcrumbProps` extends native nav attrs without children, with `items:BreadcrumbItem[]`
@@ -215,7 +215,7 @@ Exports: `Stepper`; `StepperProps`, `StepperItem`.
   Current publishes `aria-current='step'`; complete has a check and accessible Complete
   text; other steps retain their ordered numbers. Current wins over complete visually.
   Disabled is meaningful only for interactive steps, and cannot activate.
-- Horizontal steps form one locally scrolling progress sequence; vertical wraps labels/descriptions.
+- Horizontal steps become a vertical sequence in constrained containers; all labels/descriptions wrap.
   Tracks reuse Progress's groove/fill recipes. No implied percentage or automatic completion.
 - Focused evidence: passive vs interactive semantics, current/complete state not color-only,
   disabled actions, controlled rejection, null/unknown current, many/long labels, RTL/narrow.
@@ -304,27 +304,31 @@ The wave composes the existing language rather than adding new tokens or recipes
   The row receives non-spatial field hover/focus feedback; only the calendar glyph presses.
   Its inset 32px hover surface stays inside the 48px field without reducing the 36×44 target.
   Base positions the popup against the field (the shared endpoint group for ranges).
-- A completed calendar range is one continuous selected-tone band per week, with rounded outer
-  endpoints and stronger endpoint text. Single dates and incomplete ranges keep their circular
-  mark. The selection and focus targets never move.
+- Calendar navigation uses the same shafted arrows as Pagination. The seven-column grid yields
+  with a narrow container rather than hiding weekdays offscreen. A completed range is one raised,
+  selected-tone band per week, with no overlapping tint or cell-shadow seams. Single dates and
+  incomplete ranges hold the same control elevation. Selection and focus targets never move.
+  Select/Combobox options and selected tree rows share this held-choice elevation; navigation
+  highlight and command results stay flat.
 - Command has one search field with a fixed search-icon slot and a flat results list, not a
   second filled panel inside its host. Rows share an icon column when any command has an icon.
   Actions use pointer cursors and nonselectable labels; disabled rows retain Base's discoverable
   highlight without becoming actionable. The palette retains the shared acrylic dialog shell
   but uses a compact header. `placeholder` defaults to “Search commands…” and remains overridable.
 - Pagination shares ToggleGroup's recessed track, rounded-rectangle segments and raised selected
-  tint, with 44px targets and directional arrows. It scrolls locally instead of wrapping a
-  single sequence across rows. Only number/glyph ink compresses on press.
+  tint, with 44px targets and directional arrows. A native container query shows previous/current/next
+  and the total below 32rem, keeping both directions visible. Full page choices return above that
+  width; unusually large sets wrap instead of clipping. Only number/glyph ink compresses on press.
   Breadcrumb uses compact navigation typography and explicit native-link decoration ownership.
 - Stepper divides Progress's groove into labelled stages, horizontal or vertical. Current has
   a strong fill, completed a selected tint and check, pending an empty groove. Numbers and labels
   stay plain text rather than isolated badges. Horizontal descriptions use the full content band;
   vertical descriptions align beneath their labels. Neither track nor focus boundaries compress.
-  Long sequences scroll locally. Native focus can leave a partially visible target clipped, so
-  Pagination/Stepper use `scrollIntoView({block: 'nearest', inline: 'nearest'})` on focus to reveal
-  the whole target. This does not choose focus, alter Tab order or introduce keyboard handling.
-  A passive or wholly disabled horizontal track is itself keyboard-focusable for native scrolling;
-  passive stages still have no controls and disabled stages still cannot activate.
+  Container queries switch to a readable vertical sequence below 32rem (64rem for more than four
+  stages), without duplicated controls, measurements, focus handlers or minimum stage widths.
+  Passive/disabled sequences no longer require a scrolling tab stop. Narrow desktop sidebars
+  receive the same adaptation as phone columns; tablet and full-width layouts use the available
+  container width rather than guessing from a device name.
 - FileUpload is a compact matte chooser/drop row, followed by constraints and selected files.
   Clear uses a real secondary tonal Button. Screen-reader announcements are visually hidden;
   validation errors remain visible. Showcase captions no longer narrate internal selection state.

@@ -14,7 +14,7 @@ export default function V21() {
   const [action, setAction] = useState("");
   return <DirectionProvider direction="rtl"><main dir="rtl" className="page" data-testid="no-tailwind-v21">
     <h1>v2.1 package consumer</h1>
-    <div style={{ display: "grid", gap: 16, maxWidth: 420, minWidth: 0 }}>
+    <div style={{ display: "grid", gridTemplateColumns: "minmax(0, 1fr)", gap: 16, maxWidth: 420, minWidth: 0 }}>
       <Calendar aria-label="Calendar" defaultValue="2024-06-10" today="2024-06-10" />
       <form id="dates">
         <DatePicker label="Date" name="date" defaultValue="2024-06-10" today="2024-06-10" />

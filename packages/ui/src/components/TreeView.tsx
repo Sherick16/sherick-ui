@@ -14,7 +14,7 @@ import React, {
   type ReactNode,
 } from "react";
 import { cn } from "@/libs/utils";
-import { density, material, parentFocusRingInset, shape, state, stateLayer, text, tone } from "./ui.common";
+import { density, elevation, material, parentFocusRingInset, shape, state, stateLayer, text, tone } from "./ui.common";
 import { motionFeedback, motionOrient } from "./ui.motion";
 import {
   flattenTree,
@@ -337,7 +337,7 @@ const TreeView = forwardRef<HTMLDivElement, TreeViewProps>(function TreeView(
             parentFocusRingInset,
             stateLayer.quiet,
             stateLayer.activeRow,
-            selected && tone.selected.primary,
+            selected && cn(tone.selected.primary, elevation.control),
             /* A disabled *tree* dims once, at its root, so its rows carry only the cursor; a
                disabled *node* is the one that takes the opacity step, and only over its own row. */
             disabled ? state.disabledDescendant : cn(state.enabled, state.effectiveDisabled)
