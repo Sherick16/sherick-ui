@@ -93,6 +93,7 @@ import {
   useShowcaseScrollSpy,
   type ShowcaseSectionId,
 } from "../components/ShowcaseNav";
+import StepperSpecimen from "../components/v2-1/e";
 
 const selectOptions = [
   { label: "Design system", value: "design" },
@@ -555,6 +556,10 @@ export default function Home() {
                   <Progress value={null} label="Scanning dependencies" />
                   <Progress value={100} variant="success" label="Deploy finished" showValue />
                 </div>
+              </Specimen>
+
+              <Specimen title="Stepper">
+                <StepperSpecimen />
               </Specimen>
 
               <Specimen title="Toasts">

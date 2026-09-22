@@ -1,9 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-/* Relative source import while this unit iterates on its own module; integration switches it to the
-   `sherick-ui` root import once the barrel exports `Stepper`. */
-import Stepper, { type StepperItem } from "../../../../packages/ui/src/components/Stepper";
+import { Stepper, type StepperItem } from "sherick-ui";
 
 const Group = ({ label, children }: { label: string; children: ReactNode }) => (
   <div className="flex min-w-0 flex-col gap-3">

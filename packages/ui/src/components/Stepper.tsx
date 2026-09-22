@@ -55,7 +55,7 @@ const StepMark = ({
           : cn(tone.tonal.secondary, text.medium)
     )}
   >
-    {complete ? (
+    {complete && !current ? (
       <>
         <CheckIcon aria-hidden="true" />
         <span className={cn("sr-only")}>Complete</span>

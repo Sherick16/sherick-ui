@@ -70,6 +70,17 @@ test("current, complete and remaining steps state themselves beyond colour", asy
   expect(errors).toEqual([]);
 });
 
+test("current takes precedence when the consumer also marks that step complete", async ({ page, errors }) => {
+  const nav = page.getByRole("navigation", { name: "Checkout progress" });
+  const cart = step(nav, /Cart/);
+  await cart.click();
+  await expect(cart).toHaveAttribute("aria-current", "step");
+  await expect(cart).toHaveAccessibleName(/\b1\b/);
+  await expect(cart).not.toHaveAccessibleName(/Complete/);
+  await expect(cart.locator("svg")).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
+
 test("the consumer owns the current step and can reject a reported change", async ({ page, errors }) => {
   const nav = page.getByRole("navigation", { name: "Checkout progress" });
 
