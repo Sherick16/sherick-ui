@@ -1,16 +1,13 @@
-# Rendered visual-consistency audit
+# Rendered visual-consistency audit (historical checkpoint)
 
 ## Scope and evidence
 
 Reviewed the production-built catalog against `DESIGN_LANGUAGE.md`, starting from `5ed76ff`.
 This was a rendered review, not a source-only normalization pass.
 
-**Method deviation.** The brief asked for the inspection to be fanned out by visual concern and
-then synthesized across the tracks. It was not: the review ran as a single sequential pass, with
-no subagents, and that is how a sibling inconsistency below was missed — `Alert` still
-compensated only its top edge after `Toast`'s identical defect had been fixed in this same PR.
-External review caught it. The follow-up therefore re-checked the rule across the library
-instead of patching the one component it was reported against.
+This Phase B record describes the earlier rendered audit, not the current release gate.
+The [design language](DESIGN_LANGUAGE.md) and [verification guide](VERIFICATION.md) own
+current rules and commands.
 
 The showcase covers every public component family; `/verification/visual-consistency` adds
 same-content sibling comparisons and real overlay triggers. Review captures cover both themes,

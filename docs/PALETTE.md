@@ -82,8 +82,8 @@ gate uses.
   that would have made a primary tonal button's fill 8% of the accent and a danger badge's 6%: the
   tonal family would have stopped reading as a tinted surface at all, and it is a *maximum* with no
   headroom. Rejected: it solves the metric by removing the thing being measured.
-- **Neutral labels on tinted surfaces (A3).** §10 already says "the mark lands on the surface and the
-  icon; the copy stays at its normal emphasis", and `Alert` does exactly that. Applied everywhere it
+- **Neutral labels on tinted surfaces (A3).** `Alert` already keeps its copy neutral while the
+  mark takes the semantic tone. Applied everywhere it
   would give every tonal button, badge and primary card an `ink` label — 11:1 and up, and no palette
   change at all. Rejected for *character*, not for correctness: the coloured label is what makes a
   tonal control read as "this action is the destructive one" at a glance, and flattening it is a

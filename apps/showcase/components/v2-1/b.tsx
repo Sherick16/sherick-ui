@@ -35,7 +35,7 @@ const Specimen = ({
   children: React.ReactNode;
 }) => (
   <div className="flex min-w-0 flex-col gap-3">
-    <h3 className="text-sm font-medium text-sherick-ink">{caption}</h3>
+    <h4 className="text-sm font-medium text-sherick-ink">{caption}</h4>
     {children}
   </div>
 );

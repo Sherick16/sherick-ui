@@ -256,43 +256,12 @@ Exports: `TreeView`; `TreeViewProps`, `TreeViewItem`.
   RTL, deep/narrow/long content, SSR hydration and axe.
 - Excluded: multi-select, checkbox tree, virtualization, drag reorder, lazy loading, networking.
 
-## Implementation and verification ownership
+## Verification
 
-Six independent source seams are isolated in worktrees. Unit A owns `Calendar.tsx`,
-`DatePicker.tsx`, `DateRangePicker.tsx` and private date-family files; B owns `Command.tsx`
-and `CommandPalette.tsx`; C owns `Pagination.tsx` and `Breadcrumb.tsx`; D/E/F own their
-named files. Each owns `apps/showcase/components/v2-1/<unit>.tsx`, a dedicated
-`app/verification/v2-1-<unit>/page.tsx`, and `tests/browser/v2-1-<unit>.spec.ts`.
-
-Workers implement component modules/public types and those focused specimens/tests only.
-The parent owns barrels, showcase registration, package smoke/packed/type fixtures,
-documentation and shared-system/generated changes. Workers must not edit those surfaces,
-install dependencies, change budgets or rebase/push/publish. They inspect adjacent patterns
-before editing and run library typecheck, lint for their source, and motion policy; browser
-specimens initially import their component source by relative path for isolated iteration.
-The parent migrates them to package-root imports at integration and runs the browser checks
-against the integrated published build. Tests use existing fixtures, hydration markers and
-semantic/geometry assertions, not skipped checks or private implementation snapshots.
-
-Every initial unit is implemented by DeepSeek V4.1 Flash and reviewed read-only by GPT-5.6
-Sol High. The parent (GPT-6 Astra) verifies findings and owns every correction, focused
-regression and integration. The complete diff receives independent architecture/API and
-interaction/accessibility/design review tracks. The exact final tree must pass
-`bun install --frozen-lockfile`, `bun run verify`, and `git diff --check` before PR delivery.
-
-The shared publication fixtures exercise all ten components through installed package imports:
-React 18/19 Vite and Next hydration, NodeNext/Bundler/CommonJS declarations, native forms,
-portals and axe checks before/after invalid date/file entry. The no-Tailwind wave route runs
-on Chromium, Firefox and WebKit, including RTL keyboard use, narrow themed portals and
-reduced motion; forced-colors emulation is additionally asserted on Chromium.
-
-The deterministic style-contract baseline adds 15 wave specimens and 35 net scoped utility
-rules. Its existing 93 specimens, token blocks and overlay recipes are unchanged. The
-forced-colors selection rule extends its existing declarations to calendar days and tree
-rows; targeted fallbacks preserve direct-row focus and active-descendant highlighting.
-The selected-files specimen pins owned-list normalization, and the interactive Stepper
-specimen pins mark-only press motion. Test-only date bounds/forms and tree mutation probes
-render only in their verification routes, not the showcase.
+Each family has a showcase specimen, a focused `apps/showcase/app/verification/v2-1-*`
+route and a matching browser spec. The packed consumers and no-Tailwind fixture exercise
+the installed public exports. See [VERIFICATION.md](VERIFICATION.md) for the current gate; the
+fixtures, not a past implementation plan or specimen count, are the evidence.
 
 ## Visual anatomy
 
@@ -336,6 +305,3 @@ The wave composes the existing language rather than adding new tokens or recipes
   validation errors remain visible. Showcase captions no longer narrate internal selection state.
 - TreeView retains its row language. Showcase specimens size to content rather than stretching
   into empty neighboring panels; the date family gets room for its grids.
-
-Screenshots must be inspected in addition to the deterministic style manifest. Computed classes,
-passing API tests and an updated manifest do not establish that the rendered anatomy is good.

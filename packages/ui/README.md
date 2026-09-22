@@ -1,235 +1,79 @@
 # Sherick UI
 
-Sherick UI is a React component library with a soft, expressive design language and Base UI-backed interaction/accessibility primitives.
+A React 18/19 component library with soft tonal surfaces, deliberate shape contrast
+and restrained motion. `2.0.0` is stable under npm's `latest` tag; the `1.x` line
+is frozen. The v2.1 components currently in the repository are not yet published.
 
-The current stable release is `2.0.0` under npm's `latest` dist-tag. The `1.x` line is frozen, and API compatibility is promised from `2.0.0` onward under ordinary semver. See the repository's `docs/RELEASE.md` for the full compatibility contract.
-
-## Installation
+## Install and style
 
 ```bash
 npm install sherick-ui
 ```
 
-Import the complete stylesheet once near your application root. Load framework/Tailwind/reset CSS first, then Sherick UI:
-
 ```tsx
-import "./app.css";
+import "./app.css"; // framework, reset or Tailwind CSS first
 import "sherick-ui/styles.css";
 ```
 
-The order matters when the host also uses Tailwind: Sherick ships a precompiled internal utility graph, so loading it after host CSS prevents duplicate host utility definitions from changing Sherick component anatomy. A dedicated application override stylesheet may be loaded after `sherick-ui/styles.css` when selector-level overrides are required; ordinary Tailwind `className` conflicts are already resolved by Sherick's `cn()`/tailwind-merge composition.
+The complete stylesheet is precompiled, scoped and reset-free. No consumer Tailwind
+configuration or package-content scan is needed. Load a dedicated selector-level
+app override stylesheet **after** Sherick if required; `className` utility overrides
+are merged by the components. `sherick-ui/theme.css` is also available for token-only
+applications. See the [styling contract](https://github.com/Sherick16/sherick-ui/blob/main/docs/RELEASE.md#styling-import-contract).
 
-That is the full styling integration. Consumers do not need Tailwind, a Sherick preset, package content scanning, or any other Sherick-specific CSS build configuration.
-
-Tailwind is private authoring/build infrastructure inside the Sherick UI repository. The published package ships finished, scoped CSS and initializes the Tailwind runtime custom properties it needs inside that private scope, so shadows, rings, transforms and backdrop filters work even when the consumer has no Tailwind preflight.
-
-No host reset is required: native controls and border-box geometry are normalized only on Sherick-owned nodes. Keyframes and math font families are namespaced; unrelated host elements and consumer children remain untouched.
-
-## Writing direction
-
-For an RTL application, set `<html dir="rtl">` and wrap the React tree with
-`<DirectionProvider direction="rtl">` imported from `sherick-ui`. Keep both values in
-sync when changing locale. The provider adds no DOM; it gives keyboard navigation and
-portaled positioning the same direction as CSS. Consumers never import Base UI.
-`Drawer` sides remain physical; `CodeBlock` source remains left-to-right.
-
-## Themes
-
-Theme selection is CSS-only:
-
-```ts
-// Force light
-document.documentElement.dataset.sherickTheme = "light";
-
-// Force dark
-document.documentElement.dataset.sherickTheme = "dark";
-
-// Follow prefers-color-scheme
-document.documentElement.removeAttribute("data-sherick-theme");
-```
-
-Custom themes override the documented `--sui-*` CSS variables at document/root level:
-
-```css
-:root {
-  --sui-primary: 0.50 0.17 255;
-  --sui-primary-strong: 0.47 0.19 257;
-  --sui-on-primary: 0.985 0.005 255;
-}
-```
-
-`styles.css` includes both component styling and the generated light/dark/system token defaults. `theme.css` is also exported separately for token-only consumers.
-
-## Runtime and browser support
-
-Sherick UI supports React and React DOM 18 or 19. Its automated browser baseline is the Chromium,
-Firefox and WebKit versions shipped by the repository's pinned Playwright release. Chrome, Edge and
-Safari distribution builds and previous browser majors are not separately certified. The core package
-has ESM and CommonJS entries; the rich-content subpath is ESM-only.
-
-### Editable Combobox isolation
-
-The editable `Combobox` blocker is resolved by a version-specific patch to Base UI's own isolation
-utility. The patch uses Base's focusability model to suppress every radio in a native group, observes
-hidden subtrees for the full open lifetime, restores prior values on close and preserves non-modal
-outside pointer interaction. The audited Base UI package is bundled so installed npm consumers receive
-the same fix. It may be retired only after a released Base UI version passes the same axe,
-live-mutation, restoration and pointer-interaction gates.
-The repository's `docs/RELEASE.md` records the complete evidence and release condition.
-
-## Usage
+## Use
 
 ```tsx
-import { Button, Combobox, Dialog, Field, Input, Menu, Select } from "sherick-ui";
-import "sherick-ui/styles.css";
+import { Button, Field, Input, Select } from "sherick-ui";
 
 export function Example() {
   return (
     <>
       <Input label="Email" name="email" type="email" required />
-      <Select
-        options={[
+      <Field label="Project">
+        <Select options={[
           { label: "Design system", value: "design" },
           { label: "Dashboard", value: "dashboard" },
-        ]}
-        defaultValue="design"
-      />
-      <Field label="Project">
-        <Combobox
-          options={[
-            { label: "Design system", value: "design" },
-            { label: "Dashboard", value: "dashboard" },
-          ]}
-          defaultValue="design"
-        />
+        ]} defaultValue="design" />
       </Field>
-      <Menu>
-        <Menu.Trigger render={<Button appearance="tonal">Actions</Button>} />
-        <Menu.Content>
-          <Menu.Item>Rename</Menu.Item>
-          <Menu.Item variant="danger">Delete</Menu.Item>
-        </Menu.Content>
-      </Menu>
       <Button appearance="filled">Save</Button>
-      <Dialog defaultOpen>
-        <Dialog.Header>Example dialog</Dialog.Header>
-        <Dialog.Description>Base UI owns the dialog mechanics.</Dialog.Description>
-        <Dialog.Content>Styled by Sherick UI.</Dialog.Content>
-      </Dialog>
     </>
   );
 }
 ```
 
-## Package exports
+The root barrel contains actions, forms, selection, navigation, feedback and overlays.
+`Markdown` and `CodeBlock` are imported from **ESM-only** `sherick-ui/content`;
+CommonJS consumers use dynamic `import()`. The rich stack is installed with the
+package but never bundled by a core-only import. `sherick-ui/dev` is unsupported
+workbench infrastructure, not consumer API. For the current export list and semver
+boundaries see the [release contract](https://github.com/Sherick16/sherick-ui/blob/main/docs/RELEASE.md#public-export-contract).
 
-The package publishes these subpaths:
+The repository's **unreleased** v2.1 wave adds Calendar/DatePicker/DateRangePicker,
+Command/CommandPalette, Pagination/Breadcrumb, FileUpload, Stepper and TreeView to
+the same root barrel. Its [component contracts](https://github.com/Sherick16/sherick-ui/blob/main/docs/V2_1_COMPONENTS.md)
+use civil `YYYY-MM-DD` dates and `File[]` selections; FileUpload does not upload files.
 
-- `sherick-ui` — the core component barrel: `Accordion`, `Alert`, `AlertDialog`, `Avatar`, `Badge`, `Button`, `Card`, `Checkbox`, `Chip`, `ChipGroup`, `Collapsible`, `Combobox`, `Dialog`, `DirectionProvider`, `Divider`, `Drawer`, `Field`, `IconButton`, `Input`, `Menu`, `NavGroup`, `NavItem`, `NumberField`, `Popover`, `Progress`, `RadioGroup`, `Search`, `SegmentedControl`, `Select`, `Skeleton`, `Slider`, `Spinner`, `Switch`, `Table`, `Tabs`, `Textarea`, `ToastProvider`, `ToastViewport`, `ToggleGroup`, `Tooltip`, `useToast`, `createToastManager`, plus their prop types and the shared `Variant` type.
-- `sherick-ui/content` — the rich-content boundary, **ESM only**: `Markdown`, `CodeBlock` and their prop types.
-- `sherick-ui/styles.css` — the complete component stylesheet.
-- `sherick-ui/theme.css` — token-only theme output.
-- `sherick-ui/dev` — development-only recipes for this repository's workbench. Unstable and unsupported; do not depend on it.
+## Themes and direction
 
-The unreleased v2.1 wave also adds `Calendar`, `DatePicker`, `DateRangePicker`, `Command`,
-`CommandPalette`, `Pagination`, `Breadcrumb`, `FileUpload`, `Stepper` and `TreeView` to the
-same root barrel, with their prop/data types. Dates use civil `YYYY-MM-DD` strings.
-FileUpload reports `File[]`; consumers build their own upload/FormData payload. The same
-`styles.css` import styles every new component and independently portaled surface.
+With no root `data-sherick-theme`, the library follows `prefers-color-scheme`. Set
+`"light"` or `"dark"` to override it. Retune `--sui-*` variables at the document
+root; nested theme islands are not supported because overlays portal to the body.
+The [token source](https://github.com/Sherick16/sherick-ui/blob/main/packages/ui/src/styles/tokens.ts)
+contains the defaults; custom accent values should pass the
+[contrast contract](https://github.com/Sherick16/sherick-ui/blob/main/docs/VERIFICATION.md#fast-package-smoke-checks)
+in both themes and interaction states.
 
-The names above are canonical. There are no compatibility aliases: `ActionButton`, `Dropdown`, `Modal`, `TabGroup` and their prop types are gone, as are the deprecated `Select.selected`, `Select.onSelect`, `Tabs.defaultTabId`, `Tabs.onTabChange`, `Dialog.onClose` and `Table.variant` props. The `onChange` props on `Input`, `Textarea` and `Switch` are no longer Sherick callbacks — `Input` and `Textarea` pass through native `onChange`, and boolean state goes through `Switch.onCheckedChange`.
+For RTL, set both `<html dir="rtl">` and `<DirectionProvider direction="rtl">`.
+Drawer sides stay physical and CodeBlock source stays LTR.
 
-Base-owned value/state callbacks keep `(nextValue, eventDetails)`: for example
-`Input.onValueChange`, `Textarea.onValueChange` and the callbacks on `Search`, `Select`,
-`Switch`, `Tabs`, `Dialog` and `Combobox`. These are distinct from native `onChange`;
-consumers that do not need the event details may ignore the second argument.
+## Support
 
-The viewport-owning surfaces differ in what they own. `Dialog` composes as
-`Dialog.Header`, `Dialog.Description`, `Dialog.Content` and `Dialog.Footer`; `AlertDialog` is the
-destructive confirmation, with `title`, `description`, `confirmLabel`, `onConfirm` and `onCancel`
-— `onCancel` runs for every user cancellation, the cancel action and Escape alike — and it is
-always modal and never dismisses on an outside press. `Popover`, `Menu` and `Combobox` anchor to
-the element that opened them: `Popover.Trigger`/`Popover.Content`,
-`Menu.Trigger`/`Menu.Content`/`Menu.Item`/`Menu.Separator`, and a `Combobox` that takes `options`
-and a `value` the way `Select` does. Label a `Combobox` with `Field`, and drop it into `Select`'s
-place when the list needs to be searchable; a `readOnly` Combobox still opens and browses, it just
-cannot change its value.
-
-These components compose Base UI primitives, and Base UI stays internal: the parts above accept the
-capabilities this package documents rather than the primitive's complete prop set, so a Base
-upgrade is not a Sherick breaking change.
-
-Six further families are worth naming, because each is one behavioral foundation under more than
-one name:
-
-- **disclosure** — `Accordion` and `Collapsible` are one object at two scopes: the same row and the
-  same measured panel, one holding a group's value array and one holding a single region's boolean.
-  Compose `Accordion.Item`/`Accordion.Trigger`/`Accordion.Panel`, or
-  `Collapsible.Trigger`/`Collapsible.Panel`. The region's height is measured by the primitive and
-  moved by the disclosure recipe, so a collapsed panel is not mounted and an expanded one can grow
-  with its own content;
-- **the sheet** — `Drawer` is a `Dialog` with an edge rather than a second kind of modal, so it
-  traps focus, restores it, locks the page and dismisses exactly as a dialog does. Compose a
-  `Drawer.Trigger` and a `Drawer.Content`, with `Drawer.Header`/`Drawer.Description`/
-  `Drawer.Footer`/`Drawer.Close`. `side` is physical — `"right"` is the right edge of the screen
-  in every writing direction — and it is also the edge the surface slides out of;
-- **toasts** — `ToastProvider` wraps the application, `ToastViewport` renders the stack, and
-  `useToast()` raises one from inside the tree. The queue, the auto-dismiss timer, the limit, the
-  live region, swipe dismissal and the stack's own state all stay with the primitive, and
-  `createToastManager()` builds a manager that lives outside React for code that has no component
-  to raise one from. What a toast is raised with is this package's own contract — `add`, `update`,
-  `close` and `promise`, with `title`, `description`, `type`, `timeout`, `priority`, `actionProps`
-  and the two lifecycle callbacks — rather than the primitive's whole option set; `promise()`
-  reports one promise through one toast, and its loading, success and error states each carry a
-  mark and a tone. **F6** enters the notification stack, including while a Dialog or Drawer is
-  open; **Tab** reaches each toast's action and dismissal. **Shift+Tab** from the viewport, or
-  Tab past the final control, returns to the previous control. Ordinary modal Tab navigation
-  remains inside the modal; notification access uses the primitive's dedicated shortcut;
-- **navigation** — `NavGroup` is a titled group of `NavGroupItem`s that brings no surface of its
-  own, so a navigation column reads as one region rather than a card holding cards. `NavItem` is a
-  row the densest density step sizes, whose current destination takes the lightest accent tint and
-  publishes `aria-current`;
-- **the toggle family** — a `Chip` is a tag until it is given a selection, and a toggle chip inside a
-  `ChipGroup` is a button that holds the group's value; a `ToggleGroup` and its `ToggleGroup.Item`
-  segments are the same object inside a recessed track, and `SegmentedControl` is that group's
-  single-choice form over an `options` array. Selection lives in Base UI's own pressed marker, so an
-  uncontrolled toggle is styled from the same source of truth as a controlled one, and a
-  `SegmentedControl` never empties itself;
-- **`Progress`** — a determinate bar announces its value through Base UI's `progressbar` role, and omitting
-  `value`, or passing `null`, sweeps the fill instead of reporting a position;
-- **removable tags** — only a chip that holds no selection can be dismissed, because a control that
-  both holds a value and deletes itself is one target with two meanings.
-
-## Rich content
-
-`Markdown` and `CodeBlock` are not on the root export — they live on a separate subpath:
-
-```tsx
-import { Markdown, CodeBlock } from "sherick-ui/content";
-
-export function Docs() {
-  return <Markdown>{"# Heading"}</Markdown>;
-}
-```
-
-The rich-content stack (Prism, remark/rehype, KaTeX) is deliberately separate, so a build that only uses core components never bundles a syntax highlighter or a Markdown pipeline. Importing `Button` from `sherick-ui` does not reach `sherick-ui/content`; that boundary is enforced by the package's bundle budget gate.
-
-It is a bundle boundary, not an install boundary: the rich stack stays an ordinary dependency, so installing `sherick-ui` installs it whether or not the subpath is imported.
-
-The subpath is **ESM only**, because `react-markdown` and remark/rehype have no CommonJS build. It therefore declares no `require` entry, and `require("sherick-ui/content")` fails with `ERR_PACKAGE_PATH_NOT_EXPORTED`. From CommonJS, use `await import("sherick-ui/content")`. The root barrel and `sherick-ui/dev` keep their CommonJS entries.
-
-## Architecture
-
-Base UI owns generic interaction and accessibility mechanics when it provides the primitive: keyboard navigation, focus management, semantic relationships, form participation, portals, dismissal and popup positioning. Sherick UI owns anatomy, its public design API and the visual language.
-
-Base UI is internal infrastructure. Consumers never import `@base-ui/react` to use Sherick UI, and Base UI's own props, DOM structure and generated IDs are not part of this package's compatibility promise.
-
-The package tarball includes the exact audited Base UI implementation. This carries the temporary
-editable-Combobox isolation patch into installed npm consumers while leaving Base UI — not a Sherick
-wrapper — responsible for focus, ARIA isolation, dismissal and popup lifecycle.
-
-Tailwind is not a runtime integration surface. It is internal authoring/build infrastructure: the package ships no Tailwind preset, declares no Tailwind peer dependency and requires no package-content scanning. Component CSS is generated inside this package and scoped internally; `.sui-scope` is private implementation detail, not a consumer class or theming hook.
-
-Themes are document-level. Overlays portal to `document.body`, so root-level `--sui-*` variables apply to Dialog, Select and Tooltip surfaces; nested theme islands are not a supported contract.
-
-The design language remains canonical in the repository-level `docs/DESIGN_LANGUAGE.md`. Reusable recipes live in `src/components/ui.common.ts`; authored theme values live in `src/styles/tokens.ts` and compile to the published CSS artifacts.
+The core ships ESM and CommonJS and supports React/React DOM 18 or 19. The automated
+browser baseline is the pinned Playwright Chromium, Firefox and WebKit engines;
+shipping browser builds and older majors are not separately certified. Base UI owns
+generic widget behavior and accessibility; Tailwind is private styling infrastructure.
+Neither is a consumer API. The audited patched Base UI copy is bundled for editable
+Combobox focus isolation. See the [release contract](https://github.com/Sherick16/sherick-ui/blob/main/docs/RELEASE.md)
+and [design language](https://github.com/Sherick16/sherick-ui/blob/main/docs/DESIGN_LANGUAGE.md)
+for details.
