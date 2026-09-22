@@ -20,6 +20,11 @@ may continue to name only a prerelease; stable `2.0.0` is published exclusively 
 `publishConfig.tag` is `latest`. `scripts/verify-packed-package.mjs` fails if a prerelease would publish
 under `latest` or a stable version would publish under anything but `latest`.
 
+The unreleased v2.1 component wave is additive to this stable contract. Its public APIs and
+narrow component-owned behavior for missing Base primitives are recorded in
+[`V2_1_COMPONENTS.md`](V2_1_COMPONENTS.md). It does not change the package version or authorize
+publication, an npm dist-tag change, or a release tag.
+
 During the `2.0.0-alpha.N` line:
 
 - breaking changes were allowed and shipped without deprecation cycles, aliases, transitional props,

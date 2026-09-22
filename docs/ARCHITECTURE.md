@@ -190,6 +190,15 @@ CSS and font assets, because the stylesheet is published as one complete artifac
 
 Reusable components belong under `packages/ui/src/components` and are exported from the package's public barrel — unless they pull a heavyweight dependency stack that most consumers should not bundle, in which case they belong on their own subpath the way rich content belongs to `sherick-ui/content`. Application-only layout/specimens remain in app workspaces.
 
+### v2.1 behavioral gaps
+
+The additive [v2.1 contracts](V2_1_COMPONENTS.md) record the missing primitives in audited
+Base UI `1.8.0` before component-owned behavior is introduced. Calendar/date selection and
+tree navigation stay narrowly in those families; native date/file inputs, buttons and links
+supply platform behavior. Commands use Base Autocomplete, calendar popups use Base Popover,
+and the palette reuses Base Dialog with `DialogSurface`. This is not a new generic headless
+layer, dependency upgrade, theme system or package subpath. Existing stable APIs remain intact.
+
 For styling, a new component should only need to:
 
 1. compose non-temporal recipes from `ui.common.ts` and semantic temporal recipes from `ui.motion.ts`;
