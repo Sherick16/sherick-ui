@@ -132,6 +132,8 @@ Exports: `Pagination`, `Breadcrumb`; `PaginationProps`, `BreadcrumbItem`, `Bread
   `getPageHref?:(page:number)=>string`, `getPageLabel?:(page:number)=>string`,
   `previousLabel?:string`, `nextLabel?:string`. Ref is nav. Default nav name Pagination.
   Finite nonnegative count/sibling count are floored; invalid values normalize to 0/1.
+  Totals above `Number.MAX_SAFE_INTEGER` are invalid: consecutive pages must remain distinct.
+  Sibling count caps at 5, keeping every render bounded even for accidental huge prop values.
   Current page is clamped to available pages; zero pages has no current page or activation.
 - Native nav/ol with real buttons, or anchors when getPageHref exists. Anchors preserve
   modified clicks/browser navigation; ordinary page activation reports callback without

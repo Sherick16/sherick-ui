@@ -83,7 +83,7 @@ const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
                   >
                     {item.label}
                   </span>
-                ) : item.href ? (
+                ) : item.href !== undefined ? (
                   renderLink ? (
                     renderLink(item, linkProps(item))
                   ) : (

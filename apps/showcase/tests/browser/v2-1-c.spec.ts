@@ -394,3 +394,45 @@ test("the passive breadcrumb arrives in the server markup", async ({ page, error
 
   expect(errors).toEqual([]);
 });
+
+test("numeric limits stay bounded and preserve distinct page identities", async ({ page, errors }) => {
+  await openFixture(page);
+  const unsafe = landmark(page, "Unsafe total");
+  await expect(currentPages(unsafe)).toHaveCount(0);
+  await expect(unsafe.getByRole("button")).toHaveCount(2);
+  const maximum = landmark(page, "Maximum safe total");
+  expect(await maximum.locator("ol > li").count()).toBeLessThanOrEqual(17);
+  const numbers = await pageNumbers(maximum);
+  expect(new Set(numbers).size).toBe(numbers.length);
+  expect(numbers.at(-1)).toBe(Number.MAX_SAFE_INTEGER);
+  await expect(currentPages(maximum)).toHaveText("1000");
+  expect(errors).toEqual([]);
+});
+
+test("an empty href remains a real native navigation link", async ({ page, errors }) => {
+  await openFixture(page);
+  const pagination = landmark(page, "Empty-href pagination");
+  await expect(pagination.getByRole("link")).toHaveCount(5);
+  for (const link of await pagination.getByRole("link").all()) await expect(link).toHaveAttribute("href", "");
+  await expect(landmark(page, "Empty-href breadcrumb").getByRole("link", { name: "Reload" })).toHaveAttribute("href", "");
+  expect(errors).toEqual([]);
+});
+
+test("previous and next press the mark without shrinking their targets", async ({ page, errors }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await openFixture(page);
+  const target = landmark(page, "Pagination").getByRole("button", { name: "Next page" });
+  const mark = target.locator("svg");
+  const before = (await target.boundingBox())!;
+  const inkBefore = (await mark.boundingBox())!;
+  await target.hover();
+  await page.mouse.down();
+  try {
+    await expect.poll(async () => (await mark.boundingBox())!.width).toBeLessThan(inkBefore.width - 1);
+    expect((await target.boundingBox())!.width).toBeCloseTo(before.width, 1);
+    expect((await target.boundingBox())!.height).toBeCloseTo(before.height, 1);
+  } finally {
+    await page.mouse.up();
+  }
+  expect(errors).toEqual([]);
+});

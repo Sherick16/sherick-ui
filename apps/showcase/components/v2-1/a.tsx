@@ -1,20 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Button from "../../../../packages/ui/src/components/Button";
-import Calendar from "../../../../packages/ui/src/components/Calendar";
-import DatePicker from "../../../../packages/ui/src/components/DatePicker";
-import DateRangePicker from "../../../../packages/ui/src/components/DateRangePicker";
-import { DirectionProvider } from "../../../../packages/ui/src/components/DirectionProvider";
-import type { CalendarDate, DateRange } from "../../../../packages/ui/src/components/Calendar";
-import { material, shape, text } from "../../../../packages/ui/src/components/ui.common";
-import { cn } from "../../../../packages/ui/src/libs/utils";
-
-/* v2.1 unit A — the date family.
-   Specimens only: every state appears once, and each one is labelled with what it shows so the
-   browser suite can address it by role and accessible name rather than by class. The component
-   imports reach into the package source because this worktree has no published build yet; the
-   integration owner replaces them with `sherick-ui` imports. */
+import { Button, Calendar, DatePicker, DateRangePicker, DirectionProvider, type CalendarDate, type DateRange } from "sherick-ui";
+import { cn, material, shape, text } from "sherick-ui/dev";
 
 const leapMonth: CalendarDate = "2024-02-15";
 const rangeStart: DateRange = { start: "2024-01-08", end: "2024-01-12" };

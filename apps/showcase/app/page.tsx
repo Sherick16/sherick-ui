@@ -95,6 +95,7 @@ import {
 } from "../components/ShowcaseNav";
 import StepperSpecimen from "../components/v2-1/e";
 import NavigationSpecimen from "../components/v2-1/c";
+import DateFamilySpecimen from "../components/v2-1/a";
 
 const selectOptions = [
   { label: "Design system", value: "design" },
@@ -407,6 +408,9 @@ export default function Home() {
                     <NumberField defaultValue={4} disabled />
                   </Field>
                 </div>
+              </Specimen>
+              <Specimen title="Calendar & date pickers">
+                <DateFamilySpecimen />
               </Specimen>
             </div>
           </ShowcaseSection>

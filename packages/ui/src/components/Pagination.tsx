@@ -10,7 +10,7 @@ import {
 } from "react";
 import { cn, cx } from "@/libs/utils";
 import { density, focusRing, shape, state, stateLayer, text, tone } from "./ui.common";
-import { motionTactile } from "./ui.motion";
+import { motionFeedback, motionInkPress, motionTactile } from "./ui.motion";
 
 export interface PaginationProps
   extends Omit<ComponentPropsWithoutRef<"nav">, "children" | "defaultValue" | "onChange"> {
@@ -22,7 +22,7 @@ export interface PaginationProps
   defaultValue?: number;
   /** Reports the page an ordinary activation asked for. */
   onValueChange?: (page: number) => void;
-  /** Pages kept on each side of the current one before a gap is drawn. */
+  /** Pages kept on each side of the current one, capped at 5 to keep rendering bounded. */
   siblingCount?: number;
   disabled?: boolean;
   /** Renders every available page as a real anchor to the href this returns. */
@@ -44,9 +44,10 @@ type PaginationItem = number | PaginationGap;
    empty pagination for a count, one sibling for a sibling count, and the first page for a page. A
    sibling count is a distance, so `0` is meaningful; a page total is not, and `0` is the empty case
    rather than an invalid one. */
-const normalizeCount = (count: number) => (Number.isFinite(count) && count > 0 ? Math.floor(count) : 0);
+const normalizeCount = (count: number) =>
+  Number.isSafeInteger(Math.floor(count)) && count > 0 ? Math.floor(count) : 0;
 const normalizeSiblings = (value: number) =>
-  Number.isFinite(value) && value >= 0 ? Math.floor(value) : 1;
+  Number.isFinite(value) && value >= 0 ? Math.min(5, Math.floor(value)) : 1;
 const normalizePage = (value: number) => (Number.isFinite(value) && value > 0 ? Math.floor(value) : 1);
 
 /* The bounded set. Both ends are always shown, the current page keeps `siblingCount` neighbours on
@@ -86,7 +87,7 @@ const controlBase = /* @__PURE__ */ cx(
   "inline-flex shrink-0 items-center justify-center text-sm tabular-nums",
   density.target,
   focusRing,
-  motionTactile,
+  motionFeedback,
   stateLayer.quiet,
   text.high
 );
@@ -168,24 +169,24 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
 
       return (
         <li className={cn("flex")}>
-          {href ? (
+          {href !== undefined ? (
             <a
               href={href}
               aria-label={label}
-              className={cn(controlBase, shape.circle, "[&>svg]:size-5", controlState(onBoundary))}
+              className={cn(controlBase, "group", shape.circle, controlState(onBoundary))}
               onClick={(event) => activateFromAnchor(event, page)}
             >
-              {icon}
+              <span className={cn("inline-flex size-5 items-center justify-center [&>svg]:size-5", motionInkPress)}>{icon}</span>
             </a>
           ) : (
             <button
               type="button"
               disabled={onBoundary || disabled}
               aria-label={label}
-              className={cn(controlBase, shape.circle, "[&>svg]:size-5", controlState(onBoundary))}
+              className={cn(controlBase, "group", shape.circle, controlState(onBoundary))}
               onClick={() => activate(page)}
             >
-              {icon}
+              <span className={cn("inline-flex size-5 items-center justify-center [&>svg]:size-5", !disabled && !onBoundary && motionInkPress)}>{icon}</span>
             </button>
           )}
         </li>
@@ -199,13 +200,14 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
 
       return (
         <li key={page} className={cn("flex")}>
-          {href ? (
+          {href !== undefined ? (
             <a
               href={href}
               aria-current={isCurrent ? "page" : undefined}
               aria-label={label}
               className={cn(
                 controlBase,
+                motionTactile,
                 shape.pill,
                 "px-3",
                 isCurrent && cn(tone.tonal.primary, "font-medium"),
@@ -223,6 +225,7 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
               aria-label={label}
               className={cn(
                 controlBase,
+                motionTactile,
                 shape.pill,
                 "px-3",
                 isCurrent && cn(tone.tonal.primary, "font-medium"),
