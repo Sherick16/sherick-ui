@@ -715,6 +715,7 @@ export const fixture = (
       "focusRestoreMap",
       "MutationObserver",
       "isTabbable",
+      "focusable",
       "attributeOldValue",
       "takeRecords",
     ]) {

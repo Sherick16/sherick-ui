@@ -1,5 +1,5 @@
 diff --git a/floating-ui-react/utils/markOthers.js b/floating-ui-react/utils/markOthers.js
-index c813f114e8b5fa6f2cd9076170b4c26354a9e404..00b812afbb5dd8d52b49934e0132ef673bcb2b5e 100644
+index c813f114e8b5fa6f2cd9076170b4c26354a9e404..e59f17689f47b58592f528c1290fb61f7aff52cf 100644
 --- a/floating-ui-react/utils/markOthers.js
 +++ b/floating-ui-react/utils/markOthers.js
 @@ -6,6 +6,8 @@ Object.defineProperty(exports, "__esModule", {
@@ -49,7 +49,7 @@ index c813f114e8b5fa6f2cd9076170b4c26354a9e404..00b812afbb5dd8d52b49934e0132ef67
 +      state.restore.delete(element);
 +    }
 +  });
-+  const targets = (0, _tabbable.tabbable)(node);
++  const targets = (0, _tabbable.focusable)(node).filter(_tabbable.isTabbable);
 +  if ((0, _tabbable.isTabbable)(node)) {
 +    targets.unshift(node);
 +  }
@@ -121,7 +121,7 @@ index c813f114e8b5fa6f2cd9076170b4c26354a9e404..00b812afbb5dd8d52b49934e0132ef67
        });
      }
 diff --git a/floating-ui-react/utils/markOthers.mjs b/floating-ui-react/utils/markOthers.mjs
-index 2c7e806b36fa33782c61adf58cd6aa420e69374d..e485454fb3d64ff8723e8a767bf56bedac9eac51 100644
+index 2c7e806b36fa33782c61adf58cd6aa420e69374d..05c93ea751c0e79fd5324ac192a9d6fdba44c9df 100644
 --- a/floating-ui-react/utils/markOthers.mjs
 +++ b/floating-ui-react/utils/markOthers.mjs
 @@ -2,6 +2,8 @@
@@ -129,7 +129,7 @@ index 2c7e806b36fa33782c61adf58cd6aa420e69374d..e485454fb3d64ff8723e8a767bf56bed
  import { getNodeName, isShadowRoot } from '@floating-ui/utils/dom';
  import { ownerDocument } from '@base-ui/utils/owner';
 +import { contains } from "./element.mjs";
-+import { isTabbable, tabbable } from "./tabbable.mjs";
++import { focusable, isTabbable } from "./tabbable.mjs";
  const counters = {
    inert: new WeakMap(),
    'aria-hidden': new WeakMap()
@@ -171,7 +171,7 @@ index 2c7e806b36fa33782c61adf58cd6aa420e69374d..e485454fb3d64ff8723e8a767bf56bed
 +      state.restore.delete(element);
 +    }
 +  });
-+  const targets = tabbable(node);
++  const targets = focusable(node).filter(isTabbable);
 +  if (isTabbable(node)) {
 +    targets.unshift(node);
 +  }

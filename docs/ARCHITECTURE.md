@@ -22,11 +22,14 @@ of the publishable artifact. `@base-ui/react@1.8.0` has an upstream editable-Com
 defect ([mui/base-ui#5528](https://github.com/mui/base-ui/issues/5528)): its floating focus manager
 applies `aria-hidden` around an open non-modal listbox without taking focusable descendants out of
 sequential navigation. Sherick carries a version-specific Bun patch to Base's existing `markOthers`
-authority. When that authority applies `aria-hidden`, the patch uses Base's own tabbability model to
-temporarily write `tabindex="-1"`. A subtree observer repeats that check for the complete isolation
-lifetime, so newly mounted controls, controls that become focusable and native cases such as
-`<summary>` remain suppressed. Balanced cleanup disconnects the observer and restores the latest
-intended values. `inert` is deliberately not used, so outside pointer interaction remains available.
+authority. When that authority applies `aria-hidden`, the patch starts with Base's own focusable
+candidates and applies its individual tabbability check instead of using the radio-group-reduced
+`tabbable()` result. It therefore temporarily writes `tabindex="-1"` to every native radio that could
+enter sequential focus after a property-only selection change. A subtree observer repeats that check
+for the complete isolation lifetime, so newly mounted controls, controls that become focusable and
+native cases such as `<summary>` remain suppressed. Balanced cleanup disconnects the observer and
+restores the latest intended values. `inert` is deliberately not used, so outside pointer interaction
+remains available.
 
 This is a dependency patch, not a second focus manager or a component-local state mirror. Components
 still import Base primitives directly from their public subpaths, and Base still owns open state, focus,

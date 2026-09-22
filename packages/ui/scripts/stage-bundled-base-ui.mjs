@@ -45,6 +45,7 @@ async function assertPatched(packagePath) {
       "focusRestoreMap",
       "MutationObserver",
       "isTabbable",
+      "focusable",
       "attributeOldValue",
       "takeRecords",
     ]) {

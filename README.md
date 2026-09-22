@@ -180,10 +180,11 @@ policy is recorded in [`docs/RELEASE.md`](docs/RELEASE.md).
 
 Automated browser coverage includes exclusion-free axe scans plus keyboard and focus assertions. The
 editable-`Combobox` blocker is resolved by a version-specific patch to Base UI's own isolation utility:
-it uses Base's maintained tabbability model and observes hidden subtrees for the popup's full open
-lifetime, including newly mounted controls and controls that become focusable. The exact audited Base
-UI package is bundled so npm consumers receive the fix. The patch can be retired only when a released
-Base UI version passes the same open-state, live-mutation, restoration and non-modal pointer gates.
+it uses Base's maintained focusability model and observes hidden subtrees for the popup's full open
+lifetime, including newly mounted controls, controls that become focusable and every radio in a native
+group. The exact audited Base UI package is bundled so npm consumers receive the fix. The patch can be
+retired only when a released Base UI version passes the same open-state, live-mutation, restoration and
+non-modal pointer gates.
 
 ## Components
 

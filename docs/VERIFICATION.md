@@ -379,12 +379,15 @@ the editable input while applying `aria-hidden` around the portaled listbox, but
 controls from sequential focus. The cause is tracked as
 [mui/base-ui#5528](https://github.com/mui/base-ui/issues/5528).
 
-The exact `@base-ui/react@1.8.0` dependency is patched at Base's own `markOthers` authority. It uses
-Base's existing tabbability model rather than a partial selector and observes each subtree newly hidden
-with `aria-hidden` for the complete isolation lifetime. Existing, newly mounted and newly focusable
-controls temporarily receive `tabindex="-1"`; cleanup disconnects the observer and restores the latest
-intended values, while Base's existing counters keep nested opens balanced. `inert` is deliberately not
-used because this popup remains non-modal and outside pointer interaction must keep working.
+The exact `@base-ui/react@1.8.0` dependency is patched at Base's own `markOthers` authority. It starts
+from Base's focusable candidates and applies its individual tabbability check rather than the
+radio-group-reduced `tabbable()` result. Every native radio is therefore suppressed even when a
+property-only checked-state change could make a different group member sequentially tabbable. The
+patch also observes each subtree newly hidden with `aria-hidden` for the complete isolation lifetime.
+Existing, newly mounted and newly focusable controls temporarily receive `tabindex="-1"`; cleanup
+disconnects the observer and restores the latest intended values, while Base's existing counters keep
+nested opens balanced. `inert` is deliberately not used because this popup remains non-modal and
+outside pointer interaction must keep working.
 
 The showcase accessibility suite now proves all of the following:
 
@@ -394,6 +397,8 @@ The showcase accessibility suite now proves all of the following:
   and returns to its original value after Escape;
 - a button mounted after opening, an element made focusable while hidden and native `<summary>` all
   move out of sequential focus and restore their intended values on close;
+- both members of a native radio group stay out of sequential focus when selection moves through the
+  `checked` property without an attribute mutation, then restore without changing the selected radio;
 - clicking an outside control still dismisses the list and runs the clicked control, proving the fix
   did not turn the popup modal;
 - `role="listbox"`, option selection, disabled options, `aria-activedescendant` and the highlighted
@@ -401,8 +406,9 @@ The showcase accessibility suite now proves all of the following:
 
 The package boundary repeats the open-state contract against the actual tarball. `test:packed` checks
 that npm installed the patched Base UI copy nested in `sherick-ui`, then opens and scans the editable
-Combobox and repeats the existing, newly mounted, newly focusable, native `<summary>`, restoration and
-outside-pointer assertions in the React 18 and React 19 Vite consumers and the React 19 Next consumer.
+Combobox and repeats the existing, newly mounted, newly focusable, native `<summary>`, native-radio,
+restoration and outside-pointer assertions in the React 18 and React 19 Vite consumers and the React 19
+Next consumer.
 This prevents a workspace-only patch from producing a green repository while npm consumers receive the
 defective upstream implementation.
 

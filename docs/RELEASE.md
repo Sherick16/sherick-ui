@@ -327,13 +327,15 @@ keyboard focus could enter content a screen reader could not perceive. The defec
 [mui/base-ui#5528](https://github.com/mui/base-ui/issues/5528).
 
 The blocker is resolved without removing or making the editable Combobox modal. A version-specific
-Bun patch extends Base UI's own `markOthers` isolation authority. It uses Base's existing tabbability
-model rather than a partial selector, temporarily writes `tabindex="-1"`, and observes each hidden
-subtree for the full isolation lifetime. Controls mounted later or made focusable while hidden are
-therefore suppressed too; balanced cleanup disconnects the observer and restores the latest intended
-values. Pre-existing values and nested isolation counters are preserved. The patch does not use
-`inert`, so pointer interaction outside the non-modal listbox still dismisses it and runs the clicked
-action.
+Bun patch extends Base UI's own `markOthers` isolation authority. It starts from Base's focusable
+candidates and applies the individual tabbability check rather than the radio-group-reduced
+`tabbable()` result, then temporarily writes `tabindex="-1"` and observes each hidden subtree for the
+full isolation lifetime. All native radios are therefore suppressed before a property-only selection
+change can make a different group member sequentially tabbable. Controls mounted later or made
+focusable while hidden are suppressed too; balanced cleanup disconnects the observer and restores the
+latest intended values. Pre-existing values and nested isolation counters are preserved. The patch
+does not use `inert`, so pointer interaction outside the non-modal listbox still dismisses it and runs
+the clicked action.
 
 Because a workspace patch alone would disappear for consumers, `@base-ui/react` and its runtime
 closure are bundled inside the published tarball. The packed-package gate checks the installed nested
@@ -342,9 +344,9 @@ from the tarball in React 18 and React 19 Vite builds and the React 19 Next buil
 
 The browser contract now includes exclusion-free open-state axe scans in both themes, direct
 listbox/option/active-descendant assertions, lifetime coverage for newly mounted controls, changed
-focusability and native `<summary>`, restoration after Escape, and preserved outside pointer
-interaction. The patch may be retired only when a released Base UI version passes the same gates. No
-component API was removed or changed.
+focusability, property-only native-radio selection and native `<summary>`, restoration after Escape,
+and preserved outside pointer interaction. The patch may be retired only when a released Base UI
+version passes the same gates. No component API was removed or changed.
 
 The Phase E acceptance run completed with the frozen lockfile:
 `WEBKIT_EXECUTABLE_PATH=/tmp/sherick-webkit bun run verify` passed 204 showcase tests (with the two

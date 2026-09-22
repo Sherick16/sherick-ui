@@ -64,6 +64,8 @@ test("packed editable Combobox isolates hidden content without becoming modal", 
       <details><summary data-packed-summary>Native summary</summary></details>
       <button data-packed-late-button>Mounted while hidden</button>
       <button data-packed-explicit-negative>Stops participating while hidden</button>
+      <label><input data-packed-radio-first type="radio" name="packed-isolation" checked> First</label>
+      <label><input data-packed-radio-second type="radio" name="packed-isolation"> Second</label>
     `;
     hiddenRoot.append(fixture);
   });
@@ -71,9 +73,20 @@ test("packed editable Combobox isolates hidden content without becoming modal", 
   const nativeSummary = page.locator("[data-packed-summary]");
   const lateButton = page.locator("[data-packed-late-button]");
   const explicitlyRemoved = page.locator("[data-packed-explicit-negative]");
+  const firstRadio = page.locator("[data-packed-radio-first]");
+  const secondRadio = page.locator("[data-packed-radio-second]");
   await expect(nativeSummary).toHaveAttribute("tabindex", "-1");
   await expect(lateButton).toHaveAttribute("tabindex", "-1");
   await expect(explicitlyRemoved).toHaveAttribute("tabindex", "-1");
+  await expect(firstRadio).toBeChecked();
+  await expect(secondRadio).not.toBeChecked();
+  await secondRadio.evaluate((element) => {
+    element.checked = true;
+  });
+  await expect(firstRadio).not.toBeChecked();
+  await expect(secondRadio).toBeChecked();
+  await expect(firstRadio).toHaveAttribute("tabindex", "-1");
+  await expect(secondRadio).toHaveAttribute("tabindex", "-1");
   await mutableTarget.evaluate((element) => {
     element.tabIndex = 0;
   });
@@ -93,6 +106,10 @@ test("packed editable Combobox isolates hidden content without becoming modal", 
   expect(await nativeSummary.getAttribute("tabindex")).toBeNull();
   expect(await lateButton.getAttribute("tabindex")).toBeNull();
   await expect(explicitlyRemoved).toHaveAttribute("tabindex", "-1");
+  expect(await firstRadio.getAttribute("tabindex")).toBeNull();
+  expect(await secondRadio.getAttribute("tabindex")).toBeNull();
+  await expect(firstRadio).not.toBeChecked();
+  await expect(secondRadio).toBeChecked();
 
   await searchable.click();
   await expect(page.getByRole("option", { name: "Dashboard" })).toBeVisible();

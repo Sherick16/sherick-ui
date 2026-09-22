@@ -70,10 +70,11 @@ has ESM and CommonJS entries; the rich-content subpath is ESM-only.
 ### Editable Combobox isolation
 
 The editable `Combobox` blocker is resolved by a version-specific patch to Base UI's own isolation
-utility. The patch uses Base's tabbability model, observes hidden subtrees for the full open lifetime,
-restores prior values on close and preserves non-modal outside pointer interaction. The audited Base UI
-package is bundled so installed npm consumers receive the same fix. It may be retired only after a
-released Base UI version passes the same axe, live-mutation, restoration and pointer-interaction gates.
+utility. The patch uses Base's focusability model to suppress every radio in a native group, observes
+hidden subtrees for the full open lifetime, restores prior values on close and preserves non-modal
+outside pointer interaction. The audited Base UI package is bundled so installed npm consumers receive
+the same fix. It may be retired only after a released Base UI version passes the same axe,
+live-mutation, restoration and pointer-interaction gates.
 The repository's `docs/RELEASE.md` records the complete evidence and release condition.
 
 ## Usage
