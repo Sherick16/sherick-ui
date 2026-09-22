@@ -5,6 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
 import { verifyConsumers } from "./packed-consumers.mjs";
+import { restoreBundledBaseUi, stageBundledBaseUi } from "./stage-bundled-base-ui.mjs";
 
 const root = fileURLToPath(new URL("..", import.meta.url));
 const work = await mkdtemp(join(tmpdir(), "sherick-ui-packed-"));
@@ -23,6 +24,9 @@ try {
   await mkdir(packDir, { recursive: true });
   await mkdir(consumerDir, { recursive: true });
 
+  /* npm cannot bundle Bun's dependency symlink directly. Stage the audited patched package as a
+     real directory for packlist, then restore the workspace link as soon as the tarball exists. */
+  await stageBundledBaseUi();
   const packOutput = run(
     "npm",
     ["pack", "--json", "--ignore-scripts", "--pack-destination", packDir],
@@ -34,6 +38,7 @@ try {
 
   const tarball = join(packDir, packed[0].filename);
   await access(tarball);
+  await restoreBundledBaseUi();
 
   await writeFile(
     join(consumerDir, "package.json"),
@@ -373,21 +378,30 @@ const buttonProps: ButtonProps = { children: "Save", appearance: "filled" };
 const selectProps: SelectProps = {
   options: [{ label: "Design", value: "design" }],
   defaultValue: "design",
+  onValueChange(_value, eventDetails) {
+    void eventDetails.reason;
+  },
 };
 const inputProps: InputProps = {
   label: "Name",
   description: "Helper",
   error: true,
   errorMessage: "Invalid",
-  onValueChange() {},
+  onValueChange(_value, eventDetails) {
+    void eventDetails.reason;
+  },
 };
 const searchProps: SearchProps = {
   onSearch() {},
-  onValueChange() {},
+  onValueChange(_value, eventDetails) {
+    void eventDetails.reason;
+  },
 };
 const switchProps: SwitchProps = {
   checked: true,
-  onCheckedChange() {},
+  onCheckedChange(_checked, eventDetails) {
+    void eventDetails.reason;
+  },
   name: "enabled",
   value: "yes",
 };
@@ -396,15 +410,24 @@ const switchProps: SwitchProps = {
 const uncontrolledSwitchProps: SwitchProps = { defaultChecked: true, onCheckedChange() {} };
 const tabsProps: TabsProps = {
   value: "one",
-  onValueChange() {},
+  onValueChange(_value, eventDetails) {
+    void eventDetails.reason;
+  },
   tabs: [{ id: "one", label: "One", content: "Panel" }],
 };
-const dialogProps: DialogProps = { defaultOpen: true, onOpenChange() {}, children: null };
+const dialogProps: DialogProps = {
+  defaultOpen: true,
+  onOpenChange(_open, eventDetails) {
+    void eventDetails.reason;
+  },
+  children: null,
+};
 const comboboxProps: ComboboxProps = {
   options: [{ label: "Design", value: "design", disabled: false }],
   value: "design",
-  onValueChange(value: string | null) {
+  onValueChange(value: string | null, eventDetails) {
     void value;
+    void eventDetails.reason;
   },
 };
 const comboboxOption: ComboboxOption = { label: "Design", value: "design" };
@@ -552,7 +575,11 @@ export const fixture = (
   <>
     <Button {...buttonProps} />
     <Input {...inputProps} onChange={(event) => void event.currentTarget.value} />
-    <Textarea label="Body" onChange={(event) => void event.currentTarget.value} />
+    <Textarea
+      label="Body"
+      onChange={(event) => void event.currentTarget.value}
+      onValueChange={(_value, eventDetails) => void eventDetails.reason}
+    />
     <Search {...searchProps} />
     <Select {...selectProps} />
     <Combobox {...comboboxProps} />
@@ -662,6 +689,42 @@ export const fixture = (
   assert.equal(installedPackage.exports["./theme.css"], "./dist/theme.css");
   assert.equal(installedPackage.exports["./tailwind-preset"], undefined);
   assert.equal(installedPackage.peerDependencies.tailwindcss, undefined);
+  assert.deepEqual(
+    installedPackage.bundledDependencies,
+    ["@base-ui/react"],
+    "the patched Base UI implementation must travel inside the published package",
+  );
+  assert.deepEqual(packed[0].bundled, ["@base-ui/react"]);
+
+  const bundledBaseRoot = join(
+    consumerDir,
+    "node_modules",
+    "sherick-ui",
+    "node_modules",
+    "@base-ui",
+    "react",
+  );
+  const bundledBasePackage = JSON.parse(await readFile(join(bundledBaseRoot, "package.json"), "utf8"));
+  assert.equal(bundledBasePackage.version, "1.8.0");
+  for (const modulePath of [
+    "floating-ui-react/utils/markOthers.js",
+    "floating-ui-react/utils/markOthers.mjs",
+  ]) {
+    const source = await readFile(join(bundledBaseRoot, modulePath), "utf8");
+    for (const marker of [
+      "focusRestoreMap",
+      "MutationObserver",
+      "isTabbable",
+      "focusable",
+      "attributeOldValue",
+      "takeRecords",
+    ]) {
+      assert.ok(
+        source.includes(marker),
+        `${modulePath} must contain the editable Combobox isolation patch marker ${marker}`,
+      );
+    }
+  }
 
   /* A prerelease must never publish under `latest`, and a stable version must — otherwise
      `npm install sherick-ui` either silently hands consumers an unstable API or hides a
@@ -676,19 +739,32 @@ export const fixture = (
       : `stable ${installedPackage.version} must publish under the latest dist-tag`
   );
 
-  /* Only intentional publication artifacts may reach the registry: the built package
-     plus npm's own metadata files. A stray source tree, Tailwind config, lint config or
-     test artifact here means `files` or the build layout regressed. */
+  /* Only intentional publication artifacts may reach the registry: the built package, the exact
+     patched Base UI dependency, and npm's own metadata files. A stray source tree, config or test
+     artifact here means `files` or the bundled dependency boundary regressed. */
   const publishedPaths = packed[0].files.map((file) => file.path);
   const unexpected = publishedPaths.filter(
-    (path) => !/^dist\//.test(path) && !["package.json", "README.md", "LICENSE"].includes(path)
+    (path) =>
+      !path.startsWith("dist/") &&
+      !path.startsWith("node_modules/@base-ui/react/") &&
+      !["package.json", "README.md", "LICENSE"].includes(path),
   );
   assert.deepEqual(unexpected, [], `unexpected file published in the tarball: ${unexpected.join(", ")}`);
-  for (const path of publishedPaths.filter((path) => path.endsWith(".map"))) {
+  assert.ok(
+    !publishedPaths.some((path) => path.split("/").some((part) => part.startsWith(".bun-tag-"))),
+    "Bun dependency-store metadata must not be published",
+  );
+  for (const path of publishedPaths.filter(
+    (path) => path.startsWith("dist/") && path.endsWith(".map"),
+  )) {
     const map = JSON.parse(await readFile(join(consumerDir, "node_modules", "sherick-ui", path), "utf8"));
     assert.ok(map.sources.every((_, index) => typeof map.sourcesContent?.[index] === "string"), `${path} must embed its unpublished sources`);
   }
   assert.ok(publishedPaths.includes("dist/KaTeX-LICENSE"), "redistributed KaTeX assets need their license");
+  assert.ok(
+    publishedPaths.includes("node_modules/@base-ui/react/LICENSE"),
+    "bundled Base UI code must retain its license",
+  );
   assert.ok(
     publishedPaths.some((path) => path === "dist/esm/content.js"),
     "the packed tarball must include the content subpath build"
@@ -698,8 +774,13 @@ export const fixture = (
     "the CommonJS build must not publish the ESM-only rich-content modules"
   );
   assert.ok(
-    !publishedPaths.some((path) => /\.(ts|tsx)$/.test(path) && !path.endsWith(".d.ts")),
-    "the packed tarball must not include TypeScript sources"
+    !publishedPaths.some(
+      (path) =>
+        !path.startsWith("node_modules/") &&
+        /\.(?:[cm]?ts|tsx)$/.test(path) &&
+        !/\.d\.(?:ts|mts|cts)$/.test(path),
+    ),
+    "the packed tarball must not include Sherick TypeScript sources",
   );
 
   for (const artifact of [
@@ -716,6 +797,7 @@ export const fixture = (
 
   console.log(`Packed package verification passed: ${packed[0].filename}`);
 } finally {
+  await restoreBundledBaseUi();
   if (process.env.KEEP_PACKED_CONSUMERS) console.log(`Packed consumer artifacts retained: ${work}`);
   else await rm(work, { recursive: true, force: true });
 }

@@ -25,8 +25,10 @@ Tailwind) and the size-budget policy.
 ## Installation
 
 ```bash
-bun add sherick-ui
+bun add sherick-ui@alpha
 ```
+
+Until stable `2.0.0` is published, the untagged install resolves to the frozen `1.x` line.
 
 Import the complete stylesheet once near your application root. If the application has a framework stylesheet, Tailwind build or reset, load that first and Sherick UI second:
 
@@ -95,7 +97,7 @@ Or target a forced theme:
 }
 ```
 
-Core roles include the canvas/surface levels, three-step text hierarchy, accent hierarchy, semantic states and their `on-*` colors, focus/scrim roles, structural edge tint, elevation ladder, acrylic recipes, motion and syntax-highlighting colors.
+Core roles include the canvas/surface levels, two text roles plus a compact detail role, accent hierarchy, semantic states and their `on-*` colors, focus/scrim roles, structural edge tint, elevation ladder, acrylic recipes, motion and syntax-highlighting colors.
 
 Sherick UI's generated theme CSS is layered, so ordinary unlayered application CSS can override these variables without `!important` or selector escalation.
 
@@ -168,6 +170,22 @@ export function Example() {
 
 Components expose their relevant native HTML props and refs where appropriate. Base-backed interactive primitives delegate their generic widget semantics and accessibility mechanics to Base UI while retaining Sherick's visual language and focus treatment.
 
+## Runtime, browser and accessibility support
+
+Sherick UI supports React and React DOM 18 or 19. Its automated browser baseline is the Chromium,
+Firefox and WebKit versions shipped by the repository's pinned Playwright release; Chrome, Edge and
+Safari distribution builds and previous browser majors are not separately certified. The core package
+has ESM and CommonJS entries; `sherick-ui/content` is ESM-only. The precise compatibility and semver
+policy is recorded in [`docs/RELEASE.md`](docs/RELEASE.md).
+
+Automated browser coverage includes exclusion-free axe scans plus keyboard and focus assertions. The
+editable-`Combobox` blocker is resolved by a version-specific patch to Base UI's own isolation utility:
+it uses Base's maintained focusability model and observes hidden subtrees for the popup's full open
+lifetime, including newly mounted controls, controls that become focusable and every radio in a native
+group. The exact audited Base UI package is bundled so npm consumers receive the fix. The patch can be
+retired only when a released Base UI version passes the same open-state, live-mutation, restoration and
+non-modal pointer gates.
+
 ## Components
 
 The public package exports:
@@ -232,7 +250,11 @@ const { Markdown } = await import("sherick-ui/content");
 
 ## Behavioral foundation
 
-`@base-ui/react` is a direct Sherick UI runtime dependency. Components import the relevant Base primitive directly from public subpaths such as `@base-ui/react/dialog` or `@base-ui/react/select`; Sherick UI does not maintain a parallel generic headless layer.
+`@base-ui/react` is Sherick UI's direct behavioral dependency. Components import the relevant Base
+primitive from public subpaths such as `@base-ui/react/dialog` or `@base-ui/react/select`; Sherick UI
+does not maintain a parallel generic headless layer. The exact audited Base UI implementation is
+bundled inside the package tarball so the editable-Combobox isolation patch reaches every consumer
+rather than existing only in this workspace.
 
 When Base UI provides the primitive, it owns keyboard navigation, roving focus, focus trapping/restoration, generated accessibility relationships, composite-control form participation, portals, anchored positioning/collision handling, outside interaction/Escape dismissal and popup lifecycle. Passive semantics such as cards, badges, navigation links and tables remain native HTML rather than being forced through a headless abstraction.
 

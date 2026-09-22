@@ -60,6 +60,23 @@ Custom themes override the documented `--sui-*` CSS variables at document/root l
 
 `styles.css` includes both component styling and the generated light/dark/system token defaults. `theme.css` is also exported separately for token-only consumers.
 
+## Runtime and browser support
+
+Sherick UI supports React and React DOM 18 or 19. Its automated browser baseline is the Chromium,
+Firefox and WebKit versions shipped by the repository's pinned Playwright release. Chrome, Edge and
+Safari distribution builds and previous browser majors are not separately certified. The core package
+has ESM and CommonJS entries; the rich-content subpath is ESM-only.
+
+### Editable Combobox isolation
+
+The editable `Combobox` blocker is resolved by a version-specific patch to Base UI's own isolation
+utility. The patch uses Base's focusability model to suppress every radio in a native group, observes
+hidden subtrees for the full open lifetime, restores prior values on close and preserves non-modal
+outside pointer interaction. The audited Base UI package is bundled so installed npm consumers receive
+the same fix. It may be retired only after a released Base UI version passes the same axe,
+live-mutation, restoration and pointer-interaction gates.
+The repository's `docs/RELEASE.md` records the complete evidence and release condition.
+
 ## Usage
 
 ```tsx
@@ -115,6 +132,10 @@ The package publishes these subpaths:
 - `sherick-ui/dev` — development-only recipes for this repository's workbench. Unstable and unsupported; do not depend on it.
 
 The names above are canonical. There are no compatibility aliases: `ActionButton`, `Dropdown`, `Modal`, `TabGroup` and their prop types are gone, as are the deprecated `Select.selected`, `Select.onSelect`, `Tabs.defaultTabId`, `Tabs.onTabChange`, `Dialog.onClose` and `Table.variant` props. The `onChange` props on `Input`, `Textarea` and `Switch` are no longer Sherick callbacks — `Input` and `Textarea` pass through native `onChange`, and boolean state goes through `Switch.onCheckedChange`.
+
+Controlled callbacks keep Base UI's `(nextValue, eventDetails)` signature. This includes `Input`,
+`Textarea`, `Search`, `Select`, `Switch`, `Tabs`, `Dialog` and `Combobox`; consumers that do not need
+the event details may ignore the second argument.
 
 The viewport-owning surfaces differ in what they own. `Dialog` composes as
 `Dialog.Header`, `Dialog.Description`, `Dialog.Content` and `Dialog.Footer`; `AlertDialog` is the
@@ -195,6 +216,10 @@ The subpath is **ESM only**, because `react-markdown` and remark/rehype have no 
 Base UI owns generic interaction and accessibility mechanics when it provides the primitive: keyboard navigation, focus management, semantic relationships, form participation, portals, dismissal and popup positioning. Sherick UI owns anatomy, its public design API and the visual language.
 
 Base UI is internal infrastructure. Consumers never import `@base-ui/react` to use Sherick UI, and Base UI's own props, DOM structure and generated IDs are not part of this package's compatibility promise.
+
+The package tarball includes the exact audited Base UI implementation. This carries the temporary
+editable-Combobox isolation patch into installed npm consumers while leaving Base UI — not a Sherick
+wrapper — responsible for focus, ARIA isolation, dismissal and popup lifecycle.
 
 Tailwind is not a runtime integration surface. It is internal authoring/build infrastructure: the package ships no Tailwind preset, declares no Tailwind peer dependency and requires no package-content scanning. Component CSS is generated inside this package and scoped internally; `.sui-scope` is private implementation detail, not a consumer class or theming hook.
 

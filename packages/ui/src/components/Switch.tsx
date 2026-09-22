@@ -23,7 +23,8 @@ export interface SwitchProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "value"> {
   checked?: boolean;
   defaultChecked?: boolean;
-  onCheckedChange?: (checked: boolean) => void;
+  /** Base's checked-change callback, event details included. */
+  onCheckedChange?: BaseSwitch.Root.Props["onCheckedChange"];
   variant?: Variant;
   value?: string;
   uncheckedValue?: string;

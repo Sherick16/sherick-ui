@@ -15,6 +15,35 @@ Application workspaces consume `sherick-ui`; library source must never import Ne
 
 The showcase consumes `sherick-ui` through package exports. Its only privileged surface is `sherick-ui/dev`, an explicitly unstable development-only export that hands the workbench the shared visual and motion recipes plus the `cn()` helper; production consumers must not depend on that subpath.
 
+### Audited Base UI dependency
+
+Base UI remains the sole owner of generic widget mechanics, but the exact implementation is now part
+of the publishable artifact. `@base-ui/react@1.8.0` has an upstream editable-Combobox isolation
+defect ([mui/base-ui#5528](https://github.com/mui/base-ui/issues/5528)): its floating focus manager
+applies `aria-hidden` around an open non-modal listbox without taking focusable descendants out of
+sequential navigation. Sherick carries a version-specific Bun patch to Base's existing `markOthers`
+authority. When that authority applies `aria-hidden`, the patch starts with Base's own focusable
+candidates and applies its individual tabbability check instead of using the radio-group-reduced
+`tabbable()` result. It therefore temporarily writes `tabindex="-1"` to every native radio that could
+enter sequential focus after a property-only selection change. A subtree observer repeats that check
+for the complete isolation lifetime, so newly mounted controls, controls that become focusable and
+native cases such as `<summary>` remain suppressed. Balanced cleanup disconnects the observer and
+restores the latest intended values. `inert` is deliberately not used, so outside pointer interaction
+remains available.
+
+This is a dependency patch, not a second focus manager or a component-local state mirror. Components
+still import Base primitives directly from their public subpaths, and Base still owns open state, focus,
+ARIA isolation, dismissal and popup lifecycle.
+
+A workspace-only patch would not protect npm consumers. The package therefore declares Base UI as a
+bundled dependency. Publication stages the patched package and its runtime dependency closure inside
+the tarball; `test:packed` verifies the installed nested copy, its license, both patched ESM/CommonJS
+modules, clean dependency trees, and open-listbox behavior under React 18, React 19, Vite and Next.
+`scripts/stage-bundled-base-ui.mjs` exists only to turn Bun's dependency-store symlink into npm's
+bundleable directory during packing, then restores the link. The patch and bundling may be removed
+only after a released Base UI version passes the same exclusion-free axe, live-mutation, native
+tabbability, restoration and non-modal pointer tests.
+
 ## Build and client boundaries
 
 The library build starts at `packages/ui/src/index.ts` plus the `src/content.ts` rich-content boundary and the development-only `src/dev.ts`, and emits preserved ESM/CJS modules. Rollup does not add a package-wide `"use client"` banner. Source modules that genuinely require a client boundary retain their own directive; passive components remain server-usable.
@@ -59,7 +88,7 @@ Cascade ownership is deliberate:
 
 ## Motion architecture
 
-Motion is selected by **intent**, not by component. The canonical intents are `feedback`, `tactile`, `arrive`, `orient`, `relocate`, `direct`, `disclose`, `presence` and `activity`, and the dynamics below them (`swift`, `settle`, `spring`, `exit`, `continuous`) are the motion module's business alone. Components own target geometry — where a part ends up — but never a duration, a curve, a transition declaration or a keyframe. `disclose` is a reserved semantic role with no recipe until a disclosure primitive exists.
+Motion is selected by **intent**, not by component. The canonical intents are `feedback`, `tactile`, `arrive`, `orient`, `relocate`, `direct`, `disclose`, `presence` and `activity`, and the dynamics below them (`swift`, `settle`, `spring`, `exit`, `continuous`) are the motion module's business alone. Components own target geometry — where a part ends up — but never a duration, a curve, a transition declaration or a keyframe. `motionDisclose` owns the measured height change shared by Accordion and Collapsible.
 
 The architecture has four hard boundaries:
 
@@ -104,14 +133,14 @@ Base UI owns generic widget mechanics; Sherick UI exposes a small opinionated AP
 - a component built on a primitive that owns a queue or a lifecycle hands that ownership straight through instead of mirroring it. `Toast` publishes the provider, the viewport, the hook and the manager factory; the queue, the timer, the limit, the live region and the stack's state all stay Base's, and Sherick owns only the surface and how the stack moves. The handle it publishes is a **narrow view** of the primitive's manager, not a re-export of it: Base's own object also carries a subscriber channel for its store and add-options this renderer does not implement — a positioner for anchored toasts, a custom data bag, the primitive's internal presence state — and inheriting those would promise capabilities the package does not have. A capability the renderer does not implement is left out of the contract;
 - a contract this package owns **maps** the primitive's own enumerations rather than passing them through, because a value the renderer does not know fails silently. Base's `promise()` sets a toast's type to `loading`, `success` or `error`, which are states of one lifecycle rather than roles a caller picks; `Toast` carries a mark and a tone for each, so a promise toast is never a toast with no icon and no semantic tone.
 
-**Two field APIs, one intended end state.** `Input`, `Textarea` and `Search` compose `Field.Root`
-internally, so they take `label` / `description` / `error` as props; the selection and value
-controls (`Checkbox`, `Slider`, `NumberField`) compose through the exported `Field` instead, because
-they are one control among several in a form and label themselves the same way everything else
-does. Both paths render the same Base parts and produce the same ARIA relationships. The intended
-end state is the exported `Field` as the only label/error/required API, with the text controls
-migrating to it in a later change; until then the two coexist deliberately and this paragraph is the
-record of which one is leaving.
+**Two field composition forms are intentional.** `Input` and `Textarea` retain their convenience
+`label` / `description` / `error` props and compose `Field.Root` internally. `Search` also composes a
+field internally because its submit control is part of one composite input. Selection and value
+controls (`Checkbox`, `Slider`, `NumberField`, `Select`, `Combobox`) compose through the exported
+`Field`, so consumers can place those controls in the same label/description/error anatomy. Both
+forms render Base Field parts and produce the same ARIA relationships. The convenience props and
+the exported `Field` composition are both part of the stable `2.x` contract; neither is a pending
+migration or compatibility shim.
 
 Do not add generic controlled-state hooks, focus helpers, form mirrors or event-composition utilities to Sherick UI when Base UI already supplies the behavior.
 

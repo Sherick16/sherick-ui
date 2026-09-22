@@ -1,4 +1,5 @@
 import { test, expect } from "@playwright/test";
+import AxeBuilder from "@axe-core/playwright";
 
 // Register before navigation: a post-hydration listener would miss the package defect.
 let errors;
@@ -35,7 +36,7 @@ test("no-reset CSS, consumer ownership, and className overrides", async ({ page 
   })).toEqual(["96px", "0px", "0px", "0px", "static", "visible", "1"]);
   await override.hover();
   await expect.poll(() => style(override, "opacity")).toBe("0.5");
-  const select = page.getByRole("combobox", { name: "Project" });
+  const select = page.getByRole("combobox", { name: "Project", exact: true });
   expect(await style(select, "padding")).toBe("0px");
   expect(await style(select, "borderRadius")).toBe("0px");
   expect(await style(page.locator("#slider-root"), "width")).toBe("180px");
@@ -44,6 +45,76 @@ test("no-reset CSS, consumer ownership, and className overrides", async ({ page 
   await expect(page.getByRole("checkbox", { name: "Accept" })).not.toBeChecked();
   await page.getByRole("switch", { name: "Enabled" }).click();
   await expect(page.getByRole("switch", { name: "Enabled" })).not.toBeChecked();
+});
+
+test("packed editable Combobox isolates hidden content without becoming modal", async ({ page }) => {
+  const searchable = page.getByRole("combobox", { name: "Search project" });
+  const outsideButton = page.locator("#primary");
+  await expect(outsideButton).toHaveAttribute("tabindex", "0");
+
+  await searchable.click();
+  await expect(page.getByRole("option", { name: "Dashboard" })).toBeVisible();
+  await expect(outsideButton).toHaveAttribute("tabindex", "-1");
+  await outsideButton.evaluate((button) => {
+    const hiddenRoot = button.closest('[aria-hidden="true"]');
+    if (!hiddenRoot) throw new Error("Outside button is not inside Combobox isolation");
+    const fixture = document.createElement("div");
+    fixture.innerHTML = `
+      <div data-packed-focusability-target>Becomes focusable while hidden</div>
+      <details><summary data-packed-summary>Native summary</summary></details>
+      <button data-packed-late-button>Mounted while hidden</button>
+      <button data-packed-explicit-negative>Stops participating while hidden</button>
+      <label><input data-packed-radio-first type="radio" name="packed-isolation" checked> First</label>
+      <label><input data-packed-radio-second type="radio" name="packed-isolation"> Second</label>
+    `;
+    hiddenRoot.append(fixture);
+  });
+  const mutableTarget = page.locator("[data-packed-focusability-target]");
+  const nativeSummary = page.locator("[data-packed-summary]");
+  const lateButton = page.locator("[data-packed-late-button]");
+  const explicitlyRemoved = page.locator("[data-packed-explicit-negative]");
+  const firstRadio = page.locator("[data-packed-radio-first]");
+  const secondRadio = page.locator("[data-packed-radio-second]");
+  await expect(nativeSummary).toHaveAttribute("tabindex", "-1");
+  await expect(lateButton).toHaveAttribute("tabindex", "-1");
+  await expect(explicitlyRemoved).toHaveAttribute("tabindex", "-1");
+  await expect(firstRadio).toBeChecked();
+  await expect(secondRadio).not.toBeChecked();
+  await secondRadio.evaluate((element) => {
+    element.checked = true;
+  });
+  await expect(firstRadio).not.toBeChecked();
+  await expect(secondRadio).toBeChecked();
+  await expect(firstRadio).toHaveAttribute("tabindex", "-1");
+  await expect(secondRadio).toHaveAttribute("tabindex", "-1");
+  await mutableTarget.evaluate((element) => {
+    element.tabIndex = 0;
+  });
+  await expect(mutableTarget).toHaveAttribute("tabindex", "-1");
+  await explicitlyRemoved.evaluate((element) => {
+    element.tabIndex = -1;
+  });
+
+  const results = await new AxeBuilder({ page })
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"])
+    .analyze();
+  expect(results.violations).toEqual([]);
+
+  await page.keyboard.press("Escape");
+  await expect(outsideButton).toHaveAttribute("tabindex", "0");
+  await expect(mutableTarget).toHaveAttribute("tabindex", "0");
+  expect(await nativeSummary.getAttribute("tabindex")).toBeNull();
+  expect(await lateButton.getAttribute("tabindex")).toBeNull();
+  await expect(explicitlyRemoved).toHaveAttribute("tabindex", "-1");
+  expect(await firstRadio.getAttribute("tabindex")).toBeNull();
+  expect(await secondRadio.getAttribute("tabindex")).toBeNull();
+  await expect(firstRadio).not.toBeChecked();
+  await expect(secondRadio).toBeChecked();
+
+  await searchable.click();
+  await expect(page.getByRole("option", { name: "Dashboard" })).toBeVisible();
+  await outsideButton.click();
+  await expect(page.getByRole("option", { name: "Dashboard" })).toHaveCount(0);
 });
 
 test("document themes and overrides reach styled portals", async ({ page }) => {
@@ -71,12 +142,12 @@ test("document themes and overrides reach styled portals", async ({ page }) => {
   expect(await dialog.evaluate(el => getComputedStyle(el).getPropertyValue("--sui-surface-overlay").trim())).toBe("0.4 0.1 145");
   await page.locator("#portal-primary").click();
   await expect(dialog).toBeHidden();
-  await page.getByRole("combobox", { name: "Project" }).click();
+  await page.getByRole("combobox", { name: "Project", exact: true }).click();
   const option = page.getByRole("option", { name: "Two" });
   await expect(option).toBeVisible();
   expect(await style(option, "borderRadius")).not.toBe("0px");
   await option.click();
-  await expect(page.getByRole("combobox", { name: "Project" })).toHaveText("Two");
+  await expect(page.getByRole("combobox", { name: "Project", exact: true })).toHaveText("Two");
   await page.getByRole("button", { name: "Popup", exact: true }).click();
   await expect(page.getByText("Package popup")).toBeVisible();
   await page.keyboard.press("Escape");

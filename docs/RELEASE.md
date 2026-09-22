@@ -53,8 +53,9 @@ below.
 
 For this package, any of the following is a breaking change:
 
-- **removing or renaming an export** — including a component, a prop type, a helper or an
-  exported type from any subpath;
+- **removing or renaming a consumer export** — including a component, prop type, helper or exported
+  type from the core or content subpath. Symbols under the explicitly unsupported `dev` subpath are
+  excluded; the `dev` subpath itself remains part of the five-subpath package map;
 - **changing a prop name, its signature, or its controlled/uncontrolled character** — for
   example a prop that used to be optional becoming required, an `onValueChange` callback
   changing its argument, or a control that used to stay uncontrolled when the `value` prop
@@ -87,8 +88,8 @@ The root `sherick-ui` export is:
   `Combobox`, `Checkbox`, `RadioGroup`, `Slider`, `Switch`, `ToggleGroup`;
 - **Surfaces and overlays**: `Dialog`, `Drawer`, `Menu`, `Popover`, `Tooltip`, `Table`, `Tabs`,
   `NavGroup`, `NavItem`, `Divider`;
-- **Toasts**: `ToastProvider`, `ToastViewport`, `useToast`, `createToastManager`, and the
-  `createToastManager()` factory for a manager that lives outside the React tree;
+- **Toasts**: `ToastProvider`, `ToastViewport`, `useToast`, and `createToastManager()` for a
+  manager that lives outside the React tree;
 - **Writing direction**: `DirectionProvider`;
 - the matching prop types (`AccordionProps`, `AccordionItemProps`, `AccordionTriggerProps`,
   `AccordionPanelProps`, `AccordionHeadingLevel`, `CollapsibleProps`, `CollapsibleTriggerProps`,
@@ -186,20 +187,19 @@ Theming is CSS-only and document-level:
 ## Runtime baseline
 
 - **React**: `react` and `react-dom` `^18.0.0 || ^19.0.0` are the supported peer range.
-- **Browsers**: modern evergreen browsers. The library ships ES2019-level syntax and relies
-  on the consumer's bundler for anything newer; it does not ship a legacy transpiled
-  bundle.
-- **Node**: the core entries need no floor. Their runtime dependency graph
-  (`@base-ui/react`, `lucide-react`, `clsx`, `tailwind-merge`,
-  `class-variance-authority`) publishes CommonJS, so `require("sherick-ui")` works on any
-  Node that supports the syntax we ship, and no `require(esm)` feature is involved. The one
-  Node feature this package depends on is the dynamic `import()` used to reach
-  `sherick-ui/content` from CommonJS, which is available far below any supported version.
-  The package therefore declares no `engines` floor: there is no runtime constraint to
-  enforce, and the ESM-only subpath is expressed in the `exports` map rather than as a
-  version requirement.
+- **Browsers**: the automated compatibility baseline is the Chromium, Firefox and WebKit engine
+  versions shipped by the repository's pinned Playwright release. That baseline rolls forward when
+  Playwright is deliberately updated. Chrome, Edge and Safari distribution builds, and previous browser
+  majors, are not separately certified; the shipping-browser and physical-device checks below remain
+  manual. Dropping one of the three engine families or requiring a capability absent from this baseline
+  is a breaking change. The package ships ES2019-level syntax and no legacy/ES5 bundle.
+- **Node/module formats**: the core and `dev` entries provide ESM and CommonJS. The core entries
+  need no declared Node floor beyond support for the shipped syntax. `sherick-ui/content` is ESM
+  only; CommonJS consumers reach it with dynamic `import()`. The package therefore declares no
+  `engines` floor: the module-format constraint is expressed by the `exports` map.
 
-Raising any of these baselines is a breaking change.
+Raising the React range, dropping a browser family, or removing a module format from an existing
+subpath is a breaking change.
 
 ## Internal infrastructure is not consumer API
 
@@ -207,14 +207,16 @@ Raising any of these baselines is a breaking change.
   builds interaction, focus, portal, positioning, dismissal and ARIA mechanics on. Consumers
   must not import Base UI to use Sherick UI, and Base UI internals — its props, its DOM
   structure, its generated IDs — are **not covered by this package's compatibility
-  promise**. Sherick's components own the public API; upgrading behavior normally means
-  Sherick upgrading Base UI, not consumers depending on it.
+  promise**. Sherick's components own the public API. The exact patched implementation is currently
+  bundled into the tarball so installation cannot substitute the unpatched `1.8.0` artifact; upgrading
+  behavior still means Sherick upgrading and re-verifying Base UI, not consumers depending on it.
 - **Tailwind CSS is internal authoring/build infrastructure.** It is not a consumer contract:
   the package ships no Tailwind preset, declares no Tailwind peer dependency, and requires no
   package-content scanning. Sherick UI compiles its own component CSS ahead of time.
 - **`sherick-ui/dev` is development-only.** It exists so the in-repository workbench can
-  import the shared visual recipes and the `cn()` helper. It is unstable, unsupported, may
-  change or disappear in any release, and must not be used by a published consumer.
+  import shared visual recipes and `cn()`. The five-subpath export map keeps the subpath available,
+  but its symbol set is unstable, unsupported and excluded from semver compatibility; published
+  consumers must not import it.
 
 ## Size budgets
 
@@ -235,53 +237,10 @@ as `bun run test:bundle`.
   is a size regression, lowering it is a maintained contract, and neither is a routine
   refresh.
 
-### Recorded baseline changes
-
-| Change | Fixtures | Recorded reason |
-| --- | --- | --- |
-| Wave C: `Accordion`, `Collapsible`, `Drawer` and `Toast` added to the core barrel | `disclosure` and `toast` fixtures added; `overlay` extended with `Drawer`; `barrel` and `stylesCss` raised | The core component catalog is completed. `Drawer` is a positioned `Dialog`, so it adds no second modal system and no gesture machinery: `overlay` moved by less than 1%. `toast` is the wave's cost — Base's toast primitive owns the queue, the timer, the limit, the live region and the stack, and it is the only new dependency subtree. No core bundle reaches rich-content code. |
-| Wave C follow-up: shared recipe modules made tree-shakeable | `button`, `form`, `toggles` and `content` all **lowered** | The wave had also raised fixtures it does not touch — `button` by 5.2%, just past the tolerance — because the visual and motion recipe modules are shared by every component and their unused recipes survived tree-shaking. See below. |
-
-### What the shared-recipe modules cost, and what they cost now
-
-Adding a family to a shared module had been taxing every unrelated bundle, and the gate caught it.
-The mechanism, measured rather than inferred:
-
-- a recipe composed from other recipes is a template literal with substitutions, and a template
-  literal is not provably side-effect-free — joining class strings may in principle call something —
-  so an *unused* recipe was kept, along with everything it referenced. Every consumer that imported
-  any part of `ui.common.ts` or `ui.motion.ts` therefore paid for every recipe in both. In the
-  `button` bundle alone the two shared modules were **11.9 kB of the 45.6 kB** it weighed, almost
-  all of it recipes `Button` never uses;
-- the recipes are now composed through `cx` in `libs/utils.ts`, whose call is marked pure. A pure
-  call is dropped whole when nothing references it, so composition no longer costs anything the
-  bundle does not use. The annotation survives the library build, so a consumer's bundler sees it
-  too;
-- measured, against the wave's raised baselines and then against the state before the wave
-  (gate figures, kB):
-
-  | Fixture | Before the wave | Raised by the wave | Now |
-  | --- | --- | --- | --- |
-  | `button` | 43.3 | 45.5 | **41.8** |
-  | `form` | 283.3 | 285.6 | **283.2** |
-  | `toggles` | 63.5 | 65.7 | **62.0** |
-  | `content` | 614.6 | 616.7 | **613.0** |
-  | `overlay` | 307.5 | 311.5 | 310.4 |
-  | `barrel` | 409.4 | 448.4 | 448.9 |
-
-  Every fixture the wave does not itself compose is now at or **below** where it started: `button`
-  is 1.5 kB *lighter* than before `Accordion`, `Collapsible`, `Drawer` and `Toast` existed. `overlay`
-  and `barrel` grew for the right reason — they contain `Drawer` and the toast stack — and no core
-  bundle reaches rich-content code;
-- no class string changed. The deterministic style contract was reviewed change by change and shows
-  only the intended sheet-radius and toast-positioning edits;
-- what remains is *pre-existing* and recorded rather than fixed: an **object**-valued recipe table
-  (`overlay`, `list`, `disclosure`, `selectable`, `edge`) still cannot be dropped property by
-  property, because a bundler keeps an object literal whose properties contain calls. Those tables
-  cost roughly 7.5 kB in every core bundle and did so before this wave too. Flattening them into
-  single literal strings would drop them, at the cost of the composition the design language
-  depends on — a shell recipe genuinely bundles material, elevation and shape — so that is left as a
-  separate, deliberate change rather than folded into this one.
+Historical bundle-baseline changes and their measured reasons live in the phase audit documents.
+The current JSON file is authoritative; a future baseline edit must record its reason in the same
+change. The remaining object-valued shared recipe tables are a post-release optimization candidate,
+not a correctness defect and not permission to raise a budget.
 
 ## Accessibility: the authored palette meets AA
 
@@ -332,28 +291,96 @@ If any one of them stops being true, the freeze described in
 [`ARCHITECTURE.md`](ARCHITECTURE.md) no longer holds and this document must be revised with
 it.
 
-## Phase C additions
+## Final gate and stable transition
 
-The core barrel also exports `DirectionProvider` and `DirectionProviderProps`: a DOM-free
-provider accepting `direction: "ltr" | "rtl"` and `children`. RTL applications pair it with
-`<html dir="rtl">`; changing locale updates both. It delegates to the existing behavior
-substrate rather than implementing directional keyboard navigation locally. Consumers do not
-import Base UI or the removed workbench-only `BaseDirectionProvider` export. Drawer sides
-remain physical and CodeBlock remains LTR.
+A release candidate is shippable only when the checkout is clean, the stable blocker below is
+resolved, the manual checklist is recorded, and `bun run verify` passes from the exact candidate
+commit with the frozen lockfile. CI uses `bun install --frozen-lockfile` and runs that same command.
+The two opt-in screenshot-review projects are review tools, not hidden requirements of the routine
+deterministic gate.
 
-The stress pass adds no package subpath, theme system or motion owner. Notification stacking
-is now explicit in the design language because the persistent toast portal can precede the
-modal that raises a notification. See `docs/HOSTILE_LAYOUT.md` for the evidence and limits.
+The stable transition is one deliberate release commit:
 
-## Phase D publication corrections
+1. set `packages/ui/package.json` to version `2.0.0` and `publishConfig.tag` to `latest`;
+2. replace prerelease install examples (`sherick-ui@alpha`) with untagged stable installs;
+3. run `bun install --frozen-lockfile`, `bun run verify`, and review the complete diff;
+4. from `packages/ui`, run `npm pack --dry-run` and `npm publish --dry-run --access public --tag latest`;
+5. confirm the dry-run manifest contains only the declared files and all five export subpaths;
+6. only after explicit publish approval, publish with `npm publish --access public --tag latest`;
+7. verify `npm view sherick-ui dist-tags versions --json`: `latest` must be `2.0.0`, `alpha` may
+   continue to name the final prerelease, and an untagged install must resolve to `2.0.0`;
+8. tag and push `v2.0.0` only after the registry verification succeeds.
 
-The five-subpath architecture is unchanged. Root and dev now publish module-correct `.d.ts` /
-`.d.cts` declarations; source maps embed source text. `MenuTriggerProps` and `PopoverTriggerProps`
-are exported. `Select.className` targets its visible trigger; Slider div attributes target its
-root while handle labeling stays on the thumb. These are prerelease corrections, not aliases.
+`prepack`, not consumer installation, owns the Bun build. Do not add lifecycle scripts that build
+on consumer install, publish the prerelease under `latest`, or move stable `2.0.0` back under
+`alpha`.
 
-The complete stylesheet no longer assumes a host reset: its native-control/border-box baseline
-is restricted to Sherick-owned nodes. Global keyframes and math font names are namespaced, and
-the copied math assets carry their license. Prism manual mode prevents document-wide highlighting
-before React hydration. Packed React 18/19 Vite and Next fixtures guard these contracts; no bundle
-budget was increased. `prepack`, rather than consumer installation, owns the Bun build.
+## Release-readiness classifications
+
+### Resolved stable-release blocker: editable Combobox isolation
+
+The original blocker was reproduced against `@base-ui/react@1.8.0` and the packed implementation:
+opening the editable listbox on the interactions fixture produced axe's serious
+`aria-hidden-focus` violation on 37 outside nodes. Base's floating focus manager marked content
+around the popup `aria-hidden="true"` while leaving that content in sequential focus navigation, so
+keyboard focus could enter content a screen reader could not perceive. The defect is tracked as
+[mui/base-ui#5528](https://github.com/mui/base-ui/issues/5528).
+
+The blocker is resolved without removing or making the editable Combobox modal. A version-specific
+Bun patch extends Base UI's own `markOthers` isolation authority. It starts from Base's focusable
+candidates and applies the individual tabbability check rather than the radio-group-reduced
+`tabbable()` result, then temporarily writes `tabindex="-1"` and observes each hidden subtree for the
+full isolation lifetime. All native radios are therefore suppressed before a property-only selection
+change can make a different group member sequentially tabbable. Controls mounted later or made
+focusable while hidden are suppressed too; balanced cleanup disconnects the observer and restores the
+latest intended values. Pre-existing values and nested isolation counters are preserved. The patch
+does not use `inert`, so pointer interaction outside the non-modal listbox still dismisses it and runs
+the clicked action.
+
+Because a workspace patch alone would disappear for consumers, `@base-ui/react` and its runtime
+closure are bundled inside the published tarball. The packed-package gate checks the installed nested
+Base UI version, license and patched ESM/CommonJS modules before exercising the editable Combobox
+from the tarball in React 18 and React 19 Vite builds and the React 19 Next build.
+
+The browser contract now includes exclusion-free open-state axe scans in both themes, direct
+listbox/option/active-descendant assertions, lifetime coverage for newly mounted controls, changed
+focusability, property-only native-radio selection and native `<summary>`, restoration after Escape,
+and preserved outside pointer interaction. The patch may be retired only when a released Base UI
+version passes the same gates. No component API was removed or changed.
+
+The Phase E acceptance run completed with the frozen lockfile:
+`WEBKIT_EXECUTABLE_PATH=/tmp/sherick-webkit bun run verify` passed 204 showcase tests (with the two
+opt-in review captures skipped), all 96 no-Tailwind Chromium/Firefox/WebKit tests, all 15
+packed-consumer tests, and every lint, type, motion, bundle-budget, package-smoke and visual-contract
+gate. `npm publish --dry-run --access public --tag alpha` also completed against the staged tarball
+and restored Bun's workspace link afterward. These automated results do not replace the manual checks
+below, and the eventual stable-version commit still requires the exact-commit rerun described above.
+
+### Accepted stable limitations
+
+These are explicit contract boundaries, not unresolved defects:
+
+- rich content is ESM-only; the core and `dev` entries remain ESM/CommonJS;
+- themes are document-level; nested isolated theme islands are unsupported;
+- RTL applications keep document `dir` and `DirectionProvider.direction` in sync; Drawer sides are
+  physical and source code remains LTR;
+- compact-label truncation, short non-interactive tooltip content, and surrounding clearance for
+  expanded small-mark hit areas follow the constraints in `HOSTILE_LAYOUT.md`;
+- the package targets the pinned three-engine browser baseline above and does not ship a legacy bundle.
+
+### Manual pre-publish checks
+
+Automation covers reflow-equivalent viewport reduction, root-font scaling, coarse-pointer
+emulation and all three browser engines, but it does not honestly replace:
+
+- browser-UI zoom at 200% and 400% in a shipping Chromium, Firefox and Safari browser;
+- one physical iOS and one physical Android pass for soft-keyboard viewport changes, browser chrome,
+  safe areas and touch targeting;
+- keyboard plus NVDA/Firefox and VoiceOver/Safari announcements for the form, modal, selection and
+  toast critical paths.
+
+These checks are a small human release checklist. They are not evidence of another known software
+defect, but they must be recorded before publishing stable.
+
+Historical Phase C and Phase D findings remain in `HOSTILE_LAYOUT.md` and
+`PACKAGE_INTEGRITY.md`; they are not part of this consumer compatibility contract.

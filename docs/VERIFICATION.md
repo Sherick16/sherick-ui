@@ -93,6 +93,9 @@ Both consume `sherick-ui` through package exports after the library build.
 - `theme.css` also runs alone on a plain HTML page;
 - the existing bundle-budget owner runs against the installed tarball, checking all eight graphs and the same unchanged size budgets;
 - npm validates both dependency trees, and tarball checks require source-bearing maps, math assets/license, finished JS/declarations/CSS and only intentional publication files.
+- the tarball contains the exact patched `@base-ui/react@1.8.0` package, its license and complete
+  runtime closure; all three production browser consumers run the exclusion-free open editable-Combobox
+  axe scan plus tab-order restoration and non-modal pointer dismissal.
 
 `packages/ui/scripts/packed-consumers.mjs` and `scripts/fixtures/packed` are fixtures within this existing publication gate, not a second behavioral suite. `KEEP_PACKED_CONSUMERS=1 bun run test:packed` retains temporary consumers for diagnosis. This layer catches publication problems direct workspace imports can hide; it does not repeat Phase C's complete cross-browser behavior matrix.
 
@@ -370,39 +373,44 @@ tree below it has run its effects, which React flushes parent-last — and not f
 selector such as `[aria-labelledby]`, which any unrelated component on the page can satisfy while
 the component under test is still bare. The wait is the state, not a timeout.
 
-**One combination is asserted directly instead of scanned, and it is a demonstrated upstream
-gap.** With an editable Combobox's listbox open, axe reports `aria-hidden-focus` — 37 nodes on the
-interactions fixture — because the page around the popup is marked `aria-hidden` while remaining
-focusable.
+**The open editable Combobox is scanned without an exclusion.** The original failure was axe's
+serious `aria-hidden-focus` rule on 37 nodes: Base's untrapped typeable-Combobox path kept focus in
+the editable input while applying `aria-hidden` around the portaled listbox, but did not remove hidden
+controls from sequential focus. The cause is tracked as
+[mui/base-ui#5528](https://github.com/mui/base-ui/issues/5528).
 
-Where it comes from, read from the installed Base UI rather than inferred:
+The exact `@base-ui/react@1.8.0` dependency is patched at Base's own `markOthers` authority. It starts
+from Base's focusable candidates and applies its individual tabbability check rather than the
+radio-group-reduced `tabbable()` result. Every native radio is therefore suppressed even when a
+property-only checked-state change could make a different group member sequentially tabbable. The
+patch also observes each subtree newly hidden with `aria-hidden` for the complete isolation lifetime.
+Existing, newly mounted and newly focusable controls temporarily receive `tabindex="-1"`; cleanup
+disconnects the observer and restores the latest intended values, while Base's existing counters keep
+nested opens balanced. `inert` is deliberately not used because this popup remains non-modal and
+outside pointer interaction must keep working.
 
-- a Combobox that renders its `Input` **outside** the popup (the editable combobox pattern this
-  package uses) gets `initialFocus: false` from Base's own default, because focus has to stay in the
-  input so typing keeps working (`combobox/popup/ComboboxPopup.mjs`, `computedDefaultInitialFocus`);
-- that makes `isUntrappedTypeableCombobox` true, and Base's floating focus manager then passes
-  `ariaHidden: modal || isUntrappedTypeableCombobox` — i.e. `true` regardless of `modal`
-  (`floating-ui-react/components/FloatingFocusManager.mjs`);
-- the same condition is what *skips* the focus guards ("guards are not rendered, but `aria-hidden`
-  is still applied"), so the page outside is hidden from assistive technology while focus is still
-  free to leave the popup;
-- Base's `markOthers` **supports** an `inert` option; `FloatingFocusManager` never passes it.
+The showcase accessibility suite now proves all of the following:
 
-So the missing `inert` is Base's to add. It cannot be fixed from here without changing what the
-component is: the two shapes that avoid it are a combobox whose input renders *inside* the popup
-(a different control anatomy, and a different visual contract) or one that hands focus to the popup
-(which stops the field being editable while open). `@base-ui/react@1.8.0` is the latest published
-version and there is no newer dist-tag, so there is no dependency update to take either.
+- the complete interactions page with the editable listbox open passes the unmodified WCAG A/AA axe
+  tag set in light and dark themes;
+- a representative outside control moves from its original `tabindex` to `-1` while the list is open
+  and returns to its original value after Escape;
+- a button mounted after opening, an element made focusable while hidden and native `<summary>` all
+  move out of sequential focus and restore their intended values on close;
+- both members of a native radio group stay out of sequential focus when selection moves through the
+  `checked` property without an attribute mutation, then restore without changing the selected radio;
+- clicking an outside control still dismisses the list and runs the clicked control, proving the fix
+  did not turn the popup modal;
+- `role="listbox"`, option selection, disabled options, `aria-activedescendant` and the highlighted
+  row remain asserted directly because a green axe result does not prove behavior.
 
-The state is therefore covered by **direct behavioural assertions** — `role="listbox"`,
-`role="option"`, `aria-selected`, `aria-disabled`, the input's `aria-activedescendant`, and the
-active row's own highlight — while the *closed* Combobox runs the full axe scan over the same
-control and its `Field` label, description and error relationships, and a modal Menu, an open
-AlertDialog and a Select opened inside a dialog are all scanned in their open states.
-
-**Those assertions are not equivalent to scanning the open state**, and they are not recorded as if
-they were. It remains a dependency risk to settle before the stable `2.0.0`: an upstream fix, or an
-explicit decision that an open listbox may hide the rest of the page from assistive technology.
+The package boundary repeats the open-state contract against the actual tarball. `test:packed` checks
+that npm installed the patched Base UI copy nested in `sherick-ui`, then opens and scans the editable
+Combobox and repeats the existing, newly mounted, newly focusable, native `<summary>`, native-radio,
+restoration and outside-pointer assertions in the React 18 and React 19 Vite consumers and the React 19
+Next consumer.
+This prevents a workspace-only patch from producing a green repository while npm consumers receive the
+defective upstream implementation.
 
 **No rule is excluded.** The scan runs the WCAG A/AA tag set as it is
 (`wcag2a`, `wcag2aa`, `wcag21a`, `wcag21aa`, `wcag22aa`), `color-contrast` included, and it is the contrast

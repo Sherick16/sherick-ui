@@ -174,13 +174,100 @@ for (const theme of THEMES) {
     await page.keyboard.press("Escape");
     expect(errors).toEqual([]);
   });
+
+  test(`an open Combobox has no automatically detectable WCAG A/AA violations (${theme})`, async ({
+    page,
+    errors,
+  }) => {
+    await gotoTheme(page, theme, "/verification/interactions");
+    const searchable = page.getByRole("combobox", { name: "Combobox project" });
+    await searchable.click();
+    await expect(page.getByRole("option", { name: "Design system" })).toBeVisible();
+
+    await expectNoA11yViolations(page, theme);
+
+    expect(errors).toEqual([]);
+  });
 }
 
-/* An open Combobox listbox is asserted directly rather than scanned, and the divergence is
-   recorded in docs/VERIFICATION.md: Base UI's combobox focus manager marks the page around an
-   open listbox `aria-hidden` without `inert`, which axe reports as `aria-hidden-focus` on page
-   content Sherick does not own. The listbox relationships Sherick is responsible for are checked
-   here instead. */
+test("an open Combobox preserves tab-order isolation for its full open lifetime", async ({
+  page,
+  errors,
+}) => {
+  await page.goto("/verification/interactions");
+  const searchable = page.getByRole("combobox", { name: "Combobox project" });
+  const outsideButton = page.getByTestId("menu-plain-trigger");
+  const mutableTarget = page.getByTestId("combobox-focusability-target");
+  const nativeSummary = page.getByTestId("combobox-native-summary");
+  const lateButton = page.getByTestId("combobox-late-button");
+  const explicitlyRemoved = page.getByTestId("combobox-explicit-negative");
+  const firstRadio = page.getByTestId("combobox-radio-first");
+  const secondRadio = page.getByTestId("combobox-radio-second");
+  await expect(outsideButton).toHaveAttribute("tabindex", "0");
+
+  await searchable.click();
+  await expect(page.getByRole("option", { name: "Design system" })).toBeVisible();
+  await expect(outsideButton).toHaveAttribute("tabindex", "-1");
+
+  await outsideButton.evaluate((button) => {
+    const hiddenRoot = button.closest('[aria-hidden="true"]');
+    if (!hiddenRoot) throw new Error("Outside button is not inside Combobox isolation");
+    const fixture = document.createElement("div");
+    fixture.dataset.testid = "combobox-live-isolation";
+    fixture.innerHTML = `
+      <div data-testid="combobox-focusability-target">Becomes focusable while hidden</div>
+      <details><summary data-testid="combobox-native-summary">Native summary</summary></details>
+      <button data-testid="combobox-late-button">Mounted while hidden</button>
+      <button data-testid="combobox-explicit-negative">Stops participating while hidden</button>
+      <label><input data-testid="combobox-radio-first" type="radio" name="combobox-isolation" checked> First</label>
+      <label><input data-testid="combobox-radio-second" type="radio" name="combobox-isolation"> Second</label>
+    `;
+    hiddenRoot.append(fixture);
+  });
+  await expect(nativeSummary).toHaveAttribute("tabindex", "-1");
+  await expect(lateButton).toHaveAttribute("tabindex", "-1");
+  await expect(explicitlyRemoved).toHaveAttribute("tabindex", "-1");
+  await expect(firstRadio).toBeChecked();
+  await expect(secondRadio).not.toBeChecked();
+  await secondRadio.evaluate((element) => {
+    if (!(element instanceof HTMLInputElement)) throw new Error("Expected a native radio input");
+    element.checked = true;
+  });
+  await expect(firstRadio).not.toBeChecked();
+  await expect(secondRadio).toBeChecked();
+  await expect(firstRadio).toHaveAttribute("tabindex", "-1");
+  await expect(secondRadio).toHaveAttribute("tabindex", "-1");
+
+  await mutableTarget.evaluate((element) => {
+    element.tabIndex = 0;
+  });
+  await expect(mutableTarget).toHaveAttribute("tabindex", "-1");
+  await explicitlyRemoved.evaluate((element) => {
+    element.tabIndex = -1;
+  });
+
+  await page.keyboard.press("Escape");
+  await expect(outsideButton).toHaveAttribute("tabindex", "0");
+  await expect(mutableTarget).toHaveAttribute("tabindex", "0");
+  expect(await nativeSummary.getAttribute("tabindex")).toBeNull();
+  expect(await lateButton.getAttribute("tabindex")).toBeNull();
+  await expect(explicitlyRemoved).toHaveAttribute("tabindex", "-1");
+  expect(await firstRadio.getAttribute("tabindex")).toBeNull();
+  expect(await secondRadio.getAttribute("tabindex")).toBeNull();
+  await expect(firstRadio).not.toBeChecked();
+  await expect(secondRadio).toBeChecked();
+
+  /* Removing a control from sequential focus must not make a non-modal popup inert: outside
+     pointer interaction remains available and closes the list before running the clicked action. */
+  await searchable.click();
+  await expect(page.getByRole("option", { name: "Design system" })).toBeVisible();
+  await outsideButton.click();
+  await expect(page.getByRole("option", { name: "Design system" })).toHaveCount(0);
+  await expect(page.getByRole("menuitem", { name: "Plain action" })).toBeVisible();
+
+  expect(errors).toEqual([]);
+});
+
 test("an open Combobox publishes its own listbox relationships", async ({ page, errors }) => {
   await page.goto("/verification/interactions");
 

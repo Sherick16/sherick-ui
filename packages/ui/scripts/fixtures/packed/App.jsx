@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import {
-  Badge, Button, Card, Checkbox, Dialog, DirectionProvider, Divider, Drawer,
+  Badge, Button, Card, Checkbox, Combobox, Dialog, DirectionProvider, Divider, Drawer,
   Input, Popover, Select, Skeleton, Slider, Spinner, Switch, ToastProvider, ToastViewport, useToast,
 } from "sherick-ui";
 import { CodeBlock, Markdown } from "sherick-ui/content";
@@ -31,6 +31,8 @@ export default function App() {
     <Switch aria-label="Enabled" defaultChecked />
     <Slider id="slider-root" aria-label="Volume" defaultValue={30} style={{ width: 180 }} />
     <Select aria-label="Project" className="p-0 rounded-none" options={[{ value: "one", label: "One" }, { value: "two", label: "Two" }]} defaultValue="one" />
+    <label htmlFor="packed-combobox">Search project</label>
+    <Combobox id="packed-combobox" options={[{ value: "design", label: "Design system" }, { value: "dashboard", label: "Dashboard" }]} defaultValue="design" />
     <Popover><Popover.Trigger render={<Button>Popup</Button>} /><Popover.Content>Package popup</Popover.Content></Popover>
     <Button onClick={() => setDialog(true)}>Open dialog</Button>
     <Dialog open={dialog} onOpenChange={setDialog}>
