@@ -240,9 +240,10 @@ test("RTL mirrors the directional glyphs and leaves page identity alone", async 
   });
 
   try {
-    expect(await svgScaleX(previous)).toBeLessThan(0);
-    expect(await svgScaleX(next)).toBeLessThan(0);
-    expect(await svgScaleX(separator)).toBeLessThan(0);
+    // The host's reduced-motion reset still leaves a tiny CSS transition; observe the settled glyph.
+    await expect.poll(() => svgScaleX(previous)).toBeLessThan(0);
+    await expect.poll(() => svgScaleX(next)).toBeLessThan(0);
+    await expect.poll(() => svgScaleX(separator)).toBeLessThan(0);
 
     /* A page is a number, not a direction: the set and the current page are unchanged. */
     expect(await pageNumbers(pagination)).toEqual([1, 4, 5, 6, 12]);

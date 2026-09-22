@@ -94,6 +94,7 @@ import {
   type ShowcaseSectionId,
 } from "../components/ShowcaseNav";
 import StepperSpecimen from "../components/v2-1/e";
+import NavigationSpecimen from "../components/v2-1/c";
 
 const selectOptions = [
   { label: "Design system", value: "design" },
@@ -525,6 +526,9 @@ export default function Home() {
                     ]}
                   />
                 </div>
+              </Specimen>
+              <Specimen title="Pagination & breadcrumb">
+                <NavigationSpecimen />
               </Specimen>
             </div>
           </ShowcaseSection>
