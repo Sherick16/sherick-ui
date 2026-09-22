@@ -1,27 +1,58 @@
 # Component index
 
-Individual component references are intentionally not populated in this foundation.
-Absence here does not mean a component is unavailable in the installed package.
+Start from the task, not the component name. Read the linked family reference for the
+matching contract; load a cross-cutting reference only when the task also changes its
+topic. Availability below describes the repository contract, not the consuming app's
+installed package. Stable means published in `2.0.0`; v2.1 additions are still
+unreleased and must not be recommended until the installed package confirms them.
 
-## API lookup until entries exist
+## Choose a component
 
-Resolve the consuming application's installed package and inspect its `exports` and
-`types` entries. Follow only the declarations for the relevant export; consult that
-version's package README and matching source/examples for behavior not expressed by
-types. Distinguish native events from value/state callbacks. Do not infer a public API
-from a screenshot, private DOM attributes or upstream Base UI documentation.
+| Need | Choose | API reference | Availability |
+| --- | --- | --- | --- |
+| A labelled action, submit action, or loading action | `Button` | [Actions and display](actions-display.md) | Stable 2.0.0 |
+| An icon-only action | `IconButton` | [Actions and display](actions-display.md) | Stable 2.0.0 |
+| A short status label, person image/initials, or grouped content surface | `Badge`, `Avatar`, `Card` | [Actions and display](actions-display.md) | Stable 2.0.0 |
+| Separate content or show a passive message | `Divider`, `Alert` | [Actions and display](actions-display.md) | Stable 2.0.0 |
+| Show tabular data | `Table` | [Actions and display](actions-display.md) | Stable 2.0.0 |
+| Show loading activity, a placeholder, or measured completion | `Spinner`, `Skeleton`, `Progress` respectively | [Actions and display](actions-display.md) | Stable 2.0.0 |
+| Label a control or compose field text/errors | `Field` | [Forms](forms.md) | Stable 2.0.0 |
+| Enter text, multiline text, search, or a number | `Input`, `Textarea`, `Search`, `NumberField` | [Forms](forms.md) | Stable 2.0.0 |
+| Choose checked state, one radio option, or a continuous value | `Checkbox`, `Switch`, `RadioGroup`, `Slider` | [Forms](forms.md) | Stable 2.0.0 |
+| Pick one fixed option vs search among options | `Select` vs `Combobox` | [Selection](selection.md) | Stable 2.0.0 |
+| Hold tags vs choose one/many compact toggles | `Chip`/`ChipGroup` vs `SegmentedControl`/`ToggleGroup` | [Selection](selection.md) | Stable 2.0.0 |
+| Search and invoke an action inline vs in a modal palette | `Command` vs `CommandPalette` | [Selection](selection.md) | Unreleased v2.1 |
+| Choose a date vs a date range | `Calendar`, `DatePicker`, `DateRangePicker` | [Selection](selection.md) | Unreleased v2.1 |
+| Link to a destination, show a location trail, or paginate results | `NavGroup`/`NavItem`, `Breadcrumb`, `Pagination` | [Navigation and overlays](navigation-overlays.md) | NavGroup/NavItem stable; Breadcrumb/Pagination unreleased v2.1 |
+| Select a panel vs disclose content in place | `Tabs` vs `Accordion`/`Collapsible` | [Navigation and overlays](navigation-overlays.md) | Stable 2.0.0 |
+| Browse a hierarchy vs show workflow steps | `TreeView` vs `Stepper` | [Navigation and overlays](navigation-overlays.md) | Unreleased v2.1 |
+| Confirm one destructive choice, complete a modal task, or attach a task to an edge | `AlertDialog`, `Dialog`, `Drawer` | [Navigation and overlays](navigation-overlays.md) | Stable 2.0.0 |
+| Open a command menu, anchored interactive content, or a short hint | `Menu`, `Popover`, `Tooltip` | [Navigation and overlays](navigation-overlays.md) | Stable 2.0.0 |
+| Report success/activity to the user | Toast API | [Feedback, direction and rich content](feedback-content.md) | Stable 2.0.0 |
+| Configure text direction | `DirectionProvider` | [Feedback, direction and rich content](feedback-content.md) | Stable 2.0.0 |
+| Render Markdown or a syntax-highlighted code block | `Markdown`, `CodeBlock` | [Feedback, direction and rich content](feedback-content.md) | Stable `sherick-ui/content` subpath; ESM only |
+| Select files (not upload them) | `FileUpload` | [Forms](forms.md) | Unreleased v2.1 |
 
-When an entry exists, read its linked reference rather than every component document.
-If a signature or behavior conflicts with the installation, follow the
-[version-check workflow](../../SKILL.md#how-to-work-with-sherick-ui) before writing code.
+## Public types and boundaries
 
-## Routing convention for the component pass
+Family references also document the props and related public types exported with their
+components, including `Variant` in actions and display; `FileUploadProps`/`FileRejection`
+in forms; selection option/date/item types; navigation item/part props, `DrawerSide`,
+`OverlayAlign` and `OverlaySide`; and toast/provider/manager types. `sherick-ui/content`
+exports only `Markdown`, `CodeBlock`, `MarkdownProps` and `CodeBlockProps`. Rich content
+is not part of the root barrel. Do not document or import `sherick-ui/dev` as consumer API.
 
-Add concise rows under this heading with: **user need → public export/import path →
-relative reference link**, plus a release-availability note when relevant. Link only
-to files that exist. Use family files for related small contracts and dedicated files
-for complex ones; avoid intermediate indexes or a duplicated all-components manual.
+`Select` is the fixed-choice control; `Combobox` is the searchable choice control. A
+`Tooltip` is a short hint, not an accessible name or a place for interactive content.
+`Spinner` indicates activity without a known completion amount; `Progress` communicates
+determinate completion. `FileUpload` selects local `File` objects but does not transmit
+them. Date-family values are civil `YYYY-MM-DD` strings, not timestamps. See the linked
+references for exact behavior and composition.
 
-Each target owns its API, usage, important states and component-specific caveats.
-The cross-component references remain the owners of design, composition, theming
-and accessibility guidance. No component entries are claimed by this handoff.
+## Version check
+
+The consuming application's resolved package is authoritative. Read its `exports` and
+declaration files, not just its semver range. Repository `main` includes unreleased v2.1
+additions; their presence here is a routing aid, not evidence that they exist in a
+published or installed package. Follow the [installed-version workflow](../../SKILL.md#how-to-work-with-sherick-ui)
+if a reference conflicts with the installation.

@@ -6,7 +6,7 @@ description: >-
   themes or accessibility in an application that uses it. Not a guide to maintaining
   the library itself or to unrelated backend work.
 metadata:
-  source-revision: "b1c201bc0ef2c755b508a968b90f8a02f2cd2d85"
+  source-revision: "2bf6da5189e0e5b0d113954029e2fe6f0fda1ef3"
 ---
 
 # Consuming Sherick UI
@@ -53,6 +53,3 @@ repository's maintainer documentation for every task.
 | Install/integrate CSS; debug styling; change themes or tokens | [Theming and integration](references/theming.md) |
 | Add/change controls, labels, focus, overlays, direction or accessibility | [Accessibility](references/accessibility.md) |
 | Choose/configure a component or check its API and states | [Component index](references/components/index.md) |
-
-The component index is a foundation-only handoff until the component-reference pass
-populates it. It supplies an installed-package lookup path in the meantime.

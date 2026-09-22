@@ -10,11 +10,10 @@ maintainer guidance and should not be copied into an application as consumer rul
 
 ## Ownership and progressive disclosure
 
-`SKILL.md` owns the workflow, universal constraints and direct task routes. Its four
-foundation references own visual decisions, application composition, CSS/theme
-integration and accessibility respectively. The component index is the one deliberate
-lookup hop for future individual API references; it currently supplies an honest
-installed-package fallback, not an incomplete catalog presented as complete.
+`SKILL.md` owns the workflow, universal constraints and direct task routes. The four
+cross-cutting references own visual decisions, application composition, CSS/theme
+integration and accessibility. The component index routes by user intent to focused API
+references; it is not a second component manual. Load only the family relevant to the task.
 
 Maintain each detailed rule in its owning reference. Link to an owner when another
 topic needs it rather than copying its procedure. Do not make every task load every
@@ -23,37 +22,37 @@ and upstream evidence uses revision-pinned links rather than assuming a library 
 
 ## Grounding and maintenance
 
-The foundation was checked against `main` at
-[`b1c201b`](https://github.com/Sherick16/sherick-ui/commit/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85).
+The cross-cutting foundation was checked against `main` at
+[`b1c201b`](https://github.com/Sherick16/sherick-ui/commit/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85); the component-reference pass was checked against current `main` at
+[`2bf6da5`](https://github.com/Sherick16/sherick-ui/commit/2bf6da5189e0e5b0d113954029e2fe6f0fda1ef3).
 The canonical [design language](../docs/DESIGN_LANGUAGE.md) owns visual policy;
 [consumer documentation](../packages/ui/README.md), [package exports](../packages/ui/package.json)
-and public declarations own the consumer API. Recipes in `ui.common.ts`, authored
-`styles/tokens.ts`, the CSS compiler, `Field.tsx` and the showcase root were inspected
-to distinguish actual contracts from demonstrations or implementation details.
+and public declarations own the consumer API. Implementations, relevant tests and showcase
+specimens were checked to distinguish contracts from examples and internal behavior.
 
 These guides are a consumer translation, not a new visual authority. When a contract
 changes, update its reference and source provenance together. Reconcile conflicting
 sources explicitly; do not silently redefine the system through this skill. The source
 revision is provenance, not a promise that unreleased `main` exports are installed.
 
-## Component-reference handoff
+## Component references
 
-Populate [the component index](sherick-ui/references/components/index.md) in a separate
-pass. Each reference should cover exact imports/types, supported composition, minimal
-valid usage, state ownership/callbacks, meaningful states and specific caveats. Record
-release availability; do not assume repository presence equals a published API. Keep
-shared rules in the foundation and group small related APIs without creating a giant
-manual. This pass deliberately does not enumerate components or generate prop tables.
+The semantic [component index](sherick-ui/references/components/index.md) routes all stable
+root exports, unreleased v2.1 additions and the ESM-only `sherick-ui/content` exports to
+five focused family references. It marks release availability separately from repository
+presence and links shared composition, design, theming and accessibility rules to their
+owners. Keep API caveats with the relevant component family; do not create one file per
+trivial export or duplicate the cross-cutting foundation.
 
 ## Review checks
 
 Validate frontmatter and naming against the Agent Skills specification. Check local
-links and anchors, direct reachability of each foundation reference, and portability
-after copying just the skill folder. Review setup, visual composition, theme changes,
-accessibility/RTL and missing-component-reference tasks through the routes; an unrelated
-backend task should not require this skill. Typecheck any future component examples
-against the package version they document. Do not call structural checks a model eval
-or a full application accessibility audit.
+links/anchors, export-to-reference coverage and portability after copying just the skill
+folder. Use the [component cold-start scenarios](COMPONENT_SCENARIOS.md) to evaluate
+representative component choice, API usage, compound composition and release availability;
+keep task prompts separate from evaluator criteria. Typecheck examples against the package
+version they document where practical. Structural checks are not proof of agent
+effectiveness or a full application accessibility audit.
 
 ## Research basis
 
