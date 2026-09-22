@@ -46,7 +46,7 @@ const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
        shared classes — including the focus ring the keyboard needs to see. */
     const linkProps = (item: BreadcrumbItem): AnchorHTMLAttributes<HTMLAnchorElement> => ({
       href: item.href,
-      className: cn("min-w-0 [overflow-wrap:anywhere]", focusRing, text.medium, "hover:text-sherick-ink"),
+      className: cn("min-w-0 no-underline [overflow-wrap:anywhere]", focusRing, text.medium, "hover:text-sherick-ink"),
       children: item.label,
     });
 
@@ -55,7 +55,7 @@ const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
         {...props}
         ref={ref}
         aria-label={ariaLabel ?? "Breadcrumb"}
-        className={cn("min-w-0", className)}
+        className={cn("min-w-0 text-sm leading-6", className)}
       >
         {/* A native ordered list: the trail has an order, and the order is the information. The row
             wraps rather than overflowing, so a long trail stays inside its column. `role="list"`

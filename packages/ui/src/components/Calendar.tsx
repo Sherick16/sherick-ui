@@ -106,7 +106,7 @@ const todayButtonClassName = `inline-flex shrink-0 items-center justify-center p
 /* The visual mark of one day. A day is a compact square target, so its corner is the circle, and
    it is flat: depth never announces hover or selection inside a grid. Its press is tone alone —
    the day boundary is what the reader is aiming at, and it does not move. */
-const dayButtonClassName = `relative inline-flex size-10 shrink-0 items-center justify-center text-sm tabular-nums ${shape.circle} ${motionFeedback} ${focusRingInset}`;
+const dayButtonClassName = `relative inline-flex size-10 shrink-0 select-none items-center justify-center text-sm tabular-nums ${shape.circle} ${motionFeedback} ${focusRingInset}`;
 
 /**
  * One month of a Gregorian calendar, navigated as a keyboard grid.
@@ -515,6 +515,7 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
                 /* A range's endpoints carry the emphasis; its interior is the span between them.
                    A single selection is an endpoint of its own. */
                 const isEdge = !isRange || isRangeEdge(date);
+                const joinedRange = selected && isRange && Boolean(selectedRange.end) && selectedRange.start !== selectedRange.end;
 
                 return (
                   <td
@@ -522,8 +523,19 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
                     role="gridcell"
                     aria-selected={selected || undefined}
                     aria-current={isToday ? "date" : undefined}
-                    className={cn("p-0 text-center align-middle")}
+                    className={cn("relative p-0 text-center align-middle")}
                   >
+                    {joinedRange && (
+                      <span
+                        aria-hidden="true"
+                        className={cn(
+                          "pointer-events-none absolute inset-y-1 inset-x-0",
+                          date === selectedRange.start && cn(shape.pill, "rounded-e-none"),
+                          date === selectedRange.end && cn(shape.pill, "rounded-s-none"),
+                          invalid ? tone.selected.danger : tone.selected.primary
+                        )}
+                      />
+                    )}
                     <button
                       type="button"
                       data-day={date}
@@ -540,7 +552,7 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
                         text.high,
                         isToday && `${tone.text.primary} underline underline-offset-4`,
                         selected && isEdge && "font-medium",
-                        selected && (invalid ? tone.selected.danger : tone.selected.primary),
+                        selected && !joinedRange && (invalid ? tone.selected.danger : tone.selected.primary),
                         !disabled && !unavailable && `${stateLayer.quiet} ${state.enabled}`,
                         unavailable && !disabled && state.disabled,
                         disabled && state.disabledDescendant

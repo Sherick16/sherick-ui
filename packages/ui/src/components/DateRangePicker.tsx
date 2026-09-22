@@ -132,6 +132,7 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(({
   const startInputRef = useRef<HTMLInputElement | null>(null);
   const endInputRef = useRef<HTMLInputElement | null>(null);
   const popupActionsRef = useRef<BasePopover.Root.Actions | null>(null);
+  const calendarAnchorRef = useRef<HTMLDivElement | null>(null);
   const startFieldActions = useRef<BaseField.Root.Actions | null>(null);
   const endFieldActions = useRef<BaseField.Root.Actions | null>(null);
 
@@ -260,20 +261,22 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(({
         data-invalid={invalid || undefined}
         className={cn(dateFieldRowClassName(disabled))}
       >
-        <BaseField.Control
-          ref={inputRef === startInputRef ? ref : undefined}
-          render={<input type="date" ref={inputRef} />}
-          id={inputId}
-          name={inputName}
-          form={form}
-          required={required}
-          disabled={disabled}
-          min={minDate ?? undefined}
-          max={maxDate ?? undefined}
-          value={displayedValue ?? ""}
-          onChange={handleChange}
-          className={cn(dateInputClassName)}
-        />
+        <div className={cn("min-w-0 flex-1 overflow-hidden")}>
+          <BaseField.Control
+            ref={inputRef === startInputRef ? ref : undefined}
+            render={<input type="date" ref={inputRef} />}
+            id={inputId}
+            name={inputName}
+            form={form}
+            required={required}
+            disabled={disabled}
+            min={minDate ?? undefined}
+            max={maxDate ?? undefined}
+            value={displayedValue ?? ""}
+            onChange={handleChange}
+            className={cn(dateInputClassName)}
+          />
+        </div>
         <DateFieldTrigger label={`Open ${inputLabel}`} disabled={disabled} />
       </div>
     </Field>
@@ -301,7 +304,7 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(({
         actionsRef={popupActionsRef}
         modal={false}
       >
-        <div className={cn("mt-2 grid gap-4 sm:grid-cols-2")}>
+        <div ref={calendarAnchorRef} className={cn("mt-2 grid grid-cols-[repeat(auto-fit,minmax(min(100%,14rem),1fr))] gap-3")}>
           {row(
             startInputRef,
             id,
@@ -324,7 +327,7 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(({
           )}
         </div>
 
-        <DateCalendarPopup title={label}>
+        <DateCalendarPopup title={label} anchor={calendarAnchorRef}>
           <Calendar
             mode="range"
             value={currentRange}

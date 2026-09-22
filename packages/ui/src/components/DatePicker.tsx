@@ -198,24 +198,26 @@ const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(({
           data-invalid={fieldInvalid || undefined}
           className={cn(dateFieldRowClassName(disabled))}
         >
-          <BaseField.Control
-            ref={ref}
-            render={<input type="date" ref={inputRef} />}
-            id={id}
-            name={name}
-            form={form}
-            required={required}
-            disabled={disabled}
-            min={minDate ?? undefined}
-            max={maxDate ?? undefined}
-            value={displayText}
-            onChange={handleInputChange}
-            className={cn(dateInputClassName)}
-          />
+          <div className={cn("min-w-0 flex-1 overflow-hidden")}>
+            <BaseField.Control
+              ref={ref}
+              render={<input type="date" ref={inputRef} />}
+              id={id}
+              name={name}
+              form={form}
+              required={required}
+              disabled={disabled}
+              min={minDate ?? undefined}
+              max={maxDate ?? undefined}
+              value={displayText}
+              onChange={handleInputChange}
+              className={cn(dateInputClassName)}
+            />
+          </div>
           <DateFieldTrigger label={`Open ${label}`} disabled={disabled} />
         </div>
 
-        <DateCalendarPopup title={label}>
+        <DateCalendarPopup title={label} anchor={() => inputRef.current?.parentElement?.parentElement ?? null}>
           <Calendar
             mode="single"
             value={currentValue}

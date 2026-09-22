@@ -2,8 +2,9 @@
 
 import { Autocomplete as BaseAutocomplete } from "@base-ui/react/autocomplete";
 import React, { forwardRef, useId, useMemo, type ReactNode } from "react";
+import { Search as SearchIcon } from "lucide-react";
 import { cn } from "@/libs/utils";
-import { density, focusRing, list, material, shape, state, text } from "./ui.common";
+import { density, focusRingWithin, list, material, shape, state, text } from "./ui.common";
 import { motionFeedback } from "./ui.motion";
 
 export interface CommandItem {
@@ -102,7 +103,7 @@ const Command = forwardRef<HTMLInputElement, CommandProps>(({
   value,
   defaultValue,
   onValueChange,
-  placeholder,
+  placeholder = "Search commands…",
   emptyMessage = "No commands found.",
   disabled = false,
   locale,
@@ -116,6 +117,7 @@ const Command = forwardRef<HTMLInputElement, CommandProps>(({
      caller did not supply one, and the label points at that id. */
   const generatedId = useId();
   const inputId = id ?? generatedId;
+  const hasIcons = items.some((item) => item.icon !== undefined);
 
   /* Default matching is Base's collator over the label and the command's own keywords, so a
      keyword search never becomes a second matching implementation — and `locale` is the primitive's
@@ -150,7 +152,7 @@ const Command = forwardRef<HTMLInputElement, CommandProps>(({
       key={item.value}
       value={item}
       disabled={item.disabled}
-      className={cn(list.command)}
+      className={cn(list.command, "select-none", state.enabled)}
       onClick={(event) => {
         /* Base's own item press commits a selection: it would replace the query with the command's
            label — or clear it — and close the list. A command does neither, so the primitive's own
@@ -161,7 +163,7 @@ const Command = forwardRef<HTMLInputElement, CommandProps>(({
         onAction?.(item.value);
       }}
     >
-      {item.icon !== undefined && (
+      {hasIcons && (
         <span
           aria-hidden="true"
           className={cn(
@@ -174,7 +176,7 @@ const Command = forwardRef<HTMLInputElement, CommandProps>(({
       )}
       <span className={cn("min-w-0 flex-1 truncate")}>{renderItem ? renderItem(item) : item.label}</span>
       {item.shortcut !== undefined && (
-        <span className={cn("ms-3 shrink-0 text-xs", text.medium)}>{item.shortcut}</span>
+        <span className={cn("ms-3 shrink-0 font-mono text-xs", text.medium)}>{item.shortcut}</span>
       )}
     </BaseAutocomplete.Item>
   );
@@ -209,40 +211,36 @@ const Command = forwardRef<HTMLInputElement, CommandProps>(({
         autoHighlight="always"
         keepHighlight
       >
-        {/* The field is a plain text field that filters what is already on screen: nothing opens on
-            a press, so it is `Input`'s field — hover and focus tonality — rather than the tactile
-            press a control that opens a list answers with. */}
-        <BaseAutocomplete.Input
-          ref={ref}
-          id={inputId}
-          placeholder={placeholder}
+        {/* The search field has the ordinary composite-field surface. The results belong to the
+            surrounding surface, rather than another filled box nested inside it. */}
+        <div
           className={cn(
-            "min-w-0 w-full px-5 py-3",
+            "flex min-w-0 items-center gap-3 px-4",
             density.normal,
             shape.control,
             material.control,
             motionFeedback,
-            focusRing,
+            focusRingWithin,
             !disabled && state.field.hover,
-            !disabled && state.field.focus,
-            disabled ? state.disabled : state.text,
-            inputClassName
-          )}
-        />
-
-        {/* The sheet is the component's own anatomy — a grounded panel, not a floating one — and it
-            scrolls inside itself rather than growing past what the viewport leaves it. An inline
-            list is anchored to nothing, so the clamp is authored here rather than read from a
-            positioner's available height. */}
-        <div
-          className={cn(
-            list.sheet,
-            "space-y-1 p-1.5",
-            shape.control,
-            material.matte,
-            "max-h-[min(24rem,60dvh)] max-w-full"
+            !disabled && state.field.focusWithin,
+            disabled ? state.disabled : state.text
           )}
         >
+          <SearchIcon aria-hidden="true" className={cn("size-5 shrink-0", text.medium)} />
+          <BaseAutocomplete.Input
+            ref={ref}
+            id={inputId}
+            placeholder={placeholder}
+            className={cn(
+              "min-w-0 w-full bg-transparent py-3 text-inherit outline-none",
+              disabled ? state.disabledDescendant : state.text,
+              inputClassName
+            )}
+          />
+        </div>
+
+        {/* The inline list has no positioner; it scrolls within the space left by the viewport. */}
+        <div className={cn(list.sheet, "max-h-[min(24rem,60dvh)] max-w-full space-y-1")}>
           {/* The list's own child renders what Base derived, not the array handed in: a grouped list
               is filtered per group, a group whose commands all matched nothing disappears with
               them, and the rows are always the collection the primitive is navigating. */}
@@ -254,7 +252,7 @@ const Command = forwardRef<HTMLInputElement, CommandProps>(({
                 className={cn("space-y-1 [&:not(:first-child)]:pt-1")}
               >
                 {group.label !== undefined && (
-                  <BaseAutocomplete.GroupLabel className={cn("px-3 pt-1 pb-0.5 text-xs font-medium", text.high)}>
+                  <BaseAutocomplete.GroupLabel className={cn("px-3 pt-3 pb-1 text-xs font-medium", text.medium)}>
                     {group.label}
                   </BaseAutocomplete.GroupLabel>
                 )}

@@ -170,3 +170,22 @@ test("selection and keyboard focus survive reduced motion and Chromium forced co
   }
   expect(await page.evaluate(() => document.getAnimations().filter(animation => animation.playState === "running").length)).toBe(0);
 });
+
+test("focused composite fields keep their engaged tone under the pointer", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  for (const input of [page.getByLabel("Date", { exact: true }), page.getByRole("combobox", { name: "Commands", exact: true })]) {
+    const row = input.locator("xpath=ancestor::div[contains(@class, 'rounded-')][1]");
+    await page.getByRole("button", { name: "Reset dates" }).focus();
+    await page.mouse.move(0, 0);
+    const resting = await css(row, "background-color");
+    await input.hover();
+    const hovered = await css(row, "background-color");
+    expect(hovered).not.toBe(resting);
+    await page.mouse.move(0, 0);
+    await input.focus();
+    const focused = await css(row, "background-color");
+    expect(focused).not.toBe(hovered);
+    await input.hover();
+    expect(await css(row, "background-color")).toBe(focused);
+  }
+});

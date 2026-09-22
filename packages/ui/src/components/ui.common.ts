@@ -242,7 +242,8 @@ export const state = {
   field: {
     hover: "hover:bg-sherick-surface-high/[0.82]",
     focus: "focus:bg-sherick-surface-high/[0.9]",
-    focusWithin: "focus-within:bg-sherick-surface-high/[0.9]",
+    /* A composite's engaged tone outranks hover, independent of variant emission order. */
+    focusWithin: "[&&]:focus-within:bg-sherick-surface-high/[0.9]",
     engaged: "bg-sherick-surface-high/[0.9]",
     errorHover: "hover:bg-sherick-danger/[0.10]",
     errorFocus: "focus:bg-sherick-danger/[0.13]",
@@ -253,7 +254,7 @@ export const state = {
     invalid: "data-[invalid]:bg-sherick-danger/[0.075]",
     invalidHover: "data-[invalid]:hover:bg-sherick-danger/[0.10]",
     invalidEngaged: "data-[invalid]:bg-sherick-danger/[0.13]",
-    invalidFocusWithin: "data-[invalid]:focus-within:bg-sherick-danger/[0.13]",
+    invalidFocusWithin: "[&&]:data-[invalid]:focus-within:bg-sherick-danger/[0.13]",
   },
 } as const;
 

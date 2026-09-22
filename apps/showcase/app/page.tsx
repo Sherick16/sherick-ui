@@ -412,7 +412,7 @@ export default function Home() {
                   </Field>
                 </div>
               </Specimen>
-              <Specimen title="Calendar & date pickers">
+              <Specimen title="Calendar & date pickers" className="xl:col-span-2">
                 <DateFamilySpecimen />
               </Specimen>
               <Specimen title="File upload">
@@ -850,7 +850,7 @@ function ShowcaseSection({
 
 function Specimen({ title, className = "", children }: { title: string; className?: string; children: React.ReactNode }) {
   return (
-    <div className={cn(shape.surface, material.matte, "min-w-0 p-6", className)}>
+    <div className={cn(shape.surface, material.matte, "min-w-0 self-start p-4 sm:p-6", className)}>
       <h3 className="mb-5 font-medium tracking-[-0.01em]">{title}</h3>
       {children}
     </div>

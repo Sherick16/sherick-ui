@@ -123,7 +123,7 @@ Exports: `Command`, `CommandPalette`; `CommandItem`, `CommandProps`, `CommandPal
   `description?:ReactNode`, `trigger?:ReactElement`, `open?`, `defaultOpen?`,
   `onOpenChange?` (Base Dialog signature), `className?` (dialog surface).
   Ref remains search input. Compose Base Dialog.Root/Trigger, existing DialogSurface,
-  DialogHeader/Description and DialogDismiss; initialFocus points to search input.
+  Base Title/Description in a compact header, and DialogDismiss; initialFocus points to search input.
   `actionsRef.close()` dismisses after action without maintaining another open state.
   Escape closes on the first press, focus returns to trigger/previous focus, uncontrolled
   query resets when palette unmounts; controlled query remains consumer-owned.
@@ -291,3 +291,33 @@ rows; targeted fallbacks preserve direct-row focus and active-descendant highlig
 The selected-files specimen pins owned-list normalization, and the interactive Stepper
 specimen pins mark-only press motion. Test-only date bounds/forms and tree mutation probes
 render only in their verification routes, not the showcase.
+
+## Visual anatomy
+
+The wave composes the existing language rather than adding new tokens or recipes:
+
+- Date fields show one calendar affordance. Native date entry is clipped only at its trailing
+  browser affordance; the input type, editing, validity and form behavior remain native. Firefox
+  exposes no picker-indicator pseudo-element, so a WebKit-only icon rule is insufficient.
+  The whole row receives field hover/focus feedback and tactile press. Base positions the popup
+  against the field (the shared endpoint group for ranges), not the small trailing icon.
+- A completed calendar range is one continuous selected-tone band per week, with rounded outer
+  endpoints and stronger endpoint text. Single dates and incomplete ranges keep their circular
+  mark. The selection and focus targets never move.
+- Command has one search field with a fixed search-icon slot and a flat results list, not a
+  second filled panel inside its host. Rows share an icon column when any command has an icon.
+  Actions use pointer cursors and nonselectable labels; disabled rows retain Base's discoverable
+  highlight without becoming actionable. The palette retains the shared acrylic dialog shell
+  but uses a compact header. `placeholder` defaults to “Search commands…” and remains overridable.
+- Pagination groups its destinations on a flat `matteHigh` surface, retains the quieter current
+  navigation tint, and preserves 44px targets. Only number/glyph ink compresses on press.
+  Breadcrumb uses compact navigation typography and explicit native-link decoration ownership.
+- Horizontal steps use equal responsive columns, with a 32px mark above the label; vertical
+  steps align marks to the first line and join them with the existing structural hairline.
+  Descriptions are supporting copy. Neither target bounds nor focus boundaries compress.
+- TreeView and FileUpload already use the intended row/well language. Their visual review does
+  not justify a cosmetic rewrite. Showcase specimens size to content rather than stretching
+  these components into empty neighboring panels; the date family gets room for its grids.
+
+Screenshots must be inspected in addition to the deterministic style manifest. Computed classes,
+passing API tests and an updated manifest do not establish that the rendered anatomy is good.

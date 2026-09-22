@@ -4,9 +4,8 @@ import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import React, { forwardRef, useRef, type ReactElement, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import Command, { type CommandProps } from "./Command";
-import { DialogDescription } from "./DialogDescription";
-import { DialogHeader } from "./DialogHeader";
 import { DialogDismiss, DialogSurface } from "./DialogSurface";
+import { text } from "./ui.common";
 
 export interface CommandPaletteProps extends Omit<CommandProps, "className" | "id"> {
   /** The surface's own heading. It names the dialog. */
@@ -28,7 +27,7 @@ export interface CommandPaletteProps extends Omit<CommandProps, "className" | "i
 
 /**
  * The same command list as a surface that owns the viewport: a palette. It is a `Dialog` — Base's
- * dialog root, the shared `DialogSurface`, the shared header, description and dismissal — with one
+ * dialog root, the shared `DialogSurface` and dismissal, with a compact command header — with one
  * difference: the surface exists to be typed into, so the search field takes the initial focus and
  * the commands are the answer to what was typed.
  *
@@ -73,12 +72,19 @@ const CommandPalette = forwardRef<HTMLInputElement, CommandPaletteProps>(({
 
       {/* The search field is the initial focus, and Base still owns everything else the surface
           does: the trap, the dismissal, the restoration to whatever opened it. */}
-      <DialogSurface className={cn(className)} initialFocus={searchRef}>
-        <DialogDismiss label="Close command palette" />
-        <DialogHeader>{title}</DialogHeader>
-        {description && <DialogDescription>{description}</DialogDescription>}
+      <DialogSurface className={cn("max-w-xl", className)} initialFocus={searchRef}>
+        {/* 20px title line at y=20: center the 44px dismissal on y=30. */}
+        <DialogDismiss label="Close command palette" className={cn("top-2 end-2")} />
+        <div className={cn("px-5 pt-5 pe-16")}>
+          <BaseDialog.Title className={cn("m-0 text-sm font-medium", text.high)}>{title}</BaseDialog.Title>
+          {description && (
+            <BaseDialog.Description className={cn("mt-1 mb-0 text-xs leading-5", text.medium)}>
+              {description}
+            </BaseDialog.Description>
+          )}
+        </div>
 
-        <div className={cn("px-6 pt-3 pb-5 sm:px-7")}>
+        <div className={cn("px-4 pt-4 pb-4")}>
           <Command
             {...commandProps}
             onAction={(value) => {

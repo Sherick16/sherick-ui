@@ -229,34 +229,29 @@ test("many steps with long labels wrap inside their container at a narrow viewpo
   expect(errors).toEqual([]);
 });
 
-test("a right-to-left page puts the mark at the logical start of the step", async ({ page, errors }) => {
-  const item = page.getByRole("navigation", { name: "Checkout progress" }).locator("li").first();
-  const mark = item.locator("span").first();
-  const label = item.getByText("Cart", { exact: true });
-
-  const ltr = { mark: await mark.boundingBox(), label: await label.boundingBox() };
-  expect(ltr.mark!.x).toBeLessThan(ltr.label!.x);
-
-  await page.evaluate(() => {
-    document.documentElement.dir = "rtl";
-  });
-
-  try {
-    const rtl = { mark: await mark.boundingBox(), label: await label.boundingBox() };
-    expect(rtl.mark!.x).toBeGreaterThan(rtl.label!.x);
-    expect(rtl.label!.x + rtl.label!.width).toBeLessThanOrEqual(rtl.mark!.x + 1);
-
-    const documentBox = await page.evaluate(() => ({
-      scrollWidth: document.documentElement.scrollWidth,
-      clientWidth: document.documentElement.clientWidth,
-    }));
-    expect(documentBox.scrollWidth).toBeLessThanOrEqual(documentBox.clientWidth);
-  } finally {
-    await page.evaluate(() => {
-      document.documentElement.removeAttribute("dir");
-    });
+test("both step layouts retain logical alignment and order in RTL", async ({ page, errors }) => {
+  for (const direction of ["ltr", "rtl"]) {
+    await page.evaluate(value => { document.documentElement.dir = value; }, direction);
+    for (const [name, stacked] of [["Checkout progress", false], ["Vertical progress", true]] as const) {
+      const items = page.getByRole("navigation", { name }).locator("li");
+      const mark = (await items.first().locator("span").first().boundingBox())!;
+      const label = (await items.first().getByText(stacked ? "Account" : "Cart", { exact: true }).boundingBox())!;
+      if (stacked) {
+        if (direction === "ltr") expect(mark.x + mark.width).toBeLessThan(label.x);
+        else expect(label.x + label.width).toBeLessThan(mark.x);
+      } else {
+        expect(mark.y + mark.height).toBeLessThan(label.y);
+        const start = direction === "ltr" ? mark.x : mark.x + mark.width;
+        const labelStart = direction === "ltr" ? label.x : label.x + label.width;
+        expect(Math.abs(start - labelStart)).toBeLessThanOrEqual(1);
+        const second = (await items.nth(1).boundingBox())!;
+        const first = (await items.first().boundingBox())!;
+        if (direction === "ltr") expect(first.x).toBeLessThan(second.x);
+        else expect(first.x).toBeGreaterThan(second.x);
+      }
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(1);
   }
-
   expect(errors).toEqual([]);
 });
 

@@ -41,10 +41,11 @@ export const dateFieldRowClassName = (disabled: boolean) =>
     disabled ? state.disabledDescendant : state.text
   );
 
-/** The borderless input inside the field's row. It takes the field's tone rather than the
- *  platform's `fieldtext`, and it draws no focus indicator of its own: the row does. */
+/** Native date entry remains intact. Its trailing browser affordance sits outside the clipped
+ *  input slot, leaving one visible calendar trigger in every engine (Firefox does not expose
+ *  a picker-indicator pseudo-element). The composite row owns focus, not the clipped input. */
 export const dateInputClassName =
-  "min-w-0 flex-1 bg-transparent py-3 text-inherit outline-none disabled:cursor-not-allowed";
+  "block w-[calc(100%+2.5rem)] min-w-0 bg-transparent py-3 text-inherit outline-none disabled:cursor-not-allowed";
 
 /* The trailing control of a composite field is a `part`: it keeps the field's row height and
    takes only the width its glyph needs, because it is gripped as one cluster with the field
@@ -77,6 +78,7 @@ export interface DateCalendarPopupProps {
   /** Names the popup, through Base's own Title part. */
   title: string;
   children: ReactNode;
+  anchor: React.ComponentProps<typeof BasePopover.Positioner>["anchor"];
 }
 
 /**
@@ -88,12 +90,13 @@ export interface DateCalendarPopupProps {
  * dismissal and the focus restoration; the surface is non-modal, so the rest of the page stays
  * reachable. Sherick owns only the sheet and its presence.
  */
-export const DateCalendarPopup = ({ title, children }: DateCalendarPopupProps) => {
+export const DateCalendarPopup = ({ title, children, anchor }: DateCalendarPopupProps) => {
   const popupRef = useRef<HTMLDivElement | null>(null);
 
   return (
     <BasePopover.Portal>
       <BasePopover.Positioner
+        anchor={anchor}
         side="bottom"
         align="start"
         sideOffset={8}
@@ -108,7 +111,7 @@ export const DateCalendarPopup = ({ title, children }: DateCalendarPopupProps) =
             popupRef.current?.querySelector<HTMLElement>('[data-day][tabindex="0"]') ?? null
           }
           className={cn(
-            "w-max max-w-[min(24rem,var(--available-width))] max-h-[var(--available-height)] overflow-y-auto p-5 [overflow-wrap:anywhere]",
+            "w-max max-w-[min(24rem,var(--available-width))] max-h-[var(--available-height)] overflow-y-auto p-3 [overflow-wrap:anywhere]",
             overlay.popup,
             motionPresenceAnchored
           )}

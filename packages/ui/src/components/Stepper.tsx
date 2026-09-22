@@ -3,7 +3,7 @@
 import { Check as CheckIcon } from "lucide-react";
 import React, { forwardRef, type ComponentProps, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { focusRing, shape, state, stateLayer, text, tone } from "./ui.common";
+import { edge, focusRing, shape, state, stateLayer, text, tone } from "./ui.common";
 import { motionFeedback, motionInkPress } from "./ui.motion";
 
 export interface StepperItem {
@@ -47,7 +47,7 @@ const StepMark = ({
 }) => (
   <span
     className={cn(
-      "flex size-6 shrink-0 items-center justify-center text-xs font-medium tabular-nums [&>svg]:size-4",
+      "flex size-8 shrink-0 items-center justify-center text-sm font-medium tabular-nums [&>svg]:size-4",
       shape.circle,
       pressable ? motionInkPress : motionFeedback,
       current
@@ -111,7 +111,13 @@ const Stepper = forwardRef<HTMLElement, StepperProps>(
     const interactive = notify !== undefined;
     const listDisabled = interactive && disabled;
     const stack = orientation === "vertical";
-    const rowLayout = "flex min-w-0 items-start gap-3 px-3 py-2 text-start text-sm";
+    const rowLayout = cn(
+      "flex min-w-0 w-full gap-3 px-3 py-3 text-start text-sm",
+      stack ? "items-start" : "flex-col items-start"
+    );
+    const connector = stack && (
+      <span aria-hidden="true" className={cn("pointer-events-none absolute start-7 top-[3.25rem] -bottom-1 border-s", edge.rule)} />
+    );
 
     return (
       <nav
@@ -125,8 +131,8 @@ const Stepper = forwardRef<HTMLElement, StepperProps>(
         <ol
           role="list"
           className={cn(
-            "m-0 flex list-none p-0",
-            stack ? "flex-col gap-2" : "flex-wrap items-start gap-x-6 gap-y-4"
+            "m-0 list-none p-0",
+            stack ? "flex flex-col" : "grid grid-cols-[repeat(auto-fit,minmax(min(100%,9rem),1fr))] gap-x-2 gap-y-4"
           )}
         >
           {items.map((item, index) => {
@@ -140,11 +146,11 @@ const Stepper = forwardRef<HTMLElement, StepperProps>(
                 <span className={cn("flex min-w-0 flex-col")}>
                   {/* The label carries no tone of its own: it takes the row's, so a row that answers
                       the pointer brightens its label with it. */}
-                  <span className={cn("leading-6 [overflow-wrap:anywhere]", current && "font-medium")}>
+                  <span className={cn("[overflow-wrap:anywhere]", stack ? "leading-8" : "leading-5", current && "font-medium")}>
                     {item.label}
                   </span>
                   {item.description ? (
-                    <span className={cn("leading-6 [overflow-wrap:anywhere]", text.medium)}>
+                    <span className={cn("mt-1 text-xs leading-5 [overflow-wrap:anywhere]", text.medium)}>
                       {item.description}
                     </span>
                   ) : null}
@@ -157,11 +163,12 @@ const Stepper = forwardRef<HTMLElement, StepperProps>(
                 <li
                   key={item.value}
                   aria-current={current ? "step" : undefined}
-                  className={cn("min-w-0", stack && "w-full")}
+                  className={cn("relative min-w-0 w-full")}
                 >
                   <div className={cn(rowLayout, current ? text.high : text.medium, stack && "w-full")}>
                     {content}
                   </div>
+                  {index < items.length - 1 && connector}
                 </li>
               );
             }
@@ -169,7 +176,7 @@ const Stepper = forwardRef<HTMLElement, StepperProps>(
             const change = notify;
 
             return (
-              <li key={item.value} className={cn("min-w-0", stack && "w-full", dimmed && state.disabled)}>
+              <li key={item.value} className={cn("relative min-w-0 w-full", dimmed && state.disabled)}>
                 <button
                   type="button"
                   disabled={unavailable}
@@ -190,6 +197,7 @@ const Stepper = forwardRef<HTMLElement, StepperProps>(
                 >
                   {content}
                 </button>
+                {index < items.length - 1 && connector}
               </li>
             );
           })}

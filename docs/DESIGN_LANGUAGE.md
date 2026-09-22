@@ -538,6 +538,9 @@ focus, focus-within, engaged and their error counterparts. A control that reads 
 validity from the field it sits in rather than from a prop takes the same error ladder
 through `state.field.invalid*`, which is one tonality keyed on the field's own
 `data-invalid` attribute and deliberately outranks the prop-keyed step it overlaps.
+An already engaged field must not drop back to the weaker hover step when the pointer enters.
+The shared normal/error focus-within recipes explicitly outrank hover; this precedence must
+not depend on utility emission order or a component-local override.
 The tone is the whole of a plain text field's response, and a field that opens a list — a
 `Select` trigger, an editable `Combobox` field — adds the tactile press in §12 to it, because it
 is a control the user presses as well as a place text goes. Both forms press identically: the

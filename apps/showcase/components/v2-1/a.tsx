@@ -9,7 +9,7 @@ const rangeStart: DateRange = { start: "2024-01-08", end: "2024-01-12" };
 const pickerUnavailable = (date: CalendarDate) => date === "2024-06-18" || date === "2024-06-19";
 
 const Panel = ({ children, className }: { children: React.ReactNode; className?: string }) => (
-  <div className={cn(shape.surface, material.matte, "inline-flex min-w-0 flex-col gap-3 p-5", className)}>
+  <div className={cn(shape.surface, material.matte, "inline-flex min-w-0 max-w-full flex-col gap-3 p-3", className)}>
     {children}
   </div>
 );
@@ -32,7 +32,7 @@ export default function DateFamilySpecimen({ verification = false }: { verificat
   const [formResult, setFormResult] = useState("");
 
   return (
-    <div className="space-y-12">
+    <div className={verification ? "space-y-12" : "grid grid-cols-1 items-start gap-10 xl:grid-cols-2"}>
       <section className="space-y-3">
         <h2 className="text-lg font-medium text-sherick-ink">Single calendar</h2>
         <div data-testid="single-calendar">

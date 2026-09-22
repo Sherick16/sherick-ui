@@ -9,8 +9,8 @@ import {
   type ReactNode,
 } from "react";
 import { cn, cx } from "@/libs/utils";
-import { density, focusRing, shape, state, stateLayer, text, tone } from "./ui.common";
-import { motionFeedback, motionInkPress, motionTactile } from "./ui.motion";
+import { density, focusRing, material, shape, state, stateLayer, text, tone } from "./ui.common";
+import { motionFeedback, motionInkPress } from "./ui.motion";
 
 export interface PaginationProps
   extends Omit<ComponentPropsWithoutRef<"nav">, "children" | "defaultValue" | "onChange"> {
@@ -84,7 +84,7 @@ const boundedItems = (count: number, current: number, siblings: number): Paginat
    reads as one object — and both answer the pointer through the quiet layer every navigation surface
    uses. A page stays flat: it is a destination that is read, not an object that is lifted. */
 const controlBase = /* @__PURE__ */ cx(
-  "inline-flex shrink-0 items-center justify-center text-sm tabular-nums",
+  "inline-flex shrink-0 select-none items-center justify-center text-sm tabular-nums no-underline",
   density.target,
   focusRing,
   motionFeedback,
@@ -207,15 +207,14 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
               aria-label={label}
               className={cn(
                 controlBase,
-                motionTactile,
                 shape.pill,
-                "px-3",
+                "group px-3",
                 isCurrent && cn(tone.tonal.primary, "font-medium"),
                 controlState(false)
               )}
               onClick={(event) => activateFromAnchor(event, page)}
             >
-              {page}
+              <span className={cn(motionInkPress)}>{page}</span>
             </a>
           ) : (
             <button
@@ -225,15 +224,14 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
               aria-label={label}
               className={cn(
                 controlBase,
-                motionTactile,
                 shape.pill,
-                "px-3",
+                "group px-3",
                 isCurrent && cn(tone.tonal.primary, "font-medium"),
                 controlState(false)
               )}
               onClick={() => activate(page)}
             >
-              {page}
+              <span className={cn(!disabled && motionInkPress)}>{page}</span>
             </button>
           )}
         </li>
@@ -264,7 +262,7 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
             long set stays inside whatever column it was given and the two steps stay reachable. */}
         <ol
           role="list"
-          className={cn("m-0 flex min-w-0 list-none flex-wrap items-center justify-center gap-1 p-0")}
+          className={cn("m-0 flex min-w-0 list-none flex-wrap items-center p-1", shape.control, material.matteHigh)}
         >
           {step(
             previousPage,
