@@ -4,6 +4,8 @@ import { useState } from "react";
 import { Calendar, DatePicker, DateRangePicker, type DateRange } from "sherick-ui";
 import DateFamilySpecimen from "../../../components/v2-1/a";
 
+const unavailableJune10 = (date: string) => date === "2024-06-10";
+
 /* Browser harness for v2.1 unit A. The specimens live in the component so they can be reused as a
    showcase section; this page is the address the browser suite visits. */
 export default function VerificationDateFamilyPage() {
@@ -15,6 +17,12 @@ export default function VerificationDateFamilyPage() {
   const [cancelReset, setCancelReset] = useState(false);
   const [disabledPopup, setDisabledPopup] = useState<"single" | "range" | null>(null);
   const [disabledRequests, setDisabledRequests] = useState(0);
+  const [dateUnavailable, setDateUnavailable] = useState(false);
+  const [dynamicSubmits, setDynamicSubmits] = useState<string[]>([]);
+  const [enableConstrainedDates, setEnableConstrainedDates] = useState(false);
+  const [constrainedSubmits, setConstrainedSubmits] = useState(0);
+  const [relaxedBounds, setRelaxedBounds] = useState(false);
+  const [draftCommits, setDraftCommits] = useState<string[]>([]);
   return (
     <main
       data-testid="verification-v2-1-a"
@@ -29,7 +37,7 @@ export default function VerificationDateFamilyPage() {
           </p>
         </header>
 
-        <DateFamilySpecimen />
+        <DateFamilySpecimen verification />
         <section data-testid="date-regressions" className="grid min-w-0 gap-6">
           <Calendar data-testid="month-retry" month={month} defaultValue="2024-03-31" today="2024-03-15"
             onMonthChange={(next) => {
@@ -74,6 +82,37 @@ export default function VerificationDateFamilyPage() {
             defaultValue={{ start: "2024-06-10", end: "2024-06-20" }} today="2024-06-10"
             onValueChange={() => setDisabledRequests((count) => count + 1)} />
           <output data-testid="disabled-date-requests">{disabledRequests}</output>
+          <label><input type="checkbox" checked={dateUnavailable} onChange={(event) => setDateUnavailable(event.target.checked)} />Make current dates unavailable</label>
+          <label><input type="checkbox" checked={relaxedBounds} onChange={(event) => setRelaxedBounds(event.target.checked)} />Relax native date bounds</label>
+          <form data-testid="dynamic-date-form" onSubmit={(event) => {
+            event.preventDefault();
+            const data = new FormData(event.currentTarget);
+            setDynamicSubmits((previous) => [...previous, `${data.get("date")}/${data.get("controlled")}`]);
+          }}>
+            <DatePicker label="Dynamic date" name="date" defaultValue="2024-06-10" today="2024-06-10"
+              max={relaxedBounds ? "2024-06-30" : "2024-06-15"}
+              onValueChange={(next) => setDraftCommits((previous) => [...previous, `date:${next}`])}
+              isDateUnavailable={(date) => dateUnavailable && date === "2024-06-10"} />
+            <DatePicker label="Dynamic controlled date" name="controlled" value="2024-06-10" today="2024-06-10"
+              isDateUnavailable={(date) => dateUnavailable && date === "2024-06-10"} />
+            <DateRangePicker label="Dynamic range" startLabel="Dynamic start" endLabel="Dynamic end" startName="start" endName="end"
+              defaultValue={{ start: "2024-06-10", end: "2024-06-12" }} today="2024-06-10"
+              max={relaxedBounds ? "2024-06-30" : "2024-06-15"}
+              onValueChange={(next) => setDraftCommits((previous) => [...previous, `range:${next.start}/${next.end}`])} />
+            <button type="submit">Submit dynamic dates</button>
+          </form>
+          <output data-testid="dynamic-date-submits">{JSON.stringify(dynamicSubmits)}</output>
+          <output data-testid="draft-date-commits">{JSON.stringify(draftCommits)}</output>
+          <label><input type="checkbox" checked={enableConstrainedDates} onChange={(event) => setEnableConstrainedDates(event.target.checked)} />Enable constrained dates</label>
+          <form data-testid="enabled-date-form" onSubmit={(event) => { event.preventDefault(); setConstrainedSubmits((count) => count + 1); }}>
+            <DatePicker label="Enabled constrained date" name="date" disabled={!enableConstrainedDates}
+              defaultValue="2024-06-10" today="2024-06-10" isDateUnavailable={unavailableJune10} />
+            <DateRangePicker label="Enabled constrained range" startLabel="Enabled constrained start" endLabel="Enabled constrained end"
+              startName="start" endName="end" disabled={!enableConstrainedDates} today="2024-06-10"
+              defaultValue={{ start: "2024-06-10", end: "2024-06-12" }} isDateUnavailable={unavailableJune10} />
+            <button type="submit">Submit enabled dates</button>
+          </form>
+          <output data-testid="enabled-date-submits">{constrainedSubmits}</output>
         </section>
       </div>
     </main>

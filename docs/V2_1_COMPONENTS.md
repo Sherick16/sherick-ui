@@ -78,6 +78,11 @@ Exports: `Calendar`, `DatePicker`, `DateRangePicker`; `CalendarDate`, `DateRange
   independently labelled start/end fields. Native inputs own form submission, required,
   min/max validation; custom validity covers unavailable/reversed ranges. Editing can show
   invalid values with feedback; the calendar never selects one. Clearing uses null.
+  A rejected native draft remains invalid until a fresh accepted edit/calendar selection,
+  reset or controlled-value replacement; relaxing constraints does not silently accept it
+  or emit callbacks. Constraint/enabled-state changes refresh Base's native custom validity
+  even when the field's text is unchanged. Programmatic `new FormData()` does not validate;
+  normal native submission remains blocked while a rejected draft is shown.
   Uncontrolled form reset restores defaults, including calendar selection; native reset does
   not emit value-change callbacks. Controlled values remain held. Base Field.Control does not
   bridge a native form reset to a date domain value, so the private date-field module listens
@@ -272,3 +277,15 @@ Sol High. The parent (GPT-6 Astra) verifies findings and owns every correction, 
 regression and integration. The complete diff receives independent architecture/API and
 interaction/accessibility/design review tracks. The exact final tree must pass
 `bun install --frozen-lockfile`, `bun run verify`, and `git diff --check` before PR delivery.
+
+The shared publication fixtures exercise all ten components through installed package imports:
+React 18/19 Vite and Next hydration, NodeNext/Bundler/CommonJS declarations, native forms,
+portals and axe checks before/after invalid date/file entry. The no-Tailwind wave route runs
+on Chromium, Firefox and WebKit, including RTL keyboard use, narrow themed portals and
+reduced motion; forced-colors emulation is additionally asserted on Chromium.
+
+The deterministic style-contract baseline adds 14 wave specimens and 33 scoped utility
+rules. Its existing 93 specimens, token blocks, overlay recipes and previously recorded
+utility declarations are unchanged. This is additive coverage, not acceptance of a drift
+in existing visuals. Test-only date bounds/forms and tree mutation probes render only in
+their verification routes, not the showcase.

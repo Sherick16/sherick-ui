@@ -308,6 +308,20 @@ const specimens = {
   "progress.determinate": h(Progress, { value: 40, label: "Uploading", showValue: true, locale: "en-US" }),
   "progress.indeterminate": h(Progress, { value: null, label: "Working", locale: "en-US" }),
   "progress.bare": h(Progress, { value: 65, variant: "success", locale: "en-US" }),
+  "calendar.single": h(library.Calendar, { defaultValue: "2024-06-10", today: "2024-06-10" }),
+  "calendar.range": h(library.Calendar, { mode: "range", defaultValue: { start: "2024-06-10", end: "2024-06-12" }, today: "2024-06-10" }),
+  "date-picker": h(library.DatePicker, { label: "Date", defaultValue: "2024-06-10", today: "2024-06-10" }),
+  "date-picker.disabled": h(library.DatePicker, { label: "Date", disabled: true, defaultValue: "2024-06-10", today: "2024-06-10" }),
+  "date-range-picker": h(library.DateRangePicker, { label: "Date range", defaultValue: { start: "2024-06-10", end: "2024-06-12" }, today: "2024-06-10" }),
+  "command": h(library.Command, { label: "Commands", items: [{ value: "save", label: "Save", icon: h(Check) }, { value: "archive", label: "Archive", disabled: true }] }),
+  "command-palette.trigger": h(library.CommandPalette, { title: "Commands", label: "Search", items: [], trigger: h(Button, null, "Open commands") }),
+  "pagination": h(library.Pagination, { count: 12, defaultValue: 3 }),
+  "breadcrumb": h(library.Breadcrumb, { items: [{ label: "Home", href: "/" }, { label: "Current" }] }),
+  "file-upload": h(library.FileUpload, { label: "Files", multiple: true }),
+  "file-upload.disabled": h(library.FileUpload, { label: "Files", disabled: true }),
+  "stepper.current-complete": h(library.Stepper, { items: [{ value: "draft", label: "Draft", complete: true }, { value: "review", label: "Review" }], value: "draft", onValueChange: noop }),
+  "stepper.passive": h(library.Stepper, { items: [{ value: "draft", label: "Draft" }], value: "draft" }),
+  "tree-view": h(library.TreeView, { label: "Tree", items: [{ value: "root", label: "Root", children: [{ value: "child", label: "Child" }] }], defaultExpandedValues: ["root"], defaultValue: "child" }),
 };
 
 const normalizeMarkup = (html) =>

@@ -199,6 +199,15 @@ supply platform behavior. Commands use Base Autocomplete, calendar popups use Ba
 and the palette reuses Base Dialog with `DialogSurface`. This is not a new generic headless
 layer, dependency upgrade, theme system or package subpath. Existing stable APIs remain intact.
 
+The v2.1 size change is deliberately limited to the **whole core barrel** and **component
+CSS**: ten new public components add their implementation, narrowly local date/tree/file
+helpers, Base Autocomplete composition and new scoped anatomy/focus selectors. These costs
+belong to a complete-barrel or complete-stylesheet consumer, not a Button-only import.
+The existing budget owner supports `--update=barrel,stylesCss` so this additive allowance
+does not re-record the Button, form, overlay, disclosure, toast, toggle, content or theme
+budgets. Tolerance and stale-shrink rules remain unchanged; rich-content exclusion and
+Button tree-shaking assertions still run for every measurement.
+
 For styling, a new component should only need to:
 
 1. compose non-temporal recipes from `ui.common.ts` and semantic temporal recipes from `ui.motion.ts`;

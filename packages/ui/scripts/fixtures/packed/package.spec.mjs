@@ -190,3 +190,91 @@ test("theme.css works alone without component rules or a reset", async ({ page }
   expect(await style(token, "position")).toBe("static");
   expect(await style(page.getByRole("button"), "borderTopWidth")).not.toBe("0px");
 });
+
+test("packed date family keeps RTL keyboard selection, native forms and portaled styling", async ({ page }) => {
+  const fixture = page.getByTestId("packed-v21");
+  const grid = fixture.getByRole("grid");
+  await grid.getByRole("button", { name: "Monday, June 10, 2024", exact: true }).focus();
+  await page.keyboard.press("ArrowLeft");
+  const next = grid.getByRole("button", { name: "Tuesday, June 11, 2024", exact: true });
+  await expect(next).toBeFocused();
+  expect(await style(next, "boxShadow")).not.toBe("none");
+  expect(await style(next, "borderTopWidth")).toBe("0px");
+  await page.keyboard.press("Space");
+  await expect(grid.getByRole("gridcell", { name: "Tuesday, June 11, 2024", exact: true })).toHaveAttribute("aria-selected", "true");
+  const input = fixture.getByLabel("Packed date", { exact: true });
+  await input.fill("2024-06-14");
+  expect(await page.locator("#packed-dates").evaluate(form => Object.fromEntries(new FormData(form)))).toEqual({ date: "2024-06-14", start: "2024-06-10", end: "2024-06-12" });
+  await fixture.getByRole("button", { name: "Reset packed dates" }).click();
+  await expect(input).toHaveValue("2024-06-10");
+  await fixture.getByRole("button", { name: "Open Packed date", exact: true }).click();
+  const popup = page.getByRole("dialog", { name: "Packed date", exact: true });
+  await expect(popup).toBeVisible();
+  expect(await popup.evaluate(element => element.closest("main"))).toBeNull();
+  expect(await style(popup, "boxShadow")).not.toBe("none");
+  expect(await style(popup, "backgroundColor")).not.toBe("rgba(0, 0, 0, 0)");
+  await page.keyboard.press("Escape");
+  await expect(fixture.getByRole("button", { name: "Open Packed date", exact: true })).toBeFocused();
+});
+
+test("packed commands act, filter, and restore palette focus", async ({ page }) => {
+  const fixture = page.getByTestId("packed-v21");
+  const field = fixture.getByRole("combobox", { name: "Packed commands", exact: true });
+  await field.fill("archive");
+  await expect(fixture.getByRole("option")).toHaveCount(1);
+  await page.keyboard.press("ArrowDown");
+  await page.keyboard.press("Enter");
+  await expect(page.getByTestId("packed-command-action")).toHaveText("archive");
+  await expect(field).toHaveValue("archive");
+  const trigger = fixture.getByRole("button", { name: "Open packed palette" });
+  await trigger.click();
+  const palette = page.getByRole("dialog", { name: "Packed palette", exact: true });
+  await expect(palette.getByRole("combobox", { name: "Packed palette search" })).toBeFocused();
+  expect(await style(palette, "boxShadow")).not.toBe("none");
+  await palette.getByRole("option", { name: "Save draft" }).click();
+  await expect(palette).toBeHidden();
+  await expect(trigger).toBeFocused();
+  await expect(page.getByTestId("packed-command-action")).toHaveText("save");
+});
+
+test("packed navigation, tree, upload and stepper preserve native state and focus", async ({ page }) => {
+  const fixture = page.getByTestId("packed-v21");
+  const pages = fixture.getByRole("navigation", { name: "Packed pages" });
+  await pages.getByRole("button", { name: "Next page" }).click();
+  await expect(pages.getByRole("button", { name: "Page 3", exact: true })).toHaveAttribute("aria-current", "page");
+  const breadcrumb = fixture.getByRole("navigation", { name: "Packed breadcrumb" });
+  await expect(breadcrumb.getByRole("link", { name: "Home" })).toHaveAttribute("href", "#home");
+  await expect(breadcrumb.getByText("Current", { exact: true })).toHaveAttribute("aria-current", "page");
+  const workflow = fixture.getByRole("navigation", { name: "Packed workflow" });
+  await workflow.getByRole("button", { name: /Draft/ }).click();
+  await expect(workflow.getByRole("button", { name: /Draft/ })).toHaveAttribute("aria-current", "step");
+  const child = fixture.getByRole("treeitem", { name: "Child", exact: true });
+  await workflow.getByRole("button", { name: /Draft/ }).focus();
+  await page.keyboard.press("Tab");
+  await page.keyboard.press("Tab");
+  await expect(fixture.getByRole("treeitem", { name: "Root", exact: true })).toBeFocused();
+  await page.keyboard.press("ArrowDown");
+  await expect(child).toBeFocused();
+  await page.keyboard.press("Space");
+  await expect(child).toHaveAttribute("aria-selected", "true");
+  expect(await child.evaluate(element => getComputedStyle(element.firstElementChild).boxShadow)).not.toBe("none");
+  await fixture.getByLabel("Packed files", { exact: true }).setInputFiles({ name: "notes.txt", mimeType: "text/plain", buffer: Buffer.from("notes") });
+  const remove = fixture.getByRole("button", { name: "Remove notes.txt" });
+  await expect(remove).toBeVisible();
+  expect((await remove.boundingBox()).height).toBeGreaterThanOrEqual(44);
+  await remove.click();
+  await expect(remove).toHaveCount(0);
+});
+
+test("published wave semantics pass axe before and after invalid date/file entry", async ({ page }) => {
+  const fixture = page.getByTestId("packed-v21");
+  const audit = () => new AxeBuilder({ page }).include('[data-testid="packed-v21"]')
+    .withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"]).analyze();
+  expect((await audit()).violations).toEqual([]);
+  const end = fixture.getByLabel("Packed end", { exact: true });
+  await end.fill("2024-06-05");
+  await expect(end).toHaveAttribute("aria-invalid", "true");
+  await fixture.getByLabel("Packed files", { exact: true }).setInputFiles({ name: "blocked.bin", mimeType: "application/octet-stream", buffer: Buffer.from("blocked") });
+  await expect(fixture.getByRole("status").filter({ hasText: "blocked.bin" })).toBeVisible();
+  expect((await audit()).violations).toEqual([]);
+});

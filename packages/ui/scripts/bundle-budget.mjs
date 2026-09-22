@@ -26,7 +26,8 @@ import { build } from "esbuild";
 const packageRoot = process.env.SHERICK_CONSUMER_DIR ?? fileURLToPath(new URL("..", import.meta.url));
 const stylesheetRoot = dirname(createRequire(join(packageRoot, "package.json")).resolve("sherick-ui/styles.css"));
 const baselinePath = fileURLToPath(new URL("./bundle-budget.json", import.meta.url));
-const update = process.argv.includes("--update");
+const updateOnly = process.argv.find(arg => arg.startsWith("--update="))?.slice("--update=".length).split(",");
+const update = process.argv.includes("--update") || updateOnly !== undefined;
 
 const gzipSize = (buffer) => gzipSync(buffer, { level: 9 }).length;
 const brotliSize = (buffer) => brotliCompressSync(buffer).length;
@@ -161,8 +162,14 @@ if (update) {
       ])
     ),
   };
-  await writeFile(baselinePath, `${JSON.stringify(baseline, null, 2)}\n`);
-  console.log(`Recorded size baseline in ${baselinePath}`);
+  // Additive waves may update their whole-barrel/CSS records without relaxing tree-shaken entries.
+  const recorded = updateOnly ? JSON.parse(await readFile(baselinePath, "utf8")) : baseline;
+  for (const name of updateOnly ?? []) {
+    assert.ok(Object.hasOwn(baseline.budgets, name), `unknown size fixture: ${name}`);
+    recorded.budgets[name] = baseline.budgets[name];
+  }
+  await writeFile(baselinePath, `${JSON.stringify(recorded, null, 2)}\n`);
+  console.log(`Recorded size baseline in ${baselinePath}${updateOnly ? ` (${updateOnly.join(", ")})` : ""}`);
 } else {
   const baseline = JSON.parse(await readFile(baselinePath, "utf8"));
   const tolerance = baseline.tolerance ?? 1.05;

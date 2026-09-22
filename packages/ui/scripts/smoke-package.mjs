@@ -32,6 +32,16 @@ for (const exportName of [
   "ChipGroup",
   "Collapsible",
   "Combobox",
+  "Calendar",
+  "DatePicker",
+  "DateRangePicker",
+  "Command",
+  "CommandPalette",
+  "Pagination",
+  "Breadcrumb",
+  "FileUpload",
+  "Stepper",
+  "TreeView",
   "Dialog",
   "DirectionProvider",
   "Divider",
@@ -89,6 +99,24 @@ assert.ok(declarations.includes("ButtonProps"), "declarations should expose Butt
 assert.ok(declarations.includes("SelectProps"), "declarations should expose Select props");
 for (const propType of [
   "AccordionProps",
+  "CalendarDate",
+  "CalendarLabels",
+  "CalendarProps",
+  "DateRange",
+  "DatePickerProps",
+  "DateRangePickerProps",
+  "CommandItem",
+  "CommandProps",
+  "CommandPaletteProps",
+  "PaginationProps",
+  "BreadcrumbItem",
+  "BreadcrumbProps",
+  "FileUploadProps",
+  "FileRejection",
+  "StepperItem",
+  "StepperProps",
+  "TreeViewItem",
+  "TreeViewProps",
   "AccordionHeadingLevel",
   "CollapsibleProps",
   "FieldProps",
@@ -418,6 +446,24 @@ assert.match(inputMarkup, /<label[^>]*\sfor=/);
 assert.match(inputMarkup, /required=""/);
 assert.match(inputMarkup, /required=""/);
 
+const waveFixtures = [
+  ["Calendar", { defaultValue: "2024-06-10", today: "2024-06-10" }, /aria-selected="true"/],
+  ["Calendar", { mode: "range", defaultValue: { start: "2024-06-10", end: "2024-06-12" }, today: "2024-06-10" }, /role="grid"/],
+  ["DatePicker", { label: "Date", defaultValue: "2024-06-10", today: "2024-06-10" }, /type="date"/],
+  ["DateRangePicker", { label: "Range", today: "2024-06-10" }, /<fieldset/],
+  ["Command", { label: "Commands", items: [{ value: "save", label: "Save" }] }, /role="combobox"/],
+  ["Pagination", { count: 10, defaultValue: 2 }, /aria-current="page"/],
+  ["Breadcrumb", { items: [{ label: "Home", href: "/" }, { label: "Current" }] }, /aria-current="page"/],
+  ["FileUpload", { label: "Files" }, /type="file"/],
+  ["Stepper", { items: [{ value: "one", label: "One" }], value: "one" }, /aria-current="step"/],
+  ["TreeView", { label: "Files", items: [{ value: "one", label: "One" }], defaultValue: "one" }, /role="treeitem"/],
+];
+for (const [name, props, semantics] of waveFixtures) {
+  const markup = renderToStaticMarkup(React.createElement(library[name], props));
+  assert.match(markup, semantics, `${name} must retain its server semantics`);
+  assert.match(markup, /sui-scope/, `${name} must own its published style scope`);
+}
+
 /* Base's popup portal renders nothing on the server, so server rendering proves only that a
    floating surface is safe to render there. The scope of a portaled subtree is asserted where
    the portal actually exists: the browser suites.
@@ -427,6 +473,9 @@ const serverSurfaces = [
   ["Popover", { defaultOpen: true }],
   ["Menu", { defaultOpen: true }],
   ["Combobox", { options: [{ label: "Design system", value: "design" }] }],
+  ["CommandPalette", { title: "Commands", label: "Search", items: [] }],
+  ["DatePicker", { label: "Date", today: "2024-06-10" }],
+  ["DateRangePicker", { label: "Range", today: "2024-06-10" }],
 ];
 for (const [componentName, props] of serverSurfaces) {
   for (const open of [false, true]) {

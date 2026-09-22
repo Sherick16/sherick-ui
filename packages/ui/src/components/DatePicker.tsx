@@ -112,6 +112,7 @@ const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(({
   const maxDate = normalizeCalendarDate(max);
   const inputRef = useRef<HTMLInputElement | null>(null);
   const popupActionsRef = useRef<BasePopover.Root.Actions | null>(null);
+  const fieldActionsRef = useRef<BaseField.Root.Actions | null>(null);
 
   useEffect(() => setDraft(null), [currentValue]);
   useDateFormReset(inputRef, form, () => {
@@ -140,10 +141,17 @@ const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(({
   );
   const fieldInvalid = Boolean(error) || typedIssue;
   const validateValue = (candidate: unknown) => {
+    if (draft !== null) return labels.unavailableRange;
     if (typeof candidate !== "string" || !candidate) return null;
     const date = normalizeCalendarDate(candidate);
     return !date || isDateUnavailable?.(date) ? labels.unavailableRange : null;
   };
+
+  // Constraints can change while the native text stays the same. Base remains the
+  // validation owner; refresh its native custom validity as well as the field's visuals.
+  useEffect(() => {
+    fieldActionsRef.current?.validate();
+  }, [displayText, typedIssue, minDate, maxDate, isDateUnavailable, disabled, labels.unavailableRange]);
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const input = event.currentTarget;
@@ -173,6 +181,7 @@ const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(({
       invalid={typedIssue}
       validate={validateValue}
       validationMode="onChange"
+      actionsRef={fieldActionsRef}
       className={cn(disabled && state.disabled, className)}
     >
       <BasePopover.Root

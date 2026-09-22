@@ -29,6 +29,7 @@ export async function verifyConsumers({ consumerDir, work, tarball, run }) {
   const bin = (dir, name) => join(dir, "node_modules", ".bin", name);
   await cp(join(fixtureRoot, "App.jsx"), join(consumerDir, "App.jsx"));
   await cp(join(fixtureRoot, "host.css"), join(consumerDir, "host.css"));
+  await cp(join(fixtureRoot, "v21-types.tsx"), join(consumerDir, "v21-types.tsx"));
   await mkdir(join(consumerDir, "tests"));
   await cp(join(fixtureRoot, "package.spec.mjs"), join(consumerDir, "tests", "package.spec.mjs"));
   await mkdir(join(consumerDir, "public"));
@@ -49,6 +50,10 @@ createRoot(document.getElementById("root")).render(<App />);
   await writeFile(join(consumerDir, "commonjs.cts"), `import ui = require("sherick-ui");
 import dev = require("sherick-ui/dev");
 const props: ui.ButtonProps = { children: "CJS" };
+const range: ui.DateRange = { start: "2024-06-10", end: null };
+const calendar: ui.CalendarProps = { mode: "range", value: range };
+const upload: ui.FileUploadProps = { label: "Files", onFilesChange: files => void files };
+console.log(ui.Calendar, ui.DatePicker, ui.DateRangePicker, ui.Command, ui.CommandPalette, ui.Pagination, ui.Breadcrumb, ui.FileUpload, ui.Stepper, ui.TreeView, calendar, upload);
 console.log(ui.Button, dev.cn(props.children));
 `);
   await writeFile(join(consumerDir, "public-types.tsx"), `import * as React from "react";
@@ -72,9 +77,9 @@ export const invalidRef = <Button ref={React.createRef<HTMLInputElement>()}>Inva
 `);
   const types = (dir) => {
     const common = ["--noEmit", "--strict", "--target", "ES2022"];
-    run(bin(dir, "tsc"), [...common, "--jsx", "react-jsx", "--module", "NodeNext", "--moduleResolution", "NodeNext", "consumer.tsx", "public-types.tsx"], dir);
+    run(bin(dir, "tsc"), [...common, "--jsx", "react-jsx", "--module", "NodeNext", "--moduleResolution", "NodeNext", "consumer.tsx", "public-types.tsx", "v21-types.tsx"], dir);
     run(bin(dir, "tsc"), [...common, "--module", "Node16", "--moduleResolution", "Node16", "commonjs.cts"], dir);
-    run(bin(dir, "tsc"), [...common, "--jsx", "react-jsx", "--module", "ESNext", "--moduleResolution", "Bundler", "consumer.tsx", "public-types.tsx"], dir);
+    run(bin(dir, "tsc"), [...common, "--jsx", "react-jsx", "--module", "ESNext", "--moduleResolution", "Bundler", "consumer.tsx", "public-types.tsx", "v21-types.tsx"], dir);
   };
   types(consumerDir);
   run(bin(consumerDir, "vite"), ["build"], consumerDir);
@@ -93,7 +98,7 @@ export const invalidRef = <Button ref={React.createRef<HTMLInputElement>()}>Inva
       vite: "7.1.7", "@playwright/test": playwrightVersion, "@axe-core/playwright": axeVersion,
     },
   }));
-  for (const file of ["esm.mjs", "cjs.cjs", "consumer.tsx", "public-types.tsx", "commonjs.cts", "App.jsx", "host.css", "src", "tests", "public", "index.html", "vite.config.mjs", "playwright.config.mjs"]) {
+  for (const file of ["esm.mjs", "cjs.cjs", "consumer.tsx", "public-types.tsx", "v21-types.tsx", "commonjs.cts", "App.jsx", "host.css", "src", "tests", "public", "index.html", "vite.config.mjs", "playwright.config.mjs"]) {
     await cp(join(consumerDir, file), join(react18, file), { recursive: true });
   }
   run("npm", ["install", "--no-audit", "--no-fund"], react18);

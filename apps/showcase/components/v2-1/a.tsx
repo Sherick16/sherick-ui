@@ -20,7 +20,7 @@ const Readout = ({ testId, children }: { testId: string; children: React.ReactNo
   </p>
 );
 
-export default function DateFamilySpecimen() {
+export default function DateFamilySpecimen({ verification = false }: { verification?: boolean }) {
   const [single, setSingle] = useState<CalendarDate | null>(leapMonth);
   const [range, setRange] = useState<DateRange>(rangeStart);
   const [controlled, setControlled] = useState<CalendarDate | null>("2024-03-10");
@@ -67,7 +67,7 @@ export default function DateFamilySpecimen() {
         </div>
       </section>
 
-      <section className="space-y-3">
+      {verification && <section className="space-y-3">
         <h2 className="text-lg font-medium text-sherick-ink">Controlled month and value</h2>
         <div data-testid="controlled-calendar">
           <Panel>
@@ -113,11 +113,12 @@ export default function DateFamilySpecimen() {
             </div>
           </Panel>
         </div>
-      </section>
+      </section>}
 
       <section className="space-y-3">
-        <h2 className="text-lg font-medium text-sherick-ink">Bounds, disabled and invalid</h2>
+        <h2 className="text-lg font-medium text-sherick-ink">{verification ? "Bounds, disabled and invalid" : "Disabled and invalid"}</h2>
         <div className="flex flex-wrap items-start gap-6">
+          {verification && <>
           <Panel>
             <span className="text-xs text-sherick-ink-muted">First month of the value format</span>
             <div data-testid="bounds-calendar">
@@ -130,6 +131,7 @@ export default function DateFamilySpecimen() {
               <Calendar month="9999-12-01" today="9999-12-31" />
             </div>
           </Panel>
+          </>}
           <Panel>
             <span className="text-xs text-sherick-ink-muted">Disabled</span>
             <div data-testid="disabled-calendar">
@@ -160,7 +162,7 @@ export default function DateFamilySpecimen() {
         </div>
       </section>
 
-      <section className="space-y-3">
+      {verification && <section className="space-y-3">
         <h2 className="text-lg font-medium text-sherick-ink">Narrow container and right-to-left</h2>
         <div className="flex flex-wrap items-start gap-6">
           <div className="w-64 max-w-full" data-testid="narrow-calendar">
@@ -180,7 +182,7 @@ export default function DateFamilySpecimen() {
             </DirectionProvider>
           </div>
         </div>
-      </section>
+      </section>}
 
       <section className="space-y-3">
         <h2 className="text-lg font-medium text-sherick-ink">Date field</h2>
@@ -239,7 +241,7 @@ export default function DateFamilySpecimen() {
         </Readout>
       </section>
 
-      <section className="space-y-3">
+      {verification && <section className="space-y-3">
         <h2 className="text-lg font-medium text-sherick-ink">Native form, submission and reset</h2>
         <form
           data-testid="leap-form"
@@ -271,7 +273,7 @@ export default function DateFamilySpecimen() {
             </span>
           </div>
         </form>
-      </section>
+      </section>}
     </div>
   );
 }

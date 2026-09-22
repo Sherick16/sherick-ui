@@ -441,7 +441,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
         {/* Mounted whether or not it holds anything, so the region exists before its content
             changes. It reports what the selection became — and every failure with its file. */}
         <div role="status" className={cn(status && "mt-2 flex flex-col gap-1 text-xs leading-5")}>
-          {announcement !== "" && <span className={text.medium}>{announcement}</span>}
+          {announcement !== "" && <span className={cn(text.medium)}>{announcement}</span>}
           {rejections.length > 0 && (
             <span key={attempt} className={cn("text-sherick-danger")}>
               {rejections.map((rejection) => rejection.message).join(" ")}

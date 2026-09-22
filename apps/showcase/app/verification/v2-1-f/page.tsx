@@ -16,7 +16,7 @@ export default function VerificationTreePage() {
           </p>
         </header>
 
-        <V21TreeSpecimen />
+        <V21TreeSpecimen verification />
       </section>
     </main>
   );

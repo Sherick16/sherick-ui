@@ -138,10 +138,9 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(({
   // One endpoint can repair the other's custom validity without changing its text.
   // Base still owns validation; an invalid draft is explained by the edited field only.
   useEffect(() => {
-    if (typedIssue) return;
     startFieldActions.current?.validate();
     endFieldActions.current?.validate();
-  }, [displayedRange.start, displayedRange.end, typedIssue, minDate, maxDate, isDateUnavailable]);
+  }, [displayedRange.start, displayedRange.end, typedIssue, minDate, maxDate, isDateUnavailable, disabled, labels.unavailableRange]);
 
   const descriptionId = useId();
   const errorId = useId();
@@ -196,6 +195,7 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(({
   /* Each field reports the problem from its own perspective, so whichever endpoint was typed last
      is the one that explains it. Bounds and emptiness are the browser's own validation. */
   const validateStart = (candidate: unknown) => {
+    if (typedIssue) return typedIssue === "start" ? labels.unavailableRange : null;
     const date = typeof candidate === "string" ? normalizeCalendarDate(candidate) : null;
     if (!date) return candidate ? labels.unavailableRange : null;
     if (isDateUnavailable?.(date)) return labels.unavailableRange;
@@ -206,6 +206,7 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(({
   };
 
   const validateEnd = (candidate: unknown) => {
+    if (typedIssue) return typedIssue === "end" ? labels.unavailableRange : null;
     const date = typeof candidate === "string" ? normalizeCalendarDate(candidate) : null;
     if (!date) return candidate ? labels.unavailableRange : null;
     if (isDateUnavailable?.(date)) return labels.unavailableRange;

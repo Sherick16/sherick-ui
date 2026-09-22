@@ -80,6 +80,9 @@ The root `sherick-ui` export is:
 - **Toasts**: `ToastProvider`, `ToastViewport`, `useToast`, and `createToastManager()` for a
   manager that lives outside the React tree;
 - **Writing direction**: `DirectionProvider`;
+- **Unreleased v2.1 additions**: `Calendar`, `DatePicker`, `DateRangePicker`, `Command`,
+  `CommandPalette`, `Pagination`, `Breadcrumb`, `FileUpload`, `Stepper`, `TreeView` and
+  their prop/data types, specified in [`V2_1_COMPONENTS.md`](V2_1_COMPONENTS.md);
 - the matching prop types (`AccordionProps`, `AccordionItemProps`, `AccordionTriggerProps`,
   `AccordionPanelProps`, `AccordionHeadingLevel`, `CollapsibleProps`, `CollapsibleTriggerProps`,
   `CollapsiblePanelProps`, `ButtonProps`, `ButtonAppearance`, `ButtonSize`, `IconButtonProps`,
@@ -230,6 +233,18 @@ Historical bundle-baseline changes and their measured reasons live in the phase 
 The current JSON file is authoritative; a future baseline edit must record its reason in the same
 change. The remaining object-valued shared recipe tables are a post-release optimization candidate,
 not a correctness defect and not permission to raise a budget.
+
+The unreleased v2.1 wave deliberately re-records only `barrel` and `stylesCss`, using
+`bun --filter sherick-ui test:bundle --update=barrel,stylesCss`. The reason is additive
+component/helper implementation and scoped anatomy for ten new core components, not a
+dependency upgrade or a relaxed tree-shaking contract; see [the architecture decision](ARCHITECTURE.md#v21-behavioral-gaps).
+All other recorded budgets, the 5% tolerance and the stale-shrink check are preserved.
+Measured deltas must be inspected again if subsequent corrections change either artifact.
+
+The inspected v2.1 measurements (raw / gzip / brotli bytes) are:
+- whole barrel: `460798 / 152841 / 125775` → `505021 / 168701 / 138120`;
+- component CSS: `115647 / 14135 / 11682` → `121436 / 14965 / 12343`.
+The other eight budget records are byte-for-byte unchanged.
 
 ## Accessibility: the authored palette meets AA
 

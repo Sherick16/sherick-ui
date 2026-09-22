@@ -7,8 +7,8 @@ export default defineConfig({
   workers: 1,
   projects: [
     { name: "chromium", use: { browserName: "chromium" } },
-    { name: "firefox", testMatch: /hostile\.spec\.ts/, use: { browserName: "firefox" } },
-    { name: "webkit", testMatch: /hostile\.spec\.ts/, use: { browserName: "webkit", launchOptions: { executablePath: process.env.WEBKIT_EXECUTABLE_PATH } } },
+    { name: "firefox", testMatch: /(?:hostile|v2-1)\.spec\.ts/, use: { browserName: "firefox" } },
+    { name: "webkit", testMatch: /(?:hostile|v2-1)\.spec\.ts/, use: { browserName: "webkit", launchOptions: { executablePath: process.env.WEBKIT_EXECUTABLE_PATH } } },
   ],
   use: {
     baseURL: "http://127.0.0.1:4173",

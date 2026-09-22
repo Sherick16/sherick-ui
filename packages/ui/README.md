@@ -131,9 +131,15 @@ The package publishes these subpaths:
 - `sherick-ui/theme.css` — token-only theme output.
 - `sherick-ui/dev` — development-only recipes for this repository's workbench. Unstable and unsupported; do not depend on it.
 
+The unreleased v2.1 wave also adds `Calendar`, `DatePicker`, `DateRangePicker`, `Command`,
+`CommandPalette`, `Pagination`, `Breadcrumb`, `FileUpload`, `Stepper` and `TreeView` to the
+same root barrel, with their prop/data types. Dates use civil `YYYY-MM-DD` strings.
+FileUpload reports `File[]`; consumers build their own upload/FormData payload. The same
+`styles.css` import styles every new component and independently portaled surface.
+
 The names above are canonical. There are no compatibility aliases: `ActionButton`, `Dropdown`, `Modal`, `TabGroup` and their prop types are gone, as are the deprecated `Select.selected`, `Select.onSelect`, `Tabs.defaultTabId`, `Tabs.onTabChange`, `Dialog.onClose` and `Table.variant` props. The `onChange` props on `Input`, `Textarea` and `Switch` are no longer Sherick callbacks — `Input` and `Textarea` pass through native `onChange`, and boolean state goes through `Switch.onCheckedChange`.
 
-Controlled callbacks keep Base UI's `(nextValue, eventDetails)` signature. This includes `Input`,
+Callbacks owned by Base UI keep its `(nextValue, eventDetails)` signature. This includes `Input`,
 `Textarea`, `Search`, `Select`, `Switch`, `Tabs`, `Dialog` and `Combobox`; consumers that do not need
 the event details may ignore the second argument.
 

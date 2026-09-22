@@ -714,11 +714,18 @@ test("repairing a reversed range through its other endpoint clears native custom
   const end = page.getByLabel("Draft end", { exact: true });
   await end.fill("2024-06-05");
   await expect(end).toHaveAttribute("aria-invalid", "true");
+  await start.fill("2024-06-08");
+  await expect(start).toHaveAttribute("aria-invalid", "true");
+  await expect(end).not.toHaveAttribute("aria-invalid", "true");
+  await expect.poll(() => start.evaluate((element) => (element as HTMLInputElement).validity.customError)).toBe(true);
+  await expect.poll(() => end.evaluate((element) => (element as HTMLInputElement).validity.customError)).toBe(false);
   await start.fill("2024-06-01");
   await expect(start).toHaveValue("2024-06-01");
   await expect(end).toHaveValue("2024-06-05");
-  await expect(end).not.toHaveAttribute("aria-invalid", "true");
-  expect(await end.evaluate((element) => (element as HTMLInputElement).validity.valid)).toBe(true);
+  for (const field of [start, end]) {
+    await expect(field).not.toHaveAttribute("aria-invalid", "true");
+    expect(await field.evaluate((element) => (element as HTMLInputElement).validity.valid)).toBe(true);
+  }
 });
 
 test("disabled controlled-open pickers expose no enabled calendar controls", async ({ page }) => {
@@ -732,4 +739,78 @@ test("disabled controlled-open pickers expose no enabled calendar controls", asy
     await popup.locator('[data-day="2024-06-12"]').click({ force: true });
     await expect(page.getByTestId("disabled-date-requests")).toHaveText("0");
   }
+});
+
+test("dynamic unavailability revalidates unchanged controlled and uncontrolled date fields", async ({ page }) => {
+  const form = page.getByTestId("dynamic-date-form");
+  const submitted = page.getByTestId("dynamic-date-submits");
+  const toggle = page.getByLabel("Make current dates unavailable");
+  const fields = [form.getByLabel("Dynamic date", { exact: true }), form.getByLabel("Dynamic controlled date", { exact: true })];
+  await form.getByRole("button", { name: "Submit dynamic dates" }).click();
+  await expect(submitted).toHaveText('["2024-06-10/2024-06-10"]');
+  await toggle.check();
+  for (const field of fields) {
+    await expect(field).toHaveValue("2024-06-10");
+    await expect(field).toHaveAttribute("aria-invalid", "true");
+    await expect.poll(() => field.evaluate((element) => (element as HTMLInputElement).validity.customError)).toBe(true);
+  }
+  await form.getByRole("button", { name: "Submit dynamic dates" }).click();
+  await expect(submitted).toHaveText('["2024-06-10/2024-06-10"]');
+  await toggle.uncheck();
+  for (const field of fields) {
+    await expect(field).not.toHaveAttribute("aria-invalid", "true");
+    await expect.poll(() => field.evaluate((element) => (element as HTMLInputElement).validity.valid)).toBe(true);
+  }
+  await form.getByRole("button", { name: "Submit dynamic dates" }).click();
+  await expect(submitted).toHaveText('["2024-06-10/2024-06-10","2024-06-10/2024-06-10"]');
+});
+
+test("enabling unchanged date fields installs their native custom validity", async ({ page }) => {
+  const form = page.getByTestId("enabled-date-form");
+  const fields = ["Enabled constrained date", "Enabled constrained start", "Enabled constrained end"].map(name => form.getByLabel(name, { exact: true }));
+  for (const field of fields) await expect(field).toBeDisabled();
+  await form.getByRole("button", { name: "Submit enabled dates" }).click();
+  await expect(page.getByTestId("enabled-date-submits")).toHaveText("1");
+  await page.getByLabel("Enable constrained dates", { exact: true }).check();
+  for (const field of fields) {
+    await expect(field).toBeEnabled();
+    await expect.poll(() => field.evaluate((element) => (element as HTMLInputElement).validity.customError)).toBe(true);
+  }
+  await form.getByRole("button", { name: "Submit enabled dates" }).click();
+  await expect(page.getByTestId("enabled-date-submits")).toHaveText("1");
+  await page.getByLabel("Enable constrained dates", { exact: true }).uncheck();
+  await form.getByRole("button", { name: "Submit enabled dates" }).click();
+  await expect(page.getByTestId("enabled-date-submits")).toHaveText("2");
+});
+
+test("relaxing date bounds cannot silently submit a previously rejected draft", async ({ page }) => {
+  const form = page.getByTestId("dynamic-date-form");
+  const single = form.getByLabel("Dynamic date", { exact: true });
+  const end = form.getByLabel("Dynamic end", { exact: true });
+  const commits = page.getByTestId("draft-date-commits");
+  await single.fill("2024-06-20");
+  await end.fill("2024-06-20");
+  await expect(commits).toHaveText("[]");
+  await page.getByLabel("Relax native date bounds").check();
+  for (const field of [single, end]) {
+    await expect(field).toHaveValue("2024-06-20");
+    await expect(field).toHaveAttribute("aria-invalid", "true");
+    await expect.poll(() => field.evaluate((element) => (element as HTMLInputElement).validity.customError)).toBe(true);
+  }
+  await expect(commits).toHaveText("[]");
+  await form.getByRole("button", { name: "Submit dynamic dates" }).click();
+  await expect(page.getByTestId("dynamic-date-submits")).toHaveText("[]");
+  // A fresh valid user edit, not a prop change, accepts the draft into the date model.
+  await single.fill("2024-06-21");
+  await end.fill("2024-06-21");
+  for (const field of [single, end]) {
+    await expect(field).not.toHaveAttribute("aria-invalid", "true");
+    await expect.poll(() => field.evaluate((element) => (element as HTMLInputElement).validity.valid)).toBe(true);
+  }
+  await expect(commits).toHaveText('["date:2024-06-21","range:2024-06-10/2024-06-21"]');
+  expect(await form.evaluate(element => Object.fromEntries(new FormData(element as HTMLFormElement)))).toEqual({
+    date: "2024-06-21", controlled: "2024-06-10", start: "2024-06-10", end: "2024-06-21",
+  });
+  await form.getByRole("button", { name: "Submit dynamic dates" }).click();
+  await expect(page.getByTestId("dynamic-date-submits")).toHaveText('["2024-06-21/2024-06-10"]');
 });

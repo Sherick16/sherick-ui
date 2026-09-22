@@ -88,7 +88,7 @@ const mirroredItems: TreeViewItem[] = [
 ];
 
 /** The unit F specimens: every meaningful state of a tree, once. */
-export default function V21TreeSpecimen() {
+export default function V21TreeSpecimen({ verification = false }: { verification?: boolean }) {
   const [value, setValue] = useState<string | null>("first");
   const [expanded, setExpanded] = useState<string[]>(["parent"]);
   const [rejecting, setRejecting] = useState(false);
@@ -117,7 +117,7 @@ export default function V21TreeSpecimen() {
         />
       </section>
 
-      <section className="space-y-3">
+      {verification && <section className="space-y-3">
         <TreeView
           data-testid="tree-controlled"
           label="Controlled tree"
@@ -172,7 +172,7 @@ export default function V21TreeSpecimen() {
             Remove child while focus is here
           </button>
         </div>
-      </section>
+      </section>}
 
       <section className="space-y-3">
         <TreeView
@@ -188,7 +188,7 @@ export default function V21TreeSpecimen() {
         <TreeView data-testid="tree-empty" label="Empty tree" items={[]} className="max-w-sm" />
       </section>
 
-      <section className="w-56" data-testid="tree-deep-container">
+      {verification && <section className="w-56" data-testid="tree-deep-container">
         <TreeView
           data-testid="tree-deep"
           label="Deep tree"
@@ -201,7 +201,7 @@ export default function V21TreeSpecimen() {
             </span>
           )}
         />
-      </section>
+      </section>}
 
       <section dir="rtl" data-testid="tree-rtl-container">
         <DirectionProvider direction="rtl">
