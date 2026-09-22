@@ -4,7 +4,11 @@ import {
   DirectionProvider, FileUpload, Pagination, Stepper, TreeView,
 } from "sherick-ui";
 
-const commands = [{ value: "save", label: "Save draft" }, { value: "archive", label: "Archive draft" }];
+const commands = [
+  { value: "save", label: "Save draft" },
+  { value: "archive", label: "Archive draft" },
+  { value: "publish", label: "Publish draft", disabled: true },
+];
 export default function V21() {
   const [step, setStep] = useState("review");
   const [action, setAction] = useState("");

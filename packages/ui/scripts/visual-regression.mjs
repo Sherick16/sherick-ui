@@ -319,6 +319,7 @@ const specimens = {
   "breadcrumb": h(library.Breadcrumb, { items: [{ label: "Home", href: "/" }, { label: "Current" }] }),
   "file-upload": h(library.FileUpload, { label: "Files", multiple: true }),
   "file-upload.disabled": h(library.FileUpload, { label: "Files", disabled: true }),
+  "file-upload.selected": h(library.FileUpload, { label: "Files", defaultFiles: [new File(["notes"], "notes.txt", { type: "text/plain", lastModified: 0 })] }),
   "stepper.current-complete": h(library.Stepper, { items: [{ value: "draft", label: "Draft", complete: true }, { value: "review", label: "Review" }], value: "draft", onValueChange: noop }),
   "stepper.passive": h(library.Stepper, { items: [{ value: "draft", label: "Draft" }], value: "draft" }),
   "tree-view": h(library.TreeView, { label: "Tree", items: [{ value: "root", label: "Root", children: [{ value: "child", label: "Child" }] }], defaultExpandedValues: ["root"], defaultValue: "child" }),

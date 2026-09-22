@@ -1038,6 +1038,19 @@ handle that the pointer is already moving keeps its ring for the keyboard.
 - Color is never the only carrier of meaning: a semantic state also carries an icon, a
   label or a position.
 
+### Forced colors
+
+When forced colors removes tone and depth, the CSS compiler substitutes system-color
+boundaries: a 1px `Highlight` outline preserves selection, and the canonical 2px `Highlight`
+outline identifies focus or a highlighted option whose focus remains in its input. The
+focused boundary wins over selection on the same target; disabled-but-navigable options
+retain their highlight. These are accessibility fallbacks, not rims in ordinary themes.
+
+The boundary follows the same anatomy as the normal recipe: a treeitem paints only its
+direct row, never its nested group; selected calendar days retain a boundary across the
+whole range, including interior days after focus leaves. Do not outline a subtree or rely
+on a flattened state-layer tint to identify the option Enter will activate.
+
 ### The contrast contract
 
 The authored palette meets WCAG AA. What that means is not a claim but a measurement: every

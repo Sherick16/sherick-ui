@@ -52,6 +52,12 @@ test("published controls retain native forms, selection and keyboard focus", asy
   const remove = page.getByRole("button", { name: "Remove notes.txt" });
   await expect(remove).toBeVisible();
   expect((await remove.boundingBox())!.height).toBeGreaterThanOrEqual(44);
+  const files = page.getByRole("list").filter({ has: remove });
+  await expect(files).toHaveAttribute("role", "list");
+  for (const property of ["margin-block-start", "margin-block-end", "padding-inline-start", "padding-inline-end"]) {
+    expect(await css(files, property)).toBe("0px");
+  }
+  expect(await css(files, "list-style-type")).toBe("none");
   await remove.click();
   await expect(remove).toHaveCount(0);
 });
@@ -93,6 +99,74 @@ test("selection and keyboard focus survive reduced motion and Chromium forced co
   if (browserName === "chromium") {
     expect(await css(next, "outline-style")).not.toBe("none");
     expect(parseFloat(await css(next, "outline-width"))).toBeGreaterThanOrEqual(2);
+
+    const root = page.getByRole("treeitem", { name: "Root", exact: true });
+    const rootRow = root.locator(":scope > div").first();
+    const child = page.getByRole("treeitem", { name: "Child", exact: true });
+    const childRow = child.locator(":scope > div").first();
+    await root.focus();
+    await page.keyboard.press("Home");
+    await page.keyboard.press("Space");
+    await expect(root).toBeFocused();
+    await expect(root).toHaveAttribute("aria-expanded", "true");
+    await expect(root).toHaveAttribute("aria-selected", "true");
+    expect(await css(root, "outline-style")).toBe("none");
+    expect(await css(rootRow, "outline-style")).toBe("solid");
+    expect(await css(rootRow, "outline-width")).toBe("2px");
+    expect(await css(rootRow, "outline-offset")).toBe("-2px");
+    expect((await rootRow.boundingBox())!.height).toBeLessThan((await root.boundingBox())!.height);
+    expect((await rootRow.boundingBox())!.height).toBe((await childRow.boundingBox())!.height);
+    expect(await css(root.getByRole("group"), "outline-style")).toBe("none");
+    await page.keyboard.press("ArrowDown");
+    await expect(child).toBeFocused();
+    await expect(root).toHaveAttribute("aria-selected", "true");
+    await expect(child).toHaveAttribute("aria-selected", "false");
+    expect(await css(rootRow, "outline-style")).toBe("solid");
+    expect(await css(rootRow, "outline-width")).toBe("1px");
+    expect(await css(child, "outline-style")).toBe("none");
+    expect(await css(childRow, "outline-style")).toBe("solid");
+    expect(await css(childRow, "outline-width")).toBe("2px");
+    expect(await css(childRow, "outline-offset")).toBe("-2px");
+
+    const commands = page.getByRole("combobox", { name: "Commands", exact: true });
+    const save = page.getByRole("option", { name: "Save draft", exact: true });
+    const archive = page.getByRole("option", { name: "Archive draft", exact: true });
+    const publish = page.getByRole("option", { name: "Publish draft", exact: true });
+    await commands.fill("draft");
+    await expect(save).toHaveAttribute("data-highlighted", "");
+    for (const option of [save, archive, publish]) {
+      await expect(commands).toBeFocused();
+      await expect(commands).toHaveAttribute("aria-activedescendant", (await option.getAttribute("id"))!);
+      await expect(option).toHaveAttribute("data-highlighted", "");
+      expect(await css(option, "outline-style")).toBe("solid");
+      expect(await css(option, "outline-width")).toBe("2px");
+      expect(await css(option, "outline-offset")).toBe("-2px");
+      if (option !== publish) await page.keyboard.press("ArrowDown");
+    }
+    await expect(publish).toHaveAttribute("aria-disabled", "true");
+    for (const inactive of [save, archive]) {
+      await expect(inactive).not.toHaveAttribute("data-highlighted", "");
+      expect(await css(inactive, "outline-style")).toBe("none");
+    }
+    await page.keyboard.press("Enter");
+    await expect(page.getByTestId("command-action")).toHaveText("");
+
+    await page.getByRole("button", { name: "Open Start", exact: true }).click();
+    const range = page.getByRole("dialog", { name: "Date range", exact: true });
+    const selectedDays = range.getByRole("gridcell", { selected: true }).getByRole("button");
+    await expect(selectedDays).toHaveCount(3);
+    // Interior days need a persistent selection cue as well as the emphasized endpoints.
+    await selectedDays.nth(1).focus();
+    await page.keyboard.press("ArrowLeft");
+    expect(await css(selectedDays.nth(2), "outline-width")).toBe("2px");
+    await range.getByRole("button", { name: "Today", exact: true }).focus();
+    for (const day of await selectedDays.all()) {
+      expect(await css(day, "outline-style")).toBe("solid");
+      expect(await css(day, "outline-width")).toBe("1px");
+      expect(await css(day, "outline-offset")).toBe("-2px");
+    }
+    await page.keyboard.press("Escape");
+    await expect(range).toBeHidden();
   }
   expect(await page.evaluate(() => document.getAnimations().filter(animation => animation.playState === "running").length)).toBe(0);
 });

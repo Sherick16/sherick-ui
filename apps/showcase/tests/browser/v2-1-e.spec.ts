@@ -259,3 +259,34 @@ test("a right-to-left page puts the mark at the logical start of the step", asyn
 
   expect(errors).toEqual([]);
 });
+
+test("step presses move only enabled ink and respect reduced motion", async ({ page, errors }) => {
+  const nav = page.getByRole("navigation", { name: "Checkout progress" });
+  for (const reducedMotion of ["no-preference", "reduce"] as const) {
+    await page.emulateMedia({ reducedMotion });
+    for (const target of [step(nav, /Payment/), step(nav, /Review and confirm/)]) {
+      await target.scrollIntoViewIfNeeded();
+      const mark = target.locator(":scope > span").first();
+      const before = (await target.boundingBox())!;
+      const inkBefore = (await mark.boundingBox())!;
+      const presses = reducedMotion === "no-preference" && await target.isEnabled();
+      await page.mouse.move(before.x + 1, before.y + before.height / 2);
+      await page.mouse.down();
+      try {
+        if (presses) {
+          await expect.poll(async () => (await mark.boundingBox())!.width).toBeLessThan(inkBefore.width - 1);
+        } else {
+          expect((await mark.boundingBox())!.width).toBeCloseTo(inkBefore.width, 1);
+        }
+        const held = (await target.boundingBox())!;
+        for (const property of ["x", "y", "width", "height"] as const) {
+          expect(held[property]).toBeCloseTo(before[property], 1);
+        }
+      } finally {
+        await page.mouse.up();
+      }
+      await expect.poll(async () => (await mark.boundingBox())!.width).toBeCloseTo(inkBefore.width, 1);
+    }
+  }
+  expect(errors).toEqual([]);
+});

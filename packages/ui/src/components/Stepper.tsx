@@ -4,7 +4,7 @@ import { Check as CheckIcon } from "lucide-react";
 import React, { forwardRef, type ComponentProps, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import { focusRing, shape, state, stateLayer, text, tone } from "./ui.common";
-import { motionFeedback, motionTactile } from "./ui.motion";
+import { motionFeedback, motionInkPress } from "./ui.motion";
 
 export interface StepperItem {
   value: string;
@@ -38,16 +38,18 @@ const StepMark = ({
   index,
   complete,
   current,
+  pressable,
 }: {
   index: number;
   complete: boolean;
   current: boolean;
+  pressable: boolean;
 }) => (
   <span
     className={cn(
       "flex size-6 shrink-0 items-center justify-center text-xs font-medium tabular-nums [&>svg]:size-4",
       shape.circle,
-      motionFeedback,
+      pressable ? motionInkPress : motionFeedback,
       current
         ? tone.strong.primary
         : complete
@@ -134,7 +136,7 @@ const Stepper = forwardRef<HTMLElement, StepperProps>(
             const dimmed = interactive && !disabled && item.disabled === true;
             const content = (
               <>
-                <StepMark index={index} complete={complete} current={current} />
+                <StepMark index={index} complete={complete} current={current} pressable={interactive && !unavailable} />
                 <span className={cn("flex min-w-0 flex-col")}>
                   {/* The label carries no tone of its own: it takes the row's, so a row that answers
                       the pointer brightens its label with it. */}
@@ -177,7 +179,8 @@ const Stepper = forwardRef<HTMLElement, StepperProps>(
                     rowLayout,
                     stack && "w-full",
                     shape.row,
-                    motionTactile,
+                    !unavailable && "group",
+                    motionFeedback,
                     focusRing,
                     stateLayer.quiet,
                     current ? text.high : text.medium,

@@ -284,8 +284,10 @@ portals and axe checks before/after invalid date/file entry. The no-Tailwind wav
 on Chromium, Firefox and WebKit, including RTL keyboard use, narrow themed portals and
 reduced motion; forced-colors emulation is additionally asserted on Chromium.
 
-The deterministic style-contract baseline adds 14 wave specimens and 33 scoped utility
-rules. Its existing 93 specimens, token blocks, overlay recipes and previously recorded
-utility declarations are unchanged. This is additive coverage, not acceptance of a drift
-in existing visuals. Test-only date bounds/forms and tree mutation probes render only in
-their verification routes, not the showcase.
+The deterministic style-contract baseline adds 15 wave specimens and 35 net scoped utility
+rules. Its existing 93 specimens, token blocks and overlay recipes are unchanged. The
+forced-colors selection rule extends its existing declarations to calendar days and tree
+rows; targeted fallbacks preserve direct-row focus and active-descendant highlighting.
+The selected-files specimen pins owned-list normalization, and the interactive Stepper
+specimen pins mark-only press motion. Test-only date bounds/forms and tree mutation probes
+render only in their verification routes, not the showcase.

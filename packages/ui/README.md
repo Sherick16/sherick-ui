@@ -139,9 +139,10 @@ FileUpload reports `File[]`; consumers build their own upload/FormData payload. 
 
 The names above are canonical. There are no compatibility aliases: `ActionButton`, `Dropdown`, `Modal`, `TabGroup` and their prop types are gone, as are the deprecated `Select.selected`, `Select.onSelect`, `Tabs.defaultTabId`, `Tabs.onTabChange`, `Dialog.onClose` and `Table.variant` props. The `onChange` props on `Input`, `Textarea` and `Switch` are no longer Sherick callbacks — `Input` and `Textarea` pass through native `onChange`, and boolean state goes through `Switch.onCheckedChange`.
 
-Callbacks owned by Base UI keep its `(nextValue, eventDetails)` signature. This includes `Input`,
-`Textarea`, `Search`, `Select`, `Switch`, `Tabs`, `Dialog` and `Combobox`; consumers that do not need
-the event details may ignore the second argument.
+Base-owned value/state callbacks keep `(nextValue, eventDetails)`: for example
+`Input.onValueChange`, `Textarea.onValueChange` and the callbacks on `Search`, `Select`,
+`Switch`, `Tabs`, `Dialog` and `Combobox`. These are distinct from native `onChange`;
+consumers that do not need the event details may ignore the second argument.
 
 The viewport-owning surfaces differ in what they own. `Dialog` composes as
 `Dialog.Header`, `Dialog.Description`, `Dialog.Content` and `Dialog.Footer`; `AlertDialog` is the

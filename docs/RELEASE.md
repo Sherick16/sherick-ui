@@ -241,10 +241,12 @@ dependency upgrade or a relaxed tree-shaking contract; see [the architecture dec
 All other recorded budgets, the 5% tolerance and the stale-shrink check are preserved.
 Measured deltas must be inspected again if subsequent corrections change either artifact.
 
-The inspected v2.1 measurements (raw / gzip / brotli bytes) are:
+The recorded v2.1 checkpoint measurements (raw / gzip / brotli bytes) are:
 - whole barrel: `460798 / 152841 / 125775` → `505021 / 168701 / 138120`;
 - component CSS: `115647 / 14135 / 11682` → `121436 / 14965 / 12343`.
 The other eight budget records are byte-for-byte unchanged.
+Subsequent forced-colors, mark-press and owned-list corrections were remeasured and remain
+within these allowances; no further budget baseline was changed.
 
 ## Accessibility: the authored palette meets AA
 

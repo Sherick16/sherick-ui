@@ -242,15 +242,16 @@ output.append(
     border: 1px solid CanvasText;
   }
 
-  /* A control whose selection is carried by tone or depth alone needs a boundary once forced
-     colors flattens both: a checked switch, checkbox or radio, the selected tab, and a pressed
-     toggle button — a chip or a segment. */
+  /* Selection carried by tone or depth alone needs a boundary once forced colors flattens
+     both. Calendar days and tree rows keep that boundary on the selected target, not its group. */
   :where(.${SUI_SCOPE_CLASS})[role="switch"][aria-checked="true"]:not(:focus-visible),
   :where(.${SUI_SCOPE_CLASS})[role="tab"][aria-selected="true"]:not(:focus-visible),
   :where(.${SUI_SCOPE_CLASS})[role="checkbox"][aria-checked="true"]:not(:focus-visible),
   :where(.${SUI_SCOPE_CLASS})[role="checkbox"][aria-checked="mixed"]:not(:focus-visible),
   :where(.${SUI_SCOPE_CLASS})[role="radio"][aria-checked="true"]:not(:focus-visible),
-  :where(.${SUI_SCOPE_CLASS})[aria-pressed="true"]:not(:focus-visible) {
+  :where(.${SUI_SCOPE_CLASS})[aria-pressed="true"]:not(:focus-visible),
+  :where(.${SUI_SCOPE_CLASS})[role="gridcell"][aria-selected="true"] > :where(.${SUI_SCOPE_CLASS})[data-day]:not(:focus-visible),
+  :where(.${SUI_SCOPE_CLASS})[data-sui-tree-value][aria-selected="true"]:not(:focus-visible) > :where(.${SUI_SCOPE_CLASS}):first-child {
     outline: 1px solid Highlight;
     outline-offset: -2px;
   }
@@ -285,6 +286,22 @@ output.append(
   :where(.${SUI_SCOPE_CLASS}):focus-visible {
     outline: 2px solid Highlight;
     outline-offset: 2px;
+  }
+
+  /* A tree's focus owner contains its descendants. Match parentFocusRingInset: only the
+     direct row gets the boundary, and focus takes precedence over its selection outline.
+     Also remove inactive options' transparent utility outlines, which forced colors makes
+     opaque: only the active descendant should acquire a keyboard-target boundary. */
+  :where(.${SUI_SCOPE_CLASS})[data-sui-tree-value],
+  :where(.${SUI_SCOPE_CLASS})[role="option"]:not([data-highlighted]):not(:focus-visible) {
+    outline: none;
+  }
+  :where(.${SUI_SCOPE_CLASS})[data-sui-tree-value]:focus-visible > :where(.${SUI_SCOPE_CLASS}):first-child,
+  /* Autocomplete keeps focus in its input; the highlighted option is still Enter's target,
+     including a disabled-but-navigable option. Do not gate this on availability. */
+  :where(.${SUI_SCOPE_CLASS})[role="option"][data-highlighted]:not(:focus-visible) {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
   }
 }`).nodes
 );

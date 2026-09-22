@@ -358,7 +358,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
 
         {selected.length > 0 && (
           <div className={cn("mt-3 flex min-w-0 flex-col gap-2")}>
-            <ul className={cn("flex min-w-0 flex-col gap-1.5")}>
+            <ul role="list" className={cn("m-0 flex min-w-0 list-none flex-col gap-1.5 p-0")}>
               {selected.map((file, index) => {
                 const key = fileKey(file);
                 return (
