@@ -235,3 +235,24 @@ test("a nested icon node keeps the mark slot and the target size", async ({ page
 
   expect(errors).toEqual([]);
 });
+
+test("held options share control elevation without raising navigation highlight", async ({ page }) => {
+  const errors = runtimeErrors(page);
+  for (const theme of ["light", "dark"]) {
+    await page.evaluate(theme => { document.documentElement.dataset.sherickTheme = theme; }, theme);
+    const reference = page.getByRole("button", { name: "Comfortable", exact: true });
+    const depth = await reference.evaluate(element => getComputedStyle(element).boxShadow);
+    for (const name of ["Project type", "Portaled combobox"]) {
+      await page.getByRole("combobox", { name, exact: true }).click();
+      const chosen = page.getByRole("option", { name: "Design system", exact: true });
+      const other = page.getByRole("option", { name: "Dashboard", exact: true });
+      await expect(chosen).toHaveAttribute("aria-selected", "true");
+      await other.hover();
+      await expect(other).toHaveAttribute("data-highlighted", "");
+      await expect.poll(() => chosen.evaluate(element => getComputedStyle(element).boxShadow)).toBe(depth);
+      expect(await other.evaluate(element => getComputedStyle(element).boxShadow)).toBe("none");
+      await page.keyboard.press("Escape");
+    }
+  }
+  expect(errors).toEqual([]);
+});

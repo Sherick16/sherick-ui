@@ -1,3 +1,4 @@
+import V21 from "./V21";
 import Hostile from "./Hostile";
 import { useState } from "react";
 import { createRoot } from "react-dom/client";
@@ -294,4 +295,6 @@ function ToastTrigger() {
   );
 }
 
-createRoot(document.getElementById("root")!).render(location.pathname === "/hostile" ? <Hostile /> : <App />);
+createRoot(document.getElementById("root")!).render(
+  location.pathname === "/hostile" ? <Hostile /> : location.pathname === "/v2-1" ? <V21 /> : <App />
+);

@@ -93,6 +93,12 @@ import {
   useShowcaseScrollSpy,
   type ShowcaseSectionId,
 } from "../components/ShowcaseNav";
+import StepperSpecimen from "../components/v2-1/e";
+import NavigationSpecimen from "../components/v2-1/c";
+import DateFamilySpecimen from "../components/v2-1/a";
+import CommandSpecimen from "../components/v2-1/b";
+import TreeSpecimen from "../components/v2-1/f";
+import FileUploadSpecimen from "../components/v2-1/d";
 
 const selectOptions = [
   { label: "Design system", value: "design" },
@@ -406,6 +412,12 @@ export default function Home() {
                   </Field>
                 </div>
               </Specimen>
+              <Specimen title="Calendar & date pickers" className="xl:col-span-2">
+                <DateFamilySpecimen />
+              </Specimen>
+              <Specimen title="File upload">
+                <FileUploadSpecimen />
+              </Specimen>
             </div>
           </ShowcaseSection>
 
@@ -525,6 +537,9 @@ export default function Home() {
                   />
                 </div>
               </Specimen>
+              <Specimen title="Pagination & breadcrumb">
+                <NavigationSpecimen />
+              </Specimen>
             </div>
           </ShowcaseSection>
 
@@ -555,6 +570,10 @@ export default function Home() {
                   <Progress value={null} label="Scanning dependencies" />
                   <Progress value={100} variant="success" label="Deploy finished" showValue />
                 </div>
+              </Specimen>
+
+              <Specimen title="Stepper">
+                <StepperSpecimen />
               </Specimen>
 
               <Specimen title="Toasts">
@@ -603,6 +622,9 @@ export default function Home() {
                   </Collapsible.Panel>
                 </Collapsible>
               </Specimen>
+              <Specimen title="Tree view">
+                <TreeSpecimen />
+              </Specimen>
             </div>
           </ShowcaseSection>
 
@@ -645,6 +667,9 @@ export default function Home() {
 
           <ShowcaseSection id="floating">
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
+              <Specimen title="Command & palette">
+                <CommandSpecimen />
+              </Specimen>
               <Specimen title="Popover">
                 <Popover>
                   <Popover.Trigger
@@ -825,7 +850,7 @@ function ShowcaseSection({
 
 function Specimen({ title, className = "", children }: { title: string; className?: string; children: React.ReactNode }) {
   return (
-    <div className={cn(shape.surface, material.matte, "min-w-0 p-6", className)}>
+    <div className={cn(shape.surface, material.matte, "min-w-0 self-start p-4 sm:p-6", className)}>
       <h3 className="mb-5 font-medium tracking-[-0.01em]">{title}</h3>
       {children}
     </div>

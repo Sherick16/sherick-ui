@@ -6,6 +6,7 @@ import { Check, ChevronDown, X } from "lucide-react";
 import { cn } from "@/libs/utils";
 import {
   density,
+  elevation,
   focusRingWithin,
   list,
   material,
@@ -208,7 +209,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(({
                   value={option}
                   disabled={option.disabled}
                   className={({ selected: isSelected }) =>
-                    cn(list.option, isSelected && tone.selected.primary)
+                    cn(list.option, isSelected && cn(tone.selected.primary, elevation.control))
                   }
                 >
                   <span className={cn("min-w-0 flex-1 truncate")}>{option.label}</span>

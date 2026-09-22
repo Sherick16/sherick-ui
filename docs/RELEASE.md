@@ -20,6 +20,11 @@ may continue to name only a prerelease; stable `2.0.0` is published exclusively 
 `publishConfig.tag` is `latest`. `scripts/verify-packed-package.mjs` fails if a prerelease would publish
 under `latest` or a stable version would publish under anything but `latest`.
 
+The unreleased v2.1 component wave is additive to this stable contract. Its public APIs and
+narrow component-owned behavior for missing Base primitives are recorded in
+[`V2_1_COMPONENTS.md`](V2_1_COMPONENTS.md). It does not change the package version or authorize
+publication, an npm dist-tag change, or a release tag.
+
 During the `2.0.0-alpha.N` line:
 
 - breaking changes were allowed and shipped without deprecation cycles, aliases, transitional props,
@@ -75,6 +80,9 @@ The root `sherick-ui` export is:
 - **Toasts**: `ToastProvider`, `ToastViewport`, `useToast`, and `createToastManager()` for a
   manager that lives outside the React tree;
 - **Writing direction**: `DirectionProvider`;
+- **Unreleased v2.1 additions**: `Calendar`, `DatePicker`, `DateRangePicker`, `Command`,
+  `CommandPalette`, `Pagination`, `Breadcrumb`, `FileUpload`, `Stepper`, `TreeView` and
+  their prop/data types, specified in [`V2_1_COMPONENTS.md`](V2_1_COMPONENTS.md);
 - the matching prop types (`AccordionProps`, `AccordionItemProps`, `AccordionTriggerProps`,
   `AccordionPanelProps`, `AccordionHeadingLevel`, `CollapsibleProps`, `CollapsibleTriggerProps`,
   `CollapsiblePanelProps`, `ButtonProps`, `ButtonAppearance`, `ButtonSize`, `IconButtonProps`,
@@ -225,6 +233,24 @@ Historical bundle-baseline changes and their measured reasons live in the phase 
 The current JSON file is authoritative; a future baseline edit must record its reason in the same
 change. The remaining object-valued shared recipe tables are a post-release optimization candidate,
 not a correctness defect and not permission to raise a budget.
+
+The unreleased v2.1 wave deliberately re-records only `barrel` and `stylesCss`, using
+`bun --filter sherick-ui test:bundle --update=barrel,stylesCss`. The reason is additive
+component/helper implementation and scoped anatomy for ten new core components, not a
+dependency upgrade or a relaxed tree-shaking contract; see [the architecture decision](ARCHITECTURE.md#v21-behavioral-gaps).
+All other recorded budgets, the 5% tolerance and the stale-shrink check are preserved.
+Measured deltas must be inspected again if subsequent corrections change either artifact.
+
+The recorded v2.1 checkpoint measurements (raw / gzip / brotli bytes) are:
+- whole barrel: `460798 / 152841 / 125775` → `505021 / 168701 / 138120`;
+- component CSS: `115647 / 14135 / 11682` → `121436 / 14965 / 12343`.
+The other eight budget records are byte-for-byte unchanged.
+The later responsive refinement re-records **only component CSS**:
+`121436 / 14965 / 12343` → `125677 / 15832 / 13021`. The intentional increase funds scoped
+container-query layouts, compact pagination, flexible step/calendar anatomy and the intervening
+visual refinements. This replaces clipped controls rather than hiding their scrollbars; it adds
+no client-side measuring machinery. Tokens and shared motion are unchanged. All other nine budget
+records, the 5% tolerance and stale-shrink checks remain byte-for-byte unchanged.
 
 ## Accessibility: the authored palette meets AA
 

@@ -72,6 +72,10 @@ export const focusRing =
 export const focusRingInset =
   "focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-focus";
 
+/* A focus owner that also contains a subtree paints the inset ring on its direct row only. */
+export const parentFocusRingInset =
+  "[:focus-visible>&]:ring-2 [:focus-visible>&]:ring-inset [:focus-visible>&]:ring-sherick-focus";
+
 /* The ring of a value control that is itself the focusable element: it wears it whenever it
    holds focus, however it was focused, and whenever the surface it opened is on screen. A select
    hands the DOM focus to its list while that list is open, so the ring follows the control's
@@ -105,7 +109,7 @@ export const groupFocusRing =
                touchable; pressing it returns it to the track.
    - floating: a surface that genuinely sits above the application.
    - control:  the resting half of the tactile pair, for a part the user moves —
-               a switch thumb, a selected segment.
+               a switch thumb, a selected segment or a held option/date selection.
    - recessed: the other half of that pair: a groove, a track or a well, which is
                recessed by definition, and a raised control while it is held, which
                lands at the same depth.
@@ -196,8 +200,8 @@ const effectiveDisabled =
      pressed    a raised control returning to the recessed depth of its own track, plus
                 a slight compression; a flat control stays flat and a floating one keeps
                 its elevation
-     selected   a selected tone; depth comes from the component's anatomy — a
-                segment inside a groove is raised, a row in a list is not
+     selected   a held choice: selected tone plus control elevation on a segment,
+                option/tree row or date surface; never on mere navigation highlight
      disabled   45% opacity, no pointer affordance, no interactive state at all
      focus      the shared outer focus ring, visible on keyboard focus */
 export const state = {
@@ -238,7 +242,8 @@ export const state = {
   field: {
     hover: "hover:bg-sherick-surface-high/[0.82]",
     focus: "focus:bg-sherick-surface-high/[0.9]",
-    focusWithin: "focus-within:bg-sherick-surface-high/[0.9]",
+    /* A composite's engaged tone outranks hover, independent of variant emission order. */
+    focusWithin: "[&&]:focus-within:bg-sherick-surface-high/[0.9]",
     engaged: "bg-sherick-surface-high/[0.9]",
     errorHover: "hover:bg-sherick-danger/[0.10]",
     errorFocus: "focus:bg-sherick-danger/[0.13]",
@@ -249,7 +254,7 @@ export const state = {
     invalid: "data-[invalid]:bg-sherick-danger/[0.075]",
     invalidHover: "data-[invalid]:hover:bg-sherick-danger/[0.10]",
     invalidEngaged: "data-[invalid]:bg-sherick-danger/[0.13]",
-    invalidFocusWithin: "data-[invalid]:focus-within:bg-sherick-danger/[0.13]",
+    invalidFocusWithin: "[&&]:data-[invalid]:focus-within:bg-sherick-danger/[0.13]",
   },
 } as const;
 
@@ -504,8 +509,9 @@ export const detail = {
    The sheet never exceeds what the viewport leaves it, and scrolls inside itself rather than
    growing. Its width is the list's own decision: a control's list is never narrower than the
    control it came from and grows to fit its own content until the viewport clamp, and a command
-   list only ever grows to its content. A row is flat — depth never announces a state —
-   and one row step of `stateLayer.quiet` plus `stateLayer.activeRow` carries both its hover and
+   list only ever grows to its content. Unselected rows and commands stay flat; held options
+   compose `tone.selected` with `elevation.control`. One row step of `stateLayer.quiet` plus
+   `stateLayer.activeRow` carries both its hover and
    its keyboard highlight, so an option and a command are highlighted by the same tone at the
    same strength. Keyboard focus adds the shared inset ring independently of that highlight.
    Selection is a tint of the sheet through `tone.selected` and never the opaque

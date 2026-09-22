@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import {
   Badge, Button, Card, Checkbox, Combobox, Dialog, DirectionProvider, Divider, Drawer,
   Input, Popover, Select, Skeleton, Slider, Spinner, Switch, ToastProvider, ToastViewport, useToast,
+  Breadcrumb, Calendar, Command, CommandPalette, DatePicker, DateRangePicker, FileUpload,
+  Pagination, Stepper, TreeView,
 } from "sherick-ui";
 import { CodeBlock, Markdown } from "sherick-ui/content";
 
@@ -15,6 +17,9 @@ function Notice() {
 export default function App() {
   const [dialog, setDialog] = useState(false);
   const [ready, setReady] = useState(false);
+  const [action, setAction] = useState("");
+  const [step, setStep] = useState("review");
+  const commands = [{ value: "save", label: "Save draft" }, { value: "archive", label: "Archive draft" }];
   useEffect(() => setReady(true), []);
   return <DirectionProvider direction="rtl"><ToastProvider><main data-ready={ready}>
     <div id="sentinel" className="flex absolute rounded-full text-sm px-6">Consumer</div>
@@ -46,5 +51,26 @@ export default function App() {
     <Spinner>Working</Spinner><Skeleton className="consumer-skeleton" />
     <CodeBlock language="tsx">{'<Button appearance="filled">Hello</Button>'}</CodeBlock>
     <Markdown>{"# Packed content\n\n$x^2$\n\n```python\ndef answer():\n    return 42\n```"}</Markdown>
+    <section data-testid="packed-v21" style={{ display: "grid", gap: 16, width: "min(100%, 28rem)", minWidth: 0 }}>
+      <h2>v2.1 components</h2>
+      <Calendar aria-label="Packed calendar" defaultValue="2024-06-10" today="2024-06-10" />
+      <form id="packed-dates">
+        <DatePicker label="Packed date" name="date" defaultValue="2024-06-10" today="2024-06-10" />
+        <DateRangePicker label="Packed range" startLabel="Packed start" endLabel="Packed end"
+          startName="start" endName="end" defaultValue={{ start: "2024-06-10", end: "2024-06-12" }} today="2024-06-10" />
+        <Button type="reset">Reset packed dates</Button>
+      </form>
+      <Command label="Packed commands" items={commands} onAction={setAction} />
+      <CommandPalette title="Packed palette" label="Packed palette search" items={commands}
+        onAction={setAction} trigger={<Button>Open packed palette</Button>} />
+      <output data-testid="packed-command-action">{action}</output>
+      <Pagination aria-label="Packed pages" count={20} defaultValue={2} />
+      <Breadcrumb aria-label="Packed breadcrumb" items={[{ label: "Home", href: "#home" }, { label: "Current" }]} />
+      <FileUpload label="Packed files" multiple accept=".txt" />
+      <Stepper aria-label="Packed workflow" value={step} onValueChange={setStep}
+        items={[{ value: "draft", label: "Draft", complete: true }, { value: "review", label: "Review" }]} />
+      <TreeView label="Packed tree" defaultExpandedValues={["root"]}
+        items={[{ value: "root", label: "Root", children: [{ value: "child", label: "Child" }] }]} />
+    </section>
   </main></ToastProvider></DirectionProvider>;
 }

@@ -208,6 +208,14 @@ The public package exports:
 
 Public prop types and the shared `Variant` type are exported from the package root as well. The names above are the canonical ones — there are no compatibility aliases.
 
+### Unreleased v2.1 additions
+
+The same root barrel adds `Calendar`, `DatePicker`, `DateRangePicker`, `Command`,
+`CommandPalette`, `Pagination`, `Breadcrumb`, `FileUpload`, `Stepper` and `TreeView`,
+with their prop and data types. See [the component contracts](docs/V2_1_COMPONENTS.md).
+Dates use civil `YYYY-MM-DD` values, not JavaScript timestamps. FileUpload reports `File[]`;
+it does not submit files automatically. No new CSS import, dependency setup or subpath is needed.
+
 ### Rich content: `sherick-ui/content`
 
 `Markdown` and `CodeBlock` live on a separate subpath, not on the root export:

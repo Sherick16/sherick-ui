@@ -41,9 +41,9 @@
     },
     "barrel": {
       "definition": "The complete core root barrel with nothing tree-shaken beyond unused exports.",
-      "raw": 460798,
-      "gzip": 152841,
-      "brotli": 125775
+      "raw": 505021,
+      "gzip": 168701,
+      "brotli": 138120
     },
     "content": {
       "definition": "The optional rich-content subpath: Markdown, CodeBlock and their full dependency stack.",
@@ -53,9 +53,9 @@
     },
     "stylesCss": {
       "definition": "Published component stylesheet.",
-      "raw": 115647,
-      "gzip": 14135,
-      "brotli": 11682
+      "raw": 125677,
+      "gzip": 15832,
+      "brotli": 13021
     },
     "themeCss": {
       "definition": "Published token-only theme stylesheet.",

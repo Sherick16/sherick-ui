@@ -175,11 +175,10 @@ preset, declares no Tailwind peer dependency, requires no content scanning, and 
 must not import Base UI to use Sherick UI. Base UI internals are not covered by this
 package's compatibility promise.
 
-The package is on a prerelease line. `1.0.0`-`1.0.5` are published and `1.0.5` holds the npm
-`latest` dist-tag, so the `1.x` line is frozen and new work ships as `2.0.0-alpha.N` under the
-`alpha` dist-tag. Breaking changes are allowed and expected without deprecation cycles, and
-compatibility starts being promised at the stable `2.0.0`. Do not add a release to `1.x`, and
-do not publish a prerelease under `latest`. See [`docs/RELEASE.md`](docs/RELEASE.md).
+`2.0.0` is stable under npm's `latest` dist-tag. The `1.x` line is frozen; existing
+`2.x` public APIs and behavior follow ordinary semver compatibility. The v2.1 component
+wave is additive functionality, not another prerelease cutover. Do not publish or create
+release tags without explicit approval. See [`docs/RELEASE.md`](docs/RELEASE.md).
 
 ## Frozen architecture (mandatory)
 
