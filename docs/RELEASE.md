@@ -6,48 +6,32 @@ on. The architecture this contract protects is described in
 [`ARCHITECTURE.md`](ARCHITECTURE.md); the verification that enforces it is described in
 [`VERIFICATION.md`](VERIFICATION.md).
 
-## Release status: prerelease, published as `2.0.0-alpha.N`
+## Release status: stable at `2.0.0`
 
-`sherick-ui` has a published stable history: `1.0.0` through `1.0.5`, with `1.0.5` on the
-npm `latest` dist-tag. That history is real and npm acts on it: a consumer on `^1.0.5`
-accepts `>=1.0.5 <2.0.0`, so a `1.x` minor or patch release is *presumed compatible* and can
-be installed automatically. No statement in this document can change that, so this document
-does not try.
+`sherick-ui@2.0.0` is the current stable release and is published under npm's `latest` dist-tag.
+API compatibility begins at this version, and ordinary semver applies to the export contract below.
+The published `1.0.0` through `1.0.5` line is frozen and receives no further releases.
 
-The unstable line therefore lives above the published one:
+The prerelease line is historical. No prerelease is promoted or published by the stable transition,
+and an untagged `npm install sherick-ui` resolves to stable `2.0.0`. If an `alpha` dist-tag exists, it
+may continue to name only a prerelease; stable `2.0.0` is published exclusively under `latest`.
 
-- the next published versions are **`2.0.0-alpha.N`**, published under the **`alpha`**
-  dist-tag, so `npm install sherick-ui` keeps resolving to the last stable `1.x` release and
-  only an explicit `npm install sherick-ui@alpha` opts into the prerelease;
-- the `1.x` line is **frozen**. It receives no further releases — no breaking changes, no new
-  components, no backports. It is not a line that "isn't really 1.0"; it is a published line
-  that has stopped moving. Anything new goes to `2.0.0-alpha.N`;
-- the **stable** release of this work is `2.0.0`, which is the version the compatibility
-  promise below starts from. Publishing `2.0.0` under `latest` is the semver-major signal
-  that the API settled.
+`packages/ui/package.json` enforces the stable mapping mechanically: its version is `2.0.0` and
+`publishConfig.tag` is `latest`. `scripts/verify-packed-package.mjs` fails if a prerelease would publish
+under `latest` or a stable version would publish under anything but `latest`.
 
-`packages/ui/package.json` enforces the mapping mechanically: `publishConfig.tag` is `alpha`,
-and `scripts/verify-packed-package.mjs` fails if a prerelease would publish under `latest` or
-a stable version would publish under anything but `latest`. Flipping `2.0.0-alpha.N` to
-`2.0.0` is therefore a deliberate edit to both fields, not an accident waiting in CI.
+During the `2.0.0-alpha.N` line:
 
-On the `2.0.0-alpha.N` line:
+- breaking changes were allowed and shipped without deprecation cycles, aliases, transitional props,
+  shim modules or codemods;
+- the canonical name or shape was the only name or shape that shipped. `ActionButton`, `Dropdown`,
+  `Modal`, `TabGroup`, `Tabs.defaultTabId`, `Tabs.onTabChange`, `Dialog.onClose`, `Select.selected`,
+  `Select.onSelect` and `Table.variant` were removed exactly this way, and none of them return in the
+  stable contract. The same applies to the old Sherick callback form of `Input.onChange`,
+  `Textarea.onChange` and `Switch.onChange`: the text controls pass through native `onChange`, and
+  boolean state goes through `Switch.onCheckedChange`.
 
-- breaking changes are allowed and expected;
-- breaking changes ship **without deprecation cycles**: no deprecated aliases, no
-  transitional props, no shim modules, no codemods;
-- the canonical name or shape is the only name or shape that ships. `ActionButton`,
-  `Dropdown`, `Modal`, `TabGroup`, `Tabs.defaultTabId`, `Tabs.onTabChange`,
-  `Dialog.onClose`, `Select.selected`, `Select.onSelect` and `Table.variant` were removed
-  exactly this way, and none of them will come back. The same applies to the `onChange` props
-  that used to be Sherick callbacks on `Input`, `Textarea` and `Switch`: `Input` and
-  `Textarea` now pass through native `onChange`, and boolean state goes through
-  `Switch.onCheckedChange`.
-
-**API compatibility starts being promised at `2.0.0`.** Until that version is published as
-stable, every prerelease may break, and a prerelease version bump is not a compatibility
-signal. Once `2.0.0` ships, ordinary semver applies to everything in the export contract
-below.
+From `2.0.0` onward, those public surfaces follow ordinary semver.
 
 ## What counts as a breaking change
 
@@ -307,8 +291,8 @@ The stable transition is one deliberate release commit:
 4. from `packages/ui`, run `npm pack --dry-run` and `npm publish --dry-run --access public --tag latest`;
 5. confirm the dry-run manifest contains only the declared files and all five export subpaths;
 6. only after explicit publish approval, publish with `npm publish --access public --tag latest`;
-7. verify `npm view sherick-ui dist-tags versions --json`: `latest` must be `2.0.0`, `alpha` may
-   continue to name the final prerelease, and an untagged install must resolve to `2.0.0`;
+7. verify `npm view sherick-ui dist-tags versions --json`: `latest` and an untagged install must
+   resolve to `2.0.0`; `alpha`, if present, may name only the final prerelease and never stable `2.0.0`;
 8. tag and push `v2.0.0` only after the registry verification succeeds.
 
 `prepack`, not consumer installation, owns the Bun build. Do not add lifecycle scripts that build
@@ -348,13 +332,13 @@ focusability, property-only native-radio selection and native `<summary>`, resto
 and preserved outside pointer interaction. The patch may be retired only when a released Base UI
 version passes the same gates. No component API was removed or changed.
 
-The Phase E acceptance run completed with the frozen lockfile:
+The stable `2.0.0` candidate run completed with the frozen lockfile:
 `WEBKIT_EXECUTABLE_PATH=/tmp/sherick-webkit bun run verify` passed 204 showcase tests (with the two
 opt-in review captures skipped), all 96 no-Tailwind Chromium/Firefox/WebKit tests, all 15
 packed-consumer tests, and every lint, type, motion, bundle-budget, package-smoke and visual-contract
-gate. `npm publish --dry-run --access public --tag alpha` also completed against the staged tarball
-and restored Bun's workspace link afterward. These automated results do not replace the manual checks
-below, and the eventual stable-version commit still requires the exact-commit rerun described above.
+gate. `npm publish --dry-run --access public --tag latest` also completed against the staged stable
+tarball and restored Bun's workspace link afterward. The committed release tree must also pass the
+same CI gate before publication; these automated results do not replace the manual record below.
 
 ### Accepted stable limitations
 
@@ -381,6 +365,12 @@ emulation and all three browser engines, but it does not honestly replace:
 
 These checks are a small human release checklist. They are not evidence of another known software
 defect, but they must be recorded before publishing stable.
+
+#### `2.0.0` manual-check record
+
+On 2026-09-22, the release owner confirmed completion of all three manual groups above: shipping-browser
+zoom, physical iOS/Android viewport and touch behavior, and NVDA/Firefox plus VoiceOver/Safari critical
+path announcements. This is a human release attestation; automation does not substitute for it.
 
 Historical Phase C and Phase D findings remain in `HOSTILE_LAYOUT.md` and
 `PACKAGE_INTEGRITY.md`; they are not part of this consumer compatibility contract.

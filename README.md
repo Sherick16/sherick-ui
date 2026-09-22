@@ -8,14 +8,9 @@ Interactive behavior is deliberately separate from visual design. Sherick UI use
 
 ## Release status / compatibility
 
-The published stable line is `1.0.x`, and it is frozen: it receives no further releases. New
-work ships as `2.0.0-alpha.N` under the `alpha` dist-tag, so `npm install sherick-ui` keeps
-resolving to the last stable `1.x` release and only `npm install sherick-ui@alpha` opts in.
-API compatibility starts being promised at `2.0.0`; until then every prerelease may break,
-and a prerelease bump is not a compatibility signal.
-
-This is a semver consequence, not a disclaimer: `^1.0.5` means `>=1.0.5 <2.0.0` to npm, so the
-unstable work cannot live on the `1.x` line without promising compatibility it does not have.
+The current stable release is `2.0.0`, published under npm's `latest` dist-tag. The `1.x` line is
+frozen and receives no further releases. API compatibility is promised from `2.0.0` onward under
+ordinary semver. No prerelease is promoted to `latest` by the stable transition.
 
 The full contract lives in [`docs/RELEASE.md`](docs/RELEASE.md): what counts as a breaking
 change, the public export subpaths, the styling import order and theme contracts, the
@@ -25,10 +20,10 @@ Tailwind) and the size-budget policy.
 ## Installation
 
 ```bash
-bun add sherick-ui@alpha
+bun add sherick-ui
 ```
 
-Until stable `2.0.0` is published, the untagged install resolves to the frozen `1.x` line.
+The untagged install resolves to stable `2.0.0`.
 
 Import the complete stylesheet once near your application root. If the application has a framework stylesheet, Tailwind build or reset, load that first and Sherick UI second:
 

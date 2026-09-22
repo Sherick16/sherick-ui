@@ -1,6 +1,6 @@
 {
   "name": "sherick-ui",
-  "version": "2.0.0-alpha.1",
+  "version": "2.0.0",
   "description": "A reusable React component library inspired by Material 3 Expressive.",
   "repository": {
     "type": "git",
@@ -18,7 +18,7 @@
   ],
   "publishConfig": {
     "access": "public",
-    "tag": "alpha"
+    "tag": "latest"
   },
   "main": "dist/cjs/index.cjs",
   "module": "dist/esm/index.js",

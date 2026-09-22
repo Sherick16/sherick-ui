@@ -114,11 +114,12 @@ source-bearing maps, two CSS files, math fonts/license, package metadata, README
 No source tree, tests, fixtures, visual baselines, build scripts, tsbuildinfo or repository
 configuration was included. Rich content has no misleading CJS build.
 
-Phase E deliberately changes that packaging result to carry the Combobox accessibility fix to
-consumers: the inspected artifact contains 4,129 files, 3,204,079 compressed bytes and 14,260,677
-unpacked bytes. The additional files are exactly the bundled `@base-ui/react@1.8.0` package and its
-runtime dependency closure, including their licenses and declarations; transient Bun store tags are
-removed during staging. Sherick source, tests, fixtures and build scripts remain excluded. Application
+The stable `sherick-ui-2.0.0.tgz` deliberately changes that packaging result to carry the Combobox
+accessibility fix to consumers: the inspected artifact contains 4,129 files, 3,204,005 compressed
+bytes and 14,260,490 unpacked bytes. The additional files are exactly the bundled
+`@base-ui/react@1.8.0` package and its runtime dependency closure, including their licenses and
+declarations; transient Bun store tags are removed during staging. Sherick source, tests, fixtures and
+build scripts remain excluded. Application
 bundle output is unchanged in kind and still passes the existing raw/gzip/brotli budgets; this is an
 installation-artifact increase, not permission to raise a runtime size budget.
 

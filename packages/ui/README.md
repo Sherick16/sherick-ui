@@ -2,12 +2,12 @@
 
 Sherick UI is a React component library with a soft, expressive design language and Base UI-backed interaction/accessibility primitives.
 
-The published stable line is `1.0.x` and is frozen. New work ships as `2.0.0-alpha.N` under the `alpha` dist-tag, so `npm install sherick-ui` keeps resolving to the last stable `1.x` release. Breaking changes are allowed and expected on the prerelease line and ship without deprecation cycles; API compatibility starts being promised at `2.0.0`. See the repository's `docs/RELEASE.md` for the full compatibility contract.
+The current stable release is `2.0.0` under npm's `latest` dist-tag. The `1.x` line is frozen, and API compatibility is promised from `2.0.0` onward under ordinary semver. See the repository's `docs/RELEASE.md` for the full compatibility contract.
 
 ## Installation
 
 ```bash
-npm install sherick-ui@alpha
+npm install sherick-ui
 ```
 
 Import the complete stylesheet once near your application root. Load framework/Tailwind/reset CSS first, then Sherick UI:
