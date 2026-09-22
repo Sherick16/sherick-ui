@@ -91,7 +91,7 @@ Both consume `sherick-ui` through package exports after the library build.
 - computed CSS proves native rims are absent, dividers are solid, portals are styled, light/dark/system/custom document themes propagate, unrelated host/nested utility-looking classes remain untouched, and width/radius/padding/position/overflow/opacity overrides survive merging;
 - host animation names and host code markup remain untouched, non-core Prism grammars survive production bundling, and namespaced KaTeX fonts load;
 - `theme.css` also runs alone on a plain HTML page;
-- the existing bundle-budget owner runs against the installed tarball, checking all eight graphs and the same unchanged size budgets;
+- the existing bundle-budget owner runs against the installed tarball, checking all eight graphs against the recorded size budgets;
 - npm validates both dependency trees, and tarball checks require source-bearing maps, math assets/license, finished JS/declarations/CSS and only intentional publication files.
 - the tarball contains the exact patched `@base-ui/react@1.8.0` package, its license and complete
   runtime closure; all three production browser consumers run the exclusion-free open editable-Combobox
@@ -176,11 +176,8 @@ The existing reviewed Chromium snapshots remain the visual baseline for:
 
 Those screenshots are immutable: a difference is a styling-distribution defect unless explicitly proven otherwise.
 
-The visual-consistency pass deliberately updates only the two core screenshots: Tabs now uses
-the shared recessed track with nested corner roles, and Switch mirrors its thumb in RTL. The
-review also accepts the already-landed palette and settled-thumb rendering visible against the
-older pixel baselines; no token value changed in this pass. The Dialog screenshots are unchanged.
-The findings and deliberate differences are recorded in [VISUAL_CONSISTENCY.md](VISUAL_CONSISTENCY.md).
+The prior visual-consistency checkpoint and its deliberate baseline changes are recorded in
+[VISUAL_CONSISTENCY.md](VISUAL_CONSISTENCY.md).
 
 `visual-consistency.spec.ts` adds both-theme rendered assertions for sibling field density, invalid
 engagement, inherited disability without double opacity, loading/resting depth, held-state feedback,

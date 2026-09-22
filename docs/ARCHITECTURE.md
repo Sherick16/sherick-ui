@@ -88,7 +88,7 @@ Cascade ownership is deliberate:
 
 ## Motion architecture
 
-Motion is selected by **intent**, not by component. The canonical intents are `feedback`, `tactile`, `arrive`, `orient`, `relocate`, `direct`, `disclose`, `presence` and `activity`, and the dynamics below them (`swift`, `settle`, `spring`, `exit`, `continuous`) are the motion module's business alone. Components own target geometry — where a part ends up — but never a duration, a curve, a transition declaration or a keyframe. `motionDisclose` owns the measured height change shared by Accordion and Collapsible.
+Motion is selected by **intent**, not by component. The canonical intents are `feedback`, `tactile`, `arrive`, `orient`, `relocate`, `direct`, `disclose`, `presence` and `activity`, and the dynamics below them (`swift`, `settle`, `glide`, `spring`, `exit`, `continuous`) are the motion module's business alone. Components own target geometry — where a part ends up — but never a duration, a curve, a transition declaration or a keyframe. `motionDisclose` owns the measured height change shared by Accordion and Collapsible.
 
 The architecture has four hard boundaries:
 
@@ -262,20 +262,6 @@ requirement, that is an architecture decision, documented here and in [`RELEASE.
 
 The root `bun run verify` proves both publication and integration boundaries. The packed-package test remains the publication boundary: workspace resolution alone is never accepted as evidence that npm consumers can install the package. Browser verification includes the existing reviewed visual baselines, the no-Tailwind consumer, CSS leakage checks, custom-theme torture coverage, forced-colors fallbacks, axe accessibility checks, narrow-viewport and RTL coverage, cross-component interaction composition and the motion invariants (which physical event each part answers with, that a stable boundary stays put, that a drag is never interpolated, and that presence is Base's lifecycle). Size and tree-shaking budgets are enforced separately by `bun run test:bundle`; temporal ownership is enforced by `bun run test:motion`. See `docs/VERIFICATION.md`.
 
-## Phase C composition findings
-
-The hostile consumer exposed a missing public direction contract: CSS `dir` mirrored Slider
-geometry while Base's keyboard direction remained LTR. `DirectionProvider` now exposes only
-`direction` and `children` through the core barrel and delegates directly to Base's existing
-provider; it adds no DOM, state mirror or keyboard implementation. Pair it with document `dir`.
-The private workbench-only `BaseDirectionProvider` export is removed and its callers migrated.
-The five subpaths and behavioral boundary are unchanged.
-
-The persistent ToastViewport is not a nested interaction portal: its mount order can precede
-a modal even when the toast is raised inside it. The design language therefore distinguishes
-application notifications from the shared interaction stacking plane. This is a visual recipe
-correction, not a local dismissal stack or portal manager.
-
-## Phase D publication findings
-
-The packed consumer matrix found and fixed CJS declaration-format mismatch, omitted trigger prop exports, Select class overrides landing on its wrapper, Slider root attributes landing on its thumb, host-reset assumptions, global keyframe/font collisions, and source maps without source text. Prism's automatic document scan also rewrote React/host code before hydration; CodeBlock now uses Prism's native manual mode, and the hydration-error allowlists are removed. No subpath, dependency boundary, theme system, motion owner or size budget changed.
+Historical implementation findings are recorded in [HOSTILE_LAYOUT.md](HOSTILE_LAYOUT.md)
+and [PACKAGE_INTEGRITY.md](PACKAGE_INTEGRITY.md). Current behavior and release
+boundaries are specified above and in [RELEASE.md](RELEASE.md).

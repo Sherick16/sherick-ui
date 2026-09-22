@@ -84,7 +84,7 @@ const CommandPalette = forwardRef<HTMLInputElement, CommandPaletteProps>(({
           )}
         </div>
 
-        <div className={cn("px-4 pt-4 pb-4")}>
+        <div className={cn("px-5 pt-4 pb-4")}>
           <Command
             {...commandProps}
             onAction={(value) => {

@@ -49,7 +49,7 @@ export const dateInputClassName =
 
 /* The 36×44 target holds a concentric 32px hover surface, leaving air inside the 48px field.
    Only the icon presses: the adjacent native text entry never activates this button. */
-const datePartClassName = `group inline-flex h-11 w-9 shrink-0 items-center justify-center ${density.part} ${shape.circle} ${text.medium} ${motionFeedback} ${stateLayer.quiet} before:inset-x-0.5 before:inset-y-1.5 ${state.enabled} ${state.disabledPart} [&:not([data-disabled]):not(:disabled)]:hover:text-sherick-ink`;
+const datePartClassName = `group inline-flex shrink-0 items-center justify-center ${density.part} ${shape.circle} ${text.medium} ${motionFeedback} ${stateLayer.quiet} before:inset-x-0.5 before:inset-y-1.5 ${state.enabled} ${state.disabledPart} [&:not([data-disabled]):not(:disabled)]:hover:text-sherick-ink`;
 
 export interface DateFieldTriggerProps {
   /** The control's accessible name. It has no visible label, so it has to be named. */

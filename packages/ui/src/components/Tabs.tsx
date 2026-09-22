@@ -4,6 +4,7 @@ import { Tabs as BaseTabs } from "@base-ui/react/tabs";
 import React, { type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import {
+  density,
   elevation,
   focusRingInset,
   selectable,
@@ -95,7 +96,8 @@ export const Tabs = ({
               disabled={tab.disabled}
               className={({ active, disabled }) =>
                 cn(
-                  "relative z-10 min-h-12 min-w-28 flex-1 whitespace-nowrap px-7 py-3 text-sm font-medium",
+                  "relative z-10 min-w-28 flex-1 whitespace-nowrap px-7 py-3 font-medium",
+                  density.normal,
                   shape.control,
                   motionTactile,
                   focusRingInset,

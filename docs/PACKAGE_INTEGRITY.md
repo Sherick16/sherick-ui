@@ -1,10 +1,11 @@
-# Phase D — library and package integrity
+# Phase D — library and package integrity (historical checkpoint)
 
 ## Result
 
-**Complete for the current prerelease contract.** The implementation at `87275da` passed the
-full `bun run verify` from a fresh `git archive` snapshot with a frozen dependency install.
-No registry release was made, and this does not declare the alpha API stable.
+At the Phase D checkpoint (`87275da`), the prerelease contract passed `bun run verify`
+from a fresh `git archive` snapshot with a frozen dependency install. No release was
+published at that checkpoint. Stable `2.0.0` has since shipped; [RELEASE.md](RELEASE.md)
+is the current contract. The findings below are retained as historical evidence.
 
 ## Public surface
 

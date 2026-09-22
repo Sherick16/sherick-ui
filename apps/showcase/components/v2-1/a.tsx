@@ -21,6 +21,7 @@ const Readout = ({ testId, children }: { testId: string; children: React.ReactNo
 );
 
 export default function DateFamilySpecimen({ verification = false }: { verification?: boolean }) {
+  const Heading = verification ? "h2" : "h4";
   const [single, setSingle] = useState<CalendarDate | null>(leapMonth);
   const [range, setRange] = useState<DateRange>(rangeStart);
   const [controlled, setControlled] = useState<CalendarDate | null>("2024-03-10");
@@ -34,7 +35,7 @@ export default function DateFamilySpecimen({ verification = false }: { verificat
   return (
     <div className={verification ? "space-y-12" : "grid grid-cols-1 items-start gap-10 xl:grid-cols-2"}>
       <section className="space-y-3">
-        <h2 className="text-lg font-medium text-sherick-ink">Single calendar</h2>
+        <Heading className="text-lg font-medium text-sherick-ink">Single calendar</Heading>
         <div data-testid="single-calendar">
           <Panel>
             <Calendar
@@ -48,7 +49,7 @@ export default function DateFamilySpecimen({ verification = false }: { verificat
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-medium text-sherick-ink">Range calendar</h2>
+        <Heading className="text-lg font-medium text-sherick-ink">Range calendar</Heading>
         <div data-testid="range-calendar">
           <Panel>
             <Calendar
@@ -68,7 +69,7 @@ export default function DateFamilySpecimen({ verification = false }: { verificat
       </section>
 
       {verification && <section className="space-y-3">
-        <h2 className="text-lg font-medium text-sherick-ink">Controlled month and value</h2>
+        <Heading className="text-lg font-medium text-sherick-ink">Controlled month and value</Heading>
         <div data-testid="controlled-calendar">
           <Panel>
             <Calendar
@@ -116,7 +117,7 @@ export default function DateFamilySpecimen({ verification = false }: { verificat
       </section>}
 
       <section className="space-y-3">
-        <h2 className="text-lg font-medium text-sherick-ink">{verification ? "Bounds, disabled and invalid" : "Disabled and invalid"}</h2>
+        <Heading className="text-lg font-medium text-sherick-ink">{verification ? "Bounds, disabled and invalid" : "Disabled and invalid"}</Heading>
         <div className="flex flex-wrap items-start gap-6">
           {verification && <>
           <Panel>
@@ -148,7 +149,7 @@ export default function DateFamilySpecimen({ verification = false }: { verificat
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-medium text-sherick-ink">Locale and week start</h2>
+        <Heading className="text-lg font-medium text-sherick-ink">Locale and week start</Heading>
         <div data-testid="locale-calendar">
           <Panel>
             <Calendar
@@ -163,7 +164,7 @@ export default function DateFamilySpecimen({ verification = false }: { verificat
       </section>
 
       {verification && <section className="space-y-3">
-        <h2 className="text-lg font-medium text-sherick-ink">Narrow container and right-to-left</h2>
+        <Heading className="text-lg font-medium text-sherick-ink">Narrow container and right-to-left</Heading>
         <div className="flex flex-wrap items-start gap-6">
           <div className="w-64 max-w-full" data-testid="narrow-calendar">
             <Calendar
@@ -185,7 +186,7 @@ export default function DateFamilySpecimen({ verification = false }: { verificat
       </section>}
 
       <section className="space-y-3">
-        <h2 className="text-lg font-medium text-sherick-ink">Date field</h2>
+        <Heading className="text-lg font-medium text-sherick-ink">Date field</Heading>
         <div className="flex flex-wrap items-start gap-6">
           <div className="w-72 max-w-full space-y-2" data-testid="picker-field">
             <DatePicker
@@ -221,7 +222,7 @@ export default function DateFamilySpecimen({ verification = false }: { verificat
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-medium text-sherick-ink">Date range field</h2>
+        <Heading className="text-lg font-medium text-sherick-ink">Date range field</Heading>
         <div className="w-[36rem] max-w-full" data-testid="range-picker-field">
           <DateRangePicker
             label="Release window"
@@ -242,7 +243,7 @@ export default function DateFamilySpecimen({ verification = false }: { verificat
       </section>
 
       {verification && <section className="space-y-3">
-        <h2 className="text-lg font-medium text-sherick-ink">Native form, submission and reset</h2>
+        <Heading className="text-lg font-medium text-sherick-ink">Native form, submission and reset</Heading>
         <form
           data-testid="leap-form"
           className="flex w-[30rem] max-w-full flex-col gap-4"

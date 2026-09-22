@@ -1,10 +1,7 @@
 # Release status and compatibility contract
 
-This document is the practical compatibility contract for `sherick-ui`. It says what the
-package promises today, what it will promise later, and which surfaces a consumer may build
-on. The architecture this contract protects is described in
-[`ARCHITECTURE.md`](ARCHITECTURE.md); the verification that enforces it is described in
-[`VERIFICATION.md`](VERIFICATION.md).
+This is the current consumer compatibility contract. The implementation boundaries live in
+[ARCHITECTURE.md](ARCHITECTURE.md), and their checks in [VERIFICATION.md](VERIFICATION.md).
 
 ## Release status: stable at `2.0.0`
 
@@ -25,18 +22,6 @@ narrow component-owned behavior for missing Base primitives are recorded in
 [`V2_1_COMPONENTS.md`](V2_1_COMPONENTS.md). It does not change the package version or authorize
 publication, an npm dist-tag change, or a release tag.
 
-During the `2.0.0-alpha.N` line:
-
-- breaking changes were allowed and shipped without deprecation cycles, aliases, transitional props,
-  shim modules or codemods;
-- the canonical name or shape was the only name or shape that shipped. `ActionButton`, `Dropdown`,
-  `Modal`, `TabGroup`, `Tabs.defaultTabId`, `Tabs.onTabChange`, `Dialog.onClose`, `Select.selected`,
-  `Select.onSelect` and `Table.variant` were removed exactly this way, and none of them return in the
-  stable contract. The same applies to the old Sherick callback form of `Input.onChange`,
-  `Textarea.onChange` and `Switch.onChange`: the text controls pass through native `onChange`, and
-  boolean state goes through `Switch.onCheckedChange`.
-
-From `2.0.0` onward, those public surfaces follow ordinary semver.
 
 ## What counts as a breaking change
 
@@ -301,29 +286,14 @@ If any one of them stops being true, the freeze described in
 [`ARCHITECTURE.md`](ARCHITECTURE.md) no longer holds and this document must be revised with
 it.
 
-## Final gate and stable transition
+## Release gate
 
-A release candidate is shippable only when the checkout is clean, the stable blocker below is
-resolved, the manual checklist is recorded, and `bun run verify` passes from the exact candidate
-commit with the frozen lockfile. CI uses `bun install --frozen-lockfile` and runs that same command.
-The two opt-in screenshot-review projects are review tools, not hidden requirements of the routine
-deterministic gate.
-
-The stable transition is one deliberate release commit:
-
-1. set `packages/ui/package.json` to version `2.0.0` and `publishConfig.tag` to `latest`;
-2. replace prerelease install examples (`sherick-ui@alpha`) with untagged stable installs;
-3. run `bun install --frozen-lockfile`, `bun run verify`, and review the complete diff;
-4. from `packages/ui`, run `npm pack --dry-run` and `npm publish --dry-run --access public --tag latest`;
-5. confirm the dry-run manifest contains only the declared files and all five export subpaths;
-6. only after explicit publish approval, publish with `npm publish --access public --tag latest`;
-7. verify `npm view sherick-ui dist-tags versions --json`: `latest` and an untagged install must
-   resolve to `2.0.0`; `alpha`, if present, may name only the final prerelease and never stable `2.0.0`;
-8. tag and push `v2.0.0` only after the registry verification succeeds.
-
-`prepack`, not consumer installation, owns the Bun build. Do not add lifecycle scripts that build
-on consumer install, publish the prerelease under `latest`, or move stable `2.0.0` back under
-`alpha`.
+`2.0.0` is already published; the stable transition and `v2.0.0` tag are historical.
+For a future release, install with the frozen lockfile, run `bun run verify` from the exact
+candidate commit, review the packed manifest and dry-run publication, then publish/tag only
+with explicit release approval. `prepack` builds the artifacts; consumer installation must
+not invoke Bun or a build script. Optional screenshot-review projects support manual review
+and are not hidden requirements of the routine gate.
 
 ## Release-readiness classifications
 

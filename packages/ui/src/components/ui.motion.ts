@@ -114,9 +114,9 @@ export const motionRelocate =
 export const motionDirect =
   "transition-[inset-inline-start,width,height,background-color,color,box-shadow,transform,opacity] duration-release ease-release active:duration-press active:ease-press data-[dragging]:transition-[background-color,color,box-shadow,transform,opacity] motion-reduce:transition-none motion-reduce:transform-none";
 
-/* Presence is split by role: an anchored popup, a tooltip, a modal surface and the plane
-   behind it. All four describe the same three states — settled, `data-starting-style` and
-   `data-ending-style` — and let the primitive decide when the node mounts and unmounts.
+/* Anchored popup, tooltip, modal, sheet, toast and scrim presence share three states:
+   settled, `data-starting-style` and `data-ending-style`. The primitive decides
+   when the node mounts and unmounts.
    None of them writes an animation keyframe or a timer, so a rapid open → close → open
    retargets from the current painted value instead of restarting.
 

@@ -19,6 +19,13 @@ test.beforeEach(async ({ page }) => {
   await openDateFamily(page);
 });
 
+test("date specimens keep their host heading hierarchy", async ({ page, errors }) => {
+  await expect(page.getByRole("heading", { name: "Single calendar", level: 2 })).toBeVisible();
+  await page.goto("/");
+  await expect(page.locator("#fields").getByRole("heading", { name: "Single calendar", level: 4 })).toBeVisible();
+  expect(errors).toEqual([]);
+});
+
 test("the grid names itself, keeps one tab stop and marks today", async ({ page, errors }) => {
   const calendar = page.getByTestId("single-calendar");
   const grid = calendar.getByRole("grid");

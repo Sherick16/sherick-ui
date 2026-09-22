@@ -1,11 +1,12 @@
-# Phase C — hostile-layout hardening
+# Phase C — hostile-layout hardening (historical checkpoint)
 
 ## Status
 
 Phase C's automated composition matrix is complete. The full release gate passes, including
 all three engines for the new hostile consumer. This is not a claim of exhaustive device,
 assistive-technology or operating-system coverage; the remaining limits are explicit below.
-No release was published.
+No release was published at this checkpoint; stable `2.0.0` has since shipped. See
+[RELEASE.md](RELEASE.md) for the current compatibility and manual-check record.
 
 ## 1. Scenarios and ownership
 
