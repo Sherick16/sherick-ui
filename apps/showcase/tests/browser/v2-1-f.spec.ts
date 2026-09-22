@@ -189,9 +189,7 @@ test("a disabled node cannot be chosen or opened, and its visible child stays it
   await expect(archive).toHaveAttribute("aria-expanded", "true");
 
   /* Its own pointer region cannot close the branch either. */
-  const row = await rowBox(scope, "Archive").boundingBox();
-  expect(row).not.toBeNull();
-  await page.mouse.click(row!.x + 32, row!.y + row!.height / 2);
+  await rowBox(scope, "Archive").locator(":scope > span").first().click({ force: true });
   await expect(archive).toHaveAttribute("aria-expanded", "true");
 
   /* Disability is the node's, never its already-visible descendants'. */
@@ -301,6 +299,7 @@ test("a controlled tree reports requests and refuses without moving the keyboard
   expect(await focusedName(page)).toBe("Parent");
   await expect(item(scope, "Parent").locator('> [role="group"]')).toHaveCount(1);
   await expect(page.getByTestId("tree-expanded")).toHaveText("parent");
+  await expect(page.getByTestId("tree-expansion-requests")).toHaveText("[[]]");
 
   expect(errors).toEqual([]);
 });
@@ -493,20 +492,7 @@ test("typeahead searches the visible labels and never chooses", async ({ page, e
   /* A search moves the keyboard; it never makes the choice. */
   await expect(item(scope, "components")).toHaveAttribute("aria-selected", "false");
 
-  /* Rapid characters are one search, and the same character again cycles through the nodes that
-     start with it rather than looking for a word that does not exist. */
-  await item(scope, "components").focus();
-  await page.keyboard.press("s");
-  expect(await focusedName(page)).toBe("Select.tsx");
-  await page.keyboard.press("s");
-  expect(await focusedName(page)).toBe("src");
-  await page.keyboard.press("c");
-  expect(await focusedName(page)).toBe("components");
 
-  await item(scope, "Select.tsx").focus();
-  await page.keyboard.press("r");
-  await page.keyboard.press("e");
-  expect(await focusedName(page)).toBe("README.md");
 
   expect(errors).toEqual([]);
 });
@@ -527,4 +513,25 @@ test("the tree specimens pass an axe scan", async ({ page, errors }) => {
   expect(results.violations, `axe violations:\n${summary}`).toEqual([]);
 
   expect(errors).toEqual([]);
+});
+
+test("rapid typeahead accumulates an unambiguous prefix", async ({ page }) => {
+  const scope = projects(page);
+  await item(scope, "README.md").focus();
+  await page.keyboard.press("s");
+  expect(await focusedName(page)).toBe("src");
+  await page.keyboard.press("e");
+  expect(await focusedName(page)).toBe("Select.tsx");
+  await expect(item(scope, "Select.tsx")).toHaveAttribute("aria-selected", "false");
+});
+
+test("repeated typeahead letters cycle between matching visible nodes", async ({ page }) => {
+  const scope = projects(page);
+  await item(scope, "README.md").focus();
+  await page.keyboard.press("s");
+  expect(await focusedName(page)).toBe("src");
+  await page.keyboard.press("s");
+  expect(await focusedName(page)).toBe("Select.tsx");
+  await page.keyboard.press("s");
+  expect(await focusedName(page)).toBe("src");
 });

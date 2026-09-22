@@ -95,8 +95,10 @@ export interface FileUploadProps
   clearLabel?: string;
 }
 
-/** What the commit after a removal should hand focus to. */
-type FocusRequest = { kind: "row"; index: number } | { kind: "clear" };
+type FocusRequest =
+  | { kind: "row"; index: number; source: HTMLButtonElement }
+  | { kind: "clear"; source: HTMLButtonElement };
+type FileAction = { before: File[]; next: File[]; focus?: FocusRequest };
 
 const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
   (
@@ -128,11 +130,8 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
     const removalRefs = useRef(new Map<string, HTMLButtonElement>());
     const clearRef = useRef<HTMLButtonElement | null>(null);
     const dragDepth = useRef(0);
-    const focusRequest = useRef<FocusRequest | null>(null);
-    /** The selection the last committed render presented, for the live region's own diff. */
-    const renderedSelection = useRef<File[] | null>(null);
-    /** Whether the change that is about to land is one the user asked this component for. */
-    const actionPending = useRef(false);
+    const [pendingAction, setPendingAction] = useState<FileAction | null>(null);
+    const [attempt, setAttempt] = useState(0);
 
     const [dragging, setDragging] = useState(false);
     const [announcement, setAnnouncement] = useState("");
@@ -148,64 +147,55 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
       multiple,
     };
 
-    const setInput = (node: HTMLInputElement | null) => {
-      inputRef.current = node;
-      if (typeof forwardedRef === "function") forwardedRef(node);
-      else if (forwardedRef) forwardedRef.current = node;
-    };
-
-    /* Both effects run against the selection the commit actually presented, never against the
-       request that produced it, so a controlled consumer that refuses an update neither hears a
-       removal announced nor has focus taken off the row it left in place. The live region reports
-       the outcome of what the user asked for — a picker or drop, a removal, a clear — and stays
-       quiet when the selection changes for a reason of the consumer's own. */
-
+    // A request gets exactly its next committed render. Rejection expires it even if files
+    // stays referentially identical, so a later external update cannot consume stale effects.
     useEffect(() => {
-      const request = focusRequest.current;
-      if (!request) return;
-      focusRequest.current = null;
+      if (!pendingAction) return;
+      setPendingAction(null);
+      const { before, next, focus } = pendingAction;
+      const accepted = selected.length === next.length &&
+        selected.every((file, index) => fileKey(file) === fileKey(next[index]));
+      if (!accepted) return;
 
-      if (request.kind === "clear") {
-        // The clear control is gone once the selection is empty; the picker is what is left.
-        if (selected.length > 0) clearRef.current?.focus();
-        else inputRef.current?.focus();
-        return;
-      }
-
-      const row = selected[Math.min(request.index, selected.length - 1)];
-      const control = row ? removalRefs.current.get(fileKey(row)) : undefined;
-      (control ?? inputRef.current)?.focus();
-    }, [selected]);
-
-    useEffect(() => {
-      const before = renderedSelection.current;
-      const requested = actionPending.current;
-      actionPending.current = false;
-      renderedSelection.current = selected;
-      if (before === null || !requested) return;
       const beforeKeys = new Set(before.map(fileKey));
       const afterKeys = new Set(selected.map(fileKey));
       const added = selected.filter((file) => !beforeKeys.has(fileKey(file))).length;
       const removed = before.filter((file) => !afterKeys.has(fileKey(file)));
-      if (added === 0 && removed.length === 0) {
-        setAnnouncement("");
-        return;
-      }
-
       const parts: string[] = [];
       if (removed.length === 1) parts.push(`Removed ${removed[0].name}.`);
       else if (removed.length > 1) parts.push(`Removed ${removed.length} files.`);
       if (added > 0) parts.push(`Added ${added} file${added === 1 ? "" : "s"}.`);
       setAnnouncement(parts.join(" "));
-    }, [selected]);
 
-    const commit = (next: File[]) => {
+      if (!focus || removed.length === 0) return;
+      const document = focus.source.ownerDocument;
+      if (document.activeElement !== focus.source &&
+        (focus.source.isConnected || document.activeElement !== document.body)) return;
+      const row = focus.kind === "row" ? selected[Math.min(focus.index, selected.length - 1)] : null;
+      (row ? removalRefs.current.get(fileKey(row)) : inputRef.current)?.focus();
+    }, [selected, pendingAction]);
+
+    useEffect(() => {
+      if (disabled) {
+        dragDepth.current = 0;
+        setDragging(false);
+      }
+    }, [disabled]);
+
+    const commit = (next: File[], focus?: FocusRequest) => {
+      setPendingAction({ before: selected, next, focus });
       if (!controlled) setUncontrolledFiles(next);
       onFilesChange?.(next);
     };
 
+    const beginAttempt = () => {
+      setAttempt((previous) => previous + 1);
+      setAnnouncement("");
+    };
+
     const ingest = (incoming: File[]) => {
       if (disabled || incoming.length === 0) return;
+      beginAttempt();
 
       const { files: next, rejections: refused, accepted } = selectFiles({
         incoming,
@@ -216,7 +206,6 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
       setRejections(refused);
       if (refused.length > 0) onReject?.(refused);
       if (accepted > 0) {
-        actionPending.current = true;
         commit(next);
       }
     };
@@ -238,26 +227,26 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
       Array.from(event.dataTransfer.types).includes("Files");
 
     const handleDragEnter = (event: DragEvent<HTMLLabelElement>) => {
-      if (disabled || !carriesFiles(event)) return;
+      if (!carriesFiles(event)) return;
       event.preventDefault();
+      if (disabled) return;
       dragDepth.current += 1;
       setDragging(true);
     };
 
     const handleDragOver = (event: DragEvent<HTMLLabelElement>) => {
-      if (disabled || !carriesFiles(event)) return;
+      if (!carriesFiles(event)) return;
       event.preventDefault();
-      event.dataTransfer.dropEffect = "copy";
+      event.dataTransfer.dropEffect = disabled ? "none" : "copy";
     };
 
     const handleDragLeave = () => {
-      if (disabled) return;
       dragDepth.current = Math.max(0, dragDepth.current - 1);
       if (dragDepth.current === 0) setDragging(false);
     };
 
     const handleDrop = (event: DragEvent<HTMLLabelElement>) => {
-      if (disabled || !carriesFiles(event)) return;
+      if (!carriesFiles(event)) return;
       event.preventDefault();
       dragDepth.current = 0;
       setDragging(false);
@@ -266,29 +255,23 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
 
     const removeFile = (index: number) => {
       const file = selected[index];
-      if (!file) return;
-
+      if (disabled || !file) return;
       const control = removalRefs.current.get(fileKey(file));
-      // Focus follows the list, but only when the row the pointer or keyboard left behind is the
-      // one being removed: a removal by a pointer that never focused its control leaves it alone.
-      if (control && control === control.ownerDocument.activeElement) {
-        focusRequest.current = { kind: "row", index };
-      }
-
+      const focus: FocusRequest | undefined = control && control === control.ownerDocument.activeElement
+        ? { kind: "row", index, source: control } : undefined;
+      beginAttempt();
       setRejections([]);
-      actionPending.current = true;
-      commit(selected.filter((_, position) => position !== index));
+      commit(selected.filter((_, position) => position !== index), focus);
     };
 
     const clearFiles = () => {
+      if (disabled) return;
       const control = clearRef.current;
-      if (control && control === control.ownerDocument.activeElement) {
-        focusRequest.current = { kind: "clear" };
-      }
-
+      const focus: FocusRequest | undefined = control && control === control.ownerDocument.activeElement
+        ? { kind: "clear", source: control } : undefined;
+      beginAttempt();
       setRejections([]);
-      actionPending.current = true;
-      commit([]);
+      commit([], focus);
     };
 
     const hint = [
@@ -362,7 +345,8 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
           {/* Uncontrolled by design, and never assigned a value: the selection is the component's
               own state, and the picker is only a way to ask the platform for files. */}
           <Field.Control
-            render={<input ref={setInput} />}
+            ref={forwardedRef}
+            render={<input ref={inputRef} />}
             type="file"
             multiple={multiple || undefined}
             accept={accept}
@@ -406,7 +390,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                       disabled={disabled}
                       onClick={() => removeFile(index)}
                       className={cn(
-                        "-my-2.5 inline-flex shrink-0 items-center justify-center",
+                        "group -my-2.5 inline-flex shrink-0 items-center justify-center",
                         density.target,
                         shape.circle,
                         text.medium,
@@ -459,7 +443,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
         <div role="status" className={cn(status && "mt-2 flex flex-col gap-1 text-xs leading-5")}>
           {announcement !== "" && <span className={text.medium}>{announcement}</span>}
           {rejections.length > 0 && (
-            <span className={cn("text-sherick-danger")}>
+            <span key={attempt} className={cn("text-sherick-danger")}>
               {rejections.map((rejection) => rejection.message).join(" ")}
             </span>
           )}

@@ -14,7 +14,7 @@ import React, {
   type ReactNode,
 } from "react";
 import { cn } from "@/libs/utils";
-import { density, material, shape, state, stateLayer, text, tone } from "./ui.common";
+import { density, material, parentFocusRingInset, shape, state, stateLayer, text, tone } from "./ui.common";
 import { motionFeedback, motionOrient } from "./ui.motion";
 import {
   flattenTree,
@@ -65,13 +65,6 @@ const indentSteps = ["ps-2", "ps-5", "ps-8", "ps-11", "ps-14"] as const;
 
 const indent = (depth: number) => indentSteps[Math.min(depth, indentSteps.length - 1)];
 
-/* The shared inset ring, read from the tree item's own visible focus and scoped to the row that
-   item draws. A tree item has to be the element that holds focus *and* the element that owns the
-   group its branch opens, so the ring cannot live on it without tracing the whole subtree; the
-   direct-child relation is what keeps the ring on the row, and it is also what stops an ancestor's
-   focus from painting a ring on a nested row. */
-const rowFocusRing =
-  "[[role=treeitem]:focus-visible>&]:ring-2 [[role=treeitem]:focus-visible>&]:ring-inset [[role=treeitem]:focus-visible>&]:ring-sherick-focus";
 
 /**
  * A tree of nodes the user browses, expands and chooses from.
@@ -341,7 +334,7 @@ const TreeView = forwardRef<HTMLDivElement, TreeViewProps>(function TreeView(
             shape.row,
             motionFeedback,
             text.high,
-            rowFocusRing,
+            parentFocusRingInset,
             stateLayer.quiet,
             stateLayer.activeRow,
             selected && tone.selected.primary,

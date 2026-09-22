@@ -11,7 +11,6 @@ import React, {
   useRef,
   useState,
   type ChangeEvent,
-  type ForwardedRef,
   type ReactNode,
 } from "react";
 import { cn } from "@/libs/utils";
@@ -23,6 +22,7 @@ import {
   DateFieldTrigger,
   dateFieldRowClassName,
   dateInputClassName,
+  useDateFormReset,
 } from "./date-field";
 import {
   compareCalendarDates,
@@ -79,12 +79,6 @@ export interface DateRangePickerProps {
   labels?: Partial<CalendarLabels>;
 }
 
-const mergeInputRef = (ref: ForwardedRef<HTMLInputElement>, local: React.RefObject<HTMLInputElement | null>) =>
-  (node: HTMLInputElement | null) => {
-    local.current = node;
-    if (typeof ref === "function") ref(node);
-    else if (ref) ref.current = node;
-  };
 
 /**
  * A range of dates: two independently labelled native date fields in one named group, and one
@@ -128,8 +122,9 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(({
   const isControlled = value !== undefined;
   const [internalRange, setInternalRange] = useState<DateRange>(() => normalizeDateRange(defaultValue));
   const currentRange = isControlled ? normalizeDateRange(value) : internalRange;
+  const [draft, setDraft] = useState<DateRange | null>(null);
   const [typedIssue, setTypedIssue] = useState<"start" | "end" | null>(null);
-  const [resetNonce, setResetNonce] = useState(0);
+  const displayedRange = draft ?? currentRange;
 
   const minDate = normalizeCalendarDate(min);
   const maxDate = normalizeCalendarDate(max);
@@ -137,8 +132,16 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(({
   const startInputRef = useRef<HTMLInputElement | null>(null);
   const endInputRef = useRef<HTMLInputElement | null>(null);
   const popupActionsRef = useRef<BasePopover.Root.Actions | null>(null);
-  const initialRange = useRef(normalizeDateRange(defaultValue));
-  const assignStartRef = useCallback(mergeInputRef(ref, startInputRef), [ref]);
+  const startFieldActions = useRef<BaseField.Root.Actions | null>(null);
+  const endFieldActions = useRef<BaseField.Root.Actions | null>(null);
+
+  // One endpoint can repair the other's custom validity without changing its text.
+  // Base still owns validation; an invalid draft is explained by the edited field only.
+  useEffect(() => {
+    if (typedIssue) return;
+    startFieldActions.current?.validate();
+    endFieldActions.current?.validate();
+  }, [displayedRange.start, displayedRange.end, typedIssue, minDate, maxDate, isDateUnavailable]);
 
   const descriptionId = useId();
   const errorId = useId();
@@ -146,18 +149,18 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(({
     [description ? descriptionId : null, error ? errorId : null].filter(Boolean).join(" ") || undefined;
 
   useEffect(() => {
-    const input = startInputRef.current;
-    if (!input) return;
-    const next = currentRange.start ?? "";
-    if (input.value !== next) input.value = next;
-  }, [currentRange.start, resetNonce]);
+    setDraft(null);
+    setTypedIssue(null);
+  }, [currentRange.start, currentRange.end]);
 
-  useEffect(() => {
-    const input = endInputRef.current;
-    if (!input) return;
-    const next = currentRange.end ?? "";
-    if (input.value !== next) input.value = next;
-  }, [currentRange.end, resetNonce]);
+  useDateFormReset(startInputRef, form, () => {
+    const restored = isControlled ? currentRange : normalizeDateRange(defaultValue);
+    setDraft(null);
+    setTypedIssue(null);
+    if (!isControlled) setInternalRange(restored);
+    if (startInputRef.current) startInputRef.current.value = restored.start ?? "";
+    if (endInputRef.current) endInputRef.current.value = restored.end ?? "";
+  });
 
   const commitRange = (next: DateRange) => {
     if (!isControlled) setInternalRange(next);
@@ -177,7 +180,7 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(({
     const fromParts = parseCalendarDate(from);
     const toParts = parseCalendarDate(to);
     if (!fromParts || !toParts) return true;
-    return rangeIncludesDate(fromParts, toParts, isUnavailableDate);
+    return Boolean(isDateUnavailable && rangeIncludesDate(fromParts, toParts, isDateUnavailable));
   };
 
   const isRangeAcceptable = (range: DateRange) => {
@@ -194,9 +197,9 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(({
      is the one that explains it. Bounds and emptiness are the browser's own validation. */
   const validateStart = (candidate: unknown) => {
     const date = typeof candidate === "string" ? normalizeCalendarDate(candidate) : null;
-    if (!date) return null;
+    if (!date) return candidate ? labels.unavailableRange : null;
     if (isDateUnavailable?.(date)) return labels.unavailableRange;
-    const end = currentRange.end;
+    const end = normalizeCalendarDate(displayedRange.end);
     if (!end) return null;
     if (compareCalendarDates(date, end) > 0) return labels.unavailableRange;
     return spanIsRefused(date, end) ? labels.unavailableRange : null;
@@ -204,66 +207,33 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(({
 
   const validateEnd = (candidate: unknown) => {
     const date = typeof candidate === "string" ? normalizeCalendarDate(candidate) : null;
-    if (!date) return null;
+    if (!date) return candidate ? labels.unavailableRange : null;
     if (isDateUnavailable?.(date)) return labels.unavailableRange;
-    const start = currentRange.start;
+    const start = normalizeCalendarDate(displayedRange.start);
     if (!start) return null;
     if (compareCalendarDates(date, start) < 0) return labels.unavailableRange;
     return spanIsRefused(start, date) ? labels.unavailableRange : null;
   };
 
-  const handleStartChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const handleEndpointChange = (endpoint: "start" | "end", event: ChangeEvent<HTMLInputElement>) => {
     const input = event.currentTarget;
-    const typedText = input.value;
-
-    if (typedText === "") {
-      if (input.validity.badInput) return;
-      setTypedIssue(null);
-      commitRange({ start: null, end: currentRange.end });
+    const next = { ...displayedRange, [endpoint]: input.value || null };
+    const normalized = normalizeDateRange(next);
+    if (input.validity.badInput ||
+      (next.start && !normalized.start) || (next.end && !normalized.end) ||
+      !isRangeAcceptable(normalized)) {
+      setDraft(next);
+      setTypedIssue(endpoint);
       return;
     }
-
-    const date = normalizeCalendarDate(typedText);
-    if (!date || !isRangeAcceptable({ start: date, end: currentRange.end })) {
-      setTypedIssue("start");
-      return;
-    }
-
+    setDraft(null);
     setTypedIssue(null);
-    commitRange({ start: date, end: currentRange.end });
-  };
-
-  const handleEndChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const input = event.currentTarget;
-    const typedText = input.value;
-
-    if (typedText === "") {
-      if (input.validity.badInput) return;
-      setTypedIssue(null);
-      commitRange({ start: currentRange.start, end: null });
-      return;
-    }
-
-    const date = normalizeCalendarDate(typedText);
-    if (!date || !isRangeAcceptable({ start: currentRange.start, end: date })) {
-      setTypedIssue("end");
-      return;
-    }
-
-    setTypedIssue(null);
-    commitRange({ start: currentRange.start, end: date });
-  };
-
-  const handleReset = () => {
-    const restored = normalizeDateRange(defaultValue);
-    setResetNonce((nonce) => nonce + 1);
-    setTypedIssue(null);
-    if (restored.start !== currentRange.start || restored.end !== currentRange.end) {
-      commitRange(restored);
-    }
+    commitRange(normalized);
   };
 
   const handleCalendarChange = (next: DateRange) => {
+    if (disabled) return;
+    setDraft(null);
     setTypedIssue(null);
     commitRange(next);
     /* A range is chosen when both ends exist; the surface has then done its job. */
@@ -275,18 +245,22 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(({
     inputId: string | undefined,
     inputName: string | undefined,
     inputLabel: string,
-    initialValue: CalendarDate | null,
+    displayedValue: CalendarDate | null,
     invalid: boolean,
     validate: (candidate: unknown) => string | null,
     handleChange: (event: ChangeEvent<HTMLInputElement>) => void
   ) => (
-    <Field label={inputLabel} invalid={invalid} validate={validate} validationMode="onChange">
+    <Field label={inputLabel} disabled={disabled} invalid={invalid}
+      actionsRef={inputRef === startInputRef ? startFieldActions : endFieldActions}
+      error={typedIssue === (inputRef === startInputRef ? "start" : "end") ? labels.unavailableRange : undefined}
+      validate={validate} validationMode="onChange">
       <div
         data-disabled={disabled || undefined}
         data-invalid={invalid || undefined}
         className={cn(dateFieldRowClassName(disabled))}
       >
         <BaseField.Control
+          ref={inputRef === startInputRef ? ref : undefined}
           render={<input type="date" ref={inputRef} />}
           id={inputId}
           name={inputName}
@@ -295,7 +269,7 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(({
           disabled={disabled}
           min={minDate ?? undefined}
           max={maxDate ?? undefined}
-          defaultValue={initialValue ?? ""}
+          value={displayedValue ?? ""}
           onChange={handleChange}
           className={cn(dateInputClassName)}
         />
@@ -308,7 +282,6 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(({
     <fieldset
       disabled={disabled || undefined}
       aria-describedby={describedBy}
-      onReset={handleReset}
       className={cn("m-0 min-w-0 p-0", disabled && state.disabled, className)}
     >
       <legend className={cn("p-0 text-sm font-medium", text.high)}>
@@ -329,24 +302,24 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(({
       >
         <div className={cn("mt-2 grid gap-4 sm:grid-cols-2")}>
           {row(
-            assignStartRef,
+            startInputRef,
             id,
             startName,
             startLabel,
-            initialRange.current.start,
-            typedIssue === "start" || Boolean(error),
+            displayedRange.start,
+            typedIssue === "start" || Boolean(error) || !isRangeAcceptable(currentRange),
             validateStart,
-            handleStartChange
+            (event) => handleEndpointChange("start", event)
           )}
           {row(
             endInputRef,
             id ? `${id}-end` : undefined,
             endName,
             endLabel,
-            initialRange.current.end,
-            typedIssue === "end" || Boolean(error),
+            displayedRange.end,
+            typedIssue === "end" || Boolean(error) || !isRangeAcceptable(currentRange),
             validateEnd,
-            handleEndChange
+            (event) => handleEndpointChange("end", event)
           )}
         </div>
 
@@ -355,6 +328,7 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(({
             mode="range"
             value={currentRange}
             onValueChange={handleCalendarChange}
+            disabled={disabled}
             min={min}
             max={max}
             isDateUnavailable={isDateUnavailable}

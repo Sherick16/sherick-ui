@@ -986,6 +986,10 @@ inline padding from a field's, or reach for `part` to make a standalone control 
 - `focusRingWithin` is the same ring for a value control whose focus lives in a borderless input
   **inside** it — a combobox field, a search field, a number field. It follows **visible** focus.
 - `groupFocusRing` draws it from the wrapping control instead of the track it contains.
+- `parentFocusRingInset` is the same inset ring on a direct child of the focused element.
+  Use it for a tree row whose focusable treeitem also owns its nested group: the ring traces
+  only that row, never the subtree. Do not use it for a directly focusable row (use
+  `focusRingInset`) or arbitrary descendants, where an ancestor's focus would be ambiguous.
 
 The whole rule, in one line: **the ring says where the keyboard will act**, so it appears when focus
 arrived from the keyboard and stays quiet when a pointer did the focusing — *unless the platform

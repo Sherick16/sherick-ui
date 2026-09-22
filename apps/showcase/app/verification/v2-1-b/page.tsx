@@ -2,9 +2,7 @@
 
 import { useState } from "react";
 import { Moon } from "lucide-react";
-import { Button, DirectionProvider } from "sherick-ui";
-import Command, { type CommandItem } from "../../../../../packages/ui/src/components/Command";
-import CommandPalette from "../../../../../packages/ui/src/components/CommandPalette";
+import { Button, Command, CommandPalette, DirectionProvider, type CommandItem } from "sherick-ui";
 
 const commands: CommandItem[] = [
   { value: "settings", label: "Open settings", group: "Navigation" },

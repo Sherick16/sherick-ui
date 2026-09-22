@@ -16,7 +16,8 @@ calendar popup positioning, focus, dismissal and lifecycle. Base Autocomplete ex
 supports inline command pickers; it owns command filtering, highlight, ARIA and keyboard
 activation. Base Dialog and the existing `DialogSurface` own palette modality.
 
-No new design-language rule or dependency is currently needed. Component roots and portals
+No new material, token, motion rule, or dependency is needed. The canonical focus owner
+adds the direct-parent selector form of the existing inset ring for nested tree rows. Component roots and portals
 use `cn()`, existing material/shape/state/density/focus recipes and semantic motion intents.
 A disabled subtree dims once. Selection/current state has semantic or textual evidence
 besides color. Long content yields or wraps, and inherently wide content scrolls locally.
@@ -77,7 +78,11 @@ Exports: `Calendar`, `DatePicker`, `DateRangePicker`; `CalendarDate`, `DateRange
   independently labelled start/end fields. Native inputs own form submission, required,
   min/max validation; custom validity covers unavailable/reversed ranges. Editing can show
   invalid values with feedback; the calendar never selects one. Clearing uses null.
-  Uncontrolled form reset restores defaults, including calendar selection.
+  Uncontrolled form reset restores defaults, including calendar selection; native reset does
+  not emit value-change callbacks. Controlled values remain held. Base Field.Control does not
+  bridge a native form reset to a date domain value, so the private date-field module listens
+  on the input's actual owning form (including `form=`), after the cancelable reset event.
+  This is date-field synchronization, not a generic form or controlled-state framework.
 - Reuse the `Popover.tsx` shell/presence composition directly with Base public parts where
   `initialFocus` and `actionsRef.close()` are needed; no new overlay shell or open-state
   mirror. Initial popup focus is the active day via Base `initialFocus`; selection closes

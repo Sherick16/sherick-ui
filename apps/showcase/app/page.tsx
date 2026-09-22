@@ -96,6 +96,9 @@ import {
 import StepperSpecimen from "../components/v2-1/e";
 import NavigationSpecimen from "../components/v2-1/c";
 import DateFamilySpecimen from "../components/v2-1/a";
+import CommandSpecimen from "../components/v2-1/b";
+import TreeSpecimen from "../components/v2-1/f";
+import FileUploadSpecimen from "../components/v2-1/d";
 
 const selectOptions = [
   { label: "Design system", value: "design" },
@@ -412,6 +415,9 @@ export default function Home() {
               <Specimen title="Calendar & date pickers">
                 <DateFamilySpecimen />
               </Specimen>
+              <Specimen title="File upload">
+                <FileUploadSpecimen />
+              </Specimen>
             </div>
           </ShowcaseSection>
 
@@ -616,6 +622,9 @@ export default function Home() {
                   </Collapsible.Panel>
                 </Collapsible>
               </Specimen>
+              <Specimen title="Tree view">
+                <TreeSpecimen />
+              </Specimen>
             </div>
           </ShowcaseSection>
 
@@ -658,6 +667,9 @@ export default function Home() {
 
           <ShowcaseSection id="floating">
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
+              <Specimen title="Command & palette">
+                <CommandSpecimen />
+              </Specimen>
               <Specimen title="Popover">
                 <Popover>
                   <Popover.Trigger

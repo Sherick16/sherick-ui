@@ -4,13 +4,11 @@ import { Field as BaseField } from "@base-ui/react/field";
 import { Popover as BasePopover } from "@base-ui/react/popover";
 import React, {
   forwardRef,
-  useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
   type ChangeEvent,
-  type ForwardedRef,
   type ReactNode,
 } from "react";
 import { cn } from "@/libs/utils";
@@ -22,6 +20,7 @@ import {
   DateFieldTrigger,
   dateFieldRowClassName,
   dateInputClassName,
+  useDateFormReset,
 } from "./date-field";
 import {
   compareCalendarDates,
@@ -66,15 +65,6 @@ export interface DatePickerProps {
   labels?: Partial<CalendarLabels>;
 }
 
-/* The input is the form's own control, so the picker owns its text without making it a controlled
-   React input: the DOM value is written from the value that is actually held, and a form reset
-   restores the defaults the field was given. */
-const mergeInputRef = (ref: ForwardedRef<HTMLInputElement>, local: React.RefObject<HTMLInputElement | null>) =>
-  (node: HTMLInputElement | null) => {
-    local.current = node;
-    if (typeof ref === "function") ref(node);
-    else if (ref) ref.current = node;
-  };
 
 /**
  * A date field: a native `type=date` input, with a named control beside it that opens the shared
@@ -116,31 +106,21 @@ const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(({
     normalizeCalendarDate(defaultValue)
   );
   const currentValue = isControlled ? normalizeCalendarDate(value) : internalValue;
-  /* Whether what is on screen is a date this field cannot accept. It is the field's own reading
-     of a typed value, so the row takes the error ladder while the message comes from Base's
-     validation of the same value. */
-  const [typedIssue, setTypedIssue] = useState(false);
-  const [resetNonce, setResetNonce] = useState(0);
-
+  // Invalid native entry is an explicit draft, not a second writer of a valid controlled value.
+  const [draft, setDraft] = useState<string | null>(null);
   const minDate = normalizeCalendarDate(min);
   const maxDate = normalizeCalendarDate(max);
-
   const inputRef = useRef<HTMLInputElement | null>(null);
   const popupActionsRef = useRef<BasePopover.Root.Actions | null>(null);
-  /* The input's own default, captured once: it is what the browser's `form.reset()` restores
-     before this component restores the default the field was given. */
-  const initialText = useRef(currentValue ?? "");
-  const assignInputRef = useCallback(mergeInputRef(ref, inputRef), [ref]);
 
-  /* One writer for the input's DOM value. The field is not a controlled React input, so typing is
-     never rewritten while it is in progress; a value that changes from the outside — the calendar,
-     an application update, a form reset — is what lands. */
-  useEffect(() => {
-    const input = inputRef.current;
-    if (!input) return;
-    const next = currentValue ?? "";
-    if (input.value !== next) input.value = next;
-  }, [currentValue, resetNonce]);
+  useEffect(() => setDraft(null), [currentValue]);
+  useDateFormReset(inputRef, form, () => {
+    const restored = isControlled ? currentValue : normalizeCalendarDate(defaultValue);
+    setDraft(null);
+    if (!isControlled) setInternalValue(restored);
+    // Native reset has already run and emits no React change event.
+    if (inputRef.current) inputRef.current.value = restored ?? "";
+  });
 
   const commitValue = (next: CalendarDate | null) => {
     if (!isControlled) setInternalValue(next);
@@ -153,64 +133,46 @@ const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(({
     return !isDateUnavailable?.(date);
   };
 
-  /* What the native constraints cannot express. `min`/`max` and `required` are the browser's own
-     validation, so reporting them here as well would produce the field's message twice. */
+  const displayText = draft ?? currentValue ?? "";
+  const displayedDate = normalizeCalendarDate(displayText);
+  const typedIssue = draft !== null || Boolean(
+    displayText && (!displayedDate || !isSelectableDate(displayedDate))
+  );
+  const fieldInvalid = Boolean(error) || typedIssue;
   const validateValue = (candidate: unknown) => {
-    const date = typeof candidate === "string" ? normalizeCalendarDate(candidate) : null;
-    if (!date) return null;
-    return isDateUnavailable?.(date) ? labels.unavailableRange : null;
+    if (typeof candidate !== "string" || !candidate) return null;
+    const date = normalizeCalendarDate(candidate);
+    return !date || isDateUnavailable?.(date) ? labels.unavailableRange : null;
   };
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const input = event.currentTarget;
-    const text = input.value;
-
-    if (text === "") {
-      /* An empty value with bad input is a date still being typed segment by segment: it is not a
-         cleared field, and the value must not move under the caret. */
-      if (input.validity.badInput) return;
-      setTypedIssue(false);
-      commitValue(null);
+    const next = normalizeCalendarDate(input.value);
+    if (input.validity.badInput || (input.value && (!next || !isSelectableDate(next)))) {
+      setDraft(input.value);
       return;
     }
-
-    const date = normalizeCalendarDate(text);
-    if (!date || !isSelectableDate(date)) {
-      setTypedIssue(true);
-      return;
-    }
-
-    setTypedIssue(false);
-    commitValue(date);
-  };
-
-  const handleReset = () => {
-    const restored = normalizeCalendarDate(defaultValue);
-    setResetNonce((nonce) => nonce + 1);
-    setTypedIssue(false);
-    if (restored !== currentValue) commitValue(restored);
+    setDraft(null);
+    commitValue(next);
   };
 
   const handleCalendarChange = (next: CalendarDate | null) => {
-    setTypedIssue(false);
+    if (disabled) return;
+    setDraft(null);
     commitValue(next);
-    /* A date is the whole of a single selection, so the surface has done its job. */
     if (next) popupActionsRef.current?.close();
   };
-
-  const fieldInvalid = Boolean(error) || typedIssue;
 
   return (
     <Field
       label={label}
       description={description}
-      error={error}
+      error={error || (typedIssue ? labels.unavailableRange : undefined)}
       required={required}
       disabled={disabled}
       invalid={typedIssue}
       validate={validateValue}
       validationMode="onChange"
-      onReset={handleReset}
       className={cn(disabled && state.disabled, className)}
     >
       <BasePopover.Root
@@ -228,7 +190,8 @@ const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(({
           className={cn(dateFieldRowClassName(disabled))}
         >
           <BaseField.Control
-            render={<input type="date" ref={assignInputRef} />}
+            ref={ref}
+            render={<input type="date" ref={inputRef} />}
             id={id}
             name={name}
             form={form}
@@ -236,7 +199,7 @@ const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(({
             disabled={disabled}
             min={minDate ?? undefined}
             max={maxDate ?? undefined}
-            defaultValue={initialText.current}
+            value={displayText}
             onChange={handleInputChange}
             className={cn(dateInputClassName)}
           />
@@ -248,6 +211,7 @@ const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(({
             mode="single"
             value={currentValue}
             onValueChange={handleCalendarChange}
+            disabled={disabled}
             min={min}
             max={max}
             isDateUnavailable={isDateUnavailable}

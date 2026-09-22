@@ -13,6 +13,7 @@ const openDateFamily = async (page: Page) => {
 const focused = (page: Page) => page.locator(":focus");
 
 const day = (scope: Locator, name: string) => scope.getByRole("button", { name, exact: true });
+const cell = (scope: Locator, name: string) => scope.getByRole("gridcell", { name, exact: true });
 
 test.beforeEach(async ({ page }) => {
   await openDateFamily(page);
@@ -38,9 +39,7 @@ test("the grid names itself, keeps one tab stop and marks today", async ({ page,
   );
 
   // Today is announced as the current date, and it is not the selection.
-  const todayCell = calendar
-    .getByRole("gridcell")
-    .filter({ has: day(calendar, "Tuesday, February 20, 2024") });
+  const todayCell = cell(calendar, "Tuesday, February 20, 2024");
   await expect(todayCell).toHaveAttribute("aria-current", "date");
   await expect(todayCell).not.toHaveAttribute("aria-selected", "true");
 
@@ -56,7 +55,7 @@ test("a day is selected by keyboard and by pointer, and the value follows", asyn
   await day(calendar, "Thursday, February 15, 2024").click();
   await expect(page.getByTestId("single-value")).toHaveText("2024-02-15");
   await expect(
-    calendar.getByRole("gridcell").filter({ has: day(calendar, "Thursday, February 15, 2024") })
+    cell(calendar, "Thursday, February 15, 2024")
   ).toHaveAttribute("aria-selected", "true");
 
   await day(calendar, "Thursday, February 15, 2024").focus();
@@ -66,10 +65,10 @@ test("a day is selected by keyboard and by pointer, and the value follows", asyn
 
   await expect(page.getByTestId("single-value")).toHaveText("2024-02-17");
   await expect(
-    calendar.getByRole("gridcell").filter({ has: day(calendar, "Saturday, February 17, 2024") })
+    cell(calendar, "Saturday, February 17, 2024")
   ).toHaveAttribute("aria-selected", "true");
   await expect(
-    calendar.getByRole("gridcell").filter({ has: day(calendar, "Thursday, February 15, 2024") })
+    cell(calendar, "Thursday, February 15, 2024")
   ).not.toHaveAttribute("aria-selected", "true");
 
   expect(errors).toEqual([]);
@@ -122,16 +121,16 @@ test("PageUp and PageDown cross months and years, retaining the day and the focu
 
   await page.keyboard.press("Shift+PageUp");
   await expect(grid).toHaveAccessibleName("February 2023");
-  await expect(focused(page)).toHaveAccessibleName("Wednesday, February 29, 2023");
+  await expect(focused(page)).toHaveAccessibleName("Tuesday, February 28, 2023");
 
   await page.keyboard.press("Shift+PageDown");
   await expect(grid).toHaveAccessibleName("February 2024");
-  await expect(focused(page)).toHaveAccessibleName("Thursday, February 29, 2024");
+  await expect(focused(page)).toHaveAccessibleName("Wednesday, February 28, 2024");
 
   expect(errors).toEqual([]);
 });
 
-test("a month control keeps the day's focus, and today navigates without selecting", async ({
+test("month controls keep their own focus, and today navigates without selecting", async ({
   page,
   errors,
 }) => {
@@ -142,12 +141,14 @@ test("a month control keeps the day's focus, and today navigates without selecti
   await calendar.getByRole("button", { name: "Next month" }).click();
 
   await expect(grid).toHaveAccessibleName("March 2024");
-  await expect(focused(page)).toHaveAccessibleName("Friday, March 15, 2024");
+  await expect(focused(page)).toHaveAccessibleName("Next month");
+  await expect(day(calendar, "Friday, March 15, 2024")).toHaveAttribute("tabindex", "0");
 
   await calendar.getByRole("button", { name: "Today", exact: true }).click();
 
   await expect(grid).toHaveAccessibleName("February 2024");
-  await expect(focused(page)).toHaveAccessibleName("Tuesday, February 20, 2024");
+  await expect(focused(page)).toHaveAccessibleName("Today");
+  await expect(day(calendar, "Tuesday, February 20, 2024")).toHaveAttribute("tabindex", "0");
   await expect(page.getByTestId("single-value")).toHaveText("2024-02-15");
 
   expect(errors).toEqual([]);
@@ -204,7 +205,9 @@ test("unavailable and out-of-bounds days stay discoverable and cannot be selecte
   await blocked.focus();
   await expect(focused(page)).toHaveAccessibleName("Wednesday, January 24, 2024");
 
-  await blocked.click();
+  await blocked.click({ force: true });
+  await blocked.press("Enter");
+  await blocked.press("Space");
   await expect(page.getByTestId("range-value")).toHaveText("2024-01-08 → 2024-01-12");
 
   expect(errors).toEqual([]);
@@ -243,10 +246,10 @@ test("a range's endpoints are sorted however they are chosen", async ({ page, er
   await expect(page.getByTestId("range-value")).toHaveText("2024-01-27 → 2024-01-28");
 
   await expect(
-    calendar.getByRole("gridcell").filter({ has: day(calendar, "Saturday, January 27, 2024") })
+    cell(calendar, "Saturday, January 27, 2024")
   ).toHaveAttribute("aria-selected", "true");
   await expect(
-    calendar.getByRole("gridcell").filter({ has: day(calendar, "Sunday, January 28, 2024") })
+    cell(calendar, "Sunday, January 28, 2024")
   ).toHaveAttribute("aria-selected", "true");
 
   expect(errors).toEqual([]);
@@ -261,25 +264,19 @@ test("a controlled month that is refused keeps both the month and the focus", as
 
   await expect(grid).toHaveAccessibleName("March 2024");
 
+  await page.getByTestId("controlled-reject").check();
+  await day(calendar, "Sunday, March 31, 2024").focus();
+  await page.keyboard.press("PageDown");
+  await expect(grid).toHaveAccessibleName("March 2024");
+  await expect(focused(page)).toHaveAccessibleName("Sunday, March 31, 2024");
+  await expect(day(calendar, "Sunday, March 31, 2024")).toHaveAttribute("tabindex", "0");
+  await expect(page.getByTestId("controlled-month")).toHaveText("2024-03-01");
+
+  await page.getByTestId("controlled-reject").uncheck();
   await day(calendar, "Sunday, March 31, 2024").focus();
   await page.keyboard.press("PageDown");
   await expect(grid).toHaveAccessibleName("April 2024");
   await expect(focused(page)).toHaveAccessibleName("Tuesday, April 30, 2024");
-
-  await page.getByTestId("controlled-reject").check();
-  await day(calendar, "Sunday, March 31, 2024").focus();
-  await page.keyboard.press("PageDown");
-
-  // April would have clamped the day to the 30th; the refused month keeps March and the day.
-  await expect(grid).toHaveAccessibleName("March 2024");
-  await expect(focused(page)).toHaveAccessibleName("Saturday, March 30, 2024");
-  await expect(page.getByTestId("controlled-month")).toHaveText("2024-03-01");
-
-  await page.getByTestId("controlled-reject").uncheck();
-  await day(calendar, "Saturday, March 30, 2024").focus();
-  await page.keyboard.press("PageDown");
-
-  await expect(grid).toHaveAccessibleName("April 2024");
   await expect(page.getByTestId("controlled-month")).toHaveText("2024-04-01");
 
   expect(errors).toEqual([]);
@@ -295,7 +292,7 @@ test("a value that changes from the outside is shown, and cleared again", async 
   await expect(page.getByTestId("controlled-month")).toHaveText("2024-05-01");
   await expect(grid).toHaveAccessibleName("May 2024");
   await expect(
-    calendar.getByRole("gridcell").filter({ has: day(calendar, "Saturday, May 4, 2024") })
+    cell(calendar, "Saturday, May 4, 2024")
   ).toHaveAttribute("aria-selected", "true");
 
   await page.getByTestId("controlled-clear").click();
@@ -352,7 +349,7 @@ test("a locale changes the wording and the week start, not the value", async ({ 
 
   await day(calendar, "Donnerstag, 4. Juli 2024").click();
   await expect(
-    calendar.getByRole("gridcell").filter({ has: day(calendar, "Donnerstag, 4. Juli 2024") })
+    cell(calendar, "Donnerstag, 4. Juli 2024")
   ).toHaveAttribute("aria-selected", "true");
 
   expect(errors).toEqual([]);
@@ -420,7 +417,7 @@ test("the date field labels its input, carries the constraints and reports an un
   errors,
 }) => {
   const field = page.getByTestId("picker-field");
-  const input = field.getByLabel("Arrival date");
+  const input = field.getByLabel("Arrival date", { exact: true });
 
   await expect(input).toHaveAttribute("type", "date");
   await expect(input).toHaveAttribute("min", "2024-06-01");
@@ -476,21 +473,21 @@ test("the calendar trigger opens a named surface, focuses the day and restores f
 
   await expect(popup).toHaveCount(0);
   await expect(page.getByTestId("picker-value")).toHaveText("2024-06-21");
-  await expect(field.getByLabel("Arrival date")).toHaveValue("2024-06-21");
+  await expect(field.getByLabel("Arrival date", { exact: true })).toHaveValue("2024-06-21");
 
   expect(errors).toEqual([]);
 });
 
 test("a required field is the browser's, and an error is the field's", async ({ page, errors }) => {
-  const required = page.getByTestId("picker-default-field").getByLabel("Review date");
+  const required = page.getByTestId("picker-default-field").getByLabel(/^Review date/);
   await expect(required).toHaveAttribute("required", "");
 
   const error = page.getByTestId("picker-error-field");
-  await expect(error.getByLabel("Cut-off date")).toHaveAttribute("aria-invalid", "true");
+  await expect(error.getByLabel(/^Cut-off date/)).toHaveAttribute("aria-invalid", "true");
   await expect(error.getByText("Choose a date in the current cycle.")).toBeVisible();
 
   const disabled = page.getByTestId("picker-disabled-field");
-  await expect(disabled.getByLabel("Archived date")).toBeDisabled();
+  await expect(disabled.getByLabel("Archived date", { exact: true })).toBeDisabled();
   await expect(disabled.getByRole("button", { name: "Open Archived date" })).toBeDisabled();
 
   expect(errors).toEqual([]);
@@ -501,8 +498,8 @@ test("a range field is one named group with two labelled endpoints", async ({ pa
   await expect(group).toBeVisible();
   await expect(group).toHaveAccessibleDescription("Two endpoints, one calendar.");
 
-  const start = page.getByTestId("range-picker-field").getByLabel("Start date");
-  const end = page.getByTestId("range-picker-field").getByLabel("End date");
+  const start = page.getByTestId("range-picker-field").getByLabel("Start date", { exact: true });
+  const end = page.getByTestId("range-picker-field").getByLabel("End date", { exact: true });
 
   await expect(start).toHaveValue("2024-06-03");
   await expect(end).toHaveValue("2024-06-07");
@@ -517,8 +514,8 @@ test("a reversed or unavailable range is reported and never becomes the value", 
   errors,
 }) => {
   const field = page.getByTestId("range-picker-field");
-  const start = field.getByLabel("Start date");
-  const end = field.getByLabel("End date");
+  const start = field.getByLabel("Start date", { exact: true });
+  const end = field.getByLabel("End date", { exact: true });
   const message = field.getByText("That range includes an unavailable date");
 
   await end.fill("2024-06-01");
@@ -561,8 +558,8 @@ test("the range picker's calendar completes a range and closes itself", async ({
   await grid.getByRole("button", { name: "Wednesday, June 12, 2024", exact: true }).click();
   await expect(popup).toHaveCount(0);
   await expect(page.getByTestId("range-picker-value")).toHaveText("2024-06-10 → 2024-06-12");
-  await expect(field.getByLabel("Start date")).toHaveValue("2024-06-10");
-  await expect(field.getByLabel("End date")).toHaveValue("2024-06-12");
+  await expect(field.getByLabel("Start date", { exact: true })).toHaveValue("2024-06-10");
+  await expect(field.getByLabel("End date", { exact: true })).toHaveValue("2024-06-12");
 
   expect(errors).toEqual([]);
 });
@@ -572,7 +569,7 @@ test("a native field submits its value and a form reset restores the default", a
   errors,
 }) => {
   const form = page.getByTestId("leap-form");
-  const input = form.getByLabel("Leap day");
+  const input = form.getByLabel(/^Leap day/);
 
   await expect(input).toHaveValue("2024-02-29");
 
@@ -599,11 +596,140 @@ test("a native field submits its value and a form reset restores the default", a
   const popup = page.getByRole("dialog", { name: "Leap day" });
   await expect(popup.getByRole("grid")).toHaveAccessibleName("February 2024");
   await expect(
-    popup.getByRole("gridcell").filter({
-      has: popup.getByRole("button", { name: "Thursday, February 29, 2024", exact: true }),
-    })
+    cell(popup, "Thursday, February 29, 2024")
   ).toHaveAttribute("aria-selected", "true");
   await expect(focused(page)).toHaveAccessibleName("Thursday, February 29, 2024");
 
   expect(errors).toEqual([]);
+});
+
+test("arrows and week edges cross months without selecting or losing the tab stop", async ({ page }) => {
+  const calendar = page.getByTestId("single-calendar");
+  await day(calendar, "Thursday, February 29, 2024").focus();
+  await page.keyboard.press("ArrowRight");
+  await expect(focused(page)).toHaveAccessibleName("Friday, March 1, 2024");
+  await page.keyboard.press("Home");
+  await expect(focused(page)).toHaveAccessibleName("Monday, February 26, 2024");
+  await page.keyboard.press("End");
+  await expect(focused(page)).toHaveAccessibleName("Sunday, March 3, 2024");
+  await page.keyboard.press("ArrowUp");
+  await expect(focused(page)).toHaveAccessibleName("Sunday, February 25, 2024");
+  await page.keyboard.press("ArrowDown");
+  await expect(focused(page)).toHaveAccessibleName("Sunday, March 3, 2024");
+  await expect(calendar.locator('[data-day][tabindex="0"]')).toHaveCount(1);
+  await expect(page.getByTestId("single-value")).toHaveText("2024-02-15");
+});
+
+test("every rejected month request is reported and a retry can be accepted", async ({ page }) => {
+  const calendar = page.getByTestId("month-retry");
+  const lastDay = day(calendar, "Sunday, March 31, 2024");
+  await lastDay.focus();
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    await page.keyboard.press("PageDown");
+    await expect(lastDay).toBeFocused();
+    await expect(lastDay).toHaveAttribute("tabindex", "0");
+  }
+  await expect(page.getByTestId("month-requests")).toHaveText('["2024-04-01","2024-04-01"]');
+  await page.getByRole("button", { name: "Accept month requests" }).click();
+  await lastDay.focus();
+  await page.keyboard.press("PageDown");
+  await expect(focused(page)).toHaveAccessibleName("Tuesday, April 30, 2024");
+  await expect(page.getByTestId("month-requests")).toHaveText('["2024-04-01","2024-04-01","2024-04-01"]');
+});
+
+test("keyboard navigation cannot leave the date format's year bounds", async ({ page }) => {
+  const first = page.getByTestId("bounds-calendar").locator('[data-day="0001-01-01"]');
+  const last = page.getByTestId("last-bounds-calendar").locator('[data-day="9999-12-31"]');
+  await first.focus();
+  for (const key of ["ArrowLeft", "ArrowUp", "PageUp", "Shift+PageUp"]) {
+    await page.keyboard.press(key);
+    await expect(first).toBeFocused();
+  }
+  await last.focus();
+  for (const key of ["ArrowRight", "ArrowDown", "PageDown", "Shift+PageDown"]) {
+    await page.keyboard.press(key);
+    await expect(last).toBeFocused();
+  }
+});
+
+test("constrained-invalid and reversed supplied values never paint a selection", async ({ page }) => {
+  for (const id of ["invalid-supplied-single", "invalid-supplied-range", "reversed-supplied-range"]) {
+    await expect(page.getByTestId(id).locator('[aria-selected="true"]')).toHaveCount(0);
+  }
+});
+
+test("rejected controlled native edits and clears leave DOM and FormData held", async ({ page }) => {
+  const form = page.getByTestId("reject-date-form");
+  const single = form.getByLabel("Held date", { exact: true });
+  const start = form.getByLabel("Held start", { exact: true });
+  const end = form.getByLabel("Held end", { exact: true });
+  await single.fill("2024-06-12");
+  await expect(single).toHaveValue("2024-06-10");
+  await single.fill("");
+  await expect(single).toHaveValue("2024-06-10");
+  await start.fill("2024-06-12");
+  await expect(start).toHaveValue("2024-06-10");
+  await end.fill("2024-06-25");
+  await expect(end).toHaveValue("2024-06-20");
+  await end.fill("");
+  await expect(end).toHaveValue("2024-06-20");
+  await form.getByRole("button", { name: "Reset held dates" }).click();
+  expect(await form.evaluate((element) => Object.fromEntries(new FormData(element as HTMLFormElement)))).toEqual({
+    held: "2024-06-10", start: "2024-06-10", end: "2024-06-20",
+  });
+  await expect(page.getByTestId("date-requests")).toHaveText('["2024-06-12",null]');
+  await expect(page.getByTestId("range-requests")).toHaveText(JSON.stringify([
+    { start: "2024-06-12", end: "2024-06-20" },
+    { start: "2024-06-10", end: "2024-06-25" },
+    { start: "2024-06-10", end: null },
+  ]));
+});
+
+test("external form reset restores both picker defaults and respects cancellation", async ({ page }) => {
+  const single = page.getByLabel("External date", { exact: true });
+  const start = page.getByLabel("External start", { exact: true });
+  const end = page.getByLabel("External end", { exact: true });
+  await single.fill("2024-06-13");
+  await start.fill("2024-06-12");
+  await end.fill("2024-06-25");
+  await page.getByLabel("Cancel date reset").check();
+  await page.getByRole("button", { name: "Reset external dates" }).click();
+  await expect(single).toHaveValue("2024-06-13");
+  await expect(start).toHaveValue("2024-06-12");
+  await expect(end).toHaveValue("2024-06-25");
+  await page.getByLabel("Cancel date reset").uncheck();
+  await page.getByTestId("external-date-form").evaluate((element) => (element as HTMLFormElement).reset());
+  await expect(single).toHaveValue("2024-06-10");
+  await expect(start).toHaveValue("2024-06-10");
+  await expect(end).toHaveValue("2024-06-20");
+  expect(await page.getByTestId("external-date-form").evaluate((element) => Object.fromEntries(new FormData(element as HTMLFormElement)))).toEqual({
+    date: "2024-06-10", start: "2024-06-10", end: "2024-06-20",
+  });
+  await page.getByRole("button", { name: "Open External start", exact: true }).click();
+  await expect(cell(page.getByRole("dialog", { name: "External range" }), "Monday, June 10, 2024")).toHaveAttribute("aria-selected", "true");
+});
+
+test("repairing a reversed range through its other endpoint clears native custom validity", async ({ page }) => {
+  const start = page.getByLabel("Draft start", { exact: true });
+  const end = page.getByLabel("Draft end", { exact: true });
+  await end.fill("2024-06-05");
+  await expect(end).toHaveAttribute("aria-invalid", "true");
+  await start.fill("2024-06-01");
+  await expect(start).toHaveValue("2024-06-01");
+  await expect(end).toHaveValue("2024-06-05");
+  await expect(end).not.toHaveAttribute("aria-invalid", "true");
+  expect(await end.evaluate((element) => (element as HTMLInputElement).validity.valid)).toBe(true);
+});
+
+test("disabled controlled-open pickers expose no enabled calendar controls", async ({ page }) => {
+  for (const mode of ["date", "range"]) {
+    await page.getByRole("button", { name: `Show disabled ${mode} popup` }).click();
+    const popup = page.getByRole("dialog", { name: `Disabled open ${mode}` });
+    await expect(popup).toBeVisible();
+    await expect(popup.getByRole("grid")).toHaveAttribute("aria-disabled", "true");
+    await expect(popup.locator('[data-day][tabindex="0"]')).toHaveCount(0);
+    for (const button of await popup.getByRole("button").all()) await expect(button).toBeDisabled();
+    await popup.locator('[data-day="2024-06-12"]').click({ force: true });
+    await expect(page.getByTestId("disabled-date-requests")).toHaveText("0");
+  }
 });

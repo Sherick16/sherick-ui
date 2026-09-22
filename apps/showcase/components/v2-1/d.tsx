@@ -1,11 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import FileUpload from "../../../../packages/ui/src/components/FileUpload";
+import { FileUpload } from "sherick-ui";
 
-/* FileUpload specimens: the field's meaningful states, once each — at rest, holding a selection
-   under its limits, disabled, and invalid. The component under test is imported by source path for
-   isolated iteration; the parent replaces that with the package-root import at integration. */
+/* At rest, holding a selection under limits, disabled, and invalid. */
 
 const build = (name: string, type: string, bytes: number) =>
   new File([new Uint8Array(bytes)], name, { type, lastModified: 1 });

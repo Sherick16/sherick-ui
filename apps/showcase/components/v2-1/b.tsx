@@ -2,9 +2,7 @@
 
 import { useState } from "react";
 import { Moon, PenLine, Sun } from "lucide-react";
-import { Button } from "sherick-ui";
-import Command, { type CommandItem } from "../../../../packages/ui/src/components/Command";
-import CommandPalette from "../../../../packages/ui/src/components/CommandPalette";
+import { Button, Command, CommandPalette, type CommandItem } from "sherick-ui";
 
 const commands: CommandItem[] = [
   { value: "settings", label: "Open settings", group: "Navigation" },

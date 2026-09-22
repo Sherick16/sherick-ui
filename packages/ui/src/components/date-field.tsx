@@ -2,7 +2,7 @@
 
 import { Popover as BasePopover } from "@base-ui/react/popover";
 import { CalendarDays } from "lucide-react";
-import React, { useRef, type ReactNode } from "react";
+import React, { useEffect, useRef, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import { density, focusRingWithin, material, overlay, shape, stacking, state, stateLayer, text } from "./ui.common";
 import { motionFeedback, motionPresenceAnchored, motionTactile } from "./ui.motion";
@@ -119,4 +119,28 @@ export const DateCalendarPopup = ({ title, children }: DateCalendarPopupProps) =
       </BasePopover.Positioner>
     </BasePopover.Portal>
   );
+};
+
+/** Base Field controls entry and validity, but native reset emits no input/change event.
+ * Bridge only the date family's domain state, after the owning form's cancelable reset. */
+export const useDateFormReset = (
+  inputRef: React.RefObject<HTMLInputElement | null>,
+  formId: string | undefined,
+  restore: () => void
+) => {
+  const latestRestore = useRef(restore);
+  useEffect(() => { latestRestore.current = restore; }, [restore]);
+  useEffect(() => {
+    const form = inputRef.current?.form;
+    if (!form) return;
+    const reset = (event: Event) => {
+      // A microtask can run between native listeners, before React's delegated onReset.
+      // The next task observes cancellation after the entire native dispatch/default action.
+      setTimeout(() => {
+        if (!event.defaultPrevented && inputRef.current?.form === form) latestRestore.current();
+      }, 0);
+    };
+    form.addEventListener("reset", reset);
+    return () => form.removeEventListener("reset", reset);
+  }, [inputRef, formId]);
 };

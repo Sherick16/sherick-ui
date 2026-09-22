@@ -15,8 +15,9 @@ import React, {
 } from "react";
 import { cn } from "@/libs/utils";
 import { density, focusRingInset, shape, state, stateLayer, text, tone } from "./ui.common";
-import { motionFeedback, motionTactile } from "./ui.motion";
+import { motionFeedback, motionInkPress, motionTactile } from "./ui.motion";
 import {
+  addCalendarDays,
   addCalendarMonths,
   compareCalendarDates,
   createCalendarFormat,
@@ -96,10 +97,8 @@ type CalendarRuntimeProps = Omit<CalendarBaseProps, "mode"> & {
 
 const EMPTY_RANGE: DateRange = { start: null, end: null };
 
-/* The grid's navigation controls are flat buttons inside the calendar surface, so their press is
-   the state layer's active step plus the tactile compression, and their focus ring is inset
-   because an outer one would land on the cell beside them. */
-const navigationButtonClassName = `inline-flex size-10 shrink-0 items-center justify-center ${density.compact} ${shape.circle} ${text.high} [&>svg]:size-5 ${motionFeedback} ${motionTactile} ${focusRingInset} ${stateLayer.quiet}`;
+/* Icon-only navigation keeps its full target; only its mark answers a press. */
+const navigationButtonClassName = `group inline-flex shrink-0 items-center justify-center ${density.target} ${shape.circle} ${text.high} ${motionFeedback} ${focusRingInset} ${stateLayer.quiet}`;
 
 /* A content-width text control, so its corner is the pill. */
 const todayButtonClassName = `inline-flex shrink-0 items-center justify-center px-4 ${density.compact} ${shape.pill} ${text.high} ${motionFeedback} ${motionTactile} ${focusRingInset} ${stateLayer.quiet}`;
@@ -213,36 +212,23 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
     return onScreen(anchorParts) ?? onScreen(todayParts) ?? 1;
   });
   const activeDay = Math.min(activeDayState, monthLength);
-  const activeDate = toCalendarDate({ year: view.year, month: view.month, day: activeDay });
 
   const gridRef = useRef<HTMLTableElement | null>(null);
-  /* Focus is only moved where a day already had it: a month crossing has to leave the reader on
-     the day they were on, the month controls are pressed without taking focus, and a calendar
-     that is being told what happened must never pull focus in from somewhere else. */
-  const pendingDayFocus = useRef(false);
+  // Only explicit grid navigation may move day focus. Native header buttons keep their focus.
+  const [pendingDayFocus, setPendingDayFocus] = useState<CalendarDate | null>(null);
   const focusIsInGrid = () => {
     const grid = gridRef.current;
     const focused = typeof document === "undefined" ? null : document.activeElement;
     return Boolean(grid && focused && grid.contains(focused));
   };
 
-  const lastReportedMonth = useRef<CalendarDate>(toCalendarDate(initialView));
-  const reportMonth = useCallback(
-    (next: DateParts) => {
-      const nextMonth = toCalendarDate({ year: next.year, month: next.month, day: 1 });
-      if (lastReportedMonth.current === nextMonth) return;
-      lastReportedMonth.current = nextMonth;
-      onMonthChange?.(nextMonth);
-    },
-    [onMonthChange]
-  );
-
   const requestMonth = useCallback(
     (next: DateParts) => {
+      if (next.year === view.year && next.month === view.month) return;
       if (monthProp === undefined) setInternalMonth({ year: next.year, month: next.month, day: 1 });
-      reportMonth(next);
+      onMonthChange?.(toCalendarDate({ year: next.year, month: next.month, day: 1 }));
     },
-    [monthProp, reportMonth]
+    [monthProp, onMonthChange, view.year, view.month]
   );
 
   /* A value that changed from the outside — an application update, a form reset — brings the grid
@@ -258,10 +244,13 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
   }, [selectionAnchor, requestMonth]);
 
   useEffect(() => {
-    if (!pendingDayFocus.current) return;
-    pendingDayFocus.current = false;
-    gridRef.current?.querySelector<HTMLElement>(`[data-day="${activeDate}"]`)?.focus();
-  });
+    if (!pendingDayFocus) return;
+    // A rejected controlled month has no matching day. Preserve both its focus and tab stop.
+    if (focusIsInGrid() || document.activeElement === document.body) {
+      gridRef.current?.querySelector<HTMLElement>(`[data-day="${pendingDayFocus}"]`)?.focus();
+    }
+    setPendingDayFocus(null);
+  }, [pendingDayFocus, view.year, view.month]);
 
   const isUnavailableDate = useCallback(
     (date: CalendarDate) => {
@@ -272,7 +261,15 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
     [minDate, maxDate, isDateUnavailable]
   );
 
+  const rangeSelectionInvalid = isRange && Boolean(
+    (selectedRange.start && isUnavailableDate(selectedRange.start)) ||
+    (selectedRange.end && isUnavailableDate(selectedRange.end)) ||
+    (selectedRange.start && selectedRange.end && selectedRange.start > selectedRange.end) ||
+    (isDateUnavailable && selectedRange.start && selectedRange.end &&
+      rangeIncludesDate(parseCalendarDate(selectedRange.start)!, parseCalendarDate(selectedRange.end)!, isDateUnavailable))
+  );
   const isSelectedDate = (date: CalendarDate) => {
+    if (isUnavailableDate(date) || rangeSelectionInvalid) return false;
     if (isRange) {
       const { start, end } = selectedRange;
       if (!start) return false;
@@ -328,31 +325,28 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
     notifyRange(ordered);
   };
 
+  const navigateTo = (next: DateParts) => {
+    if (next.year < 1 || next.year > 9999) return;
+    const sameMonth = next.year === view.year && next.month === view.month;
+    if (monthProp === undefined || sameMonth) setActiveDayState(next.day);
+    if (focusIsInGrid()) setPendingDayFocus(toCalendarDate(next));
+    requestMonth(next);
+  };
+
   const focusDay = (day: number) => {
-    const next = Math.min(monthLength, Math.max(1, day));
-    if (next === activeDay) return;
-    pendingDayFocus.current = focusIsInGrid();
-    setActiveDayState(next);
+    navigateTo(addCalendarDays({ year: view.year, month: view.month, day: 1 }, day - 1));
   };
 
   const walkMonth = (delta: number, deltaYears = 0) => {
-    const current: DateParts = { year: view.year, month: view.month, day: activeDay };
-    /* Month and year navigation share one step, so a year crossing clamps the day exactly as a
-       month crossing does, and neither can leave the value format's year bounds. */
-    const next = addCalendarMonths(current, deltaYears === 0 ? delta : deltaYears * 12);
-    if (next.year === view.year && next.month === view.month) return;
-    pendingDayFocus.current = focusIsInGrid();
-    requestMonth(next);
-    setActiveDayState(next.day);
+    navigateTo(addCalendarMonths(
+      { year: view.year, month: view.month, day: activeDay },
+      deltaYears === 0 ? delta : deltaYears * 12
+    ));
   };
 
   const columnOf = (day: number) => (leadingBlanks + day - 1) % 7;
 
-  const goToToday = () => {
-    pendingDayFocus.current = focusIsInGrid();
-    requestMonth({ year: todayParts.year, month: todayParts.month, day: 1 });
-    setActiveDayState(todayParts.day);
-  };
+  const goToToday = () => navigateTo(todayParts);
 
   const handleGridKeyDown = (event: KeyboardEvent<HTMLTableElement>) => {
     if (disabled) return;
@@ -394,9 +388,6 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
     event.preventDefault();
   };
 
-  /* A month control never takes focus: it is pressed to move the grid, and the day the reader was
-     on has to stay where it is. */
-  const keepFocus = (event: React.MouseEvent<HTMLButtonElement>) => event.preventDefault();
 
   const atFirstMonth = view.year === 1 && view.month === 0;
   const atLastMonth = view.year === 9999 && view.month === 11;
@@ -430,13 +421,14 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
           aria-label={labels.previousMonth}
           disabled={disabled || atFirstMonth}
           onClick={() => walkMonth(-1)}
-          onMouseDown={keepFocus}
           className={cn(
             navigationButtonClassName,
-            disabled || atFirstMonth ? state.disabledDescendant : state.enabled
+            disabled ? state.disabledDescendant : atFirstMonth ? state.disabled : state.enabled
           )}
         >
-          <ChevronLeft aria-hidden="true" className={cn("size-5", "[[dir=rtl]_&]:rotate-180")} />
+          <span className={cn("inline-flex", motionInkPress)}>
+            <ChevronLeft aria-hidden="true" className={cn("size-5", "[[dir=rtl]_&]:rotate-180")} />
+          </span>
         </button>
 
         {/* The caption is the grid's name and the live region that reports a month crossing. */}
@@ -453,13 +445,14 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
           aria-label={labels.nextMonth}
           disabled={disabled || atLastMonth}
           onClick={() => walkMonth(1)}
-          onMouseDown={keepFocus}
           className={cn(
             navigationButtonClassName,
-            disabled || atLastMonth ? state.disabledDescendant : state.enabled
+            disabled ? state.disabledDescendant : atLastMonth ? state.disabled : state.enabled
           )}
         >
-          <ChevronRight aria-hidden="true" className={cn("size-5", "[[dir=rtl]_&]:rotate-180")} />
+          <span className={cn("inline-flex", motionInkPress)}>
+            <ChevronRight aria-hidden="true" className={cn("size-5", "[[dir=rtl]_&]:rotate-180")} />
+          </span>
         </button>
       </div>
 
@@ -476,7 +469,7 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
         onBlur={(event) => {
           /* A day is no longer the focus, so a pending refocus must not claim it later. */
           if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
-            pendingDayFocus.current = false;
+            setPendingDayFocus(null);
           }
         }}
         className={cn("border-separate border-spacing-0")}
@@ -545,7 +538,7 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
                       className={cn(
                         dayButtonClassName,
                         text.high,
-                        isToday && tone.text.primary,
+                        isToday && `${tone.text.primary} underline underline-offset-4`,
                         selected && isEdge && "font-medium",
                         selected && (invalid ? tone.selected.danger : tone.selected.primary),
                         !disabled && !unavailable && `${stateLayer.quiet} ${state.enabled}`,
@@ -568,15 +561,12 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
           type="button"
           disabled={disabled}
           onClick={goToToday}
-          onMouseDown={keepFocus}
           className={cn(todayButtonClassName, disabled ? state.disabledDescendant : state.enabled)}
         >
           {labels.today}
         </button>
 
-        {/* Why a range could not be completed. Announced, never shown: the refusal is already
-            visible as the selection that did not happen. */}
-        <div role="status" className={cn("sr-only")}>
+        <div role="status" className={cn("min-w-0 text-xs", tone.text.danger)}>
           {rangeMessage ?? ""}
         </div>
       </div>

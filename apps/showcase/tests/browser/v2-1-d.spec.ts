@@ -486,3 +486,74 @@ test("a long filename wraps inside its row and the removal keeps its full target
 
   expect(errors).toEqual([]);
 });
+
+test("disabled file drops cancel browser navigation without accepting files", async ({ page }) => {
+  await openHarness(page);
+  const field = page.getByTestId("v2-1-d-disabled");
+  const canceled = await zoneOf(field).evaluate((element) => {
+    const dataTransfer = new DataTransfer();
+    dataTransfer.items.add(new File(["file"], "blocked.pdf", { type: "application/pdf" }));
+    return ["dragenter", "dragover", "drop"].map((type) => {
+      const event = new DragEvent(type, { bubbles: true, cancelable: true, dataTransfer });
+      element.dispatchEvent(event);
+      return event.defaultPrevented;
+    });
+  });
+  expect(canceled).toEqual([true, true, true]);
+  await expect(field.getByRole("listitem")).toHaveText("locked.pdf");
+  await expect(field.getByRole("status")).toHaveText("");
+});
+
+test("rejected controlled removal cannot consume a later external update", async ({ page }) => {
+  await openHarness(page);
+  const field = page.getByTestId("v2-1-d-controlled");
+  await inputOf(field).setInputFiles([pickerFile("alpha.pdf", 16), pickerFile("beta.pdf", 16)]);
+  await page.getByTestId("v2-1-d-freeze").click();
+  const remove = field.getByRole("button", { name: "Remove alpha.pdf" });
+  await remove.focus();
+  await remove.press("Enter");
+  await expect(remove).toBeFocused();
+  await expect(field.getByRole("listitem")).toHaveCount(2);
+  await expect(field.getByRole("status")).toHaveText("");
+  const outside = page.getByTestId("upload-external-update");
+  await outside.click();
+  await expect(outside).toBeFocused();
+  await expect(field.getByRole("listitem")).toHaveCount(3);
+  await expect(field.getByRole("status")).toHaveText("");
+});
+
+test("rejection-only attempts replace success and repeat as fresh live content", async ({ page }) => {
+  await openHarness(page);
+  const field = page.getByTestId("v2-1-d-single");
+  const status = field.getByRole("status");
+  await inputOf(field).setInputFiles(pickerFile("good.pdf", 16));
+  await expect(status).toContainText("Added 1 file.");
+  await inputOf(field).setInputFiles(pickerFile("notes.txt", 16, "text/plain"));
+  await expect(status).toContainText("notes.txt");
+  await expect(status).not.toContainText("Added");
+  const previousMessage = await status.locator("span").elementHandle();
+  expect(previousMessage).not.toBeNull();
+  await inputOf(field).setInputFiles(pickerFile("notes.txt", 16, "text/plain"));
+  await expect(status).toContainText("notes.txt");
+  expect(await previousMessage!.evaluate((element) => element.isConnected)).toBe(false);
+  await expect(field.getByRole("listitem")).toHaveText("good.pdf");
+});
+
+test("the removal mark presses inside an unchanged full-sized target", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await openHarness(page);
+  const button = page.getByTestId("v2-1-d-removal").getByRole("button", { name: "Remove alpha.pdf" });
+  await button.scrollIntoViewIfNeeded();
+  const before = await button.boundingBox();
+  expect(before).not.toBeNull();
+  expect(before!.width).toBeGreaterThanOrEqual(44);
+  expect(before!.height).toBeGreaterThanOrEqual(44);
+  await page.mouse.move(before!.x + before!.width / 2, before!.y + before!.height / 2);
+  await page.mouse.down();
+  await expect.poll(() => button.locator("span").evaluate((element) => new DOMMatrix(getComputedStyle(element).transform).a)).toBeLessThan(0.99);
+  const during = await button.boundingBox();
+  expect(during!.width).toBeCloseTo(before!.width, 2);
+  expect(during!.height).toBeCloseTo(before!.height, 2);
+  await page.mouse.move(0, 0);
+  await page.mouse.up();
+});

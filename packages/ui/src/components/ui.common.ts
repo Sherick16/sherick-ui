@@ -72,6 +72,10 @@ export const focusRing =
 export const focusRingInset =
   "focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-focus";
 
+/* A focus owner that also contains a subtree paints the inset ring on its direct row only. */
+export const parentFocusRingInset =
+  "[:focus-visible>&]:ring-2 [:focus-visible>&]:ring-inset [:focus-visible>&]:ring-sherick-focus";
+
 /* The ring of a value control that is itself the focusable element: it wears it whenever it
    holds focus, however it was focused, and whenever the surface it opened is on screen. A select
    hands the DOM focus to its list while that list is open, so the ring follows the control's

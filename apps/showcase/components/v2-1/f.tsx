@@ -2,10 +2,7 @@
 
 import { FileText, Folder } from "lucide-react";
 import { useState } from "react";
-/* Temporary relative imports: the parent migrates these specimens to the package root at
-   integration. */
-import { DirectionProvider } from "../../../../packages/ui/src/components/DirectionProvider";
-import TreeView, { type TreeViewItem } from "../../../../packages/ui/src/components/TreeView";
+import { DirectionProvider, TreeView, type TreeViewItem } from "sherick-ui";
 
 const folder = <Folder />;
 const file = <FileText />;
@@ -95,6 +92,7 @@ export default function V21TreeSpecimen() {
   const [value, setValue] = useState<string | null>("first");
   const [expanded, setExpanded] = useState<string[]>(["parent"]);
   const [rejecting, setRejecting] = useState(false);
+  const [expansionRequests, setExpansionRequests] = useState<string[][]>([]);
   const [removed, setRemoved] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
 
@@ -128,11 +126,13 @@ export default function V21TreeSpecimen() {
           onValueChange={setValue}
           expandedValues={collapsed ? [] : expanded}
           onExpandedValuesChange={(next) => {
+            setExpansionRequests((previous) => [...previous, next]);
             if (!rejecting) setExpanded(next);
           }}
         />
         <p data-testid="tree-value">{value ?? "none"}</p>
         <p data-testid="tree-expanded">{collapsed ? "" : expanded.join(",")}</p>
+        <output data-testid="tree-expansion-requests">{JSON.stringify(expansionRequests)}</output>
         <div className="flex flex-wrap gap-3">
           <button
             type="button"

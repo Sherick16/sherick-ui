@@ -1,14 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import FileUpload from "../../../../../packages/ui/src/components/FileUpload";
-import type { FileRejection } from "../../../../../packages/ui/src/components/FileUpload";
+import { FileUpload, type FileRejection } from "sherick-ui";
 
-/* Verification harness for the FileUpload unit. It holds the states a browser test has to be able
-   to reach — a seeded selection, a consumer that refuses an update, a disabled field — and the
-   probes that report what the component told its consumer. The component under test is imported by
-   source path for isolated iteration; the parent replaces that with the package-root import at
-   integration. */
+/* Selection, rejection, disability, and callback probes for the published component. */
 
 const build = (name: string, type: string, bytes: number) =>
   new File([new Uint8Array(bytes)], name, { type, lastModified: 1 });
@@ -125,6 +120,10 @@ export default function VerificationFileUploadPage() {
           <div className="mt-2 flex items-center gap-3">
             <button type="button" data-testid="v2-1-d-freeze" onClick={() => setFrozen((value) => !value)}>
               {frozen ? "Allow updates" : "Freeze updates"}
+            </button>
+            <button type="button" data-testid="upload-external-update"
+              onClick={() => setControlled((previous) => [...previous, build("external.pdf", "application/pdf", 16)])}>
+              Add external file
             </button>
             <p data-testid="v2-1-d-controlled-committed">{names(committed)}</p>
           </div>
