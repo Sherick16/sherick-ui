@@ -28,6 +28,13 @@ export default function V21() {
       <output data-testid="command-action">{action}</output>
       <Pagination aria-label="Pages" count={20} defaultValue={2} />
       <Breadcrumb items={[{ label: "Home", href: "#home" }, { label: "Current" }]} />
+      <Pagination aria-label="Large pages" count={1234} defaultValue={600} siblingCount={2} />
+      <Pagination aria-label="Disabled large pages" count={1234} defaultValue={600} siblingCount={2} disabled />
+      <Breadcrumb aria-label="Long trail" items={[
+        { label: "Workspace", href: "#workspace" },
+        { label: "A destination whose name is far longer than the column it has to fit in", href: "#destination" },
+        { label: "Current" },
+      ]} />
       <FileUpload label="Files" accept=".txt" multiple />
       <Stepper aria-label="Workflow" value={step} onValueChange={setStep}
         items={[{ value: "draft", label: "Draft", complete: true }, { value: "review", label: "Review" }]} />

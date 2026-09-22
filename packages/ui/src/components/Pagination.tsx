@@ -165,7 +165,7 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
       const href = stepHref(page, onBoundary);
 
       return (
-        <li className={cn("flex")}>
+        <li className={cn("absolute top-1 flex first:start-1 last:end-1")}>
           {href !== undefined ? (
             <a
               href={href}
@@ -263,11 +263,12 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
           className
         )}
       >
-        {/* Compact columns show a complete previous/current/next control, never a clipped strip.
-            Extra-large page sets may wrap at wide widths; every visible target stays reachable. */}
+        {/* Reserve a target plus a gap at each logical end (44 + 4 + 4px with the track padding).
+            Only the numbered items wrap; both directions stay beside the first row, in DOM order.
+            The minimum height also holds the two targets when there are no numbered pages. */}
         <ol
           role="list"
-          className={cn("m-0 flex w-fit max-w-full list-none flex-wrap items-center gap-1 p-1", shape.control, selectable.surface, selectable.rest)}
+          className={cn("relative m-0 flex min-h-[3.25rem] w-fit max-w-full list-none flex-wrap items-center gap-1 px-[3.25rem] py-1", shape.control, selectable.surface, selectable.rest)}
         >
           {step(
             previousPage,

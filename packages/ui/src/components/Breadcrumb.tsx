@@ -64,7 +64,7 @@ const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
         <ol
           role="list"
           className={cn(
-            "m-0 flex min-w-0 list-none flex-wrap items-center gap-x-2 gap-y-1 p-0",
+            "m-0 flex min-w-0 list-none flex-wrap items-start gap-x-2 gap-y-1 p-0",
             text.medium
           )}
         >
@@ -72,9 +72,13 @@ const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
             const isCurrent = index === items.length - 1;
 
             return (
-              <li key={index} className={cn("flex min-w-0 items-center gap-x-2")}>
+              <li key={index} className={cn("flex min-w-0 items-start gap-x-2")}>
                 {index > 0 && (
-                  <ChevronRight aria-hidden="true" className={cn("size-4 shrink-0 rtl:-scale-x-100")} />
+                  /* One inherited line box centers the glyph on the label's first line, even when
+                     the label wraps or a consumer changes the trail's line-height. */
+                  <span aria-hidden="true" className={cn("inline-flex h-[1lh] w-4 shrink-0 items-center")}>
+                    <ChevronRight className={cn("size-4 rtl:-scale-x-100")} />
+                  </span>
                 )}
                 {isCurrent ? (
                   <span

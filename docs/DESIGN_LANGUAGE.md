@@ -243,6 +243,13 @@ Two implementation constraints, both load-bearing:
 - The base fill stays an ordinary background color, so a caller can retone a sheet
   without touching its lighting.
 
+The authored fills retain **98%** of an anchored sheet's own tone and **99%** for dense/hero
+surfaces in both themes. That floor is evaluated with backdrop filtering disabled: busy text
+behind a date popup, or a sparse command palette, must not become competing foreground copy.
+Blur, saturation and the existing directional gradients still enrich the material; they are not
+the isolation guarantee. Retune these existing fill tokens at the theme owner, never a particular
+popup's background. The dense/hero recipes retain their different lighting, blur and surface tone.
+
 **Do not** use acrylic for cards, panels, tables, fields or any other grounded surface,
 and do not re-tune a sheet's blur to make it "pop".
 
@@ -1302,6 +1309,8 @@ cannot give their labels room. Never hide the next action behind a clipped track
 to pretend a desktop layout fits. Container width, not device or viewport alone, drives this choice:
 a 240px desktop sidebar and a phone column need the same treatment. Consumers still own application
 grid columns and explicit fixed-width children. Code remains unwrapped and LTR.
+In full Pagination, only the numeric/ellipsis band wraps. The directional targets reserve their
+own logical start/end slots beside its first line; Next must never become an orphaned wrap item.
 
 Modal centering must yield to a reachable scroll origin when content exceeds the viewport.
 Toast content may scroll at the dynamic viewport limit; it is never sized from the height its

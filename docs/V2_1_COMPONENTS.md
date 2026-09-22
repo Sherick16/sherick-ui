@@ -318,8 +318,10 @@ The wave composes the existing language rather than adding new tokens or recipes
 - Pagination shares ToggleGroup's recessed track, rounded-rectangle segments and raised selected
   tint, with 44px targets and directional arrows. A native container query shows previous/current/next
   and the total below 32rem, keeping both directions visible. Full page choices return above that
-  width; unusually large sets wrap instead of clipping. Only number/glyph ink compresses on press.
+  width; only the numeric/ellipsis band wraps instead of clipping. Previous/Next keep reserved
+  logical end slots beside its first line. Only number/glyph ink compresses on press.
   Breadcrumb uses compact navigation typography and explicit native-link decoration ownership.
+  Each separator occupies one inherited line-height beside the label's first line, including RTL.
 - Stepper divides Progress's groove into labelled stages, horizontal or vertical. Current has
   a strong fill, completed a selected tint and check, pending an empty groove. Numbers and labels
   stay plain text rather than isolated badges. Horizontal descriptions use the full content band;

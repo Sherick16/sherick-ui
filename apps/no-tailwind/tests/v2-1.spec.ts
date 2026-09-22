@@ -340,3 +340,112 @@ test("dates hold control elevation, with one seamless surface for each selected 
     await page.keyboard.press("Escape");
   }
 });
+
+test("acrylic fill isolates date and command surfaces without depending on backdrop filtering", async ({ page }) => {
+  for (const theme of ["light", "dark"]) {
+    await page.evaluate(theme => { document.documentElement.dataset.sherickTheme = theme; }, theme);
+    for (const [triggerName, title, minimum] of [["Open Date", "Date", 0.98], ["Open Start", "Date range", 0.98], ["Open palette", "Palette", 0.99]] as const) {
+      await page.getByRole("button", { name: triggerName, exact: true }).click();
+      const popup = page.getByRole("dialog", { name: title, exact: true });
+      await expect(popup).toHaveCSS("opacity", "1");
+      expect(await css(popup, "backdrop-filter")).toContain("blur");
+      expect(await css(popup, "background-image")).toContain("linear-gradient");
+      // Exercise the degradation case, not just browsers with working blur. The authored fill
+      // must stand alone; gradients and the filter may only strengthen this isolation.
+      const alpha = await popup.evaluate(element => {
+        element.style.setProperty("backdrop-filter", "none");
+        element.style.setProperty("-webkit-backdrop-filter", "none");
+        const canvas = document.createElement("canvas");
+        canvas.width = canvas.height = 1;
+        const context = canvas.getContext("2d")!;
+        context.fillStyle = getComputedStyle(element).backgroundColor;
+        context.fillRect(0, 0, 1, 1);
+        return context.getImageData(0, 0, 1, 1).data[3] / 255;
+      });
+      expect(await css(popup, "backdrop-filter")).toBe("none");
+      expect(alpha).toBeGreaterThanOrEqual(minimum - 1 / 255);
+      expect(alpha).toBeLessThan(1);
+      if (title === "Palette") {
+        await popup.getByRole("combobox").fill("nothing matches");
+        await expect(popup).toContainText("No commands found.");
+        expect(await css(popup, "background-image")).toContain("linear-gradient");
+      }
+      await page.keyboard.press("Escape");
+      await expect(popup).toBeHidden();
+    }
+  }
+});
+
+test("large pagination wraps only numbers while both directions keep their first-row slots", async ({ page }) => {
+  const root = page.getByTestId("no-tailwind-v21");
+  const column = root.locator(":scope > div");
+  await column.evaluate(element => { element.style.width = "768px"; element.style.maxWidth = "768px"; });
+  const enabled = page.getByRole("navigation", { name: "Large pages", exact: true });
+  for (const width of [240, 511, 512, 560, 579, 580, 581, 600, 620, 672, 768]) {
+    for (const direction of ["ltr", "rtl"]) {
+      await root.evaluate((element, direction) => element.setAttribute("dir", direction), direction);
+      for (const name of ["Large pages", "Disabled large pages"]) {
+        const nav = page.getByRole("navigation", { name, exact: true });
+        await nav.evaluate((element, width) => { element.style.width = `${width}px`; }, width);
+        const previous = (await nav.getByRole("button", { name: "Previous page" }).boundingBox())!;
+        const next = (await nav.getByRole("button", { name: "Next page" }).boundingBox())!;
+        const track = (await nav.getByRole("list").boundingBox())!;
+        expect(previous.y).toBeCloseTo(next.y, 1);
+        expect(previous.y).toBeCloseTo(track.y + 4, 1);
+        const left = direction === "ltr" ? previous : next;
+        const right = direction === "ltr" ? next : previous;
+        expect(left.x).toBeCloseTo(track.x + 4, 1);
+        expect(right.x + right.width).toBeCloseTo(track.x + track.width - 4, 1);
+        for (const target of await nav.getByRole("button").all()) {
+          const box = (await target.boundingBox())!;
+          expect(box.width).toBeGreaterThanOrEqual(44);
+          expect(box.height).toBeGreaterThanOrEqual(44);
+          if ((await target.getAttribute("aria-label"))?.startsWith("Page ")) {
+            expect(box.x).toBeGreaterThanOrEqual(left.x + left.width + 4 - 0.5);
+            expect(box.x + box.width).toBeLessThanOrEqual(right.x - 4 + 0.5);
+          }
+          if (name === "Disabled large pages") await expect(target).toBeDisabled();
+        }
+        expect(await nav.evaluate(element => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
+        const visiblePages = await nav.getByRole("button", { name: /^Page / }).allTextContents();
+        expect(visiblePages).toEqual(width < 512 ? ["600"] : ["1", "598", "599", "600", "601", "602", "1234"]);
+        const firstNumber = (await nav.getByRole("button", { name: width < 512 ? "Page 600" : "Page 1", exact: true }).boundingBox())!;
+        expect(firstNumber.y).toBeCloseTo(previous.y, 1);
+      }
+    }
+  }
+  await enabled.getByRole("button", { name: "Page 1", exact: true }).click();
+  await expect(enabled.getByRole("button", { name: "Previous page" })).toBeDisabled();
+  await enabled.getByRole("button", { name: "Page 1234", exact: true }).focus();
+  await page.keyboard.press("Tab");
+  await expect(enabled.getByRole("button", { name: "Next page" })).toBeFocused();
+  expect(await css(enabled.getByRole("button", { name: "Next page" }), "box-shadow")).not.toBe("none");
+  await page.keyboard.press("Enter");
+  await expect(enabled.locator('[aria-current="page"]')).toHaveText("2");
+  await enabled.getByRole("button", { name: "Page 1234", exact: true }).click();
+  await expect(enabled.getByRole("button", { name: "Next page" })).toBeDisabled();
+});
+
+test("breadcrumb separators stay centered on the first line in both directions", async ({ page }) => {
+  const trail = page.getByRole("navigation", { name: "Long trail" });
+  for (const width of [672, 240]) for (const direction of ["ltr", "rtl"]) for (const lineHeight of [24, 32]) {
+    await page.getByTestId("no-tailwind-v21").evaluate((element, direction) => element.setAttribute("dir", direction), direction);
+    await trail.evaluate((element, values) => {
+      element.style.width = `${values.width}px`;
+      element.style.lineHeight = `${values.lineHeight}px`;
+    }, { width, lineHeight });
+    for (const item of await trail.locator("li").filter({ has: page.locator("svg") }).all()) {
+      const separator = item.locator("svg");
+      const label = item.locator(":scope > :last-child");
+      const glyph = (await separator.boundingBox())!;
+      const copy = (await label.boundingBox())!;
+      expect(glyph.y + glyph.height / 2).toBeCloseTo(copy.y + lineHeight / 2, 1);
+      if (direction === "ltr") expect(glyph.x + glyph.width).toBeLessThan(copy.x);
+      else expect(glyph.x).toBeGreaterThan(copy.x + copy.width);
+      expect(await css(separator, "transform")).toBe(direction === "rtl" ? "matrix(-1, 0, 0, 1, 0, 0)" : "none");
+    }
+    const longLabel = trail.getByRole("link", { name: /^A destination/ });
+    if (width === 240) expect((await longLabel.boundingBox())!.height).toBeGreaterThanOrEqual(lineHeight * 3);
+    expect(await trail.evaluate(element => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
+  }
+});
