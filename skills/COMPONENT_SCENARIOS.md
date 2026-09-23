@@ -4,7 +4,7 @@ Evaluation prompts for the consumer skill. Give an agent only the task prompt an
 portable copy of `skills/sherick-ui/`; do not provide repository-maintainer context or
 point it directly at reference answers. The notes after each prompt are evaluator criteria,
 not part of the prompt. A successful answer chooses a valid API, follows the right reference,
-and checks installed-version availability before recommending unreleased exports.
+and checks installed-version availability before recommending newer exports.
 
 ## 1. Fixed choice or searchable choice
 
@@ -30,7 +30,7 @@ visible text. Which component and what must the example provide?
 PDFs, show chosen names, and let the form submit the selected files. Can I use Sherick's
 file component, and what remains app-owned?
 
-**Look for:** identifies `FileUpload` as unreleased v2.1 and does not recommend it for stable
+**Look for:** identifies `FileUpload` as added in 2.1.0 and does not recommend it for
 2.0 without verifying the installed exports; distinguishes selection from upload and native
 form submission; proposes no fictional hidden-input contract. Routes to `forms.md`.
 
@@ -41,7 +41,7 @@ runs it and must not replace the search query. Should I use Combobox or Command,
 available from the stable package?
 
 **Look for:** chooses `Command` for actions rather than a value choice, distinguishes it from
-`Combobox`, routes to `selection.md`, labels Command as unreleased v2.1, and checks the
+`Combobox`, routes to `selection.md`, labels Command as added in 2.1.0, and checks the
 resolved package before use.
 
 ## 5. Confirmation vs general modal
@@ -68,7 +68,7 @@ time zones and support null endpoints. What value shape should the app own, and 
 consumer import it?
 
 **Look for:** routes to `selection.md`; describes civil `YYYY-MM-DD` values and the
-`{ start, end }` range with nullable endpoints; identifies the date family as unreleased v2.1
+`{ start, end }` range with nullable endpoints; identifies the date family as added in 2.1.0
 and verifies installed package availability rather than treating repository source as release.
 
 ## 8. Hierarchy vs disclosure
@@ -108,4 +108,4 @@ rendered, and is the component available to an app pinned to `sherick-ui@2.0.0`?
 **Look for:** routes to `actions-display.md#media`; uses `Media.Image` with meaningful
 `alt` and `Media.Video` with `autoPlay muted loop decorative`, without controls;
 keeps Hero placement in the application, does not force video cropping without explicit
-`aspect`/`fit`, and checks installed exports since Media is unreleased in 2.0.0.
+`aspect`/`fit`, and checks installed exports since Media is not in 2.0.0 (added in 2.1.0).

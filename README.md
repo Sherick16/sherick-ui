@@ -5,9 +5,9 @@ contrast and restrained motion. It is **quiet by default, expressive where it ma
 [The design language](docs/DESIGN_LANGUAGE.md) defines its visual roles; [Base UI](https://base-ui.com/)
 owns generic widget behavior and accessibility where a primitive is available.
 
-**Release status:** `2.0.0` is stable under npm's `latest` tag. The `1.x` line is frozen;
-ordinary semver compatibility starts at `2.0.0`. The additional v2.1 components in this
-repository are **not yet published**. See the [release contract](docs/RELEASE.md).
+**Release status:** `2.0.0` established the stable line; `1.x` is frozen. This
+checkout's package version is `2.1.0`, published from verified `main` via npm trusted
+publishing. Check npm for the installed version; see the [release contract](docs/RELEASE.md).
 
 ## Installation
 
@@ -92,11 +92,11 @@ The stable core barrel exports:
   `ToastProvider`, `ToastViewport`, `useToast`, `createToastManager`;
 - writing direction: `DirectionProvider`.
 
-The **unreleased** v2.1 source also exports `Calendar`, `DatePicker`, `DateRangePicker`,
+The `2.1.0` source also exports `Calendar`, `DatePicker`, `DateRangePicker`,
 `Command`, `CommandPalette`, `Pagination`, `Breadcrumb`, `FileUpload`, `Stepper` and
-`TreeView`. Their current APIs are in [v2.1 component contracts](docs/V2_1_COMPONENTS.md).
+`TreeView`. Their APIs are in [v2.1 component contracts](docs/V2_1_COMPONENTS.md).
 Dates use civil `YYYY-MM-DD` values; FileUpload reports `File[]` without uploading files.
-No new stylesheet or subpath is required when these additions are released.
+Check the installed package version before using these additions.
 
 Use `Media.Image` and `Media.Video` for rounded, clipped, responsive images and native video.
 Video keeps its original aspect ratio unless you opt into a constraint. See the

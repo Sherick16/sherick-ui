@@ -7,10 +7,9 @@ defaults, states and component-specific caveats. The [design language](../design
 [composition](../composition.md), [theming](../theming.md) and
 [accessibility](../accessibility.md) references own the cross-component rules.
 
-The original eleven ship in the stable `2.0.0` core barrel. `Media` is a later
-unreleased repository addition: verify the consuming application's installed exports
-before using it. Import from `sherick-ui`; no Base UI import, workbench recipe or
-private class is needed or supported.
+The original eleven ship in the `2.0.0` core barrel. `Media` joins them in `2.1.0`:
+verify the consuming application's installed exports before using it. Import from
+`sherick-ui`; no Base UI import, workbench recipe or private class is needed or supported.
 
 ```tsx
 import {

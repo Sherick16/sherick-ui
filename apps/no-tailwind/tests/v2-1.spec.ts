@@ -54,8 +54,12 @@ test("published controls retain native forms, selection and keyboard focus", asy
   expect((await remove.boundingBox())!.height).toBeGreaterThanOrEqual(44);
   const files = page.getByRole("list").filter({ has: remove });
   await expect(files).toHaveAttribute("role", "list");
-  for (const property of ["margin-block-start", "margin-block-end", "padding-inline-start", "padding-inline-end"]) {
+  for (const property of ["margin-block-start", "margin-block-end"]) {
     expect(await css(files, property)).toBe("0px");
+  }
+  // The list resets browser defaults but retains FileUpload's authored px-3 inset.
+  for (const property of ["padding-inline-start", "padding-inline-end"]) {
+    expect(await css(files, property)).toBe("12px");
   }
   expect(await css(files, "list-style-type")).toBe("none");
   await remove.click();

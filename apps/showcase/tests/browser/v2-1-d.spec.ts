@@ -274,7 +274,7 @@ test("the zone opens the platform's own chooser, by pointer and by keyboard", as
 
   // And the platform opens the same chooser for the keyboard.
   const keyboardChooser = page.waitForEvent("filechooser");
-  await page.keyboard.press("Enter");
+  await page.keyboard.press("Space");
   const second = await keyboardChooser;
   await second.setFiles(pickerFile("typed.pdf", 16));
   await expect(field.getByRole("listitem")).toHaveCount(1);

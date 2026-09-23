@@ -8,10 +8,9 @@ in [composition](../composition.md), [accessibility](../accessibility.md),
 [design language](../design-language.md) and [theming](../theming.md).
 
 Release availability: `NavGroup`, `NavItem`, `Tabs`, `Accordion`, `Collapsible`, `Dialog`,
-`AlertDialog`, `Drawer`, `Menu`, `Popover` and `Tooltip` are part of the stable `2.0.0` root
-export. `Breadcrumb`, `Pagination`, `Stepper` and `TreeView` are **unreleased v2.1 additions** —
-the import path is the same `sherick-ui`, but they are not in a published release, so confirm each
-exists in the installed package before using it.
+`AlertDialog`, `Drawer`, `Menu`, `Popover` and `Tooltip` are part of the `2.0.0` root
+export. `Breadcrumb`, `Pagination`, `Stepper` and `TreeView` arrive in `2.1.0` under
+the same `sherick-ui` import; confirm each exists in the installed package before use.
 
 ```tsx
 import {
@@ -143,7 +142,7 @@ A titled group of destinations — structure inside the surface it sits on, not 
   group). There is no icon, no per-item `disabled` and no render escape hatch: for those, compose
   `NavItem` yourself.
 
-### `Breadcrumb` (unreleased v2.1)
+### `Breadcrumb` (from 2.1.0)
 
 The trail of places a reader came through. Passive: links and text, no state, no effect and no
 client directive, so a server component renders it.
@@ -173,7 +172,7 @@ client directive, so a server component renders it.
   is information — so plan the column for a long trail.
 - Items are keyed by position.
 
-### `Pagination` (unreleased v2.1)
+### `Pagination` (from 2.1.0)
 
 A bounded set of numbered destinations over one native ordered list. It renders the control only.
 
@@ -206,7 +205,7 @@ A bounded set of numbered destinations over one native ordered list. It renders 
   current and next reachable side by side without a scrolling strip. Targets stay ≥44px.
 - It does not fetch data, does not know what a page holds and does not scroll the page.
 
-### `Stepper` (unreleased v2.1)
+### `Stepper` (from 2.1.0)
 
 A discrete progress track that names the workflow's stages and can be operated.
 
@@ -245,7 +244,7 @@ const [step, setStep] = useState<string | null>("shipping");
   a 32rem container (64rem when there are more than four steps). DOM order and the controls never
   change with the arrangement, so nothing is reordered or duplicated by resizing.
 
-### `TreeView` (unreleased v2.1)
+### `TreeView` (from 2.1.0)
 
 A finite static tree the user browses, expands and chooses from.
 
@@ -598,7 +597,7 @@ A short hint for a control.
 - `Breadcrumb` ignores an `href` on the final item by design, and its items are keyed by position.
 - `TreeView` and `Stepper` own mechanics that Base UI does not provide (the APG tree, and the
   step's controlled workflow). Do not wrap either in extra keyboard or focus machinery.
-- `Breadcrumb`, `Pagination`, `Stepper` and `TreeView` are unreleased v2.1 additions; confirm the
+- `Breadcrumb`, `Pagination`, `Stepper` and `TreeView` require 2.1.0; confirm the
   installed package actually exports them before depending on them.
 
 Sources: [component sources at the pinned
