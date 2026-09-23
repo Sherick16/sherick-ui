@@ -1,0 +1,13 @@
+{
+  "name": "@sherick-ui/sidebar-example",
+  "private": true,
+  "version": "0.0.0",
+  "dependencies": {
+    "lucide-react": "^1.46.0",
+    "react": "^19.3.0",
+    "sherick-ui": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0"
+  }
+}

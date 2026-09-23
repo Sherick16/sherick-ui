@@ -1,7 +1,7 @@
 # v2.1 component contracts
 
 This additive wave follows stable `2.0.0` and ships with the `2.1.0` source package
-after verified `main` publication. Its five subpaths, existing APIs, audited Base UI
+after approval of the staged release. Its five subpaths, existing APIs, audited Base UI
 `1.8.0`, dependencies and motion owners remain unchanged; there is no release tag.
 Check the installed package version before relying on these components.
 

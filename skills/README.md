@@ -26,7 +26,7 @@ The cross-cutting foundation was checked against `main` at
 [`b1c201b`](https://github.com/Sherick16/sherick-ui/commit/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85); the component-reference pass was checked against current `main` at
 [`2bf6da5`](https://github.com/Sherick16/sherick-ui/commit/2bf6da5189e0e5b0d113954029e2fe6f0fda1ef3).
 The Media extension was checked against [`9ecb90d`](https://github.com/Sherick16/sherick-ui/commit/9ecb90dd7ddfa81437e87144ac98255a67b4cad9);
-it joins the published package starting with `2.1.0` after verified main publication.
+it joins the published package starting with `2.1.0` after staged-release approval.
 The canonical [design language](../docs/DESIGN_LANGUAGE.md) owns visual policy;
 [consumer documentation](../packages/ui/README.md), [package exports](../packages/ui/package.json)
 and public declarations own the consumer API. Implementations, relevant tests and showcase

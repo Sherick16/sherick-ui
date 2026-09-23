@@ -2,8 +2,8 @@
 
 A React 18/19 component library with soft tonal surfaces, deliberate shape contrast
 and restrained motion. `2.0.0` established the stable line; `1.x` is frozen.
-This package source is `2.1.0`; verified `main` publishes new versions via npm trusted
-publishing. Check the installed version to determine component availability.
+This package source is `2.1.0`; verified `main` stages new versions via npm trusted
+publishing for maintainer approval. Check the installed version for availability.
 
 ## Install and style
 

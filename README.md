@@ -6,8 +6,8 @@ contrast and restrained motion. It is **quiet by default, expressive where it ma
 owns generic widget behavior and accessibility where a primitive is available.
 
 **Release status:** `2.0.0` established the stable line; `1.x` is frozen. This
-checkout's package version is `2.1.0`, published from verified `main` via npm trusted
-publishing. Check npm for the installed version; see the [release contract](docs/RELEASE.md).
+checkout's package version is `2.1.0`. Verified `main` stages releases for maintainer
+approval; check npm for the installed version. See the [release contract](docs/RELEASE.md).
 
 ## Installation
 
@@ -115,6 +115,10 @@ There are exactly five subpaths: core, `content`, development-only `dev`, `style
 [release contract](docs/RELEASE.md#public-export-contract) records module formats and
 semver boundaries; [`packages/ui/README.md`](packages/ui/README.md) is the concise
 consumer-facing package entry.
+
+## Examples
+
+The [application sidebar](examples/sidebar/) is a copyable navigation shell with a responsive mobile drawer. See the [example index](examples/README.md) for previews.
 
 ## Support and development
 
