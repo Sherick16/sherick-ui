@@ -402,7 +402,7 @@ export const material = {
     "bg-sherick-surface-overlay/[var(--sui-overlay-fill)] bg-[image:var(--sui-glass-hero-gradient)] text-sherick-ink backdrop-blur-[var(--sui-glass-hero-blur)] backdrop-saturate-[var(--sui-glass-hero-saturation)] backdrop-brightness-[var(--sui-glass-hero-brightness)]",
 } as const;
 /* A passive sheet tucked below a stronger control; independently tree-shakeable. */
-export const matteInset = "bg-sherick-surface-high/[0.56] text-sherick-ink";
+export const matteInset = "bg-sherick-surface-high/[0.35] text-sherick-ink";
 
 /* Density — three control steps plus the accessible hit target.
    Density owns height and the type step, so controls of one density share a

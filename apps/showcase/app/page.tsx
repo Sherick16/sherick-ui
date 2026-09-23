@@ -157,7 +157,7 @@ export default function Home() {
             <Badge variant="primary">Sherick UI · development workbench</Badge>
             <h1 className="mt-5 text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">Design system showcase</h1>
             <p className={cn("mt-3 max-w-2xl text-base leading-7", text.medium)}>
-              Every component and primitive, side by side, in every theme.
+              A closer look at the components and materials that make up Sherick UI.
             </p>
             <a
               href="https://github.com/Sherick16/sherick-ui/blob/main/docs/DESIGN_LANGUAGE.md"
@@ -180,7 +180,7 @@ export default function Home() {
         </div>
         <div className="space-y-16">
           <ShowcaseSection id="design-language">
-            <div className="mt-6 grid gap-4 xl:grid-cols-2">
+            <div className="mt-6 columns-1 gap-4 xl:columns-2 [&>*]:mb-4 [&>*]:break-inside-avoid">
               <Specimen title="Material">
                 <div className={cn("grid grid-cols-2 gap-4 p-5 sm:grid-cols-3", shape.control, material.canvas)}>
                   <Tile label="Canvas" className={cn(material.canvas, "outline outline-1 outline-dashed outline-sherick-edge/[0.25]")} />
@@ -358,30 +358,24 @@ export default function Home() {
                 <div className="space-y-4">
                   <Input label="Project name" placeholder="Sherick UI" />
                   <Input label="Invalid" placeholder="Required value" error />
-                  <Input label="Focus-visible" placeholder="Keyboard focus" inputClassName="outline outline-2 outline-sherick-focus outline-offset-[3px] bg-sherick-surface-high/[0.9]" />
-                  <Input label="Disabled" placeholder="Unavailable" disabled />
                 </div>
               </Specimen>
 
               <Specimen title="Textarea">
                 <div className="space-y-4">
                   <Textarea label="Notes" placeholder="Describe what you want to build…" />
-                  <Textarea label="Invalid notes" placeholder="Add more detail" error />
                 </div>
               </Specimen>
 
               <Specimen title="Search">
                 <div className="space-y-4">
                   <Search onSearch={() => undefined} placeholder="Search components" className="w-full" />
-                  <Search onSearch={() => undefined} placeholder="Loading search" loading className="w-full" />
                 </div>
               </Specimen>
 
               <Specimen title="Select">
                 <div className="space-y-4">
-                  <Select options={selectOptions} aria-label="Empty project type" />
                   <Select options={selectOptions} value={selection} onValueChange={(next) => setSelection(next ?? "")} aria-label="Project type" />
-                  <Select options={selectOptions} disabled aria-label="Disabled project type" />
                 </div>
               </Specimen>
 
@@ -389,12 +383,6 @@ export default function Home() {
                 <div className="space-y-4">
                   <Field label="Project">
                     <Combobox options={comboboxOptions} defaultValue="dashboard" />
-                  </Field>
-                  <Field label="No results">
-                    <Combobox options={comboboxOptions} defaultInputValue="Nothing matches this query" />
-                  </Field>
-                  <Field label="Disabled">
-                    <Combobox options={comboboxOptions} defaultValue="design" disabled />
                   </Field>
                 </div>
               </Specimen>
@@ -404,25 +392,19 @@ export default function Home() {
                   <Field label="Quantity" description="Between 1 and 10.">
                     <NumberField min={1} max={10} defaultValue={4} />
                   </Field>
-                  <Field label="Seats" required error="Choose between 1 and 10 seats.">
-                    <NumberField min={1} max={10} defaultValue={10} />
-                  </Field>
-                  <Field label="Locked" description="Owned by the workspace.">
-                    <NumberField defaultValue={4} disabled />
-                  </Field>
                 </div>
               </Specimen>
               <Specimen title="Calendar & date pickers" className="xl:col-span-2">
                 <DateFamilySpecimen />
               </Specimen>
-              <Specimen title="File upload">
+              <Specimen title="File upload" className="xl:col-span-2">
                 <FileUploadSpecimen />
               </Specimen>
             </div>
           </ShowcaseSection>
 
           <ShowcaseSection id="selection">
-            <div className="mt-6 grid gap-4 xl:grid-cols-2">
+            <div className="mt-6 columns-1 gap-4 xl:columns-2 [&>*]:mb-4 [&>*]:break-inside-avoid">
               <Specimen title="Checkbox">
                 <div className="flex flex-wrap items-center gap-6">
                   <StateLabel label="Checked"><Checkbox defaultChecked aria-label="Checked" /></StateLabel>
@@ -544,7 +526,7 @@ export default function Home() {
           </ShowcaseSection>
 
           <ShowcaseSection id="feedback">
-            <div className="mt-6 grid gap-4 xl:grid-cols-2">
+            <div className="mt-6 columns-1 gap-4 xl:columns-2 [&>*]:mb-4 [&>*]:break-inside-avoid">
               <Specimen title="Alerts">
                 <div className="space-y-3">
                   <Alert variant="primary">A useful piece of information.</Alert>
@@ -589,7 +571,7 @@ export default function Home() {
           </ShowcaseSection>
 
           <ShowcaseSection id="disclosure">
-            <div className="mt-6 grid gap-4 xl:grid-cols-2">
+            <div className="mt-6 columns-1 gap-4 xl:columns-2 [&>*]:mb-4 [&>*]:break-inside-avoid">
               <Specimen title="Accordion">
                 <Accordion defaultValue={["wrapped"]}>
                   <Accordion.Item value="plan">
@@ -666,7 +648,7 @@ export default function Home() {
           </ShowcaseSection>
 
           <ShowcaseSection id="floating">
-            <div className="mt-6 grid gap-4 xl:grid-cols-2">
+            <div className="mt-6 columns-1 gap-4 xl:columns-2 [&>*]:mb-4 [&>*]:break-inside-avoid">
               <Specimen title="Command & palette">
                 <CommandSpecimen />
               </Specimen>

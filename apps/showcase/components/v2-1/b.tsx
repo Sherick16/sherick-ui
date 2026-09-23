@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Moon, PenLine, Sun } from "lucide-react";
 import { Button, Command, CommandPalette, type CommandItem } from "sherick-ui";
 
@@ -41,10 +40,8 @@ const Specimen = ({
 );
 
 export default function CommandSpecimen() {
-  const [query, setQuery] = useState("theme");
-
   return (
-    <div className="grid min-w-0 gap-8 lg:grid-cols-2">
+    <div className="grid min-w-0 gap-6">
       <Specimen caption="Command">
         <Command
           items={commands}
@@ -60,30 +57,7 @@ export default function CommandSpecimen() {
           description="Search the commands, then press Enter."
           label="Search palette commands"
           items={commands}
-          trigger={<Button appearance="filled">Open command palette</Button>}
-        />
-      </Specimen>
-
-      <Specimen caption="No matching command">
-        <Command
-          items={commands}
-          label="Search commands with no match"
-          placeholder="Search commands"
-          defaultValue="nothing matches this"
-        />
-      </Specimen>
-
-      <Specimen caption="Disabled command">
-        <Command items={commands} label="Search disabled commands" placeholder="Search commands" disabled />
-      </Specimen>
-
-      <Specimen caption="Controlled query">
-        <Command
-          items={commands}
-          label="Search commands with a controlled query"
-          placeholder="Search commands"
-          value={query}
-          onValueChange={(next) => setQuery(next)}
+          trigger={<Button appearance="tonal" variant="secondary" className="self-start">Open command palette</Button>}
         />
       </Specimen>
     </div>
