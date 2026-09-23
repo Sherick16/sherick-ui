@@ -116,6 +116,10 @@ There are exactly five subpaths: core, `content`, development-only `dev`, `style
 semver boundaries; [`packages/ui/README.md`](packages/ui/README.md) is the concise
 consumer-facing package entry.
 
+## Examples
+
+The [application sidebar](examples/sidebar/) is a copyable navigation shell with a responsive mobile drawer. See the [example index](examples/README.md) for previews.
+
 ## Support and development
 
 The core has ESM and CommonJS entries and supports React/React DOM 18 or 19. The tested
