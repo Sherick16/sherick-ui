@@ -388,19 +388,30 @@ test("the clear control empties the selection and returns focus to the picker", 
   await expect(field.getByRole("listitem").last()).toContainText("b.png16 B · PNG");
   await expect(field.getByRole("listitem").last().locator("svg.lucide-image")).toBeVisible();
 
-  // The inset sheet tucks under the chooser; its rows meet at a shared divider.
+  // One visible inset sheet tucks under the chooser, square at the join and rounded below.
   const placement = await field.evaluate((element) => {
-    const zone = element.querySelector("label:has(input[type=file])")!.getBoundingClientRect();
-    const sheet = element.querySelector("ul[role=list]")!.parentElement!.getBoundingClientRect();
+    const zoneElement = element.querySelector("label:has(input[type=file])")!;
+    const zone = zoneElement.getBoundingClientRect();
+    const sheet = element.querySelector("ul[role=list]")!.parentElement!;
+    const bounds = sheet.getBoundingClientRect();
+    const style = getComputedStyle(sheet);
     const rows = element.querySelectorAll("li");
     return {
-      inset: sheet.left > zone.left && sheet.right < zone.right,
-      attached: sheet.top < zone.bottom && sheet.bottom > zone.bottom,
+      inset: bounds.left > zone.left && bounds.right < zone.right,
+      attached: bounds.top < zone.bottom && bounds.bottom > zone.bottom,
       joined: rows[0].getBoundingClientRect().bottom === rows[1].getBoundingClientRect().top,
       divider: getComputedStyle(rows[0]).borderBottomWidth,
+      topRadius: style.borderTopLeftRadius,
+      bottomRadius: style.borderBottomLeftRadius,
+      fill: style.backgroundColor,
+      zoneFill: getComputedStyle(zoneElement).backgroundColor,
+      depth: style.boxShadow,
     };
   });
-  expect(placement).toEqual({ inset: true, attached: true, joined: true, divider: "1px" });
+  expect(placement).toMatchObject({ inset: true, attached: true, joined: true, divider: "1px", topRadius: "0px" });
+  expect(placement.bottomRadius).not.toBe("0px");
+  expect(placement.fill).toBe(placement.zoneFill);
+  expect(placement.depth).not.toBe("none");
 
   await field.getByRole("button", { name: "Remove all" }).click();
   await expect(field.getByRole("listitem")).toHaveCount(0);

@@ -19,6 +19,7 @@ import Button from "./Button";
 import {
   density,
   edge,
+  elevation,
   fieldLayout,
   focusRingInset,
   focusRingWithin,
@@ -351,7 +352,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
         </label>
 
         {selected.length > 0 && (
-          <div className={cn("mx-3 -mt-3 min-w-0 overflow-hidden pt-3", shape.control, material.matteQuiet)}>
+          <div className={cn("mx-3 -mt-3 min-w-0 overflow-hidden pt-3", shape.control, "rounded-t-none", material.matteHigh, elevation.recessed)}>
             <ul role="list" className={cn("m-0 min-w-0 list-none px-3 pt-1")}>
               {selected.map((file, index) => {
                 const key = fileKey(file);
