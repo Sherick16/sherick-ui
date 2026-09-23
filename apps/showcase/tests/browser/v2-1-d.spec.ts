@@ -91,6 +91,8 @@ test("the field names its picker and describes it with every limit", async ({ pa
     const supporting = copy.lastElementChild!.getBoundingClientRect();
     return {
       iconSize: icon.width,
+      iconTitleGap: title.top - icon.bottom,
+      zoneHeight: zone.getBoundingClientRect().height,
       stacked: icon.bottom < title.top,
       centered: Math.abs((icon.left + icon.right) / 2 - (title.left + title.right) / 2) <= 1,
       hierarchy: Number(getComputedStyle(copy.firstElementChild!).fontWeight) > Number(getComputedStyle(copy.lastElementChild!).fontWeight),
@@ -98,7 +100,9 @@ test("the field names its picker and describes it with every limit", async ({ pa
     };
   });
   expect(stack).toMatchObject({ stacked: true, centered: true, hierarchy: true, supportingBelow: true });
-  expect(stack.iconSize).toBeGreaterThanOrEqual(32);
+  expect(stack.iconSize).toBe(28);
+  expect(stack.iconTitleGap).toBeLessThanOrEqual(11);
+  expect(stack.zoneHeight).toBeLessThanOrEqual(124);
 
   expect(errors).toEqual([]);
 });
@@ -336,6 +340,9 @@ test("a file drag marks the zone and hands the drop to the same rules", async ({
   await expect(zone.getByText("Add files")).toHaveCount(0);
   // The state is not carried by colour alone; it also takes a fill the resting zone does not hold.
   await settled().not.toBe(rest);
+  const accent = await zone.evaluate((element) => getComputedStyle(element).getPropertyValue("--sui-primary").trim());
+  expect(accent).not.toBe("");
+  expect(await background(zone)).toContain(accent.split(" ").map(Number).join(" "));
   await expect(zone).toHaveAttribute("data-dragging", "true");
   await expect.poll(() => zone.evaluate((element) => {
     const style = getComputedStyle(element);
