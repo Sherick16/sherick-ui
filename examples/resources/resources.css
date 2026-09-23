@@ -1,0 +1,137 @@
+.resources-page {
+  max-width: 72rem;
+  min-height: 100dvh;
+  margin-inline: auto;
+  padding: 3rem clamp(1.25rem, 4vw, 3rem) 5rem;
+  color: oklch(var(--sui-ink));
+  background: oklch(var(--sui-canvas));
+}
+
+.resources-heading,
+.resources-results-bar,
+.resources-footer {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.resources-heading h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+}
+
+.resources-heading p,
+.resources-empty p,
+.resources-results-bar p,
+.resources-footer p {
+  color: oklch(var(--sui-ink-muted));
+  line-height: 1.5;
+}
+
+.resources-heading p {
+  margin: 0.5rem 0 0;
+}
+
+.resources-filters {
+  display: grid;
+  grid-template-columns: minmax(14rem, 1.7fr) repeat(2, minmax(10rem, 1fr));
+  align-items: end;
+  gap: 1rem;
+  margin-block: 2.5rem 1.75rem;
+}
+
+.resources-results-bar {
+  flex-wrap: wrap;
+  margin-bottom: 1rem;
+}
+
+.resources-results-bar p {
+  flex: 1;
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.resources-sort {
+  width: 11rem;
+  max-width: 100%;
+}
+
+.resources-name {
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.resources-nowrap {
+  white-space: nowrap;
+}
+
+.resources-footer {
+  align-items: center;
+  margin-top: 1.5rem;
+}
+
+.resources-footer p {
+  flex-shrink: 0;
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.resources-empty {
+  padding: 4rem 1rem;
+  text-align: center;
+}
+
+.resources-empty h2 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.resources-empty p {
+  margin: 0.5rem 0 0;
+}
+
+.resources-empty button {
+  margin-top: 1.25rem;
+}
+
+@media (max-width: 850px) {
+  .resources-filters {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .resources-filters > :first-child {
+    grid-column: 1 / -1;
+  }
+
+  .resources-footer {
+    align-items: start;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 540px) {
+  .resources-page {
+    padding-top: 2rem;
+  }
+
+  .resources-heading {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .resources-filters {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .resources-results-bar {
+    align-items: center;
+  }
+
+  .resources-sort {
+    width: 100%;
+  }
+}
