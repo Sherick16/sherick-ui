@@ -13,6 +13,7 @@ test("breadcrumb, stable identity and distinct project views", async ({ page, er
   await expect(breadcrumb.getByText("Details")).toHaveAttribute("aria-current", "page");
   await expect(breadcrumb.getByText("Customer portal")).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Customer portal", level: 1 })).toBeVisible();
+  await expect(page.getByText("Active", { exact: true })).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "About this project" })).toBeVisible();
   await expect(page.getByText("Team members")).toBeVisible();
 
@@ -60,24 +61,51 @@ test("editing validates, cancels and saves without losing the selected view", as
   await expect(dialog).toHaveCount(0);
   await expect(page.getByRole("heading", { name: "Member portal", level: 1 })).toBeVisible();
   await expect(page.getByText("Shared work for the customer team.")).toBeVisible();
-  await expect(page.getByRole("status").filter({ hasText: "Project updated." })).toBeVisible();
+  await expect(page.getByRole("dialog", { name: "Project updated" })).toBeVisible();
   await expect(page.getByRole("tab", { name: "Activity" })).toHaveAttribute("aria-selected", "true");
   expect(errors).toEqual([]);
 });
 
-test("narrow actions and link copying stay usable", async ({ page, context, errors }) => {
+test("narrow overflow actions and link copying stay usable", async ({ page, context, errors }) => {
   await context.grantPermissions(["clipboard-read", "clipboard-write"]);
   await page.setViewportSize({ width: 320, height: 700 });
-  const copy = page.getByRole("button", { name: "Copy link" });
-  await copy.click();
-  await expect(page.getByRole("status").filter({ hasText: "Link copied." })).toBeVisible();
+  const trigger = page.getByRole("button", { name: "More project actions" });
+  await trigger.click();
+  const menu = page.getByRole("menu");
+  await expect(menu.getByRole("menuitem", { name: "Delete project" })).toBeVisible();
+  await menu.getByRole("menuitem", { name: "Copy link" }).click();
+  await expect(page.getByRole("dialog", { name: "Link copied" })).toBeVisible();
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(page.url());
   expect(await page.evaluate(() => document.documentElement.scrollWidth)).toBeLessThanOrEqual(320);
   await page.getByRole("button", { name: "Edit project" }).click();
   await expect(page.getByRole("dialog", { name: "Edit project" })).toBeVisible();
   await page.keyboard.press("Escape");
-  await expect(page.getByRole("dialog")).toHaveCount(0);
+  await expect(page.getByRole("dialog", { name: "Edit project" })).toHaveCount(0);
   await expect(page.getByRole("button", { name: "Edit project" })).toBeFocused();
+  expect(errors).toEqual([]);
+});
+
+test("delete requires confirmation and leaves a useful local result", async ({ page, errors }) => {
+  const trigger = page.getByRole("button", { name: "More project actions" });
+  await trigger.click();
+  await page.getByRole("menuitem", { name: "Delete project" }).click();
+  const dialog = page.getByRole("alertdialog", { name: "Delete project?" });
+  await expect(dialog).toBeVisible();
+  await expect(dialog).toContainText("cannot be undone");
+  await expect(dialog.getByRole("button", { name: "Keep project" })).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(dialog).toHaveCount(0);
+  await expect(page.getByRole("heading", { name: "Customer portal", level: 1 })).toBeVisible();
+  await trigger.click();
+  await page.getByRole("menuitem", { name: "Delete project" }).click();
+  await dialog.getByRole("button", { name: "Delete project" }).click();
+  await expect(dialog).toHaveCount(0);
+  const heading = page.getByRole("heading", { name: "Project deleted", level: 1 });
+  await expect(heading).toBeVisible();
+  await expect(heading).toBeFocused();
+  await expect(page.getByRole("dialog", { name: "Project deleted" })).toBeVisible();
+  await expect(page.getByRole("tablist")).toHaveCount(0);
+  await expect(page.getByRole("navigation", { name: "Breadcrumb" }).getByRole("link", { name: "Projects" })).toHaveAttribute("href", "/examples/resources");
   expect(errors).toEqual([]);
 });
 
