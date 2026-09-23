@@ -45,6 +45,17 @@
         "typescript": "^5.9.3",
       },
     },
+    "examples/detail": {
+      "name": "@sherick-ui/detail-example",
+      "version": "0.0.0",
+      "dependencies": {
+        "react": "^19.3.0",
+        "sherick-ui": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/react": "^19.3.0",
+      },
+    },
     "examples/resources": {
       "name": "@sherick-ui/resources-example",
       "version": "0.0.0",
@@ -421,6 +432,8 @@
     "@rollup/rollup-win32-x64-msvc": ["@rollup/rollup-win32-x64-msvc@4.63.3", "", { "os": "win32", "cpu": "x64" }, "sha512-+lIKX7O0+IGe7WuhATaAMMeT7B76vfhXH/l9wLQL+nvyhbw2ohYCKIdWL56JfDu75CWt5oKRP4QFH/jkMtBquA=="],
 
     "@rtsao/scc": ["@rtsao/scc@1.1.0", "", {}, "sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g=="],
+
+    "@sherick-ui/detail-example": ["@sherick-ui/detail-example@workspace:examples/detail"],
 
     "@sherick-ui/no-tailwind": ["@sherick-ui/no-tailwind@workspace:apps/no-tailwind"],
 

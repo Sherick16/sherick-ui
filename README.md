@@ -118,7 +118,7 @@ consumer-facing package entry.
 
 ## Examples
 
-Copyable examples include an [application sidebar](examples/sidebar/), a [settings page](examples/settings/), and a [searchable project list](examples/resources/). See the [example index](examples/README.md) for previews.
+Copyable examples include an [application sidebar](examples/sidebar/), a [settings page](examples/settings/), a [searchable project list](examples/resources/), and a [project detail page](examples/detail/). See the [example index](examples/README.md) for previews.
 
 ## Support and development
 

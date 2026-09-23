@@ -1,0 +1,12 @@
+{
+  "name": "@sherick-ui/detail-example",
+  "private": true,
+  "version": "0.0.0",
+  "dependencies": {
+    "react": "^19.3.0",
+    "sherick-ui": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/react": "^19.3.0"
+  }
+}
