@@ -45,6 +45,17 @@
         "typescript": "^5.9.3",
       },
     },
+    "examples/resources": {
+      "name": "@sherick-ui/resources-example",
+      "version": "0.0.0",
+      "dependencies": {
+        "react": "^19.3.0",
+        "sherick-ui": "workspace:*",
+      },
+      "devDependencies": {
+        "@types/react": "^19.3.0",
+      },
+    },
     "examples/settings": {
       "name": "@sherick-ui/settings-example",
       "version": "0.0.0",
@@ -412,6 +423,8 @@
     "@rtsao/scc": ["@rtsao/scc@1.1.0", "", {}, "sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g=="],
 
     "@sherick-ui/no-tailwind": ["@sherick-ui/no-tailwind@workspace:apps/no-tailwind"],
+
+    "@sherick-ui/resources-example": ["@sherick-ui/resources-example@workspace:examples/resources"],
 
     "@sherick-ui/settings-example": ["@sherick-ui/settings-example@workspace:examples/settings"],
 
