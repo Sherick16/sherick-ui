@@ -30,6 +30,7 @@ import {
   state,
   stateLayer,
   text,
+  tone,
 } from "./ui.common";
 import { motionFeedback, motionInkPress } from "./ui.motion";
 import {
@@ -308,7 +309,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             the matte fill and quiet state layer make the affordance readable without a large well. */}
         <label
           className={cn(
-            "relative z-10 flex min-w-0 flex-col items-center gap-3 px-4 py-5 text-center",
+            "relative z-10 flex min-w-0 flex-col items-center gap-2 px-4 py-4 text-center",
             shape.control,
             material.matteHigh,
             motionFeedback,
@@ -316,7 +317,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             focusRingDrag,
             !disabled && state.enabled,
             !disabled && stateLayer.quiet,
-            !disabled && dragging && state.field.engaged,
+            !disabled && dragging && tone.tonal.primary,
             disabled && state.disabled
           )}
           data-dragging={dragging || undefined}
@@ -326,7 +327,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
           onDrop={handleDrop}
         >
           <span
-            className={cn("inline-flex size-8 shrink-0 items-center justify-center [&>svg]:size-8", text.medium)}
+            className={cn("inline-flex size-8 shrink-0 items-center justify-center [&>svg]:size-7", text.medium)}
             aria-hidden="true"
           >
             <Upload />
