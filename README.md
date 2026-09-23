@@ -118,7 +118,7 @@ consumer-facing package entry.
 
 ## Examples
 
-The [application sidebar](examples/sidebar/) is a copyable navigation shell with a responsive mobile drawer. See the [example index](examples/README.md) for previews.
+Copyable examples include an [application sidebar](examples/sidebar/) and a [settings page](examples/settings/). See the [example index](examples/README.md) for previews.
 
 ## Support and development
 

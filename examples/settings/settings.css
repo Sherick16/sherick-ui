@@ -1,0 +1,80 @@
+.settings-page {
+  max-width: 46rem;
+  min-height: 100dvh;
+  margin-inline: auto;
+  padding: 3rem clamp(1.25rem, 5vw, 3rem) 5rem;
+  color: oklch(var(--sui-ink));
+  background: oklch(var(--sui-canvas));
+}
+
+.settings-heading h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+}
+
+.settings-heading p,
+.settings-danger > p:first-of-type {
+  margin: 0.5rem 0 0;
+  color: oklch(var(--sui-ink-muted));
+  line-height: 1.6;
+}
+
+.settings-section {
+  margin-top: 2.5rem;
+}
+
+.settings-section h2,
+.settings-danger h2 {
+  margin: 0 0 1.25rem;
+  font-size: 1.125rem;
+  font-weight: 600;
+}
+
+.settings-fields {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.settings-switch {
+  align-self: flex-start;
+}
+
+.settings-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  margin-top: 2rem;
+}
+
+.settings-actions p {
+  flex: 1 0 100%;
+  margin: 0;
+  font-size: 0.875rem;
+}
+
+.settings-divider {
+  margin-block: 3rem;
+}
+
+.settings-danger > p:first-of-type {
+  margin: 0 0 1rem;
+}
+
+.settings-danger > p:last-of-type {
+  margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+}
+
+@media (max-width: 420px) {
+  .settings-page {
+    padding-top: 2rem;
+  }
+
+  .settings-actions > button {
+    flex: 1;
+  }
+}
