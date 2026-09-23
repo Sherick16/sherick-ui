@@ -117,7 +117,7 @@ test("the chooser keeps the valid part of a mixed batch and reports every failur
   ]);
 
   await expect(field.getByRole("listitem")).toHaveCount(1);
-  await expect(field.getByRole("listitem")).toHaveText("good.pdf");
+  await expect(field.getByRole("listitem")).toContainText("good.pdf");
   await expect(page.getByTestId("v2-1-d-multiple-rejections")).toHaveText("type:notes.txt, size:big.pdf");
 
   const status = field.getByRole("status");
@@ -133,7 +133,7 @@ test("defaultFiles seeds the selection the field starts with", async ({ page, er
   const field = page.getByTestId("v2-1-d-defaults");
 
   await expect(field.getByRole("listitem")).toHaveCount(1);
-  await expect(field.getByRole("listitem")).toHaveText("seeded.pdf");
+  await expect(field.getByRole("listitem")).toContainText("seeded.pdf");
 
   // From there the field owns its own selection: an addition reports the whole next selection.
   await inputOf(field).setInputFiles(pickerFile("added.pdf", 16));
@@ -168,7 +168,7 @@ test("a drop answers to exactly the rules the chooser applies", async ({ page, e
 
   await expect(rejections).toHaveText(fromChooser ?? "");
   await expect(field.getByRole("listitem")).toHaveCount(1);
-  await expect(field.getByRole("listitem")).toHaveText("good.pdf");
+  await expect(field.getByRole("listitem")).toContainText("good.pdf");
   await expect(field.getByRole("status")).toContainText("Added 1 file.");
 
   expect(errors).toEqual([]);
@@ -187,7 +187,7 @@ test("a single-file field replaces its selection and refuses the rest of the bat
   ]);
 
   await expect(field.getByRole("listitem")).toHaveCount(1);
-  await expect(field.getByRole("listitem")).toHaveText("one.pdf");
+  await expect(field.getByRole("listitem")).toContainText("one.pdf");
   await expect(page.getByTestId("v2-1-d-single-rejections")).toHaveText("count:two.pdf");
   await expect(field.getByRole("status")).toContainText(
     "two.pdf was not added: this field holds one file."
@@ -195,7 +195,7 @@ test("a single-file field replaces its selection and refuses the rest of the bat
 
   await dropFiles(field, [dropFile("three.pdf", { type: "application/pdf" })]);
   await expect(field.getByRole("listitem")).toHaveCount(1);
-  await expect(field.getByRole("listitem")).toHaveText("three.pdf");
+  await expect(field.getByRole("listitem")).toContainText("three.pdf");
 
   expect(errors).toEqual([]);
 });
@@ -258,7 +258,7 @@ test("the zone opens the platform's own chooser, by pointer and by keyboard", as
   const second = await keyboardChooser;
   await second.setFiles(pickerFile("typed.pdf", 16));
   await expect(field.getByRole("listitem")).toHaveCount(1);
-  await expect(field.getByRole("listitem")).toHaveText("typed.pdf");
+  await expect(field.getByRole("listitem")).toContainText("typed.pdf");
 
   expect(errors).toEqual([]);
 });
@@ -326,7 +326,7 @@ test("a file drag marks the zone and hands the drop to the same rules", async ({
 
   await dropFiles(field, [dropFile("dragged.pdf", { type: "application/pdf" })]);
   await expect(field.getByRole("listitem")).toHaveCount(1);
-  await expect(field.getByRole("listitem")).toHaveText("dragged.pdf");
+  await expect(field.getByRole("listitem")).toContainText("dragged.pdf");
 
   expect(errors).toEqual([]);
 });
@@ -384,6 +384,23 @@ test("the clear control empties the selection and returns focus to the picker", 
 
   await input.setInputFiles([pickerFile("a.pdf", 16), pickerFile("b.png", 16, "image/png")]);
   await expect(field.getByRole("listitem")).toHaveCount(2);
+  await expect(field.getByRole("listitem").first()).toContainText("a.pdf16 B · PDF");
+  await expect(field.getByRole("listitem").last()).toContainText("b.png16 B · PNG");
+  await expect(field.getByRole("listitem").last().locator("svg.lucide-image")).toBeVisible();
+
+  // The inset sheet tucks under the chooser; its rows meet at a shared divider.
+  const placement = await field.evaluate((element) => {
+    const zone = element.querySelector("label:has(input[type=file])")!.getBoundingClientRect();
+    const sheet = element.querySelector("ul[role=list]")!.parentElement!.getBoundingClientRect();
+    const rows = element.querySelectorAll("li");
+    return {
+      inset: sheet.left > zone.left && sheet.right < zone.right,
+      attached: sheet.top < zone.bottom && sheet.bottom > zone.bottom,
+      joined: rows[0].getBoundingClientRect().bottom === rows[1].getBoundingClientRect().top,
+      divider: getComputedStyle(rows[0]).borderBottomWidth,
+    };
+  });
+  expect(placement).toEqual({ inset: true, attached: true, joined: true, divider: "1px" });
 
   await field.getByRole("button", { name: "Remove all" }).click();
   await expect(field.getByRole("listitem")).toHaveCount(0);
@@ -500,7 +517,7 @@ test("disabled file drops cancel browser navigation without accepting files", as
     });
   });
   expect(canceled).toEqual([true, true, true]);
-  await expect(field.getByRole("listitem")).toHaveText("locked.pdf");
+  await expect(field.getByRole("listitem")).toContainText("locked.pdf");
   await expect(field.getByRole("status")).toHaveText("");
 });
 
@@ -536,7 +553,7 @@ test("rejection-only attempts replace success and repeat as fresh live content",
   await inputOf(field).setInputFiles(pickerFile("notes.txt", 16, "text/plain"));
   await expect(status).toContainText("notes.txt");
   expect(await previousMessage!.evaluate((element) => element.isConnected)).toBe(false);
-  await expect(field.getByRole("listitem")).toHaveText("good.pdf");
+  await expect(field.getByRole("listitem")).toContainText("good.pdf");
 });
 
 test("the removal mark presses inside an unchanged full-sized target", async ({ page }) => {
