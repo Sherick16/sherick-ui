@@ -405,3 +405,6 @@ and the ref is the root `HTMLDivElement`.
 Sources: [component sources at the pinned revision](https://github.com/Sherick16/sherick-ui/tree/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components),
 [public export contract](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/docs/RELEASE.md#public-export-contract)
 and [design language, sections 8–11 and 17–19](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/docs/DESIGN_LANGUAGE.md).
+Media: [source](https://github.com/Sherick16/sherick-ui/blob/9ecb90dd7ddfa81437e87144ac98255a67b4cad9/packages/ui/src/components/Media.tsx)
+and [consumer contract](https://github.com/Sherick16/sherick-ui/blob/9ecb90dd7ddfa81437e87144ac98255a67b4cad9/docs/MEDIA.md)
+at the media extension revision; availability still depends on the installed package.
