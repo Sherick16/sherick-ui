@@ -252,6 +252,7 @@ test("held options share control elevation without raising navigation highlight"
       await expect.poll(() => chosen.evaluate(element => getComputedStyle(element).boxShadow)).toBe(depth);
       expect(await other.evaluate(element => getComputedStyle(element).boxShadow)).toBe("none");
       await page.keyboard.press("Escape");
+      await expect(other).toHaveCount(0);
     }
   }
   expect(errors).toEqual([]);

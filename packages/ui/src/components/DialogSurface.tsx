@@ -39,7 +39,8 @@ export interface DialogSurfaceProps {
 /* Which way the surface is placed, how much room it takes, and the offset it arrives from. A
    sheet keeps every corner except the ones that would lift it off its own edge: an attached
    corner would draw a gap where the surface meets the viewport, and squaring it is anatomy
-   while `shape` still supplies the radius. */
+   while `shape` still supplies the radius. A sheet's viewport clips without becoming a scroll
+   container: focusing its content would otherwise scroll away positive-edge travel. */
 const attachmentLayout: Record<
   DialogAttachment,
   { viewport: string; popup: string; from: string; presence: string }
@@ -51,25 +52,25 @@ const attachmentLayout: Record<
     presence: motionPresenceModal,
   },
   bottom: {
-    viewport: "items-end justify-center overflow-hidden",
+    viewport: "items-end justify-center overflow-clip",
     popup: "flex max-h-[85dvh] flex-col rounded-b-none",
     from: "[--sui-sheet-from-y:100%]",
     presence: motionPresenceSheet,
   },
   top: {
-    viewport: "items-start justify-center overflow-hidden",
+    viewport: "items-start justify-center overflow-clip",
     popup: "flex max-h-[85dvh] flex-col rounded-t-none",
     from: "[--sui-sheet-from-y:-100%]",
     presence: motionPresenceSheet,
   },
   left: {
-    viewport: "items-stretch justify-start overflow-hidden rtl:flex-row-reverse",
+    viewport: "items-stretch justify-start overflow-clip rtl:flex-row-reverse",
     popup: "flex w-full max-w-[min(28rem,90vw)] flex-col rounded-l-none",
     from: "[--sui-sheet-from-x:-100%]",
     presence: motionPresenceSheet,
   },
   right: {
-    viewport: "items-stretch justify-end overflow-hidden rtl:flex-row-reverse",
+    viewport: "items-stretch justify-end overflow-clip rtl:flex-row-reverse",
     popup: "flex w-full max-w-[min(28rem,90vw)] flex-col rounded-r-none",
     from: "[--sui-sheet-from-x:100%]",
     presence: motionPresenceSheet,

@@ -18,27 +18,37 @@ const settled = (page: Page) =>
     () => document.querySelector('[role="dialog"]')?.getAnimations().length === 0
   );
 
-/* The transform a sheet is painted at when its entrance begins. Paused and seeked to the start of
-   its own transition, because a running one is only sampled by luck, and decomposed so a travel
-   along one axis can be told from a travel along both. */
-const startingTravel = (popup: Locator) =>
+/* Pause the entrance and seek its start and midpoint; an overflow-hidden viewport can scroll
+   to focused content, canceling positive-side travel while the computed transform still moves. */
+const entranceTravel = (popup: Locator) =>
   popup.evaluate((element) => {
-    element.getAnimations().forEach((animation) => {
+    const animations = element.getAnimations();
+    animations.forEach((animation) => {
       animation.pause();
       animation.currentTime = 0;
     });
     const style = getComputedStyle(element);
     const matrix = new DOMMatrix(style.transform === "none" ? "" : style.transform);
+    const duration = animations.find(animation =>
+      animation instanceof CSSTransition && animation.transitionProperty === "transform"
+    )?.effect?.getComputedTiming().duration;
+    if (typeof duration !== "number") throw new Error("Sheet transform must transition");
+    animations.forEach(animation => { animation.currentTime = duration / 2; });
+    const middle = getComputedStyle(element);
+    const middleMatrix = new DOMMatrix(middle.transform === "none" ? "" : middle.transform);
+    const box = element.getBoundingClientRect();
     return {
       x: Number(matrix.e.toFixed(2)),
       y: Number(matrix.f.toFixed(2)),
       scale: Number(matrix.a.toFixed(3)),
-      width: Math.round(element.getBoundingClientRect().width),
-      height: Math.round(element.getBoundingClientRect().height),
+      width: Math.round(box.width),
+      height: Math.round(box.height),
       from: [
         style.getPropertyValue("--sui-sheet-from-x").trim(),
         style.getPropertyValue("--sui-sheet-from-y").trim(),
       ],
+      middle: { x: box.x, y: box.y, offsetX: middleMatrix.e, offsetY: middleMatrix.f },
+      viewport: { width: window.innerWidth, height: window.innerHeight },
     };
   });
 
@@ -79,7 +89,7 @@ for (const { side, axis, sign } of edges) {
     const popup = sheet(page);
     await popup.waitFor({ state: "visible" });
 
-    const travel = await startingTravel(popup);
+    const travel = await entranceTravel(popup);
     const own = axis === "x" ? travel.x : travel.y;
     const other = axis === "x" ? travel.y : travel.x;
     /* The offset is the sheet's own extent: it begins entirely outside the viewport, which is what
@@ -97,6 +107,14 @@ for (const { side, axis, sign } of edges) {
     expect(travel.from).toEqual(
       axis === "x" ? [`${sign * 100}%`, ""] : ["", `${sign * 100}%`]
     );
+
+    /* The painted position must follow the transform rather than a viewport scroll offset. */
+    const base = axis === "x"
+      ? (sign > 0 ? travel.viewport.width - travel.width : 0)
+      : (sign > 0 ? travel.viewport.height - travel.height : 0);
+    const painted = axis === "x" ? travel.middle.x : travel.middle.y;
+    const offset = axis === "x" ? travel.middle.offsetX : travel.middle.offsetY;
+    expect(Math.abs(painted - (base + offset))).toBeLessThan(2);
 
     expect(errors).toEqual([]);
   });

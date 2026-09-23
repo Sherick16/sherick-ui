@@ -6,8 +6,8 @@ This is the current consumer compatibility contract. The implementation boundari
 ## Release status and automated publication
 
 `2.0.0` established the stable line under npm's `latest` dist-tag; `1.0.0` through
-`1.0.5` are frozen. The current source package version is `2.1.0`: the v2.1 component
-wave and Media add public functionality, so this is a **minor** release. An installed
+`1.0.5` are frozen. `2.1.0` added the v2.1 component wave and Media; the current
+source package version is `2.1.1`, a patch for the Drawer animation fix. An installed
 package's actual version and exports, not this checkout, determine availability.
 
 `packages/ui/package.json` owns the release version and `publishConfig.tag` remains `latest`.
