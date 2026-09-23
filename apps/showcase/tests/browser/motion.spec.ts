@@ -184,6 +184,7 @@ const entrances = (page: Page) =>
 const openFixture = async (page: Page) => {
   await page.goto(fixture);
   await expect(page.getByRole("heading", { name: "Interaction verification" })).toBeVisible();
+  await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
 };
 
 test.beforeEach(async ({ page }) => {
