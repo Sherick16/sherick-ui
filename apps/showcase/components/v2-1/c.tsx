@@ -10,13 +10,13 @@ const NARROW_LABEL = "A destination whose name is far longer than the column it 
 
 const label = "text-xs text-sherick-ink-muted";
 
-export default function NavigationSpecimen() {
+export default function NavigationSpecimen({ verification = false }: { verification?: boolean }) {
   const [reportedPage, setReportedPage] = useState<number | null>(null);
   const [linkedPage, setLinkedPage] = useState(3);
   const [longPage, setLongPage] = useState(600);
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className="flex flex-col gap-6">
       <section className="flex flex-col gap-6">
         <div className="space-y-2">
           <p className={label}>Pages</p>
@@ -26,7 +26,7 @@ export default function NavigationSpecimen() {
           </span>
         </div>
 
-        <div className="space-y-2">
+        {verification && <div className="space-y-2">
           <p className={label}>Linked pages</p>
           <Pagination
             aria-label="Linked pagination"
@@ -39,8 +39,9 @@ export default function NavigationSpecimen() {
           <span data-testid="linked-page" hidden>
             {linkedPage}
           </span>
-        </div>
+        </div>}
 
+        {verification && <>
         <div className="flex flex-wrap items-start gap-10 [&>div]:min-w-0 [&>div]:max-w-full">
           <div className="space-y-2">
             <p className={label}>Empty</p>
@@ -81,6 +82,7 @@ export default function NavigationSpecimen() {
           <p className={label}>No siblings</p>
           <Pagination aria-label="No-sibling pagination" count={20} value={10} siblingCount={0} />
         </div>
+        </>}
       </section>
 
       <section className="flex flex-col gap-6">
@@ -96,6 +98,7 @@ export default function NavigationSpecimen() {
           />
         </div>
 
+        {verification && <>
         <div className="space-y-2">
           <p className={label}>Custom links</p>
           <Breadcrumb
@@ -114,9 +117,10 @@ export default function NavigationSpecimen() {
           <p className={label}>One destination</p>
           <Breadcrumb aria-label="Single-item breadcrumb" items={[{ label: "Home", href: "#home" }]} />
         </div>
+        </>}
       </section>
 
-      <section className="space-y-2">
+      {verification && <section className="space-y-2">
         <p className={label}>Narrow column</p>
         <div data-testid="v21-narrow" style={{ width: 240 }} className="flex flex-col gap-5">
           <Pagination aria-label="Narrow pagination" count={12} defaultValue={5} />
@@ -129,7 +133,7 @@ export default function NavigationSpecimen() {
             ]}
           />
         </div>
-      </section>
+      </section>}
     </div>
   );
 }

@@ -39,6 +39,7 @@ a sideways shadow or an upward-lit gradient to one component.
 | --- | --- | --- |
 | `canvas` | application background | nested content |
 | `matteQuiet`, `matte`, `matteHigh` | quiet, ordinary and stronger grounded surfaces | floating UI |
+| `matteInset` | a passive sheet tucked beneath a stronger control, visible but quieter than that control | independent cards or fields |
 | `control`, `controlError` | text fields and their invalid state | passive cards |
 | `handle` | a small value-control part that must remain findable, even disabled | large surfaces |
 | `acrylic`, `acrylicDense`, `acrylicHero` | anchored sheets, compact hints, viewport-owning overlays respectively | grounded content |
@@ -55,6 +56,7 @@ how important its content feels.
 | `raised` | tactile tonal actions at rest | hover or passive data |
 | `control` | switch thumb or a held selection inside a track, list or calendar | keyboard highlight |
 | `recessed` | grooves, tracks and a raised control while pressed | fields or flat cards |
+| `recessedTop` | the upper wall of an inset sheet continuing directly below a control, without a lower rim | standalone tracks or wells |
 | `well` | a small empty checkbox/radio mark whose recessed wall identifies it | a wide groove with its own fill |
 | `floating` | real overlay surfaces | anything in document flow |
 
@@ -233,6 +235,8 @@ follows the input in a composite field, and `groupFocusRing` follows a wrapping 
 plain text field follows the platform's `:focus-visible` on pointer *and* keyboard
 focus; button and slider focus rings normally appear for keyboard focus. No second
 inner field rim is added.
+A file drop target uses that same outline with a soft primary tonal fill while a file is
+dragged over it; it has no permanent rim.
 
 An icon-only action needs an accessible name independent of its tooltip, and a 44px
 standalone target. Checkbox/radio marks may keep a smaller visible footprint while a

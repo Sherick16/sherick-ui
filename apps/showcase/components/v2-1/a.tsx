@@ -33,7 +33,7 @@ export default function DateFamilySpecimen({ verification = false }: { verificat
   const [formResult, setFormResult] = useState("");
 
   return (
-    <div className={verification ? "space-y-12" : "grid grid-cols-1 items-start gap-10 xl:grid-cols-2"}>
+    <div className={verification ? "space-y-12" : "grid grid-cols-1 items-start gap-8 lg:grid-cols-2"}>
       <section className="space-y-3">
         <Heading className="text-lg font-medium text-sherick-ink">Single calendar</Heading>
         <div data-testid="single-calendar">
@@ -116,8 +116,8 @@ export default function DateFamilySpecimen({ verification = false }: { verificat
         </div>
       </section>}
 
-      <section className="space-y-3">
-        <Heading className="text-lg font-medium text-sherick-ink">{verification ? "Bounds, disabled and invalid" : "Disabled and invalid"}</Heading>
+      {verification && <section className="space-y-3">
+        <Heading className="text-lg font-medium text-sherick-ink">Bounds, disabled and invalid</Heading>
         <div className="flex flex-wrap items-start gap-6">
           {verification && <>
           <Panel>
@@ -146,9 +146,9 @@ export default function DateFamilySpecimen({ verification = false }: { verificat
             </div>
           </Panel>
         </div>
-      </section>
+      </section>}
 
-      <section className="space-y-3">
+      {verification && <section className="space-y-3">
         <Heading className="text-lg font-medium text-sherick-ink">Locale and week start</Heading>
         <div data-testid="locale-calendar">
           <Panel>
@@ -161,7 +161,7 @@ export default function DateFamilySpecimen({ verification = false }: { verificat
             />
           </Panel>
         </div>
-      </section>
+      </section>}
 
       {verification && <section className="space-y-3">
         <Heading className="text-lg font-medium text-sherick-ink">Narrow container and right-to-left</Heading>
@@ -201,6 +201,7 @@ export default function DateFamilySpecimen({ verification = false }: { verificat
             />
             <Readout testId="picker-value">{picker ?? "none"}</Readout>
           </div>
+          {verification && <>
           <div className="w-72 max-w-full" data-testid="picker-default-field">
             <DatePicker
               label="Review date"
@@ -218,6 +219,7 @@ export default function DateFamilySpecimen({ verification = false }: { verificat
           <div className="w-72 max-w-full" data-testid="picker-locale-field">
             <DatePicker label="Anreisedatum" defaultValue="2024-07-04" locale="de-DE" />
           </div>
+          </>}
         </div>
       </section>
 

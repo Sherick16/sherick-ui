@@ -84,6 +84,26 @@ test("the field names its picker and describes it with every limit", async ({ pa
   // The ref is the native picker itself, so a consumer can reach the element the platform drives.
   await expect(page.getByTestId("v2-1-d-single-ref")).toHaveText("INPUT:file");
 
+  const stack = await zoneOf(field).evaluate((zone) => {
+    const icon = zone.querySelector(":scope > span[aria-hidden] svg")!.getBoundingClientRect();
+    const copy = zone.querySelector(":scope > span:not([aria-hidden])")!;
+    const title = copy.firstElementChild!.getBoundingClientRect();
+    const supporting = copy.lastElementChild!.getBoundingClientRect();
+    return {
+      iconSize: icon.width,
+      iconTitleGap: title.top - icon.bottom,
+      zoneHeight: zone.getBoundingClientRect().height,
+      stacked: icon.bottom < title.top,
+      centered: Math.abs((icon.left + icon.right) / 2 - (title.left + title.right) / 2) <= 1,
+      hierarchy: Number(getComputedStyle(copy.firstElementChild!).fontWeight) > Number(getComputedStyle(copy.lastElementChild!).fontWeight),
+      supportingBelow: supporting.top >= title.bottom,
+    };
+  });
+  expect(stack).toMatchObject({ stacked: true, centered: true, hierarchy: true, supportingBelow: true });
+  expect(stack.iconSize).toBe(28);
+  expect(stack.iconTitleGap).toBeLessThanOrEqual(11);
+  expect(stack.zoneHeight).toBeLessThanOrEqual(124);
+
   expect(errors).toEqual([]);
 });
 
@@ -117,7 +137,7 @@ test("the chooser keeps the valid part of a mixed batch and reports every failur
   ]);
 
   await expect(field.getByRole("listitem")).toHaveCount(1);
-  await expect(field.getByRole("listitem")).toHaveText("good.pdf");
+  await expect(field.getByRole("listitem")).toContainText("good.pdf");
   await expect(page.getByTestId("v2-1-d-multiple-rejections")).toHaveText("type:notes.txt, size:big.pdf");
 
   const status = field.getByRole("status");
@@ -133,7 +153,7 @@ test("defaultFiles seeds the selection the field starts with", async ({ page, er
   const field = page.getByTestId("v2-1-d-defaults");
 
   await expect(field.getByRole("listitem")).toHaveCount(1);
-  await expect(field.getByRole("listitem")).toHaveText("seeded.pdf");
+  await expect(field.getByRole("listitem")).toContainText("seeded.pdf");
 
   // From there the field owns its own selection: an addition reports the whole next selection.
   await inputOf(field).setInputFiles(pickerFile("added.pdf", 16));
@@ -168,7 +188,7 @@ test("a drop answers to exactly the rules the chooser applies", async ({ page, e
 
   await expect(rejections).toHaveText(fromChooser ?? "");
   await expect(field.getByRole("listitem")).toHaveCount(1);
-  await expect(field.getByRole("listitem")).toHaveText("good.pdf");
+  await expect(field.getByRole("listitem")).toContainText("good.pdf");
   await expect(field.getByRole("status")).toContainText("Added 1 file.");
 
   expect(errors).toEqual([]);
@@ -187,7 +207,7 @@ test("a single-file field replaces its selection and refuses the rest of the bat
   ]);
 
   await expect(field.getByRole("listitem")).toHaveCount(1);
-  await expect(field.getByRole("listitem")).toHaveText("one.pdf");
+  await expect(field.getByRole("listitem")).toContainText("one.pdf");
   await expect(page.getByTestId("v2-1-d-single-rejections")).toHaveText("count:two.pdf");
   await expect(field.getByRole("status")).toContainText(
     "two.pdf was not added: this field holds one file."
@@ -195,7 +215,7 @@ test("a single-file field replaces its selection and refuses the rest of the bat
 
   await dropFiles(field, [dropFile("three.pdf", { type: "application/pdf" })]);
   await expect(field.getByRole("listitem")).toHaveCount(1);
-  await expect(field.getByRole("listitem")).toHaveText("three.pdf");
+  await expect(field.getByRole("listitem")).toContainText("three.pdf");
 
   expect(errors).toEqual([]);
 });
@@ -258,7 +278,7 @@ test("the zone opens the platform's own chooser, by pointer and by keyboard", as
   const second = await keyboardChooser;
   await second.setFiles(pickerFile("typed.pdf", 16));
   await expect(field.getByRole("listitem")).toHaveCount(1);
-  await expect(field.getByRole("listitem")).toHaveText("typed.pdf");
+  await expect(field.getByRole("listitem")).toContainText("typed.pdf");
 
   expect(errors).toEqual([]);
 });
@@ -306,6 +326,7 @@ test("a file drag marks the zone and hands the drop to the same rules", async ({
   const field = page.getByTestId("v2-1-d-multiple");
   const zone = zoneOf(field);
   const rest = await background(zone);
+  const restOutline = await zone.evaluate((element) => getComputedStyle(element).outlineWidth);
   /* The fill answers on the feedback intent, so a change is read as a settled value rather than as
      whatever was painted in the first frame after the event. */
   const settled = () => expect.poll(() => background(zone));
@@ -319,14 +340,24 @@ test("a file drag marks the zone and hands the drop to the same rules", async ({
   await expect(zone.getByText("Add files")).toHaveCount(0);
   // The state is not carried by colour alone; it also takes a fill the resting zone does not hold.
   await settled().not.toBe(rest);
+  const accent = await zone.evaluate((element) => getComputedStyle(element).getPropertyValue("--sui-primary").trim());
+  expect(accent).not.toBe("");
+  expect(await background(zone)).toContain(accent.split(" ").map(Number).join(" "));
+  await expect(zone).toHaveAttribute("data-dragging", "true");
+  await expect.poll(() => zone.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { width: style.outlineWidth, offset: style.outlineOffset, style: style.outlineStyle };
+  })).toEqual({ width: "2px", offset: "3px", style: "solid" });
 
   await dragFiles(field, [dropFile("dragged.pdf", { type: "application/pdf" })], ["dragleave"]);
   await expect(zone.getByText("Add files")).toBeVisible();
   await settled().toBe(rest);
+  await expect(zone).not.toHaveAttribute("data-dragging");
+  await expect.poll(() => zone.evaluate((element) => getComputedStyle(element).outlineWidth)).toBe(restOutline);
 
   await dropFiles(field, [dropFile("dragged.pdf", { type: "application/pdf" })]);
   await expect(field.getByRole("listitem")).toHaveCount(1);
-  await expect(field.getByRole("listitem")).toHaveText("dragged.pdf");
+  await expect(field.getByRole("listitem")).toContainText("dragged.pdf");
 
   expect(errors).toEqual([]);
 });
@@ -384,6 +415,42 @@ test("the clear control empties the selection and returns focus to the picker", 
 
   await input.setInputFiles([pickerFile("a.pdf", 16), pickerFile("b.png", 16, "image/png")]);
   await expect(field.getByRole("listitem")).toHaveCount(2);
+  await expect(field.getByRole("listitem").first()).toContainText("a.pdf16 B · PDF");
+  await expect(field.getByRole("listitem").last()).toContainText("b.png16 B · PNG");
+  await expect(field.getByRole("listitem").last().locator("svg.lucide-image")).toBeVisible();
+
+  // One visible inset sheet tucks under the chooser, square at the join and rounded below.
+  const placement = await field.evaluate((element) => {
+    const zoneElement = element.querySelector("label:has(input[type=file])")!;
+    const zone = zoneElement.getBoundingClientRect();
+    const sheet = element.querySelector("ul[role=list]")!.parentElement!;
+    const bounds = sheet.getBoundingClientRect();
+    const style = getComputedStyle(sheet);
+    const rows = element.querySelectorAll("li");
+    const leading = rows[0].querySelector("[aria-hidden] svg")!.getBoundingClientRect();
+    const trailing = rows[0].querySelector("button svg")!.getBoundingClientRect();
+    return {
+      inset: bounds.left - zone.left,
+      centered: Math.abs((bounds.left - zone.left) - (zone.right - bounds.right)) <= 1,
+      attached: Math.abs(bounds.top - zone.bottom) <= 1,
+      joined: rows[0].getBoundingClientRect().bottom === rows[1].getBoundingClientRect().top,
+      divider: getComputedStyle(rows[0]).borderBottomWidth,
+      lastDivider: getComputedStyle(rows[1]).borderBottomWidth,
+      evenDivider: Math.abs((rows[0].getBoundingClientRect().left - bounds.left) - (bounds.right - rows[0].getBoundingClientRect().right)) <= 1,
+      topRadius: style.borderTopLeftRadius,
+      bottomRadius: style.borderBottomLeftRadius,
+      fill: style.backgroundColor,
+      zoneFill: getComputedStyle(zoneElement).backgroundColor,
+      depth: style.boxShadow,
+      zoneDepth: getComputedStyle(zoneElement).boxShadow,
+      balanced: Math.abs((leading.left - bounds.left) - (bounds.right - trailing.right)) <= 1,
+    };
+  });
+  expect(placement).toMatchObject({ inset: 16, centered: true, attached: true, joined: true, divider: "1px", lastDivider: "0px", evenDivider: true, topRadius: "0px", balanced: true });
+  expect(placement.bottomRadius).not.toBe("0px");
+  expect(placement.fill).not.toBe(placement.zoneFill);
+  expect(placement.depth).toContain("inset");
+  expect(placement.zoneDepth).toBe("none");
 
   await field.getByRole("button", { name: "Remove all" }).click();
   await expect(field.getByRole("listitem")).toHaveCount(0);
@@ -500,7 +567,7 @@ test("disabled file drops cancel browser navigation without accepting files", as
     });
   });
   expect(canceled).toEqual([true, true, true]);
-  await expect(field.getByRole("listitem")).toHaveText("locked.pdf");
+  await expect(field.getByRole("listitem")).toContainText("locked.pdf");
   await expect(field.getByRole("status")).toHaveText("");
 });
 
@@ -536,7 +603,7 @@ test("rejection-only attempts replace success and repeat as fresh live content",
   await inputOf(field).setInputFiles(pickerFile("notes.txt", 16, "text/plain"));
   await expect(status).toContainText("notes.txt");
   expect(await previousMessage!.evaluate((element) => element.isConnected)).toBe(false);
-  await expect(field.getByRole("listitem")).toHaveText("good.pdf");
+  await expect(field.getByRole("listitem")).toContainText("good.pdf");
 });
 
 test("the removal mark presses inside an unchanged full-sized target", async ({ page }) => {
@@ -569,12 +636,14 @@ test("file changes are announced without a visible log; rejection and clear affo
   expect((await status.boundingBox())!.height).toBe(0);
   const clear = field.getByRole("button", { name: "Clear files", exact: true });
   await expect(clear).toBeVisible();
+  await expect(clear.locator("svg.lucide-trash-2")).toBeVisible();
   const resting = await clear.evaluate(element => {
     const css = getComputedStyle(element);
-    return { fill: css.backgroundColor, shadow: css.boxShadow };
+    return { fill: css.backgroundColor, shadow: css.boxShadow, color: css.color, label: getComputedStyle(element.closest('[data-testid]')!.querySelector('label')!).color };
   });
-  expect(resting.fill).not.toBe("rgba(0, 0, 0, 0)");
-  expect(resting.shadow).not.toBe("none");
+  expect(resting.fill).toBe("rgba(0, 0, 0, 0)");
+  expect(resting.shadow).toBe("none");
+  expect(resting.color).not.toBe(resting.label);
   await inputOf(field).setInputFiles(pickerFile("notes.txt", 16, "text/plain"));
   await expect(status.getByText("notes.txt is not an accepted file type.", { exact: true })).toBeVisible();
   expect((await status.boundingBox())!.height).toBeGreaterThan(1);

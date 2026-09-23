@@ -93,6 +93,10 @@ export const focusRingHeld =
 export const focusRingWithin =
   "has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-sherick-focus has-[:focus-visible]:outline-offset-[3px]";
 
+/* A file drag marks the same target with the same outline as visible keyboard focus. */
+export const focusRingDrag =
+  "data-[dragging]:outline data-[dragging]:outline-2 data-[dragging]:outline-sherick-focus data-[dragging]:outline-offset-[3px]";
+
 export const groupFocusRing =
   "group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-sherick-focus group-focus-visible:outline-offset-[3px]";
 
@@ -127,6 +131,9 @@ export const elevation = {
      of the well is deepened and that boundary is what says what it is. See `selectable.markSurface`. */
   well: "shadow-sherick-well",
 } as const;
+/* An inset sheet's shaded upper wall, without a lower rim. Kept independent so
+   unrelated components do not bundle this recipe. */
+export const recessedTop = "shadow-sherick-recessed-top";
 
 /* Shape — semantic corner roles, never an arbitrary radius. Softness grows with
    the size of the object and the emphasis it carries:
@@ -342,6 +349,8 @@ export const hitArea =
                   should sit back from the surface around them.
    - matte:       a matte surface that separates from the canvas by tone alone.
    - matteHigh:   the second matte step, for nesting inside another matte surface.
+   - matteInset:  a passive sheet tucked under a stronger control; subdued without
+                  blending into the canvas or needing a drawn rim.
    - control:     the fill every text control shares, plus its placeholder tone.
    - handle:      the fill of a small part the user has to find — a value control's handle.
                   Surface steps sit within a few percent of their neighbours, so this role
@@ -392,6 +401,8 @@ export const material = {
   acrylicHero:
     "bg-sherick-surface-overlay/[var(--sui-overlay-fill)] bg-[image:var(--sui-glass-hero-gradient)] text-sherick-ink backdrop-blur-[var(--sui-glass-hero-blur)] backdrop-saturate-[var(--sui-glass-hero-saturation)] backdrop-brightness-[var(--sui-glass-hero-brightness)]",
 } as const;
+/* A passive sheet tucked below a stronger control; independently tree-shakeable. */
+export const matteInset = "bg-sherick-surface-high/[0.35] text-sherick-ink";
 
 /* Density — three control steps plus the accessible hit target.
    Density owns height and the type step, so controls of one density share a

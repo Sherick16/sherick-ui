@@ -105,7 +105,7 @@ export default function V21TreeSpecimen({ verification = false }: { verification
     : controlledItems;
 
   return (
-    <div className="flex flex-col gap-10">
+    <div className={verification ? "flex flex-col gap-10" : ""}>
       <section className="space-y-3">
         <TreeView
           data-testid="tree-projects"
@@ -174,6 +174,7 @@ export default function V21TreeSpecimen({ verification = false }: { verification
         </div>
       </section>}
 
+      {verification && <>
       <section className="space-y-3">
         <TreeView
           data-testid="tree-disabled"
@@ -188,7 +189,7 @@ export default function V21TreeSpecimen({ verification = false }: { verification
         <TreeView data-testid="tree-empty" label="Empty tree" items={[]} className="max-w-sm" />
       </section>
 
-      {verification && <section className="w-56" data-testid="tree-deep-container">
+      <section className="w-56" data-testid="tree-deep-container">
         <TreeView
           data-testid="tree-deep"
           label="Deep tree"
@@ -201,7 +202,7 @@ export default function V21TreeSpecimen({ verification = false }: { verification
             </span>
           )}
         />
-      </section>}
+      </section>
 
       <section dir="rtl" data-testid="tree-rtl-container">
         <DirectionProvider direction="rtl">
@@ -214,6 +215,7 @@ export default function V21TreeSpecimen({ verification = false }: { verification
           />
         </DirectionProvider>
       </section>
+      </>}
     </div>
   );
 }

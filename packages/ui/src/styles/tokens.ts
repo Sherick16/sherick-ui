@@ -40,6 +40,7 @@ export const lightTokens = {
      tightest step this neutral ladder has measures about 1.3:1 against the surface around it. The
      depth is the least that clears 3:1 once rendered. */
   "elevation-recessed": "inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.22), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.50)",
+  "elevation-recessed-top": "inset 0 5px 8px -5px oklch(var(--sui-light-bottom) / 0.21)",
   "elevation-well": "inset 0 3px 4px oklch(var(--sui-light-bottom) / 0.62), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.50)",
   /* Fill isolates content even without backdrop filtering; blur only enriches the remaining light. */
   "glass-fill": "0.98",
@@ -98,6 +99,7 @@ export const darkTokens = {
   "elevation-floating": "0 18px 44px oklch(var(--sui-light-bottom) / 0.38), inset 0 1px 0 oklch(var(--sui-light-top) / 0.05)",
   "elevation-control": "0 1px 2px oklch(var(--sui-light-bottom) / 0.30), inset 0 1px 0 oklch(var(--sui-light-top) / 0.08)",
   "elevation-recessed": "inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.38), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.06)",
+  "elevation-recessed-top": "inset 0 5px 8px -5px oklch(var(--sui-light-bottom) / 0.36)",
   /* Dark mode inverts the light, so it inverts which wall of a sunk mark is legible: the shade tone
      is darker than the surface here and cannot outline anything, and the lit lower wall is the wall
      that reads. Same rung, same recipe shape, the other end of the same model. */

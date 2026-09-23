@@ -14,7 +14,7 @@ export default function VerificationV21CPage() {
           <h1 className="text-3xl font-semibold tracking-[-0.03em]">Navigation verification</h1>
           <p className="text-sherick-ink-muted">Pagination and Breadcrumb fixtures.</p>
         </header>
-        <NavigationSpecimen />
+        <NavigationSpecimen verification />
         <section aria-label="Numeric and href boundaries" className="space-y-6">
           <Pagination aria-label="Unsafe total" count={Number.MAX_VALUE} value={Number.MAX_VALUE} />
           <Pagination aria-label="Maximum safe total" count={Number.MAX_SAFE_INTEGER} value={1000} siblingCount={Number.MAX_SAFE_INTEGER} />
