@@ -356,7 +356,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
         </label>
 
         {selected.length > 0 && (
-          <div className={cn("mx-3 min-w-0 overflow-hidden", shape.control, "rounded-t-none", matteInset, recessedTop)}>
+          <div className={cn("mx-4 min-w-0 overflow-hidden", shape.control, "rounded-t-none", matteInset, recessedTop)}>
             <ul role="list" className={cn("m-0 min-w-0 list-none px-3 pt-3")}>
               {selected.map((file, index) => {
                 const key = fileKey(file);

@@ -430,7 +430,8 @@ test("the clear control empties the selection and returns focus to the picker", 
     const leading = rows[0].querySelector("[aria-hidden] svg")!.getBoundingClientRect();
     const trailing = rows[0].querySelector("button svg")!.getBoundingClientRect();
     return {
-      inset: bounds.left > zone.left && bounds.right < zone.right,
+      inset: bounds.left - zone.left,
+      centered: Math.abs((bounds.left - zone.left) - (zone.right - bounds.right)) <= 1,
       attached: Math.abs(bounds.top - zone.bottom) <= 1,
       joined: rows[0].getBoundingClientRect().bottom === rows[1].getBoundingClientRect().top,
       divider: getComputedStyle(rows[0]).borderBottomWidth,
@@ -445,7 +446,7 @@ test("the clear control empties the selection and returns focus to the picker", 
       balanced: Math.abs((leading.left - bounds.left) - (bounds.right - trailing.right)) <= 1,
     };
   });
-  expect(placement).toMatchObject({ inset: true, attached: true, joined: true, divider: "1px", lastDivider: "0px", evenDivider: true, topRadius: "0px", balanced: true });
+  expect(placement).toMatchObject({ inset: 16, centered: true, attached: true, joined: true, divider: "1px", lastDivider: "0px", evenDivider: true, topRadius: "0px", balanced: true });
   expect(placement.bottomRadius).not.toBe("0px");
   expect(placement.fill).not.toBe(placement.zoneFill);
   expect(placement.depth).toContain("inset");
