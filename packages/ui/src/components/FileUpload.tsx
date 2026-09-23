@@ -2,7 +2,7 @@
 
 import { Button as BaseButton } from "@base-ui/react/button";
 import { Field } from "@base-ui/react/field";
-import { File as FileIcon, Image as ImageIcon, Upload, X } from "lucide-react";
+import { File as FileIcon, Image as ImageIcon, Trash2, Upload, X } from "lucide-react";
 import React, {
   forwardRef,
   useEffect,
@@ -19,12 +19,13 @@ import Button from "./Button";
 import {
   density,
   edge,
-  elevation,
   fieldLayout,
   focusRingInset,
   focusRingWithin,
   material,
+  matteInset,
   shape,
+  recessedTop,
   state,
   stateLayer,
   text,
@@ -352,8 +353,8 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
         </label>
 
         {selected.length > 0 && (
-          <div className={cn("mx-3 -mt-3 min-w-0 overflow-hidden pt-3", shape.control, "rounded-t-none", material.matteHigh, elevation.recessed)}>
-            <ul role="list" className={cn("m-0 min-w-0 list-none px-3 pt-1")}>
+          <div className={cn("mx-3 min-w-0 overflow-hidden", shape.control, "rounded-t-none", matteInset, recessedTop)}>
+            <ul role="list" className={cn("m-0 min-w-0 list-none px-3 pt-3")}>
               {selected.map((file, index) => {
                 const key = fileKey(file);
                 const extension = file.name.includes(".") ? file.name.slice(file.name.lastIndexOf(".") + 1) : "";
@@ -361,7 +362,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                 return (
                   <li
                     key={key}
-                    className={cn("flex min-w-0 items-start gap-3 py-2", edge.row, text.high)}
+                    className={cn("flex min-w-0 items-start gap-3 py-2 ps-3", edge.row, text.high)}
                   >
                     <span aria-hidden="true" className={cn("inline-flex h-11 w-5 shrink-0 items-center [&>svg]:size-5", text.medium)}>
                       {file.type.startsWith("image/") ? <ImageIcon /> : <FileIcon />}
@@ -403,8 +404,9 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
               <Button
                 ref={clearRef}
                 type="button"
-                appearance="tonal"
-                variant="secondary"
+                appearance="text"
+                variant="danger"
+                icon={<Trash2 />}
                 size="sm"
                 disabled={disabled}
                 onClick={clearFiles}

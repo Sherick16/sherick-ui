@@ -45,6 +45,7 @@ module.exports = {
         "sherick-floating": "var(--sui-elevation-floating)",
         "sherick-control": "var(--sui-elevation-control)",
         "sherick-recessed": "var(--sui-elevation-recessed)",
+        "sherick-recessed-top": "var(--sui-elevation-recessed-top)",
         "sherick-well": "var(--sui-elevation-well)",
       },
       transitionDuration: {
