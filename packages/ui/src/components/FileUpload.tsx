@@ -21,6 +21,7 @@ import {
   edge,
   fieldLayout,
   focusRingInset,
+  focusRingDrag,
   focusRingWithin,
   material,
   matteInset,
@@ -29,7 +30,6 @@ import {
   state,
   stateLayer,
   text,
-  tone,
 } from "./ui.common";
 import { motionFeedback, motionInkPress } from "./ui.motion";
 import {
@@ -308,32 +308,34 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             the matte fill and quiet state layer make the affordance readable without a large well. */}
         <label
           className={cn(
-            "relative z-10 flex min-w-0 items-center gap-3 px-4 py-4 text-start",
+            "relative z-10 flex min-w-0 flex-col items-center gap-3 px-4 py-5 text-center",
             shape.control,
             material.matteHigh,
             motionFeedback,
             focusRingWithin,
+            focusRingDrag,
             !disabled && state.enabled,
             !disabled && stateLayer.quiet,
-            !disabled && dragging && tone.selected.primary,
+            !disabled && dragging && state.field.engaged,
             disabled && state.disabled
           )}
+          data-dragging={dragging || undefined}
           onDragEnter={handleDragEnter}
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
         >
           <span
-            className={cn("inline-flex size-5 shrink-0 items-center justify-center [&>svg]:size-5", text.medium)}
+            className={cn("inline-flex size-8 shrink-0 items-center justify-center [&>svg]:size-8", text.medium)}
             aria-hidden="true"
           >
             <Upload />
           </span>
-          <span className={cn("flex min-w-0 flex-col gap-1")}>
-            <span className={cn("text-sm font-medium", text.high)}>
+          <span className={cn("flex min-w-0 flex-col items-center gap-1")}>
+            <span className={cn("text-base font-semibold", text.high)}>
               {dragging ? (multiple ? "Drop files here" : "Drop the file here") : selectLabel}
             </span>
-            <span className={cn("text-xs leading-5", text.medium)}>
+            <span className={cn("text-sm leading-5", text.medium)}>
               {multiple ? "or drag and drop files" : "or drag and drop a file"}
             </span>
           </span>

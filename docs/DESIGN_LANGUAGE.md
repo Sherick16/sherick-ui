@@ -235,6 +235,8 @@ follows the input in a composite field, and `groupFocusRing` follows a wrapping 
 plain text field follows the platform's `:focus-visible` on pointer *and* keyboard
 focus; button and slider focus rings normally appear for keyboard focus. No second
 inner field rim is added.
+A file drop target uses that same outline while a file is dragged over it, and the field's
+engaged fill; it has no permanent rim.
 
 An icon-only action needs an accessible name independent of its tooltip, and a 44px
 standalone target. Checkbox/radio marks may keep a smaller visible footprint while a
