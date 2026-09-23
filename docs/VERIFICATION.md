@@ -460,34 +460,33 @@ manual zoom or physical-device coverage. The existing consumer tests remain Chro
 
 All browser tests fail on page errors or error-level console output.
 
-## CI order
+## CI execution
 
-The normal immutable CI path is:
+CI starts three independent jobs on the same commit:
 
-```bash
-bun install --frozen-lockfile
-bunx playwright install --with-deps chromium firefox webkit
-bun run verify
-```
+- `verify`: lint, motion policy, library and consumer typechecks, library build, smoke,
+  bundle budgets, packed-package matrix, and deterministic visual contract. Installs
+  Chromium for the packed browser fixtures.
+- `browser-showcase`: library and showcase builds, then the Chromium showcase suite.
+- `browser-consumer`: library and no-Tailwind builds, then its Chromium/Firefox/WebKit suite.
 
-`bun install --frozen-lockfile` is the normal path; the lockfile is committed and CI must not
-rewrite it.
+Each job installs from the committed frozen lockfile in its own checkout. The two
+browser suites run with two Playwright workers in CI (tests within a file remain serial);
+local iteration retains one worker. The release job waits for **all three** jobs. CI
+installs only the browser engines each job actually needs and retains separate browser
+diff artifacts. This preserves every gate while overlapping the formerly serial packed
+checks and the two browser suites (about 3.6, 3.5 and 3.5 minutes respectively in
+[the previous main run](https://github.com/Sherick16/sherick-ui/actions/runs/35922933616)).
 
-`bun run verify` executes, in order:
+`bun run verify` remains the serial, single-runner local gate:
 
-1. lint (library and showcase);
-2. `bun run test:motion` — temporal ownership across component modules;
-3. library typecheck and build (ESM/CJS/declarations plus generated `styles.css`/`theme.css`);
-4. showcase and no-Tailwind typechecks and production builds;
-5. `bun run test` — library smoke checks over the built artifact;
-6. `bun run test:bundle` — size and tree-shaking budgets;
-7. `bun run test:packed` — `npm pack` publication contract in a clean consumer;
-8. `bun run visual` — deterministic style-contract snapshots;
-9. `bun run test:browser` — showcase (interaction, motion, accessibility, responsive, visual)
-   and no-Tailwind browser suites.
+1. lint and motion policy;
+2. library typecheck and build;
+3. showcase and no-Tailwind typechecks and production builds;
+4. smoke, bundle, packed-package and deterministic visual checks;
+5. showcase and no-Tailwind browser suites.
 
-Each step has a different job and a different failure meaning. A red bundle gate is a size or
-boundary regression, not a styling defect; a red browser suite is not a publication defect.
-Because the size budgets and the visual baselines are recorded artifacts, a genuine
-architecture change updates them deliberately and in the same change that changes the
-contract.
+Each layer has a different failure meaning. A red bundle gate is a size or boundary
+regression, not a styling defect; a red browser suite is not a publication defect.
+Because size budgets and visual baselines are recorded artifacts, a genuine
+architecture change updates them deliberately in the same change.

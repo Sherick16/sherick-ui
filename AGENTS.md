@@ -20,12 +20,14 @@ public API or compatibility changes. Do not reuse a published version or bump so
 showcase, skill, CI or documentation edits that do not change the published package.
 The v2.1 component wave and Media are additive and require a minor bump from `2.0.0` to `2.1.0`.
 
-A verified push to `main` publishes a new version under npm's `latest` tag via the
-trusted publisher configured for `.github/workflows/ci.yml`. The publish job skips a
-version already on npm and refuses a version older than `latest`. No npm token is stored
-in GitHub; OIDC `id-token: write` is scoped to the publish job. Do not manually publish,
-create release tags, change dist-tags or bypass the verification gate without explicit
-release-owner approval. See [`docs/RELEASE.md`](docs/RELEASE.md) for setup and the release contract.
+A verified push to `main` **stages** a new version with npm's trusted publisher
+configured for `.github/workflows/ci.yml`; it does not publish immediately. A release
+owner reviews and approves the staged version with 2FA before it reaches `latest`.
+The job skips a version already live on npm and refuses a version older than `latest`.
+No npm token is stored in GitHub; OIDC `id-token: write` is scoped to the stage job.
+Do not manually publish, create release tags, change dist-tags or bypass the verification
+gate without explicit release-owner approval. See [`docs/RELEASE.md`](docs/RELEASE.md)
+for setup and the release contract.
 
 ## Design language (mandatory)
 
@@ -194,8 +196,8 @@ package's compatibility promise.
 `2.0.0` established the stable `latest` line. The `1.x` line is frozen; existing
 `2.x` APIs and behavior follow ordinary semver. Additive components belong in a minor
 release, not another prerelease or a release tag created by hand. The verified `main`
-workflow publishes the version authored in the package manifest; see the version rule above
-and [`docs/RELEASE.md`](docs/RELEASE.md).
+workflow stages the version authored in the package manifest for manual approval; see
+the version rule above and [`docs/RELEASE.md`](docs/RELEASE.md).
 
 ## Frozen architecture (mandatory)
 

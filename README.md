@@ -6,8 +6,8 @@ contrast and restrained motion. It is **quiet by default, expressive where it ma
 owns generic widget behavior and accessibility where a primitive is available.
 
 **Release status:** `2.0.0` established the stable line; `1.x` is frozen. This
-checkout's package version is `2.1.0`, published from verified `main` via npm trusted
-publishing. Check npm for the installed version; see the [release contract](docs/RELEASE.md).
+checkout's package version is `2.1.0`. Verified `main` stages releases for maintainer
+approval; check npm for the installed version. See the [release contract](docs/RELEASE.md).
 
 ## Installation
 

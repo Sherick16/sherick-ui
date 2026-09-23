@@ -4,7 +4,7 @@ export default defineConfig({
   testDir: "./tests",
   timeout: 30_000,
   fullyParallel: false,
-  workers: 1,
+  workers: process.env.CI ? 2 : 1,
   projects: [
     { name: "chromium", use: { browserName: "chromium" } },
     { name: "firefox", testMatch: /(?:hostile|v2-1)\.spec\.ts/, use: { browserName: "firefox" } },

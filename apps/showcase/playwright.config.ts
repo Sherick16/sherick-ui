@@ -4,7 +4,7 @@ export default defineConfig({
   testDir: "./tests/browser",
   timeout: 30_000,
   fullyParallel: false,
-  workers: 1,
+  workers: process.env.CI ? 2 : 1,
   expect: {
     timeout: 5_000,
     toHaveScreenshot: {
