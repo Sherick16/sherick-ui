@@ -93,6 +93,10 @@ export const focusRingHeld =
 export const focusRingWithin =
   "has-[:focus-visible]:outline has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-sherick-focus has-[:focus-visible]:outline-offset-[3px]";
 
+/* A file drag marks the same target with the same outline as visible keyboard focus. */
+export const focusRingDrag =
+  "data-[dragging]:outline data-[dragging]:outline-2 data-[dragging]:outline-sherick-focus data-[dragging]:outline-offset-[3px]";
+
 export const groupFocusRing =
   "group-focus-visible:outline group-focus-visible:outline-2 group-focus-visible:outline-sherick-focus group-focus-visible:outline-offset-[3px]";
 

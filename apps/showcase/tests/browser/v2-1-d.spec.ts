@@ -84,6 +84,22 @@ test("the field names its picker and describes it with every limit", async ({ pa
   // The ref is the native picker itself, so a consumer can reach the element the platform drives.
   await expect(page.getByTestId("v2-1-d-single-ref")).toHaveText("INPUT:file");
 
+  const stack = await zoneOf(field).evaluate((zone) => {
+    const icon = zone.querySelector(":scope > span[aria-hidden] svg")!.getBoundingClientRect();
+    const copy = zone.querySelector(":scope > span:not([aria-hidden])")!;
+    const title = copy.firstElementChild!.getBoundingClientRect();
+    const supporting = copy.lastElementChild!.getBoundingClientRect();
+    return {
+      iconSize: icon.width,
+      stacked: icon.bottom < title.top,
+      centered: Math.abs((icon.left + icon.right) / 2 - (title.left + title.right) / 2) <= 1,
+      hierarchy: Number(getComputedStyle(copy.firstElementChild!).fontWeight) > Number(getComputedStyle(copy.lastElementChild!).fontWeight),
+      supportingBelow: supporting.top >= title.bottom,
+    };
+  });
+  expect(stack).toMatchObject({ stacked: true, centered: true, hierarchy: true, supportingBelow: true });
+  expect(stack.iconSize).toBeGreaterThanOrEqual(32);
+
   expect(errors).toEqual([]);
 });
 
@@ -306,6 +322,7 @@ test("a file drag marks the zone and hands the drop to the same rules", async ({
   const field = page.getByTestId("v2-1-d-multiple");
   const zone = zoneOf(field);
   const rest = await background(zone);
+  const restOutline = await zone.evaluate((element) => getComputedStyle(element).outlineWidth);
   /* The fill answers on the feedback intent, so a change is read as a settled value rather than as
      whatever was painted in the first frame after the event. */
   const settled = () => expect.poll(() => background(zone));
@@ -319,10 +336,17 @@ test("a file drag marks the zone and hands the drop to the same rules", async ({
   await expect(zone.getByText("Add files")).toHaveCount(0);
   // The state is not carried by colour alone; it also takes a fill the resting zone does not hold.
   await settled().not.toBe(rest);
+  await expect(zone).toHaveAttribute("data-dragging", "true");
+  await expect.poll(() => zone.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { width: style.outlineWidth, offset: style.outlineOffset, style: style.outlineStyle };
+  })).toEqual({ width: "2px", offset: "3px", style: "solid" });
 
   await dragFiles(field, [dropFile("dragged.pdf", { type: "application/pdf" })], ["dragleave"]);
   await expect(zone.getByText("Add files")).toBeVisible();
   await settled().toBe(rest);
+  await expect(zone).not.toHaveAttribute("data-dragging");
+  await expect.poll(() => zone.evaluate((element) => getComputedStyle(element).outlineWidth)).toBe(restOutline);
 
   await dropFiles(field, [dropFile("dragged.pdf", { type: "application/pdf" })]);
   await expect(field.getByRole("listitem")).toHaveCount(1);
