@@ -396,22 +396,29 @@ test("the clear control empties the selection and returns focus to the picker", 
     const bounds = sheet.getBoundingClientRect();
     const style = getComputedStyle(sheet);
     const rows = element.querySelectorAll("li");
+    const leading = rows[0].querySelector("[aria-hidden] svg")!.getBoundingClientRect();
+    const trailing = rows[0].querySelector("button svg")!.getBoundingClientRect();
     return {
       inset: bounds.left > zone.left && bounds.right < zone.right,
-      attached: bounds.top < zone.bottom && bounds.bottom > zone.bottom,
+      attached: Math.abs(bounds.top - zone.bottom) <= 1,
       joined: rows[0].getBoundingClientRect().bottom === rows[1].getBoundingClientRect().top,
       divider: getComputedStyle(rows[0]).borderBottomWidth,
+      lastDivider: getComputedStyle(rows[1]).borderBottomWidth,
+      evenDivider: Math.abs((rows[0].getBoundingClientRect().left - bounds.left) - (bounds.right - rows[0].getBoundingClientRect().right)) <= 1,
       topRadius: style.borderTopLeftRadius,
       bottomRadius: style.borderBottomLeftRadius,
       fill: style.backgroundColor,
       zoneFill: getComputedStyle(zoneElement).backgroundColor,
       depth: style.boxShadow,
+      zoneDepth: getComputedStyle(zoneElement).boxShadow,
+      balanced: Math.abs((leading.left - bounds.left) - (bounds.right - trailing.right)) <= 1,
     };
   });
-  expect(placement).toMatchObject({ inset: true, attached: true, joined: true, divider: "1px", topRadius: "0px" });
+  expect(placement).toMatchObject({ inset: true, attached: true, joined: true, divider: "1px", lastDivider: "0px", evenDivider: true, topRadius: "0px", balanced: true });
   expect(placement.bottomRadius).not.toBe("0px");
-  expect(placement.fill).toBe(placement.zoneFill);
-  expect(placement.depth).not.toBe("none");
+  expect(placement.fill).not.toBe(placement.zoneFill);
+  expect(placement.depth).toContain("inset");
+  expect(placement.zoneDepth).toBe("none");
 
   await field.getByRole("button", { name: "Remove all" }).click();
   await expect(field.getByRole("listitem")).toHaveCount(0);
@@ -597,12 +604,14 @@ test("file changes are announced without a visible log; rejection and clear affo
   expect((await status.boundingBox())!.height).toBe(0);
   const clear = field.getByRole("button", { name: "Clear files", exact: true });
   await expect(clear).toBeVisible();
+  await expect(clear.locator("svg.lucide-trash-2")).toBeVisible();
   const resting = await clear.evaluate(element => {
     const css = getComputedStyle(element);
-    return { fill: css.backgroundColor, shadow: css.boxShadow };
+    return { fill: css.backgroundColor, shadow: css.boxShadow, color: css.color, label: getComputedStyle(element.closest('[data-testid]')!.querySelector('label')!).color };
   });
-  expect(resting.fill).not.toBe("rgba(0, 0, 0, 0)");
-  expect(resting.shadow).not.toBe("none");
+  expect(resting.fill).toBe("rgba(0, 0, 0, 0)");
+  expect(resting.shadow).toBe("none");
+  expect(resting.color).not.toBe(resting.label);
   await inputOf(field).setInputFiles(pickerFile("notes.txt", 16, "text/plain"));
   await expect(status.getByText("notes.txt is not an accepted file type.", { exact: true })).toBeVisible();
   expect((await status.boundingBox())!.height).toBeGreaterThan(1);
