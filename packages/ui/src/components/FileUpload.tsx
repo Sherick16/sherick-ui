@@ -2,7 +2,7 @@
 
 import { Button as BaseButton } from "@base-ui/react/button";
 import { Field } from "@base-ui/react/field";
-import { File as FileIcon, Upload, X } from "lucide-react";
+import { File as FileIcon, Image as ImageIcon, Upload, X } from "lucide-react";
 import React, {
   forwardRef,
   useEffect,
@@ -18,6 +18,7 @@ import { cn } from "@/libs/utils";
 import Button from "./Button";
 import {
   density,
+  edge,
   fieldLayout,
   focusRingInset,
   focusRingWithin,
@@ -305,7 +306,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             the matte fill and quiet state layer make the affordance readable without a large well. */}
         <label
           className={cn(
-            "flex min-w-0 items-center gap-3 px-4 py-4 text-start",
+            "relative z-10 flex min-w-0 items-center gap-3 px-4 py-4 text-start",
             shape.control,
             material.matteHigh,
             motionFeedback,
@@ -349,34 +350,24 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
           />
         </label>
 
-        {hint && (
-          <span id={hintId} className={cn("mt-2 text-xs leading-5", text.medium)}>
-            {hint}
-          </span>
-        )}
-
         {selected.length > 0 && (
-          <div className={cn("mt-3 flex min-w-0 flex-col gap-2")}>
-            <ul role="list" className={cn("m-0 flex min-w-0 list-none flex-col gap-1.5 p-0")}>
+          <div className={cn("mx-3 -mt-3 min-w-0 overflow-hidden pt-3", shape.control, material.matteQuiet)}>
+            <ul role="list" className={cn("m-0 min-w-0 list-none px-3 pt-1")}>
               {selected.map((file, index) => {
                 const key = fileKey(file);
+                const extension = file.name.includes(".") ? file.name.slice(file.name.lastIndexOf(".") + 1) : "";
+                const fileType = (extension || file.type.split("/").pop() || "File").toUpperCase();
                 return (
                   <li
                     key={key}
-                    /* Filenames and dismissal align to the first line even when a name wraps. */
-                    className={cn(
-                      "flex min-w-0 items-start gap-3 px-3 py-3",
-                      shape.control,
-                      material.matteQuiet,
-                      text.high,
-                      motionFeedback
-                    )}
+                    className={cn("flex min-w-0 items-start gap-3 py-2", edge.row, text.high)}
                   >
-                    <span aria-hidden="true" className={cn("inline-flex h-6 w-5 shrink-0 items-center [&>svg]:size-5", text.medium)}>
-                      <FileIcon />
+                    <span aria-hidden="true" className={cn("inline-flex h-11 w-5 shrink-0 items-center [&>svg]:size-5", text.medium)}>
+                      {file.type.startsWith("image/") ? <ImageIcon /> : <FileIcon />}
                     </span>
-                    <span className={cn("min-w-0 flex-1 text-sm leading-6 [overflow-wrap:anywhere]")}>
-                      {file.name}
+                    <span className={cn("flex min-w-0 flex-1 flex-col text-sm leading-6 [overflow-wrap:anywhere]")}>
+                      <span>{file.name}</span>
+                      <span className={cn("text-xs leading-5", text.medium)}>{formatBytes(file.size)} · {fileType}</span>
                     </span>
                     <BaseButton
                       ref={(node: HTMLButtonElement | null) => {
@@ -388,7 +379,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                       disabled={disabled}
                       onClick={() => removeFile(index)}
                       className={cn(
-                        "group -my-2.5 inline-flex shrink-0 items-center justify-center",
+                        "group inline-flex shrink-0 items-center justify-center",
                         density.target,
                         shape.circle,
                         text.medium,
@@ -407,8 +398,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                 );
               })}
             </ul>
-
-            <div className={cn("flex justify-end")}>
+            <div className={cn("flex justify-end px-3 pb-2 pt-1")}>
               <Button
                 ref={clearRef}
                 type="button"
@@ -422,6 +412,12 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
               </Button>
             </div>
           </div>
+        )}
+
+        {hint && (
+          <span id={hintId} className={cn("mt-2 text-xs leading-5", text.medium)}>
+            {hint}
+          </span>
         )}
 
         {description && (
