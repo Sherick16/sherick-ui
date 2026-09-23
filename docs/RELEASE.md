@@ -3,25 +3,30 @@
 This is the current consumer compatibility contract. The implementation boundaries live in
 [ARCHITECTURE.md](ARCHITECTURE.md), and their checks in [VERIFICATION.md](VERIFICATION.md).
 
-## Release status: stable at `2.0.0`
+## Release status and automated publication
 
-`sherick-ui@2.0.0` is the current stable release and is published under npm's `latest` dist-tag.
-API compatibility begins at this version, and ordinary semver applies to the export contract below.
-The published `1.0.0` through `1.0.5` line is frozen and receives no further releases.
+`2.0.0` established the stable line under npm's `latest` dist-tag; `1.0.0` through
+`1.0.5` are frozen. The current source package version is `2.1.0`: the v2.1 component
+wave and Media add public functionality, so this is a **minor** release. An installed
+package's actual version and exports, not this checkout, determine availability.
 
-The prerelease line is historical. No prerelease is promoted or published by the stable transition,
-and an untagged `npm install sherick-ui` resolves to stable `2.0.0`. If an `alpha` dist-tag exists, it
-may continue to name only a prerelease; stable `2.0.0` is published exclusively under `latest`.
+`packages/ui/package.json` owns the release version and `publishConfig.tag` remains `latest`.
+The packed-package gate rejects prereleases under `latest` and stable versions under
+another tag. For any publishable change, bump the manifest beyond npm `latest` in the
+same PR: patch for backward-compatible fixes, minor for additions, major for breaking
+changes (see below). Documentation, showcase, skill and CI-only changes do not need a
+new package version. Do not publish the same version twice.
 
-`packages/ui/package.json` enforces the stable mapping mechanically: its version is `2.0.0` and
-`publishConfig.tag` is `latest`. `scripts/verify-packed-package.mjs` fails if a prerelease would publish
-under `latest` or a stable version would publish under anything but `latest`.
-
-The unreleased v2.1 component wave is additive to this stable contract. Its public APIs and
-narrow component-owned behavior for missing Base primitives are recorded in
-[`V2_1_COMPONENTS.md`](V2_1_COMPONENTS.md). It does not change the package version or authorize
-publication, an npm dist-tag change, or a release tag.
-
+The `main` push workflow verifies the exact commit, then checks npm. It skips an already
+published version and rejects a downgrade; a newer stable version is published with npm
+trusted publishing (GitHub OIDC) and provenance, without an npm token. The release owner
+must configure npmjs.com's trusted publisher for owner `Sherick16`, repository
+`sherick-ui`, workflow filename **`ci.yml`** (not the full path), no environment,
+and the **`npm publish` allowed action**. Node 24 supplies an npm CLI that supports
+trusted publishing (npm 11.5.1+); do not add `NPM_TOKEN`/`NODE_AUTH_TOKEN`.
+Only this GitHub-hosted workflow has `id-token: write`; neither PRs nor failed
+verification publish. Do not manually publish or create release tags without explicit
+release-owner approval.
 
 ## What counts as a breaking change
 
@@ -65,13 +70,14 @@ The root `sherick-ui` export is:
 - **Toasts**: `ToastProvider`, `ToastViewport`, `useToast`, and `createToastManager()` for a
   manager that lives outside the React tree;
 - **Writing direction**: `DirectionProvider`;
-- **Unreleased v2.1 additions**: `Calendar`, `DatePicker`, `DateRangePicker`, `Command`,
+- **v2.1 additions**: `Media`, `Calendar`, `DatePicker`, `DateRangePicker`, `Command`,
   `CommandPalette`, `Pagination`, `Breadcrumb`, `FileUpload`, `Stepper`, `TreeView` and
-  their prop/data types, specified in [`V2_1_COMPONENTS.md`](V2_1_COMPONENTS.md);
+  their prop/data types; see [`V2_1_COMPONENTS.md`](V2_1_COMPONENTS.md) and [`MEDIA.md`](MEDIA.md);
 - the matching prop types (`AccordionProps`, `AccordionItemProps`, `AccordionTriggerProps`,
   `AccordionPanelProps`, `AccordionHeadingLevel`, `CollapsibleProps`, `CollapsibleTriggerProps`,
   `CollapsiblePanelProps`, `ButtonProps`, `ButtonAppearance`, `ButtonSize`, `IconButtonProps`,
   `IconButtonAppearance`, `AlertProps`, `AlertDialogProps`, `AvatarProps`, `BadgeProps`,
+  `MediaImageProps`, `MediaVideoProps`,
   `CardProps`, `ChipProps`, `ChipGroupProps`, `ProgressProps`, `SegmentedControlProps`,
   `SegmentedControlOption`, `SkeletonProps`, `SpinnerProps`, `FieldProps`, `InputProps`,
   `TextareaProps`, `SearchProps`, `NumberFieldProps`, `SelectProps`, `SelectOption`,
@@ -219,7 +225,7 @@ The current JSON file is authoritative; a future baseline edit must record its r
 change. The remaining object-valued shared recipe tables are a post-release optimization candidate,
 not a correctness defect and not permission to raise a budget.
 
-The unreleased v2.1 wave deliberately re-records only `barrel` and `stylesCss`, using
+The v2.1 wave deliberately re-recorded only `barrel` and `stylesCss`, using
 `bun --filter sherick-ui test:bundle --update=barrel,stylesCss`. The reason is additive
 component/helper implementation and scoped anatomy for ten new core components, not a
 dependency upgrade or a relaxed tree-shaking contract; see [the architecture decision](ARCHITECTURE.md#v21-behavioral-gaps).
@@ -288,12 +294,15 @@ it.
 
 ## Release gate
 
-`2.0.0` is already published; the stable transition and `v2.0.0` tag are historical.
-For a future release, install with the frozen lockfile, run `bun run verify` from the exact
-candidate commit, review the packed manifest and dry-run publication, then publish/tag only
-with explicit release approval. `prepack` builds the artifacts; consumer installation must
-not invoke Bun or a build script. Optional screenshot-review projects support manual review
-and are not hidden requirements of the routine gate.
+A publishable change carries a SemVer bump in `packages/ui/package.json` before merge.
+`bun run verify` runs on PRs and on the exact `main` commit. On a passing `main` push,
+the publish job installs with the frozen lockfile and runs
+`npm publish --access public --provenance` from `packages/ui`. Its `prepack` builds
+artifacts and stages the bundled
+patched Base UI dependency; `postpack` restores the workspace link. npm's trusted
+publisher must be registered before the first automated release. Main pushes queue rather
+than cancel an in-progress publication. There is no release tag generated by CI;
+manual checks below remain a separate human responsibility when relevant.
 
 ## Release-readiness classifications
 

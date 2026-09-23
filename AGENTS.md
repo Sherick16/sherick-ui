@@ -11,6 +11,22 @@ A requested change on a branch is not complete until it is committed and pushed 
 says otherwise). Do not update a PR description ahead of the branch: confirm the PR head SHA moved
 before claiming delivery in the body.
 
+## Package version and publishing (mandatory)
+
+`packages/ui/package.json` is the publishable version authority. In the same PR as any
+publishable library change, advance it beyond the version on npm: **patch** for backward-compatible
+fixes, **minor** for additive public components/props/behavior, **major** for breaking
+public API or compatibility changes. Do not reuse a published version or bump solely for
+showcase, skill, CI or documentation edits that do not change the published package.
+The v2.1 component wave and Media are additive and require a minor bump from `2.0.0` to `2.1.0`.
+
+A verified push to `main` publishes a new version under npm's `latest` tag via the
+trusted publisher configured for `.github/workflows/ci.yml`. The publish job skips a
+version already on npm and refuses a version older than `latest`. No npm token is stored
+in GitHub; OIDC `id-token: write` is scoped to the publish job. Do not manually publish,
+create release tags, change dist-tags or bypass the verification gate without explicit
+release-owner approval. See [`docs/RELEASE.md`](docs/RELEASE.md) for setup and the release contract.
+
 ## Design language (mandatory)
 
 Before any work that creates, changes or reviews reusable UI — a component, variant,
@@ -175,10 +191,11 @@ preset, declares no Tailwind peer dependency, requires no content scanning, and 
 must not import Base UI to use Sherick UI. Base UI internals are not covered by this
 package's compatibility promise.
 
-`2.0.0` is stable under npm's `latest` dist-tag. The `1.x` line is frozen; existing
-`2.x` public APIs and behavior follow ordinary semver compatibility. The v2.1 component
-wave is additive functionality, not another prerelease cutover. Do not publish or create
-release tags without explicit approval. See [`docs/RELEASE.md`](docs/RELEASE.md).
+`2.0.0` established the stable `latest` line. The `1.x` line is frozen; existing
+`2.x` APIs and behavior follow ordinary semver. Additive components belong in a minor
+release, not another prerelease or a release tag created by hand. The verified `main`
+workflow publishes the version authored in the package manifest; see the version rule above
+and [`docs/RELEASE.md`](docs/RELEASE.md).
 
 ## Frozen architecture (mandatory)
 

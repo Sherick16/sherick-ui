@@ -6,6 +6,7 @@ const colorNames = [
   "surface-high",
   "surface-float",
   "surface-overlay",
+  "media",
   "ink",
   "ink-muted",
   "detail",

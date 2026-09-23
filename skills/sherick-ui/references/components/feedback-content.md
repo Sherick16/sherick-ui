@@ -17,7 +17,7 @@ Release availability: the toast exports and `DirectionProvider` are part of the 
 `2.0.0` root barrel (`sherick-ui`), together with `ToastProviderProps`,
 `ToastViewportProps`, `ToastOptions`, `ToastActionOptions`, `ToastUpdateOptions`,
 `ToastPromiseOptions`, `ToastType`, `ToastPosition`, `ToastManager` and
-`DirectionProviderProps`. None is part of the unreleased v2.1 wave. `Markdown` and
+`DirectionProviderProps`. None was added by the v2.1 wave. `Markdown` and
 `CodeBlock` are stable but live only on `sherick-ui/content`, which is **ESM only**.
 
 ```tsx

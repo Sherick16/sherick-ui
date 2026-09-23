@@ -5,6 +5,7 @@
       "--sui-surface": "0.985 0.006 255",
       "--sui-surface-high": "0.925 0.014 255",
       "--sui-surface-float": "0.992 0.006 255",
+      "--sui-media": "0.205 0.012 260",
       "--sui-ink": "0.245 0.018 260",
       "--sui-ink-muted": "0.480 0.018 260",
       "--sui-detail": "0.600 0.016 258",
@@ -62,6 +63,7 @@
       "--sui-surface": "0.245 0.014 260",
       "--sui-surface-high": "0.295 0.016 260",
       "--sui-surface-float": "0.27 0.018 260",
+      "--sui-media": "0.205 0.012 260",
       "--sui-ink": "0.94 0.008 255",
       "--sui-ink-muted": "0.76 0.014 255",
       "--sui-detail": "0.600 0.014 256",
@@ -119,6 +121,7 @@
       "--sui-surface": "0.245 0.014 260",
       "--sui-surface-high": "0.295 0.016 260",
       "--sui-surface-float": "0.27 0.018 260",
+      "--sui-media": "0.205 0.012 260",
       "--sui-ink": "0.94 0.008 255",
       "--sui-ink-muted": "0.76 0.014 255",
       "--sui-detail": "0.600 0.014 256",
@@ -480,8 +483,20 @@
     ":where(.sui-scope).hidden": [
       "display: none"
     ],
+    ":where(.sui-scope).aspect-\\[21\\/9\\]": [
+      "aspect-ratio: 21/9"
+    ],
+    ":where(.sui-scope).aspect-\\[3\\/4\\]": [
+      "aspect-ratio: 3/4"
+    ],
+    ":where(.sui-scope).aspect-\\[4\\/3\\]": [
+      "aspect-ratio: 4/3"
+    ],
     ":where(.sui-scope).aspect-square": [
       "aspect-ratio: 1 / 1"
+    ],
+    ":where(.sui-scope).aspect-video": [
+      "aspect-ratio: 16 / 9"
     ],
     ":where(.sui-scope).size-10": [
       "height: 2.5rem",
@@ -550,6 +565,9 @@
     ],
     ":where(.sui-scope).h-\\[var\\(--sui-disclose-height\\)\\]": [
       "height: var(--sui-disclose-height)"
+    ],
+    ":where(.sui-scope).h-auto": [
+      "height: auto"
     ],
     ":where(.sui-scope).h-full": [
       "height: 100%"
@@ -1041,6 +1059,10 @@
       "--tw-bg-opacity: 1",
       "background-color: oklch(var(--sui-ink-muted) / var(--tw-bg-opacity, 1))"
     ],
+    ":where(.sui-scope).bg-sherick-media": [
+      "--tw-bg-opacity: 1",
+      "background-color: oklch(var(--sui-media) / var(--tw-bg-opacity, 1))"
+    ],
     ":where(.sui-scope).bg-sherick-primary-strong": [
       "--tw-bg-opacity: 1",
       "background-color: oklch(var(--sui-primary-strong) / var(--tw-bg-opacity, 1))"
@@ -1126,8 +1148,20 @@
     ":where(.sui-scope).bg-clip-padding": [
       "background-clip: padding-box"
     ],
+    ":where(.sui-scope).object-contain": [
+      "object-fit: contain"
+    ],
     ":where(.sui-scope).object-cover": [
       "object-fit: cover"
+    ],
+    ":where(.sui-scope).object-bottom": [
+      "object-position: bottom"
+    ],
+    ":where(.sui-scope).object-center": [
+      "object-position: center"
+    ],
+    ":where(.sui-scope).object-top": [
+      "object-position: top"
     ],
     ":where(.sui-scope).p-0": [
       "padding: 0px"
@@ -1299,6 +1333,9 @@
     ],
     ":where(.sui-scope).text-start": [
       "text-align: start"
+    ],
+    ":where(.sui-scope).align-top": [
+      "vertical-align: top"
     ],
     ":where(.sui-scope).align-middle": [
       "vertical-align: middle"

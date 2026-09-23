@@ -1,8 +1,9 @@
-# v2.1 component contracts (unreleased)
+# v2.1 component contracts
 
-This is additive work above stable `2.0.0`. Package version, publish configuration, five
-subpaths, existing APIs, audited Base UI `1.8.0`, dependencies, tokens and motion owners
-remain unchanged. No release or npm tag is part of this wave.
+This additive wave follows stable `2.0.0` and ships with the `2.1.0` source package
+after verified `main` publication. Its five subpaths, existing APIs, audited Base UI
+`1.8.0`, dependencies and motion owners remain unchanged; there is no release tag.
+Check the installed package version before relying on these components.
 
 ## Behavioral ownership
 

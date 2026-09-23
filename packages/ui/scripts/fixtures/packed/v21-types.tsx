@@ -1,12 +1,12 @@
 import * as React from "react";
 import {
   Breadcrumb, Calendar, Command, CommandPalette, DatePicker, DateRangePicker, FileUpload,
-  Pagination, Stepper, TreeView,
+  Media, Pagination, Stepper, TreeView,
   type BreadcrumbItem, type BreadcrumbProps, type CalendarDate, type CalendarLabels,
   type CalendarProps, type CommandItem, type CommandProps, type CommandPaletteProps,
   type DateRange, type DatePickerProps, type DateRangePickerProps, type FileRejection,
   type FileUploadProps, type PaginationProps, type StepperItem, type StepperProps,
-  type TreeViewItem, type TreeViewProps,
+  type TreeViewItem, type TreeViewProps, type MediaImageProps, type MediaVideoProps,
 } from "sherick-ui";
 
 const date: CalendarDate = "2024-06-10";
@@ -26,6 +26,8 @@ const steps: StepperItem[] = [{ value: "one", label: "One", complete: true }];
 const stepper: StepperProps = { items: steps, value: "one", onValueChange: (value: string) => void value };
 const treeItems: TreeViewItem[] = [{ value: "root", label: "Root", children: [{ value: "child", label: "Child" }] }];
 const tree: TreeViewProps = { label: "Tree", items: treeItems, onValueChange: (value: string | null) => void value, onExpandedValuesChange: (values: string[]) => void values };
+const image: MediaImageProps = { src: "/office.jpg", alt: "Office", srcSet: "/office@2x.jpg 2x" };
+const video: MediaVideoProps = { poster: "/poster.jpg", controls: true, preload: "none" };
 
 export const wave = <>
   <Calendar {...calendar} ref={React.createRef<HTMLDivElement>()} />
@@ -39,6 +41,13 @@ export const wave = <>
   <FileUpload {...upload} ref={React.createRef<HTMLInputElement>()} />
   <Stepper {...stepper} ref={React.createRef<HTMLElement>()} />
   <TreeView {...tree} ref={React.createRef<HTMLDivElement>()} />
+  <Media.Image {...image} ref={React.createRef<HTMLImageElement>()} />
+  <Media.Image src="/pattern.jpg" decorative />
+  <Media.Video {...video} ref={React.createRef<HTMLVideoElement>()}>
+    <source src="/demo.webm" type="video/webm" />
+    <track kind="captions" src="/en.vtt" srcLang="en" label="English" />
+  </Media.Video>
+  <Media.Video src="/ambient.mp4" autoPlay muted loop decorative />
 </>;
 
 // @ts-expect-error range mode must not accept a single-date value
@@ -51,3 +60,11 @@ export const invalidPickerRef = <DatePicker label="Date" ref={React.createRef<HT
 export const invalidUploadName = <FileUpload label="Files" name="files" />;
 // @ts-expect-error a tree value is an identity, not an item object
 export const invalidTree = <TreeView label="Tree" items={treeItems} value={treeItems[0]} />;
+// @ts-expect-error meaningful images require alt
+export const missingAlt = <Media.Image src="/office.jpg" />;
+// @ts-expect-error decorative images cannot claim descriptive alt
+export const conflictingImage = <Media.Image src="/pattern.jpg" decorative alt="Pattern" />;
+// @ts-expect-error decorative video cannot have interactive controls
+export const conflictingVideo = <Media.Video src="/ambient.mp4" decorative controls />;
+// @ts-expect-error decorative video cannot be keyboard focusable
+export const conflictingTabStop = <Media.Video src="/ambient.mp4" decorative tabIndex={0} />;

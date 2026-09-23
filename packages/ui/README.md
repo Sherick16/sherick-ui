@@ -1,8 +1,9 @@
 # Sherick UI
 
 A React 18/19 component library with soft tonal surfaces, deliberate shape contrast
-and restrained motion. `2.0.0` is stable under npm's `latest` tag; the `1.x` line
-is frozen. The v2.1 components currently in the repository are not yet published.
+and restrained motion. `2.0.0` established the stable line; `1.x` is frozen.
+This package source is `2.1.0`; verified `main` publishes new versions via npm trusted
+publishing. Check the installed version to determine component availability.
 
 ## Install and style
 
@@ -49,7 +50,11 @@ package but never bundled by a core-only import. `sherick-ui/dev` is unsupported
 workbench infrastructure, not consumer API. For the current export list and semver
 boundaries see the [release contract](https://github.com/Sherick16/sherick-ui/blob/main/docs/RELEASE.md#public-export-contract).
 
-The repository's **unreleased** v2.1 wave adds Calendar/DatePicker/DateRangePicker,
+Use `Media.Image` and `Media.Video` for Sherick's rounded, clipped media frame.
+[Examples and accessibility guidance](https://github.com/Sherick16/sherick-ui/blob/main/docs/MEDIA.md)
+cover content, decorative media and native video captions.
+
+The v2.1 wave adds Calendar/DatePicker/DateRangePicker,
 Command/CommandPalette, Pagination/Breadcrumb, FileUpload, Stepper and TreeView to
 the same root barrel. Its [component contracts](https://github.com/Sherick16/sherick-ui/blob/main/docs/V2_1_COMPONENTS.md)
 use civil `YYYY-MM-DD` dates and `File[]` selections; FileUpload does not upload files.

@@ -6,10 +6,9 @@ Use this reference for the field, text-entry and value-selection exports: `Field
 semantics. Composition guidance lives in [composition](../composition.md); naming, focus
 and error relationships live in [accessibility](../accessibility.md).
 
-Release availability: every component above except `FileUpload` is part of the stable
-`2.0.0` root export. `FileUpload` is an **unreleased v2.1 addition** — the import path is
-the same, but it is not in a published release, so confirm it exists in the installed
-package before using it.
+Release availability: every component above except `FileUpload` is part of the
+`2.0.0` root export. `FileUpload` arrives in `2.1.0` under the same import path;
+confirm it exists in the installed package before using it.
 
 ```tsx
 import {
@@ -282,7 +281,7 @@ A single handle on a groove. The ref is the handle, which is the part a user gra
 <Slider aria-label="Width" defaultValue={40} className="w-32" />
 ```
 
-## `FileUpload` (unreleased v2.1)
+## `FileUpload` (from 2.1.0)
 
 A labelled field that selects files from the native picker or by dropping them on its zone.
 The ref is the native file `<input>`.

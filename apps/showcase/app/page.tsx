@@ -38,6 +38,7 @@ import {
   Field,
   IconButton,
   Input,
+  Media,
   Menu,
   NavGroup,
   NumberField,
@@ -629,6 +630,21 @@ export default function Home() {
                 </div>
               </Specimen>
 
+              <Specimen title="Images">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <Media.Image src="https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg?auto=compress&width=680" alt="Warm living room with a sofa" />
+                  <Media.Image src="https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg?auto=compress&width=680" alt="Living room detail" aspect="square" fit="cover" position="top" />
+                </div>
+              </Specimen>
+              <Specimen title="Video">
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <Media.Video src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" poster="https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&width=680" aria-label="Flowers in the breeze" controls />
+                  <Media.Video src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" poster="https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&width=680" aria-label="Cropped flower preview" aspect="video" fit="cover" controls />
+                </div>
+              </Specimen>
+              <Specimen title="Ambient video">
+                <Media.Video src="https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4" poster="https://images.pexels.com/photos/931177/pexels-photo-931177.jpeg?auto=compress&width=680" aspect="wide" fit="cover" autoPlay muted loop decorative />
+              </Specimen>
               <Specimen title="Avatar">
                 <div className="flex flex-wrap items-end gap-5">
                   <Avatar src="https://images.pexels.com/photos/771742/pexels-photo-771742.jpeg" alt="Small avatar" size="sm" />

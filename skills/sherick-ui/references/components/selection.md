@@ -6,10 +6,9 @@ Use this reference for the choice/value exports `Select`, `Combobox`, `Chip`, `C
 for an overlay live in [composition](../composition.md).
 
 Release availability: `Select`, `Combobox`, `Chip`, `ChipGroup`, `SegmentedControl` and
-`ToggleGroup` are part of the stable `2.0.0` root export. `Calendar`, `DatePicker`,
-`DateRangePicker`, `Command` and `CommandPalette` are **unreleased v2.1 additions** — the import
-path is the same `sherick-ui`, but they are not in a published release, so confirm each exists in
-the installed package before using it.
+`ToggleGroup` are part of the `2.0.0` root export. `Calendar`, `DatePicker`,
+`DateRangePicker`, `Command` and `CommandPalette` arrive in `2.1.0` under the same
+`sherick-ui` import; confirm each exists in the installed package before using it.
 
 ```tsx
 import {
@@ -183,7 +182,7 @@ items rather than a second implementation, and adds two rules:
 Neither control participates in a form: they report state through callbacks, so the application
 owns the value.
 
-## `Calendar` (unreleased v2.1)
+## `Calendar` (from 2.1.0)
 
 One month of a Gregorian calendar, navigated as a keyboard grid. Values are `YYYY-MM-DD` civil dates
 (`CalendarDate`) with no time or timezone; every step is calendar arithmetic, so leap days, month
@@ -225,7 +224,7 @@ const [date, setDate] = useState<CalendarDate | null>("2024-02-15");
 />
 ```
 
-## `DatePicker` and `DateRangePicker` (unreleased v2.1)
+## `DatePicker` and `DateRangePicker` (from 2.1.0)
 
 Both compose a native `type=date` field (so the browser owns entry, mobile UI, submission and the
 `required` / `min` / `max` constraints) with a named trigger that opens the shared `Calendar` in a
@@ -264,7 +263,7 @@ non-modal popover, threaded through Sherick's `Field`.
 />
 ```
 
-## `Command` and `CommandPalette` (unreleased v2.1)
+## `Command` and `CommandPalette` (from 2.1.0)
 
 `Command` is a search field and the commands it filters, **inline on the surface they belong to** —
 deliberately never a popup. That is what makes a command repeatable without reopening anything;

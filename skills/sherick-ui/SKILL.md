@@ -6,7 +6,7 @@ description: >-
   themes or accessibility in an application that uses it. Not a guide to maintaining
   the library itself or to unrelated backend work.
 metadata:
-  source-revision: "2bf6da5189e0e5b0d113954029e2fe6f0fda1ef3"
+  source-revision: "9ecb90dd7ddfa81437e87144ac98255a67b4cad9"
 ---
 
 # Consuming Sherick UI

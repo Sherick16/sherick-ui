@@ -5,6 +5,7 @@ export const lightTokens = {
   "surface": "0.985 0.006 255",
   "surface-high": "0.925 0.014 255",
   "surface-float": "0.992 0.006 255",
+  "media": "0.205 0.012 260",
   "ink": "0.245 0.018 260",
   "ink-muted": "0.480 0.018 260",
   /* The detail role is non-text furniture: it carries a mark, a rail or a gutter, and it is not a
@@ -74,6 +75,7 @@ export const darkTokens = {
   "surface": "0.245 0.014 260",
   "surface-high": "0.295 0.016 260",
   "surface-float": "0.27 0.018 260",
+  "media": "0.205 0.012 260",
   "ink": "0.94 0.008 255",
   "ink-muted": "0.76 0.014 255",
   "detail": "0.600 0.014 256",
