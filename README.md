@@ -82,8 +82,8 @@ Sherick callback shims. Consult component types and the showcase for further exa
 
 The stable core barrel exports:
 
-- actions/display: `Button`, `IconButton`, `Alert`, `Avatar`, `Badge`, `Card`, `Divider`,
-  `Skeleton`, `Spinner`, `Table` and `Progress`;
+- actions/display: `Button`, `IconButton`, `Alert`, `Avatar`, `Badge`, `Card`, `Media`,
+  `Divider`, `Skeleton`, `Spinner`, `Table` and `Progress`;
 - forms/selection: `Field`, `Input`, `Textarea`, `Search`, `NumberField`, `Select`,
   `Combobox`, `Checkbox`, `RadioGroup`, `Slider`, `Switch`, `Chip`, `ChipGroup`,
   `ToggleGroup` and `SegmentedControl`;
@@ -97,6 +97,10 @@ The **unreleased** v2.1 source also exports `Calendar`, `DatePicker`, `DateRange
 `TreeView`. Their current APIs are in [v2.1 component contracts](docs/V2_1_COMPONENTS.md).
 Dates use civil `YYYY-MM-DD` values; FileUpload reports `File[]` without uploading files.
 No new stylesheet or subpath is required when these additions are released.
+
+Use `Media.Image` and `Media.Video` for rounded, clipped, responsive images and native video.
+Video keeps its original aspect ratio unless you opt into a constraint. See the
+[Media examples and accessibility contract](docs/MEDIA.md).
 
 Rich content is deliberately behind an **ESM-only** subpath:
 

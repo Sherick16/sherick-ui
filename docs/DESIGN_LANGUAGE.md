@@ -48,6 +48,12 @@ An anchored sheet carries enough of its own tone to cover content behind it; blu
 it but does not establish legibility. Use the material by what the surface **is**, not by
 how important its content feels.
 
+Media uses `matteHigh` behind images and a dark neutral `media` canvas behind video.
+The latter keeps unloaded frames and letterboxing deliberate in either theme; it is not a
+general-purpose dark surface for cards or controls. The frame takes `shape.surface`
+and clips its contents; constrained media fits inside that frame without changing the
+source's semantics. Video defaults to its source ratio and containment, never implicit cropping.
+
 ## 5. Elevation
 
 | Recipe | Use | Not for |

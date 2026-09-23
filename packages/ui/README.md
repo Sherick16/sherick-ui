@@ -49,6 +49,10 @@ package but never bundled by a core-only import. `sherick-ui/dev` is unsupported
 workbench infrastructure, not consumer API. For the current export list and semver
 boundaries see the [release contract](https://github.com/Sherick16/sherick-ui/blob/main/docs/RELEASE.md#public-export-contract).
 
+Use `Media.Image` and `Media.Video` for Sherick's rounded, clipped media frame.
+[Examples and accessibility guidance](https://github.com/Sherick16/sherick-ui/blob/main/docs/MEDIA.md)
+cover content, decorative media and native video captions.
+
 The repository's **unreleased** v2.1 wave adds Calendar/DatePicker/DateRangePicker,
 Command/CommandPalette, Pagination/Breadcrumb, FileUpload, Stepper and TreeView to
 the same root barrel. Its [component contracts](https://github.com/Sherick16/sherick-ui/blob/main/docs/V2_1_COMPONENTS.md)

@@ -50,6 +50,7 @@ for (const exportName of [
   "IconButton",
   "Input",
   "Menu",
+  "Media",
   "NavGroup",
   "NavItem",
   "NumberField",
@@ -445,6 +446,30 @@ assert.match(inputMarkup, /sui-scope/);
 assert.match(inputMarkup, /<label[^>]*\sfor=/);
 assert.match(inputMarkup, /required=""/);
 assert.match(inputMarkup, /required=""/);
+
+const image = renderToStaticMarkup(React.createElement(library.Media.Image, { src: "/office.jpg", alt: "Office", srcSet: "/office-2x.jpg 2x" }));
+assert.match(image, /<span[^>]*sui-scope[^>]*overflow-hidden[^>]*rounded-/);
+assert.match(image, /<img[^>]*alt="Office"[^>]*loading="lazy"/);
+assert.match(image, /srcSet="\/office-2x.jpg 2x"/);
+assert.match(renderToStaticMarkup(React.createElement(library.Media.Image, { src: "/pattern.jpg", decorative: true, aspect: "square", fit: "contain" })), /aspect-square[\s\S]*<img[^>]*alt=""/);
+
+const source = React.createElement("source", { src: "/demo.webm", type: "video/webm" });
+const track = React.createElement("track", { kind: "captions", src: "/en.vtt", srcLang: "en", label: "English" });
+const video = renderToStaticMarkup(React.createElement(library.Media.Video, { poster: "/poster.jpg", controls: true }, source, track));
+assert.match(video, /<div[^>]*sui-scope[^>]*overflow-hidden[^>]*rounded-/);
+assert.match(video, /bg-sherick-media/);
+assert.match(video, /has-\[:focus-visible\]:outline/);
+assert.match(video, /<video[^>]*controls=""[^>]*playsInline=""[^>]*preload="metadata"/);
+assert.match(video, /<source[^>]*src="\/demo.webm"/);
+assert.match(video, /<track[^>]*kind="captions"/);
+assert.doesNotMatch(video, /aspect-video|object-cover/);
+const cropped = renderToStaticMarkup(React.createElement(library.Media.Video, { src: "/demo.mp4", aspect: "video", fit: "cover" }));
+assert.match(cropped, /aspect-video/);
+assert.match(cropped, /object-cover/);
+const ambient = renderToStaticMarkup(React.createElement(library.Media.Video, { src: "/ambient.mp4", decorative: true, controls: true, autoPlay: true, muted: true, loop: true, preload: "none" }));
+assert.match(ambient, /<video[^>]*aria-hidden="true"[^>]*tabindex="-1"/);
+assert.doesNotMatch(ambient, /controls=""/);
+assert.match(ambient, /preload="none"/);
 
 const waveFixtures = [
   ["Calendar", { defaultValue: "2024-06-10", today: "2024-06-10" }, /aria-selected="true"/],

@@ -98,3 +98,14 @@ among three panels on the current page. Which components represent each interact
 **Look for:** routes to `navigation-overlays.md`; uses `NavGroup`/`NavItem` for destinations
 and `Tabs` for in-place panels, not SegmentedControl for navigation; keeps router state
 application-owned.
+
+## 11. Content image and ambient video
+
+**Prompt:** Replace a raw hero image and a looping background video with Sherick presentation.
+The image conveys information, but the video is atmosphere only. How should they be
+rendered, and is the component available to an app pinned to `sherick-ui@2.0.0`?
+
+**Look for:** routes to `actions-display.md#media`; uses `Media.Image` with meaningful
+`alt` and `Media.Video` with `autoPlay muted loop decorative`, without controls;
+keeps Hero placement in the application, does not force video cropping without explicit
+`aspect`/`fit`, and checks installed exports since Media is unreleased in 2.0.0.

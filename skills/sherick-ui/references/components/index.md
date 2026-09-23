@@ -13,6 +13,7 @@ unreleased and must not be recommended until the installed package confirms them
 | A labelled action, submit action, or loading action | `Button` | [Actions and display](actions-display.md) | Stable 2.0.0 |
 | An icon-only action | `IconButton` | [Actions and display](actions-display.md) | Stable 2.0.0 |
 | A short status label, person image/initials, or grouped content surface | `Badge`, `Avatar`, `Card` | [Actions and display](actions-display.md) | Stable 2.0.0 |
+| Present a content or decorative image or native video with Sherick styling | `Media.Image`, `Media.Video` | [Actions and display](actions-display.md#media) | Unreleased repository addition; check installed exports |
 | Separate content or show a passive message | `Divider`, `Alert` | [Actions and display](actions-display.md) | Stable 2.0.0 |
 | Show tabular data | `Table` | [Actions and display](actions-display.md) | Stable 2.0.0 |
 | Show loading activity, a placeholder, or measured completion | `Spinner`, `Skeleton`, `Progress` respectively | [Actions and display](actions-display.md) | Stable 2.0.0 |
@@ -36,9 +37,10 @@ unreleased and must not be recommended until the installed package confirms them
 ## Public types and boundaries
 
 Family references also document the props and related public types exported with their
-components, including `Variant` in actions and display; `FileUploadProps`/`FileRejection`
-in forms; selection option/date/item types; navigation item/part props, `DrawerSide`,
-`OverlayAlign` and `OverlaySide`; and toast/provider/manager types. `sherick-ui/content`
+components, including `Variant` and `MediaImageProps`/`MediaVideoProps` in actions and
+display; `FileUploadProps`/`FileRejection` in forms; selection option/date/item types;
+navigation item/part props, `DrawerSide`, `OverlayAlign` and `OverlaySide`; and
+toast/provider/manager types. `sherick-ui/content`
 exports only `Markdown`, `CodeBlock`, `MarkdownProps` and `CodeBlockProps`. Rich content
 is not part of the root barrel. Do not document or import `sherick-ui/dev` as consumer API.
 

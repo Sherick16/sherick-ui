@@ -102,3 +102,22 @@ test("showcase elevations and structural lines retain their design-language valu
   await expect(columnHeader).toHaveCSS("border-bottom-color", expectedEdge);
   await expect(columnHeader).toHaveCSS("border-bottom-width", "1px");
 });
+
+test("Media keeps native semantics inside the Sherick frame", async ({ page }) => {
+  await page.goto("/");
+  const display = page.locator("#display");
+  const image = display.locator("img").first();
+  const videos = display.locator("video");
+  const frame = videos.first().locator("..");
+  await expect(image).toHaveAttribute("alt", "Warm living room with a sofa");
+  await expect(image.locator("..")).toHaveCSS("overflow", "hidden");
+  await expect(frame).toHaveCSS("overflow", "hidden");
+  await expect(frame).not.toHaveCSS("border-radius", "0px");
+  await expect(frame).not.toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+  await expect(videos.first()).toHaveCSS("object-fit", "contain");
+  await expect(videos.nth(1)).toHaveCSS("object-fit", "cover");
+  await expect(videos.nth(1).locator("..")).toHaveCSS("aspect-ratio", "16 / 9");
+  await expect(videos.nth(2)).toHaveAttribute("aria-hidden", "true");
+  await expect(videos.nth(2)).toHaveAttribute("tabindex", "-1");
+  await expect(videos.nth(2)).not.toHaveAttribute("controls", "");
+});

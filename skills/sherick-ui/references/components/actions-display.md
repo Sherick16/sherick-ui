@@ -1,23 +1,24 @@
 # Actions and display
 
-Use this reference for the root-barrel actions, tags, surfaces, data region and
-loading/feedback output: `Button`, `IconButton`, `Badge`, `Avatar`, `Card`, `Divider`,
-`Alert`, `Table`, `Skeleton`, `Spinner`, `Progress`. It owns their props, defaults,
-states and component-specific caveats. The [design language](../design-language.md),
+Use this reference for the root-barrel actions, tags, media, surfaces, data region and
+loading/feedback output: `Button`, `IconButton`, `Badge`, `Avatar`, `Media`, `Card`,
+`Divider`, `Alert`, `Table`, `Skeleton`, `Spinner`, `Progress`. It owns their props,
+defaults, states and component-specific caveats. The [design language](../design-language.md),
 [composition](../composition.md), [theming](../theming.md) and
 [accessibility](../accessibility.md) references own the cross-component rules.
 
-All eleven ship in the stable `2.0.0` core barrel. None is part of the unreleased v2.1
-wave (which adds Calendar/date pickers, Command/CommandPalette, Pagination/Breadcrumb,
-FileUpload, Stepper, TreeView). Import from `sherick-ui`; no Base UI import, workbench
-recipe or private class is needed or supported.
+The original eleven ship in the stable `2.0.0` core barrel. `Media` is a later
+unreleased repository addition: verify the consuming application's installed exports
+before using it. Import from `sherick-ui`; no Base UI import, workbench recipe or
+private class is needed or supported.
 
 ```tsx
 import {
-  Alert, Avatar, Badge, Button, Card, Divider, IconButton, Progress, Skeleton, Spinner, Table,
+  Alert, Avatar, Badge, Button, Card, Divider, IconButton, Media, Progress, Skeleton, Spinner, Table,
   type AlertProps, type AvatarProps, type BadgeProps, type ButtonAppearance, type ButtonProps,
   type ButtonSize, type CardProps, type DividerProps, type DividerWeight, type IconButtonAppearance,
-  type IconButtonProps, type ProgressProps, type SkeletonProps, type SpinnerProps, type TableProps,
+  type IconButtonProps, type MediaImageProps, type MediaVideoProps, type ProgressProps,
+  type SkeletonProps, type SpinnerProps, type TableProps,
   type Variant,
 } from "sherick-ui";
 ```
@@ -29,7 +30,7 @@ import {
 - `className` is merged with the internal classes by `cn()`, so a Tailwind conflict
   replaces the internal utility rather than duplicating it. Never target private
   classes, `data-sui-*` attributes or `.sui-scope`.
-- Only `Button`, `IconButton` and `Progress` forward a ref; the rest accept no `ref`.
+- `Button`, `IconButton`, `Progress` and both `Media` parts forward native refs; the rest accept no `ref`.
 - `Button` and `IconButton` default to `type="button"`, so a form's Save action needs
   explicit `type="submit"`. Their state and callbacks are the native ones (`onClick`,
   `disabled`, `form`, `name`, `aria-*`); there is no Sherick `onPress`-style wrapper and
@@ -149,6 +150,54 @@ Everything else is the rest of `Omit<ImgHTMLAttributes<HTMLImageElement>, "src" 
 - The root is a `<span>`. Its `h-*`/`w-*` utilities only take effect where the context
   blockifies it — a flex/grid row, as the specimens place it, or an added `inline-flex`.
   Dropped directly into a text line the span stays inline and collapses to its line box.
+
+## Media
+
+```tsx
+<Media.Image src="/office.jpg" alt="The office meeting room" />
+<Media.Image src="/office.jpg" alt="Meeting room detail" aspect="square" fit="cover" position="top" />
+<Media.Image src="/texture.jpg" decorative />
+
+<Media.Video src="/demo.mp4" poster="/poster.jpg" controls aria-label="Product demo" />
+<Media.Video src="/preview.mp4" aspect="video" fit="cover" controls aria-label="Cropped preview" />
+<Media.Video src="/ambient.mp4" autoPlay muted loop decorative />
+```
+
+`MediaImageProps` and `MediaVideoProps` accept native image/video attributes and refs;
+`className` styles the frame, while native props and event handlers go to the inner element.
+The frame owns `shape.surface` rounding and clipping, a neutral image surface or a
+dark video canvas. It has no `asChild`/custom renderer hook, playback UI or image pipeline.
+
+| Shared prop | Type | Default |
+| --- | --- | --- |
+| `aspect` | `"auto" \| "square" \| "portrait" \| "landscape" \| "video" \| "wide"` | `"auto"` |
+| `fit` | `"cover" \| "contain"` | image: `"cover"`; video: `"contain"` |
+| `position` | `"center" \| "top" \| "bottom"` | `"center"` |
+| `radius` | `"default" \| "none"` | `"default"` |
+
+- An image keeps natural dimensions up to its container unless constrained with `aspect`;
+  content images require `alt`, while `decorative` sets `alt=""`. Images default to
+  `loading="lazy"`, overridable with the native prop.
+- Video fills its container but keeps the source ratio by default: it never silently
+  crops to 16:9. Opt into `aspect` and `fit="cover"` where cropping is appropriate.
+  The frame shows a dark neutral canvas behind letterboxing and unloaded media.
+- Video defaults to `playsInline` and `preload="metadata"`; native overrides work.
+  `controls`, poster, multiple `<source>` and caption `<track>` children remain native:
+
+  ```tsx
+  <Media.Video poster="/poster.jpg" controls aria-label="Product tour">
+    <source src="/tour.webm" type="video/webm" />
+    <source src="/tour.mp4" type="video/mp4" />
+    <track kind="captions" src="/en.vtt" srcLang="en" label="English" default />
+  </Media.Video>
+  ```
+
+- Meaningful video needs an accessible name and captions for speech or essential audio.
+  `decorative` video is hidden from accessibility APIs, removed from keyboard navigation
+  and cannot expose controls; it must not carry information unavailable elsewhere.
+  Interactive video shows Sherick's focus treatment around the frame.
+- Keep placement in the application's Card/Hero/gallery composition. Do not invent
+  `placement`/`hero` variants or custom playback controls on `Media`.
 
 ## Card
 
@@ -348,7 +397,7 @@ and the ref is the root `HTMLDivElement`.
 - `Alert`'s dismissal name is fixed English and there is no `aria-label` prop for it.
 - `Avatar` has no fallback slot, and its root is a `<span>` that needs a blockifying
   context to hold its size.
-- Only `Button`, `IconButton` and `Progress` expose a ref; `Card`, `Badge`, `Alert`,
+- `Button`, `IconButton`, `Progress` and `Media` expose refs; `Card`, `Badge`, `Alert`,
   `Table`, `Divider`, `Skeleton`, `Spinner` and `Avatar` cannot be given one.
 - `Skeleton` ships no dimensions and no preset shapes; every skeleton is sized by the
   caller.
