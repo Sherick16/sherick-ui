@@ -228,6 +228,7 @@ test("drawer's reading surface accepts keyboard scrolling on open", async ({ pag
   await page.getByRole("button", { name: "Open stress drawer", exact: true }).click();
   const drawer = page.getByRole("dialog");
   const scroller = drawer.locator(":scope > div").first();
+  await expect(scroller).toBeFocused();
   const before = await scroller.evaluate(el => el.scrollTop);
   await page.keyboard.press("PageDown");
   await expect.poll(() => scroller.evaluate(el => el.scrollTop)).toBeGreaterThan(before);
