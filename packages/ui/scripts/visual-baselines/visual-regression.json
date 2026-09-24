@@ -915,6 +915,9 @@
     ":where(.sui-scope).overflow-hidden": [
       "overflow: hidden"
     ],
+    ":where(.sui-scope).overflow-clip": [
+      "overflow: clip"
+    ],
     ":where(.sui-scope).overflow-x-auto": [
       "overflow-x: auto"
     ],

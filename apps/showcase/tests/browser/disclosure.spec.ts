@@ -216,16 +216,24 @@ test("an opening region grows out of zero and a closing one travels back rather 
   await trigger.click();
   await expect(trigger).toHaveAttribute("aria-expanded", "true");
 
-  /* `data-starting-style` is the collapsed state the primitive opens from, so the first painted
-     height is zero and the measured height is what it grows to. */
+  /* Let the opening transition finish before measuring its full height. */
   await expect.poll(() => height(region)).toBeGreaterThan(0);
+  await expect.poll(() => region.evaluate(element => element.getAnimations().some(animation => animation.playState === "running"))).toBe(false);
   const opened = await height(region);
 
+  /* Observe the close where it starts, not after a Playwright round trip that can consume most
+     of the transition under CI load. Without the transition, this event never fires. */
+  const closing = region.evaluate(element => new Promise<number>(resolve => {
+    element.addEventListener("transitionrun", event => {
+      if (event instanceof TransitionEvent && event.propertyName === "height" && element.hasAttribute("data-ending-style")) {
+        resolve(element.getBoundingClientRect().height);
+      }
+    });
+    element.setAttribute("data-close-listener-ready", "");
+  }));
+  await expect(region).toHaveAttribute("data-close-listener-ready", "");
   await trigger.click();
-  /* Sampled as the close begins: the region is still at its opened size, which is only true when
-     the height is interpolated instead of applied. Without the recipe's transition the primitive
-     would unmount the region in the same task. */
-  expect(await height(region)).toBeGreaterThan(opened * 0.5);
+  expect(await closing).toBeGreaterThan(opened * 0.5);
   await expect(region).toHaveCount(0);
 
   expect(errors).toEqual([]);
