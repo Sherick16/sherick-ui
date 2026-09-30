@@ -3,7 +3,7 @@
 import { Tooltip as BaseTooltip } from "@base-ui/react/tooltip";
 import React, { type ReactElement, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { overlay, stacking, text } from "./ui.common";
+import { overlay, stacking, text, type } from "./ui.common";
 import { motionPresenceTooltip } from "./ui.motion";
 
 export interface TooltipProps {
@@ -24,7 +24,8 @@ const Tooltip = ({ children, content, className, position = "bottom" }: TooltipP
           <BaseTooltip.Positioner side={position} sideOffset={8} className={cn(stacking.float)}>
             <BaseTooltip.Popup
               className={cn(
-                "w-max max-w-[min(16rem,var(--available-width))] whitespace-normal px-3 py-2 text-xs leading-5 [overflow-wrap:anywhere]",
+                "w-max max-w-[min(16rem,var(--available-width))] whitespace-normal px-3 py-2 [overflow-wrap:anywhere]",
+                type.supporting,
                 overlay.tooltip,
                 text.high,
                 motionPresenceTooltip

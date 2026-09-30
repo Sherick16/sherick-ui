@@ -165,6 +165,25 @@ control or small region, not a whole table or page. Readable copy on passive sem
 regions keeps normal text emphasis. A navigation destination uses a quieter tonal tint,
 weight and `aria-current`, not the selected-value treatment of a list option.
 
+### Type roles
+
+Text takes a **role**, not a size chosen per component. The roles live in `type` in
+`ui.common.ts`; a component owns only copy that no other family renders.
+
+| Role | Size / line | Use |
+| --- | --- | --- |
+| `control` | by density (§13) | a control's own label or value; an option row matches the field that opened it |
+| `supporting` | 13 / 20px | field descriptions, hints and errors (`fieldMessage`), a row's secondary line |
+| `caption` | 12 / 16px | badges, group labels, calendar weekdays, a code language label |
+| `title` | 15 / 22px semibold | the heading of a compact surface: popover, toast, command palette |
+| `heading` | 20 / 28px semibold | the title of a viewport-owning surface: dialog, alert dialog, drawer |
+| `numeric` | tabular figures | table cells, a number field, progress and pagination values |
+
+A command palette is a utility surface whose content is its search, so it takes `title`, not
+`heading`. Every role lands on a whole-pixel line box. Sans text inherits the host typeface
+(the library is tuned for a neo-grotesque such as Inter and never sets one); code uses the
+`--sui-font-mono` stack.
+
 ## 11. Interaction states
 
 Hover is a tonal step over the resting fill. `stateLayer.quiet`, `tonal`, `filled` and
@@ -240,7 +259,7 @@ classes or keyframes in components.
 | Step | Minimum height | Type | Use |
 | --- | --- | --- | --- |
 | `compact` | 2.5rem | 0.875rem | dense actions and rows |
-| `normal` | 3rem | 0.95rem | default fields and controls |
+| `normal` | 3rem | 0.9375rem / 1.375rem | default fields and controls |
 | `prominent` | 3.5rem | 1.125rem | larger actions |
 | `target` | 2.75rem square | inherited | standalone icon-only hit area |
 | `part` | 2.75rem high, 2.25rem wide | inherited | embedded part of a composite field |

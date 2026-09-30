@@ -252,12 +252,20 @@ visual refinements. This replaces clipped controls rather than hiding their scro
 no client-side measuring machinery. Tokens and shared motion are unchanged. All other nine budget
 records, the 5% tolerance and stale-shrink checks remain byte-for-byte unchanged.
 
-The 2.3.0 visual refinement re-records **only the theme stylesheet**, using
-`bun --filter sherick-ui test:bundle --update=themeCss`: `8841 / 1453 / 1187` →
-`10063 / 1609 / 1302`. The reason is seven additive theme variables — the designed soft and
-selected surfaces per semantic role (`--sui-<role>-soft`, `--sui-<role>-selected`) that replace
-alpha-derived tints ([PALETTE.md](PALETTE.md#the-soft-and-selected-surfaces-container-role)) — each
-emitted in the light, explicit-dark and system-dark blocks. No component budget is relaxed.
+The 2.3.0 visual refinement re-records two records, using
+`bun --filter sherick-ui test:bundle --update=themeCss` and `--update=disclosure`:
+
+- **theme stylesheet** `8841 / 1453 / 1187` → `10205 / 1697 / 1377`. Seven additive theme
+  variables — the designed soft and selected surfaces per semantic role (`--sui-<role>-soft`,
+  `--sui-<role>-selected`) that replace alpha-derived tints
+  ([PALETTE.md](PALETTE.md#the-soft-and-selected-surfaces-container-role)) — each emitted in the
+  light, explicit-dark and system-dark blocks, plus the shared `--sui-font-mono` stack.
+- **disclosure** `59949 / 20760 / 18389` → `63143 / 21666 / 19072`. `main` already measured
+  61.4 kB raw (as the gate reports it) against a 61.5 kB limit, so almost all of the tolerance had
+  been used before this change. The type roles (`type` in `ui.common.ts`, which `list.option` and `density` now read)
+  add 610 bytes raw to the shared recipe module this fixture includes.
+
+No other component budget is relaxed.
 
 ## Accessibility: the authored palette meets AA
 

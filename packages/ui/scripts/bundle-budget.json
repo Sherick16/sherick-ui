@@ -23,9 +23,9 @@
     },
     "disclosure": {
       "definition": "The disclosure family: Accordion and Collapsible, which share one row and one measured panel.",
-      "raw": 59949,
-      "gzip": 20760,
-      "brotli": 18389
+      "raw": 63143,
+      "gzip": 21666,
+      "brotli": 19072
     },
     "toast": {
       "definition": "The toast stack: its provider, its viewport and the two ways a toast is raised.",
@@ -59,9 +59,9 @@
     },
     "themeCss": {
       "definition": "Published token-only theme stylesheet.",
-      "raw": 10063,
-      "gzip": 1609,
-      "brotli": 1302
+      "raw": 10205,
+      "gzip": 1697,
+      "brotli": 1377
     }
   }
 }

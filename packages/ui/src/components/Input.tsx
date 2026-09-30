@@ -11,6 +11,7 @@ import { cn } from "@/libs/utils";
 import {
   density,
   fieldLayout,
+  fieldMessage,
   focusRing,
   material,
   shape,
@@ -79,14 +80,14 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
           )}
         />
         {description && (
-          <Field.Description className={cn("mt-2 text-xs leading-5", text.medium)}>
+          <Field.Description className={cn(fieldMessage.description)}>
             {description}
           </Field.Description>
         )}
         {errorMessage && (
           <Field.Error
             match={error}
-            className={cn("mt-2 text-xs leading-5 text-sherick-danger")}
+            className={cn(fieldMessage.error)}
           >
             {errorMessage}
           </Field.Error>

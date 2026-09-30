@@ -5,7 +5,7 @@ import React, { forwardRef, useRef, type ReactElement, type ReactNode } from "re
 import { cn } from "@/libs/utils";
 import Command, { type CommandProps } from "./Command";
 import { DialogDismiss, DialogSurface } from "./DialogSurface";
-import { text } from "./ui.common";
+import { text, type } from "./ui.common";
 
 export interface CommandPaletteProps extends Omit<CommandProps, "className" | "id"> {
   /** The surface's own heading. It names the dialog. */
@@ -76,9 +76,9 @@ const CommandPalette = forwardRef<HTMLInputElement, CommandPaletteProps>(({
         {/* 20px title line at y=20: center the 44px dismissal on y=30. */}
         <DialogDismiss label="Close command palette" className={cn("top-2 end-2")} />
         <div className={cn("px-5 pt-5 pe-16")}>
-          <BaseDialog.Title className={cn("m-0 text-sm font-medium", text.high)}>{title}</BaseDialog.Title>
+          <BaseDialog.Title className={cn("m-0", type.title, text.high)}>{title}</BaseDialog.Title>
           {description && (
-            <BaseDialog.Description className={cn("mt-1 mb-0 text-xs leading-5", text.medium)}>
+            <BaseDialog.Description className={cn("mt-1 mb-0", type.supporting, text.medium)}>
               {description}
             </BaseDialog.Description>
           )}

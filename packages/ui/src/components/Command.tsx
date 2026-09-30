@@ -4,7 +4,7 @@ import { Autocomplete as BaseAutocomplete } from "@base-ui/react/autocomplete";
 import React, { forwardRef, useId, useMemo, type ReactNode } from "react";
 import { Search as SearchIcon } from "lucide-react";
 import { cn } from "@/libs/utils";
-import { density, focusRingWithin, list, material, shape, state, text } from "./ui.common";
+import { density, focusRingWithin, list, material, shape, state, text, type } from "./ui.common";
 import { motionFeedback } from "./ui.motion";
 
 export interface CommandItem {
@@ -176,7 +176,7 @@ const Command = forwardRef<HTMLInputElement, CommandProps>(({
       )}
       <span className={cn("min-w-0 flex-1 truncate")}>{renderItem ? renderItem(item) : item.label}</span>
       {item.shortcut !== undefined && (
-        <span className={cn("ms-3 shrink-0 font-mono text-xs", text.medium)}>{item.shortcut}</span>
+        <span className={cn("ms-3 shrink-0 font-sherick-mono", type.caption, text.medium)}>{item.shortcut}</span>
       )}
     </BaseAutocomplete.Item>
   );
@@ -252,7 +252,7 @@ const Command = forwardRef<HTMLInputElement, CommandProps>(({
                 className={cn("space-y-1 [&:not(:first-child)]:pt-1")}
               >
                 {group.label !== undefined && (
-                  <BaseAutocomplete.GroupLabel className={cn("px-3 pt-3 pb-1 text-xs font-medium", text.medium)}>
+                  <BaseAutocomplete.GroupLabel className={cn("px-3 pt-3 pb-1 font-medium", type.caption, text.medium)}>
                     {group.label}
                   </BaseAutocomplete.GroupLabel>
                 )}

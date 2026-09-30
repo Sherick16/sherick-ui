@@ -20,6 +20,7 @@ import {
   stateLayer,
   text,
   tone,
+  type,
 } from "./ui.common";
 import { motionFeedback, motionInkPress, motionPresenceToast } from "./ui.motion";
 
@@ -310,11 +311,11 @@ export const ToastViewport = ({ position = "bottom-end", className }: ToastViewp
                     comes first — the title when there is one, the description otherwise — so the mark
                     is centred on that line and a wrapped toast never pulls it into the middle. */}
                 {mark ? (
-                  <span className={cn("inline-flex shrink-0 items-center", toast.title ? "h-5" : "h-6")}>{mark}</span>
+                  <span className={cn("inline-flex shrink-0 items-center", toast.title ? "h-[1.375rem]" : "h-6")}>{mark}</span>
                 ) : null}
                 <div className={cn("flex min-w-0 flex-1 flex-col gap-0.5")}>
                   {toast.title ? (
-                    <BaseToast.Title className={cn("text-sm font-medium", text.high)} />
+                    <BaseToast.Title className={cn(type.title, text.high)} />
                   ) : null}
                   {toast.description ? (
                     <BaseToast.Description className={cn("text-sm leading-6", text.medium)} />
@@ -343,7 +344,9 @@ export const ToastViewport = ({ position = "bottom-end", className }: ToastViewp
                        The whole target stays intact, with an inset ring inside the clipped root.
                        Its inline end padding is compensated separately. */
                     "group -me-2 inline-flex shrink-0 items-center justify-center",
-                    toast.title ? "-my-3" : "-my-2.5",
+                    /* Half the target minus half the first line: 11px under the 22px title, 10px under the
+                       24px description. */
+                    toast.title ? "-my-[0.6875rem]" : "-my-2.5",
                     text.medium,
                     "hover:text-sherick-ink",
                     motionFeedback,

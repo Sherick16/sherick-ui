@@ -417,17 +417,41 @@ export const mediaCanvas = "bg-sherick-media";
 /* A passive sheet tucked below a stronger control; independently tree-shakeable. */
 export const matteInset = "bg-sherick-surface-high/[0.35] text-sherick-ink";
 
+/* Type roles — the recurring kinds of text the library sets, each with one size, line height and,
+   where the role owns it, one weight. A component still owns copy that only it renders; these are
+   the roles that recur across families and have to agree wherever they appear:
+   - control:    the type step of a control, owned through `density` below.
+   - supporting: a field's description, hint and error, and the secondary line under a row's label.
+   - caption:    compact labels — a badge, a tooltip, a group label, a calendar weekday.
+   - title:      the heading of a compact surface — a popover, a toast, a command palette.
+   - heading:    the title of a surface that owns the viewport — a dialog, an alert dialog, a drawer.
+   - numeric:    figures that are compared down a column or updated in place.
+   Every size lands on a whole-pixel line box, so stacked rows keep one rhythm. */
+export const type = {
+  control: {
+    compact: "text-sm",
+    normal: "text-[0.9375rem] leading-[1.375rem]",
+    prominent: "text-lg",
+  },
+  supporting: "text-[0.8125rem] leading-5",
+  caption: "text-xs leading-4",
+  title: "text-[0.9375rem] leading-[1.375rem] font-semibold",
+  heading: "text-xl leading-7 font-semibold tracking-[-0.02em]",
+  numeric: "tabular-nums",
+} as const;
+
 /* Density — three control steps plus the accessible hit target.
    Density owns height and the type step, so controls of one density share a
    rhythm. A component's anatomy owns its padding: a button's inline padding is
    set by how it is gripped, a field's by how much text it holds, and neither is
-   derived from the other. The library targets dense desktop and product UI, so
-   even the prominent step stays compact. Body copy, headings and labels are
-   content, not controls, and set their own type. */
+   derived from the other. The default step is comfortable rather than dense: a
+   48px control is Sherick's resting proportion, and `compact` is the step for
+   dense product regions. Body copy, headings and labels are content, not
+   controls, and take a type role above. */
 export const density = {
-  compact: "min-h-10 text-sm",
-  normal: "min-h-12 text-[0.95rem]",
-  prominent: "min-h-14 text-lg",
+  compact: /* @__PURE__ */ cx("min-h-10", type.control.compact),
+  normal: /* @__PURE__ */ cx("min-h-12", type.control.normal),
+  prominent: /* @__PURE__ */ cx("min-h-14", type.control.prominent),
   /* Minimum interactive target for an icon-only control that stands on its own. */
   target: "min-h-11 min-w-11",
   /* A control that is one part of a composite field — the trailing controls a Combobox owns. It
@@ -560,7 +584,8 @@ export const list = {
      row still shows where the navigation is while saying it cannot be used. The ring is inset
      because the row lives inside the sheet it belongs to, as a segment does in its track. */
   option: /* @__PURE__ */ cx(
-    "flex w-full items-center justify-between gap-4 px-4 py-3 text-start text-sm outline-none",
+    "flex w-full items-center justify-between gap-4 px-4 py-3 text-start outline-none",
+    type.control.normal,
     shape.control,
     motionFeedback,
     focusRingInset,
@@ -574,7 +599,8 @@ export const list = {
      command's corner proportional to its own height, so its highlight nests in the tighter
      sheet the menu is. */
   command: /* @__PURE__ */ cx(
-    "flex w-full items-center gap-3 px-3 py-2 text-start text-sm outline-none",
+    "flex w-full items-center gap-3 px-3 py-2 text-start outline-none",
+    type.control.compact,
     shape.row,
     motionFeedback,
     focusRingInset,
@@ -744,3 +770,10 @@ export const recipeAlphas = {
 /* A labelled field is a shrinkable column. Its explanatory copy wraps, including identifiers;
    the input itself keeps its native single-line scrolling behavior. */
 export const fieldLayout = "flex min-w-0 w-full flex-col [overflow-wrap:anywhere]";
+
+/* The messages under a field: its description or hint, and its error. One role for every field in
+   the family, so a hint reads the same under a text field, a date range and a file chooser. */
+export const fieldMessage = {
+  description: /* @__PURE__ */ cx("mt-2", type.supporting, text.medium),
+  error: /* @__PURE__ */ cx("mt-2", type.supporting, tone.text.danger),
+} as const;

@@ -156,6 +156,10 @@ export const darkTokens = {
 } as const satisfies Record<keyof typeof lightTokens, string>;
 
 export const sharedTokens = {
+  /* The code face. Sans text inherits the host's typeface — the library is tuned for a
+     neo-grotesque such as Inter but never sets one — while code needs a monospace the platform
+     default does not reliably provide, so the stack is curated here once. */
+  "font-mono": 'ui-monospace, "SF Mono", SFMono-Regular, "Cascadia Code", "JetBrains Mono", Menlo, Consolas, "Liberation Mono", monospace',
   "duration-press": "150ms",
   "duration-release": "200ms",
   "duration-overlay": "240ms",

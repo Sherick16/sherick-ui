@@ -12,6 +12,7 @@ import {
   state,
   stateLayer,
   tone,
+  type,
 } from "./ui.common";
 import { motionFeedback, motionInkPress } from "./ui.motion";
 
@@ -130,6 +131,7 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
             ref={ref}
             className={cn(
               "min-w-0 flex-1 bg-transparent py-2 text-center text-inherit outline-none",
+              type.numeric,
               state.text,
               inputClassName
             )}

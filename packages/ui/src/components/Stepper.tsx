@@ -3,7 +3,7 @@
 import { Check as CheckIcon } from "lucide-react";
 import React, { forwardRef, type ComponentProps, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { elevation, focusRing, material, shape, state, stateLayer, text, tone } from "./ui.common";
+import { elevation, focusRing, material, shape, state, stateLayer, text, tone, type } from "./ui.common";
 import { motionFeedback, motionInkPress } from "./ui.motion";
 
 export interface StepperItem {
@@ -134,7 +134,8 @@ const Stepper = forwardRef<HTMLElement, StepperProps>(
                   </span>
                   {item.description ? (
                     <span className={cn(
-                      "text-xs leading-5 [overflow-wrap:anywhere]",
+                      "[overflow-wrap:anywhere]",
+                      type.supporting,
                       "col-start-2",
                       !stack && (long ? "[@container(min-width:64rem)]:col-span-2" : "[@container(min-width:32rem)]:col-span-2"),
                       text.medium

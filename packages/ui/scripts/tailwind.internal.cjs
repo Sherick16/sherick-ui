@@ -47,6 +47,9 @@ module.exports = {
         "sherick-glass-dense": "var(--sui-glass-gradient-dense)",
         "sherick-glass-hero": "var(--sui-glass-hero-gradient)",
       },
+      fontFamily: {
+        "sherick-mono": "var(--sui-font-mono)",
+      },
       boxShadow: {
         "sherick-flat": "var(--sui-elevation-flat)",
         "sherick-raised": "var(--sui-elevation-raised)",
