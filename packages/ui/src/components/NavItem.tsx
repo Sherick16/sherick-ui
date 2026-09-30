@@ -1,7 +1,7 @@
 import React, { type AnchorHTMLAttributes, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import { currentDestination, density, focusRing, iconSlot, shape, stateLayer, text } from "./ui.common";
-import { motionTactile } from "./ui.motion";
+import { motionFeedback } from "./ui.motion";
 
 export interface NavItemProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
   children: ReactNode;
@@ -29,7 +29,7 @@ const NavItem = ({ children, icon, className, href, active = false, ...props }: 
       "flex max-w-xs items-center gap-2 overflow-hidden text-ellipsis whitespace-nowrap px-3",
       density.compact,
       shape.row,
-      motionTactile,
+      motionFeedback,
       focusRing,
       active
         ? currentDestination

@@ -183,6 +183,9 @@ test("progress measures a known value and sweeps an unknown one", async ({ page,
 
   await page.getByRole("button", { name: "Advance progress" }).click();
   await expect(determinate).toHaveAttribute("aria-valuenow", "65");
+  /* A known value relocates to its new width rather than jumping, so the fill is measured once it
+     has arrived. */
+  await expect.poll(async () => Number((await measure(determinate)).width.toFixed(2))).toBeCloseTo(0.65, 1);
   const advancedFill = await measure(determinate);
   expect(advancedFill.width).toBeCloseTo(0.65, 1);
   expect(advancedFill.height).toBeCloseTo(1, 2);

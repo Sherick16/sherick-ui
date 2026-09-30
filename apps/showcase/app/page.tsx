@@ -120,11 +120,16 @@ const isThemeMode = (value: string | null): value is ThemeMode =>
   value === "system" || value === "light" || value === "dark";
 
 const applyTheme = (theme: ThemeMode) => {
+  /* A theme change is a token swap, not an interaction: suppress transitions for the frame in which
+     it lands, so controls do not animate the old theme's tones on the new theme's page. */
+  const root = document.documentElement;
+  root.setAttribute("data-theme-switching", "");
   if (theme === "system") {
-    document.documentElement.removeAttribute("data-sherick-theme");
+    root.removeAttribute("data-sherick-theme");
   } else {
-    document.documentElement.dataset.sherickTheme = theme;
+    root.dataset.sherickTheme = theme;
   }
+  requestAnimationFrame(() => requestAnimationFrame(() => root.removeAttribute("data-theme-switching")));
 };
 
 export default function Home() {

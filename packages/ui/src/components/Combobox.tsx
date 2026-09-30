@@ -23,7 +23,7 @@ import {
   motionFeedback,
   motionOrient,
   motionPresenceAnchored,
-  motionTactile,
+  motionTactileField,
 } from "./ui.motion";
 
 export interface ComboboxOption {
@@ -145,7 +145,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>(({
             density.normal,
             shape.control,
             material.control,
-            motionTactile,
+            motionTactileField,
             focusRingWithin,
             !fieldDisabled && !open && state.field.hover,
             !fieldDisabled && state.field.focusWithin,

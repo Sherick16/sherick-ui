@@ -39,7 +39,28 @@ document.documentElement.dataset.sherickTheme = "dark";
 document.documentElement.removeAttribute("data-sherick-theme");
 ```
 
-Apply a saved choice before first paint to avoid a flash. Consumers customize through
+Apply a saved choice before first paint to avoid a flash. When a user switches theme
+while the page is open, controls animate their tone on the library's feedback timing
+while page surfaces change at once, so for a moment the old theme's controls sit on the
+new theme's page. Suppress transitions for the one frame in which the attribute changes:
+
+```ts
+const root = document.documentElement;
+root.setAttribute("data-theme-switching", "");
+root.dataset.sherickTheme = "dark";
+requestAnimationFrame(() => requestAnimationFrame(() => root.removeAttribute("data-theme-switching")));
+```
+
+```css
+/* In the host stylesheet: */
+[data-theme-switching] *,
+[data-theme-switching] *::before,
+[data-theme-switching] *::after {
+  transition: none !important;
+}
+```
+
+ Consumers customize through
 root-level `--sui-*` CSS variables, not nested theme islands (portals leave their
 trigger subtree). The [token source](packages/ui/src/styles/tokens.ts) is the authority
 for default values; the [palette record](docs/PALETTE.md) explains the contrast
@@ -100,7 +121,7 @@ Check the installed package version before using these additions.
 
 Version 2.2.0 adds Table column descriptors and `tableClassName`, plus `RadioGroup appearance="surface"`, without adding components. See the [package usage guide](packages/ui/README.md#table-and-surface-choices-from-220) and [resource-list recipe](examples/resources). Verify the installed version before using these additions.
 
-Version 2.3.0 refines the visual language from the [visual design-system audit](docs/visual-design-system-audit.md): authored soft and selected surfaces per semantic role (new `--sui-<role>-soft` and `--sui-<role>-selected` theme variables), a consistent action depth ladder, type roles, and component refinements. No component or prop is removed.
+Version 2.3.0 refines the visual language from the [visual design-system audit](docs/visual-design-system-audit.md): authored soft and selected surfaces per semantic role (new `--sui-<role>-soft` and `--sui-<role>-selected` theme variables), a consistent action depth ladder, type roles, component refinements, and the motion refinements from the [motion audit](docs/motion-audit.md) (a fading scrim, a press that lands inside a tap with amplitude tiers by role, tree disclosure, distance-aware timing and a 500ms tooltip delay). No component or prop is removed.
 
 Use `Media.Image` and `Media.Video` for rounded, clipped, responsive images and native video.
 Video keeps its original aspect ratio unless you opt into a constraint. See the

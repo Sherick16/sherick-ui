@@ -217,7 +217,8 @@ inside an already disabled field. A focus ring never substitutes for the state r
 All text fields share a borderless control fill that rises in tone on hover, then while
 focused or open; an engaged field must not fall back to hover strength under the pointer.
 Invalid fields follow the same ladder in danger tone, including validity inherited from
-Base Field. Only list-opening Select and Combobox fields compress on activation; typing
+Base Field. Only list-opening Select and Combobox fields compress on activation, and only
+by the gentle field tier (§12); typing
 and focus never compress an ordinary Input or Textarea. Date entry is native and its
 separate calendar glyph, not its text field, owns the popup press.
 
@@ -227,7 +228,11 @@ switch thumbs move, but tracks do not bounce. The accent belongs to a slider's r
 its matte handle remains separable from that range, including when disabled.
 
 Chips and ToggleGroup segments both hold selection: an unselected toggle stays neutral,
-a selected one uses the primitive's pressed marker and `tone.selected`. A chip floats
+a selected one uses the primitive's pressed marker and `tone.selected`. A segment's selection
+changes **in place** — the old fill and the new one exchange on the feedback timing — while a
+tab indicator **relocates** across its track. The difference is deliberate for now: Base
+`ToggleGroup` publishes no indicator geometry, and measuring segment positions locally would be
+the second behaviour layer §16 forbids. A travelling segment indicator waits on that Base gap. A chip floats
 on its own; a segment sits inside a track. A passive tag stays flat, and only a passive
 tag may have an independent dismiss target. Select/Combobox options hold choices and may
 rise; Menu commands perform actions and stay flat. They share row hover/highlight and
@@ -239,7 +244,8 @@ The complete row remains the label; supporting text and passive badges are consu
 The selection mark and target boundary stay still, and the original plain radio rows remain
 available. Surface selection is not a new card or option-content framework.
 
-Accordion and Collapsible share the same disclosure row and supporting-copy panel.
+Accordion and Collapsible share the same disclosure row and supporting-copy panel; a TreeView
+branch opens its group through the same measured panel and the same `disclose` motion.
 The chevron describes the whole region, so it stays centered on the row even when the
 label wraps. Only the panel height and chevron orientation change; sections do not
 animate their copy or grow a new rim.
@@ -251,7 +257,7 @@ One module, `ui.motion.ts`, chooses timing, easing and amplitude by **intent**:
 | Intent | Use |
 | --- | --- |
 | `feedback` | non-spatial tone, focus and highlight |
-| `tactile` | press/release; compact mark-only press when its target must stay still |
+| `tactile` | press/release in three amplitude tiers by role; compact mark-only press when its target must stay still |
 | `arrive` | a newly made selection mark; the sole restrained spring |
 | `orient` | chevron turning in place |
 | `relocate` | tab indicator or switch thumb traveling between stable destinations |
@@ -269,6 +275,32 @@ lifecycle and placement; Sherick adds no exit timer or parallel presence state. 
 reduced motion, states remain visible immediately and spatial travel is removed; a
 loading glyph becomes static. Do not author literal duration/easing/transition/animation
 classes or keyframes in components.
+
+A press answers inside a tap: its leg runs on the short `duration-tactile` (80ms), and the
+release settles on the release timing. Its amplitude is a distance, so it is chosen by role
+rather than written as one percentage for every width: a content-width control compresses 4%
+(`motionTactile`), a control spanning a track such as a tab 1.5% (`motionTactileWide`), and a
+list-opening field 0.7% (`motionTactileField`), which keeps every tier near two pixels per edge.
+Rows — navigation, options, commands, disclosure and tree rows — answer with tone, not
+compression. A row's highlight moves in one step (`motionRowLayer`): it marks where the
+reader is, so arrowing through a list never leaves a fading trail.
+
+Duration grows with travel in two steps. An indicator crossing a whole track takes
+`motionRelocateLong` (`duration-travel`, 300ms), and a sheet crossing a viewport edge takes the
+sheet timing (320ms in, 200ms out); short travel keeps the local and overlay timings. Every exit
+accelerates away on `ease-exit`, including a disclosure panel closing. A known progress value
+relocates to its new width rather than jumping.
+
+The scrim fades with the surface it sits behind; it never appears or disappears in one frame.
+A tooltip opens after a 500ms hover delay and closes at once, so a pointer passing over a row of
+icons does not flash a hint for each. The three activity loops share one rhythm authored in
+`tokens.ts`: a spinner turns once a second, a skeleton breathes once every two turns, and an
+indeterminate bar sweeps on its own paced loop.
+
+Known gap: an in-flow removal — a dismissed Alert, a removed tag Chip, a removed file row —
+leaves in one frame, and the content below closes the space at once. Base provides no presence
+lifecycle for in-flow lists, and components add no exit timers of their own, so this stays a
+documented gap rather than a local fix in one component.
 
 ## 13. Density
 

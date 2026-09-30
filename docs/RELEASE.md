@@ -270,6 +270,13 @@ The 2.3.0 visual refinement re-records three records, using
   shared recipe tables Button reads. Button still pulls no optional feature code: the module
   count is unchanged at 44.
 
+The motion refinements that follow ([motion audit](motion-audit.md)) re-record **the component
+stylesheet** with `--update=stylesCss`: `125677 / 15832 / 13021` → `133017 / 16730 / 13656`. `main`
+already measured 126.8 kB raw (as the gate reports it) against a 128.9 kB limit, and the visual
+refinements took it to 128.6 kB. The motion passes add the scrim's start and end states, the
+TreeView branch panel, the tactile duration and two further press-amplitude tiers
+(`motionTactileWide`, `motionTactileField`), each a scoped rule with its disabled-state gate.
+
 No other component budget is relaxed.
 
 ## Accessibility: the authored palette meets AA

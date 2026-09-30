@@ -1,6 +1,6 @@
 import { cx } from "@/libs/utils";
 import type { Variant } from "./ui.types";
-import { motionDisclose, motionFeedback, motionStateLayer } from "./ui.motion";
+import { motionDisclose, motionFeedback, motionRowLayer, motionStateLayer } from "./ui.motion";
 
 /* Sherick UI design primitives
    ==========================================================================
@@ -314,7 +314,7 @@ const pressTonal = "[&:not([data-disabled]):not(:disabled)]:active:before:opacit
 /* A neutral fill's label is ink, so a 15% ink veil turns the whole control a flat grey while it is
    held — and the recess and the compression already say "pressed". The neutral press is lighter;
    coloured fills keep the stronger step their labels were measured through. */
-const pressTonalNeutral = "[&:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.10]";
+const pressTonalNeutral = "[&:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.12]";
 const pressFilled = "[&:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.26]";
 const pressTrack = "group-[:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.26]";
 
@@ -616,6 +616,7 @@ export const list = {
     text.high,
     stateLayer.quiet,
     stateLayer.activeRow,
+    motionRowLayer,
     state.effectiveDisabled
   ),
   /* The same object at the density a list of short actions wants, where the row is scanned
@@ -631,6 +632,7 @@ export const list = {
     text.high,
     stateLayer.quiet,
     stateLayer.activeRow,
+    motionRowLayer,
     state.effectiveDisabled
   ),
 } as const;

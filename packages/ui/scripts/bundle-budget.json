@@ -53,9 +53,9 @@
     },
     "stylesCss": {
       "definition": "Published component stylesheet.",
-      "raw": 125677,
-      "gzip": 15832,
-      "brotli": 13021
+      "raw": 133017,
+      "gzip": 16730,
+      "brotli": 13656
     },
     "themeCss": {
       "definition": "Published token-only theme stylesheet.",
