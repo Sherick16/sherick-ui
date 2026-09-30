@@ -228,7 +228,11 @@ switch thumbs move, but tracks do not bounce. The accent belongs to a slider's r
 its matte handle remains separable from that range, including when disabled.
 
 Chips and ToggleGroup segments both hold selection: an unselected toggle stays neutral,
-a selected one uses the primitive's pressed marker and `tone.selected`. A chip floats
+a selected one uses the primitive's pressed marker and `tone.selected`. A segment's selection
+changes **in place** — the old fill and the new one exchange on the feedback timing — while a
+tab indicator **relocates** across its track. The difference is deliberate for now: Base
+`ToggleGroup` publishes no indicator geometry, and measuring segment positions locally would be
+the second behaviour layer §16 forbids. A travelling segment indicator waits on that Base gap. A chip floats
 on its own; a segment sits inside a track. A passive tag stays flat, and only a passive
 tag may have an independent dismiss target. Select/Combobox options hold choices and may
 rise; Menu commands perform actions and stay flat. They share row hover/highlight and
@@ -292,6 +296,11 @@ A tooltip opens after a 500ms hover delay and closes at once, so a pointer passi
 icons does not flash a hint for each. The three activity loops share one rhythm authored in
 `tokens.ts`: a spinner turns once a second, a skeleton breathes once every two turns, and an
 indeterminate bar sweeps on its own paced loop.
+
+Known gap: an in-flow removal — a dismissed Alert, a removed tag Chip, a removed file row —
+leaves in one frame, and the content below closes the space at once. Base provides no presence
+lifecycle for in-flow lists, and components add no exit timers of their own, so this stays a
+documented gap rather than a local fix in one component.
 
 ## 13. Density
 

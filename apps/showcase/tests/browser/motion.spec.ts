@@ -1340,3 +1340,31 @@ test("a sheet crosses the viewport on the sheet timing", async ({ page, errors }
   await expectDuration(page, sheet, "--sui-duration-sheet");
   expect(errors).toEqual([]);
 });
+
+test("a theme switch lands in one step rather than animating the old tones", async ({ page, errors }) => {
+  /* The showcase follows the README's guidance: transitions are suppressed for the frame in which
+     the theme lands, so a control's fill has no in-between value on the new page. */
+  await page.goto("/");
+  await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
+  const button = page.getByRole("button", { name: "Tonal", exact: true });
+  await button.evaluate((element) => element.setAttribute("data-motion-probe", ""));
+  const fills = page.evaluate(
+    () =>
+      new Promise<string[]>((resolve) => {
+        const element = document.querySelector("[data-motion-probe]")!;
+        const values: string[] = [];
+        const start = performance.now();
+        const frame = () => {
+          values.push(getComputedStyle(element).backgroundColor);
+          if (performance.now() - start < 500) requestAnimationFrame(frame);
+          else resolve(values);
+        };
+        requestAnimationFrame(frame);
+      })
+  );
+  const current = await page.evaluate(() => document.documentElement.dataset.sherickTheme);
+  await page.getByRole("button", { name: current === "dark" ? "Light" : "Dark", exact: true }).click();
+  const distinct = [...new Set(await fills)];
+  expect(distinct.length, `fills seen during the switch: ${distinct.join(" | ")}`).toBeLessThanOrEqual(2);
+  expect(errors).toEqual([]);
+});

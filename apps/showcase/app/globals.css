@@ -50,6 +50,13 @@ body {
   @apply bg-sherick-ink/20;
 }
 
+/* The theme picker suppresses transitions for the frame in which the theme lands (see README). */
+[data-theme-switching] *,
+[data-theme-switching] *::before,
+[data-theme-switching] *::after {
+  transition: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

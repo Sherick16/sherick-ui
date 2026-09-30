@@ -365,3 +365,33 @@ what it fixes (the audit's sampler can be adapted directly).
   survived precisely because its test asserted the recipe instead of the painted opacity.
 - Review each change at slow speed in `/verification/motion` and at normal speed in the showcase,
   in both themes, with reduced motion on and off.
+
+---
+
+## 5. Implementation status
+
+The four passes were implemented on the stacked branch, one commit per pass, in the same
+unpublished 2.3.0 release as the visual refinements. Every pass ran the package gates (contrast
+contract, style contract, motion policy, bundle budgets), both browser suites (showcase, and
+no-Tailwind on Chromium, Firefox and WebKit), and added frame-sampled browser assertions for what
+it fixed.
+
+| Item | Outcome |
+| --- | --- |
+| A1 Scrim | Done. Starting and ending opacity on `motionPresenceScrim`; a test samples the painted opacity on open and close. |
+| A2 Quick taps | Done. `--sui-duration-tactile` (80ms) drives the press leg of `motionTactile`, `motionInkPress` and the state layer; a test proves a 60ms tap compresses at least half-way. |
+| A3 Amplitude | Done. Tiers by role: `motionTactile` 0.96, `motionTactileWide` 0.985 (Tabs), `motionTactileField` 0.993 (Select and Combobox). Measured edge travel: Select 11.6 → **2.0px**, Tab 3.8 → 1.4px, buttons and chips unchanged (1.4–1.7px); NavItem no longer compresses. The Select/Combobox test now bounds edge travel below 3px, so the field press cannot become aggressive again unnoticed. |
+| A4 Distance | Done. `motionRelocateLong` (`--sui-duration-travel`, 300ms) for the Tabs indicator; `--sui-duration-sheet` / `-sheet-exit` (320 / 200ms) for sheets. |
+| A5 Disclose exit | Done. The ending state takes `ease-exit` and the exit duration. |
+| A6 Loops | Done. `--sui-duration-spin` (1s), `--sui-duration-pulse` (2s) and `--sui-ease-pulse` drive the spin and pulse keyframes. |
+| A7 Neutral press | Done. 0.12. |
+| A8 Glide comment | Done. The token comment now describes the measured curve. |
+| B1 TreeView | Done. A branch item is a Base `Collapsible.Root` and its group the `Collapsible.Panel`, with `motionDisclose`; closing branches keep their children until Base unmounts the panel. |
+| B2 Segments | Documented in §11 as a deliberate in-place change, pending a Base indicator primitive. |
+| B3 Keyboard highlight | Done. `motionRowLayer` makes list-row highlights move in one step. |
+| B4 Progress | Done. The determinate indicator relocates. |
+| B5 Tooltip delay | Done: 500ms open delay, 0 close delay. The additive `TooltipProvider` export for shared warm groups was deferred: it is new public API and nothing in this audit required it. |
+| C1 Theme switch | Done as guidance: the README documents a one-frame transition guard, the showcase applies it, and a test asserts a control's fill has no in-between value during a switch. |
+| C2 Inline removals | Documented in §12 as a known gap. |
+
+The component stylesheet budget was re-recorded with its reason in [RELEASE.md](RELEASE.md#size-budgets).
