@@ -340,7 +340,10 @@ an icon-to-spinner substitution does not alter a button's width. Align a status 
 or dismiss target to the first readable line of wrapping copy; a disclosure chevron
 instead belongs to its whole row. Leading and trailing marks can need different
 logical padding even when a text-only control is symmetric. Write asymmetry in logical
-start/end properties so RTL reads equally well. Code wells alone remain LTR. A local
+start/end properties so RTL reads equally well. A text action that shares an edge with text — a table cell's
+action under its column header, a toast action under its copy — **hangs** its inline padding
+outside that edge (a negative start margin equal to its padding), so its label, not its hit
+area, lines up with the text. Code wells alone remain LTR. A local
 correction should follow the actual geometry, not a global optical-offset token.
 
 ## 18. Showcase

@@ -25,14 +25,13 @@ import "prismjs/components/prism-yaml.js";
 import { cn, type TimerHandle } from "@/libs/utils";
 import {
   edge,
-  elevation,
   focusRing,
   material,
+  recessedTop,
   shape,
   state,
   stateLayer,
   text,
-  tone,
   type,
 } from "./ui.common";
 import { motionTactile } from "./ui.motion";
@@ -68,14 +67,16 @@ const CodeBlock = ({ inline = false, className, language = "text", children }: C
 
   if (inline) {
     return (
-      <code className={cn("px-1.5 py-0.5 font-sherick-mono text-[0.9em]", material.matteHigh, shape.pill, tone.text.primary, className)}>
+      <code className={cn("px-1.5 py-0.5 font-sherick-mono text-[0.9em]", material.matteHigh, shape.row, text.high, className)}>
         {children}
       </code>
     );
   }
 
   return (
-    <div className={cn("mt-4 overflow-hidden", shape.prominent, material.matte, elevation.recessed)}>
+    <div className={/* A wide well shows only its shaded upper wall: the full recessed pair is calibrated for narrow
+       tracks, and drawn around a wide panel it reads as an outline. */
+    cn("mt-4 overflow-hidden", shape.prominent, material.matte, recessedTop)}>
       <div className={cn("flex min-h-11 items-center justify-between gap-4 px-4 py-2")}>
         <span className={cn("font-sherick-mono", type.caption, text.medium)}>
           {language}
