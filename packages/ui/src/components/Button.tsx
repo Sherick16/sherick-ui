@@ -48,7 +48,10 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ...props
   }, ref) => {
     const isDisabled = disabled || loading;
-    const isTactile = appearance === "tonal" && !isDisabled;
+    /* The action ladder: text sits flat, tonal and filled are raised and recess while held. The
+       priority action is never flatter than the one beside it. */
+    const isRaised = appearance !== "text";
+    const isTactile = isRaised && !isDisabled;
 
     return (
       <BaseButton
@@ -70,7 +73,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           appearance === "tonal" && !isDisabled && stateLayer.tonal,
           appearance === "text" && tone.text[variant],
           appearance === "text" && !isDisabled && stateLayer.quiet,
-          appearance === "tonal" && elevation.raised,
+          isRaised && elevation.raised,
           isTactile && state.recess,
           isDisabled ? state.disabled : state.enabled,
           className

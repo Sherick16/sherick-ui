@@ -6,10 +6,12 @@ This is the current consumer compatibility contract. The implementation boundari
 ## Release status and automated publication
 
 `2.0.0` established the stable line under npm's `latest` dist-tag; `1.0.0` through
-`1.0.5` are frozen. `2.1.0` added the v2.1 component wave and Media; the current
-source package version is `2.2.0`: additive Table column presentation and RadioGroup surface
-choices, plus normalized overlay title margins. No new component family is added.
-Version `2.1.1` remains the published baseline until the release owner approves 2.2.0. An installed
+`1.0.5` are frozen. `2.1.0` added the v2.1 component wave and Media; `2.2.0`
+added Table column presentation and RadioGroup surface choices, plus normalized overlay title
+margins. The current source package version is `2.3.0`: the visual refinements from the
+[visual design-system audit](visual-design-system-audit.md), including additive `--sui-<role>-soft`
+and `--sui-<role>-selected` theme variables. No component family is added or removed.
+Version `2.1.1` remains the published baseline until the release owner approves a staged version. An installed
 package's actual version and exports, not this checkout, determine availability.
 
 `packages/ui/package.json` owns the release version and `publishConfig.tag` remains `latest`.
@@ -249,6 +251,13 @@ container-query layouts, compact pagination, flexible step/calendar anatomy and 
 visual refinements. This replaces clipped controls rather than hiding their scrollbars; it adds
 no client-side measuring machinery. Tokens and shared motion are unchanged. All other nine budget
 records, the 5% tolerance and stale-shrink checks remain byte-for-byte unchanged.
+
+The 2.3.0 visual refinement re-records **only the theme stylesheet**, using
+`bun --filter sherick-ui test:bundle --update=themeCss`: `8841 / 1453 / 1187` →
+`10063 / 1609 / 1302`. The reason is seven additive theme variables — the designed soft and
+selected surfaces per semantic role (`--sui-<role>-soft`, `--sui-<role>-selected`) that replace
+alpha-derived tints ([PALETTE.md](PALETTE.md#the-soft-and-selected-surfaces-container-role)) — each
+emitted in the light, explicit-dark and system-dark blocks. No component budget is relaxed.
 
 ## Accessibility: the authored palette meets AA
 

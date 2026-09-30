@@ -14,7 +14,21 @@ export const lightTokens = {
   "detail": "0.600 0.016 258",
   "primary": "0.422 0.139 255",
   "primary-strong": "0.402 0.143 257",
-  "primary-soft": "0.91 0.035 255",
+  /* The designed surfaces of each semantic role. A soft container is what a tinted surface is
+     made of — a tonal control, an Alert, a Badge, a quiet Card — and the selected step is the held
+     choice one rung stronger. They are authored rather than derived as a fraction of the role's
+     foreground, because that foreground is tuned for text contrast: a fraction of a deep navy is a
+     grey-blue and a fraction of a deep olive is a grey, so every contrast retune used to recolour
+     every tinted surface. Each value clears the contrast contract with its own foreground, `ink`
+     and the focus ring through the tonal states. */
+  "primary-soft": "0.920 0.035 255",
+  "primary-selected": "0.860 0.055 255",
+  "danger-soft": "0.930 0.030 18",
+  "danger-selected": "0.870 0.050 18",
+  "warning-soft": "0.940 0.045 85",
+  "warning-selected": "0.885 0.070 82",
+  "success-soft": "0.935 0.037 155",
+  "success-selected": "0.875 0.055 155",
   "accent": "0.62 0.10 215",
   "danger": "0.439 0.170 25",
   "warning": "0.388 0.082 75",
@@ -30,7 +44,9 @@ export const lightTokens = {
   "light-top": "1 0 0",
   "light-bottom": "0.32 0.02 256",
   "elevation-flat": "none",
-  "elevation-raised": "0 1px 2px oklch(var(--sui-light-bottom) / 0.16), 0 4px 13px oklch(var(--sui-light-bottom) / 0.09)",
+  /* A contact shadow, not a float: the ambient layer stays close to the control, so a row of raised
+     actions sits on the page rather than hovering over it. Floating depth is `elevation-floating`'s. */
+  "elevation-raised": "0 1px 2px oklch(var(--sui-light-bottom) / 0.16), 0 2px 6px oklch(var(--sui-light-bottom) / 0.07)",
   "elevation-floating": "0 16px 40px oklch(var(--sui-light-bottom) / 0.20), inset 0 1px 0 oklch(var(--sui-light-top) / 0.70)",
   "elevation-control": "0 1px 2px oklch(var(--sui-light-bottom) / 0.19), inset 0 1px 0 oklch(var(--sui-light-top) / 0.55)",
   /* The recessed rung, and the deeper rung a *small* well takes. A well differs from a groove in
@@ -81,7 +97,14 @@ export const darkTokens = {
   "detail": "0.600 0.014 256",
   "primary": "0.809 0.098 255",
   "primary-strong": "0.734 0.139 257",
-  "primary-soft": "0.42 0.055 257",
+  "primary-soft": "0.325 0.050 257",
+  "primary-selected": "0.400 0.075 257",
+  "danger-soft": "0.315 0.050 22",
+  "danger-selected": "0.395 0.070 22",
+  "warning-soft": "0.320 0.045 78",
+  "warning-selected": "0.400 0.065 78",
+  "success-soft": "0.315 0.045 160",
+  "success-selected": "0.395 0.065 160",
   "accent": "0.80 0.08 215",
   "danger": "0.799 0.115 25",
   "warning": "0.82 0.12 80",

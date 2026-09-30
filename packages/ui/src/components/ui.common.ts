@@ -609,11 +609,14 @@ export const disclosure = {
      text      foreground only, for quiet rows and links.
      soft      a de-emphasised tinted surface: alerts, badges, quiet cards.
      tonal     a matte control fill at rest: tonal buttons, icon buttons.
-     selected  the fill a selected control holds: menu options, navigation, the
-               selected segment of a segmented control.
+     selected  the fill a selected control holds: options, segments, calendar days, tree rows.
      strong    the opaque accent fill that marks priority.
-   A fill step is composited over whatever sits beneath it, so one tone reads
-   correctly on the canvas, inside a card and on an acrylic sheet. */
+   The semantic soft and selected steps are the role's own authored surfaces (`--sui-<role>-soft`,
+   `--sui-<role>-selected`), not a fraction of its foreground: the foreground is tuned for text
+   contrast, and a fraction of it is a greyed version of the hue. They are opaque, so one tone reads
+   the same on the canvas, inside a card and on an acrylic sheet. The neutral soft step is a step
+   *within* whatever holds it rather than the card fill itself, so a neutral badge or tag stays
+   visible inside a card. */
 export const tone = {
   text: {
     primary: "text-sherick-primary",
@@ -623,25 +626,25 @@ export const tone = {
     success: "text-sherick-success",
   },
   soft: {
-    primary: "bg-sherick-primary/[0.12] text-sherick-primary",
-    secondary: "bg-sherick-surface/[0.78] text-sherick-ink",
-    danger: "bg-sherick-danger/[0.09] text-sherick-danger",
-    warning: "bg-sherick-warning/[0.09] text-sherick-warning",
-    success: "bg-sherick-success/[0.09] text-sherick-success",
+    primary: "bg-sherick-primary-soft text-sherick-primary",
+    secondary: "bg-sherick-surface-high/[0.72] text-sherick-ink",
+    danger: "bg-sherick-danger-soft text-sherick-danger",
+    warning: "bg-sherick-warning-soft text-sherick-warning",
+    success: "bg-sherick-success-soft text-sherick-success",
   },
   tonal: {
-    primary: "bg-sherick-primary/[0.12]",
+    primary: "bg-sherick-primary-soft",
     secondary: "bg-sherick-surface-high/[0.56]",
-    danger: "bg-sherick-danger/[0.09]",
-    warning: "bg-sherick-warning/[0.09]",
-    success: "bg-sherick-success/[0.09]",
+    danger: "bg-sherick-danger-soft",
+    warning: "bg-sherick-warning-soft",
+    success: "bg-sherick-success-soft",
   },
   selected: {
-    primary: "bg-sherick-primary/[0.22] text-sherick-ink",
+    primary: "bg-sherick-primary-selected text-sherick-ink",
     secondary: "bg-sherick-surface-high/[0.82] text-sherick-ink",
-    danger: "bg-sherick-danger/[0.16] text-sherick-ink",
-    warning: "bg-sherick-warning/[0.16] text-sherick-ink",
-    success: "bg-sherick-success/[0.16] text-sherick-ink",
+    danger: "bg-sherick-danger-selected text-sherick-ink",
+    warning: "bg-sherick-warning-selected text-sherick-ink",
+    success: "bg-sherick-success-selected text-sherick-ink",
   },
   strong: {
     primary: "bg-sherick-primary-strong text-sherick-on-primary",
@@ -673,7 +676,7 @@ export const tone = {
    selection authoritative at the primitive rather than mirroring it in component state.
    Keep this independent so unrelated consumers of the mark recipes can tree-shake it. */
 export const selectableRowSurface =
-  "has-[[data-checked]]:bg-sherick-primary/[0.22] has-[[data-checked]]:text-sherick-ink has-[[data-checked]]:shadow-sherick-control";
+  "has-[[data-checked]]:bg-sherick-primary-selected has-[[data-checked]]:text-sherick-ink has-[[data-checked]]:shadow-sherick-control";
 
 export const selectable = {
   surface: /* @__PURE__ */ cx("relative", elevation.recessed, motionFeedback),
@@ -723,18 +726,7 @@ export const recipeAlphas = {
     filled: { hover: stateAlpha(hoverFilled, "state.filled.hover"), press: stateAlpha(pressFilled, "state.filled.press") },
   },
   tint: {
-    soft: {
-      primary: fillAlpha(tone.soft.primary, "tint.soft.primary"),
-      danger: fillAlpha(tone.soft.danger, "tint.soft.danger"),
-      warning: fillAlpha(tone.soft.warning, "tint.soft.warning"),
-      success: fillAlpha(tone.soft.success, "tint.soft.success"),
-    },
-    selected: {
-      primary: fillAlpha(tone.selected.primary, "tint.selected.primary"),
-      danger: fillAlpha(tone.selected.danger, "tint.selected.danger"),
-      warning: fillAlpha(tone.selected.warning, "tint.selected.warning"),
-      success: fillAlpha(tone.selected.success, "tint.selected.success"),
-    },
+    neutralSoft: fillAlpha(tone.soft.secondary, "tint.neutralSoft"),
     neutralRest: fillAlpha(tone.tonal.secondary, "tint.neutralRest"),
   },
   field: {

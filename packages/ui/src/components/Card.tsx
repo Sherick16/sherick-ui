@@ -1,6 +1,6 @@
 import React, { type HTMLAttributes, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { shape, text, tone } from "./ui.common";
+import { material, shape, text, tone } from "./ui.common";
 import { Variant } from "./ui.types";
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
@@ -9,7 +9,8 @@ export interface CardProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 /* A card is a large matte surface: tone separates it from the canvas, and it carries
-   no elevation until something lifts it. */
+   no elevation until something lifts it. A neutral card *is* the matte surface; the semantic
+   variants are that role's soft container. */
 export const Card = ({
   children,
   variant = "secondary",
@@ -21,7 +22,7 @@ export const Card = ({
       className={cn(
         "min-w-0 p-6 [overflow-wrap:anywhere]",
         shape.surface,
-        tone.soft[variant],
+        variant === "secondary" ? material.matte : tone.soft[variant],
         text.high,
         className
       )}

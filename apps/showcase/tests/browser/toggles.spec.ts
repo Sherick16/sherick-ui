@@ -52,7 +52,7 @@ test("a chip is a toggle only when it holds a selection", async ({ page, errors 
      because the fill is interpolated. */
   const selectedFill = await page.evaluate(() => {
     const probe = document.createElement("div");
-    probe.style.backgroundColor = "oklch(var(--sui-primary) / 0.22)";
+    probe.style.backgroundColor = "oklch(var(--sui-primary-selected))";
     document.body.appendChild(probe);
     const value = getComputedStyle(probe).backgroundColor;
     probe.remove();

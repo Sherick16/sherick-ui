@@ -340,7 +340,7 @@ test("a file drag marks the zone and hands the drop to the same rules", async ({
   await expect(zone.getByText("Add files")).toHaveCount(0);
   // The state is not carried by colour alone; it also takes a fill the resting zone does not hold.
   await settled().not.toBe(rest);
-  const accent = await zone.evaluate((element) => getComputedStyle(element).getPropertyValue("--sui-primary").trim());
+  const accent = await zone.evaluate((element) => getComputedStyle(element).getPropertyValue("--sui-primary-soft").trim());
   expect(accent).not.toBe("");
   expect(await background(zone)).toContain(accent.split(" ").map(Number).join(" "));
   await expect(zone).toHaveAttribute("data-dragging", "true");

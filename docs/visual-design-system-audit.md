@@ -23,7 +23,11 @@ visual rule is required").
 - **Source review:** `tokens.ts`, `ui.common.ts`, `ui.motion.ts` and every component a finding names.
   Where a finding says "renders as", the rendered page is the evidence and the source explains the cause.
 
-Screenshots were disposable review captures and are not committed. Every state named here can be
+Screenshots were disposable review captures and are not committed.
+
+**Correction (implementation pass):** the original audit reported TreeView rows inheriting the
+host's 16px. That measurement read the `treeitem` wrapper; the row and its label render at 14px
+from `density.compact`. The claim has been removed below. Every state named here can be
 reproduced from the showcase anchor or example route it cites.
 
 ---
@@ -55,8 +59,8 @@ Sherick UI has a real point of view, and it is recognisable in a single screensh
 The **physics** (material, depth, state, motion) is specified with unusual rigour. The **graphic
 design** layer on top of it is not specified at all, or is derived by accident:
 
-- **Typography has no system.** Nine different sizes render. There is no type role, the typeface is
-  whatever the host provides, and one component inherits the host's font size.
+- **Typography has no system.** Eight different sizes render, and there is no type role. The
+  typeface is whatever the host provides.
 - **Colour for soft surfaces is derived, not designed.** Every tint is an alpha of a foreground
   token, and those foreground values were darkened for text contrast. As a result the soft semantic
   surfaces, selection tints and neutral soft surfaces are muddy or invisible.
@@ -195,8 +199,7 @@ not the size of the change.
   | Part | Size / weight / line height |
   | --- | --- |
   | Button `md`, Input, Select trigger, Textarea, Tab | 15.2px / 400–500 / 22.8px (`density.normal` = `0.95rem`) |
-  | Button `sm`, Segment, Chip, Nav item, Accordion row, Table cell, Command row, Select **option** | 14px / 400–500 / 20px |
-  | TreeView row | **16px (inherited from the host)** / 400 / 24px |
+  | Button `sm`, Segment, Chip, Nav item, TreeView row, Accordion row, Table cell, Command row, Select **option** | 14px / 400–500 / 20px |
   | Field description and error, Tooltip, Stepper sub-label, Command group label, Calendar weekday | 12px |
   | Badge | 12px / 600 |
   | CodeBlock language label | 11px uppercase, +0.08em tracking (the only 11px text and the only uppercase) |
@@ -220,8 +223,7 @@ not the size of the change.
   chosen per component, so adjacent parts disagree:
   - a 15.2px field sits above a 12px hint;
   - a 14px option commits into a 15.2px trigger;
-  - a 20px Dialog title and a 14px CommandPalette title head the same modal surface;
-  - a tree row is 2px larger than every other collection row.
+  - a 20px Dialog title and a 14px CommandPalette title head the same modal surface.
 
   The off-grid `0.95rem` produces fractional line boxes (22.8px), which undermines vertical rhythm.
 - **Cause.** The language deliberately scopes "content typography" to components (§16). That is
@@ -238,7 +240,7 @@ not the size of the change.
   | Role | Proposed | Consumers |
   | --- | --- | --- |
   | `type.control.{compact,normal,prominent}` | 14/20, **15/22** (replace `0.95rem`), 18/26 | `density.*` (density keeps owning the step) |
-  | `type.row` | the row's density step; a Select option matches its trigger's step | `list.option`, `list.command`, TreeView (fixes the inherited 16px), NavItem, disclosure trigger |
+  | `type.row` | the row's density step; a Select option matches its trigger's step | `list.option`, `list.command`, NavItem, disclosure trigger |
   | `type.supporting` | **13/20** | field description, error and hint; Stepper sub-label; Toast description (14/24 today, which should be decided consciously) |
   | `type.caption` | 12/16 medium | Badge, Tooltip, Command group label, Calendar weekday, CodeBlock language label (drop 11px and uppercase unless uppercase is adopted as a system-wide label treatment) |
   | `type.title` | 16/24 · 500–600 | CommandPalette title, Toast title, Popover heading (documented slot or pattern), card and section headings in examples |
@@ -404,7 +406,7 @@ not the size of the change.
 | B1 | **Value handles use three materials.** The Switch thumb is `bg-current` (charcoal off, white on in light; inverted in dark). The Slider handle is a charcoal 12×20px capsule beside a navy range. Checkbox and Radio fill the mark itself. | Keep Switch as it is (it is coherent). Align the Slider handle's *geometry* with the thumb family: a 20px circle, or document why the capsule differs. Consider an on-colour handle whenever it sits on the filled range. | Slider, §11 |
 | B2 | **Field messages** are 12px, re-authored in five components (A4), and the error colour is a raw `text-sherick-danger` instead of `tone.text.danger`. | `type.supporting` plus a shared `fieldMessage.{description,error}` recipe. | Field, Input, Textarea, FileUpload, DateRangePicker |
 | B3 | **Modal-family titles disagree.** Dialog and Drawer use 20/600. CommandPalette uses 14/500 plus a 12px description. | CommandPalette takes `type.heading`, or `type.title` if it should stay subordinate to its search field, but decide once for all modal surfaces. | CommandPalette, DialogHeader, Drawer |
-| B4 | **List row sizes break at the boundary.** Select and Combobox options are 14px under a 15.2px trigger. TreeView rows inherit 16px. | Rows take the density step of the control that opened them (A4 `type.row`). | `list.option`, TreeView |
+| B4 | **List row sizes break at the boundary.** Select and Combobox options are 14px under a 15.2px trigger. | Rows take the density step of the control that opened them (A4 `type.row`). | `list.option` |
 | B5 | **Large recessed wells read as outlined boxes.** CodeBlock (`material.matte` plus `elevation.recessed` at `shape.prominent`) renders a four-sided rim at 24px radius (`#content`). `recessed` is calibrated for 6–32px tracks. | Wide wells take `recessedTop` (the upper wall only, already in the language), or add a `recessed` scale note in §5. | CodeBlock, Markdown code, FileUpload list sheet |
 | B6 | **Markdown blockquote looks like a selected callout.** It uses `tone.soft.primary` fill, a start border, and rounded end corners only. | A quote is content emphasis (§8): keep the accent rule and `text.medium`, and drop the tint and asymmetric radius (or use neutral `matteHigh`). | Markdown |
 | B7 | **Inline code is a pill in primary text colour**, so it reads as a link or chip inside prose. | `shape.row` (or `mark`) with `text.high`, on the mono token from A4. | CodeBlock (`inline`) |
@@ -536,7 +538,7 @@ visual baselines with reviewed diffs. Each pass that adds a rule updates `DESIGN
 | --- | --- | --- | --- | --- | --- | --- |
 | 2.1 | No type roles (A4) | Add type roles to §10 and §13, plus a `type` recipe group. `density.normal` → 15/22 (drop `0.95rem`). | ui.common, all density consumers | Whole-pixel rhythm; controls agree | M | none |
 | 2.2 | 12px detached helper text (A4, B2) | `type.supporting` 13/20 plus a shared `fieldMessage` recipe. Use `tone.text.danger` for errors. | Field, Input, Textarea, FileUpload, DateRangePicker | Readable hints that stay subordinate | S | 2.1 |
-| 2.3 | Rows resize at boundaries (B4) | `type.row` follows the opener's density. Set TreeView's size explicitly. | `list.option`, `list.command`, TreeView, NavItem, disclosure | Values don't jump size between list and field | S | 2.1 |
+| 2.3 | Rows resize at boundaries (B4) | `type.row` follows the opener's density. | `list.option`, `list.command`, NavItem, disclosure | Values don't jump size between list and field | S | 2.1 |
 | 2.4 | Modal and surface titles disagree (B3, C) | `type.heading` for Dialog, AlertDialog, Drawer and CommandPalette; `type.title` for Toast and the Popover heading pattern. | CommandPalette, Toast, Popover docs | One voice across floating surfaces | S | 2.1 |
 | 2.5 | Captions and labels ad hoc | `type.caption` for Badge, Tooltip, Command group label, Calendar weekday and CodeBlock label (drop 11px and uppercase). | those components | Consistent small text | S | 2.1 |
 | 2.6 | Numeric data and mono | `type.numeric` for Table (opt-in per column or default) and NumberField. Add a `--sui-font-mono` token. | Table, NumberField, CodeBlock, tokens | Aligned figures; deliberate code face | S | 2.1 |

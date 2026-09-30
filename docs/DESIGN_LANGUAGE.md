@@ -66,6 +66,11 @@ source's semantics. Video defaults to its source ratio and containment, never im
 | `well` | a small empty checkbox/radio mark whose recessed wall identifies it | a wide groove with its own fill |
 | `floating` | real overlay surfaces | anything in document flow |
 
+Actions follow one depth ladder: a text action sits flat, and tonal and filled actions are
+`raised` at rest and `recessed` while held. The priority action is never flatter than the
+secondary one beside it, so depth never contradicts the fill hierarchy. `raised` is a contact
+shadow, not a float: a row of raised actions sits on the page.
+
 Held choices combine `tone.selected` and `elevation.control`: selected segments, options,
 tree rows and calendar days. A continuous date range makes one band per week rather than
 seven separately elevated cells. The mark itself, a check or a date, remains another
@@ -145,8 +150,17 @@ are non-text furniture roles, never a third step for readable text. Surface tone
 | `strong` | priority action or a semantic mark with sufficient contrast |
 | `strongChecked` | a strong fill driven by the primitive's checked marker |
 
-Primary marks interaction, accent gives supporting emphasis, and danger/warning/success
-carry meaning rather than decoration. Semantic color belongs to the relevant icon,
+Each semantic role has three authored values: its foreground (the role token itself), a
+**soft** container (`--sui-<role>-soft`) that tonal controls and soft surfaces are made of, and
+a **selected** step (`--sui-<role>-selected`) one rung stronger. Soft and selected surfaces are
+designed values, never a fraction of the foreground: the foreground is tuned for text contrast,
+and a fraction of a deep accent is a greyed version of its hue. The neutral soft step is a step
+*within* its container (`surface-high` over whatever holds it), so a neutral badge or tag stays
+visible inside a card; a neutral card itself is the matte surface.
+
+Primary marks interaction, and danger/warning/success carry meaning rather than decoration.
+`--sui-accent` and `--sui-outline` are reserved: they are published for compatibility, no
+component consumes them, and a new use needs a role written here first. Semantic color belongs to the relevant icon,
 control or small region, not a whole table or page. Readable copy on passive semantic
 regions keeps normal text emphasis. A navigation destination uses a quieter tonal tint,
 weight and `aria-current`, not the selected-value treatment of a list option.

@@ -66,11 +66,11 @@ test("a current destination is a row carrying the quiet tint, not a pill or a ca
   /* And flat: depth never announces which page you are on. */
   expect(surface.shadow).toBe("none");
 
-  /* The current destination holds the lightest accent tint there is, read from the token itself,
-     and a resting destination holds nothing. */
+  /* The current destination holds the role's soft container, read from the token itself, and a
+     resting destination holds nothing. */
   const tint = await page.evaluate(() => {
     const probe = document.createElement("div");
-    probe.style.backgroundColor = "oklch(var(--sui-primary) / 0.12)";
+    probe.style.backgroundColor = "oklch(var(--sui-primary-soft))";
     document.body.appendChild(probe);
     const value = getComputedStyle(probe).backgroundColor;
     probe.remove();

@@ -142,6 +142,8 @@ export const contrastCompositions = (variables, alphas) => {
     "quiet well": composite(surface, FIELD.quiet, canvas),
     "matte card": composite(surface, FIELD.card, canvas),
     "chip at rest": composite(surfaceHigh, TINT.neutralRest, canvas),
+    /* A neutral badge or tag: the neutral soft step inside the card that holds it. */
+    "neutral soft in a card": composite(surfaceHigh, TINT.neutralSoft, composite(surface, FIELD.card, canvas)),
     "field": composite(surfaceHigh, FIELD.control, canvas),
     /* An empty mark sits in the *opaque* neutral well, the same one a Switch's track sits in. */
     "empty mark well": surfaceHigh,
@@ -168,6 +170,10 @@ export const contrastCompositions = (variables, alphas) => {
   const groove = composite(surface, FIELD.quiet, canvas);
 
   const tint = (role, alpha, base) => composite(colour(role), alpha, base);
+  /* A role's soft and selected surfaces are authored opaque values, so where the control sits no
+     longer changes the fill it composites its label over. */
+  const soft = (role) => colour(`${role}-soft`);
+  const selected = (role) => colour(`${role}-selected`);
   const withState = (role, alpha, base) => composite(colour(role), alpha, base);
 
   const compositions = [];
@@ -195,13 +201,13 @@ export const contrastCompositions = (variables, alphas) => {
     "text.high on a semantic tint [soft]",
     WCAG_TEXT,
     "an Alert's copy or a tag's label: the copy keeps its own emphasis while the tint carries the meaning",
-    SEMANTIC.flatMap((role) => controlEntries.map(([where, base]) => [`${where} + ${role} soft`, colour("ink"), tint(role, TINT.soft[role], base)]))
+    SEMANTIC.flatMap((role) => controlEntries.map(([where, base]) => [`${where} + ${role} soft`, colour("ink"), soft(role)]))
   );
   add(
     "text.high on a semantic tint [selected]",
     WCAG_TEXT,
     "a selected row, segment or chip: the label is the high text step over the selection tint",
-    SEMANTIC.flatMap((role) => controlEntries.map(([where, base]) => [`${where} + ${role} selected`, colour("ink"), tint(role, TINT.selected[role], base)]))
+    SEMANTIC.flatMap((role) => controlEntries.map(([where, base]) => [`${where} + ${role} selected`, colour("ink"), selected(role)]))
   );
 
   /* -- the code well, which is text on its own surface --------------------------------------- */
@@ -233,7 +239,7 @@ export const contrastCompositions = (variables, alphas) => {
       WCAG_TEXT,
       "a tonal Button/IconButton, a Badge, a Card: the label is the accent and the fill is a tint of it, and hover/press composite the label over that fill again",
       controlEntries.flatMap(([where, base]) => {
-        const fill = tint(role, TINT.soft[role], base);
+        const fill = soft(role);
         return [
           [`${where} at rest`, fg, fill],
           [`${where} hovered`, fg, withState(role, STATE.tonal.hover, fill)],
@@ -267,7 +273,7 @@ export const contrastCompositions = (variables, alphas) => {
       `tone.text.${role} on its selected tint`,
       WCAG_NON_TEXT,
       "the mark a Select or Combobox option carries, and a selected toggle's own mark",
-      controlEntries.map(([where, base]) => [where, fg, tint(role, TINT.selected[role], base)])
+      controlEntries.map(([where, base]) => [where, fg, selected(role)])
     );
     add(
       `on-colour on its strong fill, through the filled states [${role}]`,
@@ -363,7 +369,7 @@ export const contrastCompositions = (variables, alphas) => {
       `the focus indicator over the ${role} soft tint` ,
       WCAG_NON_TEXT,
       "an inset ring drawn inside a dismissal or a segment that sits on a tinted surface",
-      controlEntries.map(([where, base]) => [where, colour("focus"), tint(role, TINT.soft[role], base)])
+      controlEntries.map(([where, base]) => [where, colour("focus"), soft(role)])
     );
     add(
       `the focus indicator over a highlighted ${role} row` ,
@@ -381,7 +387,7 @@ export const contrastCompositions = (variables, alphas) => {
       `the focus indicator over the ${role} selected tint`,
       WCAG_NON_TEXT,
       "an inset ring drawn inside a selected segment or a selected row",
-      controlEntries.map(([where, base]) => [where, colour("focus"), tint(role, TINT.selected[role], base)])
+      controlEntries.map(([where, base]) => [where, colour("focus"), selected(role)])
     );
   }
 

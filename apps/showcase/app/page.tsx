@@ -194,7 +194,7 @@ export default function Home() {
                 <div className={cn("relative mt-4 overflow-hidden p-5", shape.prominent, "bg-sherick-canvas/[0.55]")}>
                   <div className="pointer-events-none absolute inset-0" aria-hidden="true">
                     <div className="absolute -left-6 -top-4 h-24 w-36 rounded-full bg-sherick-primary/[0.30] blur-[28px]" />
-                    <div className="absolute -bottom-2 right-2 h-20 w-28 rounded-full bg-sherick-accent/[0.22] blur-[26px]" />
+                    <div className="absolute -bottom-2 right-2 h-20 w-28 rounded-full bg-sherick-success/[0.22] blur-[26px]" />
                   </div>
                   <div className="relative grid grid-cols-1 gap-4 sm:grid-cols-3">
                     <Tile label="Acrylic" className={material.acrylic} />
@@ -237,12 +237,15 @@ export default function Home() {
                     <Swatch label="Primary strong" className="bg-sherick-primary-strong" />
                     <Swatch label="Primary" className="bg-sherick-primary" />
                     <Swatch label="Primary soft" className="bg-sherick-primary-soft" />
-                    <Swatch label="Accent" className="bg-sherick-accent" />
+                    <Swatch label="Primary selected" className="bg-sherick-primary-selected" />
                   </div>
                   <div className="grid grid-cols-3 gap-3">
                     <Swatch label="Danger" className="bg-sherick-danger" />
                     <Swatch label="Warning" className="bg-sherick-warning" />
                     <Swatch label="Success" className="bg-sherick-success" />
+                    <Swatch label="Danger soft" className="bg-sherick-danger-soft" />
+                    <Swatch label="Warning soft" className="bg-sherick-warning-soft" />
+                    <Swatch label="Success soft" className="bg-sherick-success-soft" />
                   </div>
                   <div className="space-y-2">
                     <p className={cn("text-sm", text.high)}>High emphasis</p>
