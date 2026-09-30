@@ -597,3 +597,41 @@ visual baselines with reviewed diffs. Each pass that adds a rule updates `DESIGN
 - Update deterministic visual baselines with reviewed diffs.
 - Do a rendered review in both themes at 1440px and 375px, including open overlays. Pay particular
   attention to side-by-side sibling comparisons on `/verification/visual-consistency`.
+
+---
+
+## 5. Implementation status
+
+The five passes were implemented on the same branch, one commit per pass, in version **2.3.0**.
+Every pass ran lint, typechecks, `bun run test` (including the contrast contract, which has no
+allowlist), the deterministic style contract, the motion policy, the bundle budgets and the
+full showcase browser suite (350 passed, 2 intentional skips, after each pass).
+
+| Item | Outcome |
+| --- | --- |
+| 1.1 Soft and selected containers | Done. Seven new `--sui-<role>-soft/-selected` tokens plus the previously unused `--sui-primary-soft`; values and measurements in [PALETTE.md](PALETTE.md#the-soft-and-selected-surfaces-container-role). The first light-mode values rendered too loud and were pulled back about 25% in chroma before commit. |
+| 1.2 Neutral soft step | Done. `tone.soft.secondary` is `surface-high/0.72`; a neutral `Card` is `material.matte`. |
+| 1.3 Action depth ladder | Done. Filled actions are raised and recess; light `raised` is a contact shadow. |
+| 1.4 Badge meaning | Resolved by 1.1 without a new rule. With designed containers the semantic badges read distinctly in both themes, so the §10 rule (neutral copy on passive semantic regions) was kept and no status dot was added. |
+| 1.5 Unused palette roles | Done. `primary-soft` is consumed; `accent` and `outline` are documented as reserved and removed from the Tonality specimen. Removing them from `theme.css` is left for a major release. |
+| 2.1–2.6 Type roles | Done. `type` roles, 15/22px normal step, one `fieldMessage` recipe, options match their field, `heading`/`title`/`caption` roles, tabular figures, `--sui-font-mono`. Toast first-line geometry was corrected for the 22px title line. |
+| 3.1 Silhouette | Done with Option A: container radii step down (control 16, row 12, prominent 20, surface 24, sheet 16, expressive 28); chips and tags are pills. Identity-level; isolated in its own commit. |
+| 3.2 Icon slots | Done. `iconSlot` by type step; Button and NavItem use it. |
+| 3.3 Current location | Done. `currentDestination` for NavItem and Pagination; Tabs documented as the held-view exception. |
+| 3.4 Groove fill | Done. Slider, Progress and Stepper tracks use `matteHigh`; the contract measures handles and fills against it. |
+| 3.5 Neutral press | Done. `stateLayer.tonalNeutral` (0.10), with a contract entry. |
+| 3.6 Slider handle | Done. Round 20px handle, matching the Switch thumb. |
+| 4.1 Wide wells | Done. CodeBlock uses `recessedTop`. |
+| 4.2 Blockquote | Done. Accent rule and supporting tone, no fill. |
+| 4.3 Inline code | Done. `shape.row`, `text.high`, mono stack. |
+| 4.4 Stepper index | Done. A 20px mark in the step's state. |
+| 4.5 Table actions | Rule added to §17 and applied in the resources example. The end-edge scroll affordance was not added: it would be a new visual rule, and nothing in this audit proved it necessary. |
+| 4.6 FileUpload list | **Declined after review.** The inset list is the documented `matteInset` pattern (§4, a passive sheet tucked beneath a stronger control); aligning its edges would erase that relationship. |
+| 4.7 Calendar "Today" | **Declined after review.** Its label already starts in line with the day numbers; hanging its padding would pull it left of the grid. |
+| 5.1 Composition guidance | Done. DESIGN_LANGUAGE §20. |
+| 5.2 Showcase navigation | Done. Below the gutter-rail width the jump control rides a full-width frosted band instead of floating over content. |
+| 5.3–5.4 Showcase specimens | Done. Specimen titles take `type.title`; calendar sub-headings no longer outrank them; surface specimens sit on canvas bands; one current NavItem; image frames keep their own height. |
+| 5.5 Examples | Done. Full-bleed page backgrounds; a setting row for the switch; one filter row including Sort; hanging table actions. |
+
+Three size budgets were re-recorded with reasons in [RELEASE.md](RELEASE.md#size-budgets):
+`themeCss`, `disclosure` and `button`. `main` was already within 0.1 kB of the last two limits.

@@ -261,8 +261,21 @@ test("pagination and step tracks match the existing segmented and progress famil
     for (const property of ["background-color", "box-shadow"]) {
       expect(await css(pages.getByRole("list"), property)).toBe(await css(segments, property));
       expect(await css(pages.getByRole("list"), property)).toBe(await css(tabs, property));
-      expect(await css(selected, property)).toBe(await css(segment, property));
     }
+    /* The current page is a navigation destination (DESIGN_LANGUAGE §10): the primary soft
+       container, flat, with a segment's corner. A selected segment is a held value and keeps its
+       control elevation, so the two share geometry but not depth. */
+    const soft = await page.evaluate(() => {
+      const probe = document.createElement("div");
+      probe.style.backgroundColor = "oklch(var(--sui-primary-soft))";
+      document.body.appendChild(probe);
+      const value = getComputedStyle(probe).backgroundColor;
+      probe.remove();
+      return value;
+    });
+    expect(await css(selected, "background-color")).toBe(soft);
+    expect(await css(selected, "box-shadow")).toBe("none");
+    expect(await css(segment, "box-shadow")).not.toBe("none");
     expect(await css(selected, "border-radius")).toBe(await css(segment, "border-radius"));
     const workflow = page.getByRole("navigation", { name: "Workflow" });
     const track = workflow.locator("[data-sui-step-track]").first();

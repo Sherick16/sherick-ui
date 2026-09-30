@@ -85,6 +85,7 @@ import {
   stateLayer,
   text,
   tone,
+  type,
 } from "sherick-ui/dev";
 
 import {
@@ -171,14 +172,18 @@ export default function Home() {
           <ThemePicker theme={theme} onChange={changeTheme} />
         </div>
       </div>
+      {/* Below the gutter-rail width, the jump control rides a full-width frosted band, so content
+          scrolls beneath a surface rather than colliding with a floating pill. */}
+      <div className={cn("sticky top-0 z-30 mb-6 min-[1660px]:hidden", material.acrylicDense)}>
+        <div className="mx-auto w-full max-w-[1320px] px-5 py-3 sm:px-8 lg:px-10">
+          <ShowcaseJumpNav activeId={activeSection} />
+        </div>
+      </div>
       <div className="mx-auto grid w-full max-w-[1320px] grid-cols-1 min-[1660px]:max-w-none min-[1660px]:grid-cols-[minmax(0,1fr)_1320px_minmax(0,1fr)]">
         <div className="hidden min-[1660px]:block">
           <ShowcaseSideNav activeId={activeSection} className="sticky top-28 ml-auto mr-3 w-36" />
         </div>
         <div className="min-w-0 px-5 pb-10 sm:px-8 lg:px-10 lg:pb-14">
-        <div className="sticky top-4 z-30 mb-6 min-[1660px]:hidden">
-          <ShowcaseJumpNav activeId={activeSection} />
-        </div>
         <div className="space-y-16">
           <ShowcaseSection id="design-language">
             <div className="mt-6 columns-1 gap-4 xl:columns-2 [&>*]:mb-4 [&>*]:break-inside-avoid">
@@ -227,8 +232,8 @@ export default function Home() {
 
               <Specimen title="Tonality">
                 <div className="space-y-5">
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                    <Swatch label="Canvas" className={material.canvas} />
+                  <div className={cn("grid grid-cols-2 gap-3 p-3 sm:grid-cols-4", shape.control, material.canvas)}>
+                    <Swatch label="Canvas" className={cn(material.canvas, "outline outline-1 outline-dashed outline-sherick-edge/[0.25]")} />
                     <Swatch label="Surface" className="bg-sherick-surface" />
                     <Swatch label="Surface high" className="bg-sherick-surface-high" />
                     <Swatch label="Surface float" className="bg-sherick-surface-float" />
@@ -514,7 +519,6 @@ export default function Home() {
                   />
                   <NavGroup
                     title="Controls"
-                    activeHref="#fields"
                     items={[
                       { label: "Buttons", href: "#buttons" },
                       { label: "Fields", href: "#fields" },
@@ -617,7 +621,7 @@ export default function Home() {
           <ShowcaseSection id="display">
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
               <Specimen title="Cards">
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className={cn("grid gap-3 p-3 sm:grid-cols-2", shape.control, material.canvas)}>
                   <Card variant="secondary"><div className="font-medium">Neutral card</div><p className={cn("mt-2 text-sm leading-6", text.medium)}>Body copy goes here.</p></Card>
                   <Card variant="primary"><div className="font-medium">Tonal card</div><p className={cn("mt-2 text-sm leading-6", text.medium)}>Body copy goes here.</p></Card>
                 </div>
@@ -634,7 +638,7 @@ export default function Home() {
               </Specimen>
 
               <Specimen title="Images">
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className="grid items-start gap-3 sm:grid-cols-2">
                   <Media.Image src="https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg?auto=compress&width=680" alt="Warm living room with a sofa" />
                   <Media.Image src="https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg?auto=compress&width=680" alt="Living room detail" aspect="square" fit="cover" position="top" />
                 </div>
@@ -852,7 +856,7 @@ function ShowcaseSection({
 function Specimen({ title, className = "", children }: { title: string; className?: string; children: React.ReactNode }) {
   return (
     <div className={cn(shape.surface, material.matte, "min-w-0 self-start p-4 sm:p-6", className)}>
-      <h3 className="mb-5 font-medium tracking-[-0.01em]">{title}</h3>
+      <h3 className={cn("mb-5", type.title)}>{title}</h3>
       {children}
     </div>
   );

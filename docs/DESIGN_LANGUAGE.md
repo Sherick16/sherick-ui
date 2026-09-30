@@ -366,3 +366,25 @@ toasts stay inside the dynamic viewport. Tooltips are short hints, not forms. Na
 date input remains editable and its calendar is an anchored popup. A file chooser shows
 one affordance, constraints once, selected files as quiet rows, and visible rejection
 feedback; it does not invent upload progress.
+
+## 20. Composition
+
+The language above governs objects; these rules carry it to pages. They are guidance for
+consumers and for the repository's own examples, not new primitives.
+
+- **A surface sits on canvas.** A card is a matte surface on the canvas. Do not nest a card in a
+  card to group content: inside a surface, group with spacing, a type role and an `edge.rule`.
+  Specimens of surfaces are shown on a canvas band, not inside another card.
+- **Headings step down, never up.** A page heading, then a section heading, then `type.title`
+  for a surface's own heading. A heading inside a surface is never larger than the surface's
+  title; below `title`, label a group with `caption` or a medium-weight supporting line.
+- **A setting row.** A binary setting puts its label and description at the start and its
+  Switch at the end of one row, rather than a switch alone on a line beneath its label.
+- **A filter bar.** Filters, and the sort that orders their result, share one row of fields
+  aligned on their bottom edge. A result count and a "clear" action sit on the line below,
+  aligned with the content they describe. An action among fields is still an action: it keeps
+  its capsule and its depth.
+- **Actions.** One filled action per view. Secondary actions are tonal or text; a text action
+  that shares an edge with text hangs its padding (§17).
+- **Page backgrounds are full-bleed.** A page's canvas reaches the viewport edges and its
+  content is centred within it; a column with its own background leaves a seam against the host.

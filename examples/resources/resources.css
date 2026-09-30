@@ -1,8 +1,9 @@
 .resources-page {
-  max-width: 72rem;
+  /* Full-bleed page, centred content column: the canvas reaches both viewport edges, so the page
+     never shows a hard seam against whatever the host paints behind it. */
   min-height: 100dvh;
-  margin-inline: auto;
-  padding: 3rem clamp(1.25rem, 4vw, 3rem) 5rem;
+  padding-block: 3rem 5rem;
+  padding-inline: max(clamp(1.25rem, 4vw, 3rem), calc((100% - 72rem) / 2));
   color: oklch(var(--sui-ink));
   background: oklch(var(--sui-canvas));
 }
@@ -37,7 +38,7 @@
 
 .resources-filters {
   display: grid;
-  grid-template-columns: minmax(14rem, 1.7fr) repeat(2, minmax(10rem, 1fr));
+  grid-template-columns: minmax(14rem, 1.6fr) repeat(3, minmax(9rem, 1fr));
   align-items: end;
   gap: 1rem;
   margin-block: 2.5rem 1.75rem;
@@ -55,8 +56,13 @@
 }
 
 .resources-sort {
-  width: 11rem;
-  max-width: 100%;
+  min-width: 0;
+}
+
+/* A text action in a column hangs its inline padding, so its label lines up with the header
+   (DESIGN_LANGUAGE §17). */
+.resources-row-action {
+  margin-inline-start: -1rem;
 }
 
 .resources-name {

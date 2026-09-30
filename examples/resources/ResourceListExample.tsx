@@ -146,7 +146,7 @@ export default function ResourceListExample({ initialProjects = sampleProjects, 
         </section>
       ) : (
         <>
-          <div className="resources-filters" role="search" aria-label="Filter projects">
+          <div className="resources-filters" role="search" aria-label="Filter and sort projects">
             <Input
               type="search"
               label="Search projects or owners"
@@ -175,6 +175,12 @@ export default function ResourceListExample({ initialProjects = sampleProjects, 
                 setPage(1);
               }} />
             </Field>
+            <Field label="Sort by" className="resources-sort">
+              <Select options={sortOptions} value={sort} onValueChange={(value) => {
+                setSort(value ?? "newest");
+                setPage(1);
+              }} />
+            </Field>
           </div>
 
           {activeFilters && <p className="resources-filter-summary">
@@ -193,12 +199,6 @@ export default function ResourceListExample({ initialProjects = sampleProjects, 
               {activeFilters && matches.length > 0 && (
                 <Button appearance="text" variant="secondary" size="sm" onClick={clearFilters}>Clear filters</Button>
               )}
-              <Field label="Sort by" className="resources-sort">
-                <Select options={sortOptions} value={sort} onValueChange={(value) => {
-                  setSort(value ?? "newest");
-                  setPage(1);
-                }} />
-              </Field>
             </div>
 
             {matches.length === 0 ? (
@@ -223,7 +223,7 @@ export default function ResourceListExample({ initialProjects = sampleProjects, 
                       appearance="text"
                       variant="secondary"
                       size="sm"
-                      className="resources-nowrap"
+                      className="resources-nowrap resources-row-action"
                       aria-label={`${project.status === "Active" ? "Archive" : "Restore"} ${project.name}`}
                       onClick={() => toggleArchive(project.id)}
                     >
