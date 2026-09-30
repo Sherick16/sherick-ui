@@ -142,6 +142,18 @@ A titled group of destinations — structure inside the surface it sits on, not 
   group). There is no icon, no per-item `disabled` and no render escape hatch: for those, compose
   `NavItem` yourself.
 
+### Anchor-preserving router composition
+
+A destination must keep an actual `<a href>`: adapt `NavItem` through your router's
+supported anchor adapter, or use the router's native Link with local presentation.
+Preserve modified clicks, target/download behavior, query/hash and `aria-current`.
+Wrapping `Button` in `createLink` (or adding an `href`) still leaves a native button.
+Test role, href and new-tab behavior as well as an ordinary client-side click.
+
+`Breadcrumb.renderLink` below is the supported way to render router links in a trail.
+Spread its destination, content and classes into an anchor-rendering link; do not add
+`asChild`, a fictional `NavItem.render`, or private recipes. Route state stays in the app.
+
 ### `Breadcrumb` (from 2.1.0)
 
 The trail of places a reader came through. Passive: links and text, no state, no effect and no
@@ -601,28 +613,28 @@ A short hint for a control.
   installed package actually exports them before depending on them.
 
 Sources: [component sources at the pinned
-revision](https://github.com/Sherick16/sherick-ui/tree/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components)
-— [`NavItem.tsx`](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components/NavItem.tsx),
-[`NavGroup.tsx`](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components/NavGroup.tsx),
-[`Breadcrumb.tsx`](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components/Breadcrumb.tsx),
-[`Pagination.tsx`](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components/Pagination.tsx),
-[`Stepper.tsx`](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components/Stepper.tsx),
-[`TreeView.tsx`](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components/TreeView.tsx),
-[`Tabs.tsx`](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components/Tabs.tsx),
-[`Accordion.tsx`](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components/Accordion.tsx),
-[`Collapsible.tsx`](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components/Collapsible.tsx),
-[`Dialog.tsx`](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components/Dialog.tsx),
-[`DialogSurface.tsx`](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components/DialogSurface.tsx),
-[`AlertDialog.tsx`](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components/AlertDialog.tsx),
-[`Drawer.tsx`](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components/Drawer.tsx),
-[`Menu.tsx`](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components/Menu.tsx),
-[`Popover.tsx`](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components/Popover.tsx),
-[`Tooltip.tsx`](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components/Tooltip.tsx),
-the [disclosure](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/apps/showcase/tests/browser/disclosure.spec.ts),
-[floating-surface](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/apps/showcase/tests/browser/floating-surfaces.spec.ts),
-[sheet](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/apps/showcase/tests/browser/sheet.spec.ts),
-[navigation](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/apps/showcase/tests/browser/v2-1-c.spec.ts),
-[stepper](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/apps/showcase/tests/browser/v2-1-e.spec.ts)
-and [tree](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/apps/showcase/tests/browser/v2-1-f.spec.ts)
-specs, the [release contract](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/docs/RELEASE.md)
-and the [v2.1 component contracts](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/docs/V2_1_COMPONENTS.md).
+revision](https://github.com/Sherick16/sherick-ui/tree/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components)
+— [`NavItem.tsx`](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components/NavItem.tsx),
+[`NavGroup.tsx`](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components/NavGroup.tsx),
+[`Breadcrumb.tsx`](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components/Breadcrumb.tsx),
+[`Pagination.tsx`](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components/Pagination.tsx),
+[`Stepper.tsx`](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components/Stepper.tsx),
+[`TreeView.tsx`](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components/TreeView.tsx),
+[`Tabs.tsx`](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components/Tabs.tsx),
+[`Accordion.tsx`](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components/Accordion.tsx),
+[`Collapsible.tsx`](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components/Collapsible.tsx),
+[`Dialog.tsx`](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components/Dialog.tsx),
+[`DialogSurface.tsx`](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components/DialogSurface.tsx),
+[`AlertDialog.tsx`](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components/AlertDialog.tsx),
+[`Drawer.tsx`](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components/Drawer.tsx),
+[`Menu.tsx`](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components/Menu.tsx),
+[`Popover.tsx`](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components/Popover.tsx),
+[`Tooltip.tsx`](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components/Tooltip.tsx),
+the [disclosure](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/apps/showcase/tests/browser/disclosure.spec.ts),
+[floating-surface](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/apps/showcase/tests/browser/floating-surfaces.spec.ts),
+[sheet](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/apps/showcase/tests/browser/sheet.spec.ts),
+[navigation](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/apps/showcase/tests/browser/v2-1-c.spec.ts),
+[stepper](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/apps/showcase/tests/browser/v2-1-e.spec.ts)
+and [tree](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/apps/showcase/tests/browser/v2-1-f.spec.ts)
+specs, the [release contract](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/docs/RELEASE.md)
+and the [v2.1 component contracts](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/docs/V2_1_COMPONENTS.md).

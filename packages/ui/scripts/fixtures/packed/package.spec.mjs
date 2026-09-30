@@ -47,6 +47,44 @@ test("no-reset CSS, consumer ownership, and className overrides", async ({ page 
   await expect(page.getByRole("switch", { name: "Enabled" })).not.toBeChecked();
 });
 
+test("packed Table keeps legacy and descriptor columns in constrained auto and fixed layouts", async ({ page }) => {
+  const autoContainer = page.getByTestId("packed-table-auto-container");
+  const autoTable = autoContainer.getByRole("table");
+  await expect(autoTable.getByRole("columnheader", { name: "Name" })).toBeVisible();
+  await expect(autoTable.getByRole("cell", { name: "Ada" })).toBeVisible();
+  expect(await style(autoTable, "tableLayout")).toBe("auto");
+  const autoWrapper = autoContainer.locator(".packed-table-wrapper");
+  expect(await autoWrapper.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
+  await autoWrapper.focus();
+  await expect(autoWrapper).toBeFocused();
+  // This packed consumer is RTL, so forward horizontal scrolling moves left of zero.
+  await page.keyboard.press("ArrowLeft");
+  await expect.poll(() => autoWrapper.evaluate((element) => element.scrollLeft)).toBeLessThan(0);
+  expect(await style(autoWrapper, "outlineWidth")).toBe("2px");
+
+  const fixedContainer = page.getByTestId("packed-table-fixed-container");
+  const fixedTable = fixedContainer.getByRole("table");
+  const fixedWrapper = fixedContainer.locator(".packed-table-wrapper");
+  await expect(fixedTable).toHaveClass(/packed-table-fixed/);
+  expect(await style(fixedTable, "tableLayout")).toBe("fixed");
+  expect(await style(fixedTable, "minWidth")).toBe("448px");
+  expect(await fixedWrapper.evaluate((element) => element.scrollWidth > element.clientWidth)).toBe(true);
+  await expect(fixedTable.getByRole("columnheader", { name: "Name" })).toHaveClass(/text-center/);
+  await expect(fixedTable.getByRole("columnheader", { name: "Profile" })).toHaveClass(/text-end/);
+  const profileRow = fixedTable.getByRole("row").nth(1);
+  await expect(profileRow.getByRole("cell").nth(0)).toHaveClass(/text-center/);
+  await expect(profileRow.getByRole("cell").nth(1)).toHaveClass(/text-end/);
+  await expect(profileRow.getByRole("link", { name: "Open profile" })).toHaveAttribute("href", "/people/ada");
+
+  const identity = page.getByTestId("packed-table-identity");
+  await identity.getByTestId("column-name").click();
+  await expect(identity.getByTestId("column-name")).toHaveText("name: 1");
+  await identity.getByRole("button", { name: "Reorder columns" }).click();
+  await expect(identity.getByRole("row").first().getByRole("columnheader").nth(0)).toHaveText("Record");
+  await expect(identity.getByTestId("column-name")).toHaveText("name: 1");
+  await expect(identity.getByTestId("column-record")).toHaveText("record: 0");
+});
+
 test("packed editable Combobox isolates hidden content without becoming modal", async ({ page }) => {
   const searchable = page.getByRole("combobox", { name: "Search project" });
   const outsideButton = page.locator("#primary");
@@ -277,4 +315,20 @@ test("published wave semantics pass axe before and after invalid date/file entry
   await fixture.getByLabel("Packed files", { exact: true }).setInputFiles({ name: "blocked.bin", mimeType: "application/octet-stream", buffer: Buffer.from("blocked") });
   await expect(fixture.getByRole("status").filter({ hasText: "blocked.bin" })).toBeVisible();
   expect((await audit()).violations).toEqual([]);
+});
+
+
+test("packed surface radio labels expand, select and keep their selected styling without a reset", async ({ page }) => {
+  const choices = page.getByRole("radiogroup", { name: "Packed delivery" });
+  const express = choices.getByRole("radio", { name: /Express delivery/ });
+  const label = express.locator("xpath=ancestor::label[1]");
+  const row = label.locator("..");
+  await label.click({ position: { x: 2, y: 2 } });
+  await expect(express).toBeChecked();
+  expect(await style(row, "boxShadow")).not.toBe("none");
+  const box = await choices.boundingBox();
+  expect(box.width).toBeLessThanOrEqual(260);
+  await express.focus();
+  await page.keyboard.press("ArrowUp");
+  await expect(choices.getByRole("radio", { name: /Standard delivery/ })).toBeChecked();
 });

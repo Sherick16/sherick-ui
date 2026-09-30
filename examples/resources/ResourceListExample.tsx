@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Badge, Button, Field, Pagination, Search, Select, Table } from "sherick-ui";
+import { useEffect, useState } from "react";
+import { Alert, Badge, Button, Checkbox, Field, Input, Pagination, Popover, Select, Skeleton, Table, type TableColumn } from "sherick-ui";
 import "./resources.css";
 
 type Project = {
@@ -30,11 +30,14 @@ const sampleProjects: Project[] = [
 
 const PAGE_SIZE = 5;
 const dateFormat = new Intl.DateTimeFormat("en-US", { dateStyle: "medium", timeZone: "UTC" });
-const statusOptions = [
-  { label: "All statuses", value: "all" },
-  { label: "Active", value: "Active" },
-  { label: "Archived", value: "Archived" },
+const columns: TableColumn[] = [
+  { id: "project", label: "Project", className: "resources-column-project" },
+  { id: "owner", label: "Owner", className: "resources-column-owner" },
+  { id: "status", label: "Status", className: "resources-column-status" },
+  { id: "created", label: "Created", className: "resources-column-created" },
+  { id: "action", label: "Action", className: "resources-column-action" },
 ];
+const statuses = ["Active", "Archived"] as const;
 const ownerOptions = [
   { label: "Anyone", value: "all" },
   { label: "Assigned to me", value: "mine" },
@@ -44,19 +47,39 @@ const sortOptions = [
   { label: "Name A–Z", value: "name" },
 ];
 
-export default function ResourceListExample({ initialProjects = sampleProjects }: { initialProjects?: Project[] }) {
+export default function ResourceListExample({ initialProjects = sampleProjects, failAttempt = 0 }: {
+  initialProjects?: Project[];
+  // Preview-only failure injection: 1 fails first load, 2 fails the first refresh. Retry succeeds.
+  failAttempt?: number;
+}) {
   const [projects, setProjects] = useState(initialProjects);
   const [query, setQuery] = useState("");
-  const [status, setStatus] = useState("all");
+  const [selectedStatuses, setSelectedStatuses] = useState<string[]>([]);
   const [owner, setOwner] = useState("all");
   const [sort, setSort] = useState("newest");
   const [page, setPage] = useState(1);
 
-  const activeFilters = Boolean(query.trim() || status !== "all" || owner !== "all");
+  const [read, setRead] = useState({ attempt: 1, status: "loading", hasLoaded: false });
+
+  useEffect(() => {
+    // Deterministic stand-in for the application's read. Cancellation prevents a stale completion.
+    const timer = setTimeout(() => setRead((current) => ({
+      ...current,
+      status: current.attempt === failAttempt ? "error" : "ready",
+      hasLoaded: current.hasLoaded || current.attempt !== failAttempt,
+    })), 500);
+    return () => clearTimeout(timer);
+  }, [read.attempt, failAttempt]);
+
+  function refresh() {
+    setRead((current) => ({ ...current, attempt: current.attempt + 1, status: "loading" }));
+  }
+
+  const activeFilters = Boolean(query.trim() || selectedStatuses.length > 0 || owner !== "all");
   const term = query.trim().toLowerCase();
   const matches = projects
     .filter((project) =>
-      (status === "all" || project.status === status) &&
+      (selectedStatuses.length === 0 || selectedStatuses.includes(project.status)) &&
       (owner === "all" || project.owner === "You") &&
       (!term || `${project.name} ${project.owner}`.toLowerCase().includes(term))
     )
@@ -68,7 +91,7 @@ export default function ResourceListExample({ initialProjects = sampleProjects }
 
   function clearFilters() {
     setQuery("");
-    setStatus("all");
+    setSelectedStatuses([]);
     setOwner("all");
     setPage(1);
   }
@@ -98,10 +121,24 @@ export default function ResourceListExample({ initialProjects = sampleProjects }
           <h1>Projects</h1>
           <p>Review status and ownership across your team’s projects.</p>
         </div>
-        {projects.length > 0 && <Button appearance="filled" onClick={createProject}>New project</Button>}
+        {read.hasLoaded && <div className="resources-actions">
+          <Button appearance="text" variant="secondary" disabled={read.status === "loading"} onClick={refresh}>Refresh projects</Button>
+          {projects.length > 0 && <Button appearance="filled" onClick={createProject}>New project</Button>}
+        </div>}
       </header>
 
-      {projects.length === 0 ? (
+      {read.status === "error" && <Alert variant="danger">
+        <p>Could not read projects.{read.hasLoaded ? " Showing the last successful results." : ""}</p>
+        <Button appearance="text" onClick={refresh}>Retry reading projects</Button>
+      </Alert>}
+      {!read.hasLoaded ? (
+        read.status === "loading" && <section className="resources-results" aria-label="Project results" aria-busy="true">
+          <p role="status">Loading projects</p>
+          <Table headers={columns} tableClassName="resources-table" rows={Array.from({ length: PAGE_SIZE }, () =>
+            columns.map((column) => <Skeleton key={column.id} className="resources-cell-placeholder" />)
+          )} />
+        </section>
+      ) : projects.length === 0 ? (
         <section className="resources-empty" aria-labelledby="resources-empty-title">
           <h2 id="resources-empty-title">No projects yet</h2>
           <p>Create a project to start organizing your work.</p>
@@ -110,20 +147,28 @@ export default function ResourceListExample({ initialProjects = sampleProjects }
       ) : (
         <>
           <div className="resources-filters" role="search" aria-label="Filter projects">
-            <Search
-              aria-label="Search projects or owners"
+            <Input
+              type="search"
+              label="Search projects or owners"
               placeholder="Search projects or owners"
               value={query}
-              onValueChange={setQuery}
-              onSearch={() => setPage(1)}
-              debounceMs={0}
+              onValueChange={(value) => { setQuery(value); setPage(1); }}
             />
-            <Field label="Status">
-              <Select options={statusOptions} value={status} onValueChange={(value) => {
-                setStatus(value ?? "all");
-                setPage(1);
-              }} />
-            </Field>
+            <Popover>
+              <Popover.Trigger render={<Button appearance="tonal" variant="secondary">Statuses</Button>} />
+              <Popover.Content>
+                <fieldset className="resources-status-options">
+                  <legend>Include statuses</legend>
+                  {statuses.map((status) => <label key={status} className="resources-status-option">
+                    <Checkbox checked={selectedStatuses.includes(status)} onCheckedChange={(checked) => {
+                      setSelectedStatuses((current) => checked ? [...current, status] : current.filter((item) => item !== status));
+                      setPage(1);
+                    }} />
+                    <span>{status}</span>
+                  </label>)}
+                </fieldset>
+              </Popover.Content>
+            </Popover>
             <Field label="Owner">
               <Select options={ownerOptions} value={owner} onValueChange={(value) => {
                 setOwner(value ?? "all");
@@ -132,7 +177,15 @@ export default function ResourceListExample({ initialProjects = sampleProjects }
             </Field>
           </div>
 
-          <section className="resources-results" aria-label="Project results">
+          {activeFilters && <p className="resources-filter-summary">
+            Filters: {[
+              query.trim() ? `Search: ${query.trim()}` : "",
+              selectedStatuses.length ? `Status: ${selectedStatuses.join(", ")}` : "",
+              owner === "mine" ? "Assigned to me" : "",
+            ].filter(Boolean).join(" · ")}
+          </p>}
+          <section className="resources-results" aria-label="Project results" aria-busy={read.status === "loading"}>
+            {read.status === "loading" && <p role="status">Refreshing projects; previous results remain visible.</p>}
             <div className="resources-results-bar">
               <p role="status">
                 {matches.length}{activeFilters ? ` of ${projects.length}` : ""} {projects.length === 1 ? "project" : "projects"}
@@ -157,7 +210,8 @@ export default function ResourceListExample({ initialProjects = sampleProjects }
             ) : (
               <>
                 <Table
-                  headers={["Project", "Owner", "Status", "Created", "Action"]}
+                  headers={columns}
+                  tableClassName="resources-table"
                   rows={visible.map((project) => [
                     <span className="resources-name">{project.name}</span>,
                     <span className="resources-nowrap">{project.owner}</span>,

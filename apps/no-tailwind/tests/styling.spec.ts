@@ -25,6 +25,37 @@ test.beforeEach(async ({ page }) => {
   await expect(page.getByTestId("no-tailwind-ready")).toBeVisible();
 });
 
+for (const theme of ["light", "dark"] as const) {
+  test(`overlay titles own their margins under ordinary host styles (${theme})`, async ({ page }) => {
+    await page.evaluate((value) => document.documentElement.setAttribute("data-sherick-theme", value), theme);
+    const hostHeading = page.getByRole("heading", { name: "Ordinary host heading" });
+    expect(await hostHeading.evaluate((el) => parseFloat(getComputedStyle(el).marginBlockStart))).toBeGreaterThan(0);
+
+    for (const [trigger, role] of [["Open dialog", "dialog"], ["Open sheet", "dialog"], ["Open portaled alert", "alertdialog"]] as const) {
+      await page.getByRole("button", { name: trigger, exact: true }).click();
+      const surface = page.getByRole(role);
+      await expect(surface).toBeVisible();
+      const title = surface.getByRole("heading");
+      await expect(title).toHaveCSS("margin-top", "0px");
+      await expect(title).toHaveCSS("margin-bottom", "0px");
+      const geometry = await title.evaluate((el) => {
+        const header = el.parentElement!;
+        const style = getComputedStyle(header);
+        return { top: el.getBoundingClientRect().top - header.getBoundingClientRect().top, padding: style.paddingTop, bottom: style.paddingBottom };
+      });
+      expect(geometry).toEqual({ top: 20, padding: "20px", bottom: "8px" });
+      if (role === "dialog") {
+        const titleBox = await title.boundingBox();
+        const closeBox = await surface.getByRole("button", { name: trigger === "Open dialog" ? "Close dialog" : "Close", exact: true }).first().boundingBox();
+        expect(Math.abs(titleBox!.y + titleBox!.height / 2 - closeBox!.y - closeBox!.height / 2)).toBeLessThanOrEqual(1);
+      }
+      await page.keyboard.press("Escape");
+      await expect(surface).toBeHidden();
+    }
+    expect(await hostHeading.evaluate((el) => parseFloat(getComputedStyle(el).marginBlockStart))).toBeGreaterThan(0);
+  });
+}
+
 test("package CSS styles Sherick components but never generic consumer descendants", async ({ page }) => {
   const errors = runtimeErrors(page);
 

@@ -6,7 +6,7 @@ contrast and restrained motion. It is **quiet by default, expressive where it ma
 owns generic widget behavior and accessibility where a primitive is available.
 
 **Release status:** `2.0.0` established the stable line; `1.x` is frozen. This
-checkout's package version is `2.1.0`. Verified `main` stages releases for maintainer
+checkout's package version is `2.2.0`. Verified `main` stages releases for maintainer
 approval; check npm for the installed version. See the [release contract](docs/RELEASE.md).
 
 ## Installation
@@ -97,6 +97,8 @@ The `2.1.0` source also exports `Calendar`, `DatePicker`, `DateRangePicker`,
 `TreeView`. Their APIs are in [v2.1 component contracts](docs/V2_1_COMPONENTS.md).
 Dates use civil `YYYY-MM-DD` values; FileUpload reports `File[]` without uploading files.
 Check the installed package version before using these additions.
+
+Version 2.2.0 adds Table column descriptors and `tableClassName`, plus `RadioGroup appearance="surface"`, without adding components. See the [package usage guide](packages/ui/README.md#table-and-surface-choices-from-220) and [resource-list recipe](examples/resources). Verify the installed version before using these additions.
 
 Use `Media.Image` and `Media.Video` for rounded, clipped, responsive images and native video.
 Video keeps its original aspect ratio unless you opt into a constraint. See the

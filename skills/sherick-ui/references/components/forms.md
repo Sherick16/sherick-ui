@@ -136,6 +136,10 @@ is the native element.
 <Input label="Project name" defaultValue="Sherick UI" error errorMessage="Project names must be unique." />
 ```
 
+For immediate local filtering, use `Input type="search"` with a visible `label` and
+`onValueChange`. `Search` below adds a real submit/debounce action: do not satisfy that
+contract with a no-op callback.
+
 ## `Search`
 
 A text field with its own submit control. `Search` composes the field itself, so it has no
@@ -208,9 +212,17 @@ UI keeps beside it is reached through `inputRef`.
   rather than assuming adjacent 24px marks never overlap.
 
 ```tsx
-<Checkbox name="notify" value="yes" checked={notify} onCheckedChange={setNotify} aria-label="Form notifications" />
+<label>
+  <Checkbox name="notify" value="yes" checked={notify} onCheckedChange={setNotify} />
+  <span>Form notifications</span>
+</label>
 <Checkbox indeterminate aria-label="Partial selection" />
 ```
+
+Visible Checkbox wording must be an associated native label (wrapping or `htmlFor`)
+or the supported `Field` label, not a nearby span with only an unrelated `aria-label`.
+Click the words in a test. If disambiguating repeated labels, keep the visible wording
+in the accessible name, for example “Select document, invoice 42”.
 
 ## `Switch`
 
@@ -258,6 +270,30 @@ the group `<div>`; `inputRef` is the hidden form input.
   ]}
 />
 ```
+
+### Selectable surfaces (from 2.2.0)
+
+Let supporting text inherit the row ink; use size and weight for hierarchy. A muted ink
+override may not retain sufficient contrast over the selected surface.
+
+After verifying the installed version, use `appearance="surface"` for substantial
+single choices such as plans or shipping methods. Omit it for the original plain rows.
+Sherick owns selected/hover/pressed/focus/disabled treatment and full-row activation;
+continue using `options[].label` for rich content. Labels expand and wrap naturally:
+
+```tsx
+<RadioGroup label="Shipping method" name="shipping" appearance="surface" defaultValue="standard"
+  options={[
+    { value: "standard", label: <span><strong>Standard</strong><br />Arrives in 3–5 days · Free</span> },
+    { value: "express", label: <span><strong>Express</strong><br />Arrives tomorrow · $12</span> },
+  ]}
+/>
+```
+
+Descriptions, badges and price hints are application content, not additional RadioGroup
+props. Keep links/buttons out of the label; place separate actions outside the group.
+Do not recreate row states with role descendants or `:has([data-checked])` in app CSS.
+A checkbox card is not an implied sibling API.
 
 ## `Slider`
 
@@ -332,16 +368,16 @@ const [files, setFiles] = useState<File[]>([]);
 
 ## Sources
 
-[`Field.tsx`](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components/Field.tsx),
-[`Input.tsx`](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components/Input.tsx),
-[`Textarea.tsx`](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components/Textarea.tsx),
-[`Search.tsx`](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components/Search.tsx),
-[`NumberField.tsx`](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components/NumberField.tsx),
-[`Checkbox.tsx`](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components/Checkbox.tsx),
-[`Switch.tsx`](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components/Switch.tsx),
-[`RadioGroup.tsx`](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components/RadioGroup.tsx),
-[`Slider.tsx`](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components/Slider.tsx),
-[`FileUpload.tsx`](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components/FileUpload.tsx),
-[field-family verification spec](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/apps/showcase/tests/browser/fields.spec.ts),
-[FileUpload spec](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/apps/showcase/tests/browser/v2-1-d.spec.ts)
-and the [release contract](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/docs/RELEASE.md).
+[`Field.tsx`](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components/Field.tsx),
+[`Input.tsx`](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components/Input.tsx),
+[`Textarea.tsx`](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components/Textarea.tsx),
+[`Search.tsx`](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components/Search.tsx),
+[`NumberField.tsx`](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components/NumberField.tsx),
+[`Checkbox.tsx`](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components/Checkbox.tsx),
+[`Switch.tsx`](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components/Switch.tsx),
+[`RadioGroup.tsx`](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components/RadioGroup.tsx),
+[`Slider.tsx`](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components/Slider.tsx),
+[`FileUpload.tsx`](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components/FileUpload.tsx),
+[field-family verification spec](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/apps/showcase/tests/browser/fields.spec.ts),
+[FileUpload spec](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/apps/showcase/tests/browser/v2-1-d.spec.ts)
+and the [release contract](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/docs/RELEASE.md).

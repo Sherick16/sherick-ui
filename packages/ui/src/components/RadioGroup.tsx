@@ -9,13 +9,17 @@ import {
   density,
   fieldLayout,
   groupFocusRing,
+  focusRingWithin,
+  material,
   selectable,
+  selectableRowSurface,
   shape,
   state,
   stateLayer,
+  stateLayerQuietComposite,
   text,
 } from "./ui.common";
-import { motionArrive } from "./ui.motion";
+import { motionArrive, motionFeedback } from "./ui.motion";
 
 export interface RadioGroupOption {
   value: string;
@@ -26,6 +30,8 @@ export interface RadioGroupOption {
 export interface RadioGroupProps
   extends Omit<ComponentProps<"div">, "onChange" | "defaultValue" | "children"> {
   options: RadioGroupOption[];
+  /** Gives each choice its own selectable surface. The default keeps the compact, unfilled rows. */
+  appearance?: "default" | "surface";
   /** The group's own label. Naming the group is the group's job, not a field's: an
    *  enclosing `Field` names one control, while every option here is its own control. */
   label?: ReactNode;
@@ -51,6 +57,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
   (
     {
       options,
+      appearance = "default",
       label,
       value,
       defaultValue,
@@ -92,14 +99,25 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
           disabled={disabled}
           readOnly={readOnly}
           inputRef={inputRef}
-          className={cn("flex flex-col")}
+          className={cn("flex flex-col", appearance === "surface" && "gap-2")}
         >
           {options.map((option) => (
             <Field.Item
               key={option.value}
+              {...(appearance === "surface" && readOnly ? { "data-readonly": "" } : {})}
               className={cn(
                 "group flex items-stretch",
                 density.normal,
+                appearance === "surface" &&
+                  cn(
+                    "relative min-w-0 forced-colors:has-[:focus-visible]:[outline-style:none]",
+                    shape.control,
+                    material.matteQuiet,
+                    selectableRowSurface,
+                    stateLayerQuietComposite,
+                    focusRingWithin,
+                    motionFeedback
+                  ),
                 state.enabled,
                 state.effectiveDisabled,
                 state.disabledRow
@@ -112,7 +130,12 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
                   `density.normal` sets the type step but no leading, and this package ships no reset —
                   so the mark's 24px slot and the line it is centred on are the same 24px whatever
                   line height a host happens to inherit. */}
-              <Field.Label className={cn("flex min-w-0 flex-1 items-center")}>
+              <Field.Label
+                className={cn(
+                  "flex min-w-0 flex-1 items-center",
+                  appearance === "surface" && "px-4 py-3"
+                )}
+              >
                 <span className={cn("flex w-full items-start gap-3")}>
                   <Radio.Root
                     value={option.value}
@@ -130,7 +153,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
                         selectable.mark,
                         selectable.selected,
                         stateLayer.track,
-                        groupFocusRing
+                        appearance === "default" && groupFocusRing
                       )}
                     >
                       <Radio.Indicator className={cn("flex items-center justify-center", motionArrive)}>
@@ -138,7 +161,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
                       </Radio.Indicator>
                     </span>
                   </Radio.Root>
-                  <span className={cn(text.high, "min-w-0 leading-6")}>{option.label}</span>
+                  <span className={cn(text.high, "min-w-0 leading-6", appearance === "surface" && "flex-1")}>{option.label}</span>
                 </span>
               </Field.Label>
             </Field.Item>

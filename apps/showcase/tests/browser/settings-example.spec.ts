@@ -42,6 +42,13 @@ test("settings validate on submit, save a baseline and cancel edits", async ({ p
   await expect(name).toHaveValue("Field team");
   await expect(email).toHaveValue("team@example.org");
   await expect(save).toBeDisabled();
+  const workspaceVisibility = page.getByRole("radio", { name: /Everyone in the workspace/ });
+  await workspaceVisibility.click();
+  await expect(workspaceVisibility).toBeChecked();
+  await expect(save).toBeEnabled();
+  await cancel.click();
+  await expect(page.getByRole("radio", { name: /Invite only.*Recommended/ })).toBeChecked();
+  await expect(save).toBeDisabled();
   const summary = page.getByRole("switch", { name: "Weekly summary" });
   await summary.click();
   await expect(summary).not.toBeChecked();

@@ -6,7 +6,7 @@ description: >-
   themes or accessibility in an application that uses it. Not a guide to maintaining
   the library itself or to unrelated backend work.
 metadata:
-  source-revision: "9ecb90dd7ddfa81437e87144ac98255a67b4cad9"
+  source-revision: "0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f"
 ---
 
 # Consuming Sherick UI
@@ -52,4 +52,8 @@ repository's maintainer documentation for every task.
 | Assemble screens, forms, navigation or nested/responsive surfaces | [Composition](references/composition.md) |
 | Install/integrate CSS; debug styling; change themes or tokens | [Theming and integration](references/theming.md) |
 | Add/change controls, labels, focus, overlays, direction or accessibility | [Accessibility](references/accessibility.md) |
+| Table columns/placeholders; bounded native media | [Actions and display](references/components/actions-display.md) |
+| Rich radio choices; visible Checkbox labels; immediate vs submitted search | [Forms](references/components/forms.md) |
+| Router destinations and breadcrumb links | [Navigation](references/components/navigation-overlays.md) |
+| Async list states and filter composition | [Composition](references/composition.md#resource-lists-and-async-states) |
 | Choose/configure a component or check its API and states | [Component index](references/components/index.md) |

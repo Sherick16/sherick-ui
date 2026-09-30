@@ -68,6 +68,21 @@ Keep application CSS away from internal overlay geometry. Test a nested popup in
 actual parent surface; looking correct in isolation does not verify clipping,
 stacking, theme inheritance or focus restoration.
 
+## Resource lists and async states
+
+Compose these states from existing primitives and ordinary layout. First load can put
+`Skeleton` bars in the real `Table`, reusing its descriptors and native table class
+(from 2.2.0). During refetch, retain successful content when the application's freshness
+policy allows it, announce refresh, and keep one retry beside the failed read. Do not
+place retry buttons inside row links. A truly empty dataset offers creation; a filtered
+empty result offers clearing. The app owns the distinction, request state and data.
+
+Use labelled `Checkbox` controls in `Popover` for a small multiple-filter set. Keep a
+selected-filter summary and a clear action outside the popup so its closed state still
+explains the results. Let the toolbar wrap and the table scroll locally. Immediate
+filtering uses `Input type="search"`; submitted/debounced search uses `Search`.
+There is no AsyncBoundary, EmptyState, FilterBar, TableSkeleton or query-state package API.
+
 ## When a primitive does not cover the requirement
 
 First check the installed API and the application's existing compositions. Use native
@@ -76,5 +91,5 @@ missing reusable visual/behavioral primitive is a library gap to report, not per
 to import workbench recipes or patch private descendants. Keep unavoidable application
 extensions local and explicit; do not describe them as supported Sherick API.
 
-Sources: [design language, sections 7–11 and 16–19](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/docs/DESIGN_LANGUAGE.md)
-and [published consumer contract](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/README.md).
+Sources: [design language, sections 7–11 and 16–19](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/docs/DESIGN_LANGUAGE.md)
+and [published consumer contract](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/README.md).

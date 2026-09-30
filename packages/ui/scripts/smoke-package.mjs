@@ -447,6 +447,36 @@ assert.match(inputMarkup, /<label[^>]*\sfor=/);
 assert.match(inputMarkup, /required=""/);
 assert.match(inputMarkup, /required=""/);
 
+const legacyTableMarkup = renderToStaticMarkup(
+  React.createElement(library.Table, {
+    headers: ["Name", "Profile"],
+    rows: [["Ada", React.createElement("a", { href: "/people/ada" }, "Open profile")]],
+  })
+);
+assert.match(legacyTableMarkup, /<table class="[^"]*border-collapse[^"]*">/);
+assert.match(legacyTableMarkup, /<th[^>]*>Name<\/th>/);
+assert.match(legacyTableMarkup, /<td[^>]*>Ada<\/td>/);
+assert.match(legacyTableMarkup, /<a href="\/people\/ada">Open profile<\/a>/);
+
+const describedTableMarkup = renderToStaticMarkup(
+  React.createElement(library.Table, {
+    headers: [
+      { id: "name", label: "Name", className: "text-center" },
+      { id: "profile", label: "Profile", className: "text-end" },
+    ],
+    rows: [["Ada", React.createElement("a", { href: "/people/ada" }, "Open profile")]],
+    className: "max-w-lg",
+    tableClassName: "packed-table-fixed",
+  })
+);
+assert.match(describedTableMarkup, /<div tabindex="0" class="[^"]*max-w-lg[^"]*">/);
+assert.match(describedTableMarkup, /<table class="[^"]*packed-table-fixed[^"]*">/);
+assert.match(describedTableMarkup, /<th class="[^"]*text-center[^"]*">Name<\/th>/);
+assert.match(describedTableMarkup, /<td class="[^"]*text-center[^"]*">Ada<\/td>/);
+assert.match(describedTableMarkup, /<th class="[^"]*text-end[^"]*">Profile<\/th>/);
+assert.match(describedTableMarkup, /<td class="[^"]*text-end[^"]*"><a href="\/people\/ada">Open profile<\/a><\/td>/);
+assert.ok(declarations.includes("TableColumn"), "declarations should expose TableColumn");
+
 const image = renderToStaticMarkup(React.createElement(library.Media.Image, { src: "/office.jpg", alt: "Office", srcSet: "/office-2x.jpg 2x" }));
 assert.match(image, /<span[^>]*sui-scope[^>]*overflow-hidden[^>]*rounded-/);
 assert.match(image, /<img[^>]*alt="Office"[^>]*loading="lazy"/);

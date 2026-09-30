@@ -185,6 +185,11 @@ rise; Menu commands perform actions and stay flat. They share row hover/highligh
 inset keyboard focus, but their row density differs. A destructive command tints its
 own label, not the whole menu sheet.
 
+RadioGroup's opt-in surface rows use the same held-choice tone and control elevation.
+The complete row remains the label; supporting text and passive badges are consumer content.
+The selection mark and target boundary stay still, and the original plain radio rows remain
+available. Surface selection is not a new card or option-content framework.
+
 Accordion and Collapsible share the same disclosure row and supporting-copy panel.
 The chevron describes the whole region, so it stays centered on the row even when the
 label wraps. Only the panel height and chevron orientation change; sections do not

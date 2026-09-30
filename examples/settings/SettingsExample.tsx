@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, type FormEvent } from "react";
-import { AlertDialog, Button, Divider, Field, Input, Switch, Textarea } from "sherick-ui";
+import { AlertDialog, Badge, Button, Divider, Field, Input, RadioGroup, Switch, Textarea } from "sherick-ui";
 import "./settings.css";
 
 type Settings = {
@@ -9,6 +9,7 @@ type Settings = {
   email: string;
   description: string;
   weeklySummary: boolean;
+  projectVisibility: "private" | "workspace";
 };
 
 const initialSettings: Settings = {
@@ -16,6 +17,7 @@ const initialSettings: Settings = {
   email: "team@example.com",
   description: "Projects and shared work for the operations team.",
   weeklySummary: true,
+  projectVisibility: "private",
 };
 
 export default function SettingsExample() {
@@ -29,7 +31,8 @@ export default function SettingsExample() {
   const emailRef = useRef<HTMLInputElement>(null);
 
   const dirty = draft.name !== saved.name || draft.email !== saved.email ||
-    draft.description !== saved.description || draft.weeklySummary !== saved.weeklySummary;
+    draft.description !== saved.description || draft.weeklySummary !== saved.weeklySummary ||
+    draft.projectVisibility !== saved.projectVisibility;
 
   function update<K extends keyof Settings>(key: K, value: Settings[K]) {
     setDraft((current) => ({ ...current, [key]: value }));
@@ -106,6 +109,29 @@ export default function SettingsExample() {
               onValueChange={(value) => update("description", value)}
             />
           </div>
+        </section>
+
+        <section className="settings-section" aria-labelledby="settings-projects">
+          <h2 id="settings-projects">Project defaults</h2>
+          <RadioGroup
+            label="New project visibility"
+            appearance="surface"
+            name="project-visibility"
+            value={draft.projectVisibility}
+            onValueChange={(value) => {
+              if (value === "private" || value === "workspace") update("projectVisibility", value);
+            }}
+            options={[
+              { value: "private", label: <span className="settings-choice-label">
+                <span className="settings-choice-title"><strong>Invite only</strong><Badge>Recommended</Badge></span>
+                <span>Only invited people can find and open the project.</span>
+              </span> },
+              { value: "workspace", label: <span className="settings-choice-label">
+                <strong>Everyone in the workspace</strong>
+                <span>Make new projects discoverable to all workspace members.</span>
+              </span> },
+            ]}
+          />
         </section>
 
         <section className="settings-section" aria-labelledby="settings-notifications">

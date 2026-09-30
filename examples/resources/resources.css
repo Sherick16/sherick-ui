@@ -135,3 +135,32 @@
     width: 100%;
   }
 }
+
+.resources-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+.resources-status-options {
+  border: 0;
+  padding: 0;
+  margin: 0;
+}
+.resources-status-option {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+}
+.resources-filter-summary {
+  overflow-wrap: anywhere;
+}
+/* Loaded and placeholder tables receive these same column classes. */
+.resources-table { table-layout: fixed; min-width: 48rem; }
+.resources-column-project { width: 28%; }
+.resources-column-owner { width: 19%; }
+.resources-column-status { width: 16%; }
+.resources-column-created { width: 20%; }
+.resources-column-action { width: 17%; }
+.resources-name { white-space: normal; overflow-wrap: anywhere; }
+.resources-cell-placeholder { width: 75%; height: 1.25rem; }

@@ -2,11 +2,13 @@ import * as React from "react";
 import {
   Breadcrumb, Calendar, Command, CommandPalette, DatePicker, DateRangePicker, FileUpload,
   Media, Pagination, Stepper, TreeView,
+  Table, RadioGroup,
   type BreadcrumbItem, type BreadcrumbProps, type CalendarDate, type CalendarLabels,
   type CalendarProps, type CommandItem, type CommandProps, type CommandPaletteProps,
   type DateRange, type DatePickerProps, type DateRangePickerProps, type FileRejection,
   type FileUploadProps, type PaginationProps, type StepperItem, type StepperProps,
   type TreeViewItem, type TreeViewProps, type MediaImageProps, type MediaVideoProps,
+  type TableColumn, type TableProps, type RadioGroupProps,
 } from "sherick-ui";
 
 const date: CalendarDate = "2024-06-10";
@@ -28,8 +30,17 @@ const treeItems: TreeViewItem[] = [{ value: "root", label: "Root", children: [{ 
 const tree: TreeViewProps = { label: "Tree", items: treeItems, onValueChange: (value: string | null) => void value, onExpandedValuesChange: (values: string[]) => void values };
 const image: MediaImageProps = { src: "/office.jpg", alt: "Office", srcSet: "/office@2x.jpg 2x" };
 const video: MediaVideoProps = { poster: "/poster.jpg", controls: true, preload: "none" };
+const columns: TableColumn[] = [
+  { id: "name", label: "Name", className: "text-start" },
+  { id: "profile", label: "Profile", className: "text-end" },
+];
+const legacyTable: TableProps = { headers: ["Name", "Profile"], rows: [["Ada", <a href="/people/ada">Open</a>]] };
+const describedTable: TableProps = { headers: columns, rows: [["Ada", <a href="/people/ada">Open</a>]], tableClassName: "table-layout-contract" };
+
+const surfaceRadio: RadioGroupProps = { appearance: "surface", label: "Plan", options: [{ value: "basic", label: <strong>Basic</strong> }], name: "plan" };
 
 export const wave = <>
+  <RadioGroup {...surfaceRadio} />
   <Calendar {...calendar} ref={React.createRef<HTMLDivElement>()} />
   <Calendar value={date} onValueChange={(value: CalendarDate | null) => void value} />
   <DatePicker {...picker} ref={React.createRef<HTMLInputElement>()} />
@@ -48,6 +59,8 @@ export const wave = <>
     <track kind="captions" src="/en.vtt" srcLang="en" label="English" />
   </Media.Video>
   <Media.Video src="/ambient.mp4" autoPlay muted loop decorative />
+  <Table {...legacyTable} />
+  <Table {...describedTable} />
 </>;
 
 // @ts-expect-error range mode must not accept a single-date value

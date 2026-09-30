@@ -4,10 +4,17 @@ import React, { useEffect, useState } from "react";
 import {
   Badge, Button, Card, Checkbox, Combobox, Dialog, DirectionProvider, Divider, Drawer,
   Input, Popover, Select, Skeleton, Slider, Spinner, Switch, ToastProvider, ToastViewport, useToast,
-  Breadcrumb, Calendar, Command, CommandPalette, DatePicker, DateRangePicker, FileUpload,
-  Pagination, Stepper, TreeView,
+  Breadcrumb, Calendar, Command, CommandPalette, DatePicker, DateRangePicker, FileUpload, Table,
+  Pagination, RadioGroup, Stepper, TreeView,
 } from "sherick-ui";
 import { CodeBlock, Markdown } from "sherick-ui/content";
+
+function ColumnIdentityCell({ id }) {
+  const [count, setCount] = useState(0);
+  return <button type="button" data-testid={`column-${id}`} onClick={() => setCount((value) => value + 1)}>
+    {id}: {count}
+  </button>;
+}
 
 function Notice() {
   const toast = useToast();
@@ -19,7 +26,14 @@ export default function App() {
   const [ready, setReady] = useState(false);
   const [action, setAction] = useState("");
   const [step, setStep] = useState("review");
+  const [tableReordered, setTableReordered] = useState(false);
   const commands = [{ value: "save", label: "Save draft" }, { value: "archive", label: "Archive draft" }];
+  const identityColumns = tableReordered
+    ? [{ id: "record", label: "Record" }, { id: "name", label: "Name" }]
+    : [{ id: "name", label: "Name" }, { id: "record", label: "Record" }];
+  const identityCells = tableReordered
+    ? [<ColumnIdentityCell id="record" />, <ColumnIdentityCell id="name" />]
+    : [<ColumnIdentityCell id="name" />, <ColumnIdentityCell id="record" />];
   useEffect(() => setReady(true), []);
   return <DirectionProvider direction="rtl"><ToastProvider><main data-ready={ready}>
     <div id="sentinel" className="flex absolute rounded-full text-sm px-6">Consumer</div>
@@ -34,6 +48,13 @@ export default function App() {
     <Input label="Name" defaultValue="Packed" />
     <Checkbox aria-label="Accept" defaultChecked />
     <Switch aria-label="Enabled" defaultChecked />
+    <section style={{ width: 260 }}>
+      <RadioGroup appearance="surface" label="Packed delivery" name="delivery" defaultValue="standard"
+        options={[
+          { value: "standard", label: <span>Standard delivery<br />Within three working days</span> },
+          { value: "express", label: <span>Express delivery<br />Arrives tomorrow</span> },
+        ]} />
+    </section>
     <Slider id="slider-root" aria-label="Volume" defaultValue={30} style={{ width: 180 }} />
     <Select aria-label="Project" className="p-0 rounded-none" options={[{ value: "one", label: "One" }, { value: "two", label: "Two" }]} defaultValue="one" />
     <label htmlFor="packed-combobox">Search project</label>
@@ -71,6 +92,20 @@ export default function App() {
         items={[{ value: "draft", label: "Draft", complete: true }, { value: "review", label: "Review" }]} />
       <TreeView label="Packed tree" defaultExpandedValues={["root"]}
         items={[{ value: "root", label: "Root", children: [{ value: "child", label: "Child" }] }]} />
+      <div data-testid="packed-table-auto-container" style={{ width: 224 }}>
+        <Table headers={["Name", { id: "0", label: "Identifier" }]} rows={[["Ada", "record_0123456789012345678901234567890123456789"]]} className="packed-table-wrapper" />
+      </div>
+      <div data-testid="packed-table-fixed-container" style={{ width: 224 }}>
+        <Table headers={[
+          { id: "name", label: "Name", className: "text-center" },
+          { id: "profile", label: "Profile", className: "text-end" },
+        ]} rows={[["Ada", <a href="/people/ada">Open profile</a>]]}
+          className="packed-table-wrapper" tableClassName="packed-table-fixed" />
+      </div>
+      <div data-testid="packed-table-identity">
+        <button type="button" onClick={() => setTableReordered((reordered) => !reordered)}>Reorder columns</button>
+        <Table headers={identityColumns} rows={[identityCells]} />
+      </div>
     </section>
   </main></ToastProvider></DirectionProvider>;
 }

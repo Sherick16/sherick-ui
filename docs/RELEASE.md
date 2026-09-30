@@ -7,7 +7,9 @@ This is the current consumer compatibility contract. The implementation boundari
 
 `2.0.0` established the stable line under npm's `latest` dist-tag; `1.0.0` through
 `1.0.5` are frozen. `2.1.0` added the v2.1 component wave and Media; the current
-source package version is `2.1.1`, a patch for the Drawer animation fix. An installed
+source package version is `2.2.0`: additive Table column presentation and RadioGroup surface
+choices, plus normalized overlay title margins. No new component family is added.
+Version `2.1.1` remains the published baseline until the release owner approves 2.2.0. An installed
 package's actual version and exports, not this checkout, determine availability.
 
 `packages/ui/package.json` owns the release version and `publishConfig.tag` remains `latest`.
@@ -92,7 +94,7 @@ The root `sherick-ui` export is:
   `DrawerProps`, `DrawerTriggerProps`, `DrawerContentProps`, `DrawerHeaderProps`,
   `DrawerDescriptionProps`, `DrawerFooterProps`, `DrawerSide`, `MenuProps`, `MenuTriggerProps`,
   `MenuContentProps`, `MenuItemProps`, `MenuSeparatorProps`, `PopoverProps`, `PopoverTriggerProps`, `PopoverContentProps`,
-  `TooltipProps`, `TableProps`, `TabsProps`, `Tab`, `NavGroupProps`, `NavGroupItem`,
+  `TooltipProps`, `TableProps`, `TableColumn`, `TabsProps`, `Tab`, `NavGroupProps`, `NavGroupItem`,
   `NavGroupHeadingLevel`, `NavItemProps`, `DividerProps`, `DividerWeight`, `ToastProviderProps`,
   `ToastViewportProps`, `DirectionProviderProps`,
   `ToastOptions`, `ToastActionOptions`, `ToastUpdateOptions`, `ToastPromiseOptions`, `ToastType`,
