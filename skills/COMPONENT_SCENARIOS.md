@@ -109,3 +109,55 @@ rendered, and is the component available to an app pinned to `sherick-ui@2.0.0`?
 `alt` and `Media.Video` with `autoPlay muted loop decorative`, without controls;
 keeps Hero placement in the application, does not force video cropping without explicit
 `aspect`/`fit`, and checks installed exports since Media is not in 2.0.0 (added in 2.1.0).
+
+
+## 12. Prominent router destination
+
+**Prompt:** A project page uses `createLink(Button)` for “Billing settings”. Clicking
+works, but users need to open it in a new tab. Keep client-side navigation and prominence.
+
+**Look for:** checks the resulting host, uses a real router anchor with local presentation
+(or an anchor-preserving NavItem adapter if appropriate), preserves href/query/modifiers,
+and tests link semantics. No LinkButton, fake href, asChild or unsupported render prop.
+
+## 13. Rich single-choice rows
+
+**Prompt:** On Sherick UI 2.2.0, show three shipping choices with a name, delivery estimate
+and price. The whole row should select, wrap on a phone and submit one value.
+
+**Look for:** `RadioGroup appearance="surface"`, rich non-interactive ReactNode labels,
+name/value and existing keyboard semantics. No new card primitive, prop catalog or
+private row-state selectors. Verifies installed version rather than trusting the prompt alone.
+
+## 14. Visible filter labels
+
+**Prompt:** A checkbox beside “Include archived projects” has an aria-label, but clicking
+the words does nothing. Fix the composition.
+
+**Look for:** a native associated/wrapping label or supported Field, visible wording in
+the accessible name, and a label-click check. No new Checkbox API or wrapper framework.
+
+## 15. Matching table placeholders
+
+**Prompt:** An invoice table's loading bars shift its columns. The existing CSS sizes
+`th:nth-child(2)` and reaches through the scroll wrapper to set fixed layout.
+
+**Look for:** checks for 2.2.0, shared TableColumn descriptors with stable IDs and one class
+per column, `tableClassName`, ordinary CSS and Skeleton cells. No DataTable, width props,
+accessors, row-key API or TableSkeleton.
+
+## 16. Immediate filtering
+
+**Prompt:** A small local list filters on every keystroke. Its Search has `onSearch={() => {}}`.
+Simplify it without changing the URL-owned filter state.
+
+**Look for:** labelled `Input type="search"` and meaningful onValueChange; keeps submitted
+Search for actual submission/debounce workflows. Does not weaken Search's contract.
+
+## 17. Bounded media
+
+**Prompt:** Keep portrait and landscape previews contained beneath a heading without
+`.preview img` reaching into the Media-generated markup.
+
+**Look for:** Media frame className versus native image style/props, deliberate aspect/fit,
+viewport-aware native height bounds, no imageClassName/private slot. Application zoom stays local.

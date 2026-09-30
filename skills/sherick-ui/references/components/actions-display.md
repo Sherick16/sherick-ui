@@ -17,7 +17,7 @@ import {
   type AlertProps, type AvatarProps, type BadgeProps, type ButtonAppearance, type ButtonProps,
   type ButtonSize, type CardProps, type DividerProps, type DividerWeight, type IconButtonAppearance,
   type IconButtonProps, type MediaImageProps, type MediaVideoProps, type ProgressProps,
-  type SkeletonProps, type SpinnerProps, type TableProps,
+  type SkeletonProps, type SpinnerProps, type TableColumn, type TableProps,
   type Variant,
 } from "sherick-ui";
 ```
@@ -70,7 +70,7 @@ native `<button>`; the ref points at that element.
   `Button` passes `size-5` to the spinner it substitutes, which is why a nested `Spinner` is a
   mark a plain `svg` selector cannot reach.
 - Sizes are density floors on the control's height: sm ≥40px, md ≥48px, lg ≥56px.
-- For navigation use the navigation components or an anchor, not a filled button.
+- For navigation use a real anchor or an anchor-preserving router adapter. A router helper wrapping `Button` does not change its button host; successful ordinary clicks do not prove link semantics. See [router composition](navigation-overlays.md#anchor-preserving-router-composition).
 
 ## IconButton
 
@@ -198,6 +198,16 @@ dark video canvas. It has no `asChild`/custom renderer hook, playback UI or imag
 - Keep placement in the application's Card/Hero/gallery composition. Do not invent
   `placement`/`hero` variants or custom playback controls on `Media`.
 
+A responsive height bound belongs on the native image, not a descendant selector:
+
+```tsx
+<Media.Image className="preview-frame" src="/document.jpg" alt="Scanned document"
+  fit="contain" style={{ width: "auto", maxHeight: "min(36rem, 70dvh)" }} />
+```
+
+`className` styles the frame; `style` here reaches the image. Keep the default natural
+aspect for portrait/landscape containment, or choose a frame aspect deliberately.
+
 ## Card
 
 ```tsx
@@ -298,21 +308,42 @@ Inline and non-portaled; no `ref`, no title or actions prop — the whole copy i
 
 | Prop | Type | Default |
 | --- | --- | --- |
-| `headers` | `string[]` | required |
+| `headers` | `(string \| TableColumn)[]` | required |
 | `rows` | `ReactNode[][]` | required |
-| `className` | `string` | — |
+| `className` | `string` (scroll wrapper) | — |
+| `tableClassName` | `string` (native table, from 2.2.0) | — |
 
-- Header labels are the header cells' React keys, so they must be unique strings, and a header
-  cell cannot hold a node. Body cells accept any `ReactNode`; give a list rendered inside one
-  cell its own keys. Rows are keyed by position, so re-sorted or filtered data re-renders by
-  position rather than by identity.
-- `className` styles the scrolling wrapper, not the `<table>`.
+- The scroll wrapper is keyboard focusable, including for passive cells.
+- String headers remain supported. Starting in **2.2.0**, `TableColumn` is
+  `{ id: string; label: string; className?: string }`; give descriptors unique, stable IDs.
+  Labels remain strings; body cells accept `ReactNode`, including router anchors. Cell
+  positions still correspond to header order. Rows remain keyed by position.
+- `className` styles the scrolling wrapper. From **2.2.0**, `tableClassName?: string`
+  styles the native `<table>`; the column's class reaches its `<th>` and every `<td>`.
+  Use those classes for ordinary CSS width/min-width, alignment and tabular figures.
+- Share the same descriptors and `tableClassName` between real rows and `Skeleton` rows.
+  Do not style columns with `nth-child` or reach through the wrapper to find the table.
+  Verify the installed version before using either new contract.
 - Presentation only: no sorting, selection, sticky columns, density or `variant` (removed
   in v2). The wrapper owns the quiet matte fill, `control` corners and horizontal
   scrolling of wide content; rows answer pointer hover with tone only, and the header row
   carries the heavier rule.
 - The rendered table has no `<caption>` and no name or label prop, so a table whose
   meaning is not clear from its headers needs a labelled application region around it.
+
+```tsx
+const columns: TableColumn[] = [
+  { id: "name", label: "Name", className: "name-column" },
+  { id: "amount", label: "Amount", className: "amount-column" },
+];
+<Table headers={columns} rows={rows} tableClassName="invoice-table" />
+```
+
+```css
+.invoice-table { table-layout: fixed; min-width: 32rem; }
+.name-column { width: 70%; }
+.amount-column { width: 30%; text-align: end; font-variant-numeric: tabular-nums; }
+```
 
 ## Skeleton
 
@@ -401,9 +432,9 @@ and the ref is the root `HTMLDivElement`.
 - `Skeleton` ships no dimensions and no preset shapes; every skeleton is sized by the
   caller.
 
-Sources: [component sources at the pinned revision](https://github.com/Sherick16/sherick-ui/tree/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/packages/ui/src/components),
-[public export contract](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/docs/RELEASE.md#public-export-contract)
-and [design language, sections 8–11 and 17–19](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/docs/DESIGN_LANGUAGE.md).
-Media: [source](https://github.com/Sherick16/sherick-ui/blob/9ecb90dd7ddfa81437e87144ac98255a67b4cad9/packages/ui/src/components/Media.tsx)
-and [consumer contract](https://github.com/Sherick16/sherick-ui/blob/9ecb90dd7ddfa81437e87144ac98255a67b4cad9/docs/MEDIA.md)
+Sources: [component sources at the pinned revision](https://github.com/Sherick16/sherick-ui/tree/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components),
+[public export contract](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/docs/RELEASE.md#public-export-contract)
+and [design language, sections 8–11 and 17–19](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/docs/DESIGN_LANGUAGE.md).
+Media: [source](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/packages/ui/src/components/Media.tsx)
+and [consumer contract](https://github.com/Sherick16/sherick-ui/blob/0a8f36215906d6ee0936c45ba7fb2a25e0f7f42f/docs/MEDIA.md)
 at the media extension revision; availability still depends on the installed package.
