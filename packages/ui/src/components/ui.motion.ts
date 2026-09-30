@@ -48,16 +48,41 @@ export const motionFeedback =
 
 /** A control answers a press immediately and settles on its release.
  *
- *  The recipe owns the *amplitude* of that answer as well as its timing, because how far a
- *  press travels is the system's physical character rather than a component's anatomy: a
- *  control whose outline is what the user sees compresses 4%, which is about two pixels at the
- *  size of the ink it moves. A control whose visible ink is far smaller than the target it is
- *  aimed at takes `motionInkPress` on that ink instead, so the target itself never moves. The
- *  interpolation and the compression are neutralised together under reduced motion. */
+ *  The recipe owns the *amplitude* of that answer as well as its timing, because how far a press
+ *  travels is the system's physical character rather than a component's anatomy. A percentage is a
+ *  distance only once it meets a size, so the amplitude comes in tiers chosen by the control's role:
+ *
+ *  - `motionTactile`: a content-width control — a button, a chip, a segment — compresses 4%, about
+ *    two pixels at the size of the ink it moves.
+ *  - `motionTactileWide`: a control that spans a track — a tab — compresses 1.5%, so its edges move
+ *    about as far as a button's.
+ *  - `motionTactileField`: a list-opening field — a Select trigger, an editable Combobox — spans
+ *    its whole container, and 4% of a 580px field moved each edge 11.6px. It compresses 0.7%, about
+ *    two pixels at that width: the field acknowledges the press without lurching.
+ *
+ *  The press leg runs on `duration-tactile`, short enough to land inside a tap; the release settles
+ *  on the release timing. A control whose visible ink is far smaller than its target takes
+ *  `motionInkPress` on that ink instead, so the target itself never moves. The interpolation and
+ *  the compression are neutralised together under reduced motion. */
 /* Base may disable the surface itself or the value control inside a Select wrapper.
-   Neither is a pressable surface. Timing and amplitude are otherwise unchanged. */
-export const motionTactile =
-  "transition-[background-color,color,box-shadow,transform,opacity] duration-release ease-release active:duration-press active:ease-press motion-safe:[&:not([data-disabled],:disabled,:has(>[role=combobox][data-disabled]))]:active:scale-[0.96] motion-reduce:transition-none";
+   Neither is a pressable surface. Timing is otherwise shared by every tier. */
+const tactileTiming =
+  "transition-[background-color,color,box-shadow,transform,opacity] duration-release ease-release active:duration-tactile active:ease-press motion-reduce:transition-none";
+
+export const motionTactile = /* @__PURE__ */ cx(
+  tactileTiming,
+  "motion-safe:[&:not([data-disabled],:disabled,:has(>[role=combobox][data-disabled]))]:active:scale-[0.96]"
+);
+
+export const motionTactileWide = /* @__PURE__ */ cx(
+  tactileTiming,
+  "motion-safe:[&:not([data-disabled],:disabled)]:active:scale-[0.985]"
+);
+
+export const motionTactileField = /* @__PURE__ */ cx(
+  tactileTiming,
+  "motion-safe:[&:not([data-disabled],:disabled,:has(>[role=combobox][data-disabled]))]:active:scale-[0.993]"
+);
 
 /** The spatial half of a compact press, applied to the *mark* rather than to the control.
  *
@@ -69,7 +94,7 @@ export const motionTactile =
  *  target still owns the focus ring and the state layer, and still carries the tone and depth
  *  response, so the boundary a press happens inside never moves. */
 export const motionInkPress =
-  "transition-transform duration-release ease-release group-active:duration-press group-active:ease-press group-active:scale-[0.88] motion-reduce:transition-none motion-reduce:group-active:scale-100";
+  "transition-transform duration-release ease-release group-active:duration-tactile group-active:ease-press group-active:scale-[0.88] motion-reduce:transition-none motion-reduce:group-active:scale-100";
 
 /* Motion is not owned here — but the recipes above are the whole vocabulary: every press, arrival,
    travel, presence and activity in the library is one of these names plus its owner's own target
@@ -230,7 +255,7 @@ export const motionActivityIndeterminate =
 /** The state layer is a composited overlay, so its own opacity is the only thing that
  *  moves. Shared here because four interaction states across the library ride it. */
 export const motionStateLayer =
-  "before:transition-opacity before:duration-release before:ease-release active:before:duration-press active:before:ease-press group-active:before:duration-press group-active:before:ease-press motion-reduce:before:transition-none";
+  "before:transition-opacity before:duration-release before:ease-release active:before:duration-tactile active:before:ease-press group-active:before:duration-tactile group-active:before:ease-press motion-reduce:before:transition-none";
 
 /* `disclose` is the in-flow counterpart of presence: nothing mounts or unmounts, and nothing
    leaves the page — one region changes its own height where it sits. Base measures the panel and

@@ -162,6 +162,10 @@ export const sharedTokens = {
   "font-mono": 'ui-monospace, "SF Mono", SFMono-Regular, "Cascadia Code", "JetBrains Mono", Menlo, Consolas, "Liberation Mono", monospace',
   "duration-press": "150ms",
   "duration-release": "200ms",
+  /* The press leg of a tactile response. A tap on a trackpad or a brisk click is held for well
+     under 100ms, and a press that interpolates over the feedback duration is released before it
+     shows; this leg lands inside a tap, and the release still settles on the release timing. */
+  "duration-tactile": "80ms",
   "duration-overlay": "240ms",
   "duration-overlay-exit": "160ms",
   /* Continuous activity runs for as long as the work does: a spinner's loop has no duration of

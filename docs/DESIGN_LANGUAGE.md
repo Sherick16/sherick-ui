@@ -217,7 +217,8 @@ inside an already disabled field. A focus ring never substitutes for the state r
 All text fields share a borderless control fill that rises in tone on hover, then while
 focused or open; an engaged field must not fall back to hover strength under the pointer.
 Invalid fields follow the same ladder in danger tone, including validity inherited from
-Base Field. Only list-opening Select and Combobox fields compress on activation; typing
+Base Field. Only list-opening Select and Combobox fields compress on activation, and only
+by the gentle field tier (§12); typing
 and focus never compress an ordinary Input or Textarea. Date entry is native and its
 separate calendar glyph, not its text field, owns the popup press.
 
@@ -252,7 +253,7 @@ One module, `ui.motion.ts`, chooses timing, easing and amplitude by **intent**:
 | Intent | Use |
 | --- | --- |
 | `feedback` | non-spatial tone, focus and highlight |
-| `tactile` | press/release; compact mark-only press when its target must stay still |
+| `tactile` | press/release in three amplitude tiers by role; compact mark-only press when its target must stay still |
 | `arrive` | a newly made selection mark; the sole restrained spring |
 | `orient` | chevron turning in place |
 | `relocate` | tab indicator or switch thumb traveling between stable destinations |
@@ -270,6 +271,14 @@ lifecycle and placement; Sherick adds no exit timer or parallel presence state. 
 reduced motion, states remain visible immediately and spatial travel is removed; a
 loading glyph becomes static. Do not author literal duration/easing/transition/animation
 classes or keyframes in components.
+
+A press answers inside a tap: its leg runs on the short `duration-tactile` (80ms), and the
+release settles on the release timing. Its amplitude is a distance, so it is chosen by role
+rather than written as one percentage for every width: a content-width control compresses 4%
+(`motionTactile`), a control spanning a track such as a tab 1.5% (`motionTactileWide`), and a
+list-opening field 0.7% (`motionTactileField`), which keeps every tier near two pixels per edge.
+Rows — navigation, options, commands, disclosure and tree rows — answer with tone, not
+compression.
 
 The scrim fades with the surface it sits behind; it never appears or disappears in one frame.
 A tooltip opens after a 500ms hover delay and closes at once, so a pointer passing over a row of

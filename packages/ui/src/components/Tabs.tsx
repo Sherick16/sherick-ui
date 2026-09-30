@@ -14,7 +14,7 @@ import {
   text,
   tone,
 } from "./ui.common";
-import { motionRelocate, motionTactile } from "./ui.motion";
+import { motionRelocate, motionTactileWide } from "./ui.motion";
 import { Variant } from "./ui.types";
 
 type TabsChangeDetails = Parameters<NonNullable<BaseTabs.Root.Props["onValueChange"]>>[1];
@@ -99,7 +99,7 @@ export const Tabs = ({
                   "relative z-10 min-w-28 flex-1 whitespace-nowrap px-7 py-3 font-medium",
                   density.normal,
                   shape.control,
-                  motionTactile,
+                  motionTactileWide,
                   focusRingInset,
                   active ? text.high : cn(text.medium, !disabled && "hover:text-sherick-ink"),
                   !disabled && stateLayer.quiet,

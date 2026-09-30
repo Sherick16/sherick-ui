@@ -61,6 +61,7 @@ module.exports = {
       },
       transitionDuration: {
         press: "var(--sui-duration-press)",
+        tactile: "var(--sui-duration-tactile)",
         release: "var(--sui-duration-release)",
         overlay: "var(--sui-duration-overlay)",
         "overlay-exit": "var(--sui-duration-overlay-exit)",
