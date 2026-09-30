@@ -1,11 +1,22 @@
 import React, { type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { edge, material, shape, state, text } from "./ui.common";
+import { edge, focusRing, material, shape, state, text } from "./ui.common";
 import { motionFeedback } from "./ui.motion";
 
 export interface TableProps {
-  headers: string[];
+  headers: Array<string | TableColumn>;
   rows: ReactNode[][];
+  /** Classes for the outer scrollable surface. */
+  className?: string;
+  /** Classes for the native table element. */
+  tableClassName?: string;
+}
+
+export interface TableColumn {
+  /** Stable identity for this column, shared by its header and body cells. */
+  id: string;
+  label: string;
+  /** Classes applied to this column's header and body cells. */
   className?: string;
 }
 
@@ -16,18 +27,26 @@ export const Table = ({
   headers,
   rows,
   className,
+  tableClassName,
 }: TableProps) => {
+  const columns = headers.map((header, index): { key: string; label: string; className?: string } =>
+    typeof header === "string"
+      ? { key: `string:${index}`, label: header }
+      : { ...header, key: `column:${header.id}` }
+  );
+
   return (
-    <div className={cn("w-full overflow-auto", shape.control, material.matteQuiet, className)}>
-      <table className={cn("w-full border-collapse")}>
+    // Passive cells still need a keyboard-reachable surface when the table overflows.
+    <div tabIndex={0} className={cn("w-full overflow-auto", shape.control, material.matteQuiet, focusRing, className)}>
+      <table className={cn("w-full border-collapse", tableClassName)}>
         <thead>
           <tr className={cn(edge.header)}>
-            {headers.map((header) => (
+            {columns.map((column) => (
               <th
-                key={header}
-                className={cn("px-4 py-3 text-start text-sm font-medium", text.medium)}
+                key={column.key}
+                className={cn("px-4 py-3 text-start text-sm font-medium", text.medium, column.className)}
               >
-                {header}
+                {column.label}
               </th>
             ))}
           </tr>
@@ -36,7 +55,7 @@ export const Table = ({
           {rows.map((row, i) => (
             <tr key={i} className={cn(edge.row, motionFeedback, state.rowHover)}>
               {row.map((cell, j) => (
-                <td key={j} className={cn("px-4 py-3 text-sm", text.high)}>
+                <td key={columns[j]?.key ?? `extra:${j}`} className={cn("px-4 py-3 text-sm", text.high, columns[j]?.className)}>
                   {cell}
                 </td>
               ))}

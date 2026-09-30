@@ -61,6 +61,8 @@ function App() {
         <p>Only sherick-ui/styles.css supplies component styling on this page.</p>
       </header>
 
+      <h2 className="host-heading">Ordinary host heading</h2>
+
       <div
         data-testid="css-leak-sentinel"
         className="flex absolute rounded-full px-6 text-sm"
@@ -160,9 +162,11 @@ function App() {
         </Card>
       </section>
 
-      <section className="section">
+      <section className="section" data-testid="presentation-table" style={{ width: 224 }}>
         <Table
-          headers={["Component", "State"]}
+          className="presentation-scroll"
+          tableClassName="presentation-native"
+          headers={[{ id: "component", label: "Component", className: "presentation-component" }, "State"]}
           rows={[
             ["Button", "Ready"],
             ["Dialog", "Ready"],

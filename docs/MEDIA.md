@@ -27,3 +27,27 @@ Content images require `alt` (describe their meaning; use `decorative` instead f
 ```
 
 Media owns presentation, not placement: put it inside your Card, Hero or gallery layout without teaching it about those parents. It does not optimize images or replace the browser's playback controls. Framework-specific image renderers can compose their own delivery outside this native-element primitive.
+
+## Bounded responsive images
+
+`className` belongs to the frame; native `style`, dimensions, loading and event props belong to the image. Bound an uncropped preview without selecting a generated descendant:
+
+```tsx
+<Media.Image
+  className="document-preview"
+  src="/document.jpg"
+  alt="A scanned document"
+  fit="contain"
+  style={{ width: "auto", maxHeight: "min(36rem, 70dvh)" }}
+/>
+```
+
+```css
+.document-preview { max-width: 100%; }
+```
+
+For a fixed preview area, give the frame an `aspect` and choose `fit="contain"`;
+for natural portrait/landscape dimensions, keep the default `aspect="auto"` and bound
+the native image with `style`. There is no need for `.document-preview img`, a private
+class, or an `imageClassName` prop. A zoom stage whose pixel geometry is application-owned
+may still use a native image.

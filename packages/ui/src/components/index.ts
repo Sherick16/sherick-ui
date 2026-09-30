@@ -94,7 +94,7 @@ export type { StepperItem, StepperProps } from "./Stepper";
 export type { SwitchProps } from "./Switch";
 export type { Tab, TabsProps } from "./Tabs";
 export type { ToggleGroupItemProps, ToggleGroupProps } from "./ToggleGroup";
-export type { TableProps } from "./Table";
+export type { TableColumn, TableProps } from "./Table";
 export type { TextareaProps } from "./Textarea";
 export type { TooltipProps } from "./Tooltip";
 export type { OverlayAlign, OverlaySide, Variant } from "./ui.types";

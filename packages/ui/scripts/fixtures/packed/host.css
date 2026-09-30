@@ -10,6 +10,7 @@ main { display: grid; gap: 16px; }
 .opacity-100 { opacity: 1; }
 .hover\:opacity-50:hover { opacity: .5; }
 .consumer-skeleton { height: 20px; }
+.packed-table-fixed { table-layout: fixed; min-width: 28rem; }
 @keyframes spin { to { transform: translateX(123px); } }
 @keyframes pulse { to { opacity: .123; } }
 #host-spin { animation: spin 1s linear infinite; }

@@ -308,6 +308,17 @@ const pressTonal = "[&:not([data-disabled]):not(:disabled)]:active:before:opacit
 const pressFilled = "[&:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.26]";
 const pressTrack = "group-[:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.26]";
 
+/* A labelled control surface paints its state on a row that owns the pointer area while the
+   actual disabled marker belongs to a descendant control. Gate the same quiet response on that
+   descendant so a disabled or read-only choice does not advertise a press it cannot accept. */
+export const stateLayerQuietComposite = /* @__PURE__ */ cx(
+  "relative",
+  stateLayerBase,
+  "before:rounded-[inherit] before:bg-current",
+  "[&:not([data-disabled]):not([data-readonly]):not(:disabled):not(:has([data-disabled])):not(:has([data-readonly]))]:hover:before:opacity-[0.05]",
+  "[&:not([data-disabled]):not([data-readonly]):not(:disabled):not(:has([data-disabled])):not(:has([data-readonly]))]:active:before:opacity-[0.09]"
+);
+
 export const stateLayer = {
   /* Quiet surfaces — ghost controls, navigation rows, menu options. */
   quiet: /* @__PURE__ */ cx("relative", stateLayerBase, "before:rounded-[inherit] before:bg-current", hoverQuiet, pressQuiet),
@@ -658,6 +669,12 @@ export const tone = {
    primitive's own `data-checked` / `data-indeterminate`, so an uncontrolled control is styled
    from the same source of truth as a controlled one. A mixed box is selected but is not
    ticked, which is why the second attribute stands beside the first. */
+/* A radio's opt-in full row follows the Base control it labels. `:has` keeps uncontrolled
+   selection authoritative at the primitive rather than mirroring it in component state.
+   Keep this independent so unrelated consumers of the mark recipes can tree-shake it. */
+export const selectableRowSurface =
+  "has-[[data-checked]]:bg-sherick-primary/[0.22] has-[[data-checked]]:text-sherick-ink has-[[data-checked]]:shadow-sherick-control";
+
 export const selectable = {
   surface: /* @__PURE__ */ cx("relative", elevation.recessed, motionFeedback),
   /* The same object one rung deeper, for a mark whose identity is its depth. */

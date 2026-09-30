@@ -2,7 +2,7 @@
 
 A React 18/19 component library with soft tonal surfaces, deliberate shape contrast
 and restrained motion. `2.0.0` established the stable line; `1.x` is frozen.
-This package source is `2.1.0`; verified `main` stages new versions via npm trusted
+This package source is `2.2.0`; verified `main` stages new versions via npm trusted
 publishing for maintainer approval. Check the installed version for availability.
 
 ## Install and style
@@ -58,6 +58,29 @@ The v2.1 wave adds Calendar/DatePicker/DateRangePicker,
 Command/CommandPalette, Pagination/Breadcrumb, FileUpload, Stepper and TreeView to
 the same root barrel. Its [component contracts](https://github.com/Sherick16/sherick-ui/blob/main/docs/V2_1_COMPONENTS.md)
 use civil `YYYY-MM-DD` dates and `File[]` selections; FileUpload does not upload files.
+
+## Table and surface choices (from 2.2.0)
+
+`Table` keeps string headers valid and also accepts descriptors. Its scroll wrapper is keyboard focusable, including when every cell contains passive text:
+
+```tsx
+const columns = [
+  { id: "name", label: "Name", className: "name-column" },
+  { id: "amount", label: "Amount", className: "amount-column" },
+];
+<Table headers={columns} rows={rows} className="table-surface" tableClassName="invoice-table" />
+```
+
+A descriptor's class reaches both header and body cells. Use ordinary CSS for widths,
+alignment and tabular figures, and reuse the columns for placeholder rows. `className`
+remains on the scroll wrapper; `tableClassName` reaches the native table. Sorting,
+filtering, row content and data ownership remain yours. See the
+[resource-list example](https://github.com/Sherick16/sherick-ui/tree/main/examples/resources).
+
+`RadioGroup appearance="surface"` presents its existing radio rows as selectable surfaces.
+Use `options[].label` for rich, wrapping text, badges and non-interactive hints. It retains
+the same single-selection, keyboard and form contract; omit `appearance` for the original
+plain rows. Do not put buttons or links inside a radio's label.
 
 ## Themes and direction
 

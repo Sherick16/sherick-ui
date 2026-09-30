@@ -205,6 +205,15 @@ const specimens = {
       { value: "cluster", label: "Shared cluster", disabled: true },
     ],
   }),
+  "radio-group.surface": h(RadioGroup, {
+    appearance: "surface",
+    label: "Journal delivery",
+    defaultValue: "weekly",
+    options: [
+      { value: "daily", label: h("span", null, h("strong", null, "Daily field notes"), h("span", null, " A short digest of recent observations.")) },
+      { value: "weekly", label: h("span", null, h("strong", null, "Weekly journal"), h("span", null, " One issue gathers the full week's entries.")) },
+    ],
+  }),
   "radio-group.disabled": h(RadioGroup, {
     defaultValue: "preview",
     disabled: true,
