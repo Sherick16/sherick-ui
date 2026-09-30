@@ -216,10 +216,10 @@ export default function Home() {
 
               <Specimen title="Shape">
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                  <Tile label="1.25rem" caption="Control" className={cn(material.matteHigh, shape.control)} />
-                  <Tile label="1.5rem" caption="Prominent" className={cn(material.matteHigh, shape.prominent)} />
-                  <Tile label="1.75rem" caption="Surface" className={cn(material.matteHigh, shape.surface)} />
-                  <Tile label="2rem" caption="Expressive" className={cn(material.matteHigh, shape.expressive)} />
+                  <Tile label="1rem" caption="Control" className={cn(material.matteHigh, shape.control)} />
+                  <Tile label="1.25rem" caption="Prominent" className={cn(material.matteHigh, shape.prominent)} />
+                  <Tile label="1.5rem" caption="Surface" className={cn(material.matteHigh, shape.surface)} />
+                  <Tile label="1.75rem" caption="Expressive" className={cn(material.matteHigh, shape.expressive)} />
                   <Tile label="pill" caption="Pill" className={cn(tone.tonal.primary, shape.pill, text.high)} />
                   <Tile label="circle" caption="Circle" className={cn(tone.tonal.primary, shape.circle, text.high, "aspect-square w-24 max-w-full self-center")} />
                 </div>

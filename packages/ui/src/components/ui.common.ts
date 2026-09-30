@@ -136,7 +136,13 @@ export const elevation = {
 export const recessedTop = "shadow-sherick-recessed-top";
 
 /* Shape — semantic corner roles, never an arbitrary radius. Softness grows with
-   the size of the object and the emphasis it carries:
+   the size of the object and the emphasis it carries, and silhouette says what an object does:
+   a **capsule acts** (buttons, chips, badges, toggles are `pill`) and a **rounded rectangle
+   holds** (fields, alerts, tables, sheets). Container roles therefore stay clearly short of a
+   capsule at their own height — `control` is a third of a 48px field — so a field never reads as
+   an almost-button beside a real one. Nested roles stay concentric: an inner corner is the outer
+   corner minus the inset between them (a 20px track around a 16px indicator at 4px, a 24px list
+   sheet around 16px options at 8px).
    - control:     ordinary controls and dense data regions — fields, rows, options,
                   chips, tables.
    - mark:        a compact square selection mark — a checkbox box. `control` is a role
@@ -158,13 +164,13 @@ export const recessedTop = "shadow-sherick-recessed-top";
    - pill:        fully rounded controls whose width follows their content.
    - circle:      fully rounded square targets. */
 export const shape = {
-  control: "rounded-[1.25rem]",
+  control: "rounded-[1rem]",
   mark: "rounded-[0.625rem]",
-  row: "rounded-[0.875rem]",
-  prominent: "rounded-[1.5rem]",
-  surface: "rounded-[1.75rem]",
-  sheet: "rounded-[1.25rem]",
-  expressive: "rounded-[2rem]",
+  row: "rounded-[0.75rem]",
+  prominent: "rounded-[1.25rem]",
+  surface: "rounded-[1.5rem]",
+  sheet: "rounded-[1rem]",
+  expressive: "rounded-[1.75rem]",
   pill: "rounded-full",
   circle: "rounded-full",
 } as const;
@@ -305,6 +311,10 @@ const hoverFilled = "[&:not([data-disabled]):not(:disabled)]:hover:before:opacit
 const hoverTrack = "group-[:not([data-disabled]):not(:disabled)]:hover:before:opacity-[0.18]";
 const pressQuiet = "[&:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.09]";
 const pressTonal = "[&:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.15]";
+/* A neutral fill's label is ink, so a 15% ink veil turns the whole control a flat grey while it is
+   held — and the recess and the compression already say "pressed". The neutral press is lighter;
+   coloured fills keep the stronger step their labels were measured through. */
+const pressTonalNeutral = "[&:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.10]";
 const pressFilled = "[&:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.26]";
 const pressTrack = "group-[:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.26]";
 
@@ -326,6 +336,8 @@ export const stateLayer = {
      on-color (`current`) carries the state at a light step. Shared by every matte
      control with a fill — tonal buttons, icon buttons, acrylic buttons. */
   tonal: /* @__PURE__ */ cx("relative", stateLayerBase, "before:rounded-[inherit] before:bg-current", hoverTonal, pressTonal),
+  /* The same layer for a neutral (`secondary`) tonal fill, with the lighter press. */
+  tonalNeutral: /* @__PURE__ */ cx("relative", stateLayerBase, "before:rounded-[inherit] before:bg-current", hoverTonal, pressTonalNeutral),
   /* Opaque fills: `current` is the fill's own on-color — the color furthest from it in
      either theme — so one step reads on a saturated blue and a neutral gray alike. */
   filled: /* @__PURE__ */ cx("relative", stateLayerBase, "before:rounded-[inherit] before:bg-current", hoverFilled, pressFilled),
@@ -462,6 +474,18 @@ export const density = {
      this system's own 44px floor on purpose: that floor belongs to a control that is the whole
      target of its own action, and this one is a part of a field the pointer is already in. */
   part: "min-h-11 min-w-9",
+} as const;
+
+/* Icon slot — the fixed box a leading or trailing mark occupies, sized by the type step it sits
+   beside so the icon-to-label ratio is the same at every size: a 14px label takes a 16px mark, a
+   15px label a 20px mark, an 18px label a 24px mark, and a 12px caption a 14px mark. The box, not
+   the artwork's own whitespace, is what aligns with the label, and a spinner that replaces the icon
+   lands in the same box. */
+export const iconSlot = {
+  caption: "inline-flex size-3.5 shrink-0 items-center justify-center [&>svg]:size-3.5",
+  compact: "inline-flex size-4 shrink-0 items-center justify-center [&>svg]:size-4",
+  normal: "inline-flex size-5 shrink-0 items-center justify-center [&>svg]:size-5",
+  prominent: "inline-flex size-6 shrink-0 items-center justify-center [&>svg]:size-6",
 } as const;
 
 /* Stacking level — where anything that floats sits relative to the application.
@@ -693,6 +717,12 @@ export const tone = {
   },
 } satisfies Record<string, Record<Variant, string>>;
 
+/* Current location — where the reader is, as opposed to a value they chose. A navigation row, the
+   current page of a pagination and any other `aria-current` destination hold the role's soft
+   container, full ink and a touch of weight, and stay flat: depth and the stronger selected step
+   belong to held values (`tone.selected` with `elevation.control`). */
+export const currentDestination = "bg-sherick-primary-soft text-sherick-ink font-medium";
+
 /* Selectable surface — the recessed surface of a control that fills once it is selected: a
    switch track, a checkbox box, a radio circle, a slider groove. Selection is keyed on the
    primitive's own `data-checked` / `data-indeterminate`, so an uncontrolled control is styled
@@ -749,6 +779,7 @@ export const recipeAlphas = {
   state: {
     quiet: { hover: stateAlpha(hoverQuiet, "state.quiet.hover"), press: stateAlpha(pressQuiet, "state.quiet.press") },
     tonal: { hover: stateAlpha(hoverTonal, "state.tonal.hover"), press: stateAlpha(pressTonal, "state.tonal.press") },
+    tonalNeutral: { hover: stateAlpha(hoverTonal, "state.tonalNeutral.hover"), press: stateAlpha(pressTonalNeutral, "state.tonalNeutral.press") },
     filled: { hover: stateAlpha(hoverFilled, "state.filled.hover"), press: stateAlpha(pressFilled, "state.filled.press") },
   },
   tint: {
@@ -758,6 +789,7 @@ export const recipeAlphas = {
   field: {
     quiet: fillAlpha(material.matteQuiet, "field.quiet"),
     card: fillAlpha(material.matte, "field.card"),
+    groove: fillAlpha(material.matteHigh, "field.groove"),
     control: fillAlpha(material.control, "field.control"),
     hover: fillAlpha(state.field.hover, "field.hover"),
     engaged: fillAlpha(state.field.engaged, "field.engaged"),

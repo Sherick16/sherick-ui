@@ -99,7 +99,7 @@ const Stepper = forwardRef<HTMLElement, StepperProps>(
                       : "[@container(min-width:32rem)]:h-1.5 [@container(min-width:32rem)]:w-full"),
                     shape.pill,
                     elevation.recessed,
-                    material.matteQuiet
+                    material.matteHigh
                   )}
                 >
                   {(current || complete) && (

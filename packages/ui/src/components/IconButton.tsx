@@ -56,7 +56,7 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
           focusRing,
           tone.text[variant],
           isTonal && tone.tonal[variant],
-          (isTonal || isAcrylic) && !isDisabled && stateLayer.tonal,
+          (isTonal || isAcrylic) && !isDisabled && (isTonal && variant === "secondary" ? stateLayer.tonalNeutral : stateLayer.tonal),
           appearance === "ghost" && "bg-transparent",
           appearance === "ghost" && !isDisabled && stateLayer.quiet,
           isTonal && elevation.raised,

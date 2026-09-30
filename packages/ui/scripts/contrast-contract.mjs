@@ -168,6 +168,10 @@ export const contrastCompositions = (variables, alphas) => {
   /** The opaque neutral fill a `secondary` control takes, and the groove a value control runs in. */
   const neutralFill = surfaceHigh;
   const groove = composite(surface, FIELD.quiet, canvas);
+  /* The sunk track a value control runs in — a Slider's groove, a Progress track, a Stepper
+     connector — is the `matteHigh` step, on the page and inside a card. */
+  const track = composite(surfaceHigh, FIELD.groove, canvas);
+  const trackInCard = composite(surfaceHigh, FIELD.groove, composite(surface, FIELD.card, canvas));
 
   const tint = (role, alpha, base) => composite(colour(role), alpha, base);
   /* A role's soft and selected surfaces are authored opaque values, so where the control sits no
@@ -182,6 +186,19 @@ export const contrastCompositions = (variables, alphas) => {
   /* -- text roles, which need no semantic accent ------------------------------------------- */
   add("text.high on every authored surface", WCAG_TEXT, "labels and values", surfaceEntries.map(([where, base]) => [where, colour("ink"), base]));
   add("text.medium on every authored surface", WCAG_TEXT, "supporting copy, descriptions, placeholders", surfaceEntries.map(([where, base]) => [where, colour("ink-muted"), base]));
+  add(
+    "text.high on a neutral tonal control, through its states",
+    WCAG_TEXT,
+    "a secondary tonal Button, IconButton or unselected Chip: the ink label over the neutral fill, with the neutral hover and press steps",
+    controlEntries.flatMap(([where, base]) => {
+      const fill = composite(surfaceHigh, TINT.neutralRest, base);
+      return [
+        [`${where} at rest`, colour("ink"), fill],
+        [`${where} hovered`, colour("ink"), composite(colour("ink"), STATE.tonalNeutral.hover, fill)],
+        [`${where} pressed`, colour("ink"), composite(colour("ink"), STATE.tonalNeutral.press, fill)],
+      ];
+    })
+  );
   add("text.high on the opaque neutral fill", WCAG_TEXT, "a `secondary` filled control's label", [["strong secondary fill", colour("ink"), neutralFill]]);
   add(
     "text.medium on an invalid or engaged field",
@@ -307,7 +324,7 @@ export const contrastCompositions = (variables, alphas) => {
       `a progress fill against its track [${role}]`,
       WCAG_NON_TEXT,
       "the bar that says how far the work has come, against the groove it runs in",
-      [["progress", colour(opaqueFill(role)), groove]]
+      [["progress on the page", colour(opaqueFill(role)), track], ["progress in a card", colour(opaqueFill(role)), trackInCard]]
     );
   }
 
@@ -338,9 +355,9 @@ export const contrastCompositions = (variables, alphas) => {
     WCAG_NON_TEXT,
     "a Slider's handle is a matte fill inside a recessed groove, and takes the accent while the pointer is on it",
     [
-      ["at rest on the page", colour("ink-muted"), groove],
-      ["at rest inside a card", colour("ink-muted"), composite(surface, FIELD.quiet, surfaces["matte card"])],
-      ["while engaged", colour("primary-strong"), groove],
+      ["at rest on the page", colour("ink-muted"), track],
+      ["at rest inside a card", colour("ink-muted"), trackInCard],
+      ["while engaged", colour("primary-strong"), track],
     ]
   );
   add("a mark on the opaque neutral fill", WCAG_NON_TEXT, "an unchecked Switch's thumb is `currentColor` over the track's opaque neutral fill", [["unchecked switch thumb", colour("ink"), neutralFill]]);

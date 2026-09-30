@@ -1,6 +1,6 @@
 import React, { type AnchorHTMLAttributes, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { density, focusRing, shape, stateLayer, text, tone } from "./ui.common";
+import { currentDestination, density, focusRing, iconSlot, shape, stateLayer, text } from "./ui.common";
 import { motionTactile } from "./ui.motion";
 
 export interface NavItemProps extends AnchorHTMLAttributes<HTMLAnchorElement> {
@@ -32,7 +32,7 @@ const NavItem = ({ children, icon, className, href, active = false, ...props }: 
       motionTactile,
       focusRing,
       active
-        ? cn(tone.tonal.primary, text.high, "font-medium")
+        ? currentDestination
         : cn(text.medium, "hover:text-sherick-ink"),
       stateLayer.quiet,
       className
@@ -40,7 +40,7 @@ const NavItem = ({ children, icon, className, href, active = false, ...props }: 
     {...props}
   >
     {icon && (
-      <span className={cn("inline-flex size-5 shrink-0 items-center justify-center [&>svg]:size-5")} aria-hidden="true">
+      <span className={cn(iconSlot.compact)} aria-hidden="true">
         {icon}
       </span>
     )}

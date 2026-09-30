@@ -85,9 +85,10 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
           className={cn(
             "relative h-1.5 w-full overflow-hidden",
             shape.pill,
-            /* A groove: sunk by its anatomy, at the quietest matte step, exactly like a slider's rail. */
+            /* A groove: sunk by its anatomy, at the same matte step every sunk track takes, so the
+               whole extent of the scale stays visible on a card. */
             elevation.recessed,
-            material.matteQuiet
+            material.matteHigh
           )}
         >
           {/* The box that travels. It is the track's own width, so the sweep is expressed as a

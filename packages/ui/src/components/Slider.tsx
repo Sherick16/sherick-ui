@@ -84,15 +84,16 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
       >
         {label && <BaseSlider.Label className={cn("mb-2 text-sm font-medium", text.high)}>{label}</BaseSlider.Label>}
         <BaseSlider.Control className={cn("group flex touch-none select-none items-center py-3")}>
-          {/* The groove is the quieter matte step, so a raised handle still separates from it. */}
-          {/* The reservation the range leaves for the handle: its half-width (w-3) plus 4px of
+          {/* The groove is the matte step every sunk track takes; the handle separates from it by
+              its own mid-emphasis fill and its control elevation. */}
+          {/* The reservation the range leaves for the handle: its half-width (10px) plus 4px of
               air, owned here because both the groove and the range read it. */}
           <BaseSlider.Track
             className={cn(
-              "h-1.5 w-full [--sui-slider-reserve:0.625rem]",
+              "h-1.5 w-full [--sui-slider-reserve:0.875rem]",
               shape.pill,
               selectable.surface,
-              material.matteQuiet
+              material.matteHigh
             )}
           >
             {/* The range stops short of the handle by the handle's own half-width plus its air, so
@@ -105,16 +106,15 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
                 motionDirect
               )}
             />
-            {/* A compact capsule rather than a dot: taller than the groove, and narrow enough that
-                the range's tail lands behind it. */}
+            {/* The same round handle a switch thumb is: one family of parts the user moves. */}
             <BaseSlider.Thumb
               aria-label={ariaLabel}
               aria-labelledby={ariaLabelledby}
               ref={ref}
               data-sui-slider-thumb=""
               className={cn(
-                "h-5 w-3",
-                shape.pill,
+                "size-5",
+                shape.circle,
                 motionDirect,
                 elevation.control,
                 material.handle,

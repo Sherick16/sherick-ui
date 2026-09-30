@@ -5,9 +5,9 @@
   "budgets": {
     "button": {
       "definition": "Button alone through the root export. Guards against the root barrel pulling optional feature code.",
-      "raw": 43244,
-      "gzip": 14462,
-      "brotli": 12954
+      "raw": 45333,
+      "gzip": 15271,
+      "brotli": 13529
     },
     "form": {
       "definition": "Representative form composition: Button, Checkbox, Combobox, Field, Input, NumberField, RadioGroup, Select, Slider, Switch.",

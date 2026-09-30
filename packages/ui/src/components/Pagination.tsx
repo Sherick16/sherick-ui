@@ -9,7 +9,7 @@ import {
   type ReactNode,
 } from "react";
 import { cn, cx } from "@/libs/utils";
-import { density, elevation, focusRingInset, selectable, shape, state, stateLayer, text, tone } from "./ui.common";
+import { currentDestination, density, focusRingInset, selectable, shape, state, stateLayer, text } from "./ui.common";
 import { motionFeedback, motionInkPress } from "./ui.motion";
 
 export interface PaginationProps
@@ -208,7 +208,7 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
               className={cn(
                 controlBase,
                 "group shrink break-all px-3",
-                isCurrent && cn(tone.selected.primary, elevation.control, "font-medium", !disabled && state.recess),
+                isCurrent && currentDestination,
                 controlState(false)
               )}
               onClick={(event) => activateFromAnchor(event, page)}
@@ -224,7 +224,7 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
               className={cn(
                 controlBase,
                 "group shrink break-all px-3",
-                isCurrent && cn(tone.selected.primary, elevation.control, "font-medium", !disabled && state.recess),
+                isCurrent && currentDestination,
                 controlState(false)
               )}
               onClick={() => activate(page)}

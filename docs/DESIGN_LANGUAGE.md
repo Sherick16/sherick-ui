@@ -38,7 +38,7 @@ a sideways shadow or an upward-lit gradient to one component.
 | Recipe | Use | Not for |
 | --- | --- | --- |
 | `canvas` | application background | nested content |
-| `matteQuiet`, `matte`, `matteHigh` | quiet, ordinary and stronger grounded surfaces | floating UI |
+| `matteQuiet`, `matte`, `matteHigh` | quiet, ordinary and stronger grounded surfaces; every sunk track (slider groove, progress track, segment track) is `matteHigh`, so its full extent stays visible on a card | floating UI |
 | `matteInset` | a passive sheet tucked beneath a stronger control, visible but quieter than that control | independent cards or fields |
 | `control`, `controlError` | text fields and their invalid state | passive cards |
 | `handle` | a small value-control part that must remain findable, even disabled | large surfaces |
@@ -116,23 +116,31 @@ tone rather than drawing and removing borders on focus or error.
 
 ## 9. Shape
 
-| Role | Use |
-| --- | --- |
-| `mark` | small square checkbox |
-| `row` | command-density row, compact segment or short hint |
-| `control` | fields, ordinary controls and full-width option rows |
-| `prominent` | prominent controls, tab tracks and compact floating status |
-| `surface` | cards, panels and spacious anchored sheets |
-| `sheet` | exposed corners of a viewport-attached Drawer |
-| `expressive` | a dialog floating free of all edges |
-| `pill`, `circle` | content-width round controls and square round targets |
+| Role | Radius | Use |
+| --- | --- | --- |
+| `mark` | 10px | small square checkbox |
+| `row` | 12px | command-density row, compact segment, navigation row or short hint |
+| `control` | 16px | fields, alerts, tables, segment tracks and full-width option rows |
+| `prominent` | 20px | tab tracks, code wells and compact floating status |
+| `surface` | 24px | cards, panels and spacious anchored sheets |
+| `sheet` | 16px | exposed corners of a viewport-attached Drawer |
+| `expressive` | 28px | a dialog floating free of all edges |
+| `pill`, `circle` | full | content-width actions, chips and badges; square round targets |
+
+**A capsule acts; a rounded rectangle holds.** Buttons, chips and badges are pills; a segment
+inside a track takes its track's nested corner instead.
+Fields, alerts, tables and sheets are rounded rectangles clearly short of a capsule at their
+own height (`control` is a third of a 48px field), so a field never reads as an almost-button
+beside a real one. Do not give a container a pill, and do not give an action a container corner.
 
 Choose shape by the object's own extent. A field radius on a 24px square would make it
 a circle; a dialog radius on a drawer attached to the viewport would make the drawer
-look like an oversized card. A compact segment nests its `row` corner in a `control`
-track; a normal tab nests `control` in `prominent`. Pagination is also a recessed
-segmented track, with rounded-rectangle targets and a raised current page. Do not use
-literal radii or invent per-theme corner offsets in components.
+look like an oversized card. Nested corners are concentric: the inner radius is the outer
+radius minus the inset between them. A compact segment nests its `row` corner in a
+`control` track at 4px; a normal tab nests `control` in `prominent` at 4px; an option nests
+`control` in a `surface` list sheet at 8px. Pagination is a recessed segmented track with
+rounded-rectangle targets; its current page is a navigation destination (§10), so it is flat.
+Do not use literal radii or invent per-theme corner offsets in components.
 
 ## 10. Tonal hierarchy
 
@@ -162,8 +170,14 @@ Primary marks interaction, and danger/warning/success carry meaning rather than 
 `--sui-accent` and `--sui-outline` are reserved: they are published for compatibility, no
 component consumes them, and a new use needs a role written here first. Semantic color belongs to the relevant icon,
 control or small region, not a whole table or page. Readable copy on passive semantic
-regions keeps normal text emphasis. A navigation destination uses a quieter tonal tint,
-weight and `aria-current`, not the selected-value treatment of a list option.
+regions keeps normal text emphasis.
+
+**Where the reader is differs from what they chose.** A navigation destination — a current
+navigation row, the current page of a pagination, any `aria-current` location — takes
+`currentDestination`: the primary soft container, full ink and a touch of weight, flat. A held
+value takes `tone.selected` with `elevation.control`. Tabs are the one deliberate exception:
+a tab list is a held choice of *view* inside a recessed track, so its indicator is a held
+selection like a segment's, and it is sized as a tab (normal density) rather than a segment.
 
 ### Type roles
 
@@ -193,7 +207,9 @@ ring. Disabled rows lose interactive hover/press but remain discoverable by keyb
 the primitive permits it, so a disabled highlighted row still shows navigation.
 
 A raised control recesses while held; a flat or floating one retains its depth and
-answers with the pressed state layer plus tactile motion. Disabled controls keep resting
+answers with the pressed state layer plus tactile motion. A neutral (`secondary`) tonal fill
+takes the lighter `stateLayer.tonalNeutral` press: its label is ink, and a full ink veil on top
+of the recess and compression turns the control a flat grey for the length of the click. Disabled controls keep resting
 anatomy and take **one** 45% opacity step, with no pointer affordance. `state.disabledRow`
 reads the disabled marker on a nested control; `disabledPart` avoids dimming a part twice
 inside an already disabled field. A focus ring never substitutes for the state response.
@@ -268,6 +284,10 @@ Density owns control height and type scale; each component owns its own padding.
 embedded `part` is narrower than a standalone target because its surrounding field is
 already the larger target. Do not make an icon-only standalone button use `part`, shrink
 hit targets for phone layouts or create a fourth size step to solve a local spacing issue.
+
+A leading or trailing mark takes the `iconSlot` for the type step beside it: 16px beside a
+14px label (`compact`), 20px beside 15px (`normal`), 24px beside 18px (`prominent`) and 14px
+beside a 12px caption. An icon-only target keeps its own 20px mark inside the 44px target.
 
 ## 14. Accessibility and focus
 
