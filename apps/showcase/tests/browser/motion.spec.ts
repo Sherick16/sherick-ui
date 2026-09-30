@@ -249,7 +249,8 @@ test("a tab indicator travels on every axis it changes", async ({ page, errors }
   for (const axis of ["left", "top", "width", "height"]) {
     expect(property, `the indicator must relocate ${axis}`).toContain(axis);
   }
-  await expectDuration(page, indicator, "--sui-duration-release");
+  /* It crosses a whole track, so it takes the longer travel timing rather than the local one. */
+  await expectDuration(page, indicator, "--sui-duration-travel");
 
   const geometry = () =>
     indicator.evaluate((element) => {
@@ -1282,5 +1283,60 @@ test("amplitude follows the control's role, not its width", async ({ page, error
   const held = (await row.boundingBox())!;
   await page.mouse.up();
   expect(held.width, "a navigation row does not compress").toBe(rest.width);
+  expect(errors).toEqual([]);
+});
+
+test("a keyboard highlight moves to the next row in one step", async ({ page, errors }) => {
+  /* A highlight is where the reader is. Arrowing through a list moves it; the row being left does
+     not fade out behind the one being entered. */
+  await page.goto("/");
+  await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
+  const trigger = page.getByRole("button", { name: "Actions" });
+  await trigger.scrollIntoViewIfNeeded();
+  await trigger.focus();
+  await page.keyboard.press("Enter");
+  const first = page.getByRole("menuitem").first();
+  await expect(first).toHaveAttribute("data-highlighted", "");
+  await first.evaluate((element) => element.setAttribute("data-motion-probe", ""));
+  const leaving = page.evaluate(
+    () =>
+      new Promise<number[]>((resolve) => {
+        const element = document.querySelector("[data-motion-probe]")!;
+        const values: number[] = [];
+        const start = performance.now();
+        const frame = () => {
+          values.push(Number.parseFloat(getComputedStyle(element, "::before").opacity));
+          if (performance.now() - start < 300) requestAnimationFrame(frame);
+          else resolve(values);
+        };
+        requestAnimationFrame(frame);
+      })
+  );
+  await page.keyboard.press("ArrowDown");
+  const values = await leaving;
+  expect(values.at(-1)).toBe(0);
+  expect(values.some((value) => value > 0.001 && value < 0.049), `row layer while leaving ${values.join(",")}`).toBe(false);
+  expect(errors).toEqual([]);
+});
+
+test("a known progress value travels to its new width", async ({ page, errors }) => {
+  await page.goto("/");
+  await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
+  const indicator = page.locator("#feedback [role=progressbar] [data-sui-progress-indicator]").first();
+  const { property } = await motionOf(indicator);
+  expect(property).toContain("width");
+  await expectDuration(page, indicator, "--sui-duration-release");
+  expect(errors).toEqual([]);
+});
+
+test("a sheet crosses the viewport on the sheet timing", async ({ page, errors }) => {
+  await page.goto("/");
+  await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
+  const trigger = page.getByRole("button", { name: "right", exact: true });
+  await trigger.scrollIntoViewIfNeeded();
+  await trigger.click();
+  const sheet = page.getByRole("dialog");
+  await expect(sheet).toBeVisible();
+  await expectDuration(page, sheet, "--sui-duration-sheet");
   expect(errors).toEqual([]);
 });

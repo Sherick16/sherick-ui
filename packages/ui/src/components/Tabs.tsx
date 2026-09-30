@@ -14,7 +14,7 @@ import {
   text,
   tone,
 } from "./ui.common";
-import { motionRelocate, motionTactileWide } from "./ui.motion";
+import { motionRelocateLong, motionTactileWide } from "./ui.motion";
 import { Variant } from "./ui.types";
 
 type TabsChangeDetails = Parameters<NonNullable<BaseTabs.Root.Props["onValueChange"]>>[1];
@@ -85,7 +85,7 @@ export const Tabs = ({
               shape.control,
               tone.selected[variant],
               elevation.control,
-              motionRelocate
+              motionRelocateLong
             )}
           />
 

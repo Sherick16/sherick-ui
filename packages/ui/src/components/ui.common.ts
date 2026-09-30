@@ -1,6 +1,6 @@
 import { cx } from "@/libs/utils";
 import type { Variant } from "./ui.types";
-import { motionDisclose, motionFeedback, motionStateLayer } from "./ui.motion";
+import { motionDisclose, motionFeedback, motionRowLayer, motionStateLayer } from "./ui.motion";
 
 /* Sherick UI design primitives
    ==========================================================================
@@ -616,6 +616,7 @@ export const list = {
     text.high,
     stateLayer.quiet,
     stateLayer.activeRow,
+    motionRowLayer,
     state.effectiveDisabled
   ),
   /* The same object at the density a list of short actions wants, where the row is scanned
@@ -631,6 +632,7 @@ export const list = {
     text.high,
     stateLayer.quiet,
     stateLayer.activeRow,
+    motionRowLayer,
     state.effectiveDisabled
   ),
 } as const;

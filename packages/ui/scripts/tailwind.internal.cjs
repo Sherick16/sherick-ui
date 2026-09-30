@@ -65,6 +65,9 @@ module.exports = {
         release: "var(--sui-duration-release)",
         overlay: "var(--sui-duration-overlay)",
         "overlay-exit": "var(--sui-duration-overlay-exit)",
+        travel: "var(--sui-duration-travel)",
+        sheet: "var(--sui-duration-sheet)",
+        "sheet-exit": "var(--sui-duration-sheet-exit)",
       },
       transitionTimingFunction: {
         press: "var(--sui-ease-press)",

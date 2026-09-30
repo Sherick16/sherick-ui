@@ -168,6 +168,13 @@ export const sharedTokens = {
   "duration-tactile": "80ms",
   "duration-overlay": "240ms",
   "duration-overlay-exit": "160ms",
+  /* Duration grows with travel, in two steps rather than continuously. A tab indicator crossing a
+     track travels hundreds of pixels, and on the local timing it covers them in a handful of
+     frames; a sheet crosses a whole viewport edge, and on the anchored timing it arrives before
+     the eye has followed it. */
+  "duration-travel": "300ms",
+  "duration-sheet": "320ms",
+  "duration-sheet-exit": "200ms",
   /* Continuous activity runs for as long as the work does: a spinner's loop has no duration of
      its own, but a sweep across a track is paced, so the one loop that is timed is authored
      here with the rest of the system's timing. It is a pace, not a response, so it is the one

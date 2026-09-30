@@ -132,6 +132,11 @@ export const motionOrient =
 export const motionRelocate =
   "transition-[left,inset-inline-start,top,width,height,transform,background-color,color,box-shadow,opacity] duration-release ease-glide motion-reduce:transition-none";
 
+/** The same travel across a whole track — a tab indicator — on the longer travel timing, so a
+ *  movement of hundreds of pixels is followed rather than skipped. */
+export const motionRelocateLong =
+  "transition-[left,inset-inline-start,top,width,height,transform,background-color,color,box-shadow,opacity] duration-travel ease-glide motion-reduce:transition-none";
+
 /** Direct manipulation: the pointer owns the geometry, so a positional transition would be
  *  lag. While the primitive reports a drag, position and size are removed from the
  *  transition list and only tone and engagement geometry remain; a keyboard or programmatic
@@ -254,6 +259,11 @@ export const motionActivityIndeterminate =
 
 /** The state layer is a composited overlay, so its own opacity is the only thing that
  *  moves. Shared here because four interaction states across the library ride it. */
+/** A row in a collection moves its highlight rather than fading it: a highlight is where the reader
+ *  is, and arrowing through a list with a soft fade on every row leaves a smear of half-lit rows.
+ *  The row's layer therefore changes in one step, for the pointer and the keyboard alike. */
+export const motionRowLayer = "before:transition-none";
+
 export const motionStateLayer =
   "before:transition-opacity before:duration-release before:ease-release active:before:duration-tactile active:before:ease-press group-active:before:duration-tactile group-active:before:ease-press motion-reduce:before:transition-none";
 
@@ -263,7 +273,7 @@ export const motionStateLayer =
    The panel states the height it opens to; this recipe owns how it gets there, and reduced
    motion applies the layout state in one step rather than travelling through it. */
 export const motionDisclose =
-  "transition-[height] duration-release ease-release data-[starting-style]:h-0 data-[ending-style]:h-0 motion-reduce:transition-none";
+  "transition-[height] duration-release ease-release data-[starting-style]:h-0 data-[ending-style]:h-0 data-[ending-style]:duration-overlay-exit data-[ending-style]:ease-exit motion-reduce:transition-none";
 
 /* A sheet is a surface that owns the viewport and is attached to one edge of it, so its presence is
    a slide out of that edge rather than the modal lift, and it never bounces. The component names the
@@ -276,8 +286,8 @@ export const motionDisclose =
    the right edge would enter from the bottom-right corner and travel diagonally instead of
    straight in. One edge means one axis. */
 export const motionPresenceSheet = /* @__PURE__ */ cx(
-  "transition-[transform,opacity] duration-overlay ease-glide",
-  "data-[ending-style]:duration-overlay-exit data-[ending-style]:ease-exit",
+  "transition-[transform,opacity] duration-sheet ease-glide",
+  "data-[ending-style]:duration-sheet-exit data-[ending-style]:ease-exit",
   "motion-reduce:transition-[opacity]",
   "data-[starting-style]:opacity-0",
   "data-[ending-style]:opacity-0",

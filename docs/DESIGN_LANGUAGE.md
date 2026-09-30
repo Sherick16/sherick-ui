@@ -278,7 +278,14 @@ rather than written as one percentage for every width: a content-width control c
 (`motionTactile`), a control spanning a track such as a tab 1.5% (`motionTactileWide`), and a
 list-opening field 0.7% (`motionTactileField`), which keeps every tier near two pixels per edge.
 Rows — navigation, options, commands, disclosure and tree rows — answer with tone, not
-compression.
+compression. A row's highlight moves in one step (`motionRowLayer`): it marks where the
+reader is, so arrowing through a list never leaves a fading trail.
+
+Duration grows with travel in two steps. An indicator crossing a whole track takes
+`motionRelocateLong` (`duration-travel`, 300ms), and a sheet crossing a viewport edge takes the
+sheet timing (320ms in, 200ms out); short travel keeps the local and overlay timings. Every exit
+accelerates away on `ease-exit`, including a disclosure panel closing. A known progress value
+relocates to its new width rather than jumping.
 
 The scrim fades with the surface it sits behind; it never appears or disappears in one frame.
 A tooltip opens after a 500ms hover delay and closes at once, so a pointer passing over a row of
