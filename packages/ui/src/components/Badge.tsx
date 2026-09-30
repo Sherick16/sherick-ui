@@ -1,6 +1,6 @@
 import React, { type HTMLAttributes, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { shape, text, tone } from "./ui.common";
+import { shape, text, tone, type } from "./ui.common";
 import { Variant } from "./ui.types";
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {
@@ -20,7 +20,8 @@ const Badge = ({
     <span
       {...props}
       className={cn(
-        "inline-flex min-h-7 min-w-0 max-w-full items-center justify-center gap-1.5 px-3 py-1 text-xs font-semibold",
+        "inline-flex min-h-7 min-w-0 max-w-full items-center justify-center gap-1.5 px-3 py-1 font-semibold",
+        type.caption,
         shape.pill,
         tone.soft[variant],
         text.high,

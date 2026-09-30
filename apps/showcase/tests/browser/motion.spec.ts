@@ -249,7 +249,8 @@ test("a tab indicator travels on every axis it changes", async ({ page, errors }
   for (const axis of ["left", "top", "width", "height"]) {
     expect(property, `the indicator must relocate ${axis}`).toContain(axis);
   }
-  await expectDuration(page, indicator, "--sui-duration-release");
+  /* It crosses a whole track, so it takes the longer travel timing rather than the local one. */
+  await expectDuration(page, indicator, "--sui-duration-travel");
 
   const geometry = () =>
     indicator.evaluate((element) => {
@@ -706,11 +707,29 @@ test("the anchored family opens with one shared entrance geometry", async ({ pag
 
 test("a tooltip is the same physical idea on the lighter timing", async ({ page, errors }) => {
   await openLab(page);
+  /* A tooltip opens after its hover delay, and a retrying poll can first look long after the short
+     entrance has run. So the starting geometry is read by an observer armed before the hover, in
+     the frame the popup is added, while the primitive still marks it as starting. */
+  const mounted = page.evaluate(
+    (selector) =>
+      new Promise<{ scale: number; translateY: number }>((resolve) => {
+        const observer = new MutationObserver(() => {
+          const element = document.querySelector(selector);
+          if (!element) return;
+          observer.disconnect();
+          const style = getComputedStyle(element);
+          const matrix = new DOMMatrix(style.transform === "none" ? "" : style.transform);
+          resolve({ scale: Number(matrix.a.toFixed(3)), translateY: Number(matrix.f.toFixed(2)) });
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+      }),
+    labPopupSelector
+  );
   await page.getByRole("button", { name: "Hover", exact: true }).hover();
-  const popup = page.locator(labPopupSelector);
-  await expect(popup).toBeVisible();
-
-  const tooltip = await startingGeometry(popup);
+  const start = await mounted;
+  /* Duration and curve are the settled element's declared timing, which the entrance never changes. */
+  const timing = await startingGeometry(page.locator(labPopupSelector));
+  const tooltip = { ...start, duration: timing.duration, timing: timing.timing };
   expect(tooltip.scale).toBe(0.94);
   expect(Math.abs(tooltip.translateY)).toBe(4);
   expect(toMs(tooltip.duration)).toBeLessThan(toMs(await token(page, "--sui-duration-overlay")));
@@ -757,11 +776,15 @@ test("Select and Combobox are the same control in two forms", async ({ page, err
   await expectDuration(page, comboboxField, "--sui-duration-release");
   const comboboxPress = await pressDelta(page, comboboxInput, comboboxField);
 
-  expect(selectPress.pressedScale, "a select compresses its whole field").toBe(0.96);
-  expect(comboboxPress.pressedScale, "and the combobox reaches the same scale on the same press").toBe(0.96);
+  /* A list-opening field takes the field tier: it spans its whole container, so a press compresses
+     it by less than a percent — enough to acknowledge the press, never enough to lurch. */
+  expect(selectPress.pressedScale, "a select compresses its whole field").toBe(0.993);
+  expect(comboboxPress.pressedScale, "and the combobox reaches the same scale on the same press").toBe(0.993);
   expect(comboboxPress.compressionPercent, "the amplitudes match").toBeCloseTo(selectPress.compressionPercent, 1);
   expect(comboboxPress.restWidth).toBeCloseTo(selectPress.restWidth, 0);
-  expect(comboboxPress.restWidth - comboboxPress.pressedWidth).toBeGreaterThan(10);
+  const fieldTravel = (comboboxPress.restWidth - comboboxPress.pressedWidth) / 2;
+  expect(fieldTravel, "each edge visibly moves").toBeGreaterThan(0.5);
+  expect(fieldTravel, "but by about as far as a button's edge, not ten pixels").toBeLessThan(3);
 
   /* The field's own affordances add nothing: they answer with tone, because a second compression
      nested inside the field's would read as two events for one press. Their measured box still
@@ -772,7 +795,7 @@ test("Select and Combobox are the same control in two forms", async ({ page, err
   const fieldOfDisclosure = disclosure.locator("xpath=..");
   const disclosurePress = await pressDelta(page, disclosure, disclosure, fieldOfDisclosure);
   expect(disclosurePress.pressedScale, "the disclosure control does not deform itself").toBe(1);
-  expect(disclosurePress.alsoScale, "the field it sits in takes the press").toBe(0.96);
+  expect(disclosurePress.alsoScale, "the field it sits in takes the press").toBe(0.993);
 
   /* And once the press has completed, the field is a text field: typing does not move it. */
   await openLab(page);
@@ -809,7 +832,7 @@ test("a press inside a field's text is the same press", async ({ page, errors })
   await page.mouse.down();
   await page.mouse.move(textBox.x + 90, textBox.y + textBox.height / 2, { steps: 5 });
   await page.waitForTimeout(320);
-  expect(await scaleOf(field), "pressing the text presses the field").toBe(0.96);
+  expect(await scaleOf(field), "pressing the text presses the field").toBe(0.993);
 
   await page.mouse.up();
   await page.keyboard.press("Escape");
@@ -1141,5 +1164,207 @@ test("a compact control keeps its target stable while its mark takes the press",
     await page.mouse.up();
   }
 
+  expect(errors).toEqual([]);
+});
+
+/* Frame sampling. A recipe can name a transition and still paint nothing in between — the scrim
+   once declared an opacity transition with no state to transition from — so these tests read the
+   painted value on every animation frame of the event, not the class or the transition property. */
+const sampleFrames = (page: Page, selector: string, read: "opacity" | "height", durationMs: number) =>
+  page.evaluate(
+    ({ selector, read, durationMs }) =>
+      new Promise<number[]>((resolve) => {
+        const values: number[] = [];
+        const start = performance.now();
+        const frame = () => {
+          const element = document.querySelector(selector);
+          if (element) {
+            values.push(
+              read === "opacity"
+                ? Number.parseFloat(getComputedStyle(element).opacity)
+                : element.getBoundingClientRect().height
+            );
+          }
+          if (performance.now() - start < durationMs) requestAnimationFrame(frame);
+          else resolve(values);
+        };
+        requestAnimationFrame(frame);
+      }),
+    { selector, read, durationMs }
+  );
+
+test("the scrim fades with the surface it sits behind", async ({ page, errors }) => {
+  const scrim = '[class*="--sui-scrim-blur"]';
+  const opening = sampleFrames(page, scrim, "opacity", 600);
+  await page.getByRole("button", { name: "Open dialog" }).click();
+  const entrance = await opening;
+  expect(entrance.some((value) => value > 0.02 && value < 0.98), `scrim entrance ${entrance.join(",")}`).toBe(true);
+  expect(entrance.at(-1)).toBe(1);
+
+  const closing = sampleFrames(page, scrim, "opacity", 600);
+  await page.keyboard.press("Escape");
+  const exit = await closing;
+  expect(exit.some((value) => value > 0.02 && value < 0.98), `scrim exit ${exit.join(",")}`).toBe(true);
+  await expect(page.locator(scrim)).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
+
+test("a tree branch discloses its children rather than appearing", async ({ page, errors }) => {
+  await page.goto("/");
+  await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
+  const branch = page.locator("#disclosure").getByRole("treeitem", { name: "utils" });
+  await branch.scrollIntoViewIfNeeded();
+  await branch.evaluate((element) => element.setAttribute("data-motion-probe", ""));
+  const collapsed = (await branch.boundingBox())!.height;
+
+  const opening = sampleFrames(page, "[data-motion-probe]", "height", 600);
+  await branch.locator("> div > span").first().click();
+  const open = await opening;
+  const expanded = open.at(-1)!;
+  expect(expanded).toBeGreaterThan(collapsed);
+  expect(open.some((height) => height > collapsed + 1 && height < expanded - 1), `branch opening ${open.join(",")}`).toBe(true);
+
+  const closing = sampleFrames(page, "[data-motion-probe]", "height", 600);
+  await branch.locator("> div > span").first().click();
+  const close = await closing;
+  expect(close.at(-1)).toBe(collapsed);
+  expect(close.some((height) => height > collapsed + 1 && height < expanded - 1), `branch closing ${close.join(",")}`).toBe(true);
+  expect(errors).toEqual([]);
+});
+
+test("a brisk tap still reaches a visible press", async ({ page, errors }) => {
+  /* A trackpad tap or a quick click is held for well under 100ms. The press leg runs on the short
+     tactile duration, so even a 60ms tap compresses the control at least half of the way. */
+  await openLab(page);
+  const button = page.getByRole("button", { name: "Filled", exact: true });
+  await button.evaluate((element) => element.scrollIntoView({ block: "center", behavior: "instant" }));
+  const box = (await button.boundingBox())!;
+  await page.mouse.move(box.x + box.width / 2, box.y + box.height / 2);
+  await button.evaluate((element) => {
+    const record = { deepest: 1, stop: false };
+    (window as unknown as { __tap: typeof record }).__tap = record;
+    const frame = () => {
+      const scale = new DOMMatrix(getComputedStyle(element).transform === "none" ? "" : getComputedStyle(element).transform).a;
+      record.deepest = Math.min(record.deepest, scale);
+      if (!record.stop) requestAnimationFrame(frame);
+    };
+    requestAnimationFrame(frame);
+  });
+  await page.mouse.down();
+  await page.waitForTimeout(60);
+  await page.mouse.up();
+  await page.waitForTimeout(300);
+  const deepest = await page.evaluate(() => {
+    const record = (window as unknown as { __tap: { deepest: number; stop: boolean } }).__tap;
+    record.stop = true;
+    return record.deepest;
+  });
+  expect(deepest, "a 60ms tap compresses at least half of the 4% press").toBeLessThanOrEqual(0.98);
+  expect(errors).toEqual([]);
+});
+
+test("amplitude follows the control's role, not its width", async ({ page, errors }) => {
+  /* A tab spans its track and takes the wide tier; a navigation row answers with tone alone, like
+     every other row. Measured as the distance each edge travels. */
+  await page.goto("/");
+  await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
+  const tab = page.locator("#selection").getByRole("tab", { name: "Activity" });
+  const tabPress = await pressDelta(page, tab, tab);
+  const tabTravel = (tabPress.restWidth - tabPress.pressedWidth) / 2;
+  expect(tabTravel).toBeGreaterThan(0.5);
+  expect(tabTravel).toBeLessThan(2.5);
+
+  const row = page.locator("#selection").getByRole("link", { name: "Display" });
+  await row.scrollIntoViewIfNeeded();
+  await row.hover();
+  const rest = (await row.boundingBox())!;
+  await page.mouse.down();
+  await page.waitForTimeout(300);
+  const held = (await row.boundingBox())!;
+  await page.mouse.up();
+  expect(held.width, "a navigation row does not compress").toBe(rest.width);
+  expect(errors).toEqual([]);
+});
+
+test("a keyboard highlight moves to the next row in one step", async ({ page, errors }) => {
+  /* A highlight is where the reader is. Arrowing through a list moves it; the row being left does
+     not fade out behind the one being entered. */
+  await page.goto("/");
+  await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
+  const trigger = page.getByRole("button", { name: "Actions" });
+  await trigger.scrollIntoViewIfNeeded();
+  await trigger.focus();
+  await page.keyboard.press("Enter");
+  const first = page.getByRole("menuitem").first();
+  await expect(first).toHaveAttribute("data-highlighted", "");
+  await first.evaluate((element) => element.setAttribute("data-motion-probe", ""));
+  const leaving = page.evaluate(
+    () =>
+      new Promise<number[]>((resolve) => {
+        const element = document.querySelector("[data-motion-probe]")!;
+        const values: number[] = [];
+        const start = performance.now();
+        const frame = () => {
+          values.push(Number.parseFloat(getComputedStyle(element, "::before").opacity));
+          if (performance.now() - start < 300) requestAnimationFrame(frame);
+          else resolve(values);
+        };
+        requestAnimationFrame(frame);
+      })
+  );
+  await page.keyboard.press("ArrowDown");
+  const values = await leaving;
+  expect(values.at(-1)).toBe(0);
+  expect(values.some((value) => value > 0.001 && value < 0.049), `row layer while leaving ${values.join(",")}`).toBe(false);
+  expect(errors).toEqual([]);
+});
+
+test("a known progress value travels to its new width", async ({ page, errors }) => {
+  await page.goto("/");
+  await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
+  const indicator = page.locator("#feedback [role=progressbar] [data-sui-progress-indicator]").first();
+  const { property } = await motionOf(indicator);
+  expect(property).toContain("width");
+  await expectDuration(page, indicator, "--sui-duration-release");
+  expect(errors).toEqual([]);
+});
+
+test("a sheet crosses the viewport on the sheet timing", async ({ page, errors }) => {
+  await page.goto("/");
+  await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
+  const trigger = page.getByRole("button", { name: "right", exact: true });
+  await trigger.scrollIntoViewIfNeeded();
+  await trigger.click();
+  const sheet = page.getByRole("dialog");
+  await expect(sheet).toBeVisible();
+  await expectDuration(page, sheet, "--sui-duration-sheet");
+  expect(errors).toEqual([]);
+});
+
+test("a theme switch lands in one step rather than animating the old tones", async ({ page, errors }) => {
+  /* The showcase follows the README's guidance: transitions are suppressed for the frame in which
+     the theme lands, so a control's fill has no in-between value on the new page. */
+  await page.goto("/");
+  await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
+  const button = page.getByRole("button", { name: "Tonal", exact: true });
+  await button.evaluate((element) => element.setAttribute("data-motion-probe", ""));
+  const fills = page.evaluate(
+    () =>
+      new Promise<string[]>((resolve) => {
+        const element = document.querySelector("[data-motion-probe]")!;
+        const values: string[] = [];
+        const start = performance.now();
+        const frame = () => {
+          values.push(getComputedStyle(element).backgroundColor);
+          if (performance.now() - start < 500) requestAnimationFrame(frame);
+          else resolve(values);
+        };
+        requestAnimationFrame(frame);
+      })
+  );
+  const current = await page.evaluate(() => document.documentElement.dataset.sherickTheme);
+  await page.getByRole("button", { name: current === "dark" ? "Light" : "Dark", exact: true }).click();
+  const distinct = [...new Set(await fills)];
+  expect(distinct.length, `fills seen during the switch: ${distinct.join(" | ")}`).toBeLessThanOrEqual(2);
   expect(errors).toEqual([]);
 });

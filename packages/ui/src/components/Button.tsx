@@ -7,6 +7,7 @@ import {
   density,
   elevation,
   focusRing,
+  iconSlot,
   shape,
   state,
   stateLayer,
@@ -28,6 +29,13 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
 }
 
+/* The mark follows the type step beside it (§10): a compact label takes the compact slot. */
+const slotMap: Record<ButtonSize, string> = {
+  sm: iconSlot.compact,
+  md: iconSlot.normal,
+  lg: iconSlot.prominent,
+};
+
 const sizeMap: Record<ButtonSize, string> = {
   sm: `${density.compact} px-4 py-2`,
   md: `${density.normal} px-6 py-3`,
@@ -48,7 +56,10 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     ...props
   }, ref) => {
     const isDisabled = disabled || loading;
-    const isTactile = appearance === "tonal" && !isDisabled;
+    /* The action ladder: text sits flat, tonal and filled are raised and recess while held. The
+       priority action is never flatter than the one beside it. */
+    const isRaised = appearance !== "text";
+    const isTactile = isRaised && !isDisabled;
 
     return (
       <BaseButton
@@ -67,25 +78,25 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           appearance === "filled" && !isDisabled && stateLayer.filled,
           appearance === "tonal" && tone.tonal[variant],
           appearance === "tonal" && tone.text[variant],
-          appearance === "tonal" && !isDisabled && stateLayer.tonal,
+          appearance === "tonal" && !isDisabled && (variant === "secondary" ? stateLayer.tonalNeutral : stateLayer.tonal),
           appearance === "text" && tone.text[variant],
           appearance === "text" && !isDisabled && stateLayer.quiet,
-          appearance === "tonal" && elevation.raised,
+          isRaised && elevation.raised,
           isTactile && state.recess,
           isDisabled ? state.disabled : state.enabled,
           className
         )}
       >
-        {/* A mark occupies one slot whatever is inside it. The slot is a fixed 20px box, so a nested
-            node — a wrapped mark, a status dot — cannot change the control's width, and the loading
-            mark lands in the box the icon had. `[&>svg]` normalizes direct SVG artwork; sizing nested
-            artwork is the caller's business, as §17 says. */}
+        {/* A mark occupies one slot whatever is inside it. The slot is a fixed box sized by the
+            button's type step, so a nested node — a wrapped mark, a status dot — cannot change the
+            control's width, and the loading mark lands in the box the icon had. `[&>svg]` normalizes
+            direct SVG artwork; sizing nested artwork is the caller's business, as §17 says. */}
         {loading ? (
-          <span className={cn("inline-flex size-5 shrink-0 items-center justify-center", !icon && "absolute")}>
-            <Spinner size="small" className={cn("size-5")} />
+          <span className={cn(slotMap[size], !icon && "absolute")}>
+            <Spinner size="small" className={cn("size-full")} />
           </span>
         ) : icon ? (
-          <span className={cn("inline-flex size-5 shrink-0 items-center justify-center [&>svg]:size-5")} aria-hidden="true">
+          <span className={cn(slotMap[size])} aria-hidden="true">
             {icon}
           </span>
         ) : null}

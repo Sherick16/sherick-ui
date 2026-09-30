@@ -119,3 +119,41 @@ rung that was added — the well of an empty selection mark — and `--sui-code-
 both themes so the published syntax palette clears 4.5:1 on the code well. `focus` and `primary`
 are the same value in each theme, as they were, and `primary-strong` stays one step deeper than
 both.
+
+## The soft and selected surfaces (container role)
+
+**Decided and implemented** after the [visual audit](visual-design-system-audit.md) (finding A2).
+The foregrounds above stayed exactly as they are. What changed is where a *tinted surface* gets
+its colour.
+
+Before, every soft and selected surface was an alpha of its role's foreground:
+`bg-<role>/[0.09–0.12]` for soft, `bg-<role>/[0.22]` for selected. Once the foregrounds were
+deepened for text contrast, those fractions lost their hue. The light warning soft surface
+rendered as a warm grey that read as neutral, success as grey-green, and selection as a dusty
+steel blue. In dark mode the warning and danger badges resolved to nearly the same grey-brown.
+
+The fix is a designed container per role, authored in both themes and consumed by `tone.soft`,
+`tone.tonal` and `tone.selected`:
+
+| Token | Light | Dark |
+| --- | --- | --- |
+| `--sui-primary-soft` | `0.91 0.035 255` → **`0.920 0.035 255`** | `0.42 0.055 257` → **`0.325 0.050 257`** |
+| `--sui-primary-selected` | **`0.860 0.055 255`** | **`0.400 0.075 257`** |
+| `--sui-danger-soft` | **`0.930 0.030 18`** | **`0.315 0.050 22`** |
+| `--sui-danger-selected` | **`0.870 0.050 18`** | **`0.395 0.070 22`** |
+| `--sui-warning-soft` | **`0.940 0.045 85`** | **`0.320 0.045 78`** |
+| `--sui-warning-selected` | **`0.885 0.070 82`** | **`0.400 0.065 78`** |
+| `--sui-success-soft` | **`0.935 0.037 155`** | **`0.315 0.045 160`** |
+| `--sui-success-selected` | **`0.875 0.055 155`** | **`0.395 0.065 160`** |
+
+`--sui-primary-soft` was already published and had no consumer; it now has one. The containers
+are opaque, so a tone reads the same on the canvas, in a card and on an acrylic sheet, and the
+contract no longer needs to measure a tint over each surface: it measures the label, `ink`, the
+selection mark and the focus ring against the container itself, through the tonal states.
+
+This is not the role split rejected above. That proposal separated a role's *foreground* from its
+*strong fill* for a 0.04 lightness difference. The container is a third, different surface — the
+thing a tint used to approximate — and the difference it makes is hue, not lightness.
+
+The field error ladder (`state.field.invalid*`, `controlError`) still composites `danger` over the
+field. It sits on known surfaces, it is measured, and it was not part of the defect.

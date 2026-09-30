@@ -16,7 +16,7 @@ import React, {
 import { cn } from "@/libs/utils";
 import Calendar from "./Calendar";
 import Field from "./Field";
-import { state, text, tone } from "./ui.common";
+import { fieldMessage, state, text, tone } from "./ui.common";
 import {
   DateCalendarPopup,
   DateFieldTrigger,
@@ -345,12 +345,12 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(({
       </BasePopover.Root>
 
       {description && (
-        <p id={descriptionId} className={cn("mt-2 text-xs leading-5", text.medium)}>
+        <p id={descriptionId} className={cn(fieldMessage.description)}>
           {description}
         </p>
       )}
       {error && (
-        <p id={errorId} className={cn("mt-2 text-xs leading-5", tone.text.danger)}>
+        <p id={errorId} className={cn(fieldMessage.error)}>
           {error}
         </p>
       )}

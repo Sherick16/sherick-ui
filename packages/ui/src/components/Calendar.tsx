@@ -14,7 +14,7 @@ import React, {
   type KeyboardEvent,
 } from "react";
 import { cn } from "@/libs/utils";
-import { density, elevation, focusRingInset, shape, state, stateLayer, text, tone } from "./ui.common";
+import { density, elevation, focusRingInset, shape, state, stateLayer, text, tone, type } from "./ui.common";
 import { motionFeedback, motionInkPress, motionTactile } from "./ui.motion";
 import {
   addCalendarDays,
@@ -481,7 +481,7 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
                   key={name.long}
                   scope="col"
                   abbr={name.long}
-                  className={cn("h-8 px-0 text-center text-xs font-medium", text.medium)}
+                  className={cn("h-8 px-0 text-center font-medium", type.caption, text.medium)}
                 >
                   <span aria-hidden="true">{name.short}</span>
                   <span className={cn("sr-only")}>{name.long}</span>
@@ -583,7 +583,7 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
           {labels.today}
         </button>
 
-        <div role="status" className={cn("min-w-0 text-xs", tone.text.danger)}>
+        <div role="status" className={cn("min-w-0", type.supporting, tone.text.danger)}>
           {rangeMessage ?? ""}
         </div>
       </div>

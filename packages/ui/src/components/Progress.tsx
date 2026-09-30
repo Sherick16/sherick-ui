@@ -4,7 +4,7 @@ import { Progress as BaseProgress } from "@base-ui/react/progress";
 import React, { forwardRef, type ComponentProps, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import { elevation, material, shape, text, tone } from "./ui.common";
-import { motionActivityIndeterminate } from "./ui.motion";
+import { motionActivityIndeterminate, motionRelocate } from "./ui.motion";
 import { Variant } from "./ui.types";
 
 export interface ProgressProps
@@ -85,9 +85,10 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
           className={cn(
             "relative h-1.5 w-full overflow-hidden",
             shape.pill,
-            /* A groove: sunk by its anatomy, at the quietest matte step, exactly like a slider's rail. */
+            /* A groove: sunk by its anatomy, at the same matte step every sunk track takes, so the
+               whole extent of the scale stays visible on a card. */
             elevation.recessed,
-            material.matteQuiet
+            material.matteHigh
           )}
         >
           {/* The box that travels. It is the track's own width, so the sweep is expressed as a
@@ -112,8 +113,10 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
                 "absolute inset-y-0 start-0",
                 shape.pill,
                 tone.strong[variant],
-                /* The measure itself is Base's: it writes the indicator's own width. */
-                indeterminate ? "w-2/5" : "w-full"
+                /* The measure itself is Base's: it writes the indicator's own width. A known value
+                   that changes is a persistent part moving between stable states, so it relocates
+                   rather than jumping; the indeterminate sweep is the activity loop's. */
+                indeterminate ? "w-2/5" : cn("w-full", motionRelocate)
               )}
             />
           </div>

@@ -17,7 +17,7 @@ import {
   text,
   tone,
 } from "./ui.common";
-import { motionArrive, motionFeedback, motionOrient, motionPresenceAnchored, motionTactile } from "./ui.motion";
+import { motionArrive, motionFeedback, motionOrient, motionPresenceAnchored, motionTactileField } from "./ui.motion";
 import { Variant } from "./ui.types";
 
 export interface SelectOption {
@@ -77,7 +77,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
             a `Select` trigger's own active state is suppressed by the primitive, while a press on
             it still activates this element as its ancestor. The trigger itself is the field's
             surface, so it takes the tone. */}
-        <div className={cn("relative block min-w-0 w-full", motionTactile)}>
+        <div className={cn("relative block min-w-0 w-full", motionTactileField)}>
           <BaseSelect.Trigger
             {...triggerProps}
             ref={ref}

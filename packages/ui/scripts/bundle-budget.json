@@ -5,9 +5,9 @@
   "budgets": {
     "button": {
       "definition": "Button alone through the root export. Guards against the root barrel pulling optional feature code.",
-      "raw": 43244,
-      "gzip": 14462,
-      "brotli": 12954
+      "raw": 45333,
+      "gzip": 15271,
+      "brotli": 13529
     },
     "form": {
       "definition": "Representative form composition: Button, Checkbox, Combobox, Field, Input, NumberField, RadioGroup, Select, Slider, Switch.",
@@ -23,9 +23,9 @@
     },
     "disclosure": {
       "definition": "The disclosure family: Accordion and Collapsible, which share one row and one measured panel.",
-      "raw": 59949,
-      "gzip": 20760,
-      "brotli": 18389
+      "raw": 63143,
+      "gzip": 21666,
+      "brotli": 19072
     },
     "toast": {
       "definition": "The toast stack: its provider, its viewport and the two ways a toast is raised.",
@@ -53,15 +53,15 @@
     },
     "stylesCss": {
       "definition": "Published component stylesheet.",
-      "raw": 125677,
-      "gzip": 15832,
-      "brotli": 13021
+      "raw": 133017,
+      "gzip": 16730,
+      "brotli": 13656
     },
     "themeCss": {
       "definition": "Published token-only theme stylesheet.",
-      "raw": 8841,
-      "gzip": 1453,
-      "brotli": 1187
+      "raw": 10205,
+      "gzip": 1697,
+      "brotli": 1377
     }
   }
 }

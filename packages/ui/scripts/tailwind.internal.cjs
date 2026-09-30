@@ -13,6 +13,13 @@ const colorNames = [
   "primary",
   "primary-strong",
   "primary-soft",
+  "primary-selected",
+  "danger-soft",
+  "danger-selected",
+  "warning-soft",
+  "warning-selected",
+  "success-soft",
+  "success-selected",
   "accent",
   "danger",
   "warning",
@@ -40,6 +47,9 @@ module.exports = {
         "sherick-glass-dense": "var(--sui-glass-gradient-dense)",
         "sherick-glass-hero": "var(--sui-glass-hero-gradient)",
       },
+      fontFamily: {
+        "sherick-mono": "var(--sui-font-mono)",
+      },
       boxShadow: {
         "sherick-flat": "var(--sui-elevation-flat)",
         "sherick-raised": "var(--sui-elevation-raised)",
@@ -51,9 +61,13 @@ module.exports = {
       },
       transitionDuration: {
         press: "var(--sui-duration-press)",
+        tactile: "var(--sui-duration-tactile)",
         release: "var(--sui-duration-release)",
         overlay: "var(--sui-duration-overlay)",
         "overlay-exit": "var(--sui-duration-overlay-exit)",
+        travel: "var(--sui-duration-travel)",
+        sheet: "var(--sui-duration-sheet)",
+        "sheet-exit": "var(--sui-duration-sheet-exit)",
       },
       transitionTimingFunction: {
         press: "var(--sui-ease-press)",
@@ -77,6 +91,9 @@ module.exports = {
       },
       animation: {
         "sherick-indeterminate": "sherick-indeterminate var(--sui-duration-activity) linear infinite",
+        /* Tailwind's own spin and pulse keyframes, on the system's authored pace and curve. */
+        spin: "spin var(--sui-duration-spin) linear infinite",
+        pulse: "pulse var(--sui-duration-pulse) var(--sui-ease-pulse) infinite",
       },
     },
   },

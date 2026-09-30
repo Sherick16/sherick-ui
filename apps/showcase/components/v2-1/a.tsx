@@ -35,7 +35,7 @@ export default function DateFamilySpecimen({ verification = false }: { verificat
   return (
     <div className={verification ? "space-y-12" : "grid grid-cols-1 items-start gap-8 lg:grid-cols-2"}>
       <section className="space-y-3">
-        <Heading className="text-lg font-medium text-sherick-ink">Single calendar</Heading>
+        <Heading className="text-sm font-medium text-sherick-ink-muted">Single calendar</Heading>
         <div data-testid="single-calendar">
           <Panel>
             <Calendar
@@ -49,7 +49,7 @@ export default function DateFamilySpecimen({ verification = false }: { verificat
       </section>
 
       <section className="space-y-3">
-        <Heading className="text-lg font-medium text-sherick-ink">Range calendar</Heading>
+        <Heading className="text-sm font-medium text-sherick-ink-muted">Range calendar</Heading>
         <div data-testid="range-calendar">
           <Panel>
             <Calendar
@@ -69,7 +69,7 @@ export default function DateFamilySpecimen({ verification = false }: { verificat
       </section>
 
       {verification && <section className="space-y-3">
-        <Heading className="text-lg font-medium text-sherick-ink">Controlled month and value</Heading>
+        <Heading className="text-sm font-medium text-sherick-ink-muted">Controlled month and value</Heading>
         <div data-testid="controlled-calendar">
           <Panel>
             <Calendar
@@ -117,7 +117,7 @@ export default function DateFamilySpecimen({ verification = false }: { verificat
       </section>}
 
       {verification && <section className="space-y-3">
-        <Heading className="text-lg font-medium text-sherick-ink">Bounds, disabled and invalid</Heading>
+        <Heading className="text-sm font-medium text-sherick-ink-muted">Bounds, disabled and invalid</Heading>
         <div className="flex flex-wrap items-start gap-6">
           {verification && <>
           <Panel>
@@ -149,7 +149,7 @@ export default function DateFamilySpecimen({ verification = false }: { verificat
       </section>}
 
       {verification && <section className="space-y-3">
-        <Heading className="text-lg font-medium text-sherick-ink">Locale and week start</Heading>
+        <Heading className="text-sm font-medium text-sherick-ink-muted">Locale and week start</Heading>
         <div data-testid="locale-calendar">
           <Panel>
             <Calendar
@@ -164,7 +164,7 @@ export default function DateFamilySpecimen({ verification = false }: { verificat
       </section>}
 
       {verification && <section className="space-y-3">
-        <Heading className="text-lg font-medium text-sherick-ink">Narrow container and right-to-left</Heading>
+        <Heading className="text-sm font-medium text-sherick-ink-muted">Narrow container and right-to-left</Heading>
         <div className="flex flex-wrap items-start gap-6">
           <div className="w-64 max-w-full" data-testid="narrow-calendar">
             <Calendar
@@ -186,7 +186,7 @@ export default function DateFamilySpecimen({ verification = false }: { verificat
       </section>}
 
       <section className="space-y-3">
-        <Heading className="text-lg font-medium text-sherick-ink">Date field</Heading>
+        <Heading className="text-sm font-medium text-sherick-ink-muted">Date field</Heading>
         <div className="flex flex-wrap items-start gap-6">
           <div className="w-72 max-w-full space-y-2" data-testid="picker-field">
             <DatePicker
@@ -224,7 +224,7 @@ export default function DateFamilySpecimen({ verification = false }: { verificat
       </section>
 
       <section className="space-y-3">
-        <Heading className="text-lg font-medium text-sherick-ink">Date range field</Heading>
+        <Heading className="text-sm font-medium text-sherick-ink-muted">Date range field</Heading>
         <div className="w-[36rem] max-w-full" data-testid="range-picker-field">
           <DateRangePicker
             label="Release window"
@@ -245,7 +245,7 @@ export default function DateFamilySpecimen({ verification = false }: { verificat
       </section>
 
       {verification && <section className="space-y-3">
-        <Heading className="text-lg font-medium text-sherick-ink">Native form, submission and reset</Heading>
+        <Heading className="text-sm font-medium text-sherick-ink-muted">Native form, submission and reset</Heading>
         <form
           data-testid="leap-form"
           className="flex w-[30rem] max-w-full flex-col gap-4"

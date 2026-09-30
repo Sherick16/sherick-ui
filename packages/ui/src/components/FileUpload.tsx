@@ -20,17 +20,19 @@ import {
   density,
   edge,
   fieldLayout,
-  focusRingInset,
+  fieldMessage,
   focusRingDrag,
+  focusRingInset,
   focusRingWithin,
   material,
   matteInset,
-  shape,
   recessedTop,
+  shape,
   state,
   stateLayer,
   text,
   tone,
+  type,
 } from "./ui.common";
 import { motionFeedback, motionInkPress } from "./ui.motion";
 import {
@@ -372,7 +374,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     </span>
                     <span className={cn("flex min-w-0 flex-1 flex-col text-sm leading-6 [overflow-wrap:anywhere]")}>
                       <span>{file.name}</span>
-                      <span className={cn("text-xs leading-5", text.medium)}>{formatBytes(file.size)} · {fileType}</span>
+                      <span className={cn(type.supporting, text.medium)}>{formatBytes(file.size)} · {fileType}</span>
                     </span>
                     <BaseButton
                       ref={(node: HTMLButtonElement | null) => {
@@ -421,26 +423,26 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
         )}
 
         {hint && (
-          <span id={hintId} className={cn("mt-2 text-xs leading-5", text.medium)}>
+          <span id={hintId} className={cn(fieldMessage.description)}>
             {hint}
           </span>
         )}
 
         {description && (
-          <Field.Description className={cn("mt-2 text-xs leading-5", text.medium)}>
+          <Field.Description className={cn(fieldMessage.description)}>
             {description}
           </Field.Description>
         )}
 
         {error ? (
-          <Field.Error match className={cn("mt-2 text-xs leading-5 text-sherick-danger")}>
+          <Field.Error match className={cn(fieldMessage.error)}>
             {error}
           </Field.Error>
         ) : null}
 
         {/* Selection changes are live feedback for screen readers, not a visible activity log.
             Rejections remain visible and are announced in the same mounted region. */}
-        <div role="status" className={cn(rejections.length > 0 && "mt-2 flex flex-col gap-1 text-xs leading-5")}>
+        <div role="status" className={cn(rejections.length > 0 && cn("mt-2 flex flex-col gap-1", type.supporting))}>
           {announcement !== "" && <span className={cn("sr-only")}>{announcement}</span>}
           {rejections.length > 0 && (
             <span key={attempt} className={cn("text-sherick-danger")}>

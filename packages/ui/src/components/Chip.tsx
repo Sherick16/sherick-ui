@@ -148,7 +148,7 @@ export const Chip = forwardRef<HTMLElement, ChipProps>(
             cn(
               "inline-flex min-w-0 max-w-full items-center gap-1.5 px-4 py-1.5 font-medium",
               density.compact,
-              shape.control,
+              shape.pill,
               motionTactile,
               focusRing,
               state.enabled,
@@ -166,7 +166,7 @@ export const Chip = forwardRef<HTMLElement, ChipProps>(
                     text.medium,
                     !toggleState.disabled && "hover:text-sherick-ink"
                   ),
-              !toggleState.disabled && stateLayer.tonal,
+              !toggleState.disabled && (toggleState.pressed ? stateLayer.tonal : stateLayer.tonalNeutral),
               elevation.raised,
               !toggleState.disabled && state.recess,
               className
@@ -195,7 +195,7 @@ export const Chip = forwardRef<HTMLElement, ChipProps>(
         className={cn(
           "inline-flex min-w-0 max-w-full items-center gap-1.5 px-4 py-1.5 font-medium",
           density.compact,
-          shape.control,
+          shape.pill,
           tone.tonal[variant],
           text.high,
           className

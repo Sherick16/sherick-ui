@@ -1,8 +1,9 @@
 .settings-page {
-  max-width: 46rem;
+  /* Full-bleed page, centred content column: the canvas reaches both viewport edges, so the page
+     never shows a hard seam against whatever the host paints behind it. */
   min-height: 100dvh;
-  margin-inline: auto;
-  padding: 3rem clamp(1.25rem, 5vw, 3rem) 5rem;
+  padding-block: 3rem 5rem;
+  padding-inline: max(clamp(1.25rem, 5vw, 3rem), calc((100% - 46rem) / 2));
   color: oklch(var(--sui-ink));
   background: oklch(var(--sui-canvas));
 }
@@ -38,7 +39,25 @@
 }
 
 .settings-switch {
-  align-self: flex-start;
+  align-self: center;
+}
+
+/* A setting row: the label and its description at the start, the control at the end. The page
+   scope outranks the Field's own column layout without an !important. */
+.settings-page .settings-toggle {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 1.5rem;
+  align-items: center;
+}
+
+.settings-page .settings-toggle > * {
+  grid-column: 1;
+}
+
+.settings-page .settings-toggle > .settings-switch {
+  grid-column: 2;
+  grid-row: 1 / span 2;
 }
 
 .settings-actions {

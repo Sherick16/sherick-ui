@@ -1,6 +1,6 @@
 import { cx } from "@/libs/utils";
 import type { Variant } from "./ui.types";
-import { motionDisclose, motionFeedback, motionStateLayer } from "./ui.motion";
+import { motionDisclose, motionFeedback, motionRowLayer, motionStateLayer } from "./ui.motion";
 
 /* Sherick UI design primitives
    ==========================================================================
@@ -136,7 +136,13 @@ export const elevation = {
 export const recessedTop = "shadow-sherick-recessed-top";
 
 /* Shape — semantic corner roles, never an arbitrary radius. Softness grows with
-   the size of the object and the emphasis it carries:
+   the size of the object and the emphasis it carries, and silhouette says what an object does:
+   a **capsule acts** (buttons, chips, badges, toggles are `pill`) and a **rounded rectangle
+   holds** (fields, alerts, tables, sheets). Container roles therefore stay clearly short of a
+   capsule at their own height — `control` is a third of a 48px field — so a field never reads as
+   an almost-button beside a real one. Nested roles stay concentric: an inner corner is the outer
+   corner minus the inset between them (a 20px track around a 16px indicator at 4px, a 24px list
+   sheet around 16px options at 8px).
    - control:     ordinary controls and dense data regions — fields, rows, options,
                   chips, tables.
    - mark:        a compact square selection mark — a checkbox box. `control` is a role
@@ -158,13 +164,13 @@ export const recessedTop = "shadow-sherick-recessed-top";
    - pill:        fully rounded controls whose width follows their content.
    - circle:      fully rounded square targets. */
 export const shape = {
-  control: "rounded-[1.25rem]",
+  control: "rounded-[1rem]",
   mark: "rounded-[0.625rem]",
-  row: "rounded-[0.875rem]",
-  prominent: "rounded-[1.5rem]",
-  surface: "rounded-[1.75rem]",
-  sheet: "rounded-[1.25rem]",
-  expressive: "rounded-[2rem]",
+  row: "rounded-[0.75rem]",
+  prominent: "rounded-[1.25rem]",
+  surface: "rounded-[1.5rem]",
+  sheet: "rounded-[1rem]",
+  expressive: "rounded-[1.75rem]",
   pill: "rounded-full",
   circle: "rounded-full",
 } as const;
@@ -305,6 +311,10 @@ const hoverFilled = "[&:not([data-disabled]):not(:disabled)]:hover:before:opacit
 const hoverTrack = "group-[:not([data-disabled]):not(:disabled)]:hover:before:opacity-[0.18]";
 const pressQuiet = "[&:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.09]";
 const pressTonal = "[&:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.15]";
+/* A neutral fill's label is ink, so a 15% ink veil turns the whole control a flat grey while it is
+   held — and the recess and the compression already say "pressed". The neutral press is lighter;
+   coloured fills keep the stronger step their labels were measured through. */
+const pressTonalNeutral = "[&:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.12]";
 const pressFilled = "[&:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.26]";
 const pressTrack = "group-[:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.26]";
 
@@ -326,6 +336,8 @@ export const stateLayer = {
      on-color (`current`) carries the state at a light step. Shared by every matte
      control with a fill — tonal buttons, icon buttons, acrylic buttons. */
   tonal: /* @__PURE__ */ cx("relative", stateLayerBase, "before:rounded-[inherit] before:bg-current", hoverTonal, pressTonal),
+  /* The same layer for a neutral (`secondary`) tonal fill, with the lighter press. */
+  tonalNeutral: /* @__PURE__ */ cx("relative", stateLayerBase, "before:rounded-[inherit] before:bg-current", hoverTonal, pressTonalNeutral),
   /* Opaque fills: `current` is the fill's own on-color — the color furthest from it in
      either theme — so one step reads on a saturated blue and a neutral gray alike. */
   filled: /* @__PURE__ */ cx("relative", stateLayerBase, "before:rounded-[inherit] before:bg-current", hoverFilled, pressFilled),
@@ -417,17 +429,41 @@ export const mediaCanvas = "bg-sherick-media";
 /* A passive sheet tucked below a stronger control; independently tree-shakeable. */
 export const matteInset = "bg-sherick-surface-high/[0.35] text-sherick-ink";
 
+/* Type roles — the recurring kinds of text the library sets, each with one size, line height and,
+   where the role owns it, one weight. A component still owns copy that only it renders; these are
+   the roles that recur across families and have to agree wherever they appear:
+   - control:    the type step of a control, owned through `density` below.
+   - supporting: a field's description, hint and error, and the secondary line under a row's label.
+   - caption:    compact labels — a badge, a tooltip, a group label, a calendar weekday.
+   - title:      the heading of a compact surface — a popover, a toast, a command palette.
+   - heading:    the title of a surface that owns the viewport — a dialog, an alert dialog, a drawer.
+   - numeric:    figures that are compared down a column or updated in place.
+   Every size lands on a whole-pixel line box, so stacked rows keep one rhythm. */
+export const type = {
+  control: {
+    compact: "text-sm",
+    normal: "text-[0.9375rem] leading-[1.375rem]",
+    prominent: "text-lg",
+  },
+  supporting: "text-[0.8125rem] leading-5",
+  caption: "text-xs leading-4",
+  title: "text-[0.9375rem] leading-[1.375rem] font-semibold",
+  heading: "text-xl leading-7 font-semibold tracking-[-0.02em]",
+  numeric: "tabular-nums",
+} as const;
+
 /* Density — three control steps plus the accessible hit target.
    Density owns height and the type step, so controls of one density share a
    rhythm. A component's anatomy owns its padding: a button's inline padding is
    set by how it is gripped, a field's by how much text it holds, and neither is
-   derived from the other. The library targets dense desktop and product UI, so
-   even the prominent step stays compact. Body copy, headings and labels are
-   content, not controls, and set their own type. */
+   derived from the other. The default step is comfortable rather than dense: a
+   48px control is Sherick's resting proportion, and `compact` is the step for
+   dense product regions. Body copy, headings and labels are content, not
+   controls, and take a type role above. */
 export const density = {
-  compact: "min-h-10 text-sm",
-  normal: "min-h-12 text-[0.95rem]",
-  prominent: "min-h-14 text-lg",
+  compact: /* @__PURE__ */ cx("min-h-10", type.control.compact),
+  normal: /* @__PURE__ */ cx("min-h-12", type.control.normal),
+  prominent: /* @__PURE__ */ cx("min-h-14", type.control.prominent),
   /* Minimum interactive target for an icon-only control that stands on its own. */
   target: "min-h-11 min-w-11",
   /* A control that is one part of a composite field — the trailing controls a Combobox owns. It
@@ -438,6 +474,18 @@ export const density = {
      this system's own 44px floor on purpose: that floor belongs to a control that is the whole
      target of its own action, and this one is a part of a field the pointer is already in. */
   part: "min-h-11 min-w-9",
+} as const;
+
+/* Icon slot — the fixed box a leading or trailing mark occupies, sized by the type step it sits
+   beside so the icon-to-label ratio is the same at every size: a 14px label takes a 16px mark, a
+   15px label a 20px mark, an 18px label a 24px mark, and a 12px caption a 14px mark. The box, not
+   the artwork's own whitespace, is what aligns with the label, and a spinner that replaces the icon
+   lands in the same box. */
+export const iconSlot = {
+  caption: "inline-flex size-3.5 shrink-0 items-center justify-center [&>svg]:size-3.5",
+  compact: "inline-flex size-4 shrink-0 items-center justify-center [&>svg]:size-4",
+  normal: "inline-flex size-5 shrink-0 items-center justify-center [&>svg]:size-5",
+  prominent: "inline-flex size-6 shrink-0 items-center justify-center [&>svg]:size-6",
 } as const;
 
 /* Stacking level — where anything that floats sits relative to the application.
@@ -560,13 +608,15 @@ export const list = {
      row still shows where the navigation is while saying it cannot be used. The ring is inset
      because the row lives inside the sheet it belongs to, as a segment does in its track. */
   option: /* @__PURE__ */ cx(
-    "flex w-full items-center justify-between gap-4 px-4 py-3 text-start text-sm outline-none",
+    "flex w-full items-center justify-between gap-4 px-4 py-3 text-start outline-none",
+    type.control.normal,
     shape.control,
     motionFeedback,
     focusRingInset,
     text.high,
     stateLayer.quiet,
     stateLayer.activeRow,
+    motionRowLayer,
     state.effectiveDisabled
   ),
   /* The same object at the density a list of short actions wants, where the row is scanned
@@ -574,13 +624,15 @@ export const list = {
      command's corner proportional to its own height, so its highlight nests in the tighter
      sheet the menu is. */
   command: /* @__PURE__ */ cx(
-    "flex w-full items-center gap-3 px-3 py-2 text-start text-sm outline-none",
+    "flex w-full items-center gap-3 px-3 py-2 text-start outline-none",
+    type.control.compact,
     shape.row,
     motionFeedback,
     focusRingInset,
     text.high,
     stateLayer.quiet,
     stateLayer.activeRow,
+    motionRowLayer,
     state.effectiveDisabled
   ),
 } as const;
@@ -609,11 +661,14 @@ export const disclosure = {
      text      foreground only, for quiet rows and links.
      soft      a de-emphasised tinted surface: alerts, badges, quiet cards.
      tonal     a matte control fill at rest: tonal buttons, icon buttons.
-     selected  the fill a selected control holds: menu options, navigation, the
-               selected segment of a segmented control.
+     selected  the fill a selected control holds: options, segments, calendar days, tree rows.
      strong    the opaque accent fill that marks priority.
-   A fill step is composited over whatever sits beneath it, so one tone reads
-   correctly on the canvas, inside a card and on an acrylic sheet. */
+   The semantic soft and selected steps are the role's own authored surfaces (`--sui-<role>-soft`,
+   `--sui-<role>-selected`), not a fraction of its foreground: the foreground is tuned for text
+   contrast, and a fraction of it is a greyed version of the hue. They are opaque, so one tone reads
+   the same on the canvas, inside a card and on an acrylic sheet. The neutral soft step is a step
+   *within* whatever holds it rather than the card fill itself, so a neutral badge or tag stays
+   visible inside a card. */
 export const tone = {
   text: {
     primary: "text-sherick-primary",
@@ -623,25 +678,25 @@ export const tone = {
     success: "text-sherick-success",
   },
   soft: {
-    primary: "bg-sherick-primary/[0.12] text-sherick-primary",
-    secondary: "bg-sherick-surface/[0.78] text-sherick-ink",
-    danger: "bg-sherick-danger/[0.09] text-sherick-danger",
-    warning: "bg-sherick-warning/[0.09] text-sherick-warning",
-    success: "bg-sherick-success/[0.09] text-sherick-success",
+    primary: "bg-sherick-primary-soft text-sherick-primary",
+    secondary: "bg-sherick-surface-high/[0.72] text-sherick-ink",
+    danger: "bg-sherick-danger-soft text-sherick-danger",
+    warning: "bg-sherick-warning-soft text-sherick-warning",
+    success: "bg-sherick-success-soft text-sherick-success",
   },
   tonal: {
-    primary: "bg-sherick-primary/[0.12]",
+    primary: "bg-sherick-primary-soft",
     secondary: "bg-sherick-surface-high/[0.56]",
-    danger: "bg-sherick-danger/[0.09]",
-    warning: "bg-sherick-warning/[0.09]",
-    success: "bg-sherick-success/[0.09]",
+    danger: "bg-sherick-danger-soft",
+    warning: "bg-sherick-warning-soft",
+    success: "bg-sherick-success-soft",
   },
   selected: {
-    primary: "bg-sherick-primary/[0.22] text-sherick-ink",
+    primary: "bg-sherick-primary-selected text-sherick-ink",
     secondary: "bg-sherick-surface-high/[0.82] text-sherick-ink",
-    danger: "bg-sherick-danger/[0.16] text-sherick-ink",
-    warning: "bg-sherick-warning/[0.16] text-sherick-ink",
-    success: "bg-sherick-success/[0.16] text-sherick-ink",
+    danger: "bg-sherick-danger-selected text-sherick-ink",
+    warning: "bg-sherick-warning-selected text-sherick-ink",
+    success: "bg-sherick-success-selected text-sherick-ink",
   },
   strong: {
     primary: "bg-sherick-primary-strong text-sherick-on-primary",
@@ -664,6 +719,12 @@ export const tone = {
   },
 } satisfies Record<string, Record<Variant, string>>;
 
+/* Current location — where the reader is, as opposed to a value they chose. A navigation row, the
+   current page of a pagination and any other `aria-current` destination hold the role's soft
+   container, full ink and a touch of weight, and stay flat: depth and the stronger selected step
+   belong to held values (`tone.selected` with `elevation.control`). */
+export const currentDestination = "bg-sherick-primary-soft text-sherick-ink font-medium";
+
 /* Selectable surface — the recessed surface of a control that fills once it is selected: a
    switch track, a checkbox box, a radio circle, a slider groove. Selection is keyed on the
    primitive's own `data-checked` / `data-indeterminate`, so an uncontrolled control is styled
@@ -673,7 +734,7 @@ export const tone = {
    selection authoritative at the primitive rather than mirroring it in component state.
    Keep this independent so unrelated consumers of the mark recipes can tree-shake it. */
 export const selectableRowSurface =
-  "has-[[data-checked]]:bg-sherick-primary/[0.22] has-[[data-checked]]:text-sherick-ink has-[[data-checked]]:shadow-sherick-control";
+  "has-[[data-checked]]:bg-sherick-primary-selected has-[[data-checked]]:text-sherick-ink has-[[data-checked]]:shadow-sherick-control";
 
 export const selectable = {
   surface: /* @__PURE__ */ cx("relative", elevation.recessed, motionFeedback),
@@ -720,26 +781,17 @@ export const recipeAlphas = {
   state: {
     quiet: { hover: stateAlpha(hoverQuiet, "state.quiet.hover"), press: stateAlpha(pressQuiet, "state.quiet.press") },
     tonal: { hover: stateAlpha(hoverTonal, "state.tonal.hover"), press: stateAlpha(pressTonal, "state.tonal.press") },
+    tonalNeutral: { hover: stateAlpha(hoverTonal, "state.tonalNeutral.hover"), press: stateAlpha(pressTonalNeutral, "state.tonalNeutral.press") },
     filled: { hover: stateAlpha(hoverFilled, "state.filled.hover"), press: stateAlpha(pressFilled, "state.filled.press") },
   },
   tint: {
-    soft: {
-      primary: fillAlpha(tone.soft.primary, "tint.soft.primary"),
-      danger: fillAlpha(tone.soft.danger, "tint.soft.danger"),
-      warning: fillAlpha(tone.soft.warning, "tint.soft.warning"),
-      success: fillAlpha(tone.soft.success, "tint.soft.success"),
-    },
-    selected: {
-      primary: fillAlpha(tone.selected.primary, "tint.selected.primary"),
-      danger: fillAlpha(tone.selected.danger, "tint.selected.danger"),
-      warning: fillAlpha(tone.selected.warning, "tint.selected.warning"),
-      success: fillAlpha(tone.selected.success, "tint.selected.success"),
-    },
+    neutralSoft: fillAlpha(tone.soft.secondary, "tint.neutralSoft"),
     neutralRest: fillAlpha(tone.tonal.secondary, "tint.neutralRest"),
   },
   field: {
     quiet: fillAlpha(material.matteQuiet, "field.quiet"),
     card: fillAlpha(material.matte, "field.card"),
+    groove: fillAlpha(material.matteHigh, "field.groove"),
     control: fillAlpha(material.control, "field.control"),
     hover: fillAlpha(state.field.hover, "field.hover"),
     engaged: fillAlpha(state.field.engaged, "field.engaged"),
@@ -752,3 +804,10 @@ export const recipeAlphas = {
 /* A labelled field is a shrinkable column. Its explanatory copy wraps, including identifiers;
    the input itself keeps its native single-line scrolling behavior. */
 export const fieldLayout = "flex min-w-0 w-full flex-col [overflow-wrap:anywhere]";
+
+/* The messages under a field: its description or hint, and its error. One role for every field in
+   the family, so a hint reads the same under a text field, a date range and a file chooser. */
+export const fieldMessage = {
+  description: /* @__PURE__ */ cx("mt-2", type.supporting, text.medium),
+  error: /* @__PURE__ */ cx("mt-2", type.supporting, tone.text.danger),
+} as const;

@@ -14,7 +14,21 @@ export const lightTokens = {
   "detail": "0.600 0.016 258",
   "primary": "0.422 0.139 255",
   "primary-strong": "0.402 0.143 257",
-  "primary-soft": "0.91 0.035 255",
+  /* The designed surfaces of each semantic role. A soft container is what a tinted surface is
+     made of — a tonal control, an Alert, a Badge, a quiet Card — and the selected step is the held
+     choice one rung stronger. They are authored rather than derived as a fraction of the role's
+     foreground, because that foreground is tuned for text contrast: a fraction of a deep navy is a
+     grey-blue and a fraction of a deep olive is a grey, so every contrast retune used to recolour
+     every tinted surface. Each value clears the contrast contract with its own foreground, `ink`
+     and the focus ring through the tonal states. */
+  "primary-soft": "0.920 0.035 255",
+  "primary-selected": "0.860 0.055 255",
+  "danger-soft": "0.930 0.030 18",
+  "danger-selected": "0.870 0.050 18",
+  "warning-soft": "0.940 0.045 85",
+  "warning-selected": "0.885 0.070 82",
+  "success-soft": "0.935 0.037 155",
+  "success-selected": "0.875 0.055 155",
   "accent": "0.62 0.10 215",
   "danger": "0.439 0.170 25",
   "warning": "0.388 0.082 75",
@@ -30,7 +44,9 @@ export const lightTokens = {
   "light-top": "1 0 0",
   "light-bottom": "0.32 0.02 256",
   "elevation-flat": "none",
-  "elevation-raised": "0 1px 2px oklch(var(--sui-light-bottom) / 0.16), 0 4px 13px oklch(var(--sui-light-bottom) / 0.09)",
+  /* A contact shadow, not a float: the ambient layer stays close to the control, so a row of raised
+     actions sits on the page rather than hovering over it. Floating depth is `elevation-floating`'s. */
+  "elevation-raised": "0 1px 2px oklch(var(--sui-light-bottom) / 0.16), 0 2px 6px oklch(var(--sui-light-bottom) / 0.07)",
   "elevation-floating": "0 16px 40px oklch(var(--sui-light-bottom) / 0.20), inset 0 1px 0 oklch(var(--sui-light-top) / 0.70)",
   "elevation-control": "0 1px 2px oklch(var(--sui-light-bottom) / 0.19), inset 0 1px 0 oklch(var(--sui-light-top) / 0.55)",
   /* The recessed rung, and the deeper rung a *small* well takes. A well differs from a groove in
@@ -81,7 +97,14 @@ export const darkTokens = {
   "detail": "0.600 0.014 256",
   "primary": "0.809 0.098 255",
   "primary-strong": "0.734 0.139 257",
-  "primary-soft": "0.42 0.055 257",
+  "primary-soft": "0.325 0.050 257",
+  "primary-selected": "0.400 0.075 257",
+  "danger-soft": "0.315 0.050 22",
+  "danger-selected": "0.395 0.070 22",
+  "warning-soft": "0.320 0.045 78",
+  "warning-selected": "0.400 0.065 78",
+  "success-soft": "0.315 0.045 160",
+  "success-selected": "0.395 0.065 160",
   "accent": "0.80 0.08 215",
   "danger": "0.799 0.115 25",
   "warning": "0.82 0.12 80",
@@ -133,24 +156,45 @@ export const darkTokens = {
 } as const satisfies Record<keyof typeof lightTokens, string>;
 
 export const sharedTokens = {
+  /* The code face. Sans text inherits the host's typeface — the library is tuned for a
+     neo-grotesque such as Inter but never sets one — while code needs a monospace the platform
+     default does not reliably provide, so the stack is curated here once. */
+  "font-mono": 'ui-monospace, "SF Mono", SFMono-Regular, "Cascadia Code", "JetBrains Mono", Menlo, Consolas, "Liberation Mono", monospace',
   "duration-press": "150ms",
   "duration-release": "200ms",
+  /* The press leg of a tactile response. A tap on a trackpad or a brisk click is held for well
+     under 100ms, and a press that interpolates over the feedback duration is released before it
+     shows; this leg lands inside a tap, and the release still settles on the release timing. */
+  "duration-tactile": "80ms",
   "duration-overlay": "240ms",
   "duration-overlay-exit": "160ms",
+  /* Duration grows with travel, in two steps rather than continuously. A tab indicator crossing a
+     track travels hundreds of pixels, and on the local timing it covers them in a handful of
+     frames; a sheet crosses a whole viewport edge, and on the anchored timing it arrives before
+     the eye has followed it. */
+  "duration-travel": "300ms",
+  "duration-sheet": "320ms",
+  "duration-sheet-exit": "200ms",
   /* Continuous activity runs for as long as the work does: a spinner's loop has no duration of
      its own, but a sweep across a track is paced, so the one loop that is timed is authored
      here with the rest of the system's timing. It is a pace, not a response, so it is the one
      duration that never shortens for a press or a release. */
   "duration-activity": "1400ms",
+  /* The other two loops share one rhythm: a spinner turns once a second, and a skeleton breathes
+     once every two turns, so two loading glyphs on one screen never beat against each other. */
+  "duration-spin": "1000ms",
+  "duration-pulse": "2000ms",
+  "ease-pulse": "cubic-bezier(0.4, 0, 0.6, 1)",
   "ease-press": "cubic-bezier(0.4, 0, 0.2, 1)",
   "ease-release": "cubic-bezier(0.16, 1, 0.3, 1)",
   "ease-exit": "cubic-bezier(0.4, 0, 1, 1)",
   /* A persistent object travelling between two stable destinations — a tab indicator, a switch
-     thumb. `ease-release` is an arrival curve: it spends 90% of a travel in the first third of
-     the time, which reads as a teleport followed by a creep once the distance is large. The
-     glide curve leaves the old position gently, crosses the middle of the travel in the middle
-     of the time, and settles at the end, so the movement itself is what the eye sees. It never
-     overshoots. */
+     thumb — and the grow of a surface arriving. `ease-release` is an arrival curve: it covers
+     about 80% of a travel in the first quarter of the time, which reads as a teleport followed by
+     a creep once the distance is large. The glide curve starts from rest instead of at full
+     speed: it passes the middle of the travel at about a third of the time and is roughly 80%
+     there at half time (measured in the motion audit), so the start of the movement is visible
+     rather than skipped. It never overshoots. */
   "ease-glide": "cubic-bezier(0.32, 0, 0.24, 1)",
   /* The one overshooting curve in the system: a part that travels a little past where it lands
      and settles back. It is what makes a selection feel made and a released press feel answered,

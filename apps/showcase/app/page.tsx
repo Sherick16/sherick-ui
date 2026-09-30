@@ -85,6 +85,7 @@ import {
   stateLayer,
   text,
   tone,
+  type,
 } from "sherick-ui/dev";
 
 import {
@@ -119,11 +120,16 @@ const isThemeMode = (value: string | null): value is ThemeMode =>
   value === "system" || value === "light" || value === "dark";
 
 const applyTheme = (theme: ThemeMode) => {
+  /* A theme change is a token swap, not an interaction: suppress transitions for the frame in which
+     it lands, so controls do not animate the old theme's tones on the new theme's page. */
+  const root = document.documentElement;
+  root.setAttribute("data-theme-switching", "");
   if (theme === "system") {
-    document.documentElement.removeAttribute("data-sherick-theme");
+    root.removeAttribute("data-sherick-theme");
   } else {
-    document.documentElement.dataset.sherickTheme = theme;
+    root.dataset.sherickTheme = theme;
   }
+  requestAnimationFrame(() => requestAnimationFrame(() => root.removeAttribute("data-theme-switching")));
 };
 
 export default function Home() {
@@ -171,14 +177,18 @@ export default function Home() {
           <ThemePicker theme={theme} onChange={changeTheme} />
         </div>
       </div>
+      {/* Below the gutter-rail width, the jump control rides a full-width frosted band, so content
+          scrolls beneath a surface rather than colliding with a floating pill. */}
+      <div className={cn("sticky top-0 z-30 mb-6 min-[1660px]:hidden", material.acrylicDense)}>
+        <div className="mx-auto w-full max-w-[1320px] px-5 py-3 sm:px-8 lg:px-10">
+          <ShowcaseJumpNav activeId={activeSection} />
+        </div>
+      </div>
       <div className="mx-auto grid w-full max-w-[1320px] grid-cols-1 min-[1660px]:max-w-none min-[1660px]:grid-cols-[minmax(0,1fr)_1320px_minmax(0,1fr)]">
         <div className="hidden min-[1660px]:block">
           <ShowcaseSideNav activeId={activeSection} className="sticky top-28 ml-auto mr-3 w-36" />
         </div>
         <div className="min-w-0 px-5 pb-10 sm:px-8 lg:px-10 lg:pb-14">
-        <div className="sticky top-4 z-30 mb-6 min-[1660px]:hidden">
-          <ShowcaseJumpNav activeId={activeSection} />
-        </div>
         <div className="space-y-16">
           <ShowcaseSection id="design-language">
             <div className="mt-6 columns-1 gap-4 xl:columns-2 [&>*]:mb-4 [&>*]:break-inside-avoid">
@@ -194,7 +204,7 @@ export default function Home() {
                 <div className={cn("relative mt-4 overflow-hidden p-5", shape.prominent, "bg-sherick-canvas/[0.55]")}>
                   <div className="pointer-events-none absolute inset-0" aria-hidden="true">
                     <div className="absolute -left-6 -top-4 h-24 w-36 rounded-full bg-sherick-primary/[0.30] blur-[28px]" />
-                    <div className="absolute -bottom-2 right-2 h-20 w-28 rounded-full bg-sherick-accent/[0.22] blur-[26px]" />
+                    <div className="absolute -bottom-2 right-2 h-20 w-28 rounded-full bg-sherick-success/[0.22] blur-[26px]" />
                   </div>
                   <div className="relative grid grid-cols-1 gap-4 sm:grid-cols-3">
                     <Tile label="Acrylic" className={material.acrylic} />
@@ -216,10 +226,10 @@ export default function Home() {
 
               <Specimen title="Shape">
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                  <Tile label="1.25rem" caption="Control" className={cn(material.matteHigh, shape.control)} />
-                  <Tile label="1.5rem" caption="Prominent" className={cn(material.matteHigh, shape.prominent)} />
-                  <Tile label="1.75rem" caption="Surface" className={cn(material.matteHigh, shape.surface)} />
-                  <Tile label="2rem" caption="Expressive" className={cn(material.matteHigh, shape.expressive)} />
+                  <Tile label="1rem" caption="Control" className={cn(material.matteHigh, shape.control)} />
+                  <Tile label="1.25rem" caption="Prominent" className={cn(material.matteHigh, shape.prominent)} />
+                  <Tile label="1.5rem" caption="Surface" className={cn(material.matteHigh, shape.surface)} />
+                  <Tile label="1.75rem" caption="Expressive" className={cn(material.matteHigh, shape.expressive)} />
                   <Tile label="pill" caption="Pill" className={cn(tone.tonal.primary, shape.pill, text.high)} />
                   <Tile label="circle" caption="Circle" className={cn(tone.tonal.primary, shape.circle, text.high, "aspect-square w-24 max-w-full self-center")} />
                 </div>
@@ -227,8 +237,8 @@ export default function Home() {
 
               <Specimen title="Tonality">
                 <div className="space-y-5">
-                  <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-                    <Swatch label="Canvas" className={material.canvas} />
+                  <div className={cn("grid grid-cols-2 gap-3 p-3 sm:grid-cols-4", shape.control, material.canvas)}>
+                    <Swatch label="Canvas" className={cn(material.canvas, "outline outline-1 outline-dashed outline-sherick-edge/[0.25]")} />
                     <Swatch label="Surface" className="bg-sherick-surface" />
                     <Swatch label="Surface high" className="bg-sherick-surface-high" />
                     <Swatch label="Surface float" className="bg-sherick-surface-float" />
@@ -237,12 +247,15 @@ export default function Home() {
                     <Swatch label="Primary strong" className="bg-sherick-primary-strong" />
                     <Swatch label="Primary" className="bg-sherick-primary" />
                     <Swatch label="Primary soft" className="bg-sherick-primary-soft" />
-                    <Swatch label="Accent" className="bg-sherick-accent" />
+                    <Swatch label="Primary selected" className="bg-sherick-primary-selected" />
                   </div>
                   <div className="grid grid-cols-3 gap-3">
                     <Swatch label="Danger" className="bg-sherick-danger" />
                     <Swatch label="Warning" className="bg-sherick-warning" />
                     <Swatch label="Success" className="bg-sherick-success" />
+                    <Swatch label="Danger soft" className="bg-sherick-danger-soft" />
+                    <Swatch label="Warning soft" className="bg-sherick-warning-soft" />
+                    <Swatch label="Success soft" className="bg-sherick-success-soft" />
                   </div>
                   <div className="space-y-2">
                     <p className={cn("text-sm", text.high)}>High emphasis</p>
@@ -511,7 +524,6 @@ export default function Home() {
                   />
                   <NavGroup
                     title="Controls"
-                    activeHref="#fields"
                     items={[
                       { label: "Buttons", href: "#buttons" },
                       { label: "Fields", href: "#fields" },
@@ -614,7 +626,7 @@ export default function Home() {
           <ShowcaseSection id="display">
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
               <Specimen title="Cards">
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className={cn("grid gap-3 p-3 sm:grid-cols-2", shape.control, material.canvas)}>
                   <Card variant="secondary"><div className="font-medium">Neutral card</div><p className={cn("mt-2 text-sm leading-6", text.medium)}>Body copy goes here.</p></Card>
                   <Card variant="primary"><div className="font-medium">Tonal card</div><p className={cn("mt-2 text-sm leading-6", text.medium)}>Body copy goes here.</p></Card>
                 </div>
@@ -631,7 +643,7 @@ export default function Home() {
               </Specimen>
 
               <Specimen title="Images">
-                <div className="grid gap-3 sm:grid-cols-2">
+                <div className="grid items-start gap-3 sm:grid-cols-2">
                   <Media.Image src="https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg?auto=compress&width=680" alt="Warm living room with a sofa" />
                   <Media.Image src="https://images.pexels.com/photos/276724/pexels-photo-276724.jpeg?auto=compress&width=680" alt="Living room detail" aspect="square" fit="cover" position="top" />
                 </div>
@@ -849,7 +861,7 @@ function ShowcaseSection({
 function Specimen({ title, className = "", children }: { title: string; className?: string; children: React.ReactNode }) {
   return (
     <div className={cn(shape.surface, material.matte, "min-w-0 self-start p-4 sm:p-6", className)}>
-      <h3 className="mb-5 font-medium tracking-[-0.01em]">{title}</h3>
+      <h3 className={cn("mb-5", type.title)}>{title}</h3>
       {children}
     </div>
   );

@@ -48,16 +48,41 @@ export const motionFeedback =
 
 /** A control answers a press immediately and settles on its release.
  *
- *  The recipe owns the *amplitude* of that answer as well as its timing, because how far a
- *  press travels is the system's physical character rather than a component's anatomy: a
- *  control whose outline is what the user sees compresses 4%, which is about two pixels at the
- *  size of the ink it moves. A control whose visible ink is far smaller than the target it is
- *  aimed at takes `motionInkPress` on that ink instead, so the target itself never moves. The
- *  interpolation and the compression are neutralised together under reduced motion. */
+ *  The recipe owns the *amplitude* of that answer as well as its timing, because how far a press
+ *  travels is the system's physical character rather than a component's anatomy. A percentage is a
+ *  distance only once it meets a size, so the amplitude comes in tiers chosen by the control's role:
+ *
+ *  - `motionTactile`: a content-width control — a button, a chip, a segment — compresses 4%, about
+ *    two pixels at the size of the ink it moves.
+ *  - `motionTactileWide`: a control that spans a track — a tab — compresses 1.5%, so its edges move
+ *    about as far as a button's.
+ *  - `motionTactileField`: a list-opening field — a Select trigger, an editable Combobox — spans
+ *    its whole container, and 4% of a 580px field moved each edge 11.6px. It compresses 0.7%, about
+ *    two pixels at that width: the field acknowledges the press without lurching.
+ *
+ *  The press leg runs on `duration-tactile`, short enough to land inside a tap; the release settles
+ *  on the release timing. A control whose visible ink is far smaller than its target takes
+ *  `motionInkPress` on that ink instead, so the target itself never moves. The interpolation and
+ *  the compression are neutralised together under reduced motion. */
 /* Base may disable the surface itself or the value control inside a Select wrapper.
-   Neither is a pressable surface. Timing and amplitude are otherwise unchanged. */
-export const motionTactile =
-  "transition-[background-color,color,box-shadow,transform,opacity] duration-release ease-release active:duration-press active:ease-press motion-safe:[&:not([data-disabled],:disabled,:has(>[role=combobox][data-disabled]))]:active:scale-[0.96] motion-reduce:transition-none";
+   Neither is a pressable surface. Timing is otherwise shared by every tier. */
+const tactileTiming =
+  "transition-[background-color,color,box-shadow,transform,opacity] duration-release ease-release active:duration-tactile active:ease-press motion-reduce:transition-none";
+
+export const motionTactile = /* @__PURE__ */ cx(
+  tactileTiming,
+  "motion-safe:[&:not([data-disabled],:disabled,:has(>[role=combobox][data-disabled]))]:active:scale-[0.96]"
+);
+
+export const motionTactileWide = /* @__PURE__ */ cx(
+  tactileTiming,
+  "motion-safe:[&:not([data-disabled],:disabled)]:active:scale-[0.985]"
+);
+
+export const motionTactileField = /* @__PURE__ */ cx(
+  tactileTiming,
+  "motion-safe:[&:not([data-disabled],:disabled,:has(>[role=combobox][data-disabled]))]:active:scale-[0.993]"
+);
 
 /** The spatial half of a compact press, applied to the *mark* rather than to the control.
  *
@@ -69,7 +94,7 @@ export const motionTactile =
  *  target still owns the focus ring and the state layer, and still carries the tone and depth
  *  response, so the boundary a press happens inside never moves. */
 export const motionInkPress =
-  "transition-transform duration-release ease-release group-active:duration-press group-active:ease-press group-active:scale-[0.88] motion-reduce:transition-none motion-reduce:group-active:scale-100";
+  "transition-transform duration-release ease-release group-active:duration-tactile group-active:ease-press group-active:scale-[0.88] motion-reduce:transition-none motion-reduce:group-active:scale-100";
 
 /* Motion is not owned here — but the recipes above are the whole vocabulary: every press, arrival,
    travel, presence and activity in the library is one of these names plus its owner's own target
@@ -106,6 +131,11 @@ export const motionOrient =
  *  because it is a transition and not a keyframe. */
 export const motionRelocate =
   "transition-[left,inset-inline-start,top,width,height,transform,background-color,color,box-shadow,opacity] duration-release ease-glide motion-reduce:transition-none";
+
+/** The same travel across a whole track — a tab indicator — on the longer travel timing, so a
+ *  movement of hundreds of pixels is followed rather than skipped. */
+export const motionRelocateLong =
+  "transition-[left,inset-inline-start,top,width,height,transform,background-color,color,box-shadow,opacity] duration-travel ease-glide motion-reduce:transition-none";
 
 /** Direct manipulation: the pointer owns the geometry, so a positional transition would be
  *  lag. While the primitive reports a drag, position and size are removed from the
@@ -210,7 +240,7 @@ export const motionPresenceModal = /* @__PURE__ */ cx(
 /** The plane behind a surface that owns the viewport. Opacity only: a blur or a filter is
  *  never animated, so the plane can never animate the page behind it. */
 export const motionPresenceScrim =
-  "transition-opacity duration-overlay ease-release data-[ending-style]:duration-overlay-exit data-[ending-style]:ease-exit";
+  "transition-opacity duration-overlay ease-release data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 data-[ending-style]:duration-overlay-exit data-[ending-style]:ease-exit";
 
 /** Continuous activity is a distinct intent, not an exception to interaction motion: it
  *  reports work rather than answering an event, and it has no entrance of its own. */
@@ -229,8 +259,13 @@ export const motionActivityIndeterminate =
 
 /** The state layer is a composited overlay, so its own opacity is the only thing that
  *  moves. Shared here because four interaction states across the library ride it. */
+/** A row in a collection moves its highlight rather than fading it: a highlight is where the reader
+ *  is, and arrowing through a list with a soft fade on every row leaves a smear of half-lit rows.
+ *  The row's layer therefore changes in one step, for the pointer and the keyboard alike. */
+export const motionRowLayer = "before:transition-none";
+
 export const motionStateLayer =
-  "before:transition-opacity before:duration-release before:ease-release active:before:duration-press active:before:ease-press group-active:before:duration-press group-active:before:ease-press motion-reduce:before:transition-none";
+  "before:transition-opacity before:duration-release before:ease-release active:before:duration-tactile active:before:ease-press group-active:before:duration-tactile group-active:before:ease-press motion-reduce:before:transition-none";
 
 /* `disclose` is the in-flow counterpart of presence: nothing mounts or unmounts, and nothing
    leaves the page — one region changes its own height where it sits. Base measures the panel and
@@ -238,7 +273,7 @@ export const motionStateLayer =
    The panel states the height it opens to; this recipe owns how it gets there, and reduced
    motion applies the layout state in one step rather than travelling through it. */
 export const motionDisclose =
-  "transition-[height] duration-release ease-release data-[starting-style]:h-0 data-[ending-style]:h-0 motion-reduce:transition-none";
+  "transition-[height] duration-release ease-release data-[starting-style]:h-0 data-[ending-style]:h-0 data-[ending-style]:duration-overlay-exit data-[ending-style]:ease-exit motion-reduce:transition-none";
 
 /* A sheet is a surface that owns the viewport and is attached to one edge of it, so its presence is
    a slide out of that edge rather than the modal lift, and it never bounces. The component names the
@@ -251,8 +286,8 @@ export const motionDisclose =
    the right edge would enter from the bottom-right corner and travel diagonally instead of
    straight in. One edge means one axis. */
 export const motionPresenceSheet = /* @__PURE__ */ cx(
-  "transition-[transform,opacity] duration-overlay ease-glide",
-  "data-[ending-style]:duration-overlay-exit data-[ending-style]:ease-exit",
+  "transition-[transform,opacity] duration-sheet ease-glide",
+  "data-[ending-style]:duration-sheet-exit data-[ending-style]:ease-exit",
   "motion-reduce:transition-[opacity]",
   "data-[starting-style]:opacity-0",
   "data-[ending-style]:opacity-0",

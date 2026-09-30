@@ -3,7 +3,7 @@
 import { Field as BaseField } from "@base-ui/react/field";
 import React, { forwardRef, type ComponentProps, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { fieldLayout, text } from "./ui.common";
+import { fieldLayout, fieldMessage, text } from "./ui.common";
 
 export interface FieldProps
   extends Omit<ComponentProps<typeof BaseField.Root>, "children" | "className" | "ref"> {
@@ -62,7 +62,7 @@ export const Field = forwardRef<HTMLDivElement, FieldProps>(
         )}
         {children}
         {description && (
-          <BaseField.Description className={cn("mt-2 text-xs leading-5", text.medium)}>
+          <BaseField.Description className={cn(fieldMessage.description)}>
             {description}
           </BaseField.Description>
         )}
@@ -71,7 +71,7 @@ export const Field = forwardRef<HTMLDivElement, FieldProps>(
             and `match` pins a caller-supplied message in its place. */}
         <BaseField.Error
           match={error ? true : undefined}
-          className={cn("mt-2 text-xs leading-5 text-sherick-danger")}
+          className={cn(fieldMessage.error)}
           {...(error ? { children: error } : {})}
         />
       </BaseField.Root>

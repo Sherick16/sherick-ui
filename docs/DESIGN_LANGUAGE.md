@@ -38,7 +38,7 @@ a sideways shadow or an upward-lit gradient to one component.
 | Recipe | Use | Not for |
 | --- | --- | --- |
 | `canvas` | application background | nested content |
-| `matteQuiet`, `matte`, `matteHigh` | quiet, ordinary and stronger grounded surfaces | floating UI |
+| `matteQuiet`, `matte`, `matteHigh` | quiet, ordinary and stronger grounded surfaces; every sunk track (slider groove, progress track, segment track) is `matteHigh`, so its full extent stays visible on a card | floating UI |
 | `matteInset` | a passive sheet tucked beneath a stronger control, visible but quieter than that control | independent cards or fields |
 | `control`, `controlError` | text fields and their invalid state | passive cards |
 | `handle` | a small value-control part that must remain findable, even disabled | large surfaces |
@@ -65,6 +65,11 @@ source's semantics. Video defaults to its source ratio and containment, never im
 | `recessedTop` | the upper wall of an inset sheet continuing directly below a control, without a lower rim | standalone tracks or wells |
 | `well` | a small empty checkbox/radio mark whose recessed wall identifies it | a wide groove with its own fill |
 | `floating` | real overlay surfaces | anything in document flow |
+
+Actions follow one depth ladder: a text action sits flat, and tonal and filled actions are
+`raised` at rest and `recessed` while held. The priority action is never flatter than the
+secondary one beside it, so depth never contradicts the fill hierarchy. `raised` is a contact
+shadow, not a float: a row of raised actions sits on the page.
 
 Held choices combine `tone.selected` and `elevation.control`: selected segments, options,
 tree rows and calendar days. A continuous date range makes one band per week rather than
@@ -111,23 +116,31 @@ tone rather than drawing and removing borders on focus or error.
 
 ## 9. Shape
 
-| Role | Use |
-| --- | --- |
-| `mark` | small square checkbox |
-| `row` | command-density row, compact segment or short hint |
-| `control` | fields, ordinary controls and full-width option rows |
-| `prominent` | prominent controls, tab tracks and compact floating status |
-| `surface` | cards, panels and spacious anchored sheets |
-| `sheet` | exposed corners of a viewport-attached Drawer |
-| `expressive` | a dialog floating free of all edges |
-| `pill`, `circle` | content-width round controls and square round targets |
+| Role | Radius | Use |
+| --- | --- | --- |
+| `mark` | 10px | small square checkbox |
+| `row` | 12px | command-density row, compact segment, navigation row or short hint |
+| `control` | 16px | fields, alerts, tables, segment tracks and full-width option rows |
+| `prominent` | 20px | tab tracks, code wells and compact floating status |
+| `surface` | 24px | cards, panels and spacious anchored sheets |
+| `sheet` | 16px | exposed corners of a viewport-attached Drawer |
+| `expressive` | 28px | a dialog floating free of all edges |
+| `pill`, `circle` | full | content-width actions, chips and badges; square round targets |
+
+**A capsule acts; a rounded rectangle holds.** Buttons, chips and badges are pills; a segment
+inside a track takes its track's nested corner instead.
+Fields, alerts, tables and sheets are rounded rectangles clearly short of a capsule at their
+own height (`control` is a third of a 48px field), so a field never reads as an almost-button
+beside a real one. Do not give a container a pill, and do not give an action a container corner.
 
 Choose shape by the object's own extent. A field radius on a 24px square would make it
 a circle; a dialog radius on a drawer attached to the viewport would make the drawer
-look like an oversized card. A compact segment nests its `row` corner in a `control`
-track; a normal tab nests `control` in `prominent`. Pagination is also a recessed
-segmented track, with rounded-rectangle targets and a raised current page. Do not use
-literal radii or invent per-theme corner offsets in components.
+look like an oversized card. Nested corners are concentric: the inner radius is the outer
+radius minus the inset between them. A compact segment nests its `row` corner in a
+`control` track at 4px; a normal tab nests `control` in `prominent` at 4px; an option nests
+`control` in a `surface` list sheet at 8px. Pagination is a recessed segmented track with
+rounded-rectangle targets; its current page is a navigation destination (§10), so it is flat.
+Do not use literal radii or invent per-theme corner offsets in components.
 
 ## 10. Tonal hierarchy
 
@@ -145,11 +158,45 @@ are non-text furniture roles, never a third step for readable text. Surface tone
 | `strong` | priority action or a semantic mark with sufficient contrast |
 | `strongChecked` | a strong fill driven by the primitive's checked marker |
 
-Primary marks interaction, accent gives supporting emphasis, and danger/warning/success
-carry meaning rather than decoration. Semantic color belongs to the relevant icon,
+Each semantic role has three authored values: its foreground (the role token itself), a
+**soft** container (`--sui-<role>-soft`) that tonal controls and soft surfaces are made of, and
+a **selected** step (`--sui-<role>-selected`) one rung stronger. Soft and selected surfaces are
+designed values, never a fraction of the foreground: the foreground is tuned for text contrast,
+and a fraction of a deep accent is a greyed version of its hue. The neutral soft step is a step
+*within* its container (`surface-high` over whatever holds it), so a neutral badge or tag stays
+visible inside a card; a neutral card itself is the matte surface.
+
+Primary marks interaction, and danger/warning/success carry meaning rather than decoration.
+`--sui-accent` and `--sui-outline` are reserved: they are published for compatibility, no
+component consumes them, and a new use needs a role written here first. Semantic color belongs to the relevant icon,
 control or small region, not a whole table or page. Readable copy on passive semantic
-regions keeps normal text emphasis. A navigation destination uses a quieter tonal tint,
-weight and `aria-current`, not the selected-value treatment of a list option.
+regions keeps normal text emphasis.
+
+**Where the reader is differs from what they chose.** A navigation destination — a current
+navigation row, the current page of a pagination, any `aria-current` location — takes
+`currentDestination`: the primary soft container, full ink and a touch of weight, flat. A held
+value takes `tone.selected` with `elevation.control`. Tabs are the one deliberate exception:
+a tab list is a held choice of *view* inside a recessed track, so its indicator is a held
+selection like a segment's, and it is sized as a tab (normal density) rather than a segment.
+
+### Type roles
+
+Text takes a **role**, not a size chosen per component. The roles live in `type` in
+`ui.common.ts`; a component owns only copy that no other family renders.
+
+| Role | Size / line | Use |
+| --- | --- | --- |
+| `control` | by density (§13) | a control's own label or value; an option row matches the field that opened it |
+| `supporting` | 13 / 20px | field descriptions, hints and errors (`fieldMessage`), a row's secondary line |
+| `caption` | 12 / 16px | badges, group labels, calendar weekdays, a code language label |
+| `title` | 15 / 22px semibold | the heading of a compact surface: popover, toast, command palette |
+| `heading` | 20 / 28px semibold | the title of a viewport-owning surface: dialog, alert dialog, drawer |
+| `numeric` | tabular figures | table cells, a number field, progress and pagination values |
+
+A command palette is a utility surface whose content is its search, so it takes `title`, not
+`heading`. Every role lands on a whole-pixel line box. Sans text inherits the host typeface
+(the library is tuned for a neo-grotesque such as Inter and never sets one); code uses the
+`--sui-font-mono` stack.
 
 ## 11. Interaction states
 
@@ -160,7 +207,9 @@ ring. Disabled rows lose interactive hover/press but remain discoverable by keyb
 the primitive permits it, so a disabled highlighted row still shows navigation.
 
 A raised control recesses while held; a flat or floating one retains its depth and
-answers with the pressed state layer plus tactile motion. Disabled controls keep resting
+answers with the pressed state layer plus tactile motion. A neutral (`secondary`) tonal fill
+takes the lighter `stateLayer.tonalNeutral` press: its label is ink, and a full ink veil on top
+of the recess and compression turns the control a flat grey for the length of the click. Disabled controls keep resting
 anatomy and take **one** 45% opacity step, with no pointer affordance. `state.disabledRow`
 reads the disabled marker on a nested control; `disabledPart` avoids dimming a part twice
 inside an already disabled field. A focus ring never substitutes for the state response.
@@ -168,7 +217,8 @@ inside an already disabled field. A focus ring never substitutes for the state r
 All text fields share a borderless control fill that rises in tone on hover, then while
 focused or open; an engaged field must not fall back to hover strength under the pointer.
 Invalid fields follow the same ladder in danger tone, including validity inherited from
-Base Field. Only list-opening Select and Combobox fields compress on activation; typing
+Base Field. Only list-opening Select and Combobox fields compress on activation, and only
+by the gentle field tier (§12); typing
 and focus never compress an ordinary Input or Textarea. Date entry is native and its
 separate calendar glyph, not its text field, owns the popup press.
 
@@ -178,7 +228,11 @@ switch thumbs move, but tracks do not bounce. The accent belongs to a slider's r
 its matte handle remains separable from that range, including when disabled.
 
 Chips and ToggleGroup segments both hold selection: an unselected toggle stays neutral,
-a selected one uses the primitive's pressed marker and `tone.selected`. A chip floats
+a selected one uses the primitive's pressed marker and `tone.selected`. A segment's selection
+changes **in place** — the old fill and the new one exchange on the feedback timing — while a
+tab indicator **relocates** across its track. The difference is deliberate for now: Base
+`ToggleGroup` publishes no indicator geometry, and measuring segment positions locally would be
+the second behaviour layer §16 forbids. A travelling segment indicator waits on that Base gap. A chip floats
 on its own; a segment sits inside a track. A passive tag stays flat, and only a passive
 tag may have an independent dismiss target. Select/Combobox options hold choices and may
 rise; Menu commands perform actions and stay flat. They share row hover/highlight and
@@ -190,7 +244,8 @@ The complete row remains the label; supporting text and passive badges are consu
 The selection mark and target boundary stay still, and the original plain radio rows remain
 available. Surface selection is not a new card or option-content framework.
 
-Accordion and Collapsible share the same disclosure row and supporting-copy panel.
+Accordion and Collapsible share the same disclosure row and supporting-copy panel; a TreeView
+branch opens its group through the same measured panel and the same `disclose` motion.
 The chevron describes the whole region, so it stays centered on the row even when the
 label wraps. Only the panel height and chevron orientation change; sections do not
 animate their copy or grow a new rim.
@@ -202,7 +257,7 @@ One module, `ui.motion.ts`, chooses timing, easing and amplitude by **intent**:
 | Intent | Use |
 | --- | --- |
 | `feedback` | non-spatial tone, focus and highlight |
-| `tactile` | press/release; compact mark-only press when its target must stay still |
+| `tactile` | press/release in three amplitude tiers by role; compact mark-only press when its target must stay still |
 | `arrive` | a newly made selection mark; the sole restrained spring |
 | `orient` | chevron turning in place |
 | `relocate` | tab indicator or switch thumb traveling between stable destinations |
@@ -221,12 +276,38 @@ reduced motion, states remain visible immediately and spatial travel is removed;
 loading glyph becomes static. Do not author literal duration/easing/transition/animation
 classes or keyframes in components.
 
+A press answers inside a tap: its leg runs on the short `duration-tactile` (80ms), and the
+release settles on the release timing. Its amplitude is a distance, so it is chosen by role
+rather than written as one percentage for every width: a content-width control compresses 4%
+(`motionTactile`), a control spanning a track such as a tab 1.5% (`motionTactileWide`), and a
+list-opening field 0.7% (`motionTactileField`), which keeps every tier near two pixels per edge.
+Rows — navigation, options, commands, disclosure and tree rows — answer with tone, not
+compression. A row's highlight moves in one step (`motionRowLayer`): it marks where the
+reader is, so arrowing through a list never leaves a fading trail.
+
+Duration grows with travel in two steps. An indicator crossing a whole track takes
+`motionRelocateLong` (`duration-travel`, 300ms), and a sheet crossing a viewport edge takes the
+sheet timing (320ms in, 200ms out); short travel keeps the local and overlay timings. Every exit
+accelerates away on `ease-exit`, including a disclosure panel closing. A known progress value
+relocates to its new width rather than jumping.
+
+The scrim fades with the surface it sits behind; it never appears or disappears in one frame.
+A tooltip opens after a 500ms hover delay and closes at once, so a pointer passing over a row of
+icons does not flash a hint for each. The three activity loops share one rhythm authored in
+`tokens.ts`: a spinner turns once a second, a skeleton breathes once every two turns, and an
+indeterminate bar sweeps on its own paced loop.
+
+Known gap: an in-flow removal — a dismissed Alert, a removed tag Chip, a removed file row —
+leaves in one frame, and the content below closes the space at once. Base provides no presence
+lifecycle for in-flow lists, and components add no exit timers of their own, so this stays a
+documented gap rather than a local fix in one component.
+
 ## 13. Density
 
 | Step | Minimum height | Type | Use |
 | --- | --- | --- | --- |
 | `compact` | 2.5rem | 0.875rem | dense actions and rows |
-| `normal` | 3rem | 0.95rem | default fields and controls |
+| `normal` | 3rem | 0.9375rem / 1.375rem | default fields and controls |
 | `prominent` | 3.5rem | 1.125rem | larger actions |
 | `target` | 2.75rem square | inherited | standalone icon-only hit area |
 | `part` | 2.75rem high, 2.25rem wide | inherited | embedded part of a composite field |
@@ -235,6 +316,10 @@ Density owns control height and type scale; each component owns its own padding.
 embedded `part` is narrower than a standalone target because its surrounding field is
 already the larger target. Do not make an icon-only standalone button use `part`, shrink
 hit targets for phone layouts or create a fourth size step to solve a local spacing issue.
+
+A leading or trailing mark takes the `iconSlot` for the type step beside it: 16px beside a
+14px label (`compact`), 20px beside 15px (`normal`), 24px beside 18px (`prominent`) and 14px
+beside a 12px caption. An icon-only target keeps its own 20px mark inside the 44px target.
 
 ## 14. Accessibility and focus
 
@@ -287,7 +372,10 @@ an icon-to-spinner substitution does not alter a button's width. Align a status 
 or dismiss target to the first readable line of wrapping copy; a disclosure chevron
 instead belongs to its whole row. Leading and trailing marks can need different
 logical padding even when a text-only control is symmetric. Write asymmetry in logical
-start/end properties so RTL reads equally well. Code wells alone remain LTR. A local
+start/end properties so RTL reads equally well. A text action that shares an edge with text — a table cell's
+action under its column header, a toast action under its copy — **hangs** its inline padding
+outside that edge (a negative start margin equal to its padding), so its label, not its hit
+area, lines up with the text. Code wells alone remain LTR. A local
 correction should follow the actual geometry, not a global optical-offset token.
 
 ## 18. Showcase
@@ -310,3 +398,25 @@ toasts stay inside the dynamic viewport. Tooltips are short hints, not forms. Na
 date input remains editable and its calendar is an anchored popup. A file chooser shows
 one affordance, constraints once, selected files as quiet rows, and visible rejection
 feedback; it does not invent upload progress.
+
+## 20. Composition
+
+The language above governs objects; these rules carry it to pages. They are guidance for
+consumers and for the repository's own examples, not new primitives.
+
+- **A surface sits on canvas.** A card is a matte surface on the canvas. Do not nest a card in a
+  card to group content: inside a surface, group with spacing, a type role and an `edge.rule`.
+  Specimens of surfaces are shown on a canvas band, not inside another card.
+- **Headings step down, never up.** A page heading, then a section heading, then `type.title`
+  for a surface's own heading. A heading inside a surface is never larger than the surface's
+  title; below `title`, label a group with `caption` or a medium-weight supporting line.
+- **A setting row.** A binary setting puts its label and description at the start and its
+  Switch at the end of one row, rather than a switch alone on a line beneath its label.
+- **A filter bar.** Filters, and the sort that orders their result, share one row of fields
+  aligned on their bottom edge. A result count and a "clear" action sit on the line below,
+  aligned with the content they describe. An action among fields is still an action: it keeps
+  its capsule and its depth.
+- **Actions.** One filled action per view. Secondary actions are tonal or text; a text action
+  that shares an edge with text hangs its padding (§17).
+- **Page backgrounds are full-bleed.** A page's canvas reaches the viewport edges and its
+  content is centred within it; a column with its own background leaves a seam against the host.

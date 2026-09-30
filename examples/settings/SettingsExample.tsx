@@ -136,7 +136,7 @@ export default function SettingsExample() {
 
         <section className="settings-section" aria-labelledby="settings-notifications">
           <h2 id="settings-notifications">Notifications</h2>
-          <Field label="Weekly summary" description="Email a summary of workspace activity each week.">
+          <Field className="settings-toggle" label="Weekly summary" description="Email a summary of workspace activity each week.">
             <Switch
               className="settings-switch"
               checked={draft.weeklySummary}

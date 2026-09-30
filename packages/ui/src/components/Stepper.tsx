@@ -3,7 +3,7 @@
 import { Check as CheckIcon } from "lucide-react";
 import React, { forwardRef, type ComponentProps, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { elevation, focusRing, material, shape, state, stateLayer, text, tone } from "./ui.common";
+import { elevation, focusRing, material, shape, state, stateLayer, text, tone, type } from "./ui.common";
 import { motionFeedback, motionInkPress } from "./ui.motion";
 
 export interface StepperItem {
@@ -99,7 +99,7 @@ const Stepper = forwardRef<HTMLElement, StepperProps>(
                       : "[@container(min-width:32rem)]:h-1.5 [@container(min-width:32rem)]:w-full"),
                     shape.pill,
                     elevation.recessed,
-                    material.matteQuiet
+                    material.matteHigh
                   )}
                 >
                   {(current || complete) && (
@@ -114,11 +114,18 @@ const Stepper = forwardRef<HTMLElement, StepperProps>(
                     />
                   )}
                 </span>
-                <span className={cn("grid min-w-0 grid-cols-[1rem_minmax(0,1fr)] items-start gap-x-2 gap-y-1")}>
+                <span className={cn("grid min-w-0 grid-cols-[1.25rem_minmax(0,1fr)] items-start gap-x-2 gap-y-1")}>
                   <span
                     data-sui-step-mark=""
                     className={cn(
-                      "inline-flex h-5 w-4 shrink-0 items-center justify-center text-xs tabular-nums [&>svg]:size-4",
+                      /* The index is a mark of its own, centred on the label's first line: the current
+                         step holds the strong fill, a completed step its selected tone, and a step
+                         still ahead the neutral well its connector runs in. */
+                      "inline-flex size-5 shrink-0 items-center justify-center font-medium [&>svg]:size-3.5",
+                      type.caption,
+                      type.numeric,
+                      shape.circle,
+                      current ? tone.strong.primary : complete ? tone.selected.primary : cn(material.matteHigh, text.medium),
                       interactive && !unavailable && motionInkPress
                     )}
                   >
@@ -134,7 +141,8 @@ const Stepper = forwardRef<HTMLElement, StepperProps>(
                   </span>
                   {item.description ? (
                     <span className={cn(
-                      "text-xs leading-5 [overflow-wrap:anywhere]",
+                      "[overflow-wrap:anywhere]",
+                      type.supporting,
                       "col-start-2",
                       !stack && (long ? "[@container(min-width:64rem)]:col-span-2" : "[@container(min-width:32rem)]:col-span-2"),
                       text.medium

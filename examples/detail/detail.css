@@ -1,8 +1,9 @@
 .detail-page {
-  max-width: 72rem;
+  /* Full-bleed page, centred content column: the canvas reaches both viewport edges, so the page
+     never shows a hard seam against whatever the host paints behind it. */
   min-height: 100dvh;
-  margin-inline: auto;
-  padding: 3rem clamp(1.25rem, 4vw, 3rem) 5rem;
+  padding-block: 3rem 5rem;
+  padding-inline: max(clamp(1.25rem, 4vw, 3rem), calc((100% - 72rem) / 2));
   color: oklch(var(--sui-ink));
   background: oklch(var(--sui-canvas));
 }
