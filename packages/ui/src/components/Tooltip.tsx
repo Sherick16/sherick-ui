@@ -15,7 +15,7 @@ export interface TooltipProps {
 
 const Tooltip = ({ children, content, className, position = "bottom" }: TooltipProps) => {
   return (
-    <BaseTooltip.Provider delay={0} closeDelay={0}>
+    <BaseTooltip.Provider delay={500} closeDelay={0}>
       <BaseTooltip.Root>
         <span className={cn("inline-block", className)}>
           <BaseTooltip.Trigger render={children} />

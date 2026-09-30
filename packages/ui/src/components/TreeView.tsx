@@ -1,5 +1,6 @@
 "use client";
 
+import { Collapsible as BaseCollapsible } from "@base-ui/react/collapsible";
 import { useDirection } from "@base-ui/react/direction-provider";
 import { ChevronRight } from "lucide-react";
 import React, {
@@ -15,7 +16,7 @@ import React, {
 } from "react";
 import { cn } from "@/libs/utils";
 import { density, elevation, material, parentFocusRingInset, shape, state, stateLayer, text, tone } from "./ui.common";
-import { motionFeedback, motionOrient } from "./ui.motion";
+import { motionDisclose, motionFeedback, motionOrient } from "./ui.motion";
 import {
   flattenTree,
   isBranch,
@@ -298,28 +299,11 @@ const TreeView = forwardRef<HTMLDivElement, TreeViewProps>(function TreeView(
     const rowDisabled = disabled || nodeDisabled;
     const active = item.value === tabStop;
 
-    return (
-      <div
-        key={item.value}
-        ref={(element) => {
-          if (element) itemRefs.current.set(item.value, element);
-          else itemRefs.current.delete(item.value);
-        }}
-        role="treeitem"
-        data-sui-tree-value={item.value}
-        tabIndex={active ? 0 : -1}
-        aria-expanded={branch ? row.expanded : undefined}
-        aria-selected={selected}
-        /* `aria-disabled` is inherited down a subtree, and this tree deliberately does not mean
-           that: a node beneath an unavailable branch is its own node, so it says so rather than
-           inheriting an unavailability it does not have. */
-        aria-disabled={rowDisabled ? true : row.ancestorDisabled ? false : undefined}
-        /* A tree item is independently named. Its accessible name can only come from an explicit
-           one, because the group a branch opens is its own child: a name computed from contents
-           would read every descendant of that branch as part of the branch. */
-        aria-label={item.label}
-        className={cn("flex min-w-0 flex-col gap-0.5 outline-none")}
-      >
+    /* The row, then — for a branch — the group it opens. A branch item is itself the Base
+       collapsible root, so the group stays a direct child of its item: the structure a reader
+       hears is the structure the tree renders. */
+    const content = (
+      <>
         {/* The row's own pointer handling lives on the row rather than on the item: a nested
             item is a DOM descendant of every item above it, so a handler on the item would
             answer a click made anywhere beneath it. */}
@@ -389,14 +373,62 @@ const TreeView = forwardRef<HTMLDivElement, TreeViewProps>(function TreeView(
           <span className={cn("truncate")}>{renderItem ? renderItem(item) : item.label}</span>
         </div>
 
-        {branchExpanded ? (
-          <div role="group" className={cn("flex min-w-0 flex-col gap-0.5")}>
-            {(item.children ?? []).map((child) => {
-              const childRow = rowsByValue.get(child.value);
-              return childRow ? renderRow(childRow) : null;
-            })}
-          </div>
+        {branch ? (
+          /* Base measures and mounts the panel, and `motionDisclose` interpolates its height, as in
+             Accordion and Collapsible. While a branch closes, the tree no longer counts its
+             children as visible rows, so they are drawn from their own nodes until the primitive
+             unmounts the panel at the end of the exit. */
+          <BaseCollapsible.Panel
+            role="group"
+            className={cn(
+              "[--sui-disclose-height:var(--collapsible-panel-height)] h-[var(--sui-disclose-height)] overflow-hidden",
+              "flex min-w-0 flex-col gap-0.5 pt-0.5",
+              motionDisclose
+            )}
+          >
+            {(item.children ?? []).map((child) =>
+              renderRow(
+                rowsByValue.get(child.value) ?? {
+                  item: child,
+                  depth: depth + 1,
+                  parent: item.value,
+                  ancestors: [...row.ancestors, item.value],
+                  expanded: false,
+                  ancestorDisabled: row.ancestorDisabled || nodeDisabled,
+                }
+              )
+            )}
+          </BaseCollapsible.Panel>
         ) : null}
+      </>
+    );
+    const itemProps = {
+      ref: (element: HTMLDivElement | null) => {
+        if (element) itemRefs.current.set(item.value, element);
+        else itemRefs.current.delete(item.value);
+      },
+      role: "treeitem",
+      "data-sui-tree-value": item.value,
+      tabIndex: active ? 0 : -1,
+      "aria-expanded": branch ? row.expanded : undefined,
+      "aria-selected": selected,
+      /* `aria-disabled` is inherited down a subtree, and this tree deliberately does not mean
+         that: a node beneath an unavailable branch is its own node, so it says so rather than
+         inheriting an unavailability it does not have. */
+      "aria-disabled": rowDisabled ? true : row.ancestorDisabled ? false : undefined,
+      /* A tree item is independently named. Its accessible name can only come from an explicit
+         one, because the group a branch opens is its own child: a name computed from contents
+         would read every descendant of that branch as part of the branch. */
+      "aria-label": item.label,
+    };
+
+    return branch ? (
+      <BaseCollapsible.Root key={item.value} open={branchExpanded} {...itemProps} className={cn("flex min-w-0 flex-col outline-none")}>
+        {content}
+      </BaseCollapsible.Root>
+    ) : (
+      <div key={item.value} {...itemProps} className={cn("flex min-w-0 flex-col outline-none")}>
+        {content}
       </div>
     );
   };

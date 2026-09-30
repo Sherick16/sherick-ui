@@ -210,7 +210,7 @@ export const motionPresenceModal = /* @__PURE__ */ cx(
 /** The plane behind a surface that owns the viewport. Opacity only: a blur or a filter is
  *  never animated, so the plane can never animate the page behind it. */
 export const motionPresenceScrim =
-  "transition-opacity duration-overlay ease-release data-[ending-style]:duration-overlay-exit data-[ending-style]:ease-exit";
+  "transition-opacity duration-overlay ease-release data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 data-[ending-style]:duration-overlay-exit data-[ending-style]:ease-exit";
 
 /** Continuous activity is a distinct intent, not an exception to interaction motion: it
  *  reports work rather than answering an event, and it has no entrance of its own. */

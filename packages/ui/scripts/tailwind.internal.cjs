@@ -87,6 +87,9 @@ module.exports = {
       },
       animation: {
         "sherick-indeterminate": "sherick-indeterminate var(--sui-duration-activity) linear infinite",
+        /* Tailwind's own spin and pulse keyframes, on the system's authored pace and curve. */
+        spin: "spin var(--sui-duration-spin) linear infinite",
+        pulse: "pulse var(--sui-duration-pulse) var(--sui-ease-pulse) infinite",
       },
     },
   },

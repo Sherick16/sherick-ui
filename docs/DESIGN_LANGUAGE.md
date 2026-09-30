@@ -239,7 +239,8 @@ The complete row remains the label; supporting text and passive badges are consu
 The selection mark and target boundary stay still, and the original plain radio rows remain
 available. Surface selection is not a new card or option-content framework.
 
-Accordion and Collapsible share the same disclosure row and supporting-copy panel.
+Accordion and Collapsible share the same disclosure row and supporting-copy panel; a TreeView
+branch opens its group through the same measured panel and the same `disclose` motion.
 The chevron describes the whole region, so it stays centered on the row even when the
 label wraps. Only the panel height and chevron orientation change; sections do not
 animate their copy or grow a new rim.
@@ -269,6 +270,12 @@ lifecycle and placement; Sherick adds no exit timer or parallel presence state. 
 reduced motion, states remain visible immediately and spatial travel is removed; a
 loading glyph becomes static. Do not author literal duration/easing/transition/animation
 classes or keyframes in components.
+
+The scrim fades with the surface it sits behind; it never appears or disappears in one frame.
+A tooltip opens after a 500ms hover delay and closes at once, so a pointer passing over a row of
+icons does not flash a hint for each. The three activity loops share one rhythm authored in
+`tokens.ts`: a spinner turns once a second, a skeleton breathes once every two turns, and an
+indeterminate bar sweeps on its own paced loop.
 
 ## 13. Density
 

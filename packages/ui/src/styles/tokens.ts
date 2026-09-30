@@ -169,15 +169,21 @@ export const sharedTokens = {
      here with the rest of the system's timing. It is a pace, not a response, so it is the one
      duration that never shortens for a press or a release. */
   "duration-activity": "1400ms",
+  /* The other two loops share one rhythm: a spinner turns once a second, and a skeleton breathes
+     once every two turns, so two loading glyphs on one screen never beat against each other. */
+  "duration-spin": "1000ms",
+  "duration-pulse": "2000ms",
+  "ease-pulse": "cubic-bezier(0.4, 0, 0.6, 1)",
   "ease-press": "cubic-bezier(0.4, 0, 0.2, 1)",
   "ease-release": "cubic-bezier(0.16, 1, 0.3, 1)",
   "ease-exit": "cubic-bezier(0.4, 0, 1, 1)",
   /* A persistent object travelling between two stable destinations — a tab indicator, a switch
-     thumb. `ease-release` is an arrival curve: it spends 90% of a travel in the first third of
-     the time, which reads as a teleport followed by a creep once the distance is large. The
-     glide curve leaves the old position gently, crosses the middle of the travel in the middle
-     of the time, and settles at the end, so the movement itself is what the eye sees. It never
-     overshoots. */
+     thumb — and the grow of a surface arriving. `ease-release` is an arrival curve: it covers
+     about 80% of a travel in the first quarter of the time, which reads as a teleport followed by
+     a creep once the distance is large. The glide curve starts from rest instead of at full
+     speed: it passes the middle of the travel at about a third of the time and is roughly 80%
+     there at half time (measured in the motion audit), so the start of the movement is visible
+     rather than skipped. It never overshoots. */
   "ease-glide": "cubic-bezier(0.32, 0, 0.24, 1)",
   /* The one overshooting curve in the system: a part that travels a little past where it lands
      and settles back. It is what makes a selection feel made and a released press feel answered,

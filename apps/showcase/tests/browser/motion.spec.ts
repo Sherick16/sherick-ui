@@ -706,11 +706,29 @@ test("the anchored family opens with one shared entrance geometry", async ({ pag
 
 test("a tooltip is the same physical idea on the lighter timing", async ({ page, errors }) => {
   await openLab(page);
+  /* A tooltip opens after its hover delay, and a retrying poll can first look long after the short
+     entrance has run. So the starting geometry is read by an observer armed before the hover, in
+     the frame the popup is added, while the primitive still marks it as starting. */
+  const mounted = page.evaluate(
+    (selector) =>
+      new Promise<{ scale: number; translateY: number }>((resolve) => {
+        const observer = new MutationObserver(() => {
+          const element = document.querySelector(selector);
+          if (!element) return;
+          observer.disconnect();
+          const style = getComputedStyle(element);
+          const matrix = new DOMMatrix(style.transform === "none" ? "" : style.transform);
+          resolve({ scale: Number(matrix.a.toFixed(3)), translateY: Number(matrix.f.toFixed(2)) });
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
+      }),
+    labPopupSelector
+  );
   await page.getByRole("button", { name: "Hover", exact: true }).hover();
-  const popup = page.locator(labPopupSelector);
-  await expect(popup).toBeVisible();
-
-  const tooltip = await startingGeometry(popup);
+  const start = await mounted;
+  /* Duration and curve are the settled element's declared timing, which the entrance never changes. */
+  const timing = await startingGeometry(page.locator(labPopupSelector));
+  const tooltip = { ...start, duration: timing.duration, timing: timing.timing };
   expect(tooltip.scale).toBe(0.94);
   expect(Math.abs(tooltip.translateY)).toBe(4);
   expect(toMs(tooltip.duration)).toBeLessThan(toMs(await token(page, "--sui-duration-overlay")));
@@ -1141,5 +1159,70 @@ test("a compact control keeps its target stable while its mark takes the press",
     await page.mouse.up();
   }
 
+  expect(errors).toEqual([]);
+});
+
+/* Frame sampling. A recipe can name a transition and still paint nothing in between — the scrim
+   once declared an opacity transition with no state to transition from — so these tests read the
+   painted value on every animation frame of the event, not the class or the transition property. */
+const sampleFrames = (page: Page, selector: string, read: "opacity" | "height", durationMs: number) =>
+  page.evaluate(
+    ({ selector, read, durationMs }) =>
+      new Promise<number[]>((resolve) => {
+        const values: number[] = [];
+        const start = performance.now();
+        const frame = () => {
+          const element = document.querySelector(selector);
+          if (element) {
+            values.push(
+              read === "opacity"
+                ? Number.parseFloat(getComputedStyle(element).opacity)
+                : element.getBoundingClientRect().height
+            );
+          }
+          if (performance.now() - start < durationMs) requestAnimationFrame(frame);
+          else resolve(values);
+        };
+        requestAnimationFrame(frame);
+      }),
+    { selector, read, durationMs }
+  );
+
+test("the scrim fades with the surface it sits behind", async ({ page, errors }) => {
+  const scrim = '[class*="--sui-scrim-blur"]';
+  const opening = sampleFrames(page, scrim, "opacity", 600);
+  await page.getByRole("button", { name: "Open dialog" }).click();
+  const entrance = await opening;
+  expect(entrance.some((value) => value > 0.02 && value < 0.98), `scrim entrance ${entrance.join(",")}`).toBe(true);
+  expect(entrance.at(-1)).toBe(1);
+
+  const closing = sampleFrames(page, scrim, "opacity", 600);
+  await page.keyboard.press("Escape");
+  const exit = await closing;
+  expect(exit.some((value) => value > 0.02 && value < 0.98), `scrim exit ${exit.join(",")}`).toBe(true);
+  await expect(page.locator(scrim)).toHaveCount(0);
+  expect(errors).toEqual([]);
+});
+
+test("a tree branch discloses its children rather than appearing", async ({ page, errors }) => {
+  await page.goto("/");
+  await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
+  const branch = page.locator("#disclosure").getByRole("treeitem", { name: "utils" });
+  await branch.scrollIntoViewIfNeeded();
+  await branch.evaluate((element) => element.setAttribute("data-motion-probe", ""));
+  const collapsed = (await branch.boundingBox())!.height;
+
+  const opening = sampleFrames(page, "[data-motion-probe]", "height", 600);
+  await branch.locator("> div > span").first().click();
+  const open = await opening;
+  const expanded = open.at(-1)!;
+  expect(expanded).toBeGreaterThan(collapsed);
+  expect(open.some((height) => height > collapsed + 1 && height < expanded - 1), `branch opening ${open.join(",")}`).toBe(true);
+
+  const closing = sampleFrames(page, "[data-motion-probe]", "height", 600);
+  await branch.locator("> div > span").first().click();
+  const close = await closing;
+  expect(close.at(-1)).toBe(collapsed);
+  expect(close.some((height) => height > collapsed + 1 && height < expanded - 1), `branch closing ${close.join(",")}`).toBe(true);
   expect(errors).toEqual([]);
 });
