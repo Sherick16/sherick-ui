@@ -79,6 +79,9 @@ jobs:
       - run: bun --filter sherick-ui build
       - run: bun --filter @sherick-ui/no-tailwind build
       - run: bun --filter @sherick-ui/no-tailwind test:browser
+        env:
+          # GitHub's mounted /github/home is not owned by the container's root user.
+          HOME: /root
       - name: Capture browser diff artifacts
         if: failure()
         uses: actions/upload-artifact@v7
