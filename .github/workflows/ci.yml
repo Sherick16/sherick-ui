@@ -64,19 +64,24 @@ jobs:
 
   browser-consumer:
     runs-on: ubuntu-latest
+    # Keep this version aligned with @playwright/test in bun.lock.
+    container:
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
+      options: --ipc=host
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
         with:
           node-version: 24
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.14
+      # The Playwright image has no unzip; install Bun without setup-bun's zip extraction.
+      - run: npm install --global bun@1.3.14
       - run: bun install --frozen-lockfile
       - run: bun --filter sherick-ui build
       - run: bun --filter @sherick-ui/no-tailwind build
-      - run: bunx playwright install --with-deps chromium firefox webkit
       - run: bun --filter @sherick-ui/no-tailwind test:browser
+        env:
+          # GitHub's mounted /github/home is not owned by the container's root user.
+          HOME: /root
       - name: Capture browser diff artifacts
         if: failure()
         uses: actions/upload-artifact@v7

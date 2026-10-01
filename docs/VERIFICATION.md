@@ -472,11 +472,13 @@ CI starts three independent jobs on the same commit:
 
 Each job installs from the committed frozen lockfile in its own checkout. The two
 browser suites run with two Playwright workers in CI (tests within a file remain serial);
-local iteration retains one worker. The release job waits for **all three** jobs. CI
-installs only the browser engines each job actually needs and retains separate browser
-diff artifacts. This preserves every gate while overlapping the formerly serial packed
-checks and the two browser suites (about 3.6, 3.5 and 3.5 minutes respectively in
-[the previous main run](https://github.com/Sherick16/sherick-ui/actions/runs/35922933616)).
+local iteration retains one worker. The release job waits for **all three** jobs.
+`verify` and `browser-showcase` install only Chromium. `browser-consumer` uses the official
+`mcr.microsoft.com/playwright:v1.63.0-noble` image with Chromium, Firefox, WebKit and their OS
+dependencies preinstalled; keep its tag aligned with the Playwright version in `bun.lock`.
+This avoids reinstalling WebKit's system dependencies on every run (9–14 minutes in
+[the September 30 runs](https://github.com/Sherick16/sherick-ui/actions/runs/36773196053)),
+without dropping coverage or adding retries. Browser diff artifacts remain separate.
 
 `bun run verify` remains the serial, single-runner local gate:
 
