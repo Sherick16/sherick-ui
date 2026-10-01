@@ -134,7 +134,7 @@ test("portaled Select, Tooltip and Dialog remain styled", async ({ page }) => {
   await select.click();
   const option = page.getByRole("option", { name: "Dashboard" });
   await expect(option).toBeVisible();
-  await expect(option.evaluate((element) => getComputedStyle(element).borderRadius)).not.toBe("0px");
+  await expect(option).not.toHaveCSS("border-radius", "0px");
   await page.keyboard.press("Escape");
 
   await page.getByRole("button", { name: "Tooltip trigger" }).hover();

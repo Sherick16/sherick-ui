@@ -64,6 +64,10 @@ jobs:
 
   browser-consumer:
     runs-on: ubuntu-latest
+    # Keep this version aligned with @playwright/test in bun.lock.
+    container:
+      image: mcr.microsoft.com/playwright:v1.63.0-noble
+      options: --ipc=host
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -75,7 +79,6 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun --filter sherick-ui build
       - run: bun --filter @sherick-ui/no-tailwind build
-      - run: bunx playwright install --with-deps chromium firefox webkit
       - run: bun --filter @sherick-ui/no-tailwind test:browser
       - name: Capture browser diff artifacts
         if: failure()
