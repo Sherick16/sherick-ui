@@ -10,6 +10,7 @@ const colorNames = [
   "ink",
   "ink-muted",
   "detail",
+  "rim",
   "primary",
   "primary-strong",
   "primary-soft",

@@ -67,7 +67,10 @@ export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(
           // `align-middle` rather than the default baseline: an inline-level box whose baseline comes
           // from its own children shifts the moment its mark appears or leaves, which is exactly what
           // a checkbox does.
+          // The control takes the mark's corner so a boundary drawn on the control itself — the
+          // forced-colors outline — follows the box rather than squaring it off.
           "group inline-flex w-fit align-middle",
+          shape.mark,
           hitArea,
           state.enabled,
           state.effectiveDisabled,
@@ -77,21 +80,23 @@ export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(
         <span
           aria-hidden="true"
           className={cn(
-            "flex size-6 shrink-0 items-center justify-center",
+            "flex size-5 shrink-0 items-center justify-center",
             shape.mark,
             selectable.markSurface,
             selectable.mark,
             selectable.selected,
             selectable.indeterminate,
-            stateLayer.track,
+            stateLayer.mark,
             groupFocusRing
           )}
         >
-          <BaseCheckbox.Indicator className={cn("flex items-center justify-center", motionArrive)}>
+          {/* Positioned so the glyph paints above the mark's hover layer rather than beneath it. */}
+          <BaseCheckbox.Indicator className={cn("relative flex items-center justify-center", motionArrive)}>
+            {/* A heavier stroke than the icon default: at 14px the default draws a hairline tick. */}
             {indeterminate ? (
-              <Minus className={cn("size-4")} />
+              <Minus className={cn("size-3.5")} strokeWidth={3} />
             ) : (
-              <CheckIcon className={cn("size-4")} />
+              <CheckIcon className={cn("size-3.5")} strokeWidth={3} />
             )}
           </BaseCheckbox.Indicator>
         </span>

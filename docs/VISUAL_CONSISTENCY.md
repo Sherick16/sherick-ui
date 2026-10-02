@@ -64,7 +64,8 @@ public exports, dependencies and size-budget baselines did not change.
 - A disclosure chevron belongs to its whole row; status marks and dismiss controls belong to the
   first readable line. Code content remains LTR inside an RTL document.
 - No changes were warranted to Avatar, Progress, Spinner, Skeleton, rich-content typography,
-  the well-depth model, or the existing hit-target/mark separation.
+  or the existing hit-target/mark separation. (The well-depth model for empty marks was later
+  replaced by the hollow-control rim; see `DESIGN_LANGUAGE.md` §8.)
 
 ## Regression and baseline review
 

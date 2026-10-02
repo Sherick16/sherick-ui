@@ -256,13 +256,12 @@ output.append(
     outline-offset: -2px;
   }
 
-  /* A *resting* mark is identified by the depth of its well, which forced colors flattens, so an
-     unchecked box and an unselected radio need a boundary of their own. It is CanvasText rather
-     than Highlight: this is component identity, not selection. */
-  :where(.${SUI_SCOPE_CLASS})[role="checkbox"][aria-checked="false"]:not(:focus-visible),
+  /* A *resting* mark keeps its own rim, a real border that forced colors repaints in a system
+     colour, so an unchecked box and an unselected radio need no extra boundary — and a radio's
+     transparent utility outline, which forced colors would make opaque, must not become a second
+     ring around that rim. */
   :where(.${SUI_SCOPE_CLASS})[role="radio"][aria-checked="false"]:not(:focus-visible) {
-    outline: 1px solid CanvasText;
-    outline-offset: -2px;
+    outline: none;
   }
 
   /* A slider conveys its value through the fill of its groove and the depth of its handle, and
@@ -270,6 +269,21 @@ output.append(
      collection attributes are not component identity. */
   :where(.${SUI_SCOPE_CLASS})[data-sui-slider-thumb] {
     border: 1px solid CanvasText;
+  }
+
+  /* A drop target's dashes are a masked fill, and forced colors would flatten that fill into the
+     page. They keep a system colour, so the target still shows its boundary. */
+  :where(.${SUI_SCOPE_CLASS})[data-sui-drop-target]::after {
+    forced-color-adjust: none;
+    background-color: CanvasText;
+  }
+
+  /* A selected radio's thumb is a fill, and forced colors flattens it into its socket. It keeps a
+     system colour of its own, so selection is a shape and not only the colour of the outline
+     around the control. */
+  :where(.${SUI_SCOPE_CLASS})[role="radio"][aria-checked="true"] :where(.${SUI_SCOPE_CLASS})[data-sui-radio-dot] {
+    forced-color-adjust: none;
+    background-color: Highlight;
   }
 
   /* A progress bar says how far along the work is through the fill of its track alone, and

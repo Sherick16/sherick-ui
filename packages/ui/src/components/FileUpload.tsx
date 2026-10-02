@@ -27,6 +27,7 @@ import {
   material,
   matteInset,
   recessedTop,
+  rim,
   shape,
   state,
   stateLayer,
@@ -308,12 +309,16 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
         <Field.Label className={cn("mb-2 text-sm font-medium", text.high)}>{label}</Field.Label>
 
         {/* One compact chooser/drop surface. The native label retains picker and keyboard behavior;
-            the matte fill and quiet state layer make the affordance readable without a large well. */}
+            it is a field well like every other input, and its dashed rim and quiet state layer make
+            the affordance readable without a large surface. */}
         <label
           className={cn(
             "relative z-10 flex min-w-0 flex-col items-center gap-2 px-4 py-4 text-center",
             shape.control,
-            material.matteHigh,
+            material.control,
+            rim.dashed,
+            !disabled && rim.dashedHover,
+            rim.dashedDragging,
             motionFeedback,
             focusRingWithin,
             focusRingDrag,
@@ -322,6 +327,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             !disabled && dragging && tone.tonal.primary,
             disabled && state.disabled
           )}
+          data-sui-drop-target=""
           data-dragging={dragging || undefined}
           onDragEnter={handleDragEnter}
           onDragOver={handleDragOver}

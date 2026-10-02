@@ -128,8 +128,8 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
                   its first line instead of centring it on the block, while a one-line row is still
                   centred in the row's own density height. The copy declares its own line height —
                   `density.normal` sets the type step but no leading, and this package ships no reset —
-                  so the mark's 24px slot and the line it is centred on are the same 24px whatever
-                  line height a host happens to inherit. */}
+                  so the 20px mark plus its 2px of block margin and the line it is centred on are the
+                  same 24px whatever line height a host happens to inherit. */}
               <Field.Label
                 className={cn(
                   "flex min-w-0 flex-1 items-center",
@@ -141,23 +141,26 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
                     value={option.value}
                     disabled={option.disabled}
                     className={cn(
-                      "group relative flex size-6 shrink-0 items-center justify-center outline-none"
+                      "group relative my-0.5 flex size-5 shrink-0 items-center justify-center outline-none",
+                      shape.circle
                     )}
                   >
+                    {/* An empty socket is identified by its rim; a selected one fills and holds a light thumb. */}
                     <span
                       aria-hidden="true"
                       className={cn(
-                        "flex size-6 items-center justify-center",
+                        "flex size-5 items-center justify-center",
                         shape.circle,
                         selectable.markSurface,
                         selectable.mark,
                         selectable.selected,
-                        stateLayer.track,
+                        stateLayer.mark,
                         appearance === "default" && groupFocusRing
                       )}
                     >
-                      <Radio.Indicator className={cn("flex items-center justify-center", motionArrive)}>
-                        <span className={cn("block size-2.5", shape.circle, "bg-current")} />
+                      {/* Positioned so the thumb paints above the socket's hover layer. */}
+                      <Radio.Indicator className={cn("relative flex items-center justify-center", motionArrive)}>
+                        <span data-sui-radio-dot="" className={cn("block size-2", shape.circle, selectable.thumb)} />
                       </Radio.Indicator>
                     </span>
                   </Radio.Root>

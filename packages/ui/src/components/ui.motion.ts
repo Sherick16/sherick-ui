@@ -44,7 +44,7 @@ export type MotionIntent =
  *  It never translates, scales or resizes; reduced motion simply drops the interpolation
  *  and the state still arrives. */
 export const motionFeedback =
-  "transition-[background-color,color,box-shadow,opacity] duration-press ease-press motion-reduce:transition-none";
+  "transition-[background-color,border-color,color,box-shadow,opacity] duration-press ease-press motion-reduce:transition-none";
 
 /** A control answers a press immediately and settles on its release.
  *
@@ -263,6 +263,12 @@ export const motionActivityIndeterminate =
  *  is, and arrowing through a list with a soft fade on every row leaves a smear of half-lit rows.
  *  The row's layer therefore changes in one step, for the pointer and the keyboard alike. */
 export const motionRowLayer = "before:transition-none";
+
+/** A rim drawn as an overlay of its own — an empty selection mark's lip, a drop target's dashes —
+ *  carries its own feedback timing: it steps up on hover and fades as a selection fill arrives,
+ *  on the same press curve as the surface beneath it. */
+export const motionRim =
+  "after:transition-[background-color,border-color,opacity] after:duration-press after:ease-press motion-reduce:after:transition-none";
 
 export const motionStateLayer =
   "before:transition-opacity before:duration-release before:ease-release active:before:duration-tactile active:before:ease-press group-active:before:duration-tactile group-active:before:ease-press motion-reduce:before:transition-none";

@@ -23,7 +23,8 @@ strong fill in a view rather than making every control compete for attention.
 These roles are independent: **material** fills a surface, **elevation** gives it distance
 from the page, and **edge** marks a structural join. A card may be matte and flat, a tonal
 button matte and raised, and a switch track matte and recessed. A material contains no
-shadow, radius or rim. Add a line only where two parts of the same surface meet.
+shadow, radius or rim. Add a line only where two parts of the same surface meet, or where a
+hollow control needs its rim (§8).
 
 ## 3. Light model
 
@@ -40,7 +41,7 @@ a sideways shadow or an upward-lit gradient to one component.
 | `canvas` | application background | nested content |
 | `matteQuiet`, `matte`, `matteHigh` | quiet, ordinary and stronger grounded surfaces; every sunk track (slider groove, progress track, segment track) is `matteHigh`, so its full extent stays visible on a card | floating UI |
 | `matteInset` | a passive sheet tucked beneath a stronger control, visible but quieter than that control | independent cards or fields |
-| `control`, `controlError` | text fields and their invalid state | passive cards |
+| `control`, `controlError` | text fields, the file drop target and the interior of an empty checkbox or radio: a **well** in the canvas tone, which sits below a card in both themes, so an input reads as sunk into its surface rather than as a pad raised from it; the invalid form changes only its placeholder tone | passive cards, buttons |
 | `handle` | a small value-control part that must remain findable, even disabled | large surfaces |
 | `acrylic`, `acrylicDense`, `acrylicHero` | anchored sheets, compact hints, viewport-owning overlays respectively | grounded content |
 
@@ -61,9 +62,9 @@ source's semantics. Video defaults to its source ratio and containment, never im
 | `flat` | grounded passive surfaces | a recessed track |
 | `raised` | tactile tonal actions at rest | hover or passive data |
 | `control` | switch thumb or a held selection inside a track, list or calendar | keyboard highlight |
-| `recessed` | grooves, tracks and a raised control while pressed | fields or flat cards |
+| `recessed` | grooves, tracks, a checkbox or radio at rest, and a raised control while pressed | fields or flat cards |
 | `recessedTop` | the upper wall of an inset sheet continuing directly below a control, without a lower rim | standalone tracks or wells |
-| `well` | a small empty checkbox/radio mark whose recessed wall identifies it | a wide groove with its own fill |
+| `well` | a checkbox or radio while it is pressed: the floor sinks, the boundary stays | a resting mark, a wide groove |
 | `floating` | real overlay surfaces | anything in document flow |
 
 Actions follow one depth ladder: a text action sits flat, and tonal and filled actions are
@@ -74,8 +75,9 @@ shadow, not a float: a row of raised actions sits on the page.
 Held choices combine `tone.selected` and `elevation.control`: selected segments, options,
 tree rows and calendar days. A continuous date range makes one band per week rather than
 seven separately elevated cells. The mark itself, a check or a date, remains another
-selection signal. Navigation-only current rows and unselected commands stay flat. A small
-empty selection mark uses a deeper well, **not** a four-sided outline.
+selection signal. Navigation-only current rows and unselected commands stay flat. An empty
+selection mark is identified by its rim (§8), not by its depth: depth alone cannot reach 3:1
+on a 20px mark without turning it into a shaded orb.
 
 ## 6. Acrylic
 
@@ -111,14 +113,32 @@ ToastViewport above them, with Base's F6 keyboard route into its live region.
 and `edge.header` the stronger rule under a header. The public `Divider` chooses those
 roles by `weight`. Inset a divider to the content band it separates; let a row's line
 yield to a hovered neighbour. A quote's accent is content emphasis, not a structural
-edge. **Never outline a filled control or a card just to distinguish it.** Fields change
-tone rather than drawing and removing borders on focus or error.
+edge. **Never outline a filled control or a card just to distinguish it.**
+
+**A hollow control carries a rim.** A text field, the file drop target and an empty checkbox or
+radio have no content that says what they are, and no neutral fill step or depth reaches the
+3:1 a control's boundary needs. Each carries one 1.5px rim in the `rim` tone (`rim.field`, or the
+mark's own rim), tuned to clear 3:1 on every surface by a small margin and no more, so it reads as
+the lip of the well rather than as a line drawn around it. The rim is the only border a control
+has, and it belongs to the hollow state only:
+
+- hover, focus and an open popup step the rim to `ink-muted` while the well sinks a step; the
+  focus ring still surrounds the control (§14);
+- an invalid field turns its rim, and only its rim, to the danger tone — the fill stays the
+  well, and the placeholder and message carry the error with it;
+- a selected checkbox or radio is identified by its accent fill, and its rim fades into it;
+- the drop target's rim is dashed (`rim.dashed`): a 7px mask over its own overlay, never the
+  platform's `dashed` style, so the rhythm is fixed and the dashes follow the `control` corner.
+
+When not to use it: a button, chip, card, alert, tab or segment — anything identified by its
+fill, its label or its position in a track. A Switch track and a slider groove are identified by
+their thumb and range, so they keep no rim.
 
 ## 9. Shape
 
 | Role | Radius | Use |
 | --- | --- | --- |
-| `mark` | 10px | small square checkbox |
+| `mark` | 6px | 20px checkbox box |
 | `row` | 12px | command-density row, compact segment, navigation row or short hint |
 | `control` | 16px | fields, alerts, tables, segment tracks and full-width option rows |
 | `prominent` | 20px | tab tracks, code wells and compact floating status |
@@ -214,17 +234,20 @@ anatomy and take **one** 45% opacity step, with no pointer affordance. `state.di
 reads the disabled marker on a nested control; `disabledPart` avoids dimming a part twice
 inside an already disabled field. A focus ring never substitutes for the state response.
 
-All text fields share a borderless control fill that rises in tone on hover, then while
-focused or open; an engaged field must not fall back to hover strength under the pointer.
-Invalid fields follow the same ladder in danger tone, including validity inherited from
-Base Field. Only list-opening Select and Combobox fields compress on activation, and only
+All text fields share one well and one rim. Hover sinks the well a step and lifts the rim to
+`ink-muted`; focus or an open popup sinks it fully, and an engaged field must not fall back to
+hover strength under the pointer. Invalid fields keep that well ladder and hold a danger rim,
+including validity inherited from Base Field. Only list-opening Select and Combobox fields compress on activation, and only
 by the gentle field tier (§12); typing
 and focus never compress an ordinary Input or Textarea. Date entry is native and its
 separate calendar glyph, not its text field, owns the popup press.
 
-Checkboxes, radios, switch tracks and slider grooves retain their recessed boundaries
-through state changes. Their selection fills or marks arrive **inside** the boundary;
-switch thumbs move, but tracks do not bounce. The accent belongs to a slider's range;
+Checkboxes, radios, switch tracks and slider grooves retain their boundaries through state
+changes. Their selection fills or marks arrive **inside** the boundary; switch thumbs move, but
+tracks do not bounce. A checkbox or radio is a 20px mark: empty, it is a well with a rim; hover
+lifts the rim and lays the light `stateLayer.mark` step inside it; a press sinks it to the
+`well` rung without moving it; checked, mixed and selected marks are the strong accent edge to
+edge, flat, with a tick, a minus or a light dot. The accent belongs to a slider's range;
 its matte handle remains separable from that range, including when disabled.
 
 Chips and ToggleGroup segments both hold selection: an unselected toggle stays neutral,
@@ -330,16 +353,17 @@ follows the input in a composite field, and `groupFocusRing` follows a wrapping 
 `parentFocusRingInset` traces only a tree item's direct row, not its descendants. A
 plain text field follows the platform's `:focus-visible` on pointer *and* keyboard
 focus; button and slider focus rings normally appear for keyboard focus. No second
-inner field rim is added.
+ring is drawn inside the field's own rim.
 A file drop target uses that same outline with a soft primary tonal fill while a file is
-dragged over it; it has no permanent rim.
+dragged over it, and its dashed rim takes the primary tone.
 
 An icon-only action needs an accessible name independent of its tooltip, and a 44px
-standalone target. Checkbox/radio marks may keep a smaller visible footprint while a
-transparent hit area reaches that floor; surrounding rows still need clearance. Labels,
+standalone target. Checkbox/radio marks keep a 20px visible footprint while a transparent hit
+area reaches that floor; surrounding rows still need clearance. Labels,
 errors and descriptions keep their Base Field relationships; Base primitives own ARIA,
 keyboard mechanics, form participation and restoration where available. Forced colors
-replace lost tone/depth with system-color boundaries for selection, highlight and focus.
+replace lost tone/depth with system-color boundaries for selection, highlight and focus; a rim is
+a real border (or a masked fill with a system colour), so hollow controls keep theirs.
 The measured AA contrast contract covers both themes, text/semantic/focus compositions,
 small marks and state layers; see [PALETTE.md](PALETTE.md) and [VERIFICATION.md](VERIFICATION.md).
 Color alone never identifies meaning.

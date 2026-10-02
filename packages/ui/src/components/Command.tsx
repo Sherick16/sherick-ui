@@ -4,7 +4,7 @@ import { Autocomplete as BaseAutocomplete } from "@base-ui/react/autocomplete";
 import React, { forwardRef, useId, useMemo, type ReactNode } from "react";
 import { Search as SearchIcon } from "lucide-react";
 import { cn } from "@/libs/utils";
-import { density, focusRingWithin, list, material, shape, state, text, type } from "./ui.common";
+import { density, focusRingWithin, list, material, rim, shape, state, text, type } from "./ui.common";
 import { motionFeedback } from "./ui.motion";
 
 export interface CommandItem {
@@ -219,6 +219,7 @@ const Command = forwardRef<HTMLInputElement, CommandProps>(({
             density.normal,
             shape.control,
             material.control,
+            rim.field,
             motionFeedback,
             focusRingWithin,
             !disabled && state.field.hover,

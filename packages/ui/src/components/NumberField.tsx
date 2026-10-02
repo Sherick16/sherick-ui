@@ -8,6 +8,7 @@ import {
   density,
   focusRingWithin,
   material,
+  rim,
   shape,
   state,
   stateLayer,
@@ -106,13 +107,14 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
       >
         <BaseNumberField.Group
           className={({ disabled: fieldDisabled }) => cn(
-            // The 44px targets fit the normal 48px field without inflating its density.
-            "group/field flex w-full items-center gap-1 px-1.5 py-0.5",
+            // The 44px targets fit the normal 48px field, inside its rim, without inflating its density.
+            "group/field flex w-full items-center gap-1 px-1.5",
             density.normal,
             shape.control,
             motionFeedback,
             focusRingWithin,
             material.control,
+            rim.field,
             state.field.invalid,
             !fieldDisabled && state.field.hover,
             !fieldDisabled && state.field.focusWithin,

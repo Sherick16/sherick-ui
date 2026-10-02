@@ -16,10 +16,12 @@ import {
   focusRingInset,
   focusRingWithin,
   material,
+  rim,
   shape,
   state,
   stateLayer,
   tone,
+  type,
 } from "./ui.common";
 import { motionFeedback, motionInkPress } from "./ui.motion";
 import { Variant } from "./ui.types";
@@ -102,6 +104,7 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
           density.normal,
           shape.control,
           material.control,
+          rim.field,
           motionFeedback,
           focusRingWithin,
           !disabled && state.field.hover,
@@ -117,8 +120,10 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
           disabled={disabled}
           aria-busy={loading || undefined}
           className={cn(
-            "w-full bg-transparent py-3 ps-5 pe-12 text-inherit outline-none placeholder:text-sherick-ink-muted",
-            density.normal,
+            // The input fills the field's height inside its rim rather than declaring a 48px floor of
+            // its own, which would push the rimmed field past its density.
+            "w-full self-stretch bg-transparent ps-5 pe-12 text-inherit outline-none placeholder:text-sherick-ink-muted",
+            type.control.normal,
             shape.control,
             disabled ? state.disabledDescendant : state.text,
             inputClassName

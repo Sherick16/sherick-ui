@@ -12,6 +12,11 @@ export const lightTokens = {
      third step of the text ladder. It answers to the 3:1 non-text requirement wherever it carries
      meaning; anything a reader must read uses `ink` or `ink-muted`. */
   "detail": "0.600 0.016 258",
+  /* The rim of a hollow control — a field, a drop target, an empty checkbox or radio. It is the
+     only border a control carries, so it is tuned to clear the 3:1 non-text requirement against
+     every surface a control sits on with a small margin and no more: at `detail` strength the rim
+     outshone the labels beside it. Hover steps it to `ink-muted`. */
+  "rim": "0.630 0.016 258",
   "primary": "0.422 0.139 255",
   "primary-strong": "0.402 0.143 257",
   /* The designed surfaces of each semantic role. A soft container is what a tinted surface is
@@ -49,16 +54,14 @@ export const lightTokens = {
   "elevation-raised": "0 1px 2px oklch(var(--sui-light-bottom) / 0.16), 0 2px 6px oklch(var(--sui-light-bottom) / 0.07)",
   "elevation-floating": "0 16px 40px oklch(var(--sui-light-bottom) / 0.20), inset 0 1px 0 oklch(var(--sui-light-top) / 0.70)",
   "elevation-control": "0 1px 2px oklch(var(--sui-light-bottom) / 0.19), inset 0 1px 0 oklch(var(--sui-light-top) / 0.55)",
-  /* The recessed rung, and the deeper rung a *small* well takes. A well differs from a groove in
-     depth, never in kind: the wall the light makes legible is `recessed`'s own wall drawn deeper,
-     and the opposite wall is left exactly as `recessed` draws it, so a mark reads as a deeper groove
-     rather than as a more dramatic one. It has to be deeper at all because a wide groove and a track
-     are read from their own fill and a mark the size of a glyph has no fill step to spare: the
-     tightest step this neutral ladder has measures about 1.3:1 against the surface around it. The
-     depth is the least that clears 3:1 once rendered. */
+  /* The recessed rung, and the deeper `well` a small selection mark sinks to while it is held. A
+     checkbox box and a radio socket rest in the same groove a Switch track does — what identifies
+     an empty one is its rim, not its depth — so the well is a press response, not an identity. It
+     deepens the shaded floor and keeps the lit lower wall, so a held mark sinks without its
+     boundary moving. */
   "elevation-recessed": "inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.22), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.50)",
   "elevation-recessed-top": "inset 0 5px 8px -5px oklch(var(--sui-light-bottom) / 0.21)",
-  "elevation-well": "inset 0 3px 4px oklch(var(--sui-light-bottom) / 0.62), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.50)",
+  "elevation-well": "inset 0 2px 4px oklch(var(--sui-light-bottom) / 0.40), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.50)",
   /* Fill isolates content even without backdrop filtering; blur only enriches the remaining light. */
   "glass-fill": "0.98",
   "glass-blur": "28px",
@@ -95,6 +98,7 @@ export const darkTokens = {
   "ink": "0.94 0.008 255",
   "ink-muted": "0.76 0.014 255",
   "detail": "0.600 0.014 256",
+  "rim": "0.555 0.014 256",
   "primary": "0.809 0.098 255",
   "primary-strong": "0.734 0.139 257",
   "primary-soft": "0.325 0.050 257",
@@ -125,10 +129,7 @@ export const darkTokens = {
   "elevation-control": "0 1px 2px oklch(var(--sui-light-bottom) / 0.30), inset 0 1px 0 oklch(var(--sui-light-top) / 0.08)",
   "elevation-recessed": "inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.38), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.06)",
   "elevation-recessed-top": "inset 0 5px 8px -5px oklch(var(--sui-light-bottom) / 0.36)",
-  /* Dark mode inverts the light, so it inverts which wall of a sunk mark is legible: the shade tone
-     is darker than the surface here and cannot outline anything, and the lit lower wall is the wall
-     that reads. Same rung, same recipe shape, the other end of the same model. */
-  "elevation-well": "inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.38), inset 0 -2px 3px oklch(var(--sui-light-top) / 0.40)",
+  "elevation-well": "inset 0 2px 4px oklch(var(--sui-light-bottom) / 0.60), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.06)",
   "glass-fill": "0.98",
   "glass-blur": "32px",
   "glass-saturation": "1.10",
@@ -160,6 +161,12 @@ export const sharedTokens = {
      neo-grotesque such as Inter but never sets one — while code needs a monospace the platform
      default does not reliably provide, so the stack is curated here once. */
   "font-mono": 'ui-monospace, "SF Mono", SFMono-Regular, "Cascadia Code", "JetBrains Mono", Menlo, Consolas, "Liberation Mono", monospace',
+  /* The dash mask of a drop target's rim (see `rim.dashed`). The platform's own `dashed` style picks
+     its dash length and corner joins per engine; this fixes a 7px rhythm with round caps and follows
+     the 16px `control` corner exactly. The stroke is drawn on the box edge at 3px, so the half that
+     lands inside the box is the visible 1.5px rim. The mask carries no colour: the rim's tone is its
+     own background, so it themes like every other rim. */
+  "rim-dashed": `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='100%25' height='100%25' rx='16' fill='none' stroke='%23000' stroke-width='3' stroke-dasharray='7' stroke-linecap='round'/%3E%3C/svg%3E")`,
   "duration-press": "150ms",
   "duration-release": "200ms",
   /* The press leg of a tactile response. A tap on a trackpad or a brisk click is held for well
