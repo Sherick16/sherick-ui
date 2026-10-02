@@ -1,6 +1,6 @@
 import { cx } from "@/libs/utils";
 import type { Variant } from "./ui.types";
-import { motionDisclose, motionFeedback, motionRowLayer, motionStateLayer } from "./ui.motion";
+import { motionDisclose, motionFeedback, motionRim, motionRowLayer, motionStateLayer } from "./ui.motion";
 
 /* Sherick UI design primitives
    ==========================================================================
@@ -126,9 +126,9 @@ export const elevation = {
   floating: "shadow-sherick-floating",
   control: "shadow-sherick-control",
   recessed: "shadow-sherick-recessed",
-  /* One rung further down: the well of a mark the size of a glyph, whose whole identity is its
-     depth. A wide groove reads from its fill; a 24px well has no fill step to spare, so one wall
-     of the well is deepened and that boundary is what says what it is. See `selectable.markSurface`. */
+  /* One rung further down: the depth a small selection mark sinks to while it is held. A mark
+     rests in the ordinary groove; this is its press, never its identity. See
+     `selectable.markSurface`. */
   well: "shadow-sherick-well",
 } as const;
 /* An inset sheet's shaded upper wall, without a lower rim. Kept independent so
@@ -145,9 +145,10 @@ export const recessedTop = "shadow-sherick-recessed-top";
    sheet around 16px options at 8px).
    - control:     ordinary controls and dense data regions — fields, rows, options,
                   chips, tables.
-   - mark:        a compact square selection mark — a checkbox box. `control` is a role
+   - mark:        a compact square selection mark — a 20px checkbox box. `control` is a role
                   for objects the size of a field; its radius exceeds the half-extent of a
-                  24px square, so a mark needs a step of its own.
+                  20px square, so a mark needs a step of its own — a corner under a third of
+                  its side, so the box stays a rounded square and never reads as a radio.
    - row:         a row at command density — a row in a list that is scanned rather than
                   read holds a corner proportional to its own height, because `control`
                   would reach a 36px row's half-extent and read as a capsule.
@@ -165,7 +166,7 @@ export const recessedTop = "shadow-sherick-recessed-top";
    - circle:      fully rounded square targets. */
 export const shape = {
   control: "rounded-[1rem]",
-  mark: "rounded-[0.625rem]",
+  mark: "rounded-[0.375rem]",
   row: "rounded-[0.75rem]",
   prominent: "rounded-[1.25rem]",
   surface: "rounded-[1.5rem]",
@@ -192,6 +193,36 @@ export const edgeTone = {
   row: "border-sherick-edge/[0.06]",
   header: "border-sherick-edge/[0.10]",
   rule: "border-sherick-edge/[0.075]",
+} as const;
+
+/* Rim — the boundary of a *hollow* control: a text field, or an empty checkbox or radio. Nothing
+   inside such a control says what it is — an empty field holds at most a placeholder, an empty mark
+   holds nothing — and it still has to be identifiable at 3:1, which no neutral fill step and no
+   depth the light model can draw achieves on its own. So a hollow control carries one rim in the
+   `rim` tone, tuned to clear 3:1 on every surface by a small margin and no more, and that rim is
+   the only border a control has. A filled control — a button, a chip, a selected mark — is identified by its fill and
+   never carries one.
+   The field rim is a real border: forced colors repaints a border in a system colour, where it
+   would remove an inset shadow, and the scoped baseline sizes boxes by their border edge, so the
+   rim never changes a field's footprint. Its states ride on the field ladder in `state.field`.
+   A drop target's rim is dashed, and the dashes are a mask over an overlay rather than the native
+   `dashed` style, whose dash length and corner joins the platform decides: the mask fixes the dash
+   rhythm and follows the `control` corner exactly. The mask is authored in `tokens.ts`. */
+const dashedRimMask =
+  "after:[mask-image:var(--sui-rim-dashed)] after:[mask-size:100%_100%] after:[mask-repeat:no-repeat]";
+
+export const rim = {
+  field: "border-[1.5px] border-sherick-rim",
+  fieldError: "border-[1.5px] border-sherick-danger",
+  dashed: /* @__PURE__ */ cx(
+    "after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:content-['']",
+    "after:bg-sherick-rim",
+    dashedRimMask,
+    motionRim
+  ),
+  /* The dashes step up under the pointer and take the primary tone while a file is held over them. */
+  dashedHover: "hover:after:bg-sherick-ink-muted",
+  dashedDragging: "data-[dragging]:after:bg-sherick-primary",
 } as const;
 
 export const edge = {
@@ -252,23 +283,28 @@ export const state = {
      composite field focuses its outer surface while the input inside stays
      borderless; an expanded control holds the engaged step while its popup is
      open. Tonality carries the state, so no border appears and disappears. */
+  /* A field is a well: its fill sits below the surface around it, and engaging it sinks it further
+     while its rim steps up. An invalid field is the same well with a danger rim: the rim, the
+     danger placeholder and the field's message carry the error, so the fill never trades its
+     depth for a tinted wash. The error steps keep the well's depth ladder and leave the rim alone. */
   field: {
-    hover: "hover:bg-sherick-surface-high/[0.82]",
-    focus: "focus:bg-sherick-surface-high/[0.9]",
+    hover: "hover:bg-sherick-canvas/[0.85] hover:border-sherick-ink-muted",
+    focus: "focus:bg-sherick-canvas focus:border-sherick-ink-muted",
     /* A composite's engaged tone outranks hover, independent of variant emission order. */
-    focusWithin: "[&&]:focus-within:bg-sherick-surface-high/[0.9]",
-    engaged: "bg-sherick-surface-high/[0.9]",
-    errorHover: "hover:bg-sherick-danger/[0.10]",
-    errorFocus: "focus:bg-sherick-danger/[0.13]",
-    errorEngaged: "bg-sherick-danger/[0.13]",
+    focusWithin: "[&&]:focus-within:bg-sherick-canvas [&&]:focus-within:border-sherick-ink-muted",
+    engaged: "bg-sherick-canvas border-sherick-ink-muted",
+    errorHover: "hover:bg-sherick-canvas/[0.85]",
+    errorFocus: "focus:bg-sherick-canvas",
+    errorEngaged: "bg-sherick-canvas",
     /* The error ladder again, keyed on Base UI's validity attribute for a part that learns its
        validity from the field it sits in. Two variants outrank the single-variant ladder above,
        so neither ladder has to be conditional. */
-    invalid: "data-[invalid]:bg-sherick-danger/[0.075]",
-    invalidHover: "data-[invalid]:hover:bg-sherick-danger/[0.10]",
-    invalidEngaged: "data-[invalid]:bg-sherick-danger/[0.13]",
-    invalidFocusWithin: "[&&]:data-[invalid]:focus-within:bg-sherick-danger/[0.13]",
+    invalid: "data-[invalid]:border-sherick-danger",
+    invalidHover: "data-[invalid]:hover:border-sherick-danger",
+    invalidEngaged: "data-[invalid]:border-sherick-danger",
+    invalidFocusWithin: "[&&]:data-[invalid]:focus-within:border-sherick-danger",
   },
+
 } as const;
 
 /* State layers.
@@ -317,6 +353,14 @@ const pressTonal = "[&:not([data-disabled]):not(:disabled)]:active:before:opacit
 const pressTonalNeutral = "[&:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.12]";
 const pressFilled = "[&:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.26]";
 const pressTrack = "group-[:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.26]";
+/* A selection mark answers hover with the light tonal step: it is a 20px glyph beside its own
+   label, and the track's step would turn an empty well into a grey disc. Its press is depth, not
+   a heavier veil — `selectable.markSurface` sinks the well — so the layer only holds its hover
+   step while the pointer is down. A read-only mark accepts no change and advertises none.
+   The pseudo-class sits *inside* the group selector: written after it, as `…]:hover:`, it would
+   match the mark's own 20px box rather than the control and the row around it. */
+const hoverMark =
+  "group-[:not([data-disabled]):not([data-readonly]):not(:disabled):hover]:before:opacity-[0.09]";
 
 /* A labelled control surface paints its state on a row that owns the pointer area while the
    actual disabled marker belongs to a descendant control. Gate the same quiet response on that
@@ -344,6 +388,9 @@ export const stateLayer = {
   /* A switch track or a selection well: the same layer, but hover and press arrive from the
      wrapping control rather than from the surface itself. */
   track: /* @__PURE__ */ cx(stateLayerBase, "before:rounded-[inherit] before:bg-current", hoverTrack, pressTrack),
+  /* A checkbox box or a radio socket: the hover arrives from the wrapping control, at the light
+     tonal step, and the press is carried by the well's own depth rather than by this layer. */
+  mark: /* @__PURE__ */ cx(stateLayerBase, "before:rounded-[inherit] before:bg-current", hoverMark),
   /* A row highlighted by keyboard or pointer navigation. Base UI collection primitives expose
      `data-highlighted`; this is the one canonical visual treatment for it, and it pairs with a
      row's own `quiet` layer — the row carries both, so a highlighted row and a hovered row are the
@@ -374,7 +421,10 @@ export const hitArea =
    - matteHigh:   the second matte step, for nesting inside another matte surface.
    - matteInset:  a passive sheet tucked under a stronger control; subdued without
                   blending into the canvas or needing a drawn rim.
-   - control:     the fill every text control shares, plus its placeholder tone.
+   - control:     the fill every text control shares, plus its placeholder tone. It is a well:
+                  the canvas tone, which sits below a card in both themes, so a field reads as
+                  sunk into the surface rather than as a pad raised from it. Its rim, not its
+                  fill, is what separates it (see `rim`).
    - handle:      the fill of a small part the user has to find — a value control's handle.
                   Surface steps sit within a few percent of their neighbours, so this role
                   takes the mid-emphasis tone, which inverts with the theme and separates in
@@ -407,7 +457,7 @@ export const material = {
   matteQuiet: "bg-sherick-surface/[0.42] text-sherick-ink",
   matte: "bg-sherick-surface/[0.78] text-sherick-ink",
   matteHigh: "bg-sherick-surface-high/[0.72] text-sherick-ink",
-  control: "bg-sherick-surface-high/[0.66] text-sherick-ink placeholder:text-sherick-ink-muted",
+  control: "bg-sherick-canvas/[0.7] text-sherick-ink placeholder:text-sherick-ink-muted",
   /* The invalid fill carries its placeholder at the *full* danger tone, not at a fraction of it. A
      placeholder is text, so it answers to the same 4.5:1 the copy beside it does, and a partial
      opacity of an accent is a different colour from the accent: the 72%-opacity placeholder
@@ -415,7 +465,7 @@ export const material = {
      measures 4.1–4.7:1 light and 5.2–6.2:1 dark on it. There is no dimmer step of a semantic tone
      that is still readable, and a normal field's placeholder is `ink-muted` at full strength
      already — so the error form is the same rule, in the tone the field is in. */
-  controlError: "bg-sherick-danger/[0.075] text-sherick-ink placeholder:text-sherick-danger",
+  controlError: "bg-sherick-canvas/[0.7] text-sherick-ink placeholder:text-sherick-danger",
   handle: "bg-sherick-ink-muted text-sherick-canvas",
   acrylic:
     "bg-sherick-surface-float/[var(--sui-glass-fill)] bg-[image:var(--sui-glass-gradient)] text-sherick-ink backdrop-blur-[var(--sui-glass-blur)] backdrop-saturate-[var(--sui-glass-saturation)] backdrop-brightness-[var(--sui-glass-brightness)]",
@@ -738,29 +788,49 @@ export const selectableRowSurface =
 
 export const selectable = {
   surface: /* @__PURE__ */ cx("relative", elevation.recessed, motionFeedback),
-  /* The same object one rung deeper, for a mark whose identity is its depth. */
-  markSurface: /* @__PURE__ */ cx("relative", elevation.well, motionFeedback),
+  /* A selection mark — a checkbox box, a radio socket — rests in the same groove a Switch track
+     does. While the wrapping control is held it sinks to the `well`: the floor darkens and the
+     boundary stays exactly where it was, which is how a mark that must not move under the pointer
+     answers a press. */
+  markSurface: /* @__PURE__ */ cx(
+    "relative",
+    elevation.recessed,
+    "group-[:not([data-disabled]):not([data-readonly]):not(:disabled):active]:shadow-sherick-well",
+    motionFeedback
+  ),
   /* The resting fill a *groove* holds — a segmented control's track, a tab list — and nothing more.
      A groove that holds labelled segments is identified by those segments, exactly as a tab list is
      identified by its labels, so it takes no boundary of its own. */
   rest: /* @__PURE__ */ cx(material.matteHigh, text.medium),
-  /* An *empty mark* — an unchecked box, an unselected radio — is the one thing in the family with
-     no content at all: nothing inside it says what it is. It takes the fill a `Switch`'s track takes,
-     so the interior is a surface rather than a hole, but that *cannot* be what identifies it: the
-     tightest neutral step this palette has measures about 1.3:1 against the surface around it, where
-     WCAG asks 3:1.
-     So the mark is **sunk deeper** instead — `markSurface` — and its depth is what identifies it:
-     one wall deepened a rung further than `recessed` draws it (the shaded wall above in light mode,
-     the lit wall below in dark mode), which is the same light the whole system is built from. See
-     the elevation recipes in `tokens.ts`, and §5 of the design language. No rim: a stroke tracing
-     all four sides of a matte control is not part of this language, and the mark now reads as the
-     switch's own well does, only deeper. */
-  mark: /* @__PURE__ */ cx("bg-sherick-surface-high", text.medium),
-  /* A filled mark is identified by its own fill. */
+  /* An *empty mark* — an unchecked box, an unselected radio — is a hollow control: nothing inside it
+     says what it is, and it still has to be identifiable at 3:1. Neither the neutral fill (about
+     1.3:1 against the surface around it) nor any depth the light model can draw gets it there
+     without turning the mark into a shaded orb. So an empty mark is the one control that carries
+     a **rim**: the `rim` tone, tuned to just clear 3:1 on every surface, drawn as the lip of the
+     recess it sits in rather than as an outline over a filled control. The rim belongs to the empty
+     state only — a selected mark is identified by its fill, and the rim dissolves into it.
+     The rim is an overlay rather than the mark's own border, so the fill, the hover layer and the
+     recess all reach the mark's real edge: a border would leave a 1.5px frame of untinted fill
+     around a hovered selected box. Hover steps the rim to the mid-emphasis tone — darker in light
+     mode, lighter in dark — which is a visible answer on a 20px mark where a tint alone is not. */
+  mark: /* @__PURE__ */ cx(
+    "bg-sherick-canvas/[0.7]",
+    text.medium,
+    "after:pointer-events-none after:absolute after:inset-0 after:box-border after:rounded-[inherit] after:border-[1.5px] after:content-['']",
+    "after:border-sherick-rim",
+    "group-[:not([data-disabled]):not([data-readonly]):not(:disabled):hover]:after:border-sherick-ink-muted",
+    motionRim
+  ),
+  /* A selected mark is the strong accent, edge to edge, and it settles flat: it is identified by
+     its fill and its glyph, and the rim fades out as the fill arrives. The rim fades by opacity
+     rather than by colour, so forced colors cannot repaint a transparent rim as a visible one. */
   selected:
-    "group-data-[checked]:bg-sherick-primary-strong group-data-[checked]:text-sherick-on-primary",
+    "group-data-[checked]:bg-sherick-primary-strong group-data-[checked]:text-sherick-on-primary group-data-[checked]:shadow-sherick-flat group-data-[checked]:after:opacity-0",
   indeterminate:
-    "group-data-[indeterminate]:bg-sherick-primary-strong group-data-[indeterminate]:text-sherick-on-primary",
+    "group-data-[indeterminate]:bg-sherick-primary-strong group-data-[indeterminate]:text-sherick-on-primary group-data-[indeterminate]:shadow-sherick-flat group-data-[indeterminate]:after:opacity-0",
+  /* A selected radio's dot: the socket's on-colour, flat. A Switch thumb is lifted because it is a
+     24px part the user moves; an 8px dot under the same shadow reads as a bead with a halo. */
+  thumb: "bg-current",
 } as const;
 
 /* The authored alphas the contrast contract measures. They are derived from the class names above
@@ -776,6 +846,12 @@ const recipeAlpha = (recipe: string, pattern: RegExp, label: string) => {
 const stateAlpha = (recipe: string, label: string) =>
   recipeAlpha(recipe, /opacity-\[(0?\.\d+)\]/, label);
 const fillAlpha = (recipe: string, label: string) => recipeAlpha(recipe, /\/\[(0?\.\d+)\]/, label);
+/* A field well's canvas step: written without an alpha, the step is the opaque canvas. */
+const wellAlpha = (recipe: string, label: string) => {
+  const match = recipe.match(/bg-sherick-canvas(?:\/\[(0?\.\d+)\])?(?:\s|$)/);
+  if (!match) throw new Error(`recipe alpha missing for ${label}`);
+  return match[1] === undefined ? 1 : Number(match[1]);
+};
 
 export const recipeAlphas = {
   state: {
@@ -783,6 +859,7 @@ export const recipeAlphas = {
     tonal: { hover: stateAlpha(hoverTonal, "state.tonal.hover"), press: stateAlpha(pressTonal, "state.tonal.press") },
     tonalNeutral: { hover: stateAlpha(hoverTonal, "state.tonalNeutral.hover"), press: stateAlpha(pressTonalNeutral, "state.tonalNeutral.press") },
     filled: { hover: stateAlpha(hoverFilled, "state.filled.hover"), press: stateAlpha(pressFilled, "state.filled.press") },
+    mark: { hover: stateAlpha(hoverMark, "state.mark.hover") },
   },
   tint: {
     neutralSoft: fillAlpha(tone.soft.secondary, "tint.neutralSoft"),
@@ -792,12 +869,9 @@ export const recipeAlphas = {
     quiet: fillAlpha(material.matteQuiet, "field.quiet"),
     card: fillAlpha(material.matte, "field.card"),
     groove: fillAlpha(material.matteHigh, "field.groove"),
-    control: fillAlpha(material.control, "field.control"),
-    hover: fillAlpha(state.field.hover, "field.hover"),
-    engaged: fillAlpha(state.field.engaged, "field.engaged"),
-    invalid: fillAlpha(state.field.invalid, "field.invalid"),
-    invalidHover: fillAlpha(state.field.invalidHover, "field.invalidHover"),
-    invalidFocus: fillAlpha(state.field.invalidFocusWithin, "field.invalidFocus"),
+    control: wellAlpha(material.control, "field.control"),
+    hover: wellAlpha(state.field.hover, "field.hover"),
+    engaged: wellAlpha(state.field.engaged, "field.engaged"),
   },
 } as const;
 

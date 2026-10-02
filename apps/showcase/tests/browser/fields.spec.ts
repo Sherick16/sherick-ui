@@ -217,8 +217,8 @@ test("a compact selection control keeps a compact layout box with a comfortable 
   await checkbox.scrollIntoViewIfNeeded();
   const box = await checkbox.boundingBox();
   expect(box, "the checkbox has no box").not.toBeNull();
-  expect(Math.round(box?.width ?? 0)).toBe(24);
-  expect(Math.round(box?.height ?? 0)).toBe(24);
+  expect(Math.round(box?.width ?? 0)).toBe(20);
+  expect(Math.round(box?.height ?? 0)).toBe(20);
 
   // The target still answers over the full accessible floor, and no further.
   const reach = await checkbox.evaluate((element) => {
@@ -260,7 +260,7 @@ test("expanded hit areas stay separate in rows at the library's own rhythm", asy
   expect(firstBox).not.toBeNull();
   expect(secondBox).not.toBeNull();
 
-  // Between two 24px marks in 48px rows the 44px targets cannot meet: the point in the gap
+  // Between two 20px marks in 48px rows the 44px targets cannot meet: the point in the gap
   // belongs to neither control, so a click aimed at one row can never land on its neighbour.
   const gapY = ((firstBox?.y ?? 0) + (firstBox?.height ?? 0) + (secondBox?.y ?? 0)) / 2;
   const gapHits = await page.evaluate(
@@ -425,76 +425,68 @@ test("NumberField types, steps and stops at its bounds", async ({ page, errors }
   expect(errors).toEqual([]);
 });
 
-/* An unchecked box and an unselected radio have no content of their own, and the neutral ladder
-   cannot identify them either: the deepest step in the palette measures about 1.3:1 against the
-   surface around it, where WCAG asks 3:1. What identifies them is the *depth* of the well they sit
-   in (`elevation-well`), so this reads the rendered depth — the mark's own shadow must be the well
-   rung, and its fill must be the neutral step a `Switch`'s track sits in — rather than a class name
-   or a stroke that no longer exists. The contrast of the wall that carries the requirement is the
-   contrast contract's job, not this test's. */
-test("a resting selection mark is identified by the depth of its well", async ({ page, errors }) => {
+/* An unchecked box and an unselected radio have no content of their own, and neither the neutral
+   ladder nor depth can identify them at the 3:1 WCAG asks. What identifies them is their *rim*: the
+   mark's own `::after` in the `rim` tone, over the field well a text field is made of. A selected
+   mark drops the rim and is identified by its accent fill instead. This reads the rendered styles
+   rather than class names; the contrast of the rim is the contrast contract's job, and the pixels
+   are the next test's. */
+test("a resting selection mark is identified by its rim, a selected one by its fill", async ({ page, errors }) => {
   await page.goto("/verification/interactions");
   await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
 
   const readMark = (locator: ReturnType<Page["locator"]>) =>
     locator.evaluate((element) => {
-      const resolved = (name: string) => {
+      const resolved = (value: string) => {
         const probe = document.createElement("div");
-        probe.style.color = `oklch(var(${name}))`;
+        probe.style.backgroundColor = value;
         document.body.appendChild(probe);
-        const value = getComputedStyle(probe).color;
+        const colour = getComputedStyle(probe).backgroundColor;
         probe.remove();
-        return value;
+        return colour;
       };
-      /* A lighting recipe's layers are separated by `", "` and none of them contains a comma of its
-         own, so a layer can be read off without parsing colour syntax. */
-      const layersOf = (value: string) => {
-        const probe = document.createElement("div");
-        probe.style.boxShadow = value;
-        document.body.appendChild(probe);
-        const shadow = getComputedStyle(probe).boxShadow;
-        probe.remove();
-        return shadow.split(", ");
-      };
-      const style = getComputedStyle(element);
+      const rim = getComputedStyle(element, "::after");
       return {
-        shadow: style.boxShadow,
-        well: layersOf("var(--sui-elevation-well)"),
-        recessed: layersOf("var(--sui-elevation-recessed)"),
-        fill: style.backgroundColor,
-        neutral: resolved("--sui-surface-high"),
-        rim: getComputedStyle(element, "::after").borderTopWidth,
+        rimWidth: rim.borderTopWidth,
+        rimColour: rim.borderTopColor,
+        rimOpacity: rim.opacity,
+        expectedRim: resolved("oklch(var(--sui-rim))"),
+        fill: getComputedStyle(element).backgroundColor,
+        well: resolved("oklch(var(--sui-canvas) / 0.7)"),
+        accent: resolved("oklch(var(--sui-primary-strong))"),
       };
     });
 
   for (const [name, locator] of [
     ["an unchecked box", page.locator('button[role="checkbox"][aria-checked="false"]:not([data-disabled]) span[aria-hidden="true"]').first()],
-    ["an unselected radio", page.locator('[role="radio"][aria-checked="false"] span[aria-hidden="true"]').first()],
+    ["an unselected radio", page.locator('[role="radio"][aria-checked="false"] > span[aria-hidden="true"]').first()],
   ] as const) {
     await locator.scrollIntoViewIfNeeded();
     const mark = await readMark(locator);
-    /* The mark's own computed shadow carries Tailwind's ring plumbing on top, so the rung is read as
-       the lighting layers it is made of: the well's, not the shallower groove's. */
-    for (const layer of mark.well) {
-      expect(mark.shadow, `${name} is sunk to the well rung`).toContain(layer);
-    }
-    /* The two rungs share the shallow wall — a well is a groove one wall deeper, not a different
-       shadow — so what proves the depth is that the *deep* wall is the well's and not the groove's. */
-    expect(mark.shadow, `${name} is not left at the shallow groove rung`).not.toContain(mark.recessed[0]);
-    expect(mark.fill, `${name} sits in the neutral well`).toBe(mark.neutral);
-    /* And nothing draws a line around it: the same object a `Switch`'s track is, and a switch draws
-       none. A stroke tracing all four sides of a matte control is not part of this language. */
-    expect(mark.rim, `${name} carries no drawn edge`).toBe("0px");
+    expect(Number.parseFloat(mark.rimWidth), `${name} carries a rim`).toBeGreaterThan(0);
+    expect(mark.rimColour, `${name}'s rim is the rim tone`).toBe(mark.expectedRim);
+    expect(mark.rimOpacity, `${name}'s rim is drawn`).toBe("1");
+    expect(mark.fill, `${name} is a field well`).toBe(mark.well);
+  }
+
+  for (const [name, locator] of [
+    ["a checked box", page.locator('button[role="checkbox"][aria-checked="true"]:not([data-disabled]) span[aria-hidden="true"]').first()],
+    ["a selected radio", page.locator('[role="radio"][aria-checked="true"] > span[aria-hidden="true"]').first()],
+  ] as const) {
+    await locator.scrollIntoViewIfNeeded();
+    const mark = await readMark(locator);
+    expect(mark.rimOpacity, `${name} drops its rim`).toBe("0");
+    expect(mark.fill, `${name} is the accent fill`).toBe(mark.accent);
   }
 
   expect(errors).toEqual([]);
 });
 
-/* The contrast contract measures the well's *authored* alpha against the neutral fill; it cannot
-   see what the blurred inset shadow actually paints. This reads real pixels from the rendered
-   mark: the most extreme pixel of the well, against the surface just outside it, must clear the
-   3:1 WCAG asks of the cue that identifies an empty mark. */
-test("a resting selection mark's well clears 3:1 as rendered", async ({ page, errors }) => {
+/* The contrast contract measures the rim's *authored* tone against each surface; it cannot
+   see what the browser actually paints once a 1.5px rim is snapped to device pixels. This reads
+   real pixels from the rendered mark: the most extreme pixel of the mark, against the surface just
+   outside it, must clear the 3:1 WCAG asks of the cue that identifies an empty mark. */
+test("a resting selection mark's rim clears 3:1 as rendered", async ({ page, errors }) => {
   await page.goto("/verification/interactions");
   await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
 
@@ -546,7 +538,7 @@ test("a resting selection mark's well clears 3:1 as rendered", async ({ page, er
       return (high + 0.05) / (low + 0.05);
     };
 
-    /* The surface just outside the mark, sampled above its top edge where neither the well nor its
+    /* The surface just outside the mark, sampled above its top edge where neither the rim nor its
        inset shadow can reach. */
     const outside = pixel(Math.floor(margin + (box?.width ?? 0) / 2), margin - 3);
     let worst = 0;
@@ -569,7 +561,7 @@ test("a resting selection mark's well clears 3:1 as rendered", async ({ page, er
   for (const [name, locator] of marks) {
     for (const theme of ["light", "dark"] as const) {
       const ratio = await measure(locator, theme);
-      expect(ratio, `${name} well in ${theme} must clear 3:1`).toBeGreaterThanOrEqual(3);
+      expect(ratio, `${name} rim in ${theme} must clear 3:1`).toBeGreaterThanOrEqual(3);
     }
   }
 

@@ -195,14 +195,17 @@ test("forced colors retain radio boundaries and one focus ring on the control", 
     const style = getComputedStyle(element);
     return { outline: style.outlineStyle, width: style.outlineWidth };
   });
+  /* A resting radio is identified by its own rim — a real border, which forced colors repaints — so
+     the control itself carries no second ring around it. */
   const restingBoundary = await daily.evaluate((element) => {
-    const style = getComputedStyle(element);
-    return { outline: style.outlineStyle, width: style.outlineWidth };
+    const rim = getComputedStyle(element.querySelector(':scope > span[aria-hidden="true"]') as Element, "::after");
+    return { outline: getComputedStyle(element).outlineStyle, rim: rim.borderTopStyle, rimWidth: rim.borderTopWidth };
   });
 
   expect(selectedBoundary.outline).toBe("solid");
-  expect(restingBoundary.outline).toBe("solid");
-  expect(restingBoundary.width).toBe("1px");
+  expect(restingBoundary.outline).toBe("none");
+  expect(restingBoundary.rim).toBe("solid");
+  expect(Number.parseFloat(restingBoundary.rimWidth)).toBeGreaterThan(0);
 
   await daily.focus();
   const focusOutline = await rowFor(daily).evaluate((element) => {

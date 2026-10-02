@@ -63,7 +63,7 @@ Every composition the language permits is measured in both themes; this is the s
 | `danger` in the error fills (the invalid-field placeholder) | 4.13 → **6.08** | ok |
 | on-colour on its strong fill, through the filled states | 3.16–3.68 → **4.65–4.95** | 3.67 → **4.51** |
 | the detail role on the surfaces it is permitted on | 2.84 → **3.16** | ok |
-| the wall the light makes legible on an empty mark's well | — → **3.60** | — → **4.08** |
+| the wall the light makes legible on an empty mark's well (superseded by the rim, below) | — → **3.60** | — → **4.08** |
 | the focus indicator (outer and inset, over every fill) | 4.53 → **6.90** | ok |
 
 The palette clears every composition the contract measures, in both themes. The matrix has grown
@@ -115,7 +115,8 @@ gate uses.
 The surfaces (`canvas`, `surface`, `surface-high`, `surface-float`, `surface-overlay`), every
 `on-*` colour, `outline`, `scrim`, `edge`, the `--sui-light-*` pair, the rest of the elevation
 ladder, the glass family and the code well are exactly as they were. `elevation-well` is the one
-rung that was added — the well of an empty selection mark — and `--sui-code-comment` was retuned in
+rung that was added — the well of an empty selection mark, now its pressed depth (see the rim,
+below) — and `--sui-code-comment` was retuned in
 both themes so the published syntax palette clears 4.5:1 on the code well. `focus` and `primary`
 are the same value in each theme, as they were, and `primary-strong` stays one step deeper than
 both.
@@ -155,5 +156,36 @@ This is not the role split rejected above. That proposal separated a role's *for
 *strong fill* for a 0.04 lightness difference. The container is a third, different surface — the
 thing a tint used to approximate — and the difference it makes is hue, not lightness.
 
-The field error ladder (`state.field.invalid*`, `controlError`) still composites `danger` over the
-field. It sits on known surfaces, it is measured, and it was not part of the defect.
+The field error ladder no longer composites `danger` over the field: an invalid field keeps its
+well and turns its rim to the danger tone (see below).
+
+## The rim (hollow controls)
+
+**Decided and implemented** with the Checkbox and RadioGroup redesign. A text field, the file drop
+target and an empty checkbox or radio have no content that identifies them, and the 3:1 their
+boundary needs was out of reach of every borderless treatment measured:
+
+- **the neutral fill ladder** — the tightest step measures about 1.3:1 against the surface around
+  it, and a fill dark enough to reach 3:1 is a mid-grey box (the `detail` tone measured 3.57–4.54),
+  which read as a filled control rather than an empty one;
+- **depth** — the identifying wall of the old `elevation-well` cleared 3.60 / 4.08, but on a 20px
+  mark the shading it took made the mark read as a lit orb rather than a socket, and in dark mode no
+  colour darker than the card can reach 3:1 against it at all (black measures about 1.3:1).
+
+So each hollow control carries one rim in a dedicated `rim` token, tuned to clear 3:1 against every
+surface a control sits on by a small margin and no more. At `detail` strength (3.57 / 3.83) the rim
+outshone the labels beside it.
+
+| Token | Light | Dark |
+| --- | --- | --- |
+| `--sui-rim` | **`0.630 0.016 258`** | **`0.555 0.014 256`** |
+
+| Composition | Light | Dark |
+| --- | --- | --- |
+| a hollow control's rim, worst surface | **3.16** (canvas) | **3.18** (dense acrylic) |
+| an invalid field's danger rim | ok | ok |
+| a selected mark's accent fill against the card | **8.80** | **7.02** |
+
+Fields themselves are canvas-toned wells (`material.control`), below the card in both themes, so
+the rim rather than the fill separates them; the placeholder and danger texts are measured on that
+well, at rest and engaged.

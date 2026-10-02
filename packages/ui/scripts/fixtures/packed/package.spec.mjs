@@ -25,7 +25,19 @@ test("no-reset CSS, consumer ownership, and className overrides", async ({ page 
   expect(await style(button, "borderTopWidth")).toBe("0px");
   expect(await style(button, "fontFamily")).toBe("monospace");
   expect(await style(button, "minHeight")).toBe("48px");
-  expect(await style(page.getByRole("textbox", { name: "Name" }), "borderTopWidth")).toBe("0px");
+  // A field's only border is Sherick's own rim, in the rim tone — never one a host stylesheet or a
+  // reset adds. The 1.5px rim snaps to whole device pixels at 1x.
+  const field = page.getByRole("textbox", { name: "Name" });
+  expect(await style(field, "borderTopStyle")).toBe("solid");
+  expect(await style(field, "borderTopWidth")).toMatch(/^1(\.5)?px$/);
+  expect(await field.evaluate((element) => {
+    const probe = document.createElement("div");
+    probe.style.color = "oklch(var(--sui-rim))";
+    document.body.appendChild(probe);
+    const rim = getComputedStyle(probe).color;
+    probe.remove();
+    return getComputedStyle(element).borderTopColor === rim;
+  })).toBe(true);
   expect(await style(page.getByRole("separator"), "borderTopStyle")).toBe("solid");
   expect(await style(page.getByRole("separator"), "borderTopWidth")).toBe("1px");
   expect(await style(page.getByText("Package badge", { exact: true }), "boxSizing")).toBe("border-box");

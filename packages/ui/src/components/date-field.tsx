@@ -4,7 +4,7 @@ import { Popover as BasePopover } from "@base-ui/react/popover";
 import { CalendarDays } from "lucide-react";
 import React, { useEffect, useRef, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { density, focusRingWithin, material, overlay, shape, stacking, state, stateLayer, text } from "./ui.common";
+import { density, focusRingWithin, material, overlay, rim, shape, stacking, state, stateLayer, text } from "./ui.common";
 import { motionFeedback, motionInkPress, motionPresenceAnchored } from "./ui.motion";
 
 /* The parts the two date pickers share.
@@ -31,6 +31,7 @@ export const dateFieldRowClassName = (disabled: boolean) =>
     density.normal,
     shape.control,
     material.control,
+    rim.field,
     motionFeedback,
     focusRingWithin,
     state.field.invalid,
@@ -45,7 +46,7 @@ export const dateFieldRowClassName = (disabled: boolean) =>
  *  input slot, leaving one visible calendar trigger in every engine (Firefox does not expose
  *  a picker-indicator pseudo-element). The composite row owns focus, not the clipped input. */
 export const dateInputClassName =
-  "block w-[calc(100%+2.5rem)] min-w-0 bg-transparent py-3 text-inherit outline-none disabled:cursor-not-allowed";
+  "block w-[calc(100%+2.5rem)] min-w-0 bg-transparent py-2.5 text-inherit outline-none disabled:cursor-not-allowed";
 
 /* The 36×44 target holds a concentric 32px hover surface, leaving air inside the 48px field.
    Only the icon presses: the adjacent native text entry never activates this button. */

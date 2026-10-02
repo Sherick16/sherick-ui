@@ -84,8 +84,7 @@ export const WCAG_NON_TEXT = 3;
 
 /* The contrast model does not restate the authored alphas. `contrastCompositions` is given the
    state, tint and field steps from `recipeAlphas` — which `ui.common.ts` derives from the
-   published recipes — and it reads the acrylic fills and the identifying wall of `elevation-well`
-   from the theme variables themselves. A recipe change therefore moves the measurement with it
+   published recipes — and it reads the acrylic fills from the theme variables themselves. A recipe change therefore moves the measurement with it
    instead of leaving a second handwritten copy behind. */
 
 const SEMANTIC = ["primary", "danger", "warning", "success"];
@@ -106,18 +105,6 @@ export const contrastCompositions = (variables, alphas) => {
   const FIELD = alphas.field;
   const colour = (name) => parseColour(variables[`--sui-${name}`]);
 
-  /* The identifying wall of `elevation-well`. The design rule is that a well deepens exactly one
-     of `recessed`'s two walls, so the layer with the greatest alpha is the wall the contract
-     measures, and its tone comes from the same token rather than from a second list. The rendered
-     proof that this wall clears 3:1 as painted lives in the browser suite; this is the authored
-     model. */
-  const WELL = (() => {
-    const token = String(variables["--sui-elevation-well"] ?? "");
-    const walls = [...token.matchAll(/var\(--sui-([a-z-]+)\)\s*\/\s*([\d.]+)/g)].map(([, tone, alpha]) => ({ tone, alpha: Number(alpha) }));
-    if (walls.length === 0) throw new Error("elevation-well has no measurable wall");
-    return walls.reduce((deepest, wall) => (wall.alpha > deepest.alpha ? wall : deepest));
-  })();
-
   const canvas = colour("canvas");
   const surface = colour("surface");
   const surfaceHigh = colour("surface-high");
@@ -137,6 +124,9 @@ export const contrastCompositions = (variables, alphas) => {
   const acrylicDenseFill = Number(variables["--sui-glass-dense-fill"]);
   const overlayFill = Number(variables["--sui-overlay-fill"]);
   const codeWell = composite(canvas, 0.28, composite(surface, FIELD.card, canvas));
+  /* A field is a canvas-toned well over whatever holds it; the common case is a card. */
+  const card = composite(surface, FIELD.card, canvas);
+  const well = (alpha, base = card) => composite(canvas, alpha, base);
   const surfaces = {
     canvas,
     "quiet well": composite(surface, FIELD.quiet, canvas),
@@ -144,11 +134,11 @@ export const contrastCompositions = (variables, alphas) => {
     "chip at rest": composite(surfaceHigh, TINT.neutralRest, canvas),
     /* A neutral badge or tag: the neutral soft step inside the card that holds it. */
     "neutral soft in a card": composite(surfaceHigh, TINT.neutralSoft, composite(surface, FIELD.card, canvas)),
-    "field": composite(surfaceHigh, FIELD.control, canvas),
-    /* An empty mark sits in the *opaque* neutral well, the same one a Switch's track sits in. */
-    "empty mark well": surfaceHigh,
-    "field hover": composite(surfaceHigh, FIELD.hover, canvas),
-    "engaged field": composite(surfaceHigh, FIELD.engaged, canvas),
+    "field": well(FIELD.control),
+    /* An empty mark's interior is the field well. */
+    "empty mark": well(FIELD.control),
+    "field hover": well(FIELD.hover),
+    "engaged field": well(FIELD.engaged),
     [CODE_WELL]: codeWell,
     [ACRYLIC]: composite(surfaceFloat, acrylicFill, canvas),
     [ACRYLIC_DENSE]: composite(surfaceFloat, acrylicDenseFill, canvas),
@@ -159,7 +149,7 @@ export const contrastCompositions = (variables, alphas) => {
   /* Where a *tinted control* can actually sit: the page, inside a card, in a well, or on a floating
      sheet. The field steps are not among them — a tonal control is never placed inside a field, and
      the controls that do live there (a combobox's trailing parts, a field's submit control) are
-     foreground-only — and neither is an empty mark's well, which holds nothing but its own mark.
+     foreground-only — and neither is an empty mark's interior, which holds nothing at all.
      Both are still *surfaces* for the roles that do answer to them. */
   const controlEntries = surfaceEntries.filter(([where]) =>
     ["canvas", "quiet well", "matte card", ACRYLIC, ACRYLIC_DENSE, HERO_SHEET].includes(where)
@@ -203,9 +193,9 @@ export const contrastCompositions = (variables, alphas) => {
   add(
     "text.medium on an invalid or engaged field",
     WCAG_TEXT,
-    "a field's placeholder while the field's own error ladder is in effect",
+    "a field's placeholder in the well, at rest and engaged; an invalid field keeps the same well and changes only its rim",
     ["canvas", "matte card"].flatMap((where) =>
-      [FIELD.invalid, FIELD.invalidFocus].map((alpha) => [`${where} + danger ${alpha}`, colour("ink-muted"), tint("danger", alpha, surfaces[where])])
+      [["at rest", FIELD.control], ["engaged", FIELD.engaged]].map(([state, depth]) => [`field in ${where}, ${state}`, colour("ink-muted"), well(depth, surfaces[where])])
     )
   );
   add(
@@ -309,7 +299,7 @@ export const contrastCompositions = (variables, alphas) => {
     add(
       `a selection mark on its selected fill [${role}]`,
       WCAG_NON_TEXT,
-      "the tick, the radio dot and the switch thumb are `currentColor` over the selection fill, which the same colour overlays again while the control is hovered or pressed",
+      "a switch thumb, and a checkbox's tick or minus, are `currentColor` over the selection fill, which the same colour overlays again while the control is hovered or pressed; the switch's track layer is the heavier of the two, so it is the one measured",
       (() => {
         const fill = colour(opaqueFill(role));
         const on = colour(`on-${role}`);
@@ -329,11 +319,11 @@ export const contrastCompositions = (variables, alphas) => {
   }
 
   add(
-    "tone.text.danger in the error fills",
+    "tone.text.danger in an invalid field",
     WCAG_TEXT,
-    "the error placeholder, and error copy sitting on the invalid field's own fill",
+    "the error placeholder, in the field's own well",
     ["canvas", "matte card"].flatMap((where) =>
-      [FIELD.invalid, FIELD.invalidFocus].map((alpha) => [`${where} + danger ${alpha}`, colour("danger"), tint("danger", alpha, surfaces[where])])
+      [["at rest", FIELD.control], ["engaged", FIELD.engaged]].map(([state, depth]) => [`field in ${where}, ${state}`, colour("danger"), well(depth, surfaces[where])])
     )
   );
   add(
@@ -362,10 +352,16 @@ export const contrastCompositions = (variables, alphas) => {
   );
   add("a mark on the opaque neutral fill", WCAG_NON_TEXT, "an unchecked Switch's thumb is `currentColor` over the track's opaque neutral fill", [["unchecked switch thumb", colour("ink"), neutralFill]]);
   add(
-    "the wall the light makes legible on an empty mark's well",
+    "a hollow control's rim on the surfaces it sits on",
     WCAG_NON_TEXT,
-    "an unchecked box, an unselected radio: a mark with no content of its own is identified by its depth, and this is the wall of that well that carries it — the shaded one above in light mode, the lit one below in dark mode, exactly as `elevation-well` draws them. That the authored alpha clears 3:1 as painted is measured from rendered pixels in the browser suite; the opposite wall is a deliberate bounce and is not a boundary.",
-    surfaceEntries.map(([where, base]) => [where, composite(colour(WELL.tone), WELL.alpha, surfaceHigh), base])
+    "a text field, a drop target's dashes, an unchecked box and an unselected radio are hollow controls identified by their `rim`, tuned to clear this by a small margin; a selected mark drops the rim and is identified by its fill",
+    controlEntries.map(([where, base]) => [where, colour("rim"), base])
+  );
+  add(
+    "an invalid field's rim on the surfaces it sits on",
+    WCAG_NON_TEXT,
+    "an invalid field keeps its well and turns its rim to the danger tone; the rim, the danger placeholder and the message carry the error together",
+    controlEntries.map(([where, base]) => [where, colour("danger"), base])
   );
   add(
     "the detail role on the surfaces it is permitted on",

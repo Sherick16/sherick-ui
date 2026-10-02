@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import {
   AlignCenter,
   AlignLeft,
@@ -280,7 +280,7 @@ export default function Home() {
               <Specimen title="Interaction states">
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                   <Tile label="Rest" className={cn(material.control, text.high)} />
-                  <Tile label="Hover" className={cn(material.control, "bg-sherick-surface-high/[0.82]", text.high)} />
+                  <Tile label="Hover" className={cn(material.control, "bg-sherick-canvas/[0.85]", text.high)} />
                   <Tile label="Pressed" className={cn(material.control, text.high, stateLayer.tonal, "before:opacity-[0.15]")} />
                   <Tile label="Selected" className={cn(shape.control, tone.selected.primary)} />
                   <Tile label="Disabled" disabled className={cn(material.control, state.disabled)} />
@@ -420,12 +420,13 @@ export default function Home() {
           <ShowcaseSection id="selection">
             <div className="mt-6 columns-1 gap-4 xl:columns-2 [&>*]:mb-4 [&>*]:break-inside-avoid">
               <Specimen title="Checkbox">
-                <div className="flex flex-wrap items-center gap-6">
-                  <StateLabel label="Checked"><Checkbox defaultChecked aria-label="Checked" /></StateLabel>
-                  <StateLabel label="Unchecked"><Checkbox aria-label="Unchecked" /></StateLabel>
-                  <StateLabel label="Mixed"><Checkbox indeterminate aria-label="Mixed" /></StateLabel>
-                  <StateLabel label="Disabled"><Checkbox defaultChecked disabled aria-label="Disabled" /></StateLabel>
-                </div>
+                <MarkStates
+                  rows={[
+                    { label: "Unchecked", render: (cell) => <Checkbox aria-label={`Unchecked, ${cell.label}`} disabled={cell.disabled} readOnly={cell.readOnly} className={cell.className("[&>span]")} /> },
+                    { label: "Checked", render: (cell) => <Checkbox defaultChecked aria-label={`Checked, ${cell.label}`} disabled={cell.disabled} readOnly={cell.readOnly} className={cell.className("[&>span]")} /> },
+                    { label: "Mixed", render: (cell) => <Checkbox indeterminate aria-label={`Mixed, ${cell.label}`} disabled={cell.disabled} readOnly={cell.readOnly} className={cell.className("[&>span]")} /> },
+                  ]}
+                />
               </Specimen>
 
               <Specimen title="Radio group">
@@ -435,8 +436,15 @@ export default function Home() {
                   options={[
                     { value: "production", label: "Production" },
                     { value: "preview", label: "Preview" },
-                    { value: "cluster", label: "Shared cluster, whose label is long enough to wrap across more than one line" },
+                    { value: "cluster", label: "Shared cluster, whose label is long enough to wrap across more than one line in this column" },
                     { value: "edge", label: "Edge", disabled: true },
+                  ]}
+                />
+                <MarkStates
+                  className="mt-6"
+                  rows={[
+                    { label: "Unselected", render: (cell) => <RadioMarkState cell={cell} name="Unselected" /> },
+                    { label: "Selected", render: (cell) => <RadioMarkState cell={cell} name="Selected" selected /> },
                   ]}
                 />
               </Specimen>
@@ -902,6 +910,83 @@ function Swatch({ label, className }: { label: string; className: string }) {
 
 function StateLabel({ label, children }: { label: string; children: React.ReactNode }) {
   return <div className="flex items-center gap-2"><div>{children}</div><span className={cn("text-sm", text.medium)}>{label}</span></div>;
+}
+
+/* A selection mark's states, held still so they can be compared side by side. Hover, pressed and
+   focus are pinned onto the mark itself by a descendant selector the caller names. */
+interface MarkStateCell {
+  label: string;
+  disabled: boolean;
+  /* A pinned state is held still: a click must not turn a hover specimen into a selected one. */
+  readOnly: boolean;
+  className: (mark: string) => string;
+}
+
+const markStateColumns: { label: string; disabled?: boolean }[] = [
+  { label: "Rest" },
+  { label: "Hover" },
+  { label: "Pressed" },
+  { label: "Focus" },
+  { label: "Disabled", disabled: true },
+];
+
+/* Tailwind reads class names as literal text, so every pinned class is listed here in full. */
+const pinnedMarkClasses: Record<string, Record<string, string>> = {
+  "[&>span]": {
+    Hover: "[&>span]:before:opacity-[0.09] [&>span]:after:border-sherick-ink-muted",
+    Pressed: "[&>span]:before:opacity-[0.09] [&>span]:after:border-sherick-ink-muted [&>span]:shadow-[var(--sui-elevation-well)]",
+    Focus: "[&>span]:outline [&>span]:outline-2 [&>span]:outline-sherick-focus [&>span]:outline-offset-[3px]",
+  },
+  "[&_[role=radio]>span]": {
+    Hover: "[&_[role=radio]>span]:before:opacity-[0.09] [&_[role=radio]>span]:after:border-sherick-ink-muted",
+    Pressed: "[&_[role=radio]>span]:before:opacity-[0.09] [&_[role=radio]>span]:after:border-sherick-ink-muted [&_[role=radio]>span]:shadow-[var(--sui-elevation-well)]",
+    Focus: "[&_[role=radio]>span]:outline [&_[role=radio]>span]:outline-2 [&_[role=radio]>span]:outline-sherick-focus [&_[role=radio]>span]:outline-offset-[3px]",
+  },
+};
+
+function MarkStates({
+  rows,
+  className,
+}: {
+  rows: { label: string; render: (cell: MarkStateCell) => React.ReactNode }[];
+  className?: string;
+}) {
+  return (
+    <div className={cn("grid grid-cols-[auto_repeat(5,minmax(2.75rem,1fr))] items-center gap-x-3 gap-y-2", className)}>
+      <span />
+      {markStateColumns.map((column) => (
+        <span key={column.label} className={cn("text-center", type.caption, text.medium)}>{column.label}</span>
+      ))}
+      {rows.map((row) => (
+        <Fragment key={row.label}>
+          <span className={cn("text-sm", text.medium)}>{row.label}</span>
+          {markStateColumns.map((column) => (
+            <div key={column.label} className="flex min-h-12 items-center justify-center">
+              {row.render({
+                label: column.label.toLowerCase(),
+                disabled: column.disabled ?? false,
+                readOnly: column.label !== "Rest",
+                className: (mark) => pinnedMarkClasses[mark]?.[column.label] ?? "",
+              })}
+            </div>
+          ))}
+        </Fragment>
+      ))}
+    </div>
+  );
+}
+
+function RadioMarkState({ cell, name, selected = false }: { cell: MarkStateCell; name: string; selected?: boolean }) {
+  return (
+    <RadioGroup
+      aria-label={`${name}, ${cell.label}`}
+      className={cn("w-auto", cell.className("[&_[role=radio]>span]"))}
+      disabled={cell.disabled}
+      readOnly={cell.readOnly}
+      defaultValue={selected ? "mark" : undefined}
+      options={[{ value: "mark", label: <span className="sr-only">{`${name}, ${cell.label}`}</span> }]}
+    />
+  );
 }
 
 /* One intent per stage, and every stage is reversible by hand so both directions of its recipe are

@@ -66,15 +66,14 @@ Both consume `sherick-ui` through package exports after the library build.
   a semantic foreground on its own tint and through its hover and pressed states, an on-colour on its
   strong fill through the filled states, the marks that carry a selection, the error placeholder, the
   non-text `detail` role, the `CodeBlock` syntax palette and a Prism namespace token on the code
-  well, the wall of an empty mark's well that the light makes legible, and the focus indicator
+  well, the rim of every hollow control and the danger rim of an invalid field, and the focus indicator
   against every surface and every fill an inset ring is drawn over. **Every composition is pass or
   fail: there is no allowlist.** One module owns the colour math and one owns the description of the
   compositions; the state, tint and field alphas it measures are derived from the published recipes,
-  the acrylic fills and the well wall are read from the theme tokens, and the same module proves
+  the acrylic fills are read from the theme tokens, and the same module proves
   every recipe class has a published rule. The same module is what the palette was solved against,
-  so the numbers in `docs/PALETTE.md` are the numbers this gate measures. The well's rendered
-  contrast is not modelled here: the browser suite reads the pixels the inset shadow actually
-  paints. This is also the layer the axe scan cannot be: a scan only sees the states a fixture
+  so the numbers in `docs/PALETTE.md` are the numbers this gate measures. The rim's rendered
+  contrast is also read from pixels in the browser suite. This is also the layer the axe scan cannot be: a scan only sees the states a fixture
   happens to be in, and `@axe-core/playwright`'s `color-contrast` rule does not evaluate
   `::placeholder` text at all.
 
@@ -254,11 +253,10 @@ The showcase browser suite also verifies:
   navigation is. Every claim is read from the rendered `::before` opacity, `:focus-visible` and
   `box-shadow` — never from a class name;
 - a resting selection mark's boundary (`fields.spec.ts`): an unchecked box and an unselected radio are
-  identified by the depth of their `elevation-well`, read from the rendered shadow layers, while a
-  filled mark's own fill identifies it. A second assertion reads the *rendered pixels* of the well
-  against the surface just outside it and requires that cue to clear 3:1 — the part of the
-  requirement the analytical contract cannot see through the blur. The authored model still lives in
-  the contrast contract;
+  identified by their rim, read from the rendered `::after` in the `rim` tone over the field well,
+  while a selected mark drops the rim and is identified by its accent fill. A second assertion reads
+  the *rendered pixels* of the mark against the surface just outside it and requires that cue to
+  clear 3:1 as painted. The authored model still lives in the contrast contract;
 - a navigation group's heading level (`interactions.spec.ts`): the fixture asks for level 2 and gets
   a level-2 heading with no level-3 heading left behind, and its rows are links with `aria-current`
   on the current one — a reusable navigation group choosing its own level was the defect;
