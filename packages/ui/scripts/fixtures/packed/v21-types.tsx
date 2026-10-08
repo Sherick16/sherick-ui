@@ -2,7 +2,7 @@ import * as React from "react";
 import {
   Breadcrumb, Calendar, Command, CommandPalette, DatePicker, DateRangePicker, DateTimePicker, FileUpload,
   Media, Pagination, Stepper, TreeView,
-  Table, RadioGroup,
+  Table, RadioGroup, CheckboxGroup, Combobox, Field, Form, Input, NumberField, Select,
   type BreadcrumbItem, type BreadcrumbProps, type CalendarDate, type CalendarLabels,
   type CalendarProps, type CommandItem, type CommandProps, type CommandPaletteProps,
   type DateRange, type DatePickerProps, type DateRangePickerProps, type FileRejection,
@@ -10,6 +10,9 @@ import {
   type FileUploadProps, type PaginationProps, type StepperItem, type StepperProps,
   type TreeViewItem, type TreeViewProps, type MediaImageProps, type MediaVideoProps,
   type TableColumn, type TableProps, type RadioGroupProps,
+  type CheckboxGroupOption, type CheckboxGroupProps, type ComboboxMultipleProps,
+  type ComboboxOptionGroup, type ComboboxPasteDetails, type ComboboxProps, type ComboboxSingleProps,
+  type FormErrors, type FormProps, type SelectOptionGroup, type SelectProps,
 } from "sherick-ui";
 
 const date: CalendarDate = "2024-06-10";
@@ -46,7 +49,35 @@ const describedTable: TableProps = { headers: columns, rows: [["Ada", <a href="/
 
 const surfaceRadio: RadioGroupProps = { appearance: "surface", label: "Plan", options: [{ value: "basic", label: <strong>Basic</strong> }], name: "plan" };
 
+const channelGroup: SelectOptionGroup = { label: "Giveaways", options: [{ label: "#giveaway", value: "giveaway" }] };
+const channels: SelectProps["options"] = [{ label: "#rules", value: "rules" }, channelGroup];
+const roleGroup: ComboboxOptionGroup = { label: "Staff", options: [{ label: "Admin", value: "admin" }] };
+const single: ComboboxSingleProps = { options: [roleGroup], value: "admin", onValueChange: (value: string | null) => void value };
+const multiple: ComboboxMultipleProps = {
+  multiple: true,
+  creatable: true,
+  options: [roleGroup],
+  value: ["admin"],
+  onValueChange: (value: string[], details) => {
+    const paste: ComboboxPasteDetails | null = details.reason === "input-paste" ? details : null;
+    void [value, paste];
+  },
+};
+const eitherCombobox: ComboboxProps[] = [single, multiple];
+const casinoOptions: CheckboxGroupOption[] = [{ value: "aurora", label: "Aurora", description: "aurora.example" }];
+const casinos: CheckboxGroupProps = { name: "casinos", label: "Casinos", appearance: "surface", required: true, options: casinoOptions, onValueChange: (value: string[]) => void value };
+const formErrors: FormErrors = { title: "Taken", roles: ["One", "Two"] };
+const formProps: FormProps = { errors: formErrors, onFormSubmit: (values) => void values };
+
 export const wave = <>
+  <Form {...formProps} ref={React.createRef<HTMLFormElement>()}>
+    <Input name="link" label="Link" prefix="https://" suffix=".gg" />
+    <Field name="channel" label="Channel"><Select options={channels} /></Field>
+    {eitherCombobox.map((props, index) => <Field key={index} label="Roles"><Combobox {...props} ref={React.createRef<HTMLInputElement>()} /></Field>)}
+    <Field name="price" label="Price (€)"><NumberField prefix="€" suffix="each" format={{ minimumFractionDigits: 2 }} locale="en-US" /></Field>
+    <CheckboxGroup {...casinos} ref={React.createRef<HTMLDivElement>()} />
+    <RadioGroup label="Draw" options={[{ value: "daily", label: "Daily", description: "At midnight" }]} />
+  </Form>
   <RadioGroup {...surfaceRadio} />
   <Calendar {...calendar} ref={React.createRef<HTMLDivElement>()} />
   <Calendar value={date} onValueChange={(value: CalendarDate | null) => void value} />
@@ -91,3 +122,7 @@ export const conflictingImage = <Media.Image src="/pattern.jpg" decorative alt="
 export const conflictingVideo = <Media.Video src="/ambient.mp4" decorative controls />;
 // @ts-expect-error decorative video cannot be keyboard focusable
 export const conflictingTabStop = <Media.Video src="/ambient.mp4" decorative tabIndex={0} />;
+// @ts-expect-error only a multiple combobox can create entries
+export const singleCreatable = <Combobox options={[]} creatable />;
+// @ts-expect-error a multiple combobox reports an array of values
+export const multipleScalar = <Combobox multiple options={[]} onValueChange={(value: string | null) => void value} />;

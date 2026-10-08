@@ -28,6 +28,7 @@ import {
   Button,
   Card,
   Checkbox,
+  CheckboxGroup,
   Chip,
   ChipGroup,
   Collapsible,
@@ -107,6 +108,12 @@ const selectOptions = [
   { label: "Design system", value: "design" },
   { label: "Dashboard", value: "dashboard" },
   { label: "Marketing site", value: "marketing" },
+];
+
+const channelOptions = [
+  { label: "#rules", value: "rules" },
+  { label: "Giveaways", options: [{ label: "#giveaway", value: "giveaway" }, { label: "#winners", value: "winners" }] },
+  { label: "Community", options: [{ label: "#general", value: "general" }, { label: "#memes", value: "memes" }] },
 ];
 
 const comboboxOptions = [
@@ -373,6 +380,7 @@ export default function Home() {
                 <div className="space-y-4">
                   <Input label="Project name" placeholder="Sherick UI" />
                   <Input label="Invalid" placeholder="Required value" error />
+                  <Input label="Invite link" prefix="https://" suffix=".discord.gg" placeholder="sherick" />
                 </div>
               </Specimen>
 
@@ -391,6 +399,9 @@ export default function Home() {
               <Specimen title="Select">
                 <div className="space-y-4">
                   <Select options={selectOptions} value={selection} onValueChange={(next) => setSelection(next ?? "")} aria-label="Project type" />
+                  <Field label="Channel">
+                    <Select options={channelOptions} defaultValue="giveaway" />
+                  </Field>
                 </div>
               </Specimen>
 
@@ -398,6 +409,12 @@ export default function Home() {
                 <div className="space-y-4">
                   <Field label="Project">
                     <Combobox options={comboboxOptions} defaultValue="dashboard" />
+                  </Field>
+                  <Field label="Projects">
+                    <Combobox multiple options={comboboxOptions} defaultValue={["design", "dashboard"]} placeholder="Add a project" />
+                  </Field>
+                  <Field label="Tags">
+                    <Combobox multiple creatable options={[]} defaultValue={["launch"]} placeholder="Add a tag" />
                   </Field>
                 </div>
               </Specimen>
@@ -407,6 +424,14 @@ export default function Home() {
                   <Field label="Quantity" description="Between 1 and 10.">
                     <NumberField min={1} max={10} defaultValue={4} />
                   </Field>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <Field label="Price (€)">
+                      <NumberField prefix="€" defaultValue={0.1} step={0.05} format={{ minimumFractionDigits: 2 }} />
+                    </Field>
+                    <Field label="Multiplier">
+                      <NumberField suffix="×" min={1} defaultValue={15} />
+                    </Field>
+                  </div>
                 </div>
               </Specimen>
               <Specimen title="Calendar & date pickers" className="xl:col-span-2">
@@ -451,6 +476,29 @@ export default function Home() {
                     { label: "Selected", render: (cell) => <RadioMarkState cell={cell} name="Selected" selected /> },
                   ]}
                 />
+              </Specimen>
+
+              <Specimen title="Checkbox group">
+                <div className="space-y-6">
+                  <CheckboxGroup
+                    label="Notify on"
+                    defaultValue={["deploys"]}
+                    options={[
+                      { value: "deploys", label: "Deploys" },
+                      { value: "reviews", label: "Reviews" },
+                      { value: "incidents", label: "Incidents", disabled: true },
+                    ]}
+                  />
+                  <CheckboxGroup
+                    label="Regions"
+                    appearance="surface"
+                    defaultValue={["eu"]}
+                    options={[
+                      { value: "eu", label: "Europe", description: "Frankfurt, Amsterdam" },
+                      { value: "us", label: "United States", description: "Virginia, Oregon" },
+                    ]}
+                  />
+                </div>
               </Specimen>
 
               <Specimen title="Switch">

@@ -262,6 +262,20 @@ The showcase browser suite also verifies:
   on the current one — a reusable navigation group choosing its own level was the defect;
 - an anchored surface placed on each side of its trigger, asserting the resolved origin and the
   direction of its travel rather than only that it appeared;
+- the form wave (`forms.spec.ts`, against `/verification/forms`): a grouped `Select` and `Combobox`
+  name each group by its heading, keep an ungrouped option where it stands and drop a group with no
+  match while filtering; a multiple `Combobox` keeps its list open between choices, removes the last
+  chip on Backspace, walks into the chips with the arrow keys (the focused chip wears the inset ring)
+  and removes one with Delete or its own 24px dismiss target, and a read-only one has none; a
+  creatable one adds typed text from its leading "Add" row, one entry per pasted line, and refuses
+  and reports a duplicate — announced from inside the open list, where Base's isolation cannot hide
+  it; a `NumberField`'s units hug a value sized to its own text, centred between the steppers, and a
+  press on a unit focuses the input; a `Form` focuses the first invalid field in document order,
+  then the next, shows a server's errors map under its field, focuses it and clears the entry on
+  edit, and submits every named value; a `CheckboxGroup` names each choice by its label and
+  describes it by its supporting line. The fixture is scanned with the full WCAG tag set in both
+  themes with a multiple list open and a described card selected — the scan that found the
+  supporting line's 4.25:1 on the selected surface (`selectableRowSupporting`);
 - the motion invariants (`motion.spec.ts`, below);
 - Wave B surface semantics under the torture theme and in forced colors;
 - hostile custom theme roles, including portaled content;
@@ -452,7 +466,10 @@ The Vite fixture verifies:
 
 The `/hostile` public-API fixture adds a three-engine composition matrix (Chromium, Firefox,
 WebKit): narrow grid/flex parents, long text, local scrolling, short/edge/nested overlays, RTL,
-touch targets, loading/validation and reflow. See [`HOSTILE_LAYOUT.md`](HOSTILE_LAYOUT.md) for
+touch targets, loading/validation and reflow. Its grid also holds a multiple and a creatable
+`Combobox`, an `Input` with affixes and a described `CheckboxGroup`, and a separate pair of
+`NumberField`s with units is checked in all three engines for a value box sized to its own text,
+units held against it and inside the field, and chips that stay within theirs. See [`HOSTILE_LAYOUT.md`](HOSTILE_LAYOUT.md) for
 the scenarios, fixes and the distinction between simulated reflow/viewport reduction and
 manual zoom or physical-device coverage. The existing consumer tests remain Chromium-only.
 

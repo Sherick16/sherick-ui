@@ -354,3 +354,43 @@ test("wide tracks, tables and code scroll locally instead of losing content", as
   }
   await noPageOverflow(page);
 });
+
+test("a sized number keeps its units against it, and chips stay inside their field", async ({ page }) => {
+  const multiplier = page.getByRole("textbox", { name: "Short multiplier (×)" });
+  const geometry = await multiplier.evaluate((input) => {
+    const band = input.closest("div")!;
+    const unit = band.querySelector('[aria-hidden="true"]:last-child')!.getBoundingClientRect();
+    const box = input.getBoundingClientRect();
+    return { gap: unit.left - box.right, width: box.width };
+  });
+  expect(geometry.gap).toBeGreaterThanOrEqual(0);
+  expect(geometry.gap).toBeLessThanOrEqual(8);
+  expect(geometry.width).toBeLessThan(40);
+  await page.getByText("×", { exact: true }).click();
+  await expect(multiplier).toBeFocused();
+
+  // A long value scrolls inside its sized box instead of pushing the units out of the field.
+  const price = page.getByRole("textbox", { name: "Stress price (€)" });
+  const contained = await price.evaluate((input) => {
+    const group = input.closest('[role="group"]')!.getBoundingClientRect();
+    const band = input.closest("div")!;
+    return Array.from(band.children).every((part) => {
+      const rect = part.getBoundingClientRect();
+      return rect.left >= group.left - 1 && rect.right <= group.right + 1;
+    });
+  });
+  expect(contained).toBe(true);
+
+  for (const name of ["Stress roles", "Stress entries"]) {
+    const input = page.getByRole("combobox", { name });
+    const overflow = await input.evaluate((element) => {
+      const field = element.closest("[class*='group/field']")!;
+      const box = field.getBoundingClientRect();
+      return Array.from(field.querySelectorAll("[data-sui-value-chip]")).filter((chip) => {
+        const rect = chip.getBoundingClientRect();
+        return rect.left < box.left - 1 || rect.right > box.right + 1;
+      }).length;
+    });
+    expect(overflow, name).toBe(0);
+  }
+});

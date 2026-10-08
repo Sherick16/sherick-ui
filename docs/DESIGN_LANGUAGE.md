@@ -187,6 +187,10 @@ and a fraction of a deep accent is a greyed version of its hue. The neutral soft
 *within* its container (`surface-high` over whatever holds it), so a neutral badge or tag stays
 visible inside a card; a neutral card itself is the matte surface.
 
+Supporting copy inside a row that holds a selection takes full ink (`selectableRowSupporting`):
+`text.medium` is measured against resting surfaces and falls just short of 4.5:1 on the selected
+step, so the supporting type step, not a dimmer tone, keeps it subordinate there.
+
 Primary marks interaction, and danger/warning/success carry meaning rather than decoration.
 `--sui-accent` and `--sui-outline` are reserved: they are published for compatibility, no
 component consumes them, and a new use needs a role written here first. Semantic color belongs to the relevant icon,
@@ -209,7 +213,7 @@ Text takes a **role**, not a size chosen per component. The roles live in `type`
 | --- | --- | --- |
 | `control` | by density (§13) | a control's own label or value; an option row matches the field that opened it |
 | `supporting` | 13 / 20px | field descriptions, hints and errors (`fieldMessage`), a row's secondary line |
-| `caption` | 12 / 16px | badges, group labels, calendar weekdays, a code language label |
+| `caption` | 12 / 16px | badges, group labels (an option group's heading is `list.groupLabel`), calendar weekdays, a code language label |
 | `title` | 15 / 22px semibold | the heading of a compact surface: popover, toast, command palette |
 | `heading` | 20 / 28px semibold | the title of a viewport-owning surface: dialog, alert dialog, drawer |
 | `numeric` | tabular figures | table cells, a number field, progress and pagination values |
@@ -264,9 +268,36 @@ inset keyboard focus, but their row density differs. A destructive command tints
 own label, not the whole menu sheet.
 
 RadioGroup's opt-in surface rows use the same held-choice tone and control elevation.
-The complete row remains the label; supporting text and passive badges are consumer content.
-The selection mark and target boundary stay still, and the original plain radio rows remain
-available. Surface selection is not a new card or option-content framework.
+The complete row remains the label; passive badges are consumer content. The selection mark and
+target boundary stay still, and the original plain radio rows remain available. Surface selection
+is not a new card or option-content framework. `CheckboxGroup` is the same row with a checkbox
+mark: one anatomy (`choice-row.tsx`) serves both, so a radio card and a checkbox card cannot
+drift. A choice's `description` is supporting copy on the row: the label names the control and the
+description describes it, so a reader hears "Aurora Casino, checkbox, aurora.example" rather than
+one run-on name, and a press on the supporting line still makes the choice.
+
+An option list may be filed under headings — channels under their category. A heading is a
+`caption` in `text.medium` at the option's own start edge (`list.groupLabel`); it takes no state
+layer, highlight or focus because the reader never lands on it, and the primitive names the group
+from it. Groups are separated by the space above each heading, never by a rule or a nested sheet.
+An option outside every group is listed where it stands, as Discord lists an uncategorised
+channel above the first category.
+
+A multiple Combobox holds its chosen values as chips inside the field. A value chip is a passive
+tag — the neutral tonal pill, flat, full-ink copy — at 28px so one line of chips rides the field's
+48px resting height; more chips wrap and the field grows downward rather than squeezing the query.
+Once chips lead the field, its start inset drops to the chips' own block inset. The dismiss target
+is a 24px circle nested at the chip's 2px end inset, its glyph takes the press, and a read-only or
+disabled chip has none. When the arrow keys walk into the chips the focused chip wears the inset
+ring inside the field's own ring. Choosing keeps the list open, so several values are chosen from
+one opening. A creatable list leads with an "Add" row for text that names nothing yet, adds one
+entry per pasted line, and refuses a duplicate with a supporting-tone report under the field
+rather than doubling it or quietly removing the existing value.
+
+A unit beside a value — `€ 0.10`, `15 ×`, `2 × tickets`, `https://` — is supporting copy at the
+value's own size in `text.medium`: quieter than the value, never smaller. In a NumberField the
+value and its units are one centred figure, so the input is exactly as wide as its text; in an
+Input the affixes sit at the field's ends. A press on a unit places the caret in the value.
 
 Accordion and Collapsible share the same disclosure row and supporting-copy panel; a TreeView
 branch opens its group through the same measured panel and the same `disclose` motion.
@@ -321,7 +352,8 @@ icons does not flash a hint for each. The three activity loops share one rhythm 
 `tokens.ts`: a spinner turns once a second, a skeleton breathes once every two turns, and an
 indeterminate bar sweeps on its own paced loop.
 
-Known gap: an in-flow removal — a dismissed Alert, a removed tag Chip, a removed file row —
+Known gap: an in-flow removal — a dismissed Alert, a removed tag Chip, a removed value chip, a
+removed file row —
 leaves in one frame, and the content below closes the space at once. Base provides no presence
 lifecycle for in-flow lists, and components add no exit timers of their own, so this stays a
 documented gap rather than a local fix in one component.
@@ -368,6 +400,12 @@ a real border (or a masked fill with a system colour), so hollow controls keep t
 The measured AA contrast contract covers both themes, text/semantic/focus compositions,
 small marks and state layers; see [PALETTE.md](PALETTE.md) and [VERIFICATION.md](VERIFICATION.md).
 Color alone never identifies meaning.
+
+A unit beside a value is presentation and is hidden from assistive technology, so the field's
+label names the unit ("Price per ticket (€)"). A form reports errors where they are: on submit,
+focus moves to the first invalid field in document order, whose error is part of its description,
+and an error returned by a server does the same. A status a combobox reports while its list is open
+is made from inside the list, because the primitive hides everything outside an open list.
 
 ## 15. Theming
 
@@ -420,7 +458,8 @@ Pagination retains previous/current/next and total in a narrow container; Steppe
 vertical rather than clipping stages. Container width, not just viewport width, drives
 these changes. Dialogs preserve a reachable scroll origin when taller than the viewport;
 toasts stay inside the dynamic viewport. Tooltips are short hints, not forms. Native
-date input remains editable and its calendar is an anchored popup. A file chooser shows
+date input remains editable and its calendar is an anchored popup. Chips inside a multiple
+Combobox wrap within the field, and a long chip truncates rather than widening it. A file chooser shows
 one affordance, constraints once, selected files as quiet rows, and visible rejection
 feedback; it does not invent upload progress.
 
@@ -441,6 +480,9 @@ consumers and for the repository's own examples, not new primitives.
   aligned on their bottom edge. A result count and a "clear" action sit on the line below,
   aligned with the content they describe. An action among fields is still an action: it keeps
   its capsule and its depth.
+- **A form.** Fields stand in one column (`Form`), each with its label above and its message
+  below, and a unit named in the label. The submit action closes the column; it never answers a
+  press with nothing — the first invalid field takes focus.
 - **Actions.** One filled action per view. Secondary actions are tonal or text; a text action
   that shares an edge with text hangs its padding (§17).
 - **Page backgrounds are full-bleed.** A page's canvas reaches the viewport edges and its

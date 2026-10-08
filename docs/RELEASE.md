@@ -8,11 +8,14 @@ This is the current consumer compatibility contract. The implementation boundari
 `2.0.0` established the stable line under npm's `latest` dist-tag; `1.0.0` through
 `1.0.5` are frozen. `2.1.0` added the v2.1 component wave and Media; `2.2.0`
 added Table column presentation and RadioGroup surface choices, plus normalized overlay title
-margins. The current source package version is `2.3.0`: the visual refinements from the
+margins; `2.3.0` the visual refinements from the
 [visual design-system audit](visual-design-system-audit.md), including additive `--sui-<role>-soft`
-and `--sui-<role>-selected` theme variables. No component family is added or removed.
-Version `2.1.1` remains the published baseline until the release owner approves a staged version. An installed
-package's actual version and exports, not this checkout, determine availability.
+and `--sui-<role>-selected` theme variables; `2.4.0` the rim on hollow controls; and `2.5.0`
+`DateTimePicker`. The current source package version is `2.6.0`, the form wave: `Form`, `CheckboxGroup`, multiple and creatable
+`Combobox`, option groups in `Select` and `Combobox`, and units on `Input` and `NumberField`. It is
+additive; no component or prop is removed. Version `2.4.0` remains the published baseline until the
+release owner approves a staged version. An installed package's actual version and exports, not this
+checkout, determine availability.
 
 `packages/ui/package.json` owns the release version and `publishConfig.tag` remains `latest`.
 The packed-package gate rejects prereleases under `latest` and stable versions under
@@ -84,6 +87,10 @@ The root `sherick-ui` export is:
   their prop/data types; see [`V2_1_COMPONENTS.md`](V2_1_COMPONENTS.md) and [`MEDIA.md`](MEDIA.md);
 - **2.5.0 addition**: `DateTimePicker` with `DateTimePickerProps`, `DateTimePickerLabels` and
   `CalendarDateTime`; see [`V2_1_COMPONENTS.md`](V2_1_COMPONENTS.md#a1--datetimepicker-from-250);
+- **2.6.0 additions**: `Form` and `CheckboxGroup`, with `FormProps`, `FormErrors`,
+  `CheckboxGroupProps`, `CheckboxGroupOption`, `SelectOptionGroup`, `ComboboxOptionGroup`,
+  `ComboboxSingleProps`, `ComboboxMultipleProps` and `ComboboxPasteDetails`. `ComboboxProps` is now
+  the union of the single and multiple forms; a single combobox's props are unchanged;
 - the matching prop types (`AccordionProps`, `AccordionItemProps`, `AccordionTriggerProps`,
   `AccordionPanelProps`, `AccordionHeadingLevel`, `CollapsibleProps`, `CollapsibleTriggerProps`,
   `CollapsiblePanelProps`, `ButtonProps`, `ButtonAppearance`, `ButtonSize`, `IconButtonProps`,
@@ -278,6 +285,23 @@ already measured 126.8 kB raw (as the gate reports it) against a 128.9 kB limit,
 refinements took it to 128.6 kB. The motion passes add the scrim's start and end states, the
 TreeView branch panel, the tactile duration and two further press-amplitude tiers
 (`motionTactileWide`, `motionTactileField`), each a scoped rule with its disabled-state gate.
+
+The 2.6.0 form wave re-records **`form` and `barrel`** with `--update=form,barrel`:
+
+- **form** `290554 / 99308 / 85330` → `304394 / 104354 / 88952`. The fixture's `Combobox`,
+  `Select`, `Input`, `NumberField` and `RadioGroup` now carry multiple selection with Base's
+  chips, creatable entry with paste splitting and duplicate reports, option groups (Base's group
+  parts and the shared `option-groups.ts`), units on number and text fields, Base field validity on
+  text fields, and the shared choice row with option descriptions. On `605d6bb` these measured
+  99.1 → 101.3 kB gzip as the gate reports it; `main`'s DateTimePicker (2.5.0) then left the fixture
+  with no tolerance to absorb them (101.9 kB against a 101.8 kB limit).
+- **barrel** `505021 / 168701 / 138120` → `537936 / 179541 / 146690`. Two new public components,
+  `Form` and `CheckboxGroup`, bring Base's form and checkbox-group modules, on top of the
+  2.5.0 DateTimePicker that had already used most of the barrel's tolerance.
+
+Button still pulls no optional feature code (44 modules), no dependency is added, and the
+`button`, `overlay`, `disclosure`, `toast`, `toggles`, `content`, `stylesCss` and `themeCss`
+records, the 5% tolerance and the stale-shrink check are byte-for-byte unchanged.
 
 No other component budget is relaxed.
 

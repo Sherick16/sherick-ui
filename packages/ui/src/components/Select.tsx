@@ -19,6 +19,7 @@ import {
   tone,
 } from "./ui.common";
 import { motionArrive, motionFeedback, motionOrient, motionPresenceAnchored, motionTactileField } from "./ui.motion";
+import { flattenOptions, toOptionSections, type OptionGroup } from "./option-groups";
 import { Variant } from "./ui.types";
 
 export interface SelectOption {
@@ -27,12 +28,19 @@ export interface SelectOption {
   disabled?: boolean;
 }
 
+/** Options filed under one heading, such as channels under their category. */
+export type SelectOptionGroup = OptionGroup<SelectOption>;
+
 type SelectRootProps = BaseSelect.Root.Props<string>;
 type SelectChangeDetails = Parameters<NonNullable<SelectRootProps["onValueChange"]>>[1];
 
 export interface SelectProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "value" | "defaultValue"> {
-  options: SelectOption[];
+  /**
+   * The options, in the order they read. Any of them may be filed under a heading by passing a group
+   * (`{ label, options }`) in its place; an option outside every group is listed where it stands.
+   */
+  options: Array<SelectOption | SelectOptionGroup>;
   variant?: Variant;
   value?: string | null;
   defaultValue?: string | null;
@@ -60,9 +68,27 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
     id,
     ...triggerProps
   }, ref) => {
+    const renderOption = (option: SelectOption) => (
+      <BaseSelect.Item
+        key={option.value}
+        value={option.value}
+        disabled={option.disabled}
+        className={({ selected: isSelected }) =>
+          cn(list.option, isSelected && cn(tone.selected[variant], elevation.control))
+        }
+      >
+        <BaseSelect.ItemText className={cn("min-w-0 flex-1 truncate")}>
+          {option.label}
+        </BaseSelect.ItemText>
+        <BaseSelect.ItemIndicator>
+          <Check aria-hidden="true" className={cn("size-4", motionArrive, tone.text[variant])} />
+        </BaseSelect.ItemIndicator>
+      </BaseSelect.Item>
+    );
+
     return (
       <BaseSelect.Root
-        items={options}
+        items={flattenOptions(options)}
         value={value}
         defaultValue={defaultValue ?? null}
         onValueChange={(nextValue, eventDetails) => {
@@ -141,23 +167,17 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
               )}
             >
               <BaseSelect.List className={cn("space-y-1")}>
-                {options.map((option) => (
-                  <BaseSelect.Item
-                    key={option.value}
-                    value={option.value}
-                    disabled={option.disabled}
-                    className={({ selected: isSelected }) =>
-                      cn(list.option, isSelected && cn(tone.selected[variant], elevation.control))
-                    }
-                  >
-                    <BaseSelect.ItemText className={cn("min-w-0 flex-1 truncate")}>
-                      {option.label}
-                    </BaseSelect.ItemText>
-                    <BaseSelect.ItemIndicator>
-                      <Check aria-hidden="true" className={cn("size-4", motionArrive, tone.text[variant])} />
-                    </BaseSelect.ItemIndicator>
-                  </BaseSelect.Item>
-                ))}
+                {/* A heading names the group it opens; an ungrouped run sits directly in the list. */}
+                {toOptionSections(options).map((section) =>
+                  section.label === undefined ? (
+                    <React.Fragment key={section.key}>{section.items.map(renderOption)}</React.Fragment>
+                  ) : (
+                    <BaseSelect.Group key={section.key} className={cn("space-y-1")}>
+                      <BaseSelect.GroupLabel className={cn(list.groupLabel)}>{section.label}</BaseSelect.GroupLabel>
+                      {section.items.map(renderOption)}
+                    </BaseSelect.Group>
+                  )
+                )}
               </BaseSelect.List>
             </BaseSelect.Popup>
           </BaseSelect.Positioner>

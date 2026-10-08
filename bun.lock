@@ -93,7 +93,7 @@
     },
     "packages/ui": {
       "name": "sherick-ui",
-      "version": "2.1.0",
+      "version": "2.6.0",
       "dependencies": {
         "@base-ui/react": "1.8.0",
         "class-variance-authority": "^0.7.1",

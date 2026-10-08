@@ -31,6 +31,8 @@ The distinction is the control's semantics, not its styling:
 | --- | --- | --- |
 | Pick one of a fixed, known list | `Select` | a `<button>` trigger + popup listbox |
 | Pick one of a list, narrowed by typing | `Combobox` | a real `<input>` filtering a popup listbox |
+| Pick several of a list, shown as removable chips in the field | `Combobox multiple` (2.6.0) | the same `<input>`, chips before it |
+| Enter free-text entries, one per line, with or without a catalog | `Combobox multiple creatable` (2.6.0) | the same, with an "Add" row |
 | Repeatedly perform one of a list of actions | `Command` | an inline search field + listbox (never a popup) |
 | Hold a small selection as chips | `Chip` / `ChipGroup` | toggle buttons sharing one group value |
 | One choice out of a few, always one | `SegmentedControl` | a `ToggleGroup` with exclusivity |
@@ -40,6 +42,25 @@ The distinction is the control's semantics, not its styling:
 
 `Select` and `Combobox` share the option shape and the single-value contract; `Command` shares the
 filter shape but is not a value control at all.
+
+### Option groups (from 2.6.0)
+
+`Select` and `Combobox` accept a mix of options and groups, in reading order. A group is
+`{ label: string; options: Option[] }` (`SelectOptionGroup`, `ComboboxOptionGroup`); its heading is
+a caption above its rows and names the group for assistive technology. An option outside every
+group is listed where it stands. Filtering a Combobox hides a group with no match. Use this for
+channels under their category instead of squeezing the category into the label
+(`#giveaway (Giveaways)`):
+
+```tsx
+<Field name="channel" label="Announcement channel">
+  <Select options={[
+    { label: "#rules", value: "rules" },
+    { label: "Giveaways", options: [{ label: "#giveaway", value: "giveaway" }] },
+    { label: "Community", options: [{ label: "#general", value: "general" }] },
+  ]} />
+</Field>
+```
 
 ## `Select`
 
@@ -60,6 +81,7 @@ Escape ordering; Sherick owns the field surface and the selected row's tone.
 - The ref is the trigger `<button>`; other button attributes (`aria-label`, `type`, `onClick`) pass
   to it, which is also how a bare `Select` gets its name.
 - There is no `multiple`, no search and no custom row rendering here — that is `Combobox`.
+- `options` may hold groups (above).
 
 ```tsx
 const [project, setProject] = useState<string | null>(null);
@@ -98,11 +120,51 @@ and `aria-haspopup="listbox"` where `Select`'s button reports neither.
 - It renders no element of its own root and drops props it does not declare, so `aria-label` on the
   root is silently lost. Name it with a `Field` label or a native `<label htmlFor>` against `id`.
 - `name` / `form` submit the value through the primitive's hidden input; the ref is the `<input>`.
+- `options` may hold groups (above).
 
 ```tsx
 <Field label="Project">
   <Combobox options={options} defaultValue="dashboard" emptyMessage="No projects match."
     onValueChange={(next) => setProject(next)} />
+</Field>
+```
+
+### `multiple` (from 2.6.0)
+
+`multiple` holds any number of options. The value is `string[]` (`value` / `defaultValue`,
+`onValueChange(values, eventDetails)`), in the order chosen, and each choice is a removable chip
+inside the field. Base UI owns the keyboard: **Backspace** in an empty input removes the last chip,
+**Left Arrow** from the start of the input walks into the chips, **Backspace/Delete** removes the
+focused chip, and each chip's dismiss button (`Remove <label>`) removes it. Choosing keeps the
+list open for the next choice; Escape, Tab or a press outside close it. The clear control is
+`"Clear all"`. A read-only or disabled field shows its chips without dismiss buttons. The chip
+row is named by `chipsLabel` (default `"Selected"`). With `name`, every value submits.
+
+```tsx
+<Field name="roles" label="Required roles" description="Members need every role listed.">
+  <Combobox multiple options={roles} value={roleIds} onValueChange={setRoleIds} placeholder="Add a role" />
+</Field>
+```
+
+### `creatable` (from 2.6.0, with `multiple`)
+
+`creatable` accepts entries that are not options — a token input for lists with no catalog, such
+as forty allowed game titles. Typed text that names nothing yet is offered first as an "Add" row
+(`createLabel(query)`, default `Add “…”`), so **Enter adds exactly what was typed**; the arrow keys
+still reach the suggestions. A created entry's value is its own text.
+
+- **Pasting several lines** adds one entry per non-empty, trimmed line; a line naming an option
+  takes that option's value. The change reports `{ reason: "input-paste", event }`
+  (`ComboboxPasteDetails`) as its details.
+- **Duplicates are refused and reported**, compared case-insensitively against both values and
+  labels: a repeated pasted line, or Enter on text naming an existing entry, adds nothing and shows
+  "Skipped N duplicates: …" under the field, announced politely. It never removes the existing
+  entry.
+- `options={[]}` is fine: the empty list says "Type to add an entry." (`emptyMessage` overrides).
+
+```tsx
+<Field name="games" label="Allowed games" description="Paste one title per line.">
+  <Combobox multiple creatable options={catalog} value={games} onValueChange={setGames} placeholder="Add a game" />
 </Field>
 ```
 

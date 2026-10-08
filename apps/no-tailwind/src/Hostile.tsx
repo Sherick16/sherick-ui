@@ -1,6 +1,6 @@
 import { useState } from "react";
 import {
-  Accordion, Alert, AlertDialog, Badge, Button, Card, Checkbox, Chip, ChipGroup,
+  Accordion, Alert, AlertDialog, Badge, Button, Card, Checkbox, CheckboxGroup, Chip, ChipGroup,
   Collapsible, Combobox, Dialog, DirectionProvider, Drawer, Field, Input, Menu, NavGroup, NavItem,
   NumberField, Popover, Progress, RadioGroup, Search, SegmentedControl, Select,
   Slider, Switch, Table, Tabs, Textarea, ToastProvider, ToastViewport, ToggleGroup,
@@ -13,6 +13,14 @@ const long = "An unexpectedly long label that must remain usable in a narrow con
 const token = "project_" + "abcdefghij".repeat(12);
 const options = [{ value: "long", label: long }, { value: "token", label: token },
   ...Array.from({ length: 24 }, (_, i) => ({ value: String(i), label: `Project ${i}` }))];
+/* Values the chip and affix specimens own, so no existing selector for `token` or `long` meets them. */
+const entry = "entry_" + "klmnopqrst".repeat(12);
+const roleOptions = [
+  { value: "role-long", label: "A role whose name is long enough to wrap a narrow consumer column" },
+  { value: "role-token", label: entry },
+  { value: "role-a", label: "Role A" },
+  { value: "role-b", label: "Role B" },
+];
 const tabs = ["Overview", "Permissions and access", "Recent activity"].map((label) => ({ id: label, label, content: <Input label="Panel field" /> }));
 
 function NestedControls() {
@@ -81,6 +89,10 @@ export default function Hostile() {
       <Select aria-label="Stress select" options={options} defaultValue="long" />
       <Field label="Stress combobox"><Combobox options={options} defaultValue="long" /></Field>
       <NumberField aria-label="Stress number" defaultValue={123456789} />
+      <Field label="Stress roles"><Combobox multiple options={roleOptions} defaultValue={["role-long", "role-token", "role-a", "role-b"]} /></Field>
+      <Field label="Stress entries"><Combobox multiple creatable options={[]} defaultValue={[entry]} /></Field>
+      <Input label="Stress link" prefix="https://" suffix=".discord.gg" defaultValue={entry} />
+      <CheckboxGroup label="Stress casinos" appearance="surface" options={[{ value: "a", label: entry, description: long }, { value: "b", label: "Second casino", description: entry }]} />
       <Field label={token} description={token}><Input aria-label="Field input" /></Field>
       <Button>{token}</Button>
       <Badge>{token}</Badge>
@@ -103,6 +115,10 @@ export default function Hostile() {
       <CodeBlock language="text">{token.repeat(3)}</CodeBlock>
       <Markdown>{`[${token}](https://example.com)\n\n| Key | Value |\n| --- | --- |\n| ${token} | Wide |`}</Markdown>
     </div>
+    <section className="hostile-grid" data-testid="unit-fields">
+      <Field label="Stress price (€)"><NumberField prefix="€" suffix="per ticket" defaultValue={123456789.5} format={{ minimumFractionDigits: 2 }} locale="en-US" /></Field>
+      <Field label="Short multiplier (×)"><NumberField suffix="×" defaultValue={15} /></Field>
+    </section>
     <section data-testid="flex-fields">
       <div className="hostile-flex"><Input label="Flex input" /><Button>Go</Button></div>
       <div className="hostile-flex"><Search aria-label="Flex search" onSearch={() => undefined} /><Button>Go</Button></div>
