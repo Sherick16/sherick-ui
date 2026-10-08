@@ -669,6 +669,13 @@ export const list = {
     motionRowLayer,
     state.effectiveDisabled
   ),
+  /* The heading of a group of options — a category above the channels filed under it. It is a
+     caption, not a row: it takes no state layer, no highlight and no focus, because the reader never
+     lands on it; the primitive names the group from it, so a screen reader hears the category as it
+     enters the group. Its inline padding is the option's, so a heading and the labels beneath it
+     share one start edge, and the space above it is what separates one group from the last: a
+     group inside a sheet is grouped by spacing and a type role, never by a rule or a nested card. */
+  groupLabel: /* @__PURE__ */ cx("px-4 pb-1 pt-3 font-medium", type.caption, text.medium),
   /* The same object at the density a list of short actions wants, where the row is scanned
      rather than read and the list is a control rather than a page. `shape.row` keeps the
      command's corner proportional to its own height, so its highlight nests in the tighter
@@ -785,6 +792,12 @@ export const currentDestination = "bg-sherick-primary-soft text-sherick-ink font
    Keep this independent so unrelated consumers of the mark recipes can tree-shake it. */
 export const selectableRowSurface =
   "has-[[data-checked]]:bg-sherick-primary-selected has-[[data-checked]]:text-sherick-ink has-[[data-checked]]:shadow-sherick-control";
+
+/* Supporting copy inside such a row — a choice's description. `text.medium` is measured against the
+   resting surfaces and falls just short of 4.5:1 on the selected step (4.25:1 light, 4.32:1 dark), so
+   while the row holds the selection its supporting line takes full ink; the supporting type step
+   keeps it subordinate to the label. Keyed on the same primitive marker as the surface itself. */
+export const selectableRowSupporting = "group-has-[[data-checked]]:text-sherick-ink";
 
 export const selectable = {
   surface: /* @__PURE__ */ cx("relative", elevation.recessed, motionFeedback),

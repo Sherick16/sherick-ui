@@ -9,6 +9,7 @@ export { default as Breadcrumb } from "./Breadcrumb";
 export { default as Calendar } from "./Calendar";
 export { Card } from "./Card";
 export { default as Checkbox } from "./Checkbox";
+export { default as CheckboxGroup } from "./CheckboxGroup";
 export { Chip } from "./Chip";
 export { ChipGroup } from "./ChipGroup";
 export { default as Combobox } from "./Combobox";
@@ -21,6 +22,8 @@ export { default as Divider } from "./Divider";
 export { default as Select } from "./Select";
 export { default as Field } from "./Field";
 export { default as FileUpload } from "./FileUpload";
+export { default as Form } from "./Form";
+export type { FormErrors, FormProps } from "./Form";
 export type { FileUploadProps, FileRejection } from "./FileUpload";
 export { default as IconButton } from "./IconButton";
 export { default as Input } from "./Input";
@@ -60,9 +63,17 @@ export type { BreadcrumbItem, BreadcrumbProps } from "./Breadcrumb";
 export type { CalendarDate, CalendarLabels, CalendarProps, DateRange } from "./Calendar";
 export type { CardProps } from "./Card";
 export type { CheckboxProps } from "./Checkbox";
+export type { CheckboxGroupOption, CheckboxGroupProps } from "./CheckboxGroup";
 export type { ChipProps } from "./Chip";
 export type { ChipGroupProps } from "./ChipGroup";
-export type { ComboboxOption, ComboboxProps } from "./Combobox";
+export type {
+  ComboboxMultipleProps,
+  ComboboxOption,
+  ComboboxOptionGroup,
+  ComboboxPasteDetails,
+  ComboboxProps,
+  ComboboxSingleProps,
+} from "./Combobox";
 export type { CommandItem, CommandProps } from "./Command";
 export type { CommandPaletteProps } from "./CommandPalette";
 export type { DatePickerProps } from "./DatePicker";
@@ -73,7 +84,7 @@ export type { FieldProps } from "./Field";
 export type { RadioGroupOption, RadioGroupProps } from "./RadioGroup";
 export type { SliderProps } from "./Slider";
 export type { NumberFieldProps } from "./NumberField";
-export type { SelectOption, SelectProps } from "./Select";
+export type { SelectOption, SelectOptionGroup, SelectProps } from "./Select";
 export type { IconButtonAppearance, IconButtonProps } from "./IconButton";
 export type { InputProps } from "./Input";
 export type { DialogProps } from "./Dialog";

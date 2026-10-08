@@ -71,33 +71,39 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           value={value}
           defaultValue={defaultValue}
           onValueChange={onValueChange}
-          className={cn(
-            "min-w-0 w-full resize-y",
-            density.normal,
-            "min-h-28 px-5 py-4",
-            shape.control,
-            motionFeedback,
-            focusRing,
-            error ? material.controlError : material.control,
-            error ? rim.fieldError : rim.field,
-            !disabled && (error ? state.field.errorHover : state.field.hover),
-            !disabled && (error ? state.field.errorFocus : state.field.focus),
-            disabled ? state.disabled : state.text,
-            textareaClassName
-          )}
+          className={(controlState) => {
+            /* Invalid by its own prop, or by what Base reports — a failed constraint, or the error a
+               `Form` returns for this field's name: one field, one ladder. */
+            const invalid = error || controlState.valid === false;
+            return cn(
+              "min-w-0 w-full resize-y",
+              density.normal,
+              "min-h-28 px-5 py-4",
+              shape.control,
+              motionFeedback,
+              focusRing,
+              invalid ? material.controlError : material.control,
+              invalid ? rim.fieldError : rim.field,
+              !disabled && (invalid ? state.field.errorHover : state.field.hover),
+              !disabled && (invalid ? state.field.errorFocus : state.field.focus),
+              disabled ? state.disabled : state.text,
+              textareaClassName
+            );
+          }}
         />
         {description && (
           <Field.Description className={cn(fieldMessage.description)}>
             {description}
           </Field.Description>
         )}
-        {errorMessage && (
+        {/* Mounted whether or not a message was passed, as `Field`'s is: without `match` this part
+            renders what Base reports, including the error a `Form` returns for this field's name. */}
+        {!(error && !errorMessage) && (
           <Field.Error
-            match={error}
+            match={error ? true : undefined}
             className={cn(fieldMessage.error)}
-          >
-            {errorMessage}
-          </Field.Error>
+            {...(error ? { children: errorMessage } : {})}
+          />
         )}
       </Field.Root>
     );

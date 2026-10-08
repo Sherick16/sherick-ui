@@ -57,6 +57,7 @@ const {
   Button,
   Card,
   Checkbox,
+  CheckboxGroup,
   Chip,
   ChipGroup,
   Collapsible,
@@ -64,6 +65,7 @@ const {
   Divider,
   Drawer,
   Field,
+  Form,
   IconButton,
   Input,
   Menu,
@@ -235,6 +237,39 @@ const specimens = {
   }),
   "number-field": h(NumberField, { defaultValue: 4, min: 1, max: 10 }),
   "number-field.disabled": h(NumberField, { defaultValue: 4, disabled: true }),
+  /* Units hug a value sized to its own text. */
+  "number-field.affixes": h(NumberField, { defaultValue: 0.1, prefix: "€", suffix: "each", format: { minimumFractionDigits: 2 }, locale: "en-US" }),
+  "input.affixes": h(Input, { label: "Invite link", prefix: "https://", suffix: ".discord.gg", placeholder: "sherick" }),
+  "checkbox-group": h(CheckboxGroup, {
+    label: "Also accept",
+    defaultValue: ["bonus"],
+    options: [
+      { value: "bonus", label: "Bonus buys" },
+      { value: "spins", label: "Free spins" },
+      { value: "live", label: "Live tables", disabled: true },
+    ],
+  }),
+  /* A described card: the label names the checkbox and the supporting line describes it. */
+  "checkbox-group.surface": h(CheckboxGroup, {
+    label: "Casinos",
+    appearance: "surface",
+    required: true,
+    defaultValue: ["aurora"],
+    options: [
+      { value: "aurora", label: "Aurora Casino", description: "aurora.example, aurora-play.example" },
+      { value: "harbor", label: "Harbor Slots", description: "harborslots.example" },
+    ],
+  }),
+  "radio-group.described": h(RadioGroup, {
+    appearance: "surface",
+    label: "Draw",
+    defaultValue: "weekly",
+    options: [
+      { value: "daily", label: "Daily", description: "Draws at midnight UTC." },
+      { value: "weekly", label: "Weekly", description: "Draws every Sunday." },
+    ],
+  }),
+  "form": h(Form, { "aria-label": "Rule" }, h(Input, { name: "title", label: "Title", required: true })),
   "slider": h(Slider, { defaultValue: 40 }),
   "slider.disabled": h(Slider, { defaultValue: 40, disabled: true }),
   "markdown.document": h(Markdown, {}, "## Example\n\nBody copy with `inline` code.\n\n> A quote.\n\n```ts\nconst a = 1;\n```\n"),
@@ -262,6 +297,10 @@ const specimens = {
   "tooltip.trigger": h(Tooltip, { content: "Hint" }, h(Button, { appearance: "tonal" }, "Hover")),
   "combobox.default": h(Combobox, { options: comboboxOptions, value: "design", onValueChange: noop }),
   "combobox.disabled": h(Combobox, { options: comboboxOptions, value: "design", disabled: true }),
+  /* Chosen values as chips inside the field, with and without their dismiss targets. */
+  "combobox.multiple": h(Combobox, { multiple: true, options: comboboxOptions, value: ["design", "dashboard"], onValueChange: noop }),
+  "combobox.multiple.read-only": h(Combobox, { multiple: true, readOnly: true, options: comboboxOptions, defaultValue: ["design"] }),
+  "combobox.creatable": h(Combobox, { multiple: true, creatable: true, options: [], defaultValue: ["Book of Dead"] }),
   /* The toggle family, and the two shapes a progress bar can take. A progress specimen pins its
      locale, because the formatted value it renders is a locale decision and this gate is a
      deterministic one. */

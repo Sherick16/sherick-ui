@@ -161,3 +161,19 @@ Search for actual submission/debounce workflows. Does not weaken Search's contra
 
 **Look for:** Media frame className versus native image style/props, deliberate aspect/fit,
 viewport-aware native height bounds, no imageClassName/private slot. Application zoom stays local.
+
+## 18. A rule form that answers its submit button
+
+**Prompt:** On `sherick-ui@2.6.0`, build an extra-ticket rule form: required roles (several),
+the announcement channel grouped by Discord category, a ticket multiplier shown as `15 ×`, a
+casino picker with each casino's domains under its name, and an allowed-games list of about 40
+free-text titles that users paste in. Submitting with mistakes currently gives no feedback, and
+the server can reject a duplicate title.
+
+**Look for:** `Form` with `onFormSubmit` and an `errors` map keyed by `name`; `Combobox multiple`
+inside a named `Field`; `Select` options with `{ label, options }` groups rather than the category
+squeezed into the label; `NumberField suffix="×"` with the unit also named in the label;
+`CheckboxGroup appearance="surface"` with option `description`s and `required`; `Combobox multiple
+creatable` for the games (paste one per line, duplicates reported) instead of a Textarea. Every
+value control that lacks its own field sits in `<Field name>`. On an older install, checks the
+version before recommending these.

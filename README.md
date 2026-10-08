@@ -6,7 +6,7 @@ contrast and restrained motion. It is **quiet by default, expressive where it ma
 owns generic widget behavior and accessibility where a primitive is available.
 
 **Release status:** `2.0.0` established the stable line; `1.x` is frozen. This
-checkout's package version is `2.3.0`. Verified `main` stages releases for maintainer
+checkout's package version is `2.6.0`. Verified `main` stages releases for maintainer
 approval; check npm for the installed version. See the [release contract](docs/RELEASE.md).
 
 ## Installation
@@ -126,6 +126,8 @@ Version 2.3.0 refines the visual language from the [visual design-system audit](
 Version 2.5.0 adds `DateTimePicker`: a native `datetime-local` field whose popup sets hour, minute and (on a twelve-hour clock) day-period columns beside the shared calendar. Values are civil `YYYY-MM-DDTHH:mm` readings with no time zone; see its [contract](docs/V2_1_COMPONENTS.md#a1--datetimepicker-from-250). The native date fields of all three pickers now clip the browser's own calendar glyph in right-to-left pages too. No component or prop is removed.
 
 Version 2.4.0 gives hollow controls a rim. Text fields, the file drop target and empty checkboxes and radios carry one 1.5px border in a new `--sui-rim` theme variable, tuned to clear 3:1 on every surface; fields become canvas-toned wells below the card; an invalid field turns only its rim to the danger tone; and the drop target has a custom dashed rim. Checkbox and RadioGroup marks are 20px, with an accent fill when selected. No component or prop is removed.
+
+Version 2.6.0 is the form wave. It adds `Form` (a Base UI form that moves focus to the first invalid field on submit and takes a `{ name: message }` errors map) and `CheckboxGroup` (the options-API sibling of `RadioGroup`, with per-option descriptions and the `surface` card row). `Combobox` gains `multiple` — chosen values as removable chips inside the field, Backspace removing the last — and `creatable`, which adds typed entries, one entry per pasted line, and reports duplicates. `Select` and `Combobox` accept option groups (`{ label, options }`), `NumberField` and `Input` accept `prefix` and `suffix`, and `NumberField` passes Base's `format` and `locale` through. `RadioGroup` options take a `description` too. No component or prop is removed. See the [form recipes](packages/ui/README.md#forms-from-260).
 
 Use `Media.Image` and `Media.Video` for rounded, clipped, responsive images and native video.
 Video keeps its original aspect ratio unless you opt into a constraint. See the

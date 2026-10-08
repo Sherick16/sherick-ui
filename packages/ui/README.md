@@ -2,7 +2,7 @@
 
 A React 18/19 component library with soft tonal surfaces, deliberate shape contrast
 and restrained motion. `2.0.0` established the stable line; `1.x` is frozen.
-This package source is `2.3.0`; verified `main` stages new versions via npm trusted
+This package source is `2.6.0`; verified `main` stages new versions via npm trusted
 publishing for maintainer approval. Check the installed version for availability.
 
 ## Install and style
@@ -83,6 +83,60 @@ filtering, row content and data ownership remain yours. See the
 Use `options[].label` for rich, wrapping text, badges and non-interactive hints. It retains
 the same single-selection, keyboard and form contract; omit `appearance` for the original
 plain rows. Do not put buttons or links inside a radio's label.
+
+## Forms (from 2.6.0)
+
+`Form` wraps Base UI's form. On submit it validates every named field, keeps the submission
+from leaving while any is invalid and moves focus to the first invalid field. Errors returned
+from a server go in `errors`, keyed by field `name`; each appears under its field, the form
+focuses the first one, and an entry clears as soon as its field changes.
+
+```tsx
+import {
+  CheckboxGroup, Combobox, Field, Form, Input, NumberField, Select, type FormErrors,
+} from "sherick-ui";
+
+const [errors, setErrors] = useState<FormErrors>({});
+
+<Form errors={errors} onFormSubmit={async (values) => setErrors(await save(values))}>
+  <Input name="title" label="Rule title" required />
+
+  {/* Multiple: chosen values are chips; Backspace removes the last, arrows walk the chips. */}
+  <Field name="roles" label="Required roles">
+    <Combobox multiple options={roles} defaultValue={["admin"]} />
+  </Field>
+
+  {/* Groups: an option outside every group is listed where it stands. */}
+  <Field name="channel" label="Channel">
+    <Select options={[
+      { label: "#rules", value: "rules" },
+      { label: "Giveaways", options: [{ label: "#giveaway", value: "giveaway" }] },
+    ]} />
+  </Field>
+
+  {/* Units are presentation and hidden from assistive technology: name them in the label. */}
+  <Field name="price" label="Price per ticket (€)">
+    <NumberField prefix="€" format={{ minimumFractionDigits: 2 }} defaultValue={0.1} step={0.05} />
+  </Field>
+
+  <CheckboxGroup
+    name="casinos" label="Casinos" appearance="surface" required
+    options={[{ value: "aurora", label: "Aurora", description: "aurora.example, aurora-play.example" }]}
+  />
+
+  {/* Creatable: "Add …" for typed text, one entry per pasted line, duplicates reported. */}
+  <Field name="games" label="Allowed games" description="Paste one title per line.">
+    <Combobox multiple creatable options={[]} />
+  </Field>
+</Form>
+```
+
+`Input`, `Textarea`, `RadioGroup` and `CheckboxGroup` carry their own `Field`, so `name` is
+enough. Put `Select`, `Combobox`, `NumberField`, `Checkbox`, `Switch` and `Slider` inside a
+`Field` with the `name`, or the form cannot report their errors. A multiple `Combobox` reports
+`string[]`; a created entry's value is its own text. `CheckboxGroup required` means at least one
+choice. Option `description` names nothing: the label is the accessible name and the description
+is announced as its description.
 
 ## Themes and direction
 

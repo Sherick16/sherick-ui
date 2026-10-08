@@ -19,7 +19,10 @@ app's installed package. Verify installed exports before using any `2.1.0` addit
 | Label a control or compose field text/errors | `Field` | [Forms](forms.md) | Stable 2.0.0 |
 | Enter text, multiline text, search, or a number | `Input`, `Textarea`, `Search`, `NumberField` | [Forms](forms.md) | Stable 2.0.0 |
 | Choose checked state, one radio option, or a continuous value | `Checkbox`, `Switch`, `RadioGroup`, `Slider` | [Forms](forms.md) | Stable 2.0.0 |
+| Choose several of a short list, as rows or described cards | `CheckboxGroup` | [Forms](forms.md) | From 2.6.0 |
+| Submit fields with focus on the first invalid one and a server errors map | `Form` | [Forms](forms.md) | From 2.6.0 |
 | Pick one fixed option vs search among options | `Select` vs `Combobox` | [Selection](selection.md) | Stable 2.0.0 |
+| Pick several, group options under headings, or enter free-text entries | `Combobox multiple` / option groups / `creatable` | [Selection](selection.md) | From 2.6.0 |
 | Hold tags vs choose one/many compact toggles | `Chip`/`ChipGroup` vs `SegmentedControl`/`ToggleGroup` | [Selection](selection.md) | Stable 2.0.0 |
 | Search and invoke an action inline vs in a modal palette | `Command` vs `CommandPalette` | [Selection](selection.md) | From 2.1.0 |
 | Choose a date vs a date range | `Calendar`, `DatePicker`, `DateRangePicker` | [Selection](selection.md) | From 2.1.0 |

@@ -1,18 +1,22 @@
 # Forms and value controls
 
-Use this reference for the field, text-entry and value-selection exports: `Field`, `Input`,
-`Textarea`, `Search`, `NumberField`, `Checkbox`, `Switch`, `RadioGroup`, `Slider` and
-`FileUpload`. It owns their props, defaults, callbacks and controlled/uncontrolled
+Use this reference for the field, text-entry and value-selection exports: `Form`, `Field`,
+`Input`, `Textarea`, `Search`, `NumberField`, `Checkbox`, `CheckboxGroup`, `Switch`, `RadioGroup`,
+`Slider` and `FileUpload`. It owns their props, defaults, callbacks and controlled/uncontrolled
 semantics. Composition guidance lives in [composition](../composition.md); naming, focus
 and error relationships live in [accessibility](../accessibility.md).
 
 Release availability: every component above except `FileUpload` is part of the
-`2.0.0` root export. `FileUpload` arrives in `2.1.0` under the same import path;
-confirm it exists in the installed package before using it.
+`2.0.0` root export. `FileUpload` arrives in `2.1.0` under the same import path. `Form`,
+`CheckboxGroup`, `Input`/`NumberField` `prefix`/`suffix`, `NumberField` `format`/`locale`,
+option `description` on `RadioGroup` and `RadioGroup` `description`/`error` arrive in `2.6.0`.
+Confirm they exist in the installed package before using them.
 
 ```tsx
 import {
-  Checkbox, Field, FileUpload, Input, NumberField, RadioGroup, Search, Slider, Switch, Textarea,
+  Checkbox, CheckboxGroup, Field, FileUpload, Form, Input, NumberField, RadioGroup, Search, Slider,
+  Switch, Textarea,
+  type CheckboxGroupOption, type CheckboxGroupProps, type FormErrors, type FormProps,
   type CheckboxProps, type FieldProps, type FileRejection, type FileUploadProps,
   type InputProps, type NumberFieldProps, type RadioGroupOption, type RadioGroupProps,
   type SearchProps, type SliderProps, type SwitchProps, type TextareaProps,
@@ -25,8 +29,8 @@ Both forms render Base UI's Field parts and produce the same label/description/e
 relationships, and both are part of the stable contract rather than a migration.
 
 - **Convenience props.** `Input`, `Textarea` and `Search` compose `Field.Root` internally
-  and take `label` / `description` / `error` themselves. `RadioGroup` and `FileUpload`
-  also own their field and take their own `label`.
+  and take `label` / `description` / `error` themselves. `RadioGroup`, `CheckboxGroup` and
+  `FileUpload` also own their field and take their own `label`.
 - **Exported `Field`.** Selection and value controls (`Checkbox`, `Slider`, `NumberField`,
   `Select`, `Combobox`) compose through the exported `Field` so the application supplies
   one label/description/error wrapper.
@@ -72,6 +76,7 @@ value back.
 | `NumberField` | `value` (`number \| null`) | `defaultValue` | `onValueChange`, `onValueCommitted` |
 | `Checkbox`, `Switch` | `checked` | `defaultChecked` | `onCheckedChange` |
 | `RadioGroup` | `value` (`string`) | `defaultValue` | `onValueChange` |
+| `CheckboxGroup` | `value` (`string[]`) | `defaultValue` | `onValueChange` |
 | `Slider` | `value` (`number`) | `defaultValue` | `onValueChange`, `onValueCommitted` |
 | `FileUpload` | `files` (`File[]`) | `defaultFiles` | `onFilesChange` |
 
@@ -120,8 +125,13 @@ is the native element.
 - `className` styles the field's column; `inputClassName` (`Input`) / `textareaClassName`
   (`Textarea`) styles the control itself.
 - Unlike `Field.error`, `error` here is a **boolean** and the message is a separate prop.
-  The message renders only while `error` is true, and with `error` alone the control is
-  marked invalid with no visible message.
+  `errorMessage` renders only while `error` is true, and with `error` alone the control is
+  marked invalid with no visible message. Without `error`, the field shows what Base reports:
+  a failed constraint on submit, or the message a `Form` `errors` map holds for its `name` —
+  with the same danger rim either way.
+- `prefix?` / `suffix?` (`ReactNode`, from 2.6.0) put text or a mark at the field's ends
+  (`https://`, `€`, `.discord.gg`). They are presentation, hidden from assistive technology:
+  name the unit in the label too. A press on an affix focuses the input.
 - Here `required` does both jobs: it marks the label and sets the requirement on the
   control. There is no `validate` / `validationMode` on `Input` / `Textarea`.
 - `onValueChange(value, eventDetails)` is Base's callback; native `onChange` also works, on
@@ -182,6 +192,14 @@ form.
 - `value?: number | null`, `defaultValue?: number`, `onValueChange`, `onValueCommitted`.
 - `min`, `max`, `step` (`step` defaults to `1`), `disabled`, `readOnly`, `required`, `name`,
   `form`.
+- `format?: Intl.NumberFormatOptions` and `locale?` (from 2.6.0) are Base's, passed through:
+  `{ minimumFractionDigits: 2 }`, `{ style: "currency", currency: "EUR" }`, `{ style: "percent" }`.
+- `prefix?` / `suffix?` (from 2.6.0) write a unit beside the value — `€ 0.10`, `15 ×`,
+  `2 × tickets`. The value and its units are one centred figure, the input as wide as its text.
+  Units are hidden from assistive technology, so the label names the unit ("Price (€)"). Use
+  `format` for anything `Intl` can write; use the affixes for units it cannot, such as `×`.
+- The field fills its container. A count does not need 900px: constrain the column it sits in
+  (a grid of three, or `className="max-w-48"` on the `Field`).
 - `className` styles the field container, `inputClassName` the text input.
 - The native `value`, `defaultValue`, `onChange`, `min`, `max`, `step` and `type` props are
   removed from the inherited input attributes: these controls go through Base.
@@ -192,6 +210,12 @@ form.
 
 ```tsx
 <NumberField aria-label="Form seats" name="formSeats" defaultValue={2} min={1} max={10} step={1} />
+<Field name="price" label="Price per ticket (€)">
+  <NumberField prefix="€" defaultValue={0.1} step={0.05} format={{ minimumFractionDigits: 2 }} />
+</Field>
+<Field name="multiplier" label="Ticket multiplier (×)">
+  <NumberField suffix="×" min={1} defaultValue={15} />
+</Field>
 ```
 
 ## `Checkbox`
@@ -246,11 +270,15 @@ One choice out of a list. Base UI owns the value, the roving tab index, the arro
 name and the form participation; Sherick owns the labelled column and the rows. The ref is
 the group `<div>`; `inputRef` is the hidden form input.
 
-- `options: { value: string; label: ReactNode; disabled?: boolean }[]` is required; each
-  option is its own control and can be disabled individually.
+- `options: { value: string; label: ReactNode; description?: ReactNode; disabled?: boolean }[]`
+  is required; each option is its own control and can be disabled individually. A
+  `description` (from 2.6.0) is the option's supporting line: the label names the radio and the
+  description is announced as its description.
 - `label?` is the **group's** label (it renders its own field), `value` / `defaultValue`
   (`string`), `onValueChange(value, eventDetails)`, `name`, `form`, `required`, `disabled`,
-  `readOnly`, `className`.
+  `readOnly`, `className`. From 2.6.0, `description?` sits under the group and `error?`
+  (`ReactNode`) marks it invalid with that message; without it the group shows Base's or the
+  `Form`'s message for its `name`.
 - Do not put a `RadioGroup` inside a `Field`: it names itself, and a `Field` label belongs to
   a single control.
 - The whole row is the pointer target and the label, so wrapped text keeps the circle on its
@@ -273,8 +301,9 @@ the group `<div>`; `inputRef` is the hidden form input.
 
 ### Selectable surfaces (from 2.2.0)
 
-Let supporting text inherit the row ink; use size and weight for hierarchy. A muted ink
-override may not retain sufficient contrast over the selected surface.
+Prefer `options[].description` (2.6.0) for a supporting line: it takes the medium tone at rest
+and full ink on the selected surface, where a muted tone would fall below 4.5:1. In older
+versions, let supporting text inherit the row ink; use size and weight for hierarchy.
 
 After verifying the installed version, use `appearance="surface"` for substantial
 single choices such as plans or shipping methods. Omit it for the original plain rows.
@@ -290,10 +319,84 @@ continue using `options[].label` for rich content. Labels expand and wrap natura
 />
 ```
 
-Descriptions, badges and price hints are application content, not additional RadioGroup
-props. Keep links/buttons out of the label; place separate actions outside the group.
-Do not recreate row states with role descendants or `:has([data-checked])` in app CSS.
-A checkbox card is not an implied sibling API.
+Badges and price hints are application content inside the label. Keep links/buttons out of the
+label; place separate actions outside the group. Do not recreate row states with role
+descendants or `:has([data-checked])` in app CSS. For several choices, use `CheckboxGroup` — the
+same rows and cards with checkboxes.
+
+## `CheckboxGroup` (from 2.6.0)
+
+Any number of choices out of a list: the options-API sibling of `RadioGroup`, with the same rows,
+the same `appearance="surface"` cards and the same labelled column. Base UI owns the value, the
+group semantics (`role="group"` named by `label`) and form participation. The ref is the group
+`<div>`.
+
+- `options: { value: string; label: ReactNode; description?: ReactNode; disabled?: boolean }[]`.
+  A `description` is announced as the checkbox's description, not folded into its name.
+- `value` / `defaultValue` (`string[]`), `onValueChange(value, eventDetails)`.
+- `label?`, `description?`, `error?` (its presence makes the group invalid), `name` (one form
+  entry per ticked option), `disabled`, `readOnly`, `className`.
+- `required` means **at least one** ticked: it marks the label and is checked when a `Form`
+  validates, showing `requiredMessage` (default `"Choose at least one option."`).
+- Do not wrap it in a `Field`; like `RadioGroup` it names itself. Every row is the label and the
+  target; Tab moves through each checkbox and Space toggles it.
+
+```tsx
+<CheckboxGroup
+  name="casinos"
+  label="Casinos"
+  description="The rule applies on every domain of a ticked casino."
+  appearance="surface"
+  required
+  options={[
+    { value: "aurora", label: "Aurora Casino", description: "aurora.example, aurora-play.example" },
+    { value: "harbor", label: "Harbor Slots", description: "harborslots.example" },
+  ]}
+/>
+<CheckboxGroup
+  name="accept"
+  label="Also accept"
+  defaultValue={["bonus-buy"]}
+  options={[{ value: "bonus-buy", label: "Bonus buys" }, { value: "free-spins", label: "Free spins" }]}
+/>
+```
+
+## `Form` (from 2.6.0)
+
+Base UI's form, in a column (`flex flex-col gap-6`; override with `className`). On submit it
+validates every named field, keeps the submission while any is invalid and **moves focus to the
+first invalid field** in document order, whose message is part of its accessible description.
+
+- `onFormSubmit(values, eventDetails)` receives the named values as an object and prevents the
+  native submission; plain `onSubmit` still works for native posts.
+- `errors?: FormErrors` (`Record<string, string | string[]>`) is the server's answer, keyed by
+  field `name`. Each message appears under its field, focus moves to the first such field after
+  a submission, and an entry clears as soon as its field's value changes.
+- `validationMode` (`"onSubmit"` default — then re-validating on change — `"onBlur"`,
+  `"onChange"`) and `actionsRef` (`validate(name?)`) are Base's.
+- **Every field needs a `name`**, and must sit in a Base field to take part. `Input`,
+  `Textarea`, `RadioGroup` and `CheckboxGroup` carry one; wrap `Select`, `Combobox`,
+  `NumberField`, `Checkbox`, `Switch` and `Slider` in `<Field name="…">`.
+- Native constraints (`required`, `min`, `type="email"`) and `Field validate` run on submit.
+
+```tsx
+const [errors, setErrors] = useState<FormErrors>({});
+
+<Form
+  errors={errors}
+  onFormSubmit={async (values) => {
+    const result = await saveRule(values); // e.g. { title: "A rule with this title already exists." }
+    setErrors(result.errors ?? {});
+  }}
+>
+  <Input name="title" label="Rule title" required />
+  <Field name="roles" label="Required roles">
+    <Combobox multiple options={roles} />
+  </Field>
+  <CheckboxGroup name="casinos" label="Casinos" required options={casinos} />
+  <Button type="submit" appearance="filled">Save rule</Button>
+</Form>
+```
 
 ## `Slider`
 
