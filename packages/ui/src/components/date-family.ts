@@ -1,7 +1,7 @@
 /* The date family's own calendar arithmetic, labels and Intl formatting.
    ====================================================================
-   `Calendar`, `DatePicker` and `DateRangePicker` share one definition of what a date *is*, so a
-   calendar grid, a native `type=date` input and a range span all agree.
+   `Calendar`, `DatePicker`, `DateRangePicker` and `DateTimePicker` share one definition of what a
+   date *is*, so a calendar grid, a native `type=date` input and a range span all agree.
 
    A `CalendarDate` is a zero-padded Gregorian civil date (`YYYY-MM-DD`, years `0001`–`9999`) and
    carries no time. Every arithmetic step below reads and writes calendar fields directly, through
@@ -250,3 +250,103 @@ export const resolveCalendarLabels = (labels?: Partial<CalendarLabels>): Calenda
   ...defaultCalendarLabels,
   ...labels,
 });
+
+/* Civil date-times.
+   =================
+   A `CalendarDateTime` is a `CalendarDate` and a wall-clock minute, `YYYY-MM-DDTHH:mm` — the
+   exact value a native `datetime-local` input reads and submits. Like the date, it names a day on
+   a calendar and a reading on a clock, not an instant: it carries no time zone and no offset, so
+   nothing here converts it, and a daylight-saving change cannot move it. Zero-padded, it orders
+   lexicographically exactly as it orders in time, just as a date does. */
+
+export type CalendarDateTime = string;
+
+/** A wall-clock reading: `hour` is 0–23, `minute` 0–59. */
+export interface TimeParts {
+  hour: number;
+  minute: number;
+}
+
+const DATE_TIME_PATTERN = /^(\d{4}-\d{2}-\d{2})T(\d{2}):(\d{2})$/;
+
+/** The only way a value becomes a date-time. Seconds are not part of the format, so a value that
+ *  carries them is not one, rather than one whose seconds are silently dropped. */
+export const parseCalendarDateTime = (
+  value: CalendarDateTime | null | undefined
+): { date: CalendarDate; time: TimeParts } | null => {
+  if (typeof value !== "string") return null;
+
+  const match = DATE_TIME_PATTERN.exec(value);
+  if (!match) return null;
+
+  const date = normalizeCalendarDate(match[1]);
+  const hour = Number(match[2]);
+  const minute = Number(match[3]);
+  if (!date || hour > 23 || minute > 59) return null;
+
+  return { date, time: { hour, minute } };
+};
+
+export const toCalendarDateTime = (date: CalendarDate, { hour, minute }: TimeParts): CalendarDateTime =>
+  `${date}T${pad(hour, 2)}:${pad(minute, 2)}`;
+
+export const normalizeCalendarDateTime = (
+  value: CalendarDateTime | null | undefined
+): CalendarDateTime | null => {
+  const parts = parseCalendarDateTime(value);
+  return parts ? toCalendarDateTime(parts.date, parts.time) : null;
+};
+
+/** Minutes since midnight, which is how two readings on the same day compare. */
+export const minuteOfDay = ({ hour, minute }: TimeParts) => hour * 60 + minute;
+
+export const timeFromMinuteOfDay = (minutes: number): TimeParts => ({
+  hour: Math.floor(minutes / 60),
+  minute: minutes % 60,
+});
+
+/** Whether the locale reads a clock in twelve hours with a day period, or in twenty-four. */
+export const resolveHourCycle = (locale: string): 12 | 24 =>
+  new Intl.DateTimeFormat(locale, { hour: "numeric", timeZone: "UTC" }).resolvedOptions().hour12 ? 12 : 24;
+
+export interface TimeFormat {
+  hourCycle: 12 | 24;
+  /** An hour as its column writes it: `00`–`23`, or `12`, `1`–`11` beside a day period. */
+  formatHour: (hour: number) => string;
+  /** A minute as its column writes it, always two digits. */
+  formatMinute: (minute: number) => string;
+  /** The locale's own words for the morning and afternoon day periods. */
+  periodNames: [string, string];
+  /** The whole reading, as the locale writes a time, e.g. `2:30 PM` or `14:30`. */
+  formatTime: (time: TimeParts) => string;
+}
+
+/* A `Date` only so `Intl` can write a clock reading; the day is fixed and the zone is UTC, so the
+   reading is never shifted by the visitor's own zone. */
+const utcTime = ({ hour, minute }: TimeParts) => new Date(Date.UTC(2024, 0, 1, hour, minute));
+
+/**
+ * The locale's way of writing a clock, in the hour cycle the picker shows. As with dates, the
+ * locale changes how a time is written and announced, never what it means: values stay
+ * twenty-four-hour `HH:mm` whatever the cycle on screen is.
+ */
+export const createTimeFormat = (locale: string, hourCycle: 12 | 24): TimeFormat => {
+  const twoDigits = new Intl.NumberFormat(locale, { minimumIntegerDigits: 2, useGrouping: false });
+  const plain = new Intl.NumberFormat(locale, { useGrouping: false });
+  const reading = new Intl.DateTimeFormat(locale, {
+    hour: "numeric",
+    minute: "2-digit",
+    hourCycle: hourCycle === 12 ? "h12" : "h23",
+    timeZone: "UTC",
+  });
+  const periodOf = (hour: number, fallback: string) =>
+    reading.formatToParts(utcTime({ hour, minute: 0 })).find((part) => part.type === "dayPeriod")?.value ?? fallback;
+
+  return {
+    hourCycle,
+    formatHour: (hour) => (hourCycle === 12 ? plain.format(hour % 12 || 12) : twoDigits.format(hour)),
+    formatMinute: (minute) => twoDigits.format(minute),
+    periodNames: [periodOf(9, "AM"), periodOf(15, "PM")],
+    formatTime: (time) => reading.format(utcTime(time)),
+  };
+};

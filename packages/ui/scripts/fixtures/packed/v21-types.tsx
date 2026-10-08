@@ -1,11 +1,12 @@
 import * as React from "react";
 import {
-  Breadcrumb, Calendar, Command, CommandPalette, DatePicker, DateRangePicker, FileUpload,
+  Breadcrumb, Calendar, Command, CommandPalette, DatePicker, DateRangePicker, DateTimePicker, FileUpload,
   Media, Pagination, Stepper, TreeView,
   Table, RadioGroup,
   type BreadcrumbItem, type BreadcrumbProps, type CalendarDate, type CalendarLabels,
   type CalendarProps, type CommandItem, type CommandProps, type CommandPaletteProps,
   type DateRange, type DatePickerProps, type DateRangePickerProps, type FileRejection,
+  type CalendarDateTime, type DateTimePickerLabels, type DateTimePickerProps,
   type FileUploadProps, type PaginationProps, type StepperItem, type StepperProps,
   type TreeViewItem, type TreeViewProps, type MediaImageProps, type MediaVideoProps,
   type TableColumn, type TableProps, type RadioGroupProps,
@@ -16,6 +17,12 @@ const range: DateRange = { start: date, end: null };
 const labels: Partial<CalendarLabels> = { today: "Today" };
 const calendar: CalendarProps = { mode: "range", value: range, labels, onValueChange: (next: DateRange) => void next.end };
 const picker: DatePickerProps = { label: "Date", value: date, name: "date", form: "form", onValueChange: (next: CalendarDate | null) => void next };
+const dateTime: CalendarDateTime = "2024-06-10T09:30";
+const dateTimeLabels: Partial<DateTimePickerLabels> = { hour: "Hour", done: "Done", today: "Today" };
+const dateTimePicker: DateTimePickerProps = {
+  label: "When", value: dateTime, name: "when", min: "2024-06-01T06:00", max: "2024-06-30T22:00",
+  minuteStep: 15, hourCycle: 24, labels: dateTimeLabels, onValueChange: (next: CalendarDateTime | null) => void next,
+};
 const rangePicker: DateRangePickerProps = { label: "Range", value: range, startName: "start", endName: "end", onValueChange: (next: DateRange) => void next.start };
 const commands: CommandItem[] = [{ value: "save", label: "Save", keywords: ["write"], group: "File" }];
 const command: CommandProps = { label: "Commands", items: commands, onAction: (value: string) => void value, onValueChange: (_value, details) => void details.reason };
@@ -45,6 +52,7 @@ export const wave = <>
   <Calendar value={date} onValueChange={(value: CalendarDate | null) => void value} />
   <DatePicker {...picker} ref={React.createRef<HTMLInputElement>()} />
   <DateRangePicker {...rangePicker} ref={React.createRef<HTMLInputElement>()} />
+  <DateTimePicker {...dateTimePicker} ref={React.createRef<HTMLInputElement>()} />
   <Command {...command} ref={React.createRef<HTMLInputElement>()} />
   <CommandPalette {...palette} ref={React.createRef<HTMLInputElement>()} />
   <Breadcrumb {...breadcrumb} ref={React.createRef<HTMLElement>()} />
@@ -69,6 +77,8 @@ export const invalidRange = <Calendar mode="range" value={date} />;
 export const invalidSingle = <Calendar value={range} />;
 // @ts-expect-error picker ref is the native input, not its visible div
 export const invalidPickerRef = <DatePicker label="Date" ref={React.createRef<HTMLDivElement>()} />;
+// @ts-expect-error the hour cycle is twelve or twenty-four, nothing else
+export const invalidHourCycle = <DateTimePicker label="When" hourCycle={11} />;
 // @ts-expect-error FileUpload reports files; it does not claim native name/FormData participation
 export const invalidUploadName = <FileUpload label="Files" name="files" />;
 // @ts-expect-error a tree value is an identity, not an item object

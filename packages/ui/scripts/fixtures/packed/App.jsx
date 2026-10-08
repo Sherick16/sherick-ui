@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import {
   Badge, Button, Card, Checkbox, Combobox, Dialog, DirectionProvider, Divider, Drawer,
   Input, Popover, Select, Skeleton, Slider, Spinner, Switch, ToastProvider, ToastViewport, useToast,
-  Breadcrumb, Calendar, Command, CommandPalette, DatePicker, DateRangePicker, FileUpload, Table,
+  Breadcrumb, Calendar, Command, CommandPalette, DatePicker, DateRangePicker, DateTimePicker, FileUpload, Table,
   Pagination, RadioGroup, Stepper, TreeView,
 } from "sherick-ui";
 import { CodeBlock, Markdown } from "sherick-ui/content";
@@ -81,6 +81,7 @@ export default function App() {
           startName="start" endName="end" defaultValue={{ start: "2024-06-10", end: "2024-06-12" }} today="2024-06-10" />
         <Button type="reset">Reset packed dates</Button>
       </form>
+      <DateTimePicker label="Packed date and time" name="when" defaultValue="2024-06-10T09:30" today="2024-06-10" />
       <Command label="Packed commands" items={commands} onAction={setAction} />
       <CommandPalette title="Packed palette" label="Packed palette search" items={commands}
         onAction={setAction} trigger={<Button>Open packed palette</Button>} />

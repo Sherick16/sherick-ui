@@ -97,8 +97,57 @@ Exports: `Calendar`, `DatePicker`, `DateRangePicker`; `CalendarDate`, `DateRange
 - Focused evidence: leap days/year bounds, unavailable range, keyboard month/year crossing,
   controlled rejection and external updates, native entry/reset/FormData/invalid state,
   popup dismissal/restoration, RTL, narrow grid, locale labels and hydration.
-- Excluded: TimeField, parsing prose, time selection, scheduling, timezone engines,
-  multiple months, non-Gregorian calendars, shortcuts/presets.
+- Excluded from v2.1: TimeField, parsing prose, time selection, scheduling, timezone engines,
+  multiple months, non-Gregorian calendars, shortcuts/presets. Time selection arrived in 2.5.0 as
+  `DateTimePicker` (below); the rest remain excluded.
+
+### A.1 — DateTimePicker (from 2.5.0)
+
+Exports: `DateTimePicker`; `CalendarDateTime`, `DateTimePickerLabels`, `DateTimePickerProps`.
+
+- `CalendarDateTime = string`: a `CalendarDate` and a wall-clock minute, `YYYY-MM-DDTHH:mm`
+  (`HH` 00–23) — exactly what a native `datetime-local` input reads and submits. Like the date
+  it is civil: no time zone, no offset, no seconds, and no conversion anywhere. A value carrying
+  seconds or an offset is not a value. Zero-padded values order lexicographically.
+- Props are `DatePicker`'s, with date-times where it has dates — `value`/`defaultValue`/
+  `onValueChange` (`CalendarDateTime | null`), `min?`/`max?` (inclusive date-times) — and
+  `isDateUnavailable?(date)` refusing a whole day. It adds `minuteStep?` (default 5, clamped to
+  1–60; the interval between minutes the popup offers, while typed entry stays minute-precise),
+  `hourCycle?: 12 | 24` (default: the locale's own) and `labels?: Partial<DateTimePickerLabels>`,
+  which extends `CalendarLabels` with `time`, `hour`, `minute`, `period`, `chooseTime`, `done`
+  and `unavailableDateTime`. Ref is the native input.
+- Native `type=datetime-local` entry, form submission, `required` and `min`/`max` belong to the
+  browser, composed through Base Field exactly as `DatePicker` is; custom validity covers
+  unavailable days. A rejected draft follows the same rules as the date pickers, including reset.
+- The popup is the date family's Base Popover holding the shared `Calendar` and a time panel.
+  Each time column — hour, minute and, on a twelve-hour clock, the day period — is a Base
+  `RadioGroup` inside its own Base `Field.Root`, captioned by a `Field.Label` and with each
+  option in a `Field.Item`, so the column is named by its caption, each option by its reading,
+  and nothing in the popup registers with the native input's field. Base owns the roving tab
+  stop, the arrow keys (selection follows focus, as radios do), skipping refused readings and
+  keeping the checked option in view; the column opens with its held reading centered. Base
+  seats a radio group's tab stop once, when its options mount, so a column whose reading changes
+  from outside it (a bound settling it, the calendar, typed entry) remounts its group; a change
+  the column made itself keeps the group and its focus.
+- A half-chosen value — a date without a time or a time without a date — waits in the popup
+  and is committed when its other half is chosen; afterwards each change commits at once. An
+  hour completes a reading (an empty minute reads `:00`); a minute or day period chosen first
+  waits for its hour rather than inventing one, and a chosen period decides which hours the
+  column lists. With nothing chosen, a twelve-hour column lists the first period the day accepts.
+- A held day the constraints refuse — a value from before they changed, or one passed in —
+  anchors nothing: the calendar shows no selection and a reading waits for an acceptable day.
+  Nothing is committed unless the final value passes the field's own check.
+  On the first and last day the bounds refuse readings outside them, and a choice that would
+  cross a bound (an hour whose minute is too early, a period flipping past the limit, a day
+  whose bound excludes the held time) settles on the bound, so the popup cannot produce a
+  value the field would reject. Selection does not close the popup; Done is Base
+  `Popover.Close`, and Escape and outside interaction dismiss as for the date pickers.
+- Locale changes how readings are written (Intl digits, day-period words, the caption's
+  pattern), never the value. The value is twenty-four-hour whatever the cycle on screen.
+- Focused evidence: `/verification/date-time` and `date-time.spec.ts` — native constraints,
+  column names and roving keys, pending halves, bound settling, locale cycle and labels,
+  off-step minutes, typed rejection, form submission/reset, RTL clipping and axe on the
+  open popup in both themes.
 
 ## B — Command family
 
@@ -272,6 +321,10 @@ The wave composes the existing language rather than adding new tokens or recipes
   browser affordance; the input type, editing, validity and form behavior remain native. Firefox
   exposes no picker-indicator pseudo-element, so a WebKit-only icon rule is insufficient.
   The row receives non-spatial field hover/focus feedback; only the calendar glyph presses.
+  The slot that clips the native input is left-to-right in every page direction: Chromium lays
+  native dates out left to right regardless of `dir` while Firefox mirrors them, and the slot's
+  direction is what decides which side an overflowing input spills from. A fixed direction gives
+  every engine one layout, so the clip hides the native affordance in RTL as well.
   Its inset 32px hover surface stays inside the 48px field without reducing the 36×44 target.
   Base positions the popup against the field (the shared endpoint group for ranges).
 - Calendar navigation uses the same shafted arrows as Pagination. The seven-column grid yields
@@ -280,6 +333,13 @@ The wave composes the existing language rather than adding new tokens or recipes
   incomplete ranges hold the same control elevation. Selection and focus targets never move.
   Select/Combobox options and selected tree rows share this held-choice elevation; navigation
   highlight and command results stay flat.
+- DateTimePicker's popup sets the time panel beside the month from the `sm` breakpoint, divided
+  by an `edge.rule`, and beneath it on a narrow screen. Beside the month the panel takes no
+  height of its own, so the month decides the popup's height; the reading sits level with the
+  month caption, the column captions with the weekday headings, and Done with Today. A held
+  reading is the calendar day's held choice — `tone.selected` with `elevation.control` — on a
+  40px row with the `row` corner, nested 12px inside the `surface` sheet. Rows answer with tone,
+  not compression, and nothing in the panel moves when a reading is chosen.
 - Command has one search field with a fixed search-icon slot and a flat results list, not a
   second filled panel inside its host. Rows share an icon column when any command has an icon.
   Actions use pointer cursors and nonselectable labels; disabled rows retain Base's discoverable

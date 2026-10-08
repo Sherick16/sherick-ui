@@ -321,6 +321,8 @@ const specimens = {
   "calendar.range": h(library.Calendar, { mode: "range", defaultValue: { start: "2024-06-10", end: "2024-06-12" }, today: "2024-06-10" }),
   "date-picker": h(library.DatePicker, { label: "Date", defaultValue: "2024-06-10", today: "2024-06-10" }),
   "date-picker.disabled": h(library.DatePicker, { label: "Date", disabled: true, defaultValue: "2024-06-10", today: "2024-06-10" }),
+  "date-time-picker": h(library.DateTimePicker, { label: "Date and time", defaultValue: "2024-06-10T09:30", today: "2024-06-10" }),
+  "date-time-picker.disabled": h(library.DateTimePicker, { label: "Date and time", disabled: true, defaultValue: "2024-06-10T09:30", today: "2024-06-10" }),
   "date-range-picker": h(library.DateRangePicker, { label: "Date range", defaultValue: { start: "2024-06-10", end: "2024-06-12" }, today: "2024-06-10" }),
   "command": h(library.Command, { label: "Commands", items: [{ value: "save", label: "Save", icon: h(Check) }, { value: "archive", label: "Archive", disabled: true }] }),
   "command-palette.trigger": h(library.CommandPalette, { title: "Commands", label: "Search", items: [], trigger: h(Button, null, "Open commands") }),

@@ -58,6 +58,8 @@ The v2.1 wave adds Calendar/DatePicker/DateRangePicker,
 Command/CommandPalette, Pagination/Breadcrumb, FileUpload, Stepper and TreeView to
 the same root barrel. Its [component contracts](https://github.com/Sherick16/sherick-ui/blob/main/docs/V2_1_COMPONENTS.md)
 use civil `YYYY-MM-DD` dates and `File[]` selections; FileUpload does not upload files.
+`DateTimePicker` (from 2.5.0) adds a time of day: a native `datetime-local` field whose popup
+pairs the calendar with hour and minute columns, using civil `YYYY-MM-DDTHH:mm` values.
 
 ## Table and surface choices (from 2.2.0)
 

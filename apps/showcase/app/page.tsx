@@ -98,6 +98,7 @@ import {
 import StepperSpecimen from "../components/v2-1/e";
 import NavigationSpecimen from "../components/v2-1/c";
 import DateFamilySpecimen from "../components/v2-1/a";
+import DateTimeSpecimen from "../components/date-time";
 import CommandSpecimen from "../components/v2-1/b";
 import TreeSpecimen from "../components/v2-1/f";
 import FileUploadSpecimen from "../components/v2-1/d";
@@ -410,6 +411,9 @@ export default function Home() {
               </Specimen>
               <Specimen title="Calendar & date pickers" className="xl:col-span-2">
                 <DateFamilySpecimen />
+              </Specimen>
+              <Specimen title="Date & time picker" className="xl:col-span-2">
+                <DateTimeSpecimen />
               </Specimen>
               <Specimen title="File upload" className="xl:col-span-2">
                 <FileUploadSpecimen />

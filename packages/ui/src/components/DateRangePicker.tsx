@@ -22,6 +22,7 @@ import {
   DateFieldTrigger,
   dateFieldRowClassName,
   dateInputClassName,
+  dateInputDirection,
   useDateFormReset,
 } from "./date-field";
 import {
@@ -261,7 +262,7 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(({
         data-invalid={invalid || undefined}
         className={cn(dateFieldRowClassName(disabled))}
       >
-        <div className={cn("min-w-0 flex-1 overflow-hidden")}>
+        <div dir={dateInputDirection} className={cn("min-w-0 flex-1 overflow-hidden")}>
           <BaseField.Control
             ref={inputRef === startInputRef ? ref : undefined}
             render={<input type="date" ref={inputRef} />}

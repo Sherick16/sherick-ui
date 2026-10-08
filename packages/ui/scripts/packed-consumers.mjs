@@ -53,7 +53,7 @@ const props: ui.ButtonProps = { children: "CJS" };
 const range: ui.DateRange = { start: "2024-06-10", end: null };
 const calendar: ui.CalendarProps = { mode: "range", value: range };
 const upload: ui.FileUploadProps = { label: "Files", onFilesChange: files => void files };
-console.log(ui.Calendar, ui.DatePicker, ui.DateRangePicker, ui.Command, ui.CommandPalette, ui.Pagination, ui.Breadcrumb, ui.FileUpload, ui.Stepper, ui.TreeView, calendar, upload);
+console.log(ui.Calendar, ui.DatePicker, ui.DateRangePicker, ui.DateTimePicker, ui.Command, ui.CommandPalette, ui.Pagination, ui.Breadcrumb, ui.FileUpload, ui.Stepper, ui.TreeView, calendar, upload);
 console.log(ui.Button, dev.cn(props.children));
 `);
   await writeFile(join(consumerDir, "public-types.tsx"), `import * as React from "react";

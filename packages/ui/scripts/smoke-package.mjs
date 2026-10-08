@@ -35,6 +35,7 @@ for (const exportName of [
   "Calendar",
   "DatePicker",
   "DateRangePicker",
+  "DateTimePicker",
   "Command",
   "CommandPalette",
   "Pagination",
@@ -106,6 +107,9 @@ for (const propType of [
   "DateRange",
   "DatePickerProps",
   "DateRangePickerProps",
+  "CalendarDateTime",
+  "DateTimePickerLabels",
+  "DateTimePickerProps",
   "CommandItem",
   "CommandProps",
   "CommandPaletteProps",
@@ -506,6 +510,7 @@ const waveFixtures = [
   ["Calendar", { mode: "range", defaultValue: { start: "2024-06-10", end: "2024-06-12" }, today: "2024-06-10" }, /role="grid"/],
   ["DatePicker", { label: "Date", defaultValue: "2024-06-10", today: "2024-06-10" }, /type="date"/],
   ["DateRangePicker", { label: "Range", today: "2024-06-10" }, /<fieldset/],
+  ["DateTimePicker", { label: "When", defaultValue: "2024-06-10T09:30", today: "2024-06-10" }, /type="datetime-local"[^>]*value="2024-06-10T09:30"/],
   ["Command", { label: "Commands", items: [{ value: "save", label: "Save" }] }, /role="combobox"/],
   ["Pagination", { count: 10, defaultValue: 2 }, /aria-current="page"/],
   ["Breadcrumb", { items: [{ label: "Home", href: "/" }, { label: "Current" }] }, /aria-current="page"/],
@@ -531,6 +536,7 @@ const serverSurfaces = [
   ["CommandPalette", { title: "Commands", label: "Search", items: [] }],
   ["DatePicker", { label: "Date", today: "2024-06-10" }],
   ["DateRangePicker", { label: "Range", today: "2024-06-10" }],
+  ["DateTimePicker", { label: "When", today: "2024-06-10" }],
 ];
 for (const [componentName, props] of serverSurfaces) {
   for (const open of [false, true]) {
