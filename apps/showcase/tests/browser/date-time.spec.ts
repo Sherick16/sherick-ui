@@ -210,6 +210,20 @@ test("required and error are the field's, and a disabled field offers nothing", 
   expect(errors).toEqual([]);
 });
 
+test("a disabled picker opened by its owner offers nothing to choose", async ({ page, errors }) => {
+  await page.getByRole("button", { name: "Open locked picker" }).click();
+  const popup = page.getByRole("dialog", { name: "Locked" });
+  await expect(popup).toBeVisible();
+
+  for (const button of await popup.getByRole("button").all()) await expect(button).toBeDisabled();
+  for (const radio of await popup.getByRole("radio").all()) await expect(radio).toBeDisabled();
+  await reading(column(popup, "Hour"), "9").click({ force: true });
+  await day(popup, "Thursday, May 2, 2024").click({ force: true });
+  await expect(page.getByTestId("date-time-locked-requests")).toHaveText("0");
+
+  expect(errors).toEqual([]);
+});
+
 test("the native form submits the civil value and reset restores the default", async ({ page, errors }) => {
   const form = page.getByTestId("date-time-form");
   const input = form.getByLabel(/^Meeting/);

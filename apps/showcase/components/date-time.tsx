@@ -17,6 +17,8 @@ export default function DateTimeSpecimen({ verification = false }: { verificatio
   const [departure, setDeparture] = useState<CalendarDateTime | null>("2024-06-14T09:30");
   const [pickup, setPickup] = useState<CalendarDateTime | null>(null);
   const [formResult, setFormResult] = useState("");
+  const [lockedOpen, setLockedOpen] = useState(false);
+  const [lockedRequests, setLockedRequests] = useState(0);
 
   return (
     <div className={verification ? "space-y-12" : "grid grid-cols-1 items-start gap-8 lg:grid-cols-2"}>
@@ -75,6 +77,20 @@ export default function DateTimeSpecimen({ verification = false }: { verificatio
             </div>
             <div className="w-80 max-w-full" data-testid="date-time-disabled-field">
               <DateTimePicker label="Archived at" defaultValue="2023-02-28T16:20" disabled />
+            </div>
+            <div className="w-80 max-w-full space-y-2" data-testid="date-time-locked-field">
+              <DateTimePicker
+                label="Locked"
+                defaultValue="2024-05-01T08:00"
+                disabled
+                open={lockedOpen}
+                onOpenChange={setLockedOpen}
+                onValueChange={() => setLockedRequests((count) => count + 1)}
+              />
+              <Button size="sm" appearance="tonal" variant="secondary" onClick={() => setLockedOpen(true)}>
+                Open locked picker
+              </Button>
+              <Readout testId="date-time-locked-requests">{lockedRequests}</Readout>
             </div>
             <div className="w-80 max-w-full" data-testid="date-time-twelve-field">
               <DateTimePicker label="Reminder" defaultValue="2024-03-09T07:07" hourCycle={12} locale="en-GB" />
