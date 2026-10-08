@@ -148,6 +148,72 @@ test("a half-chosen value waits for its other half, and bounds settle a crossing
   expect(errors).toEqual([]);
 });
 
+test("a minute or period chosen first waits for its hour instead of inventing one", async ({ page, errors }) => {
+  const popup = await openPopup(page, "Pickup");
+  const time = popup.getByRole("group", { name: "Time" });
+  const value = page.getByTestId("date-time-empty-value");
+
+  await day(popup, "Wednesday, June 12, 2024").click();
+  await reading(column(time, "Minute"), "45").click();
+  await reading(column(time, "AM/PM"), "PM").click();
+  await expect(value).toHaveText("none");
+  await expect(time).toContainText("Choose a time");
+  // The period chosen first decides which hours the column lists.
+  await expect(column(time, "Hour").getByRole("radio").first()).toHaveAccessibleName("12");
+
+  await reading(column(time, "Hour"), "3").click();
+  await expect(value).toHaveText("2024-06-12T15:45");
+
+  expect(errors).toEqual([]);
+});
+
+test("a reading settled from outside its column moves that column's tab stop", async ({ page, errors }) => {
+  const popup = await openPopup(page, "Pickup");
+  const time = popup.getByRole("group", { name: "Time" });
+
+  await day(popup, "Monday, June 10, 2024").click();
+  await reading(column(time, "Hour"), "8").click();
+  await expect(page.getByTestId("date-time-empty-value")).toHaveText("2024-06-10T08:15");
+
+  // The last day ends at 17:45, so the period settles the minute the minute column did not choose.
+  await day(popup, "Thursday, June 20, 2024").click();
+  await reading(column(time, "AM/PM"), "PM").click();
+  await expect(page.getByTestId("date-time-empty-value")).toHaveText("2024-06-20T17:45");
+
+  await page.keyboard.press("Shift+Tab");
+  await expect(focused(page)).toHaveAccessibleName("45");
+  await expect(reading(column(time, "Minute"), "45")).toBeInViewport();
+
+  expect(errors).toEqual([]);
+});
+
+test("a held value the constraints refuse anchors no time edit", async ({ page, errors }) => {
+  const popup = await openPopup(page, "Renewal");
+  const requests = page.getByTestId("date-time-stale-requests");
+
+  await expect(popup.getByRole("gridcell", { selected: true })).toHaveCount(0);
+  await reading(column(popup, "Hour"), "11").click();
+  await reading(column(popup, "Minute"), "30").click();
+  await expect(requests).toHaveText("[]");
+
+  await day(popup, "Monday, February 5, 2024").click();
+  await expect(requests).toHaveText('["2024-02-05T11:30"]');
+
+  expect(errors).toEqual([]);
+});
+
+test("a day that starts in the afternoon lists its afternoon first", async ({ page, errors }) => {
+  const popup = await openPopup(page, "Late check-in");
+  await day(popup, "Monday, July 1, 2024").click();
+
+  const hours = column(popup, "Hour");
+  await expect(reading(hours, "3")).toBeEnabled();
+  await expect(reading(hours, "2")).toBeDisabled();
+  await expect(reading(column(popup, "AM/PM"), "AM")).toBeDisabled();
+
+  expect(errors).toEqual([]);
+});
+
 test("a twenty-four-hour locale drops the period and writes its own labels", async ({ page, errors }) => {
   const popup = await openPopup(page, "Abfahrt");
   const time = popup.getByRole("group", { name: "Uhrzeit" });

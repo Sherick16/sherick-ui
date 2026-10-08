@@ -3,11 +3,11 @@
 import { Field as BaseField } from "@base-ui/react/field";
 import { Radio } from "@base-ui/react/radio";
 import { RadioGroup as BaseRadioGroup } from "@base-ui/react/radio-group";
-import React, { useCallback, type ReactNode } from "react";
+import React, { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import { elevation, focusRingInset, shape, state, stateLayer, text, tone, type } from "./ui.common";
 import { motionFeedback } from "./ui.motion";
-import { timeFromMinuteOfDay, type TimeFormat, type TimeParts } from "./date-family";
+import type { TimeFormat } from "./date-family";
 
 /* The time half of the date family.
    ================================
@@ -21,6 +21,18 @@ import { timeFromMinuteOfDay, type TimeFormat, type TimeParts } from "./date-fam
 
 const UNBOUNDED_MIN = 0;
 const UNBOUNDED_MAX = 23 * 60 + 59;
+const NOON = 12 * 60;
+
+/** A reading as far as it has been chosen. An hour completes it — an empty minute reads `:00` —
+ *  while a minute or a day period chosen first waits for its hour rather than inventing one. */
+export interface PartialTime {
+  hour: number | null;
+  minute: number | null;
+  /** The day period chosen before an hour, on a twelve-hour clock. */
+  afternoon: boolean | null;
+}
+
+export const emptyTime: PartialTime = { hour: null, minute: null, afternoon: null };
 
 /* A held reading is the same shallow held surface as a calendar day or a list option; a row answers
    the pointer with tone, never compression. The column sits inside a `surface` sheet behind a 12px
@@ -50,12 +62,25 @@ function TimeColumn<Value extends string | number>({
   disabled,
 }: TimeColumnProps<Value>) {
   /* The column opens with its held reading in the middle, its neighbours visible on both sides.
-     This is placement, not navigation: it runs once, when the column mounts with its popup, and
-     from then on Base keeps the checked option in view as the keys move it. */
+     This is placement, not navigation: it runs when the column mounts, and from then on Base keeps
+     the checked option in view as the keys move it. */
   const centerHeldReading = useCallback((list: HTMLDivElement | null) => {
     const held = list?.querySelector<HTMLElement>("[data-checked]");
     if (list && held) list.scrollTop = held.offsetTop - (list.clientHeight - held.offsetHeight) / 2;
   }, []);
+
+  /* Base seats a radio group's tab stop on the checked option once, when its options mount. When
+     this column's reading changes from outside it — a bound settling the minute, a day in the
+     calendar, an entry typed into the field — the group is mounted afresh, so the tab stop and the
+     scroll position follow the reading instead of resting on the option that used to hold it. A
+     change the column made itself keeps the group, and the focus inside it. */
+  const emitted = useRef(value);
+  const [generation, setGeneration] = useState(0);
+  useEffect(() => {
+    if (value === emitted.current) return;
+    emitted.current = value;
+    setGeneration((current) => current + 1);
+  }, [value]);
 
   return (
     <BaseField.Root disabled={disabled} className={cn("flex min-h-0 min-w-0 flex-1 flex-col sm:w-14 sm:flex-none")}>
@@ -65,11 +90,14 @@ function TimeColumn<Value extends string | number>({
         {label}
       </BaseField.Label>
       <BaseRadioGroup<Value | null>
+        key={generation}
         ref={centerHeldReading}
         /* `null` keeps the group controlled while no reading has been chosen yet. */
         value={value}
         onValueChange={(next) => {
-          if (next !== null) onValueChange(next);
+          if (next === null) return;
+          emitted.current = next;
+          onValueChange(next);
         }}
         disabled={disabled}
         /* The column is its own scroll container, which is what lets Base keep the checked option in
@@ -114,9 +142,9 @@ export interface TimePanelLabels {
 }
 
 export interface TimePanelProps {
-  /** The reading on the panel, or `null` before one is chosen. */
-  time: TimeParts | null;
-  onTimeChange: (time: TimeParts) => void;
+  /** The reading on the panel, as far as it has been chosen. */
+  time: PartialTime;
+  onTimeChange: (time: PartialTime) => void;
   /** The earliest acceptable reading on the chosen day, in minutes since midnight. */
   minMinute: number | null;
   /** The latest acceptable reading on the chosen day, in minutes since midnight. */
@@ -151,23 +179,26 @@ export const TimePanel = ({
 }: TimePanelProps) => {
   const lower = minMinute ?? UNBOUNDED_MIN;
   const upper = maxMinute ?? UNBOUNDED_MAX;
-  const commit = (hour: number, minute: number) =>
-    onTimeChange(timeFromMinuteOfDay(Math.min(upper, Math.max(lower, hour * 60 + minute))));
+  const { hour, minute } = time;
+  /* Only a complete reading is settled on a bound; a partial one is only offered what fits. */
+  const complete = (nextHour: number, nextMinute: number): PartialTime => {
+    const minutes = Math.min(upper, Math.max(lower, nextHour * 60 + nextMinute));
+    const settled = Math.floor(minutes / 60);
+    return { hour: settled, minute: minutes % 60, afternoon: settled >= 12 };
+  };
 
-  const hour = time?.hour ?? null;
-  const minute = time?.minute ?? null;
   const twelveHour = format.hourCycle === 12;
-  const afternoon = hour !== null && hour >= 12;
+  /* With no hour held, the column lists the period already chosen, or else the first one that has a
+     reading the day accepts. */
+  const afternoon = hour !== null ? hour >= 12 : time.afternoon ?? lower >= NOON;
 
   /* A twelve-hour column lists the hours of the period on screen, so its values stay real hours. */
   const firstHour = twelveHour && afternoon ? 12 : 0;
   const hourOptions: TimeOption<number>[] = Array.from({ length: twelveHour ? 12 : 24 }, (_, index) => {
     const value = firstHour + index;
-    return {
-      value,
-      label: format.formatHour(value),
-      disabled: value * 60 + 59 < lower || value * 60 > upper,
-    };
+    /* An hour is refused only when no minute in it is acceptable; a held minute that does not fit
+       the hour settles on the bound instead. */
+    return { value, label: format.formatHour(value), disabled: value * 60 + 59 < lower || value * 60 > upper };
   });
 
   /* The column offers the step, and always the minute already held, so an off-step value typed into
@@ -180,12 +211,16 @@ export const TimePanel = ({
   const minuteOptions: TimeOption<number>[] = minutes.map((value) => ({
     value,
     label: format.formatMinute(value),
-    disabled: hour !== null && (hour * 60 + value < lower || hour * 60 + value > upper),
+    disabled:
+      hour !== null
+        ? hour * 60 + value < lower || hour * 60 + value > upper
+        : /* Before an hour, a minute is refused only when no hour of the day could take it. */
+          Math.ceil((lower - value) / 60) * 60 + value > upper,
   }));
 
   const periodOptions: TimeOption<"am" | "pm">[] = [
-    { value: "am", label: format.periodNames[0], disabled: lower > 11 * 60 + 59 },
-    { value: "pm", label: format.periodNames[1], disabled: upper < 12 * 60 },
+    { value: "am", label: format.periodNames[0], disabled: lower >= NOON },
+    { value: "pm", label: format.periodNames[1], disabled: upper < NOON },
   ];
 
   return (
@@ -195,10 +230,10 @@ export const TimePanel = ({
         className={cn(
           "mb-2 flex min-h-11 items-center justify-center truncate text-center text-sm font-medium",
           type.numeric,
-          time ? text.high : text.medium
+          hour !== null ? text.high : text.medium
         )}
       >
-        {time ? format.formatTime(time) : labels.chooseTime}
+        {hour !== null ? format.formatTime({ hour, minute: minute ?? 0 }) : labels.chooseTime}
       </div>
 
       <div className={cn("flex h-48 min-h-0 gap-1 sm:h-auto sm:flex-1")}>
@@ -206,25 +241,30 @@ export const TimePanel = ({
           label={labels.hour}
           value={hour}
           options={hourOptions}
-          onValueChange={(next) => commit(next, minute ?? 0)}
+          onValueChange={(next) => onTimeChange(complete(next, minute ?? 0))}
           disabled={disabled}
         />
         <TimeColumn
           label={labels.minute}
           value={minute}
           options={minuteOptions}
-          onValueChange={(next) => commit(hour ?? 0, next)}
+          onValueChange={(next) =>
+            onTimeChange(hour !== null ? complete(hour, next) : { ...time, minute: next })
+          }
           disabled={disabled}
         />
         {twelveHour && (
           <TimeColumn
             label={labels.period}
-            value={hour === null ? null : afternoon ? "pm" : "am"}
+            value={hour !== null || time.afternoon !== null ? (afternoon ? "pm" : "am") : null}
             options={periodOptions}
-            onValueChange={(next) => {
-              const base = (hour ?? 0) % 12;
-              commit(next === "pm" ? base + 12 : base, minute ?? 0);
-            }}
+            onValueChange={(next) =>
+              onTimeChange(
+                hour !== null
+                  ? complete((hour % 12) + (next === "pm" ? 12 : 0), minute ?? 0)
+                  : { ...time, afternoon: next === "pm" }
+              )
+            }
             disabled={disabled}
           />
         )}

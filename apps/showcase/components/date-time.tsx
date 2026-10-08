@@ -19,6 +19,7 @@ export default function DateTimeSpecimen({ verification = false }: { verificatio
   const [formResult, setFormResult] = useState("");
   const [lockedOpen, setLockedOpen] = useState(false);
   const [lockedRequests, setLockedRequests] = useState(0);
+  const [staleRequests, setStaleRequests] = useState<(CalendarDateTime | null)[]>([]);
 
   return (
     <div className={verification ? "space-y-12" : "grid grid-cols-1 items-start gap-8 lg:grid-cols-2"}>
@@ -66,6 +67,26 @@ export default function DateTimeSpecimen({ verification = false }: { verificatio
               today="2024-06-10"
             />
             <Readout testId="date-time-empty-value">{pickup ?? "none"}</Readout>
+          </div>
+        </section>
+
+        <section className="space-y-3">
+          <Heading className="text-sm font-medium text-sherick-ink-muted">Constraints the held value predates</Heading>
+          <div className="flex flex-wrap items-start gap-6">
+            <div className="w-80 max-w-full space-y-2" data-testid="date-time-stale-field">
+              <DateTimePicker
+                label="Renewal"
+                defaultValue="2024-01-10T10:00"
+                min="2024-02-01T00:00"
+                max="2024-02-29T23:59"
+                today="2024-02-01"
+                onValueChange={(next) => setStaleRequests((previous) => [...previous, next])}
+              />
+              <Readout testId="date-time-stale-requests">{JSON.stringify(staleRequests)}</Readout>
+            </div>
+            <div className="w-80 max-w-full" data-testid="date-time-afternoon-field">
+              <DateTimePicker label="Late check-in" min="2024-07-01T15:00" max="2024-07-31T23:00" today="2024-07-01" />
+            </div>
           </div>
         </section>
 

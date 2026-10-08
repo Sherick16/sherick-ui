@@ -281,7 +281,8 @@ popup sets hour, minute and — on a twelve-hour clock — day-period columns be
 - **`hourCycle`** (`12 | 24`) defaults to the `locale`'s own; `labels` extends `CalendarLabels`
   with `time`, `hour`, `minute`, `period`, `chooseTime`, `done` and `unavailableDateTime`.
 - In the popup, a date chosen without a time (or a time without a date) waits for its other half
-  before `onValueChange` fires; after that each change commits at once. A choice that would cross
+  before `onValueChange` fires; after that each change commits at once. An hour fills an empty
+  minute with `:00`, but a minute or AM/PM chosen first waits for its hour. A choice that would cross
   `min`/`max` settles on the bound. Choosing does not close the popup — **Done** or Escape does.
 
 ```tsx

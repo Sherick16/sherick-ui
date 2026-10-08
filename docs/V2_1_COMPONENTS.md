@@ -125,9 +125,18 @@ Exports: `DateTimePicker`; `CalendarDateTime`, `DateTimePickerLabels`, `DateTime
   option in a `Field.Item`, so the column is named by its caption, each option by its reading,
   and nothing in the popup registers with the native input's field. Base owns the roving tab
   stop, the arrow keys (selection follows focus, as radios do), skipping refused readings and
-  keeping the checked option in view; the column opens with its held reading centered.
+  keeping the checked option in view; the column opens with its held reading centered. Base
+  seats a radio group's tab stop once, when its options mount, so a column whose reading changes
+  from outside it (a bound settling it, the calendar, typed entry) remounts its group; a change
+  the column made itself keeps the group and its focus.
 - A half-chosen value — a date without a time or a time without a date — waits in the popup
-  and is committed when its other half is chosen; afterwards each change commits at once.
+  and is committed when its other half is chosen; afterwards each change commits at once. An
+  hour completes a reading (an empty minute reads `:00`); a minute or day period chosen first
+  waits for its hour rather than inventing one, and a chosen period decides which hours the
+  column lists. With nothing chosen, a twelve-hour column lists the first period the day accepts.
+- A held day the constraints refuse — a value from before they changed, or one passed in —
+  anchors nothing: the calendar shows no selection and a reading waits for an acceptable day.
+  Nothing is committed unless the final value passes the field's own check.
   On the first and last day the bounds refuse readings outside them, and a choice that would
   cross a bound (an hour whose minute is too early, a period flipping past the limit, a day
   whose bound excludes the held time) settles on the bound, so the popup cannot produce a

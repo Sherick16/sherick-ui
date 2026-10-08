@@ -37,9 +37,8 @@ import {
   type CalendarDate,
   type CalendarDateTime,
   type CalendarLabels,
-  type TimeParts,
 } from "./date-family";
-import { TimePanel, type TimePanelLabels } from "./time-panel";
+import { TimePanel, emptyTime, type PartialTime, type TimePanelLabels } from "./time-panel";
 
 export type { CalendarDateTime } from "./date-family";
 
@@ -107,7 +106,7 @@ export interface DateTimePickerProps {
    date — waits here rather than being committed with an invented other half. */
 interface Selection {
   date: CalendarDate | null;
-  time: TimeParts | null;
+  time: PartialTime;
 }
 
 /**
@@ -227,27 +226,51 @@ const DateTimePicker = forwardRef<HTMLInputElement, DateTimePickerProps>(({
     commitValue(next);
   };
 
-  /* The popup works on the committed value, or on a half-chosen one waiting for its other half. */
-  const committed = parseCalendarDateTime(currentValue);
-  const selection: Selection = pending ?? { date: committed?.date ?? null, time: committed?.time ?? null };
-
   const boundsOn = (date: CalendarDate | null) => ({
     min: minParts && date === minParts.date ? minuteOfDay(minParts.time) : null,
     max: maxParts && date === maxParts.date ? minuteOfDay(maxParts.time) : null,
   });
 
+  /* Whether any reading on a day is acceptable: the calendar's own rule, and a day whose bounds
+     leave room between them. */
+  const dayIsAcceptable = (date: CalendarDate) => {
+    if (minParts && date < minParts.date) return false;
+    if (maxParts && date > maxParts.date) return false;
+    if (isDateUnavailable?.(date)) return false;
+    const bounds = boundsOn(date);
+    return bounds.min === null || bounds.max === null || bounds.min <= bounds.max;
+  };
+
+  /* The popup works on the committed value, or on a half-chosen one waiting for its other half. A
+     held day the constraints refuse — a value from before they changed, or one the application
+     passed in — anchors nothing: the calendar shows no selection, and a reading waits for a day. */
+  const committed = parseCalendarDateTime(currentValue);
+  const held: Selection = pending ?? {
+    date: committed?.date ?? null,
+    time: committed ? { ...committed.time, afternoon: committed.time.hour >= 12 } : emptyTime,
+  };
+  const selection: Selection = { ...held, date: held.date && dayIsAcceptable(held.date) ? held.date : null };
+
   const choose = (next: Selection) => {
     if (disabled) return;
     setDraft(null);
-    if (!next.date || !next.time) {
+    const { date, time } = next;
+    if (!date || time.hour === null || time.minute === null) {
       setPending(next);
       return;
     }
     /* A day with a bound on it can make the held reading unacceptable; it settles on the bound. */
-    const bounds = boundsOn(next.date);
-    const minutes = Math.min(bounds.max ?? Infinity, Math.max(bounds.min ?? -Infinity, minuteOfDay(next.time)));
+    const bounds = boundsOn(date);
+    const reading = minuteOfDay({ hour: time.hour, minute: time.minute });
+    const minutes = Math.min(bounds.max ?? Infinity, Math.max(bounds.min ?? -Infinity, reading));
+    const candidate = toCalendarDateTime(date, timeFromMinuteOfDay(minutes));
+    /* The popup never commits what the field would refuse. */
+    if (!isSelectable(candidate)) {
+      setPending({ date: null, time });
+      return;
+    }
     setPending(null);
-    commitValue(toCalendarDateTime(next.date, timeFromMinuteOfDay(minutes)));
+    commitValue(candidate);
   };
 
   const dayBounds = boundsOn(selection.date);
