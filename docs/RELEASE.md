@@ -82,6 +82,8 @@ The root `sherick-ui` export is:
 - **v2.1 additions**: `Media`, `Calendar`, `DatePicker`, `DateRangePicker`, `Command`,
   `CommandPalette`, `Pagination`, `Breadcrumb`, `FileUpload`, `Stepper`, `TreeView` and
   their prop/data types; see [`V2_1_COMPONENTS.md`](V2_1_COMPONENTS.md) and [`MEDIA.md`](MEDIA.md);
+- **2.5.0 addition**: `DateTimePicker` with `DateTimePickerProps`, `DateTimePickerLabels` and
+  `CalendarDateTime`; see [`V2_1_COMPONENTS.md`](V2_1_COMPONENTS.md#a1--datetimepicker-from-250);
 - the matching prop types (`AccordionProps`, `AccordionItemProps`, `AccordionTriggerProps`,
   `AccordionPanelProps`, `AccordionHeadingLevel`, `CollapsibleProps`, `CollapsibleTriggerProps`,
   `CollapsiblePanelProps`, `ButtonProps`, `ButtonAppearance`, `ButtonSize`, `IconButtonProps`,

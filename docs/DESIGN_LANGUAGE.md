@@ -73,7 +73,7 @@ secondary one beside it, so depth never contradicts the fill hierarchy. `raised`
 shadow, not a float: a row of raised actions sits on the page.
 
 Held choices combine `tone.selected` and `elevation.control`: selected segments, options,
-tree rows and calendar days. A continuous date range makes one band per week rather than
+tree rows, calendar days and time readings. A continuous date range makes one band per week rather than
 seven separately elevated cells. The mark itself, a check or a date, remains another
 selection signal. Navigation-only current rows and unselected commands stay flat. An empty
 selection mark is identified by its rim (§8), not by its depth: depth alone cannot reach 3:1
@@ -158,7 +158,8 @@ a circle; a dialog radius on a drawer attached to the viewport would make the dr
 look like an oversized card. Nested corners are concentric: the inner radius is the outer
 radius minus the inset between them. A compact segment nests its `row` corner in a
 `control` track at 4px; a normal tab nests `control` in `prominent` at 4px; an option nests
-`control` in a `surface` list sheet at 8px. Pagination is a recessed segmented track with
+`control` in a `surface` list sheet at 8px; a time reading nests `row` in the date popup's
+`surface` sheet at 12px. Pagination is a recessed segmented track with
 rounded-rectangle targets; its current page is a navigation destination (§10), so it is flat.
 Do not use literal radii or invent per-theme corner offsets in components.
 

@@ -1,22 +1,24 @@
 # Selection, chips and choice
 
 Use this reference for the choice/value exports `Select`, `Combobox`, `Chip`, `ChipGroup`,
-`SegmentedControl`, `ToggleGroup`, `Calendar`, `DatePicker`, `DateRangePicker`, `Command` and
-`CommandPalette`. Field composition lives in [forms](forms.md); page structure and when to reach
+`SegmentedControl`, `ToggleGroup`, `Calendar`, `DatePicker`, `DateRangePicker`,
+`DateTimePicker`, `Command` and `CommandPalette`. Field composition lives in [forms](forms.md); page structure and when to reach
 for an overlay live in [composition](../composition.md).
 
 Release availability: `Select`, `Combobox`, `Chip`, `ChipGroup`, `SegmentedControl` and
 `ToggleGroup` are part of the `2.0.0` root export. `Calendar`, `DatePicker`,
-`DateRangePicker`, `Command` and `CommandPalette` arrive in `2.1.0` under the same
-`sherick-ui` import; confirm each exists in the installed package before using it.
+`DateRangePicker`, `Command` and `CommandPalette` arrive in `2.1.0`, and `DateTimePicker` in
+`2.5.0`, under the same `sherick-ui` import; confirm each exists in the installed package before
+using it.
 
 ```tsx
 import {
   Calendar, Chip, ChipGroup, Combobox, Command, CommandPalette, DatePicker, DateRangePicker,
-  SegmentedControl, Select, ToggleGroup,
+  DateTimePicker, SegmentedControl, Select, ToggleGroup,
   type CalendarDate, type CalendarLabels, type CalendarProps, type ChipGroupProps, type ChipProps,
   type ComboboxOption, type ComboboxProps, type CommandItem, type CommandPaletteProps, type CommandProps,
-  type DatePickerProps, type DateRange, type DateRangePickerProps, type SelectOption, type SelectProps,
+  type CalendarDateTime, type DatePickerProps, type DateRange, type DateRangePickerProps,
+  type DateTimePickerProps, type SelectOption, type SelectProps,
   type SegmentedControlOption, type SegmentedControlProps, type ToggleGroupItemProps, type ToggleGroupProps,
 } from "sherick-ui";
 ```
@@ -34,6 +36,7 @@ The distinction is the control's semantics, not its styling:
 | One choice out of a few, always one | `SegmentedControl` | a `ToggleGroup` with exclusivity |
 | Several independent toggles in one track | `ToggleGroup` | grouped toggle buttons |
 | Choose a date, or a span of dates | `Calendar` / `DatePicker` / `DateRangePicker` | a grid, or native `type=date` inputs |
+| Choose a date and a time of day | `DateTimePicker` | a native `type=datetime-local` input |
 
 `Select` and `Combobox` share the option shape and the single-value contract; `Command` shares the
 filter shape but is not a value control at all.
@@ -260,6 +263,39 @@ non-modal popover, threaded through Sherick's `Field`.
   endName="to"
   value={range}
   onValueChange={setRange}
+/>
+```
+
+## `DateTimePicker` (from 2.5.0)
+
+A date and a time of day in one native `type=datetime-local` field, with a named trigger whose
+popup sets hour, minute and — on a twelve-hour clock — day-period columns beside the shared
+`Calendar`. It takes `DatePicker`'s props with date-times where it has dates.
+
+- **Values** are `CalendarDateTime` strings, `YYYY-MM-DDTHH:mm` with a 24-hour `HH`: a civil reading
+  with no time zone, exactly what the native input submits. Convert to an instant in application
+  code if one is needed; the picker never does.
+- **`min` / `max`** are inclusive date-times; `isDateUnavailable(date)` refuses a whole day.
+- **`minuteStep`** (default 5) is the interval between the minutes the popup offers; typed entry
+  stays minute-precise and an off-step value is still shown as held.
+- **`hourCycle`** (`12 | 24`) defaults to the `locale`'s own; `labels` extends `CalendarLabels`
+  with `time`, `hour`, `minute`, `period`, `chooseTime`, `done` and `unavailableDateTime`.
+- In the popup, a date chosen without a time (or a time without a date) waits for its other half
+  before `onValueChange` fires; after that each change commits at once. A choice that would cross
+  `min`/`max` settles on the bound. Choosing does not close the popup — **Done** or Escape does.
+
+```tsx
+const [departure, setDeparture] = useState<CalendarDateTime | null>(null);
+
+<DateTimePicker
+  label="Departure"
+  name="departure"
+  value={departure}
+  onValueChange={setDeparture}
+  min="2024-06-01T06:00"
+  max="2024-06-30T22:00"
+  minuteStep={15}
+  required
 />
 ```
 

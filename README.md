@@ -123,6 +123,8 @@ Version 2.2.0 adds Table column descriptors and `tableClassName`, plus `RadioGro
 
 Version 2.3.0 refines the visual language from the [visual design-system audit](docs/visual-design-system-audit.md): authored soft and selected surfaces per semantic role (new `--sui-<role>-soft` and `--sui-<role>-selected` theme variables), a consistent action depth ladder, type roles, component refinements, and the motion refinements from the [motion audit](docs/motion-audit.md) (a fading scrim, a press that lands inside a tap with amplitude tiers by role, tree disclosure, distance-aware timing and a 500ms tooltip delay). No component or prop is removed.
 
+Version 2.5.0 adds `DateTimePicker`: a native `datetime-local` field whose popup sets hour, minute and (on a twelve-hour clock) day-period columns beside the shared calendar. Values are civil `YYYY-MM-DDTHH:mm` readings with no time zone; see its [contract](docs/V2_1_COMPONENTS.md#a1--datetimepicker-from-250). The native date fields of all three pickers now clip the browser's own calendar glyph in right-to-left pages too. No component or prop is removed.
+
 Version 2.4.0 gives hollow controls a rim. Text fields, the file drop target and empty checkboxes and radios carry one 1.5px border in a new `--sui-rim` theme variable, tuned to clear 3:1 on every surface; fields become canvas-toned wells below the card; an invalid field turns only its rim to the danger tone; and the drop target has a custom dashed rim. Checkbox and RadioGroup marks are 20px, with an accent fill when selected. No component or prop is removed.
 
 Use `Media.Image` and `Media.Video` for rounded, clipped, responsive images and native video.

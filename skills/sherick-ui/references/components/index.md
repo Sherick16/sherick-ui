@@ -23,6 +23,7 @@ app's installed package. Verify installed exports before using any `2.1.0` addit
 | Hold tags vs choose one/many compact toggles | `Chip`/`ChipGroup` vs `SegmentedControl`/`ToggleGroup` | [Selection](selection.md) | Stable 2.0.0 |
 | Search and invoke an action inline vs in a modal palette | `Command` vs `CommandPalette` | [Selection](selection.md) | From 2.1.0 |
 | Choose a date vs a date range | `Calendar`, `DatePicker`, `DateRangePicker` | [Selection](selection.md) | From 2.1.0 |
+| Choose a date and a time of day | `DateTimePicker` | [Selection](selection.md#datetimepicker-from-250) | From 2.5.0 |
 | Link to a destination, show a location trail, or paginate results | `NavGroup`/`NavItem`, `Breadcrumb`, `Pagination` | [Navigation and overlays](navigation-overlays.md) | NavGroup/NavItem from 2.0.0; Breadcrumb/Pagination from 2.1.0 |
 | Select a panel vs disclose content in place | `Tabs` vs `Accordion`/`Collapsible` | [Navigation and overlays](navigation-overlays.md) | Stable 2.0.0 |
 | Browse a hierarchy vs show workflow steps | `TreeView` vs `Stepper` | [Navigation and overlays](navigation-overlays.md) | From 2.1.0 |

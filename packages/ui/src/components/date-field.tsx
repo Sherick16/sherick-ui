@@ -44,9 +44,20 @@ export const dateFieldRowClassName = (disabled: boolean) =>
 
 /** Native date entry remains intact. Its trailing browser affordance sits outside the clipped
  *  input slot, leaving one visible calendar trigger in every engine (Firefox does not expose
- *  a picker-indicator pseudo-element). The composite row owns focus, not the clipped input. */
+ *  a picker-indicator pseudo-element). The composite row owns focus, not the clipped input.
+ *  Its slot takes `dateInputDirection`: the clip only lands on the affordance if every engine puts
+ *  the affordance on the same physical side. */
+
 export const dateInputClassName =
   "block w-[calc(100%+2.5rem)] min-w-0 bg-transparent py-2.5 text-inherit outline-none disabled:cursor-not-allowed";
+
+/** A native date is a left-to-right run of figures in every page direction. Chromium lays its date
+ *  inputs out left to right whatever `dir` says, with the affordance on the physical right, while
+ *  Firefox mirrors them — and reorders a `datetime-local` value's parts under right-to-left bidi.
+ *  Fixing the direction of the slot that clips the input gives every engine the same layout — the
+ *  slot's direction, not the input's, decides which side an overflowing input spills from — so the
+ *  clip above hides the affordance in a right-to-left page as it does in a left-to-right one. */
+export const dateInputDirection = "ltr";
 
 /* The 36×44 target holds a concentric 32px hover surface, leaving air inside the 48px field.
    Only the icon presses: the adjacent native text entry never activates this button. */
@@ -56,6 +67,8 @@ export interface DateFieldTriggerProps {
   /** The control's accessible name. It has no visible label, so it has to be named. */
   label: string;
   disabled?: boolean;
+  /** The glyph that says what the popup holds: a calendar by default. */
+  icon?: ReactNode;
 }
 
 /**
@@ -64,13 +77,13 @@ export interface DateFieldTriggerProps {
  * `aria-expanded`, `aria-controls`) and the pointer and keyboard activation that opens the
  * surface; the button itself only carries the type it needs to stay out of form submission.
  */
-export const DateFieldTrigger = ({ label, disabled = false }: DateFieldTriggerProps) => (
+export const DateFieldTrigger = ({ label, disabled = false, icon = <CalendarDays aria-hidden="true" /> }: DateFieldTriggerProps) => (
   <BasePopover.Trigger
     disabled={disabled}
     render={<button type="button" aria-label={label} disabled={disabled} className={cn(datePartClassName)} />}
   >
     <span className={cn("inline-flex size-5 items-center justify-center [&>svg]:size-5", !disabled && motionInkPress)}>
-      <CalendarDays aria-hidden="true" />
+      {icon}
     </span>
   </BasePopover.Trigger>
 );
@@ -80,6 +93,8 @@ export interface DateCalendarPopupProps {
   title: string;
   children: ReactNode;
   anchor: React.ComponentProps<typeof BasePopover.Positioner>["anchor"];
+  /** The sheet's own anatomy when it holds more than one grid, such as its wider extent. */
+  className?: string;
 }
 
 /**
@@ -91,7 +106,7 @@ export interface DateCalendarPopupProps {
  * dismissal and the focus restoration; the surface is non-modal, so the rest of the page stays
  * reachable. Sherick owns only the sheet and its presence.
  */
-export const DateCalendarPopup = ({ title, children, anchor }: DateCalendarPopupProps) => {
+export const DateCalendarPopup = ({ title, children, anchor, className }: DateCalendarPopupProps) => {
   const popupRef = useRef<HTMLDivElement | null>(null);
 
   return (
@@ -114,7 +129,8 @@ export const DateCalendarPopup = ({ title, children, anchor }: DateCalendarPopup
           className={cn(
             "w-max max-w-[min(24rem,var(--available-width))] max-h-[var(--available-height)] overflow-y-auto p-3 [overflow-wrap:anywhere]",
             overlay.popup,
-            motionPresenceAnchored
+            motionPresenceAnchored,
+            className
           )}
         >
           <BasePopover.Title className={cn("sr-only")}>{title}</BasePopover.Title>
