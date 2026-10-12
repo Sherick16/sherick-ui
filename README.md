@@ -1,6 +1,6 @@
 # Sherick UI
 
-Sherick UI is a React 18/19 component library in paper, graphite and ultramarine, with
+Sherick UI is a React 18/19 component library in graphite and iris, with
 deliberate shape contrast and restrained motion. It is **quiet by default, expressive where it matters**.
 [The design language](docs/DESIGN_LANGUAGE.md) defines its visual roles; [Base UI](https://base-ui.com/)
 owns generic widget behavior and accessibility where a primitive is available.
@@ -128,10 +128,10 @@ Version 2.5.0 adds `DateTimePicker`: a native `datetime-local` field whose popup
 Version 2.4.0 gives hollow controls a rim. Text fields, the file drop target and empty checkboxes and radios carry one 1.5px border in a new `--sui-rim` theme variable, tuned to clear 3:1 on every surface; fields become canvas-toned wells below the card; an invalid field turns only its rim to the danger tone; and the drop target has a custom dashed rim. Checkbox and RadioGroup marks are 20px, with an accent fill when selected. No component or prop is removed.
 
 Version 2.7.0 is a visual overhaul with no API change. The palette moves from a blue-grey family to
-warm paper and graphite neutrals with one deep ultramarine accent; container corners tighten
+graphite neutrals with one vivid iris accent; container corners tighten
 (fields 12px, cards 20px, dialogs 24px) while actions stay capsules; the elevation ladder gains a
 lit upper lip on raised actions and a hairline contact edge on floating sheets; and a choice held in
-a track — a selected segment, the Tabs indicator — is now a raised paper puck with an accent label
+a track — a selected segment, the Tabs indicator — is now a raised white puck with an accent label
 instead of a tinted fill, using a new `--sui-puck` theme variable. Every `--sui-*` variable keeps
 its name; consumers who retune them keep working, though their values were recalibrated. No
 component or prop is removed. See the [palette record](docs/PALETTE.md).

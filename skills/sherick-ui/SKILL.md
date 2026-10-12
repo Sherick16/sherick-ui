@@ -11,7 +11,7 @@ metadata:
 
 # Consuming Sherick UI
 
-Sherick UI is a React component library in paper, graphite and ultramarine, with
+Sherick UI is a React component library in graphite and iris, with
 integrated interaction mechanics. Build application UI with its public components;
 this skill explains how to preserve the system when composing them.
 

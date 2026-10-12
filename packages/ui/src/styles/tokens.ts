@@ -1,43 +1,43 @@
 export type ThemeName = "light" | "dark";
 
-/* The palette is "paper and ultramarine": a warm graphite ink on a paper canvas, crisp near-white
-   sheets, and one deep, saturated ultramarine that is spent only on what the reader acts on. The
-   neutrals carry a trace of warmth (hue ~75) so that the accent reads as the one cool, deliberate
-   colour on the page rather than as one more step of a blue-grey wash; shadows are a warm umbra for
-   the same reason. Every value is measured by the contrast contract (docs/PALETTE.md). */
+/* The palette is "graphite and iris": a graphite ink on a near-white canvas, white sheets, and one
+   vivid iris violet that is spent only on what the reader acts on. The neutrals carry a bare trace
+   of the accent's hue (285, chroma under 0.015), so they read as true greys yet sit in the same
+   family as the accent instead of fighting it; shadows are a violet-graphite umbra for the same
+   reason. Every value is measured by the contrast contract (docs/PALETTE.md). */
 export const lightTokens = {
-  "canvas": "0.962 0.005 80",
-  "surface": "0.996 0.002 80",
-  "surface-high": "0.928 0.006 78",
-  "surface-float": "0.998 0.002 80",
+  "canvas": "0.970 0.003 290",
+  "surface": "0.998 0.001 290",
+  "surface-high": "0.934 0.006 290",
+  "surface-float": "0.999 0.001 290",
   /* The puck: a held choice that rides in a track — a selected segment, the tab indicator. It is
      the one surface lit *above* every sheet in both themes, because a puck is a part lifted out of
      the groove it sits in; in dark mode no sheet tone can play that role, since a lifted object is
      lighter there and every sheet sits below the track that holds it. */
   "puck": "1 0 0",
-  "media": "0.200 0.006 70",
-  "ink": "0.215 0.010 65",
-  "ink-muted": "0.475 0.012 65",
+  "media": "0.200 0.008 285",
+  "ink": "0.200 0.012 285",
+  "ink-muted": "0.480 0.014 285",
   /* The detail role is non-text furniture: it carries a mark, a rail or a gutter, and it is not a
      third step of the text ladder. It answers to the 3:1 non-text requirement wherever it carries
      meaning; anything a reader must read uses `ink` or `ink-muted`. */
-  "detail": "0.590 0.012 70",
+  "detail": "0.590 0.012 285",
   /* The rim of a hollow control — a field, a drop target, an empty checkbox or radio. It is the
      only border a control carries, so it is tuned to clear the 3:1 non-text requirement against
      every surface a control sits on with a small margin and no more: at `detail` strength the rim
      outshone the labels beside it. Hover steps it to `ink-muted`. */
-  "rim": "0.620 0.012 70",
-  "primary": "0.455 0.195 270",
-  "primary-strong": "0.415 0.190 270",
+  "rim": "0.625 0.012 285",
+  "primary": "0.490 0.205 292",
+  "primary-strong": "0.430 0.200 292",
   /* The designed surfaces of each semantic role. A soft container is what a tinted surface is
      made of — a tonal control, an Alert, a Badge, a quiet Card — and the selected step is the held
      choice one rung stronger. They are authored rather than derived as a fraction of the role's
      foreground, because that foreground is tuned for text contrast: a fraction of a deep
-     ultramarine is a grey-violet and a fraction of a deep ochre is a grey, so every contrast retune
+     iris is a dusty mauve and a fraction of a deep ochre is a grey, so every contrast retune
      used to recolour every tinted surface. Each value clears the contrast contract with its own
      foreground, `ink` and the focus ring through the tonal states. */
-  "primary-soft": "0.945 0.024 274",
-  "primary-selected": "0.895 0.050 274",
+  "primary-soft": "0.952 0.024 292",
+  "primary-selected": "0.905 0.052 292",
   "danger-soft": "0.952 0.020 30",
   "danger-selected": "0.900 0.042 30",
   "warning-soft": "0.955 0.032 82",
@@ -48,16 +48,16 @@ export const lightTokens = {
   "danger": "0.465 0.180 27",
   "warning": "0.398 0.086 68",
   "success": "0.390 0.088 158",
-  "on-primary": "0.990 0.004 80",
-  "on-danger": "0.990 0.004 80",
-  "on-warning": "0.990 0.004 80",
-  "on-success": "0.990 0.004 80",
-  "focus": "0.455 0.195 270",
-  "outline": "0.50 0.012 65",
-  "scrim": "0.200 0.004 70",
-  "edge": "0.400 0.012 65",
+  "on-primary": "0.990 0.003 290",
+  "on-danger": "0.990 0.003 290",
+  "on-warning": "0.990 0.003 290",
+  "on-success": "0.990 0.003 290",
+  "focus": "0.490 0.205 292",
+  "outline": "0.500 0.012 285",
+  "scrim": "0.200 0.006 285",
+  "edge": "0.400 0.012 285",
   "light-top": "1 0 0",
-  "light-bottom": "0.300 0.020 60",
+  "light-bottom": "0.280 0.025 290",
   "elevation-flat": "none",
   /* A contact shadow, not a float: the ambient layer stays close to the control, so a row of raised
      actions sits on the page rather than hovering over it. The inset line is the lit upper lip of a
@@ -69,7 +69,7 @@ export const lightTokens = {
      two layers of depth: a close penumbra and a long, soft ambient fall. */
   "elevation-floating": "0 0 0 1px oklch(var(--sui-light-bottom) / 0.07), 0 4px 10px -2px oklch(var(--sui-light-bottom) / 0.08), 0 22px 48px -10px oklch(var(--sui-light-bottom) / 0.24), inset 0 1px 0 oklch(var(--sui-light-top) / 0.80)",
   /* A held selection — a puck in a track, a chosen option or date. It carries a half-pixel contact
-     edge so a paper puck holds its outline on the paper-toned track around it. */
+     edge so a white puck holds its outline on the pale track around it. */
   "elevation-control": "0 0 0 0.5px oklch(var(--sui-light-bottom) / 0.10), 0 1px 3px oklch(var(--sui-light-bottom) / 0.16), inset 0 1px 0 oklch(var(--sui-light-top) / 0.70)",
   /* The recessed rung, and the deeper `well` a small selection mark sinks to while it is held. A
      checkbox box and a radio socket rest in the same groove a Switch track does — what identifies
@@ -88,42 +88,42 @@ export const lightTokens = {
   "glass-dense-blur": "22px",
   "glass-dense-saturation": "1.08",
   "glass-dense-brightness": "1.01",
-  "glass-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.80) 0%, rgb(255 255 255 / 0.28) 26%, rgb(255 255 255 / 0) 62%, rgb(60 48 36 / 0.04) 100%)",
-  "glass-gradient-dense": "linear-gradient(180deg, rgb(255 255 255 / 0.70) 0%, rgb(255 255 255 / 0.22) 34%, rgb(255 255 255 / 0) 72%, rgb(60 48 36 / 0.04) 100%)",
+  "glass-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.80) 0%, rgb(255 255 255 / 0.28) 26%, rgb(255 255 255 / 0) 62%, rgb(40 36 60 / 0.04) 100%)",
+  "glass-gradient-dense": "linear-gradient(180deg, rgb(255 255 255 / 0.70) 0%, rgb(255 255 255 / 0.22) 34%, rgb(255 255 255 / 0) 72%, rgb(40 36 60 / 0.04) 100%)",
   "glass-hero-blur": "14px",
   "glass-hero-saturation": "1.06",
   "glass-hero-brightness": "1.0",
-  "glass-hero-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.50) 0%, rgb(255 255 255 / 0.12) 14%, rgb(255 255 255 / 0) 46%, rgb(60 48 36 / 0.035) 100%)",
-  "surface-overlay": "0.994 0.003 80",
+  "glass-hero-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.50) 0%, rgb(255 255 255 / 0.12) 14%, rgb(255 255 255 / 0) 46%, rgb(40 36 60 / 0.035) 100%)",
+  "surface-overlay": "0.995 0.002 290",
   "overlay-fill": "0.99",
   "scrim-blur": "8px",
-  "code-text": "oklch(0.27 0.012 65)",
-  "code-comment": "oklch(0.52 0.012 70)",
+  "code-text": "oklch(0.27 0.012 285)",
+  "code-comment": "oklch(0.52 0.012 285)",
   "code-string": "oklch(0.47 0.10 158)",
   "code-number": "oklch(0.51 0.13 55)",
-  "code-keyword": "oklch(0.47 0.19 285)",
+  "code-keyword": "oklch(0.47 0.19 300)",
   "code-function": "oklch(0.49 0.16 27)",
   "code-tag": "oklch(0.46 0.15 260)",
 } as const satisfies Record<string, string>;
 
-/* Dark is not light inverted: it is a warm graphite room in which the sheets are lit a step above
-   the floor, the accent is a luminous ultramarine that glows rather than shouts, and the floating
+/* Dark is not light inverted: it is a graphite room in which the sheets are lit a step above the
+   floor, the accent is a luminous lavender iris that glows rather than shouts, and the floating
    edge is a line of light rather than a shadow. */
 export const darkTokens = {
-  "canvas": "0.168 0.004 70",
-  "surface": "0.208 0.005 70",
-  "surface-high": "0.262 0.006 70",
-  "surface-float": "0.236 0.006 70",
-  "puck": "0.330 0.007 72",
-  "media": "0.168 0.004 70",
-  "ink": "0.950 0.004 80",
-  "ink-muted": "0.755 0.008 78",
-  "detail": "0.605 0.008 75",
-  "rim": "0.540 0.008 75",
-  "primary": "0.790 0.115 272",
-  "primary-strong": "0.725 0.155 270",
-  "primary-soft": "0.300 0.070 270",
-  "primary-selected": "0.370 0.100 270",
+  "canvas": "0.160 0.006 285",
+  "surface": "0.200 0.008 285",
+  "surface-high": "0.252 0.010 285",
+  "surface-float": "0.226 0.009 285",
+  "puck": "0.315 0.012 285",
+  "media": "0.160 0.006 285",
+  "ink": "0.950 0.004 285",
+  "ink-muted": "0.745 0.010 285",
+  "detail": "0.605 0.010 285",
+  "rim": "0.535 0.010 285",
+  "primary": "0.780 0.125 292",
+  "primary-strong": "0.720 0.160 292",
+  "primary-soft": "0.300 0.075 292",
+  "primary-selected": "0.375 0.105 292",
   "danger-soft": "0.290 0.060 25",
   "danger-selected": "0.360 0.085 25",
   "warning-soft": "0.300 0.050 75",
@@ -134,16 +134,16 @@ export const darkTokens = {
   "danger": "0.775 0.130 25",
   "warning": "0.830 0.120 80",
   "success": "0.780 0.120 158",
-  "on-primary": "0.168 0.004 70",
-  "on-danger": "0.168 0.004 70",
-  "on-warning": "0.168 0.004 70",
-  "on-success": "0.168 0.004 70",
-  "focus": "0.790 0.115 272",
-  "outline": "0.755 0.008 78",
-  "scrim": "0.060 0.004 70",
-  "edge": "0.930 0.006 80",
+  "on-primary": "0.160 0.006 285",
+  "on-danger": "0.160 0.006 285",
+  "on-warning": "0.160 0.006 285",
+  "on-success": "0.160 0.006 285",
+  "focus": "0.780 0.125 292",
+  "outline": "0.745 0.010 285",
+  "scrim": "0.060 0.006 285",
+  "edge": "0.930 0.006 285",
   "light-top": "1 0 0",
-  "light-bottom": "0.080 0.004 60",
+  "light-bottom": "0.070 0.008 285",
   "elevation-flat": "none",
   "elevation-raised": "0 1px 2px oklch(var(--sui-light-bottom) / 0.40), 0 3px 8px -2px oklch(var(--sui-light-bottom) / 0.30), inset 0 1px 0 oklch(var(--sui-light-top) / 0.08)",
   "elevation-floating": "0 0 0 1px oklch(var(--sui-light-top) / 0.08), 0 6px 14px -4px oklch(var(--sui-light-bottom) / 0.40), 0 26px 56px -12px oklch(var(--sui-light-bottom) / 0.65), inset 0 1px 0 oklch(var(--sui-light-top) / 0.06)",
@@ -165,14 +165,14 @@ export const darkTokens = {
   "glass-hero-saturation": "1.03",
   "glass-hero-brightness": "1.0",
   "glass-hero-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.035) 0%, rgb(255 255 255 / 0.01) 12%, rgb(255 255 255 / 0) 44%, rgb(0 0 0 / 0.16) 100%)",
-  "surface-overlay": "0.222 0.005 70",
+  "surface-overlay": "0.214 0.008 285",
   "overlay-fill": "0.99",
   "scrim-blur": "8px",
-  "code-text": "#e0deda",
-  "code-comment": "#96918c",
+  "code-text": "#dfdee6",
+  "code-comment": "#928f9e",
   "code-string": "#7dd3a3",
   "code-number": "#f3ad66",
-  "code-keyword": "#b6a8ff",
+  "code-keyword": "#c8a8ff",
   "code-function": "#fb9989",
   "code-tag": "#8cc3fc",
 } as const satisfies Record<keyof typeof lightTokens, string>;

@@ -24,7 +24,7 @@ const themeScript = `
 
 export const metadata: Metadata = {
   title: "Sherick UI",
-  description: "A React component library in paper, graphite and ultramarine, with light and dark themes.",
+  description: "A React component library in graphite and iris, with light and dark themes.",
 };
 
 export default function RootLayout({

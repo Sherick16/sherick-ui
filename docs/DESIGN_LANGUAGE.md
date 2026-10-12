@@ -4,14 +4,14 @@
 color, motion and depth are reserved for selection, manipulation and surfaces that float.
 Consistency means using the same roles, not giving every component identical anatomy.
 
-**Paper, graphite and ultramarine.** The page is a warm paper canvas; content sits on crisp,
-near-white sheets; copy is a warm graphite ink; and one deep, slightly violet ultramarine is spent
-only on what the reader acts on — the priority action, a made selection, a value's range, the focus
-ring. The neutrals carry a trace of warmth so the accent reads as the one deliberate cool colour on
-the page rather than as another step of a blue-grey wash, and shadows are a warm umbra for the same
-reason. Dark mode is a warm graphite room, not inverted light: sheets are lit a step above the
-floor, the accent glows rather than shouts, and a floating edge is a line of light. The palette
-record, with every measured composition, is [PALETTE.md](PALETTE.md).
+**Graphite and iris.** The page is a near-white canvas; content sits on white sheets; copy is a
+graphite ink; and one vivid iris violet is spent only on what the reader acts on — the priority
+action, a made selection, a value's range, the focus ring. The neutrals carry only a bare trace of
+the accent's hue, so they read as true greys that belong to the accent's family rather than as a
+tinted wash, and shadows are a graphite umbra for the same reason. Dark mode is a graphite room,
+not inverted light: sheets are lit a step above the floor, the accent glows rather than shouts, and
+a floating edge is a line of light. The palette record, with every measured composition, is
+[PALETTE.md](PALETTE.md).
 
 This is the canonical visual language. `packages/ui/src/components/ui.common.ts` owns reusable
 visual recipes, `ui.motion.ts` owns temporal recipes, and `src/styles/tokens.ts` owns authored
@@ -79,7 +79,7 @@ source's semantics. Video defaults to its source ratio and containment, never im
 Actions follow one depth ladder: a text action sits flat, and tonal and filled actions are
 `raised` at rest and `recessed` while held. `raised` carries the light model's lit upper lip — one
 inset line of `light-top` — so a filled action reads as a key rather than a flat swatch; `control`
-adds a half-pixel contact edge so a paper puck keeps its outline on a paper-toned track; and
+adds a half-pixel contact edge so a white puck keeps its outline on a pale track; and
 `floating` holds a hairline contact edge (an umbra line in light, a line of light in dark) so a
 white sheet over a white card never loses its boundary. These lines belong to the elevation, not to
 the component: no component draws a rim to separate a surface. The priority action is never flatter than the

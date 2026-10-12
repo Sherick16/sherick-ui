@@ -13,7 +13,7 @@ margins; `2.3.0` the visual refinements from the
 and `--sui-<role>-selected` theme variables; `2.4.0` the rim on hollow controls; and `2.5.0`
 `DateTimePicker`; and `2.6.0` the form wave: `Form`, `CheckboxGroup`, multiple and creatable
 `Combobox`, option groups in `Select` and `Combobox`, and units on `Input` and `NumberField`. The
-current source package version is `2.7.0`, the paper-and-ultramarine visual overhaul: recalibrated
+current source package version is `2.7.0`, the graphite-and-iris visual overhaul: recalibrated
 theme values, tighter container corners, a refined elevation ladder and the additive `--sui-puck`
 theme variable. It changes no component, prop or export. Version `2.4.0` remains the published baseline until the
 release owner approves a staged version. An installed package's actual version and exports, not this

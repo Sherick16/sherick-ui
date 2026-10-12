@@ -208,7 +208,7 @@ export default function Home() {
         </h1>
         <div className={`mt-10 flex flex-col gap-6 border-t pt-6 sm:flex-row sm:items-end sm:justify-between ${edge.rule}`}>
           <p className={cn("max-w-md text-base leading-7", text.medium)}>
-            Paper, graphite and ultramarine. Every component, in every state, in both themes.
+            Graphite and iris. Every component, in every state, in both themes.
           </p>
           <ul className={cn("flex gap-8 font-showcase-mono text-[0.6875rem] uppercase tracking-[0.14em]", text.medium)}>
             <li>React</li>
@@ -875,7 +875,7 @@ export default function Home() {
   );
 }
 
-/* The identity: three discs — the graphite ink, the paper puck and the ultramarine accent — which
+/* The identity: three discs — the graphite ink, the white puck and the iris accent — which
    is the whole palette at a glance. Decorative; the name beside it is the link's text. */
 function BrandMark() {
   return (
