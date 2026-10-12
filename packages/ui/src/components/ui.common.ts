@@ -409,6 +409,19 @@ export const stateLayer = {
      keyboard so it can be discovered and announced as unavailable, and a reader still has to see
      which row the navigation is on when it lands there. */
   activeRow: "data-[highlighted]:before:opacity-[0.05]",
+  /* A control that is one part of a field — a combobox's clear and trigger, a number field's
+     steppers, a search field's submit, a date field's calendar glyph. Its target keeps the height
+     the field's row needs, but its surface does not: a hover layer that filled a 44px target painted
+     a column the full height of a 48px field. The layer is a 32px circle centred in whatever target
+     the part has, which leaves the field's own air above and below it and keeps every part in every
+     field the same size under the pointer. */
+  fieldPart: /* @__PURE__ */ cx(
+    "relative",
+    stateLayerBase,
+    "before:m-auto before:size-8 before:rounded-full before:bg-current",
+    hoverQuiet,
+    pressQuiet
+  ),
 } as const;
 
 /* Hit area — the interactive region of a control whose visible mark is smaller than a comfortable
@@ -526,12 +539,13 @@ export const density = {
   target: "min-h-11 min-w-11",
   /* A control that is one part of a composite field — the trailing controls a Combobox owns. It
      keeps the floor's height, because it has to sit in the field's row, and takes only the width
-     its glyph needs: the two of them are gripped as one cluster at the field's edge, and two full
-     squares there read as two controls beside a field rather than as parts of it.
+     of its 32px hover surface (`stateLayer.fieldPart`): two parts side by side are gripped as one
+     cluster at the field's edge, their glyphs 12px apart, and any wider step spread a clear control
+     and a chevron into two controls beside a field rather than parts of it.
      The narrower step still clears the 24px pointer-target minimum WCAG AA asks for. It is below
      this system's own 44px floor on purpose: that floor belongs to a control that is the whole
      target of its own action, and this one is a part of a field the pointer is already in. */
-  part: "min-h-11 min-w-9",
+  part: "min-h-11 min-w-8",
 } as const;
 
 /* Icon slot — the fixed box a leading or trailing mark occupies, sized by the type step it sits

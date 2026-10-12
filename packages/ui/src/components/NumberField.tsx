@@ -70,7 +70,7 @@ const stepperClassName = cn(
   shape.circle,
   motionFeedback,
   tone.text.secondary,
-  stateLayer.quiet,
+  stateLayer.fieldPart,
   state.enabled,
   state.disabledPart
 );

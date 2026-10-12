@@ -87,8 +87,8 @@ secondary one beside it, so depth never contradicts the fill hierarchy. `raised`
 shadow, not a float: a row of raised actions sits on the page.
 
 Held choices take `elevation.control`, and their fill depends on what holds them. **A choice
-held in a track is a puck**: the selected segment of a ToggleGroup or SegmentedControl and the Tabs
-indicator take `puck` — the one surface lit above every sheet in both themes — and the label takes
+held in a track is a puck**: the selected segment of a ToggleGroup or SegmentedControl, the Tabs
+indicator and a value chip in a multiple Combobox's field tray take `puck` — the one surface lit above every sheet in both themes — and the label takes
 the variant's text tone, so the lift says "this one" and the colour says which family it belongs
 to. **A choice held in a sheet is a tint**: options, tree rows, calendar days and time readings
 combine `tone.selected` with the same elevation, because a list sheet is already the brightest
@@ -257,7 +257,11 @@ A command palette is a utility surface whose content is its search, so it takes 
 ## 11. Interaction states
 
 Hover is a tonal step over the resting fill. `stateLayer.quiet`, `tonal`, `filled` and
-`track` composite the response without replacing that fill. `activeRow` makes keyboard
+`track` composite the response without replacing that fill. A part embedded in a field — a
+combobox's clear and trigger, a number field's steppers, a search field's submit, a date field's
+calendar glyph — takes `stateLayer.fieldPart`: a 32px circle centred in its target, so the hover
+never paints a column the height of the field. Two parts side by side are 32px wide
+(`density.part`) and read as one cluster. `activeRow` makes keyboard
 highlight equal to pointer hover on a collection row; keyboard focus also adds the inset
 ring. Disabled rows lose interactive hover/press but remain discoverable by keyboard when
 the primitive permits it, so a disabled highlighted row still shows navigation.
@@ -318,8 +322,10 @@ from it. Groups are separated by the space above each heading, never by a rule o
 An option outside every group is listed where it stands, as Discord lists an uncategorised
 channel above the first category.
 
-A multiple Combobox holds its chosen values as chips inside the field. A value chip is a passive
-tag — the neutral tonal pill, flat, full-ink copy — at 28px so one line of chips rides the field's
+A multiple Combobox holds its chosen values as chips inside the field. A value chip is a held
+choice riding in the field's tray, so it is the tray's puck — the white (dark: lifted graphite) pill
+at `elevation.control`, full-ink copy; a neutral tonal pill is the tray's own tone and a row of them
+reads as one band — at 28px so one line of chips rides the field's
 48px resting height; more chips wrap and the field grows downward rather than squeezing the query.
 Once chips lead the field, its start inset drops to the chips' own block inset. The dismiss target
 is a 24px circle nested at the chip's 2px end inset, its glyph takes the press, and a read-only or
