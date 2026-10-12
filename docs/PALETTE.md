@@ -6,6 +6,67 @@ rejected. The rules that consume these values are [`DESIGN_LANGUAGE.md`](DESIGN_
 §14; the values themselves live in `packages/ui/src/styles/tokens.ts`, and they are verified by
 `bun run test` against the published `dist/theme.css` (see [`VERIFICATION.md`](VERIFICATION.md)).
 
+## Graphite and iris (current)
+
+**Decided and implemented** in 2.7.0, as the library's visual overhaul. The earlier palette was a
+blue-grey family end to end: a navy accent (`0.42 0.14 255`) on blue-tinted neutrals, so every
+surface, tint and shadow shared the accent's hue and the page read as one cool wash with weak
+figure/ground. A warm "paper and ultramarine" palette was drafted first and rejected on review: the
+warm neutrals read as yellowed beside a cool accent. The overhaul separates the two jobs colour does:
+
+- **Neutrals are graphite.** Canvas, sheets, ink, rims and the shadow umbra sit at hue 285 with
+  chroma under 0.015 — they read as true greys, but they share the accent's family instead of
+  pulling against it. Sheets are white, and the card separates from the canvas by tone alone.
+- **One vivid accent.** `primary` is an iris violet (hue 292, chroma 0.205), the most saturated value
+  the filled press veil allows at that lightness. In dark it is a luminous lavender fill with
+  graphite labels.
+- **Containers are quiet.** The soft and selected steps keep their designed, opaque role (below) at
+  low chroma, so an alert or a badge is a tint rather than a pastel block.
+- **A puck surface.** `--sui-puck` is the brightest surface in both themes, for a choice held in a
+  track (see DESIGN_LANGUAGE §5). In dark mode no sheet tone can play that part, because a lifted
+  object is lighter there and every sheet sits below the track that holds it. It is a contract
+  surface: both text roles, every semantic foreground and the detail role are measured on it.
+
+| Token | Light | Dark |
+| --- | --- | --- |
+| `--sui-canvas` | `0.970 0.003 290` | `0.160 0.006 285` |
+| `--sui-surface` | `0.998 0.001 290` | `0.200 0.008 285` |
+| `--sui-surface-high` | `0.934 0.006 290` | `0.252 0.010 285` |
+| `--sui-surface-float` | `0.999 0.001 290` | `0.226 0.009 285` |
+| `--sui-puck` | `1 0 0` | `0.315 0.012 285` |
+| `--sui-surface-overlay` | `0.995 0.002 290` | `0.214 0.008 285` |
+| `--sui-ink` | `0.200 0.012 285` | `0.950 0.004 285` |
+| `--sui-ink-muted` | `0.480 0.014 285` | `0.745 0.010 285` |
+| `--sui-detail` | `0.590 0.012 285` | `0.605 0.010 285` |
+| `--sui-rim` | `0.625 0.012 285` | `0.535 0.010 285` |
+| `--sui-edge` | `0.400 0.012 285` | `0.930 0.006 285` |
+| `--sui-light-bottom` | `0.280 0.025 290` | `0.070 0.008 285` |
+| `--sui-scrim` | `0.200 0.006 285` | `0.060 0.006 285` |
+| `--sui-primary` | `0.490 0.205 292` | `0.780 0.125 292` |
+| `--sui-primary-strong` | `0.430 0.200 292` | `0.720 0.160 292` |
+| `--sui-focus` | `0.490 0.205 292` | `0.780 0.125 292` |
+| `--sui-primary-soft` | `0.952 0.024 292` | `0.300 0.075 292` |
+| `--sui-primary-selected` | `0.905 0.052 292` | `0.375 0.105 292` |
+| `--sui-danger` | `0.465 0.180 27` | `0.775 0.130 25` |
+| `--sui-danger-soft` | `0.952 0.020 30` | `0.290 0.060 25` |
+| `--sui-danger-selected` | `0.900 0.042 30` | `0.360 0.085 25` |
+| `--sui-warning` | `0.398 0.086 68` | `0.830 0.120 80` |
+| `--sui-warning-soft` | `0.955 0.032 82` | `0.300 0.050 75` |
+| `--sui-warning-selected` | `0.905 0.058 80` | `0.370 0.070 75` |
+| `--sui-success` | `0.390 0.088 158` | `0.780 0.120 158` |
+| `--sui-success-soft` | `0.952 0.024 165` | `0.290 0.050 160` |
+| `--sui-success-selected` | `0.900 0.046 165` | `0.360 0.070 160` |
+| `--sui-on-primary` | `0.990 0.003 290` | `0.160 0.006 285` |
+
+The contract is unchanged in method and in requirement, and every composition clears it in both
+themes. The binding compositions are still the filled press veil (light success 4.56, warning
+4.59, danger 4.64, primary 4.67; dark primary 4.51), the rim (3.28 light on the canvas) and a text
+field's baseline against its own tray (3.07 light, 3.28 dark), which is why the strong fills and the
+rim sit where they do. `bun run test` prints the full matrix.
+
+The sections below are the decision record for the values this palette replaced. Their method — and
+every alternative they rejected — still governs how a value here may change.
+
 ## What the palette answers to
 
 A colour in this system is not a token pair, it is a *composition*: text on a surface, an accent on

@@ -142,7 +142,7 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
             focusRingInset,
             motionFeedback,
             tone.text[variant],
-            !submitDisabled && stateLayer.quiet,
+            !submitDisabled && stateLayer.fieldPart,
             submitDisabled ? state.disabledDescendant : state.enabled,
             /* After the state layer, which is `relative` itself: `tailwind-merge` keeps the last class in
                a conflicting group, so the control's own position has to be written last.

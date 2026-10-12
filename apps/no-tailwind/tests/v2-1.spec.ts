@@ -225,7 +225,8 @@ test("date text stays still and only the inset calendar affordance presses", asy
         const layer = getComputedStyle(element, "::before");
         return { width: box.width, height: box.height, layerWidth: parseFloat(layer.width), layerHeight: parseFloat(layer.height), top: parseFloat(layer.top), bottom: parseFloat(layer.bottom) };
       });
-      expect(geometry.width).toBeGreaterThanOrEqual(36);
+      // A field part is as wide as its 32px surface (`density.part`), well past the 24px AA target.
+      expect(geometry.width).toBeGreaterThanOrEqual(32);
       expect(geometry.height).toBeGreaterThanOrEqual(44);
       expect(geometry.layerWidth).toBe(32);
       expect(geometry.layerHeight).toBe(32);

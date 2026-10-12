@@ -13,6 +13,7 @@ import {
   list,
   material,
   overlay,
+  puck,
   rim,
   shape,
   stacking,
@@ -149,10 +150,12 @@ const sameText = (a: string, b: string) => a.localeCompare(b, undefined, { sensi
    a read-only combobox still opens and browses, only its value is fixed. The clear control is
    handed its own `disabled` for that case because Base itself refuses to clear a read-only
    control; nothing here has to be derived from Sherick's props. */
-const partClassName = `inline-flex shrink-0 items-center justify-center ${density.part} ${shape.circle} ${text.medium} [&>svg]:size-5 ${motionFeedback} ${stateLayer.quiet} ${state.enabled} ${state.disabledPart} [&:not([data-disabled]):not(:disabled)]:hover:text-sherick-ink`;
+const partClassName = `inline-flex shrink-0 items-center justify-center ${density.part} ${shape.circle} ${text.medium} [&>svg]:size-5 ${motionFeedback} ${stateLayer.fieldPart} ${state.enabled} ${state.disabledPart} [&:not([data-disabled]):not(:disabled)]:hover:text-sherick-ink`;
 
-/* A chosen value inside the field is a passive tag, the same object `Chip` draws for one: a neutral
-   tonal pill, flat, with its copy at full emphasis. It is shorter than a standalone chip because it
+/* A chosen value inside the field is a held choice riding in the field's tray, so it is the tray's
+   puck: the brightest surface in the view, at `elevation.control`, with its copy at full emphasis. A
+   neutral tonal pill is the tray's own tone, and a row of them read as one grey band rather than as
+   separate values. It is shorter than a standalone chip because it
    rides a text field's line rather than standing in a row of its own: 28px leaves the field's 48px
    resting height intact around one line of chips. Base gives a chip real focus while the arrow keys
    walk the row, so the focused chip takes the inset ring — the one this chip is, inside the field's
@@ -160,7 +163,8 @@ const partClassName = `inline-flex shrink-0 items-center justify-center ${densit
 const valueChipClassName = cn(
   "inline-flex h-7 min-w-0 max-w-full items-center gap-0.5 ps-3 pe-0.5 text-sm leading-5 font-medium outline-none",
   shape.pill,
-  tone.tonal.secondary,
+  puck,
+  elevation.control,
   text.high,
   focusRingInset
 );
@@ -425,12 +429,12 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>((props, ref) => {
           cn(
             /* The field's own inline padding is what places the trailing cluster, and it is set on the
                logical ends so the cluster stays at the field's end in either writing direction. The
-               20px a mark's box then sits from the edge — 12px of padding plus the 8px each `density.part`
+               20px a mark's box then sits from the edge — 14px of padding plus the 6px each `density.part`
                holds around its 20px glyph — is the same 20px the input's own leading padding uses, so the
                field reads with one inset at both ends. Once chips lead the field, its start inset
                drops to the chips' own block inset, so the first pill sits as far from the field's
                start as from its top. */
-            "group/field flex min-w-0 w-full items-center ps-5 pe-3",
+            "group/field flex min-w-0 w-full items-center ps-5 pe-3.5",
             multiple && "has-[[data-sui-value-chip]]:ps-2.5",
             density.normal,
             shape.control,

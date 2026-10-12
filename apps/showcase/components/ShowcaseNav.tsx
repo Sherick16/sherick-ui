@@ -94,13 +94,14 @@ function ShowcaseSectionLink({
   onClick?: () => void;
   className?: string;
 }) {
+  const index = showcaseSections.indexOf(section) + 1;
   return (
     <a
       href={`#${section.id}`}
       aria-current={active ? "location" : undefined}
       onClick={onClick}
       className={cn(
-        "flex items-center gap-2 text-sm",
+        "flex items-center gap-3 text-sm",
         motionFeedback,
         focusRing,
         active ? cn(text.high, "font-medium") : cn(text.medium, "hover:text-sherick-ink focus-visible:text-sherick-ink"),
@@ -111,6 +112,9 @@ function ShowcaseSectionLink({
         aria-hidden="true"
         className={cn("h-4 w-0.5 shrink-0", shape.pill, active ? "bg-sherick-primary" : "bg-transparent")}
       />
+      <span aria-hidden="true" className={cn("w-5 shrink-0 font-showcase-mono text-[0.6875rem] tabular-nums", active ? "text-sherick-primary" : text.medium)}>
+        {String(index).padStart(2, "0")}
+      </span>
       <span className="truncate">{section.nav}</span>
     </a>
   );
@@ -124,7 +128,7 @@ export function ShowcaseSideNav({
   className?: string;
 }) {
   return (
-    <nav aria-label="Showcase sections" className={cn("space-y-0.5", className)}>
+    <nav aria-label="Showcase sections" className={cn("space-y-1", className)}>
       {showcaseSections.map((section) => (
         <ShowcaseSectionLink
           key={section.id}

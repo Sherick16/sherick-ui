@@ -80,7 +80,7 @@ for (const theme of ["light", "dark"] as const) {
 
 const style = (control: Locator) => control.evaluate(el => {
   const css = getComputedStyle(el);
-  return {height: el.getBoundingClientRect().height, fontSize:css.fontSize, fill:css.backgroundColor, rim:css.borderTopColor, opacity:css.opacity, shadow:css.boxShadow, radius:parseFloat(css.borderTopLeftRadius), align:css.textAlign};
+  return {height: el.getBoundingClientRect().height, fontSize:css.fontSize, fill:css.backgroundColor, rim:css.borderBottomColor, opacity:css.opacity, shadow:css.boxShadow, radius:parseFloat(css.borderTopLeftRadius), align:css.textAlign};
 });
 const layer = (control: Locator) => control.evaluate(el => Number(getComputedStyle(el, "::before").opacity));
 const fieldSurfaces = (page: Page, state: string) => [
@@ -106,12 +106,13 @@ for (const theme of ["light", "dark"] as const) {
         expect(sibling.fill).toBe(defaults[0].fill);
         expect(sibling.rim).toBe(defaults[0].rim);
       }
-      // An invalid field is the same well with a danger rim: the fill holds, the rim changes.
+      // An invalid field is the danger tray: one danger fill and one danger baseline across the family.
       const invalid = await Promise.all(fieldSurfaces(page, "Invalid").slice(0,4).map(style));
       for (const sibling of invalid) {
-        expect(sibling.fill).toBe(defaults[0].fill);
+        expect(sibling.fill).toBe(invalid[0].fill);
         expect(sibling.rim).toBe(invalid[0].rim);
       }
+      expect(invalid[0].fill).not.toBe(defaults[0].fill);
       expect(invalid[0].rim).not.toBe(defaults[0].rim);
       const disabled = fieldSurfaces(page, "Disabled");
       for (const sibling of disabled) {
@@ -138,8 +139,9 @@ for (const theme of ["light", "dark"] as const) {
         await control.click();
         await expect(page.getByRole("listbox")).toBeVisible();
         await page.mouse.move(0, 0);
+        // The danger tray holds still while the field is engaged; the focus ring carries engagement.
         const engaged = (await style(surface)).fill;
-        expect(engaged).not.toBe(rest);
+        expect(engaged).toBe(rest);
         await control.hover();
         expect((await style(surface)).fill).toBe(engaged);
         fills.push(engaged);

@@ -1,7 +1,7 @@
 {
   "name": "sherick-ui",
-  "version": "2.6.0",
-  "description": "A reusable React component library inspired by Material 3 Expressive.",
+  "version": "2.7.0",
+  "description": "A React component library in graphite and iris, with light and dark themes.",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Sherick16/sherick-ui.git",

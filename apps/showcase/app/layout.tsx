@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Instrument_Serif } from "next/font/google";
 import Script from "next/script";
 import "./globals.css";
 import "sherick-ui/styles.css";
 import HydrationMarker from "./hydration-marker";
 
 const inter = Inter({ subsets: ["latin"] });
+/* The workbench's own display face, for its page and section titles only. Components inherit the
+   host's sans and never see it. */
+const display = Instrument_Serif({ subsets: ["latin"], weight: "400", style: ["normal", "italic"], variable: "--font-showcase-display" });
 
 const themeScript = `
 (function () {
@@ -21,7 +24,7 @@ const themeScript = `
 
 export const metadata: Metadata = {
   title: "Sherick UI",
-  description: "A soft, expressive React component library with light and dark themes.",
+  description: "A React component library in graphite and iris, with light and dark themes.",
 };
 
 export default function RootLayout({
@@ -42,7 +45,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{ __html: themeScript }}
         />
       </head>
-      <body className={inter.className}>
+      <body className={`${inter.className} ${display.variable}`}>
         <HydrationMarker />
         {children}
       </body>

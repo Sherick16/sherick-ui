@@ -7,6 +7,7 @@ import {
   density,
   elevation,
   focusRingInset,
+  puck,
   selectable,
   shape,
   state,
@@ -83,7 +84,7 @@ export const Tabs = ({
             className={cn(
               "absolute left-[var(--active-tab-left)] top-[var(--active-tab-top)] h-[var(--active-tab-height)] w-[var(--active-tab-width)]",
               shape.control,
-              tone.selected[variant],
+              puck,
               elevation.control,
               motionRelocateLong
             )}
@@ -101,7 +102,7 @@ export const Tabs = ({
                   shape.control,
                   motionTactileWide,
                   focusRingInset,
-                  active ? text.high : cn(text.medium, !disabled && "hover:text-sherick-ink"),
+                  active ? tone.text[variant] : cn(text.medium, !disabled && "hover:text-sherick-ink"),
                   !disabled && stateLayer.quiet,
                   disabled && state.disabled
                 )

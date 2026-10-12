@@ -229,7 +229,7 @@ test("Form focuses the first invalid field, shows errors where they are and acce
   await expect(title).toBeFocused();
   await expect(title).toHaveAttribute("aria-invalid", "true");
   const danger = await page.getByText("Enter an amount.").evaluate((element) => getComputedStyle(element).color);
-  await expect(title).toHaveCSS("border-top-color", danger);
+  await expect(title).toHaveCSS("border-bottom-color", danger);
   const casinos = page.getByRole("group", { name: "Casinos" });
   await expect(page.getByText("Choose at least one option.")).toBeVisible();
   await expect(page.getByTestId("form-submitted")).toHaveText("Not submitted");
@@ -278,13 +278,12 @@ test("CheckboxGroup names each choice by its label, describes it by its supporti
 
   // A press on the supporting line, far from the mark, still ticks the card.
   const card = aurora.locator("xpath=ancestor::label[1]/..");
+  const background = () => card.evaluate((element) => getComputedStyle(element).backgroundColor);
+  const resting = await background();
   await card.getByText("aurora.example, aurora-play.example").click();
   await expect(aurora).toBeChecked();
-  const surface = await card.evaluate((element) => {
-    const style = getComputedStyle(element);
-    return { background: style.backgroundColor, shadow: style.boxShadow };
-  });
-  expect(surface.shadow).not.toBe("none");
+  // The held card takes the soft selection surface.
+  await expect.poll(background).not.toBe(resting);
 
   // Space toggles a focused choice, and Tab moves through each checkbox in turn.
   const accept = page.getByRole("group", { name: "Also accept" });

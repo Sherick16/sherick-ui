@@ -74,7 +74,7 @@ test("published component styles survive a host Tailwind reset", async ({ page, 
 
 test("showcase elevations and structural lines retain their design-language values", async ({ page, errors }) => {
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Design system showcase" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Sherick UI", level: 1 })).toBeVisible();
   await setTheme(page, "dark");
 
   const raised = page.getByTestId("tile-raised");

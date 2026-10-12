@@ -13,6 +13,7 @@ import {
   density,
   elevation,
   focusRingInset,
+  puck,
   selectable,
   shape,
   state,
@@ -66,7 +67,7 @@ const ToggleGroupItem = forwardRef<HTMLButtonElement, ToggleGroupItemProps>(
             state.enabled,
             state.effectiveDisabled,
             toggleState.pressed
-              ? cn(tone.selected[variant], elevation.control, !toggleState.disabled && state.recess)
+              ? cn(puck, tone.text[variant], elevation.control, !toggleState.disabled && state.recess)
               : cn(text.medium, !toggleState.disabled && "hover:text-sherick-ink"),
             /* A held segment still answers the pointer: hover is one tonality step over whatever
                fill it holds, and selection is not a reason to stop responding. */

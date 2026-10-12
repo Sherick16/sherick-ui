@@ -198,10 +198,10 @@ test("a sheet is attached to its edge, above the page, and never leaves the view
       return radius;
     }, value);
 
-  /* `shape.sheet` is 1rem and `shape.prominent` 1.25rem (DESIGN_LANGUAGE §9). */
-  const exposedRadius = await radiusOf("1rem");
+  /* `shape.sheet` is 0.75rem and `shape.prominent` 1rem (DESIGN_LANGUAGE §9). */
+  const exposedRadius = await radiusOf("0.75rem");
   expect(geometry.innerRadius).toBe(exposedRadius);
-  expect(geometry.innerRadius).toBeLessThan(await radiusOf("1.25rem"));
+  expect(geometry.innerRadius).toBeLessThan(await radiusOf("1rem"));
   expect(geometry.attachedRadius).toBe(0);
 
   expect(errors).toEqual([]);
