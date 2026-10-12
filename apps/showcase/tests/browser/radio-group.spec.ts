@@ -27,12 +27,15 @@ test("surface rows keep the rich label and the whole padded row selects and subm
   await expect(daily).toHaveAccessibleName(/Daily field notes A short digest of recent observations/);
   await expect(weekly).toHaveAttribute("aria-checked", "true");
 
-  const selectedSurface = await rowFor(weekly).evaluate((element) => {
+  // The held row takes the soft selection surface, distinct from a resting row, and stays flat.
+  const surfaceOf = (row: Locator) => row.evaluate((element) => {
     const style = getComputedStyle(element);
     return { background: style.backgroundColor, shadow: style.boxShadow };
   });
+  const selectedSurface = await surfaceOf(rowFor(weekly));
   expect(selectedSurface.background).not.toBe("rgba(0, 0, 0, 0)");
-  expect(selectedSurface.shadow).not.toBe("none");
+  expect(selectedSurface.background).not.toBe((await surfaceOf(dailyRow)).background);
+  expect(selectedSurface.shadow).toBe("none");
 
   await dailyRow.hover();
   const hoverOpacity = await dailyRow.evaluate((element) =>

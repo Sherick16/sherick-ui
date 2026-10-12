@@ -35,9 +35,9 @@
     },
     "toggles": {
       "definition": "Representative toggle composition: Chip, ChipGroup, Progress, SegmentedControl, ToggleGroup.",
-      "raw": 63713,
-      "gzip": 21784,
-      "brotli": 19224
+      "raw": 66891,
+      "gzip": 22711,
+      "brotli": 20097
     },
     "barrel": {
       "definition": "The complete core root barrel with nothing tree-shaken beyond unused exports.",

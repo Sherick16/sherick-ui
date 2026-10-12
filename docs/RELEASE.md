@@ -14,8 +14,8 @@ and `--sui-<role>-selected` theme variables; `2.4.0` the rim on hollow controls;
 `DateTimePicker`; and `2.6.0` the form wave: `Form`, `CheckboxGroup`, multiple and creatable
 `Combobox`, option groups in `Select` and `Combobox`, and units on `Input` and `NumberField`. The
 current source package version is `2.7.0`, the graphite-and-iris visual overhaul: recalibrated
-theme values, tighter container corners, a refined elevation ladder and the additive `--sui-puck`
-theme variable. It changes no component, prop or export. Version `2.4.0` remains the published baseline until the
+theme values, tighter container corners, a refined elevation ladder, baseline-only text fields, quieter
+selected choice rows and the additive `--sui-puck` theme variable. It changes no component, prop or export. Version `2.4.0` remains the published baseline until the
 release owner approves a staged version. An installed package's actual version and exports, not this
 checkout, determine availability.
 
@@ -293,7 +293,15 @@ The 2.7.0 visual overhaul re-records **`themeCss`** with `--update=themeCss`: `1
 and system dark — so the elevation ladder's new layers (the lit upper lip on `raised`, the hairline
 contact edge on `floating`, the half-pixel edge on `control`) and the additive `--sui-puck` variable
 weigh triple in raw bytes. Marginal layers were removed before re-recording and the dark code
-palette is emitted as hex; no component entry, the component stylesheet or the barrel moved.
+palette is emitted as hex.
+
+It also re-records **`toggles`** with `--update=toggles`: `63713 / 21784 / 19224` →
+`66891 / 22711 / 20097`. The fixture's components reach the shared `state`, `material` and `rim`
+recipe tables, which are retained whole (the object-valued tables noted above), so every recipe the
+overhaul lengthened lands in it: the crisper shape scale, the puck, and the baseline field ladder
+with its danger tray. The previous commit already measured 65.3 kB raw against a 65.3 kB limit; the
+field ladder's extra 0.4 kB tipped it over. No other component entry, the component stylesheet or the
+barrel moved beyond tolerance.
 
 The 2.6.0 form wave re-records **`form` and `barrel`** with `--update=form,barrel`:
 

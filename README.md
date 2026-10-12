@@ -132,7 +132,9 @@ graphite neutrals with one vivid iris accent; container corners tighten
 (fields 12px, cards 20px, dialogs 24px) while actions stay capsules; the elevation ladder gains a
 lit upper lip on raised actions and a hairline contact edge on floating sheets; and a choice held in
 a track — a selected segment, the Tabs indicator — is now a raised white puck with an accent label
-instead of a tinted fill, using a new `--sui-puck` theme variable. Every `--sui-*` variable keeps
+instead of a tinted fill, using a new `--sui-puck` theme variable. Text fields drop their drawn box: a field is a quiet
+tray whose only 3:1 edge is its baseline, an invalid field is a soft danger tray, and a selected
+surface row in `RadioGroup` or `CheckboxGroup` holds a soft tint instead of a lifted accent block. Every `--sui-*` variable keeps
 its name; consumers who retune them keep working, though their values were recalibrated. No
 component or prop is removed. See the [palette record](docs/PALETTE.md).
 

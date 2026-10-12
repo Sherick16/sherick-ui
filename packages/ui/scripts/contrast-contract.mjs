@@ -124,9 +124,12 @@ export const contrastCompositions = (variables, alphas) => {
   const acrylicDenseFill = Number(variables["--sui-glass-dense-fill"]);
   const overlayFill = Number(variables["--sui-overlay-fill"]);
   const codeWell = composite(canvas, 0.28, composite(surface, FIELD.card, canvas));
-  /* A field is a canvas-toned well over whatever holds it; the common case is a card. */
+  /* A field is a tray in the `surface-high` tone over whatever holds it; the common case is a card.
+     An empty mark's interior is a canvas-toned well. */
   const card = composite(surface, FIELD.card, canvas);
-  const well = (alpha, base = card) => composite(canvas, alpha, base);
+  const tray = (alpha, base = card) => composite(surfaceHigh, alpha, base);
+  const markWell = composite(canvas, FIELD.mark, card);
+  const dangerTray = (base) => composite(colour("danger-soft"), FIELD.error, base);
   const surfaces = {
     canvas,
     "quiet well": composite(surface, FIELD.quiet, canvas),
@@ -134,11 +137,10 @@ export const contrastCompositions = (variables, alphas) => {
     "chip at rest": composite(surfaceHigh, TINT.neutralRest, canvas),
     /* A neutral badge or tag: the neutral soft step inside the card that holds it. */
     "neutral soft in a card": composite(surfaceHigh, TINT.neutralSoft, composite(surface, FIELD.card, canvas)),
-    "field": well(FIELD.control),
-    /* An empty mark's interior is the field well. */
-    "empty mark": well(FIELD.control),
-    "field hover": well(FIELD.hover),
-    "engaged field": well(FIELD.engaged),
+    "field": tray(FIELD.control),
+    "empty mark": markWell,
+    "field hover": tray(FIELD.hover),
+    "engaged field": tray(FIELD.engaged),
     [CODE_WELL]: codeWell,
     [ACRYLIC]: composite(surfaceFloat, acrylicFill, canvas),
     [ACRYLIC_DENSE]: composite(surfaceFloat, acrylicDenseFill, canvas),
@@ -195,9 +197,9 @@ export const contrastCompositions = (variables, alphas) => {
   add(
     "text.medium on an invalid or engaged field",
     WCAG_TEXT,
-    "a field's placeholder in the well, at rest and engaged; an invalid field keeps the same well and changes only its rim",
+    "a field's placeholder in its tray, at rest and engaged",
     ["canvas", "matte card"].flatMap((where) =>
-      [["at rest", FIELD.control], ["engaged", FIELD.engaged]].map(([state, depth]) => [`field in ${where}, ${state}`, colour("ink-muted"), well(depth, surfaces[where])])
+      [["at rest", FIELD.control], ["engaged", FIELD.engaged]].map(([state, depth]) => [`field in ${where}, ${state}`, colour("ink-muted"), tray(depth, surfaces[where])])
     )
   );
   add(
@@ -323,10 +325,11 @@ export const contrastCompositions = (variables, alphas) => {
   add(
     "tone.text.danger in an invalid field",
     WCAG_TEXT,
-    "the error placeholder, in the field's own well",
-    ["canvas", "matte card"].flatMap((where) =>
-      [["at rest", FIELD.control], ["engaged", FIELD.engaged]].map(([state, depth]) => [`field in ${where}, ${state}`, colour("danger"), well(depth, surfaces[where])])
-    )
+    "the error placeholder and value, in the field's danger tray: the danger soft surface at its field strength, over what holds the field",
+    ["canvas", "matte card"].flatMap((where) => [
+      [`danger tray in ${where}`, colour("danger"), dangerTray(surfaces[where])],
+      [`value in the danger tray in ${where}`, colour("ink"), dangerTray(surfaces[where])],
+    ])
   );
   add(
     "a destructive command's label through its highlight",
@@ -360,10 +363,23 @@ export const contrastCompositions = (variables, alphas) => {
     controlEntries.map(([where, base]) => [where, colour("rim"), base])
   );
   add(
-    "an invalid field's rim on the surfaces it sits on",
+    "a field's baseline against its own tray",
     WCAG_NON_TEXT,
-    "an invalid field keeps its well and turns its rim to the danger tone; the rim, the danger placeholder and the message carry the error together",
-    controlEntries.map(([where, base]) => [where, colour("danger"), base])
+    "a text field's rim is its baseline, the one edge that carries its 3:1 boundary: it sits between the tray above it and the surface below, and steps to `ink-muted` while the field is hovered or engaged",
+    ["canvas", "matte card"].flatMap((where) => [
+      [`tray in ${where} at rest`, colour("rim"), tray(FIELD.control, surfaces[where])],
+      [`tray in ${where} hovered`, colour("ink-muted"), tray(FIELD.hover, surfaces[where])],
+      [`tray in ${where} engaged`, colour("ink-muted"), tray(FIELD.engaged, surfaces[where])],
+    ])
+  );
+  add(
+    "an invalid field's baseline",
+    WCAG_NON_TEXT,
+    "an invalid field is the danger tray with a danger baseline; the baseline answers to the tray above it and to every surface below it",
+    [
+      ...["canvas", "matte card"].map((where) => [`danger tray in ${where}`, colour("danger"), dangerTray(surfaces[where])]),
+      ...controlEntries.map(([where, base]) => [where, colour("danger"), base]),
+    ]
   );
   add(
     "the detail role on the surfaces it is permitted on",

@@ -60,8 +60,9 @@ warm neutrals read as yellowed beside a cool accent. The overhaul separates the 
 
 The contract is unchanged in method and in requirement, and every composition clears it in both
 themes. The binding compositions are still the filled press veil (light success 4.56, warning
-4.59, danger 4.64, primary 4.67; dark primary 4.51) and the rim (3.28 light on the canvas), which is
-why the strong fills sit where they do. `bun run test` prints the full matrix.
+4.59, danger 4.64, primary 4.67; dark primary 4.51), the rim (3.28 light on the canvas) and a text
+field's baseline against its own tray (3.07 light, 3.28 dark), which is why the strong fills and the
+rim sit where they do. `bun run test` prints the full matrix.
 
 The sections below are the decision record for the values this palette replaced. Their method — and
 every alternative they rejected — still governs how a value here may change.
