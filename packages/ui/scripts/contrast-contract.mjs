@@ -143,6 +143,8 @@ export const contrastCompositions = (variables, alphas) => {
     [ACRYLIC]: composite(surfaceFloat, acrylicFill, canvas),
     [ACRYLIC_DENSE]: composite(surfaceFloat, acrylicDenseFill, canvas),
     [HERO_SHEET]: composite(surfaceOverlay, overlayFill, canvas),
+    /* A held choice in a track: an opaque puck, so it measures the same wherever the track sits. */
+    "held puck": colour("puck"),
   };
   const surfaceEntries = Object.entries(surfaces);
 

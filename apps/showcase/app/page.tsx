@@ -81,6 +81,8 @@ import {
   motionPresenceAnchored,
   motionRelocate,
   motionTactile,
+  puck,
+  selectable,
   shape,
   state,
   stateLayer,
@@ -166,38 +168,62 @@ export default function Home() {
 
   return (
     <main className={cn("min-h-screen text-left", material.canvas)}>
-      <div className="mx-auto w-full max-w-[1320px] px-5 pt-10 sm:px-8 lg:px-10 lg:pt-14">
-        <div className="mb-14 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
-          <div className="max-w-3xl">
-            <Badge variant="primary">Sherick UI · development workbench</Badge>
-            <h1 className="mt-5 text-4xl font-semibold tracking-[-0.04em] sm:text-5xl">Design system showcase</h1>
-            <p className={cn("mt-3 max-w-2xl text-base leading-7", text.medium)}>
-              A closer look at the components and materials that make up Sherick UI.
-            </p>
+      {/* An element that carries a host responsive variant is composed without `cn()`: `cn()` marks
+          its element as a Sherick scope, and the scoped copy of `hidden` or `flex-col` would outrank
+          the host's `sm:` variant on that same element. */}
+      {/* One full-bleed frosted bar carries the identity, the jump control below the sidebar
+          breakpoint, and the theme: content scrolls beneath a surface rather than past loose pills. */}
+      <header className={cn("sticky top-0 z-30 border-b", edge.rule, material.acrylicDense)}>
+        <div className="mx-auto flex h-16 w-full max-w-[1440px] items-center gap-4 px-5 sm:px-8">
+          <a href="#top" className={cn("flex items-center gap-3", shape.row, `${focusRing} focus-visible:outline-offset-4`)}>
+            <BrandMark />
+            <span className="text-[0.9375rem] font-semibold tracking-[-0.02em]">Sherick UI</span>
+          </a>
+          <span aria-hidden="true" className={`hidden h-4 border-l sm:block ${edge.rule}`} />
+          <span className={`hidden font-showcase-mono text-[0.6875rem] uppercase tracking-[0.14em] sm:block ${text.medium}`}>
+            Workbench
+          </span>
+          <div className="ml-auto flex items-center gap-2 sm:gap-4">
+            <div className="min-[1440px]:hidden">
+              <ShowcaseJumpNav activeId={activeSection} />
+            </div>
             <a
               href="https://github.com/Sherick16/sherick-ui/blob/main/docs/DESIGN_LANGUAGE.md"
-              className={cn("mt-4 inline-flex items-center gap-1.5 text-sm", text.medium, motionFeedback, `${focusRing} focus-visible:outline-offset-2`, "hover:text-sherick-ink")}
+              className={`hidden items-center gap-1.5 text-sm hover:text-sherick-ink md:inline-flex ${text.medium} ${motionFeedback} ${focusRing} focus-visible:outline-offset-2`}
             >
               Design language
               <ArrowUpRight className="size-3.5" aria-hidden="true" />
             </a>
+            <ThemePicker theme={theme} onChange={changeTheme} />
           </div>
-          <ThemePicker theme={theme} onChange={changeTheme} />
+        </div>
+      </header>
+
+      <div id="top" className="mx-auto w-full max-w-[1440px] px-5 pb-16 pt-16 sm:px-8 sm:pt-24 lg:pb-24">
+        <p className={cn("font-showcase-mono text-[0.6875rem] uppercase tracking-[0.18em]", text.medium)}>
+          Design system showcase
+        </p>
+        <h1 className="mt-6 font-showcase-display text-[4.5rem] leading-[0.9] tracking-[-0.025em] sm:text-[7.5rem] lg:text-[9.5rem]">
+          Sherick <em className="text-sherick-primary">UI</em>
+        </h1>
+        <div className={`mt-10 flex flex-col gap-6 border-t pt-6 sm:flex-row sm:items-end sm:justify-between ${edge.rule}`}>
+          <p className={cn("max-w-md text-base leading-7", text.medium)}>
+            Paper, graphite and ultramarine. Every component, in every state, in both themes.
+          </p>
+          <ul className={cn("flex gap-8 font-showcase-mono text-[0.6875rem] uppercase tracking-[0.14em]", text.medium)}>
+            <li>React</li>
+            <li>Base UI</li>
+            <li>Light · Dark</li>
+          </ul>
         </div>
       </div>
-      {/* Below the gutter-rail width, the jump control rides a full-width frosted band, so content
-          scrolls beneath a surface rather than colliding with a floating pill. */}
-      <div className={cn("sticky top-0 z-30 mb-6 min-[1660px]:hidden", material.acrylicDense)}>
-        <div className="mx-auto w-full max-w-[1320px] px-5 py-3 sm:px-8 lg:px-10">
-          <ShowcaseJumpNav activeId={activeSection} />
+
+      <div className="mx-auto grid w-full max-w-[1440px] grid-cols-1 gap-12 px-5 sm:px-8 min-[1440px]:grid-cols-[11rem_minmax(0,1fr)]">
+        <div className="hidden min-[1440px]:block">
+          <ShowcaseSideNav activeId={activeSection} className="sticky top-28" />
         </div>
-      </div>
-      <div className="mx-auto grid w-full max-w-[1320px] grid-cols-1 min-[1660px]:max-w-none min-[1660px]:grid-cols-[minmax(0,1fr)_1320px_minmax(0,1fr)]">
-        <div className="hidden min-[1660px]:block">
-          <ShowcaseSideNav activeId={activeSection} className="sticky top-28 ml-auto mr-3 w-36" />
-        </div>
-        <div className="min-w-0 px-5 pb-10 sm:px-8 lg:px-10 lg:pb-14">
-        <div className="space-y-16">
+        <div className="min-w-0 pb-24">
+        <div className="space-y-24">
           <ShowcaseSection id="design-language">
             <div className="mt-6 columns-1 gap-4 xl:columns-2 [&>*]:mb-4 [&>*]:break-inside-avoid">
               <Specimen title="Material">
@@ -234,10 +260,10 @@ export default function Home() {
 
               <Specimen title="Shape">
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
-                  <Tile label="1rem" caption="Control" className={cn(material.matteHigh, shape.control)} />
-                  <Tile label="1.25rem" caption="Prominent" className={cn(material.matteHigh, shape.prominent)} />
-                  <Tile label="1.5rem" caption="Surface" className={cn(material.matteHigh, shape.surface)} />
-                  <Tile label="1.75rem" caption="Expressive" className={cn(material.matteHigh, shape.expressive)} />
+                  <Tile label="0.75rem" caption="Control" className={cn(material.matteHigh, shape.control)} />
+                  <Tile label="1rem" caption="Prominent" className={cn(material.matteHigh, shape.prominent)} />
+                  <Tile label="1.25rem" caption="Surface" className={cn(material.matteHigh, shape.surface)} />
+                  <Tile label="1.5rem" caption="Expressive" className={cn(material.matteHigh, shape.expressive)} />
                   <Tile label="pill" caption="Pill" className={cn(tone.tonal.primary, shape.pill, text.high)} />
                   <Tile label="circle" caption="Circle" className={cn(tone.tonal.primary, shape.circle, text.high, "aspect-square w-24 max-w-full self-center")} />
                 </div>
@@ -245,11 +271,12 @@ export default function Home() {
 
               <Specimen title="Tonality">
                 <div className="space-y-5">
-                  <div className={cn("grid grid-cols-2 gap-3 p-3 sm:grid-cols-4", shape.control, material.canvas)}>
+                  <div className={cn("grid grid-cols-2 gap-3 p-3 sm:grid-cols-5", shape.control, material.canvas)}>
                     <Swatch label="Canvas" className={cn(material.canvas, "outline outline-1 outline-dashed outline-sherick-edge/[0.25]")} />
                     <Swatch label="Surface" className="bg-sherick-surface" />
                     <Swatch label="Surface high" className="bg-sherick-surface-high" />
                     <Swatch label="Surface float" className="bg-sherick-surface-float" />
+                    <Swatch label="Puck" className={cn(puck, elevation.control)} />
                   </div>
                   <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                     <Swatch label="Primary strong" className="bg-sherick-primary-strong" />
@@ -816,7 +843,6 @@ export default function Home() {
           </ShowcaseSection>
         </div>
         </div>
-        <div className="hidden min-[1660px]:block" aria-hidden="true" />
       </div>
 
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -849,6 +875,18 @@ export default function Home() {
   );
 }
 
+/* The identity: three discs — the graphite ink, the paper puck and the ultramarine accent — which
+   is the whole palette at a glance. Decorative; the name beside it is the link's text. */
+function BrandMark() {
+  return (
+    <span aria-hidden="true" className="relative inline-flex h-6 w-9 shrink-0">
+      <span className="absolute left-0 top-0 size-6 rounded-full bg-sherick-ink" />
+      <span className={cn("absolute left-1.5 top-0 size-6 rounded-full bg-sherick-puck", elevation.control)} />
+      <span className="absolute left-3 top-0 size-6 rounded-full bg-sherick-primary-strong" />
+    </span>
+  );
+}
+
 function ThemePicker({ theme, onChange }: { theme: ThemeMode; onChange: (theme: ThemeMode) => void }) {
   const choices: Array<{ value: ThemeMode; label: string; icon: typeof Sun }> = [
     { value: "system", label: "System", icon: Monitor },
@@ -857,41 +895,42 @@ function ThemePicker({ theme, onChange }: { theme: ThemeMode; onChange: (theme: 
   ];
 
   return (
-    <div className="shrink-0">
-      <div className={cn("mb-2 text-xs font-medium", text.medium)}>Theme</div>
-      <div className={cn("inline-flex bg-sherick-surface/[0.72] p-1", shape.pill, elevation.recessed)}>
-        {choices.map(({ value, label, icon: Icon }) => {
-          const selected = theme === value;
-          return (
-            <button
-              key={value}
-              type="button"
-              aria-pressed={selected}
-              onClick={() => onChange(value)}
-              className={cn(
-                "inline-flex min-h-9 items-center gap-1.5 px-3 text-xs font-medium",
-                shape.pill,
-                motionFeedback,
-                `${focusRing} focus-visible:outline-offset-2`,
-                selected
-                  ? cn(tone.selected.primary, elevation.control, text.high)
-                  : cn(text.medium, "hover:text-sherick-ink", state.rowHover)
-              )}
-            >
-              <Icon className="size-3.5" aria-hidden="true" />
-              {label}
-            </button>
-          );
-        })}
-      </div>
+    <div role="group" aria-label="Theme" className={cn("inline-flex shrink-0 gap-0.5 p-0.5", shape.pill, selectable.surface, selectable.rest)}>
+      {choices.map(({ value, label, icon: Icon }) => {
+        const selected = theme === value;
+        return (
+          <button
+            key={value}
+            type="button"
+            aria-pressed={selected}
+            aria-label={label}
+            title={label}
+            onClick={() => onChange(value)}
+            className={cn(
+              "inline-flex size-8 items-center justify-center",
+              shape.circle,
+              motionFeedback,
+              `${focusRing} focus-visible:outline-offset-2`,
+              selected
+                ? cn(puck, elevation.control, text.high)
+                : cn(text.medium, "hover:text-sherick-ink")
+            )}
+          >
+            <Icon className="size-4" aria-hidden="true" />
+          </button>
+        );
+      })}
     </div>
   );
 }
 
-function SectionHeading({ title }: { title: string }) {
+function SectionHeading({ index, title }: { index: number; title: string }) {
   return (
-    <div className={cn("border-b pb-5", edge.rule)}>
-      <h2 className="text-3xl font-semibold tracking-[-0.035em] sm:text-4xl">{title}</h2>
+    <div className={cn("flex items-baseline gap-5 border-b pb-5", edge.rule)}>
+      <span aria-hidden="true" className={cn("font-showcase-mono text-xs tabular-nums", text.medium)}>
+        {String(index).padStart(2, "0")}
+      </span>
+      <h2 className="font-showcase-display text-[2.75rem] leading-none tracking-[-0.02em] sm:text-[3.5rem]">{title}</h2>
     </div>
   );
 }
@@ -905,14 +944,15 @@ function ShowcaseSection({
   className?: string;
   children: React.ReactNode;
 }) {
-  const section = showcaseSections.find((entry) => entry.id === id);
+  const index = showcaseSections.findIndex((entry) => entry.id === id);
+  const section = showcaseSections[index];
   if (!section) {
     throw new Error(`Unknown showcase section: ${id}`);
   }
 
   return (
     <section id={section.id} className={cn("scroll-mt-28", className)}>
-      <SectionHeading title={section.title} />
+      <SectionHeading index={index + 1} title={section.title} />
       {children}
     </section>
   );
@@ -920,8 +960,8 @@ function ShowcaseSection({
 
 function Specimen({ title, className = "", children }: { title: string; className?: string; children: React.ReactNode }) {
   return (
-    <div className={cn(shape.surface, material.matte, "min-w-0 self-start p-4 sm:p-6", className)}>
-      <h3 className={cn("mb-5", type.title)}>{title}</h3>
+    <div className={cn(shape.surface, material.matte, "min-w-0 self-start p-5 sm:p-7", className)}>
+      <h3 className={cn("mb-6", type.title)}>{title}</h3>
       {children}
     </div>
   );

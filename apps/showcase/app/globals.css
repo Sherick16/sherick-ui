@@ -16,15 +16,15 @@ body {
   min-height: 100dvh;
   margin: 0;
   color: oklch(var(--sui-ink));
-  background:
-    radial-gradient(circle at 12% 4%, oklch(var(--sui-primary) / 0.055), transparent 34rem),
-    radial-gradient(circle at 92% 18%, oklch(var(--sui-accent) / 0.035), transparent 30rem),
-    oklch(var(--sui-canvas));
+  background: oklch(var(--sui-canvas));
+  font-feature-settings: "cv11", "ss01", "ss03";
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
 }
 
 ::selection {
-  color: oklch(var(--sui-on-primary));
-  background: oklch(var(--sui-primary) / 0.34);
+  color: oklch(var(--sui-ink));
+  background: oklch(var(--sui-primary-selected));
 }
 
 @layer utilities {

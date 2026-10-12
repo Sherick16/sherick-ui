@@ -139,10 +139,10 @@ export const recessedTop = "shadow-sherick-recessed-top";
    the size of the object and the emphasis it carries, and silhouette says what an object does:
    a **capsule acts** (buttons, chips, badges, toggles are `pill`) and a **rounded rectangle
    holds** (fields, alerts, tables, sheets). Container roles therefore stay clearly short of a
-   capsule at their own height — `control` is a third of a 48px field — so a field never reads as
+   capsule at their own height — `control` is a quarter of a 48px field — so a field never reads as
    an almost-button beside a real one. Nested roles stay concentric: an inner corner is the outer
-   corner minus the inset between them (a 20px track around a 16px indicator at 4px, a 24px list
-   sheet around 16px options at 8px).
+   corner minus the inset between them (a 16px track around a 12px indicator at 4px, a 20px list
+   sheet around 12px options at 8px).
    - control:     ordinary controls and dense data regions — fields, rows, options,
                   chips, tables.
    - mark:        a compact square selection mark — a 20px checkbox box. `control` is a role
@@ -165,13 +165,13 @@ export const recessedTop = "shadow-sherick-recessed-top";
    - pill:        fully rounded controls whose width follows their content.
    - circle:      fully rounded square targets. */
 export const shape = {
-  control: "rounded-[1rem]",
+  control: "rounded-[0.75rem]",
   mark: "rounded-[0.375rem]",
-  row: "rounded-[0.75rem]",
-  prominent: "rounded-[1.25rem]",
-  surface: "rounded-[1.5rem]",
-  sheet: "rounded-[1rem]",
-  expressive: "rounded-[1.75rem]",
+  row: "rounded-[0.5rem]",
+  prominent: "rounded-[1rem]",
+  surface: "rounded-[1.25rem]",
+  sheet: "rounded-[0.75rem]",
+  expressive: "rounded-[1.5rem]",
   pill: "rounded-full",
   circle: "rounded-full",
 } as const;
@@ -497,7 +497,7 @@ export const type = {
   },
   supporting: "text-[0.8125rem] leading-5",
   caption: "text-xs leading-4",
-  title: "text-[0.9375rem] leading-[1.375rem] font-semibold",
+  title: "text-[0.9375rem] leading-[1.375rem] font-semibold tracking-[-0.011em]",
   heading: "text-xl leading-7 font-semibold tracking-[-0.02em]",
   numeric: "tabular-nums",
 } as const;
@@ -565,7 +565,7 @@ export const stacking = {
    alert dialog separate from the page identically. */
 export const overlay = {
   /* The plane behind a surface that owns the viewport. */
-  scrim: /* @__PURE__ */ cx("fixed inset-0", stacking.float, "bg-sherick-scrim/[0.38] backdrop-blur-[var(--sui-scrim-blur)]"),
+  scrim: /* @__PURE__ */ cx("fixed inset-0", stacking.float, "bg-sherick-scrim/[0.30] backdrop-blur-[var(--sui-scrim-blur)]"),
   /* An anchored surface with room to breathe: a selection list (Select, Combobox) or
      structured content (Popover). It grows out of its trigger and carries the softer
      surface corner, because what it holds is read rather than scanned.
@@ -790,6 +790,14 @@ export const currentDestination = "bg-sherick-primary-soft text-sherick-ink font
 /* A radio's opt-in full row follows the Base control it labels. `:has` keeps uncontrolled
    selection authoritative at the primitive rather than mirroring it in component state.
    Keep this independent so unrelated consumers of the mark recipes can tree-shake it. */
+/* The puck — a held choice that rides in a track: a selected segment, the tab indicator. A choice
+   held *in a groove* is a part lifted out of it, so it is the brightest surface in the view, raised
+   at `elevation.control`, and its label takes the role's text tone (`tone.text`): the lift says
+   "this one" and the label's colour says which family it belongs to. A held choice in a *sheet* —
+   an option, a tree row, a date — keeps `tone.selected`, because a list sheet is already the
+   brightest surface and a white row on it would vanish. */
+export const puck = "bg-sherick-puck";
+
 export const selectableRowSurface =
   "has-[[data-checked]]:bg-sherick-primary-selected has-[[data-checked]]:text-sherick-ink has-[[data-checked]]:shadow-sherick-control";
 

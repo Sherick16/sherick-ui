@@ -4,6 +4,15 @@
 color, motion and depth are reserved for selection, manipulation and surfaces that float.
 Consistency means using the same roles, not giving every component identical anatomy.
 
+**Paper, graphite and ultramarine.** The page is a warm paper canvas; content sits on crisp,
+near-white sheets; copy is a warm graphite ink; and one deep, slightly violet ultramarine is spent
+only on what the reader acts on — the priority action, a made selection, a value's range, the focus
+ring. The neutrals carry a trace of warmth so the accent reads as the one deliberate cool colour on
+the page rather than as another step of a blue-grey wash, and shadows are a warm umbra for the same
+reason. Dark mode is a warm graphite room, not inverted light: sheets are lit a step above the
+floor, the accent glows rather than shouts, and a floating edge is a line of light. The palette
+record, with every measured composition, is [PALETTE.md](PALETTE.md).
+
 This is the canonical visual language. `packages/ui/src/components/ui.common.ts` owns reusable
 visual recipes, `ui.motion.ts` owns temporal recipes, and `src/styles/tokens.ts` owns authored
 theme values. Components own layout, spacing, padding, intrinsic size, responsive arrangement,
@@ -61,19 +70,29 @@ source's semantics. Video defaults to its source ratio and containment, never im
 | --- | --- | --- |
 | `flat` | grounded passive surfaces | a recessed track |
 | `raised` | tactile tonal actions at rest | hover or passive data |
-| `control` | switch thumb or a held selection inside a track, list or calendar | keyboard highlight |
+| `control` | switch thumb, a puck held in a track, or a held selection inside a list or calendar | keyboard highlight |
 | `recessed` | grooves, tracks, a checkbox or radio at rest, and a raised control while pressed | fields or flat cards |
 | `recessedTop` | the upper wall of an inset sheet continuing directly below a control, without a lower rim | standalone tracks or wells |
 | `well` | a checkbox or radio while it is pressed: the floor sinks, the boundary stays | a resting mark, a wide groove |
 | `floating` | real overlay surfaces | anything in document flow |
 
 Actions follow one depth ladder: a text action sits flat, and tonal and filled actions are
-`raised` at rest and `recessed` while held. The priority action is never flatter than the
+`raised` at rest and `recessed` while held. `raised` carries the light model's lit upper lip — one
+inset line of `light-top` — so a filled action reads as a key rather than a flat swatch; `control`
+adds a half-pixel contact edge so a paper puck keeps its outline on a paper-toned track; and
+`floating` holds a hairline contact edge (an umbra line in light, a line of light in dark) so a
+white sheet over a white card never loses its boundary. These lines belong to the elevation, not to
+the component: no component draws a rim to separate a surface. The priority action is never flatter than the
 secondary one beside it, so depth never contradicts the fill hierarchy. `raised` is a contact
 shadow, not a float: a row of raised actions sits on the page.
 
-Held choices combine `tone.selected` and `elevation.control`: selected segments, options,
-tree rows, calendar days and time readings. A continuous date range makes one band per week rather than
+Held choices take `elevation.control`, and their fill depends on what holds them. **A choice
+held in a track is a puck**: the selected segment of a ToggleGroup or SegmentedControl and the Tabs
+indicator take `puck` — the one surface lit above every sheet in both themes — and the label takes
+the variant's text tone, so the lift says "this one" and the colour says which family it belongs
+to. **A choice held in a sheet is a tint**: options, tree rows, calendar days and time readings
+combine `tone.selected` with the same elevation, because a list sheet is already the brightest
+surface and a white row on it would vanish. A continuous date range makes one band per week rather than
 seven separately elevated cells. The mark itself, a check or a date, remains another
 selection signal. Navigation-only current rows and unselected commands stay flat. An empty
 selection mark is identified by its rim (§8), not by its depth: depth alone cannot reach 3:1
@@ -139,26 +158,27 @@ their thumb and range, so they keep no rim.
 | Role | Radius | Use |
 | --- | --- | --- |
 | `mark` | 6px | 20px checkbox box |
-| `row` | 12px | command-density row, compact segment, navigation row or short hint |
-| `control` | 16px | fields, alerts, tables, segment tracks and full-width option rows |
-| `prominent` | 20px | tab tracks, code wells and compact floating status |
-| `surface` | 24px | cards, panels and spacious anchored sheets |
-| `sheet` | 16px | exposed corners of a viewport-attached Drawer |
-| `expressive` | 28px | a dialog floating free of all edges |
+| `row` | 8px | command-density row, compact segment, navigation row or short hint |
+| `control` | 12px | fields, alerts, tables, segment tracks and full-width option rows |
+| `prominent` | 16px | tab tracks, code wells and compact floating status |
+| `surface` | 20px | cards, panels and spacious anchored sheets |
+| `sheet` | 12px | exposed corners of a viewport-attached Drawer |
+| `expressive` | 24px | a dialog floating free of all edges |
 | `pill`, `circle` | full | content-width actions, chips and badges; square round targets |
 
 **A capsule acts; a rounded rectangle holds.** Buttons, chips and badges are pills; a segment
 inside a track takes its track's nested corner instead.
 Fields, alerts, tables and sheets are rounded rectangles clearly short of a capsule at their
-own height (`control` is a third of a 48px field), so a field never reads as an almost-button
-beside a real one. Do not give a container a pill, and do not give an action a container corner.
+own height (`control` is a quarter of a 48px field), so a field never reads as an almost-button
+beside a real one. The container corners are deliberately crisp: the contrast between a soft
+capsule that acts and a precise rectangle that holds is the library's silhouette. Do not give a container a pill, and do not give an action a container corner.
 
 Choose shape by the object's own extent. A field radius on a 24px square would make it
 a circle; a dialog radius on a drawer attached to the viewport would make the drawer
 look like an oversized card. Nested corners are concentric: the inner radius is the outer
-radius minus the inset between them. A compact segment nests its `row` corner in a
-`control` track at 4px; a normal tab nests `control` in `prominent` at 4px; an option nests
-`control` in a `surface` list sheet at 8px; a time reading nests `row` in the date popup's
+radius minus the inset between them. A compact segment nests its 8px `row` corner in a
+12px `control` track at 4px; a normal tab nests 12px `control` in 16px `prominent` at 4px; an option
+nests `control` in a 20px `surface` list sheet at 8px; a time reading nests `row` in the date popup's
 `surface` sheet at 12px. Pagination is a recessed segmented track with
 rounded-rectangle targets; its current page is a navigation destination (§10), so it is flat.
 Do not use literal radii or invent per-theme corner offsets in components.
@@ -168,7 +188,8 @@ Do not use literal radii or invent per-theme corner offsets in components.
 There are **two readable text roles**: `text.high` for labels and values, `text.medium`
 for descriptions, placeholders and supporting copy. `detail.mark` and `detail.fill`
 are non-text furniture roles, never a third step for readable text. Surface tones
-(`canvas`, `surface`, `surface-high`, `surface-float`) are not elevations.
+(`canvas`, `surface`, `surface-high`, `surface-float`, `puck`) are not elevations. `puck` is the
+brightest surface in both themes and belongs only to a choice held in a track (§5).
 
 | Tone | Meaning |
 | --- | --- |
@@ -201,8 +222,8 @@ regions keeps normal text emphasis.
 navigation row, the current page of a pagination, any `aria-current` location — takes
 `currentDestination`: the primary soft container, full ink and a touch of weight, flat. A held
 value takes `tone.selected` with `elevation.control`. Tabs are the one deliberate exception:
-a tab list is a held choice of *view* inside a recessed track, so its indicator is a held
-selection like a segment's, and it is sized as a tab (normal density) rather than a segment.
+a tab list is a held choice of *view* inside a recessed track, so its indicator is the same puck
+a segment is, and it is sized as a tab (normal density) rather than a segment.
 
 ### Type roles
 
@@ -256,7 +277,8 @@ edge, flat, with a tick, a minus or a light dot. The accent belongs to a slider'
 its matte handle remains separable from that range, including when disabled.
 
 Chips and ToggleGroup segments both hold selection: an unselected toggle stays neutral,
-a selected one uses the primitive's pressed marker and `tone.selected`. A segment's selection
+a selected chip uses the primitive's pressed marker and `tone.selected`, and a selected segment
+is the track's puck (§5). A segment's selection
 changes **in place** — the old fill and the new one exchange on the feedback timing — while a
 tab indicator **relocates** across its track. The difference is deliberate for now: Base
 `ToggleGroup` publishes no indicator geometry, and measuring segment positions locally would be

@@ -1,159 +1,180 @@
 export type ThemeName = "light" | "dark";
 
+/* The palette is "paper and ultramarine": a warm graphite ink on a paper canvas, crisp near-white
+   sheets, and one deep, saturated ultramarine that is spent only on what the reader acts on. The
+   neutrals carry a trace of warmth (hue ~75) so that the accent reads as the one cool, deliberate
+   colour on the page rather than as one more step of a blue-grey wash; shadows are a warm umbra for
+   the same reason. Every value is measured by the contrast contract (docs/PALETTE.md). */
 export const lightTokens = {
-  "canvas": "0.965 0.008 255",
-  "surface": "0.985 0.006 255",
-  "surface-high": "0.925 0.014 255",
-  "surface-float": "0.992 0.006 255",
-  "media": "0.205 0.012 260",
-  "ink": "0.245 0.018 260",
-  "ink-muted": "0.480 0.018 260",
+  "canvas": "0.962 0.005 80",
+  "surface": "0.996 0.002 80",
+  "surface-high": "0.928 0.006 78",
+  "surface-float": "0.998 0.002 80",
+  /* The puck: a held choice that rides in a track — a selected segment, the tab indicator. It is
+     the one surface lit *above* every sheet in both themes, because a puck is a part lifted out of
+     the groove it sits in; in dark mode no sheet tone can play that role, since a lifted object is
+     lighter there and every sheet sits below the track that holds it. */
+  "puck": "1 0 0",
+  "media": "0.200 0.006 70",
+  "ink": "0.215 0.010 65",
+  "ink-muted": "0.475 0.012 65",
   /* The detail role is non-text furniture: it carries a mark, a rail or a gutter, and it is not a
      third step of the text ladder. It answers to the 3:1 non-text requirement wherever it carries
      meaning; anything a reader must read uses `ink` or `ink-muted`. */
-  "detail": "0.600 0.016 258",
+  "detail": "0.590 0.012 70",
   /* The rim of a hollow control — a field, a drop target, an empty checkbox or radio. It is the
      only border a control carries, so it is tuned to clear the 3:1 non-text requirement against
      every surface a control sits on with a small margin and no more: at `detail` strength the rim
      outshone the labels beside it. Hover steps it to `ink-muted`. */
-  "rim": "0.630 0.016 258",
-  "primary": "0.422 0.139 255",
-  "primary-strong": "0.402 0.143 257",
+  "rim": "0.620 0.012 70",
+  "primary": "0.455 0.195 270",
+  "primary-strong": "0.415 0.190 270",
   /* The designed surfaces of each semantic role. A soft container is what a tinted surface is
      made of — a tonal control, an Alert, a Badge, a quiet Card — and the selected step is the held
      choice one rung stronger. They are authored rather than derived as a fraction of the role's
-     foreground, because that foreground is tuned for text contrast: a fraction of a deep navy is a
-     grey-blue and a fraction of a deep olive is a grey, so every contrast retune used to recolour
-     every tinted surface. Each value clears the contrast contract with its own foreground, `ink`
-     and the focus ring through the tonal states. */
-  "primary-soft": "0.920 0.035 255",
-  "primary-selected": "0.860 0.055 255",
-  "danger-soft": "0.930 0.030 18",
-  "danger-selected": "0.870 0.050 18",
-  "warning-soft": "0.940 0.045 85",
-  "warning-selected": "0.885 0.070 82",
-  "success-soft": "0.935 0.037 155",
-  "success-selected": "0.875 0.055 155",
-  "accent": "0.62 0.10 215",
-  "danger": "0.439 0.170 25",
-  "warning": "0.388 0.082 75",
-  "success": "0.381 0.086 160",
-  "on-primary": "0.985 0.005 255",
-  "on-danger": "0.985 0.005 255",
-  "on-warning": "0.985 0.005 255",
-  "on-success": "0.985 0.005 255",
-  "focus": "0.422 0.139 255",
-  "outline": "0.50 0.018 260",
-  "scrim": "0.16 0.01 260",
-  "edge": "0.42 0.02 258",
+     foreground, because that foreground is tuned for text contrast: a fraction of a deep
+     ultramarine is a grey-violet and a fraction of a deep ochre is a grey, so every contrast retune
+     used to recolour every tinted surface. Each value clears the contrast contract with its own
+     foreground, `ink` and the focus ring through the tonal states. */
+  "primary-soft": "0.945 0.024 274",
+  "primary-selected": "0.895 0.050 274",
+  "danger-soft": "0.952 0.020 30",
+  "danger-selected": "0.900 0.042 30",
+  "warning-soft": "0.955 0.032 82",
+  "warning-selected": "0.905 0.058 80",
+  "success-soft": "0.952 0.024 165",
+  "success-selected": "0.900 0.046 165",
+  "accent": "0.62 0.12 230",
+  "danger": "0.465 0.180 27",
+  "warning": "0.398 0.086 68",
+  "success": "0.390 0.088 158",
+  "on-primary": "0.990 0.004 80",
+  "on-danger": "0.990 0.004 80",
+  "on-warning": "0.990 0.004 80",
+  "on-success": "0.990 0.004 80",
+  "focus": "0.455 0.195 270",
+  "outline": "0.50 0.012 65",
+  "scrim": "0.200 0.004 70",
+  "edge": "0.400 0.012 65",
   "light-top": "1 0 0",
-  "light-bottom": "0.32 0.02 256",
+  "light-bottom": "0.300 0.020 60",
   "elevation-flat": "none",
   /* A contact shadow, not a float: the ambient layer stays close to the control, so a row of raised
-     actions sits on the page rather than hovering over it. Floating depth is `elevation-floating`'s. */
-  "elevation-raised": "0 1px 2px oklch(var(--sui-light-bottom) / 0.16), 0 2px 6px oklch(var(--sui-light-bottom) / 0.07)",
-  "elevation-floating": "0 16px 40px oklch(var(--sui-light-bottom) / 0.20), inset 0 1px 0 oklch(var(--sui-light-top) / 0.70)",
-  "elevation-control": "0 1px 2px oklch(var(--sui-light-bottom) / 0.19), inset 0 1px 0 oklch(var(--sui-light-top) / 0.55)",
+     actions sits on the page rather than hovering over it. The inset line is the lit upper lip of a
+     key — the light model's upper edge, drawn once — so a filled action reads as a pressable object
+     rather than a flat swatch. Floating depth is `elevation-floating`'s. */
+  "elevation-raised": "0 1px 1px oklch(var(--sui-light-bottom) / 0.10), 0 2px 5px -1px oklch(var(--sui-light-bottom) / 0.12), inset 0 1px 0 oklch(var(--sui-light-top) / 0.24)",
+  /* A floating surface holds a hairline contact edge in the umbra, so it keeps its boundary over any
+     content it covers — a white sheet over a white card has nothing else to separate it — and then
+     two layers of depth: a close penumbra and a long, soft ambient fall. */
+  "elevation-floating": "0 0 0 1px oklch(var(--sui-light-bottom) / 0.07), 0 4px 10px -2px oklch(var(--sui-light-bottom) / 0.08), 0 22px 48px -10px oklch(var(--sui-light-bottom) / 0.24), inset 0 1px 0 oklch(var(--sui-light-top) / 0.80)",
+  /* A held selection — a puck in a track, a chosen option or date. It carries a half-pixel contact
+     edge so a paper puck holds its outline on the paper-toned track around it. */
+  "elevation-control": "0 0 0 0.5px oklch(var(--sui-light-bottom) / 0.10), 0 1px 3px oklch(var(--sui-light-bottom) / 0.16), inset 0 1px 0 oklch(var(--sui-light-top) / 0.70)",
   /* The recessed rung, and the deeper `well` a small selection mark sinks to while it is held. A
      checkbox box and a radio socket rest in the same groove a Switch track does — what identifies
      an empty one is its rim, not its depth — so the well is a press response, not an identity. It
      deepens the shaded floor and keeps the lit lower wall, so a held mark sinks without its
      boundary moving. */
-  "elevation-recessed": "inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.22), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.50)",
-  "elevation-recessed-top": "inset 0 5px 8px -5px oklch(var(--sui-light-bottom) / 0.21)",
-  "elevation-well": "inset 0 2px 4px oklch(var(--sui-light-bottom) / 0.40), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.50)",
+  "elevation-recessed": "inset 0 1px 2px oklch(var(--sui-light-bottom) / 0.18), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.55)",
+  "elevation-recessed-top": "inset 0 5px 8px -5px oklch(var(--sui-light-bottom) / 0.18)",
+  "elevation-well": "inset 0 2px 4px oklch(var(--sui-light-bottom) / 0.34), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.55)",
   /* Fill isolates content even without backdrop filtering; blur only enriches the remaining light. */
   "glass-fill": "0.98",
   "glass-blur": "28px",
-  "glass-saturation": "1.06",
-  "glass-brightness": "1.012",
+  "glass-saturation": "1.10",
+  "glass-brightness": "1.015",
   "glass-dense-fill": "0.99",
   "glass-dense-blur": "22px",
-  "glass-dense-saturation": "1.05",
-  "glass-dense-brightness": "1.008",
-  "glass-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.76) 0%, rgb(255 255 255 / 0.30) 30%, rgb(112 156 224 / 0.05) 70%, rgb(38 46 62 / 0.05) 100%)",
-  "glass-gradient-dense": "linear-gradient(180deg, rgb(255 255 255 / 0.68) 0%, rgb(255 255 255 / 0.24) 36%, rgb(112 156 224 / 0.04) 76%, rgb(38 46 62 / 0.045) 100%)",
+  "glass-dense-saturation": "1.08",
+  "glass-dense-brightness": "1.01",
+  "glass-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.80) 0%, rgb(255 255 255 / 0.28) 26%, rgb(255 255 255 / 0) 62%, rgb(60 48 36 / 0.04) 100%)",
+  "glass-gradient-dense": "linear-gradient(180deg, rgb(255 255 255 / 0.70) 0%, rgb(255 255 255 / 0.22) 34%, rgb(255 255 255 / 0) 72%, rgb(60 48 36 / 0.04) 100%)",
   "glass-hero-blur": "14px",
   "glass-hero-saturation": "1.06",
   "glass-hero-brightness": "1.0",
-  "glass-hero-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.42) 0%, rgb(255 255 255 / 0.12) 14%, rgb(255 255 255 / 0) 46%, rgb(38 46 62 / 0.05) 100%)",
-  "surface-overlay": "0.993 0.005 258",
+  "glass-hero-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.50) 0%, rgb(255 255 255 / 0.12) 14%, rgb(255 255 255 / 0) 46%, rgb(60 48 36 / 0.035) 100%)",
+  "surface-overlay": "0.994 0.003 80",
   "overlay-fill": "0.99",
-  "scrim-blur": "6px",
-  "code-text": "oklch(0.30 0.018 260)",
-  "code-comment": "oklch(0.54 0.015 255)",
-  "code-string": "oklch(0.48 0.11 235)",
-  "code-number": "oklch(0.52 0.14 55)",
-  "code-keyword": "oklch(0.50 0.15 305)",
-  "code-function": "oklch(0.50 0.15 25)",
-  "code-tag": "oklch(0.48 0.12 220)",
+  "scrim-blur": "8px",
+  "code-text": "oklch(0.27 0.012 65)",
+  "code-comment": "oklch(0.52 0.012 70)",
+  "code-string": "oklch(0.47 0.10 158)",
+  "code-number": "oklch(0.51 0.13 55)",
+  "code-keyword": "oklch(0.47 0.19 285)",
+  "code-function": "oklch(0.49 0.16 27)",
+  "code-tag": "oklch(0.46 0.15 260)",
 } as const satisfies Record<string, string>;
 
+/* Dark is not light inverted: it is a warm graphite room in which the sheets are lit a step above
+   the floor, the accent is a luminous ultramarine that glows rather than shouts, and the floating
+   edge is a line of light rather than a shadow. */
 export const darkTokens = {
-  "canvas": "0.205 0.012 260",
-  "surface": "0.245 0.014 260",
-  "surface-high": "0.295 0.016 260",
-  "surface-float": "0.27 0.018 260",
-  "media": "0.205 0.012 260",
-  "ink": "0.94 0.008 255",
-  "ink-muted": "0.76 0.014 255",
-  "detail": "0.600 0.014 256",
-  "rim": "0.555 0.014 256",
-  "primary": "0.809 0.098 255",
-  "primary-strong": "0.734 0.139 257",
-  "primary-soft": "0.325 0.050 257",
-  "primary-selected": "0.400 0.075 257",
-  "danger-soft": "0.315 0.050 22",
-  "danger-selected": "0.395 0.070 22",
-  "warning-soft": "0.320 0.045 78",
-  "warning-selected": "0.400 0.065 78",
-  "success-soft": "0.315 0.045 160",
-  "success-selected": "0.395 0.065 160",
+  "canvas": "0.168 0.004 70",
+  "surface": "0.208 0.005 70",
+  "surface-high": "0.262 0.006 70",
+  "surface-float": "0.236 0.006 70",
+  "puck": "0.330 0.007 72",
+  "media": "0.168 0.004 70",
+  "ink": "0.950 0.004 80",
+  "ink-muted": "0.755 0.008 78",
+  "detail": "0.605 0.008 75",
+  "rim": "0.540 0.008 75",
+  "primary": "0.790 0.115 272",
+  "primary-strong": "0.725 0.155 270",
+  "primary-soft": "0.300 0.070 270",
+  "primary-selected": "0.370 0.100 270",
+  "danger-soft": "0.290 0.060 25",
+  "danger-selected": "0.360 0.085 25",
+  "warning-soft": "0.300 0.050 75",
+  "warning-selected": "0.370 0.070 75",
+  "success-soft": "0.290 0.050 160",
+  "success-selected": "0.360 0.070 160",
   "accent": "0.80 0.08 215",
-  "danger": "0.799 0.115 25",
-  "warning": "0.82 0.12 80",
-  "success": "0.769 0.100 160",
-  "on-primary": "0.205 0.012 260",
-  "on-danger": "0.205 0.012 260",
-  "on-warning": "0.205 0.012 260",
-  "on-success": "0.205 0.012 260",
-  "focus": "0.809 0.098 255",
-  "outline": "0.76 0.014 255",
-  "scrim": "0.08 0.01 260",
-  "edge": "0.92 0.01 256",
+  "danger": "0.775 0.130 25",
+  "warning": "0.830 0.120 80",
+  "success": "0.780 0.120 158",
+  "on-primary": "0.168 0.004 70",
+  "on-danger": "0.168 0.004 70",
+  "on-warning": "0.168 0.004 70",
+  "on-success": "0.168 0.004 70",
+  "focus": "0.790 0.115 272",
+  "outline": "0.755 0.008 78",
+  "scrim": "0.060 0.004 70",
+  "edge": "0.930 0.006 80",
   "light-top": "1 0 0",
-  "light-bottom": "0.12 0.012 260",
+  "light-bottom": "0.080 0.004 60",
   "elevation-flat": "none",
-  "elevation-raised": "0 1px 2px oklch(var(--sui-light-bottom) / 0.26), 0 4px 12px oklch(var(--sui-light-bottom) / 0.15)",
-  "elevation-floating": "0 18px 44px oklch(var(--sui-light-bottom) / 0.38), inset 0 1px 0 oklch(var(--sui-light-top) / 0.05)",
-  "elevation-control": "0 1px 2px oklch(var(--sui-light-bottom) / 0.30), inset 0 1px 0 oklch(var(--sui-light-top) / 0.08)",
-  "elevation-recessed": "inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.38), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.06)",
-  "elevation-recessed-top": "inset 0 5px 8px -5px oklch(var(--sui-light-bottom) / 0.36)",
-  "elevation-well": "inset 0 2px 4px oklch(var(--sui-light-bottom) / 0.60), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.06)",
+  "elevation-raised": "0 1px 2px oklch(var(--sui-light-bottom) / 0.40), 0 3px 8px -2px oklch(var(--sui-light-bottom) / 0.30), inset 0 1px 0 oklch(var(--sui-light-top) / 0.08)",
+  "elevation-floating": "0 0 0 1px oklch(var(--sui-light-top) / 0.08), 0 6px 14px -4px oklch(var(--sui-light-bottom) / 0.40), 0 26px 56px -12px oklch(var(--sui-light-bottom) / 0.65), inset 0 1px 0 oklch(var(--sui-light-top) / 0.06)",
+  "elevation-control": "0 0 0 0.5px oklch(var(--sui-light-bottom) / 0.40), 0 1px 3px oklch(var(--sui-light-bottom) / 0.45), inset 0 1px 0 oklch(var(--sui-light-top) / 0.09)",
+  "elevation-recessed": "inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.42), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.05)",
+  "elevation-recessed-top": "inset 0 5px 8px -5px oklch(var(--sui-light-bottom) / 0.40)",
+  "elevation-well": "inset 0 2px 4px oklch(var(--sui-light-bottom) / 0.62), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.05)",
   "glass-fill": "0.98",
   "glass-blur": "32px",
-  "glass-saturation": "1.10",
+  "glass-saturation": "1.12",
   "glass-brightness": "1.01",
   "glass-dense-fill": "0.99",
   "glass-dense-blur": "26px",
-  "glass-dense-saturation": "1.08",
+  "glass-dense-saturation": "1.10",
   "glass-dense-brightness": "1.01",
-  "glass-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.075) 0%, rgb(255 255 255 / 0.028) 30%, rgb(112 156 255 / 0.02) 70%, rgb(0 0 0 / 0.10) 100%)",
-  "glass-gradient-dense": "linear-gradient(180deg, rgb(255 255 255 / 0.06) 0%, rgb(255 255 255 / 0.018) 36%, rgb(112 156 255 / 0.016) 76%, rgb(0 0 0 / 0.08) 100%)",
+  "glass-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.07) 0%, rgb(255 255 255 / 0.025) 30%, rgb(255 255 255 / 0) 70%, rgb(0 0 0 / 0.10) 100%)",
+  "glass-gradient-dense": "linear-gradient(180deg, rgb(255 255 255 / 0.06) 0%, rgb(255 255 255 / 0.018) 36%, rgb(255 255 255 / 0) 76%, rgb(0 0 0 / 0.08) 100%)",
   "glass-hero-blur": "10px",
   "glass-hero-saturation": "1.03",
   "glass-hero-brightness": "1.0",
-  "glass-hero-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.028) 0%, rgb(255 255 255 / 0.009) 12%, rgb(255 255 255 / 0) 44%, rgb(0 0 0 / 0.16) 100%)",
-  "surface-overlay": "0.236 0.012 260",
+  "glass-hero-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.035) 0%, rgb(255 255 255 / 0.01) 12%, rgb(255 255 255 / 0) 44%, rgb(0 0 0 / 0.16) 100%)",
+  "surface-overlay": "0.222 0.005 70",
   "overlay-fill": "0.99",
-  "scrim-blur": "6px",
-  "code-text": "#e2e8f0",
-  "code-comment": "#7a8aa3",
-  "code-string": "#a5d6ff",
-  "code-number": "#f97316",
-  "code-keyword": "#c084fc",
-  "code-function": "#ff7b72",
-  "code-tag": "#7dd3fc",
+  "scrim-blur": "8px",
+  "code-text": "#e0deda",
+  "code-comment": "#96918c",
+  "code-string": "#7dd3a3",
+  "code-number": "#f3ad66",
+  "code-keyword": "#b6a8ff",
+  "code-function": "#fb9989",
+  "code-tag": "#8cc3fc",
 } as const satisfies Record<keyof typeof lightTokens, string>;
 
 export const sharedTokens = {
@@ -163,10 +184,10 @@ export const sharedTokens = {
   "font-mono": 'ui-monospace, "SF Mono", SFMono-Regular, "Cascadia Code", "JetBrains Mono", Menlo, Consolas, "Liberation Mono", monospace',
   /* The dash mask of a drop target's rim (see `rim.dashed`). The platform's own `dashed` style picks
      its dash length and corner joins per engine; this fixes a 7px rhythm with round caps and follows
-     the 16px `control` corner exactly. The stroke is drawn on the box edge at 3px, so the half that
+     the 12px `control` corner exactly. The stroke is drawn on the box edge at 3px, so the half that
      lands inside the box is the visible 1.5px rim. The mask carries no colour: the rim's tone is its
      own background, so it themes like every other rim. */
-  "rim-dashed": `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='100%25' height='100%25' rx='16' fill='none' stroke='%23000' stroke-width='3' stroke-dasharray='7' stroke-linecap='round'/%3E%3C/svg%3E")`,
+  "rim-dashed": `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='100%25' height='100%25' rx='12' fill='none' stroke='%23000' stroke-width='3' stroke-dasharray='7' stroke-linecap='round'/%3E%3C/svg%3E")`,
   "duration-press": "150ms",
   "duration-release": "200ms",
   /* The press leg of a tactile response. A tap on a trackpad or a brisk click is held for well

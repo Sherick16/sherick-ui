@@ -11,9 +11,11 @@ added Table column presentation and RadioGroup surface choices, plus normalized 
 margins; `2.3.0` the visual refinements from the
 [visual design-system audit](visual-design-system-audit.md), including additive `--sui-<role>-soft`
 and `--sui-<role>-selected` theme variables; `2.4.0` the rim on hollow controls; and `2.5.0`
-`DateTimePicker`. The current source package version is `2.6.0`, the form wave: `Form`, `CheckboxGroup`, multiple and creatable
-`Combobox`, option groups in `Select` and `Combobox`, and units on `Input` and `NumberField`. It is
-additive; no component or prop is removed. Version `2.4.0` remains the published baseline until the
+`DateTimePicker`; and `2.6.0` the form wave: `Form`, `CheckboxGroup`, multiple and creatable
+`Combobox`, option groups in `Select` and `Combobox`, and units on `Input` and `NumberField`. The
+current source package version is `2.7.0`, the paper-and-ultramarine visual overhaul: recalibrated
+theme values, tighter container corners, a refined elevation ladder and the additive `--sui-puck`
+theme variable. It changes no component, prop or export. Version `2.4.0` remains the published baseline until the
 release owner approves a staged version. An installed package's actual version and exports, not this
 checkout, determine availability.
 
@@ -285,6 +287,13 @@ already measured 126.8 kB raw (as the gate reports it) against a 128.9 kB limit,
 refinements took it to 128.6 kB. The motion passes add the scrim's start and end states, the
 TreeView branch panel, the tactile duration and two further press-amplitude tiers
 (`motionTactileWide`, `motionTactileField`), each a scoped rule with its disabled-state gate.
+
+The 2.7.0 visual overhaul re-records **`themeCss`** with `--update=themeCss`: `10776 / 1900 / 1572`
+→ `11447 / 1978 / 1627` (+78 bytes gzip). Every value is emitted three times — light, explicit dark
+and system dark — so the elevation ladder's new layers (the lit upper lip on `raised`, the hairline
+contact edge on `floating`, the half-pixel edge on `control`) and the additive `--sui-puck` variable
+weigh triple in raw bytes. Marginal layers were removed before re-recording and the dark code
+palette is emitted as hex; no component entry, the component stylesheet or the barrel moved.
 
 The 2.6.0 form wave re-records **`form` and `barrel`** with `--update=form,barrel`:
 

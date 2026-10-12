@@ -7,6 +7,7 @@ const colorNames = [
   "surface-high",
   "surface-float",
   "surface-overlay",
+  "puck",
   "ink",
   "ink-muted",
   "detail",
@@ -43,6 +44,10 @@ const config: Config = {
     extend: {
       colors: {
         sherick: Object.fromEntries(colorNames.map((name) => [name, color(name)])),
+      },
+      fontFamily: {
+        "showcase-display": ["var(--font-showcase-display)", "ui-serif", "Georgia", "serif"],
+        "showcase-mono": ["var(--sui-font-mono)"],
       },
       backgroundImage: {
         "sherick-glass": "var(--sui-glass-gradient)",
