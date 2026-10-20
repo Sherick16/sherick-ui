@@ -1,7 +1,8 @@
 "use client";
 
 import { Popover as BasePopover } from "@base-ui/react/popover";
-import { CalendarDays } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Calendar03Icon } from "@hugeicons/core-free-icons";
 import React, { useEffect, useRef, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import { density, focusRingWithin, material, overlay, rim, shape, stacking, state, stateLayer, text } from "./ui.common";
@@ -77,7 +78,7 @@ export interface DateFieldTriggerProps {
  * `aria-expanded`, `aria-controls`) and the pointer and keyboard activation that opens the
  * surface; the button itself only carries the type it needs to stay out of form submission.
  */
-export const DateFieldTrigger = ({ label, disabled = false, icon = <CalendarDays aria-hidden="true" /> }: DateFieldTriggerProps) => (
+export const DateFieldTrigger = ({ label, disabled = false, icon = <HugeiconsIcon icon={Calendar03Icon} aria-hidden="true" /> }: DateFieldTriggerProps) => (
   <BasePopover.Trigger
     disabled={disabled}
     render={<button type="button" aria-label={label} disabled={disabled} className={cn(datePartClassName)} />}

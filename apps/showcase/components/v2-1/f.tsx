@@ -1,11 +1,12 @@
 "use client";
 
-import { FileText, Folder } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { File02Icon, Folder01Icon } from "@hugeicons/core-free-icons";
 import { useState } from "react";
 import { DirectionProvider, TreeView, type TreeViewItem } from "sherick-ui";
 
-const folder = <Folder />;
-const file = <FileText />;
+const folder = <HugeiconsIcon icon={Folder01Icon} aria-hidden="true" />;
+const file = <HugeiconsIcon icon={File02Icon} aria-hidden="true" />;
 
 /* A descendant the tree shows, marks unavailable, and never selects. The disabled branch below is
    already expanded on purpose: disability is node-local, so its visible child stays usable. */

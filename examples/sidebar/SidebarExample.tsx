@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { Activity, CircleHelp, FolderKanban, LayoutDashboard, Menu, Settings2, Users } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Activity01Icon, DashboardSquare01Icon, HelpCircleIcon, KanbanIcon, Menu01Icon, Settings02Icon, UserMultipleIcon } from "@hugeicons/core-free-icons";
 import { Drawer, IconButton, NavItem } from "sherick-ui";
 import "./sidebar.css";
 
@@ -11,27 +12,27 @@ function SidebarLinks({
   return (
     <nav aria-label="Main navigation" className="sidebar-links">
       <div className="sidebar-destinations">
-        <NavItem href={`${basePath}/overview`} icon={<LayoutDashboard />} active={currentPath === `${basePath}/overview`} onClick={onNavigate}>
+        <NavItem href={`${basePath}/overview`} icon={<HugeiconsIcon icon={DashboardSquare01Icon} aria-hidden="true" />} active={currentPath === `${basePath}/overview`} onClick={onNavigate}>
           Overview
         </NavItem>
-        <NavItem href={`${basePath}/projects`} icon={<FolderKanban />} active={currentPath === `${basePath}/projects`} onClick={onNavigate}>
+        <NavItem href={`${basePath}/projects`} icon={<HugeiconsIcon icon={KanbanIcon} aria-hidden="true" />} active={currentPath === `${basePath}/projects`} onClick={onNavigate}>
           Projects
         </NavItem>
-        <NavItem href={`${basePath}/activity`} icon={<Activity />} active={currentPath === `${basePath}/activity`} onClick={onNavigate}>
+        <NavItem href={`${basePath}/activity`} icon={<HugeiconsIcon icon={Activity01Icon} aria-hidden="true" />} active={currentPath === `${basePath}/activity`} onClick={onNavigate}>
           Activity
         </NavItem>
       </div>
       <div className="sidebar-section">
         <h2>Workspace</h2>
-        <NavItem href={`${basePath}/team`} icon={<Users />} active={currentPath === `${basePath}/team`} onClick={onNavigate}>
+        <NavItem href={`${basePath}/team`} icon={<HugeiconsIcon icon={UserMultipleIcon} aria-hidden="true" />} active={currentPath === `${basePath}/team`} onClick={onNavigate}>
           Team
         </NavItem>
-        <NavItem href={`${basePath}/settings`} icon={<Settings2 />} active={currentPath === `${basePath}/settings`} onClick={onNavigate}>
+        <NavItem href={`${basePath}/settings`} icon={<HugeiconsIcon icon={Settings02Icon} aria-hidden="true" />} active={currentPath === `${basePath}/settings`} onClick={onNavigate}>
           Settings
         </NavItem>
       </div>
       <div className="sidebar-bottom">
-        <NavItem href={`${basePath}/help`} icon={<CircleHelp />} active={currentPath === `${basePath}/help`} onClick={onNavigate}>
+        <NavItem href={`${basePath}/help`} icon={<HugeiconsIcon icon={HelpCircleIcon} aria-hidden="true" />} active={currentPath === `${basePath}/help`} onClick={onNavigate}>
           Help
         </NavItem>
         <p>Alex Morgan<br /><span>Workspace admin</span></p>
@@ -57,7 +58,7 @@ export default function SidebarExample({
           <span className="sidebar-identity">Atlas</span>
           <Drawer side="left" open={menuOpen} onOpenChange={setMenuOpen}>
             <Drawer.Trigger
-              render={<IconButton appearance="ghost" variant="secondary" icon={<Menu />} aria-label="Open navigation" />}
+              render={<IconButton appearance="ghost" variant="secondary" icon={<HugeiconsIcon icon={Menu01Icon} aria-hidden="true" />} aria-label="Open navigation" />}
             />
             <Drawer.Content>
               <Drawer.Header>Atlas</Drawer.Header>

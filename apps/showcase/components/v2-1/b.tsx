@@ -1,6 +1,7 @@
 "use client";
 
-import { Moon, PenLine, Sun } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Edit02Icon, Moon02Icon, Sun03Icon } from "@hugeicons/core-free-icons";
 import { Button, Command, CommandPalette, type CommandItem } from "sherick-ui";
 
 const commands: CommandItem[] = [
@@ -10,7 +11,7 @@ const commands: CommandItem[] = [
     value: "dark",
     label: "Switch to dark theme",
     group: "Appearance",
-    icon: <Moon />,
+    icon: <HugeiconsIcon icon={Moon02Icon} aria-hidden="true" />,
     shortcut: "⌘D",
     keywords: ["night", "dim"],
   },
@@ -18,11 +19,11 @@ const commands: CommandItem[] = [
     value: "light",
     label: "Switch to light theme",
     group: "Appearance",
-    icon: <Sun />,
+    icon: <HugeiconsIcon icon={Sun03Icon} aria-hidden="true" />,
     shortcut: "⌘L",
     keywords: ["day", "bright"],
   },
-  { value: "note", label: "Create a quick note", group: "Appearance", icon: <PenLine /> },
+  { value: "note", label: "Create a quick note", group: "Appearance", icon: <HugeiconsIcon icon={Edit02Icon} aria-hidden="true" /> },
   { value: "delete", label: "Delete workspace", group: "Appearance", disabled: true },
 ];
 

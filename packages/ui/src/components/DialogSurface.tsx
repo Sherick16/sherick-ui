@@ -2,7 +2,8 @@
 
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import React, { type ComponentProps, type ReactNode, type Ref } from "react";
-import { X } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/libs/utils";
 import { density, focusRing, overlay, shape, stacking, state, stateLayer, text } from "./ui.common";
 import {
@@ -166,7 +167,7 @@ export const DialogDismiss = ({ label, className }: DialogDismissProps) => (
     {/* The target stays exactly where the pointer found it; the mark inside it carries the
         press. */}
     <span className={cn("inline-flex items-center justify-center", motionInkPress)}>
-      <X className={cn("size-5")} aria-hidden="true" />
+      <HugeiconsIcon icon={Cancel01Icon} className={cn("size-5")} aria-hidden="true" />
     </span>
   </BaseDialog.Close>
 );

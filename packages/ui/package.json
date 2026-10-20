@@ -1,6 +1,6 @@
 {
   "name": "sherick-ui",
-  "version": "2.7.0",
+  "version": "2.7.1",
   "description": "A React component library in graphite and iris, with light and dark themes.",
   "repository": {
     "type": "git",
@@ -85,10 +85,11 @@
   },
   "dependencies": {
     "@base-ui/react": "1.8.0",
+    "@hugeicons/core-free-icons": "^4.3.5",
+    "@hugeicons/react": "^1.1.10",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "katex": "^0.16.47",
-    "lucide-react": "^1.46.0",
     "prism-react-renderer": "^2.4.1",
     "prismjs": "^1.30.0",
     "react-markdown": "^10.1.0",

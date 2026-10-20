@@ -6,7 +6,8 @@ import React, {
   type MouseEventHandler,
   type ReactNode,
 } from "react";
-import { AlertTriangle, CheckCircle2, Info, X, XCircle, type LucideIcon } from "lucide-react";
+import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
+import { Alert02Icon, Cancel01Icon, CancelCircleIcon, CheckmarkCircle02Icon, InformationCircleIcon } from "@hugeicons/core-free-icons";
 import { cn } from "@/libs/utils";
 import Button from "./Button";
 import { Spinner } from "./Spinner";
@@ -154,8 +155,8 @@ const baseOf = (manager: ToastManager): BaseManager => {
    states of one lifecycle rather than roles a caller chose, and a state left out of the map would
    silently lose its mark and its tone. `loading` is the one that is not a status glyph — it is
    ongoing work, so it carries the same activity the library's `Spinner` does. */
-const markIcon = (Icon: LucideIcon, className: string) => (
-  <Icon aria-hidden="true" className={cn("size-5 shrink-0", className)} />
+const markIcon = (icon: IconSvgElement, className: string) => (
+  <HugeiconsIcon icon={icon} aria-hidden="true" className={cn("size-5 shrink-0", className)} />
 );
 
 const toastMark = (type: string | undefined): ReactNode => {
@@ -163,14 +164,14 @@ const toastMark = (type: string | undefined): ReactNode => {
     case "loading":
       return <Spinner size="small" className={cn("size-5")} />;
     case "success":
-      return markIcon(CheckCircle2, tone.text.success);
+      return markIcon(CheckmarkCircle02Icon, tone.text.success);
     case "error":
     case "danger":
-      return markIcon(XCircle, tone.text.danger);
+      return markIcon(CancelCircleIcon, tone.text.danger);
     case "warning":
-      return markIcon(AlertTriangle, tone.text.warning);
+      return markIcon(Alert02Icon, tone.text.warning);
     case "info":
-      return markIcon(Info, tone.text.primary);
+      return markIcon(InformationCircleIcon, tone.text.primary);
     default:
       return null;
   }
@@ -356,7 +357,7 @@ export const ToastViewport = ({ position = "bottom-end", className }: ToastViewp
                   )}
                 >
                   <span className={cn("inline-flex items-center justify-center", motionInkPress)}>
-                    <X className={cn("size-4")} aria-hidden="true" />
+                    <HugeiconsIcon icon={Cancel01Icon} className={cn("size-4")} aria-hidden="true" />
                   </span>
                 </BaseToast.Close>
               </BaseToast.Content>

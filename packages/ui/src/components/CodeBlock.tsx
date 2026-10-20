@@ -2,7 +2,8 @@
 
 import { Button } from "@base-ui/react/button";
 import React, { useEffect, useRef, useState, type ReactNode } from "react";
-import { Check, Copy } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Copy01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
 import { Highlight } from "prism-react-renderer";
 import Prism from "prismjs";
 import "prismjs/components/prism-jsx.js";
@@ -95,7 +96,7 @@ const CodeBlock = ({ inline = false, className, language = "text", children }: C
             state.enabled
           )}
         >
-          {copied ? <Check className={cn("size-3.5")} aria-hidden="true" /> : <Copy className={cn("size-3.5")} aria-hidden="true" />}
+          {copied ? <HugeiconsIcon icon={Tick02Icon} className={cn("size-3.5")} aria-hidden="true" /> : <HugeiconsIcon icon={Copy01Icon} className={cn("size-3.5")} aria-hidden="true" />}
           <span>{copied ? "Copied" : "Copy"}</span>
         </Button>
       </div>

@@ -2,7 +2,8 @@
 
 import { Combobox as BaseCombobox } from "@base-ui/react/combobox";
 import React, { forwardRef, useState, type ClipboardEvent, type ReactNode } from "react";
-import { Check, ChevronDown, Plus, X } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowDown01Icon, Cancel01Icon, PlusSignIcon, Tick02Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/libs/utils";
 import {
   density,
@@ -307,7 +308,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>((props, ref) => {
   const renderItem = (option: ComboboxOption) =>
     isCreateItem(option) ? (
       <BaseCombobox.Item key="sui-create" value={option} className={cn(list.option, "justify-start gap-3")}>
-        <Plus aria-hidden="true" className={cn("size-4 shrink-0", tone.text.primary)} />
+        <HugeiconsIcon icon={PlusSignIcon} aria-hidden="true" className={cn("size-4 shrink-0", tone.text.primary)} />
         <span className={cn("min-w-0 flex-1 truncate")}>{createLabel(option.label)}</span>
       </BaseCombobox.Item>
     ) : (
@@ -321,7 +322,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>((props, ref) => {
       >
         <span className={cn("min-w-0 flex-1 truncate")}>{option.label}</span>
         <BaseCombobox.ItemIndicator>
-          <Check aria-hidden="true" className={cn("size-4", motionArrive, tone.text.primary)} />
+          <HugeiconsIcon icon={Tick02Icon} aria-hidden="true" className={cn("size-4", motionArrive, tone.text.primary)} />
         </BaseCombobox.ItemIndicator>
       </BaseCombobox.Item>
     );
@@ -475,7 +476,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>((props, ref) => {
                 {!readOnly && !disabled && (
                   <BaseCombobox.ChipRemove aria-label={`Remove ${option.label}`} className={cn(chipRemoveClassName)}>
                     <span className={cn("inline-flex items-center justify-center", motionInkPress)}>
-                      <X aria-hidden="true" className={cn("size-4")} />
+                      <HugeiconsIcon icon={Cancel01Icon} aria-hidden="true" className={cn("size-4")} />
                     </span>
                   </BaseCombobox.ChipRemove>
                 )}
@@ -493,10 +494,10 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>((props, ref) => {
           disabled={disabled || readOnly}
           className={cn(partClassName)}
         >
-          <X aria-hidden="true" />
+          <HugeiconsIcon icon={Cancel01Icon} aria-hidden="true" />
         </BaseCombobox.Clear>
         <BaseCombobox.Trigger aria-label="Show options" className={cn(partClassName, "group")}>
-          <ChevronDown aria-hidden="true" className={cn("size-5", motionOrient, "group-data-[popup-open]:rotate-180")} />
+          <HugeiconsIcon icon={ArrowDown01Icon} aria-hidden="true" className={cn("size-5", motionOrient, "group-data-[popup-open]:rotate-180")} />
         </BaseCombobox.Trigger>
       </BaseCombobox.InputGroup>
 

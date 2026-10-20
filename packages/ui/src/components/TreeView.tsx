@@ -2,7 +2,8 @@
 
 import { Collapsible as BaseCollapsible } from "@base-ui/react/collapsible";
 import { useDirection } from "@base-ui/react/direction-provider";
-import { ChevronRight } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import React, {
   forwardRef,
   useEffect,
@@ -343,7 +344,7 @@ const TreeView = forwardRef<HTMLDivElement, TreeViewProps>(function TreeView(
                 !rowDisabled && "cursor-pointer"
               )}
             >
-              <ChevronRight
+              <HugeiconsIcon icon={ArrowRight01Icon}
                 aria-hidden="true"
                 className={cn(
                   "size-4",

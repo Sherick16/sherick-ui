@@ -1,24 +1,8 @@
 "use client";
 
 import { Fragment, useEffect, useRef, useState } from "react";
-import {
-  AlignCenter,
-  AlignLeft,
-  AlignRight,
-  ArrowUpRight,
-  Bell,
-  Check,
-  ChevronDown,
-  Download,
-  Ellipsis,
-  Heart,
-  Monitor,
-  Moon,
-  Search as SearchIcon,
-  SlidersHorizontal,
-  Sun,
-  Trash2,
-} from "lucide-react";
+import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
+import { ArrowDown01Icon, ArrowUpRight01Icon, ComputerIcon, Delete02Icon, Download04Icon, FavouriteIcon, FilterHorizontalIcon, Moon02Icon, MoreHorizontalIcon, Notification03Icon, Search01Icon, Sun03Icon, TextAlignCenterIcon, TextAlignLeftIcon, TextAlignRightIcon, Tick02Icon } from "@hugeicons/core-free-icons";
 import {
   Accordion,
   Alert,
@@ -192,7 +176,7 @@ export default function Home() {
               className={`hidden items-center gap-1.5 text-sm hover:text-sherick-ink md:inline-flex ${text.medium} ${motionFeedback} ${focusRing} focus-visible:outline-offset-2`}
             >
               Design language
-              <ArrowUpRight className="size-3.5" aria-hidden="true" />
+              <HugeiconsIcon icon={ArrowUpRight01Icon} className="size-3.5" aria-hidden="true" />
             </a>
             <ThemePicker theme={theme} onChange={changeTheme} />
           </div>
@@ -336,7 +320,7 @@ export default function Home() {
                 <div className="mt-5 flex items-center gap-3">
                   <span className={cn("text-xs font-medium", text.high)}>Target</span>
                   <span className={cn(density.target, shape.circle, material.matteHigh, "inline-flex items-center justify-center")}>
-                    <Heart className="size-5" aria-hidden="true" />
+                    <HugeiconsIcon icon={FavouriteIcon} className="size-5" aria-hidden="true" />
                   </span>
                 </div>
               </Specimen>
@@ -366,7 +350,7 @@ export default function Home() {
                   <Button appearance="filled">Filled</Button>
                   <Button appearance="tonal" variant="secondary">Tonal</Button>
                   <Button appearance="text" variant="secondary">Text</Button>
-                  <Button appearance="tonal" variant="danger" icon={<Trash2 />}>Delete</Button>
+                  <Button appearance="tonal" variant="danger" icon={<HugeiconsIcon icon={Delete02Icon} aria-hidden="true" />}>Delete</Button>
                 </div>
               </Specimen>
 
@@ -374,8 +358,8 @@ export default function Home() {
                 {/* A loading button keeps its label, so the two states sit beside each other and the
                     control can be compared without it moving. */}
                 <div className="flex flex-wrap items-center gap-6">
-                  <StateLabel label="Rest"><Button icon={<Download />}>Export</Button></StateLabel>
-                  <StateLabel label="Loading"><Button icon={<Download />} loading>Export</Button></StateLabel>
+                  <StateLabel label="Rest"><Button icon={<HugeiconsIcon icon={Download04Icon} aria-hidden="true" />}>Export</Button></StateLabel>
+                  <StateLabel label="Loading"><Button icon={<HugeiconsIcon icon={Download04Icon} aria-hidden="true" />} loading>Export</Button></StateLabel>
                   <StateLabel label="Disabled"><Button disabled>Disabled</Button></StateLabel>
                   <StateLabel label="Focus"><Button className="outline outline-2 outline-sherick-focus outline-offset-[3px]">Focus-visible</Button></StateLabel>
                 </div>
@@ -391,11 +375,11 @@ export default function Home() {
 
               <Specimen title="Icon buttons">
                 <div className="flex flex-wrap items-center gap-3">
-                  <Tooltip content="Notifications"><IconButton icon={<Bell />} aria-label="Notifications" /></Tooltip>
-                  <Tooltip content="Search"><IconButton appearance="ghost" variant="secondary" icon={<SearchIcon />} aria-label="Search" /></Tooltip>
-                  <Tooltip content="Download"><IconButton appearance="acrylic" variant="secondary" icon={<Download />} aria-label="Download" /></Tooltip>
-                  <IconButton icon={<Bell />} loading aria-label="Saving notifications" />
-                  <IconButton disabled icon={<Heart />} aria-label="Disabled favorite" />
+                  <Tooltip content="Notifications"><IconButton icon={<HugeiconsIcon icon={Notification03Icon} aria-hidden="true" />} aria-label="Notifications" /></Tooltip>
+                  <Tooltip content="Search"><IconButton appearance="ghost" variant="secondary" icon={<HugeiconsIcon icon={Search01Icon} aria-hidden="true" />} aria-label="Search" /></Tooltip>
+                  <Tooltip content="Download"><IconButton appearance="acrylic" variant="secondary" icon={<HugeiconsIcon icon={Download04Icon} aria-hidden="true" />} aria-label="Download" /></Tooltip>
+                  <IconButton icon={<HugeiconsIcon icon={Notification03Icon} aria-hidden="true" />} loading aria-label="Saving notifications" />
+                  <IconButton disabled icon={<HugeiconsIcon icon={FavouriteIcon} aria-hidden="true" />} aria-label="Disabled favorite" />
                 </div>
               </Specimen>
             </div>
@@ -555,9 +539,9 @@ export default function Home() {
                     <Chip value="ops" disabled>Ops</Chip>
                   </ChipGroup>
                   <div className="flex flex-wrap items-center gap-2.5">
-                    <Chip variant="success" icon={<Check />}>Ready</Chip>
+                    <Chip variant="success" icon={<HugeiconsIcon icon={Tick02Icon} aria-hidden="true" />}>Ready</Chip>
                     <Chip variant="warning">Beta</Chip>
-                    <Chip icon={<Check />} onRemove={() => undefined}>Verified</Chip>
+                    <Chip icon={<HugeiconsIcon icon={Tick02Icon} aria-hidden="true" />} onRemove={() => undefined}>Verified</Chip>
                     <Chip onRemove={() => undefined}>Platform</Chip>
                   </div>
                 </div>
@@ -579,14 +563,14 @@ export default function Home() {
                     aria-label="Text alignment"
                     defaultValue="start"
                     options={[
-                      { value: "start", label: "Start", icon: <AlignLeft className="size-4" /> },
-                      { value: "center", label: "Center", icon: <AlignCenter className="size-4" /> },
+                      { value: "start", label: "Start", icon: <HugeiconsIcon icon={TextAlignLeftIcon} aria-hidden="true" className="size-4" /> },
+                      { value: "center", label: "Center", icon: <HugeiconsIcon icon={TextAlignCenterIcon} aria-hidden="true" className="size-4" /> },
                     ]}
                   />
                   <ToggleGroup aria-label="Text format" multiple value={alignment} onValueChange={setAlignment}>
-                    <ToggleGroup.Item value="left" aria-label="Align left"><AlignLeft className="size-4" /></ToggleGroup.Item>
-                    <ToggleGroup.Item value="center" aria-label="Align center"><AlignCenter className="size-4" /></ToggleGroup.Item>
-                    <ToggleGroup.Item value="right" aria-label="Align right" disabled><AlignRight className="size-4" /></ToggleGroup.Item>
+                    <ToggleGroup.Item value="left" aria-label="Align left"><HugeiconsIcon icon={TextAlignLeftIcon} aria-hidden="true" className="size-4" /></ToggleGroup.Item>
+                    <ToggleGroup.Item value="center" aria-label="Align center"><HugeiconsIcon icon={TextAlignCenterIcon} aria-hidden="true" className="size-4" /></ToggleGroup.Item>
+                    <ToggleGroup.Item value="right" aria-label="Align right" disabled><HugeiconsIcon icon={TextAlignRightIcon} aria-hidden="true" className="size-4" /></ToggleGroup.Item>
                   </ToggleGroup>
                 </div>
               </Specimen>
@@ -723,7 +707,7 @@ export default function Home() {
                 <div className="flex flex-wrap gap-2">
                   <Badge variant="primary">Primary</Badge>
                   <Badge variant="secondary">Neutral</Badge>
-                  <Badge variant="success" icon={<Check />}>Ready</Badge>
+                  <Badge variant="success" icon={<HugeiconsIcon icon={Tick02Icon} aria-hidden="true" />}>Ready</Badge>
                   <Badge variant="warning">Warning</Badge>
                   <Badge variant="danger">Danger</Badge>
                 </div>
@@ -771,7 +755,7 @@ export default function Home() {
                 <Popover>
                   <Popover.Trigger
                     render={
-                      <Button appearance="tonal" variant="secondary" icon={<SlidersHorizontal />}>
+                      <Button appearance="tonal" variant="secondary" icon={<HugeiconsIcon icon={FilterHorizontalIcon} aria-hidden="true" />}>
                         Filters
                       </Button>
                     }
@@ -796,7 +780,7 @@ export default function Home() {
                 <Menu>
                   <Menu.Trigger
                     render={
-                      <Button appearance="tonal" variant="secondary" icon={<Ellipsis />}>
+                      <Button appearance="tonal" variant="secondary" icon={<HugeiconsIcon icon={MoreHorizontalIcon} aria-hidden="true" />}>
                         Actions
                       </Button>
                     }
@@ -821,7 +805,7 @@ export default function Home() {
               <Specimen title="Dialog & alert dialog">
                 <div className="flex flex-wrap items-center gap-3">
                   <Button appearance="tonal" variant="secondary" onClick={() => setDialogOpen(true)}>Open dialog</Button>
-                  <Button appearance="filled" variant="danger" icon={<Trash2 />} onClick={() => setAlertOpen(true)}>Delete project</Button>
+                  <Button appearance="filled" variant="danger" icon={<HugeiconsIcon icon={Delete02Icon} aria-hidden="true" />} onClick={() => setAlertOpen(true)}>Delete project</Button>
                 </div>
               </Specimen>
 
@@ -888,15 +872,15 @@ function BrandMark() {
 }
 
 function ThemePicker({ theme, onChange }: { theme: ThemeMode; onChange: (theme: ThemeMode) => void }) {
-  const choices: Array<{ value: ThemeMode; label: string; icon: typeof Sun }> = [
-    { value: "system", label: "System", icon: Monitor },
-    { value: "light", label: "Light", icon: Sun },
-    { value: "dark", label: "Dark", icon: Moon },
+  const choices: Array<{ value: ThemeMode; label: string; icon: IconSvgElement }> = [
+    { value: "system", label: "System", icon: ComputerIcon },
+    { value: "light", label: "Light", icon: Sun03Icon },
+    { value: "dark", label: "Dark", icon: Moon02Icon },
   ];
 
   return (
     <div role="group" aria-label="Theme" className={cn("inline-flex shrink-0 gap-0.5 p-0.5", shape.pill, selectable.surface, selectable.rest)}>
-      {choices.map(({ value, label, icon: Icon }) => {
+      {choices.map(({ value, label, icon }) => {
         const selected = theme === value;
         return (
           <button
@@ -916,7 +900,7 @@ function ThemePicker({ theme, onChange }: { theme: ThemeMode; onChange: (theme: 
                 : cn(text.medium, "hover:text-sherick-ink")
             )}
           >
-            <Icon className="size-4" aria-hidden="true" />
+            <HugeiconsIcon icon={icon} className="size-4" aria-hidden="true" />
           </button>
         );
       })}
@@ -1164,7 +1148,7 @@ function MotionSpecimen() {
           aria-pressed={on.orient ?? false}
           className={cn("flex size-7 items-center justify-center", shape.circle, material.matteHigh, text.high, focusRing, state.enabled)}
         >
-          <ChevronDown className={cn("size-4", motionOrient, on.orient && "rotate-180")} aria-hidden="true" />
+          <HugeiconsIcon icon={ArrowDown01Icon} className={cn("size-4", motionOrient, on.orient && "rotate-180")} aria-hidden="true" />
         </button>
       </MotionStage>
 

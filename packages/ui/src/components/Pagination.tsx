@@ -1,6 +1,7 @@
 "use client";
 
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowLeft02Icon, ArrowRight02Icon } from "@hugeicons/core-free-icons";
 import {
   forwardRef,
   useState,
@@ -274,14 +275,14 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
             previousPage,
             previousLabel,
             previousBoundary,
-            <ArrowLeft aria-hidden="true" className={cn("rtl:-scale-x-100")} />
+            <HugeiconsIcon icon={ArrowLeft02Icon} aria-hidden="true" className={cn("rtl:-scale-x-100")} />
           )}
           {items.map((item) => (typeof item === "number" ? pageControl(item) : gap(item)))}
           {step(
             nextPage,
             nextLabel,
             nextBoundary,
-            <ArrowRight aria-hidden="true" className={cn("rtl:-scale-x-100")} />
+            <HugeiconsIcon icon={ArrowRight02Icon} aria-hidden="true" className={cn("rtl:-scale-x-100")} />
           )}
         </ol>
       </nav>

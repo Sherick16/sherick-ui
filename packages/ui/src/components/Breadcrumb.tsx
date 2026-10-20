@@ -1,4 +1,5 @@
-import { ChevronRight } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import {
   forwardRef,
   type AnchorHTMLAttributes,
@@ -77,7 +78,7 @@ const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
                   /* One inherited line box centers the glyph on the label's first line, even when
                      the label wraps or a consumer changes the trail's line-height. */
                   <span aria-hidden="true" className={cn("inline-flex h-[1lh] w-4 shrink-0 items-center")}>
-                    <ChevronRight className={cn("size-4 rtl:-scale-x-100")} />
+                    <HugeiconsIcon icon={ArrowRight01Icon} aria-hidden="true" className={cn("size-4 rtl:-scale-x-100")} />
                   </span>
                 )}
                 {isCurrent ? (

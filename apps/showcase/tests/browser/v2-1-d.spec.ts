@@ -417,7 +417,11 @@ test("the clear control empties the selection and returns focus to the picker", 
   await expect(field.getByRole("listitem")).toHaveCount(2);
   await expect(field.getByRole("listitem").first()).toContainText("a.pdf16 B · PDF");
   await expect(field.getByRole("listitem").last()).toContainText("b.png16 B · PNG");
-  await expect(field.getByRole("listitem").last().locator("svg.lucide-image")).toBeVisible();
+  // An image file takes the image mark rather than the generic file mark.
+  const mark = (item: Locator) => item.locator(":scope > span[aria-hidden] > svg");
+  const imageMark = mark(field.getByRole("listitem").last());
+  await expect(imageMark).toBeVisible();
+  expect(await imageMark.innerHTML()).not.toBe(await mark(field.getByRole("listitem").first()).innerHTML());
 
   // One visible inset sheet tucks under the chooser, square at the join and rounded below.
   const placement = await field.evaluate((element) => {
@@ -636,7 +640,7 @@ test("file changes are announced without a visible log; rejection and clear affo
   expect((await status.boundingBox())!.height).toBe(0);
   const clear = field.getByRole("button", { name: "Clear files", exact: true });
   await expect(clear).toBeVisible();
-  await expect(clear.locator("svg.lucide-trash-2")).toBeVisible();
+  await expect(clear.locator("svg")).toBeVisible();
   const resting = await clear.evaluate(element => {
     const css = getComputedStyle(element);
     return { fill: css.backgroundColor, shadow: css.boxShadow, color: css.color, label: getComputedStyle(element.closest('[data-testid]')!.querySelector('label')!).color };

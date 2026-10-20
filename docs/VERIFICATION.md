@@ -145,7 +145,7 @@ not a routine refresh to make a red gate green.
 - shared overlay shell and motion recipes, including the presence recipes and the reduced-motion
   neutralization they carry;
 
-Its specimens render real Lucide marks rather than a one-character placeholder, because what the
+Its specimens render real Hugeicons marks rather than a one-character placeholder, because what the
 gate pins is a slot with its own size, whitespace and optical weight; and the multiline cases it
 carries — a wrapped alert, a wrapped radio label — pin the anatomy a component gives a mark beside
 copy that wraps.

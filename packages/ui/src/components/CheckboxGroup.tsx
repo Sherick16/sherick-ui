@@ -3,7 +3,8 @@
 import { Checkbox as BaseCheckbox } from "@base-ui/react/checkbox";
 import { CheckboxGroup as BaseCheckboxGroup } from "@base-ui/react/checkbox-group";
 import { Field } from "@base-ui/react/field";
-import { Check } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Tick02Icon } from "@hugeicons/core-free-icons";
 import React, { forwardRef, useId, type ComponentProps, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import {
@@ -167,7 +168,7 @@ export const CheckboxGroup = forwardRef<HTMLDivElement, CheckboxGroupProps>(
                         {/* Positioned so the tick paints above the box's hover layer. */}
                         <BaseCheckbox.Indicator className={cn("relative flex items-center justify-center", motionArrive)}>
                           {/* A heavier stroke than the icon default: at 14px the default draws a hairline tick. */}
-                          <Check className={cn("size-3.5")} strokeWidth={3} />
+                          <HugeiconsIcon icon={Tick02Icon} aria-hidden="true" className={cn("size-3.5")} strokeWidth={3} />
                         </BaseCheckbox.Indicator>
                       </span>
                     </BaseCheckbox.Root>

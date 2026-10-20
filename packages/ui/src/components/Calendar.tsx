@@ -1,7 +1,8 @@
 "use client";
 
 import { useDirection } from "@base-ui/react/direction-provider";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowLeft02Icon, ArrowRight02Icon } from "@hugeicons/core-free-icons";
 import React, {
   forwardRef,
   useCallback,
@@ -425,7 +426,7 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
           )}
         >
           <span className={cn("inline-flex", !disabled && !atFirstMonth && motionInkPress)}>
-            <ArrowLeft aria-hidden="true" className={cn("size-5 rtl:-scale-x-100")} />
+            <HugeiconsIcon icon={ArrowLeft02Icon} aria-hidden="true" className={cn("size-5 rtl:-scale-x-100")} />
           </span>
         </button>
 
@@ -449,7 +450,7 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
           )}
         >
           <span className={cn("inline-flex", !disabled && !atLastMonth && motionInkPress)}>
-            <ArrowRight aria-hidden="true" className={cn("size-5 rtl:-scale-x-100")} />
+            <HugeiconsIcon icon={ArrowRight02Icon} aria-hidden="true" className={cn("size-5 rtl:-scale-x-100")} />
           </span>
         </button>
       </div>

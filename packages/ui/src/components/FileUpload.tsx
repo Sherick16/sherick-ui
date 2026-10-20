@@ -2,7 +2,8 @@
 
 import { Button as BaseButton } from "@base-ui/react/button";
 import { Field } from "@base-ui/react/field";
-import { File as FileIcon, Image as ImageIcon, Trash2, Upload, X } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon, Delete02Icon, File01Icon, Image01Icon, Upload04Icon } from "@hugeicons/core-free-icons";
 import React, {
   forwardRef,
   useEffect,
@@ -338,7 +339,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             className={cn("inline-flex size-8 shrink-0 items-center justify-center [&>svg]:size-7", text.medium)}
             aria-hidden="true"
           >
-            <Upload />
+            <HugeiconsIcon icon={Upload04Icon} aria-hidden="true" />
           </span>
           <span className={cn("flex min-w-0 flex-col items-center gap-1")}>
             <span className={cn("text-base font-semibold", text.high)}>
@@ -376,7 +377,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     className={cn("flex min-w-0 items-start gap-3 py-2 ps-3", edge.row, text.high)}
                   >
                     <span aria-hidden="true" className={cn("inline-flex h-11 w-5 shrink-0 items-center [&>svg]:size-5", text.medium)}>
-                      {file.type.startsWith("image/") ? <ImageIcon /> : <FileIcon />}
+                      {file.type.startsWith("image/") ? <HugeiconsIcon icon={Image01Icon} aria-hidden="true" /> : <HugeiconsIcon icon={File01Icon} aria-hidden="true" />}
                     </span>
                     <span className={cn("flex min-w-0 flex-1 flex-col text-sm leading-6 [overflow-wrap:anywhere]")}>
                       <span>{file.name}</span>
@@ -404,7 +405,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                       )}
                     >
                       <span className={cn("inline-flex items-center justify-center", motionInkPress)}>
-                        <X className={cn("size-5")} aria-hidden="true" />
+                        <HugeiconsIcon icon={Cancel01Icon} className={cn("size-5")} aria-hidden="true" />
                       </span>
                     </BaseButton>
                   </li>
@@ -417,7 +418,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                 type="button"
                 appearance="text"
                 variant="danger"
-                icon={<Trash2 />}
+                icon={<HugeiconsIcon icon={Delete02Icon} aria-hidden="true" />}
                 size="sm"
                 disabled={disabled}
                 onClick={clearFiles}

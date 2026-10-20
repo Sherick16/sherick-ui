@@ -2,7 +2,8 @@
 
 import { Collapsible as BaseCollapsible } from "@base-ui/react/collapsible";
 import React, { type ReactNode } from "react";
-import { ChevronDown } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/libs/utils";
 import { disclosure } from "./ui.common";
 import { motionOrient } from "./ui.motion";
@@ -43,7 +44,7 @@ const CollapsibleTrigger = ({ children, className }: CollapsibleTriggerProps) =>
     <span className={cn("min-w-0 flex-1")}>{children}</span>
     {/* The same affordance, and the same in-place turn, as an `Accordion` row: the two are one
         object at two scopes. */}
-    <ChevronDown
+    <HugeiconsIcon icon={ArrowDown01Icon}
       aria-hidden="true"
       className={cn("size-4 shrink-0", motionOrient, "group-data-[panel-open]:rotate-180")}
     />

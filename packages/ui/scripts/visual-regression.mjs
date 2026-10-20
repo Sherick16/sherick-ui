@@ -17,7 +17,8 @@ import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 /* Real icons, not a placeholder dot: this gate exists to pin the anatomy a component gives its
    marks, and a one-character placeholder has no viewBox whitespace, no stroke weight and no
    optical size to pin. These are the icons the showcase uses for the same controls. */
-import { AlignCenter, AlignLeft, Bell, Check, Download, Heart, Search as SearchIcon } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Download04Icon, FavouriteIcon, Notification03Icon, Search01Icon, TextAlignCenterIcon, TextAlignLeftIcon, Tick02Icon } from "@hugeicons/core-free-icons";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
@@ -115,7 +116,7 @@ const specimens = {
   "button.tonal": h(Button, { appearance: "tonal", variant: "secondary" }, "Cancel"),
   "button.tonal.primary": h(Button, {}, "Continue"),
   "button.text": h(Button, { appearance: "text", variant: "secondary" }, "Skip"),
-  "button.icon": h(Button, { icon: h(Download) }, "Sync"),
+  "button.icon": h(Button, { icon: h(HugeiconsIcon, { icon: Download04Icon, "aria-hidden": "true" }) }, "Sync"),
   /* A nested node is a mark a direct-SVG selector cannot size, so it is the case the fixed slot
      exists for — and the case this fixture used before the slot was fixed. */
   "button.icon.nested": h(Button, { icon: h(Spinner, { size: "small" }) }, "Sync"),
@@ -137,7 +138,7 @@ const specimens = {
   "avatar.rounded.md": h(Avatar, { src: "/avatar.png", alt: "Example avatar", shape: "rounded" }),
   "badge.primary": h(Badge, {}, "Primary"),
   "badge.secondary": h(Badge, { variant: "secondary" }, "Neutral"),
-  "badge.success.icon": h(Badge, { variant: "success", icon: h(Check) }, "Ready"),
+  "badge.success.icon": h(Badge, { variant: "success", icon: h(HugeiconsIcon, { icon: Tick02Icon, "aria-hidden": "true" }) }, "Ready"),
   "card.secondary": h(Card, {}, "Neutral card"),
   "card.primary": h(Card, { variant: "primary" }, "Tonal card"),
   "code-block.block": h(CodeBlock, { language: "tsx" }, '<Button appearance="filled">Save</Button>'),
@@ -176,10 +177,10 @@ const specimens = {
   ),
   "select.trigger": h(Select, { options: [{ label: "Design system", value: "design" }], value: "design", onValueChange: noop }),
   "select.disabled": h(Select, { options: [{ label: "Design system", value: "design" }], disabled: true }),
-  "icon-button.tonal": h(IconButton, { icon: h(Bell), "aria-label": "Notifications" }),
-  "icon-button.ghost": h(IconButton, { appearance: "ghost", variant: "secondary", icon: h(SearchIcon), "aria-label": "Search" }),
-  "icon-button.acrylic": h(IconButton, { appearance: "acrylic", variant: "secondary", icon: h(Download), "aria-label": "Download" }),
-  "icon-button.disabled": h(IconButton, { disabled: true, icon: h(Heart), "aria-label": "Favorite" }),
+  "icon-button.tonal": h(IconButton, { icon: h(HugeiconsIcon, { icon: Notification03Icon, "aria-hidden": "true" }), "aria-label": "Notifications" }),
+  "icon-button.ghost": h(IconButton, { appearance: "ghost", variant: "secondary", icon: h(HugeiconsIcon, { icon: Search01Icon, "aria-hidden": "true" }), "aria-label": "Search" }),
+  "icon-button.acrylic": h(IconButton, { appearance: "acrylic", variant: "secondary", icon: h(HugeiconsIcon, { icon: Download04Icon, "aria-hidden": "true" }), "aria-label": "Download" }),
+  "icon-button.disabled": h(IconButton, { disabled: true, icon: h(HugeiconsIcon, { icon: FavouriteIcon, "aria-hidden": "true" }), "aria-label": "Favorite" }),
   "icon-button.nested": h(IconButton, { icon: h("span", null, "+"), "aria-label": "Add" }),
   "input.default": h(Input, { label: "Project name", placeholder: "Sherick UI" }),
   "input.required": h(Input, { label: "Email", required: true, name: "email", type: "email" }),
@@ -306,12 +307,12 @@ const specimens = {
      deterministic one. */
   "chip.toggle.rest": h(Chip, { value: "design" }, "Design"),
   "chip.toggle.selected": h(Chip, { value: "design", defaultChecked: true }, "Design"),
-  "chip.toggle.icon": h(Chip, { value: "code", variant: "success", icon: h(Check) }, "Code"),
+  "chip.toggle.icon": h(Chip, { value: "code", variant: "success", icon: h(HugeiconsIcon, { icon: Tick02Icon, "aria-hidden": "true" }) }, "Code"),
   "chip.toggle.disabled": h(Chip, { value: "design", disabled: true }, "Design"),
   "chip.tag": h(Chip, { variant: "warning" }, "Beta"),
-  "chip.tag.icon": h(Chip, { variant: "success", icon: h(Check) }, "Ready"),
+  "chip.tag.icon": h(Chip, { variant: "success", icon: h(HugeiconsIcon, { icon: Tick02Icon, "aria-hidden": "true" }) }, "Ready"),
   "chip.tag.dismissible": h(Chip, { onRemove: noop }, "Platform"),
-  "chip.tag.dismissible.icon": h(Chip, { variant: "success", icon: h(Check), onRemove: noop }, "Ready"),
+  "chip.tag.dismissible.icon": h(Chip, { variant: "success", icon: h(HugeiconsIcon, { icon: Tick02Icon, "aria-hidden": "true" }), onRemove: noop }, "Ready"),
   "chip-group": h(
     ChipGroup,
     { "aria-label": "Filters", defaultValue: ["design"] },
@@ -349,8 +350,8 @@ const specimens = {
     "aria-label": "Alignment",
     defaultValue: "start",
     options: [
-      { value: "start", label: "Start", icon: h(AlignLeft) },
-      { value: "center", label: "Center", icon: h(AlignCenter) },
+      { value: "start", label: "Start", icon: h(HugeiconsIcon, { icon: TextAlignLeftIcon, "aria-hidden": "true" }) },
+      { value: "center", label: "Center", icon: h(HugeiconsIcon, { icon: TextAlignCenterIcon, "aria-hidden": "true" }) },
     ],
   }),
   "progress.determinate": h(Progress, { value: 40, label: "Uploading", showValue: true, locale: "en-US" }),
@@ -363,7 +364,7 @@ const specimens = {
   "date-time-picker": h(library.DateTimePicker, { label: "Date and time", defaultValue: "2024-06-10T09:30", today: "2024-06-10" }),
   "date-time-picker.disabled": h(library.DateTimePicker, { label: "Date and time", disabled: true, defaultValue: "2024-06-10T09:30", today: "2024-06-10" }),
   "date-range-picker": h(library.DateRangePicker, { label: "Date range", defaultValue: { start: "2024-06-10", end: "2024-06-12" }, today: "2024-06-10" }),
-  "command": h(library.Command, { label: "Commands", items: [{ value: "save", label: "Save", icon: h(Check) }, { value: "archive", label: "Archive", disabled: true }] }),
+  "command": h(library.Command, { label: "Commands", items: [{ value: "save", label: "Save", icon: h(HugeiconsIcon, { icon: Tick02Icon, "aria-hidden": "true" }) }, { value: "archive", label: "Archive", disabled: true }] }),
   "command-palette.trigger": h(library.CommandPalette, { title: "Commands", label: "Search", items: [], trigger: h(Button, null, "Open commands") }),
   "pagination": h(library.Pagination, { count: 12, defaultValue: 3 }),
   "breadcrumb": h(library.Breadcrumb, { items: [{ label: "Home", href: "/" }, { label: "Current" }] }),

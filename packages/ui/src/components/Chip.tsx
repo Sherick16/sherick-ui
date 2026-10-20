@@ -2,7 +2,8 @@
 
 import { Button as BaseButton } from "@base-ui/react/button";
 import { Toggle } from "@base-ui/react/toggle";
-import { X } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import React, {
   forwardRef,
   type ButtonHTMLAttributes,
@@ -229,7 +230,7 @@ export const Chip = forwardRef<HTMLElement, ChipProps>(
                 press. The dismiss control is a part of the chip the pointer is already in, so it
                 clears the pointer-target minimum rather than the standalone target floor. */}
             <span className={cn("inline-flex items-center justify-center", motionInkPress)}>
-              <X className={cn("size-4")} aria-hidden="true" />
+              <HugeiconsIcon icon={Cancel01Icon} className={cn("size-4")} aria-hidden="true" />
             </span>
           </BaseButton>
         )}

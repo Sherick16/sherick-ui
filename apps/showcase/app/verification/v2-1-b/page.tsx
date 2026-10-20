@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Moon } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Moon02Icon } from "@hugeicons/core-free-icons";
 import { Button, Command, CommandPalette, DirectionProvider, type CommandItem } from "sherick-ui";
 
 const commands: CommandItem[] = [
@@ -11,7 +12,7 @@ const commands: CommandItem[] = [
     value: "dark",
     label: "Switch to dark theme",
     group: "Appearance",
-    icon: <Moon />,
+    icon: <HugeiconsIcon icon={Moon02Icon} aria-hidden="true" />,
     shortcut: "\u2318D",
     keywords: ["night", "dim"],
   },
