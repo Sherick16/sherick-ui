@@ -127,6 +127,13 @@ Version 2.5.0 adds `DateTimePicker`: a native `datetime-local` field whose popup
 
 Version 2.4.0 gives hollow controls a rim. Text fields, the file drop target and empty checkboxes and radios carry one 1.5px border in a new `--sui-rim` theme variable, tuned to clear 3:1 on every surface; fields become canvas-toned wells below the card; an invalid field turns only its rim to the danger tone; and the drop target has a custom dashed rim. Checkbox and RadioGroup marks are 20px, with an accent fill when selected. No component or prop is removed.
 
+Version 2.8.0 removes the line from text fields. A field is identified by its label and content, as
+WCAG 1.4.11 allows, so it is a quiet tray with no underline: the tray is a step deeper at rest, sinks
+to a new `--sui-tray-deep` theme variable under the pointer and while focused, and the focus ring
+marks engagement. An invalid field is a soft danger tray. Surface rows in `RadioGroup` and
+`CheckboxGroup` rest on a tray, and the selected row carries an accent rim. Empty checkboxes, radios
+and the file drop target keep their 3:1 rim. No component or prop is removed.
+
 Version 2.7.0 is a visual overhaul with no API change. The palette moves from a blue-grey family to
 graphite neutrals with one vivid iris accent; container corners tighten
 (fields 12px, cards 20px, dialogs 24px) while actions stay capsules; the elevation ladder gains a

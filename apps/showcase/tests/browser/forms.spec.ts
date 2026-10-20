@@ -228,8 +228,17 @@ test("Form focuses the first invalid field, shows errors where they are and acce
   await save.click();
   await expect(title).toBeFocused();
   await expect(title).toHaveAttribute("aria-invalid", "true");
-  const danger = await page.getByText("Enter an amount.").evaluate((element) => getComputedStyle(element).color);
-  await expect(title).toHaveCSS("border-bottom-color", danger);
+  // An invalid field is the danger tray: the danger soft surface, and no drawn line.
+  const dangerTray = await title.evaluate((element) => {
+    const probe = document.createElement("div");
+    probe.style.backgroundColor = "oklch(var(--sui-danger-soft))";
+    document.body.appendChild(probe);
+    const fill = getComputedStyle(probe).backgroundColor;
+    probe.remove();
+    return fill;
+  });
+  await expect(title).toHaveCSS("background-color", dangerTray);
+  await expect(title).toHaveCSS("border-bottom-color", "rgba(0, 0, 0, 0)");
   const casinos = page.getByRole("group", { name: "Casinos" });
   await expect(page.getByText("Choose at least one option.")).toBeVisible();
   await expect(page.getByTestId("form-submitted")).toHaveText("Not submitted");

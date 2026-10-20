@@ -106,14 +106,15 @@ for (const theme of ["light", "dark"] as const) {
         expect(sibling.fill).toBe(defaults[0].fill);
         expect(sibling.rim).toBe(defaults[0].rim);
       }
-      // An invalid field is the danger tray: one danger fill and one danger baseline across the family.
+      // A field draws no visible line: its border is transparent, there for forced colors to repaint.
+      expect(defaults[0].rim).toBe("rgba(0, 0, 0, 0)");
+      // An invalid field is the danger tray: one danger fill across the family, and still no line.
       const invalid = await Promise.all(fieldSurfaces(page, "Invalid").slice(0,4).map(style));
       for (const sibling of invalid) {
         expect(sibling.fill).toBe(invalid[0].fill);
-        expect(sibling.rim).toBe(invalid[0].rim);
+        expect(sibling.rim).toBe(defaults[0].rim);
       }
       expect(invalid[0].fill).not.toBe(defaults[0].fill);
-      expect(invalid[0].rim).not.toBe(defaults[0].rim);
       const disabled = fieldSurfaces(page, "Disabled");
       for (const sibling of disabled) {
         const rest = await style(sibling);

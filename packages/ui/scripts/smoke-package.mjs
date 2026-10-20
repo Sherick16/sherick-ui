@@ -229,6 +229,7 @@ for (const token of [
   "--sui-canvas",
   "--sui-surface",
   "--sui-surface-high",
+  "--sui-tray-deep",
   "--sui-surface-float",
   "--sui-surface-overlay",
   "--sui-ink",

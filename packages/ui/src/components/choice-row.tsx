@@ -36,7 +36,7 @@ export const choiceItemClasses = (appearance: ChoiceAppearance): ClassValue[] =>
     cn(
       "relative min-w-0 forced-colors:has-[:focus-visible]:[outline-style:none]",
       shape.control,
-      material.matteQuiet,
+      material.matteHigh,
       selectableRowSurface,
       stateLayerQuietComposite,
       focusRingWithin,

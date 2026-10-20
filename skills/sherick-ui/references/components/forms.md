@@ -128,7 +128,7 @@ is the native element.
   `errorMessage` renders only while `error` is true, and with `error` alone the control is
   marked invalid with no visible message. Without `error`, the field shows what Base reports:
   a failed constraint on submit, or the message a `Form` `errors` map holds for its `name` —
-  with the same danger rim either way.
+  with the same danger tray either way.
 - `prefix?` / `suffix?` (`ReactNode`, from 2.6.0) put text or a mark at the field's ends
   (`https://`, `€`, `.discord.gg`). They are presentation, hidden from assistive technology:
   name the unit in the label too. A press on an affix focuses the input.

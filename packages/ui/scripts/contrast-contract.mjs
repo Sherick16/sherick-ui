@@ -125,9 +125,12 @@ export const contrastCompositions = (variables, alphas) => {
   const overlayFill = Number(variables["--sui-overlay-fill"]);
   const codeWell = composite(canvas, 0.28, composite(surface, FIELD.card, canvas));
   /* A field is a tray in the `surface-high` tone over whatever holds it; the common case is a card.
-     An empty mark's interior is a canvas-toned well. */
+     Under the pointer and while engaged it sinks to the deep tray. A choice row rests on the
+     `matteHigh` tray. An empty mark's interior is a canvas-toned well. */
   const card = composite(surface, FIELD.card, canvas);
   const tray = (alpha, base = card) => composite(surfaceHigh, alpha, base);
+  const deepTray = (alpha, base = card) => composite(colour("tray-deep"), alpha, base);
+  const choiceRow = (base = card) => composite(surfaceHigh, FIELD.groove, base);
   const markWell = composite(canvas, FIELD.mark, card);
   const dangerTray = (base) => composite(colour("danger-soft"), FIELD.error, base);
   const surfaces = {
@@ -139,8 +142,10 @@ export const contrastCompositions = (variables, alphas) => {
     "neutral soft in a card": composite(surfaceHigh, TINT.neutralSoft, composite(surface, FIELD.card, canvas)),
     "field": tray(FIELD.control),
     "empty mark": markWell,
-    "field hover": tray(FIELD.hover),
-    "engaged field": tray(FIELD.engaged),
+    "field hover": deepTray(FIELD.hover),
+    "engaged field": deepTray(FIELD.engaged),
+    "choice row in a card": choiceRow(),
+    "choice row on the page": choiceRow(canvas),
     [CODE_WELL]: codeWell,
     [ACRYLIC]: composite(surfaceFloat, acrylicFill, canvas),
     [ACRYLIC_DENSE]: composite(surfaceFloat, acrylicDenseFill, canvas),
@@ -199,7 +204,7 @@ export const contrastCompositions = (variables, alphas) => {
     WCAG_TEXT,
     "a field's placeholder in its tray, at rest and engaged",
     ["canvas", "matte card"].flatMap((where) =>
-      [["at rest", FIELD.control], ["engaged", FIELD.engaged]].map(([state, depth]) => [`field in ${where}, ${state}`, colour("ink-muted"), tray(depth, surfaces[where])])
+      [["at rest", tray(FIELD.control, surfaces[where])], ["engaged", deepTray(FIELD.engaged, surfaces[where])]].map(([state, fill]) => [`field in ${where}, ${state}`, colour("ink-muted"), fill])
     )
   );
   add(
@@ -359,26 +364,33 @@ export const contrastCompositions = (variables, alphas) => {
   add(
     "a hollow control's rim on the surfaces it sits on",
     WCAG_NON_TEXT,
-    "a text field, a drop target's dashes, an unchecked box and an unselected radio are hollow controls identified by their `rim`, tuned to clear this by a small margin; a selected mark drops the rim and is identified by its fill",
-    controlEntries.map(([where, base]) => [where, colour("rim"), base])
-  );
-  add(
-    "a field's baseline against its own tray",
-    WCAG_NON_TEXT,
-    "a text field's rim is its baseline, the one edge that carries its 3:1 boundary: it sits between the tray above it and the surface below, and steps to `ink-muted` while the field is hovered or engaged",
-    ["canvas", "matte card"].flatMap((where) => [
-      [`tray in ${where} at rest`, colour("rim"), tray(FIELD.control, surfaces[where])],
-      [`tray in ${where} hovered`, colour("ink-muted"), tray(FIELD.hover, surfaces[where])],
-      [`tray in ${where} engaged`, colour("ink-muted"), tray(FIELD.engaged, surfaces[where])],
-    ])
-  );
-  add(
-    "an invalid field's baseline",
-    WCAG_NON_TEXT,
-    "an invalid field is the danger tray with a danger baseline; the baseline answers to the tray above it and to every surface below it",
+    "a drop target's dashes, an unchecked box and an unselected radio are hollow controls identified by their `rim`, tuned to clear this by a small margin; a selected mark drops the rim and is identified by its fill. A text field is identified by its label and content and draws no rim",
     [
-      ...["canvas", "matte card"].map((where) => [`danger tray in ${where}`, colour("danger"), dangerTray(surfaces[where])]),
-      ...controlEntries.map(([where, base]) => [where, colour("danger"), base]),
+      ...controlEntries.map(([where, base]) => [where, colour("rim"), base]),
+      ["unselected mark on a choice row in a card", colour("rim"), choiceRow()],
+      ["unselected mark on a choice row on the page", colour("rim"), choiceRow(canvas)],
+    ]
+  );
+  add(
+    "text on a choice row through its states",
+    WCAG_TEXT,
+    "a surface choice row's label and description on the resting tray, under the row's hover and press layers, which composite toward the label",
+    ["canvas", "matte card"].flatMap((where) => {
+      const row = choiceRow(surfaces[where]);
+      return ["ink", "ink-muted"].flatMap((role) => [
+        [`${role} on a row in ${where} at rest`, colour(role), row],
+        [`${role} on a row in ${where} hovered`, colour(role), composite(colour("ink"), STATE.quiet.hover, row)],
+        [`${role} on a row in ${where} pressed`, colour(role), composite(colour("ink"), STATE.quiet.press, row)],
+      ]);
+    })
+  );
+  add(
+    "a choice row's selection rim",
+    WCAG_NON_TEXT,
+    "the accent rim a selected choice row carries, against the soft surface inside it and the surfaces outside it",
+    [
+      ["primary soft inside the row", colour("primary"), soft("primary")],
+      ...controlEntries.map(([where, base]) => [where, colour("primary"), base]),
     ]
   );
   add(

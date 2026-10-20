@@ -195,20 +195,21 @@ export const edgeTone = {
   rule: "border-sherick-edge/[0.075]",
 } as const;
 
-/* Rim — the boundary of a *hollow* control: a text field, or an empty checkbox or radio. Nothing
-   inside such a control says what it is — an empty field holds at most a placeholder, an empty mark
-   holds nothing — and it still has to be identifiable at 3:1, which no neutral fill step and no
+/* Rim — the boundary of a *hollow* control: the file drop target, or an empty checkbox or radio.
+   Nothing inside such a control says what it is — an empty mark holds nothing, a drop target only
+   an invitation — and it still has to be identifiable at 3:1, which no neutral fill step and no
    depth the light model can draw achieves on its own. So a hollow control carries one rim in the
    `rim` tone, tuned to clear 3:1 by a small margin and no more, and that rim is the only border a
    control has. A filled control — a button, a chip, a selected mark — is identified by its fill and
    never carries one.
-   A text field's rim is its **baseline**: a line along the bottom edge only, which is the one part
-   of a field's boundary WCAG needs to see at 3:1 — the line the text is written on. The other three
-   sides are transparent, so the field reads as a quiet tray rather than a drawn box, and the
-   field's `control` corner bends the baseline up into a soft lip at each end. The rim is a real
-   border on all four sides: forced colors repaints even a transparent border in a system colour, so
-   a field there keeps its whole outline, and the scoped baseline sizes boxes by their border edge,
-   so the rim never changes a field's footprint. Its states ride on the field ladder in `state.field`.
+   A text field is not hollow: its label names it, and its value or placeholder and its parts — a
+   chevron, a calendar glyph, a stepper — show what it is and where it is, which is how WCAG 1.4.11
+   lets a control be identified without a 3:1 edge. Its tray says "something goes here", and its
+   states ride on the tray and the focus ring (`state.field`). `rim.field` is therefore no visible
+   line: it is a transparent border on all four sides, because forced colors repaints even a
+   transparent border in a system colour, so a field there keeps its whole outline where the tray is
+   discarded; the scoped baseline sizes boxes by their border edge, so it never changes a field's
+   footprint. An invalid field takes the same transparent border.
    A drop target's rim is dashed, and the dashes are a mask over an overlay rather than the native
    `dashed` style, whose dash length and corner joins the platform decides: the mask fixes the dash
    rhythm and follows the `control` corner exactly. The mask is authored in `tokens.ts`. */
@@ -216,8 +217,7 @@ const dashedRimMask =
   "after:[mask-image:var(--sui-rim-dashed)] after:[mask-size:100%_100%] after:[mask-repeat:no-repeat]";
 
 export const rim = {
-  field: "border-[1.5px] border-transparent border-b-sherick-rim",
-  fieldError: "border-[1.5px] border-transparent border-b-sherick-danger",
+  field: "border-[1.5px] border-transparent",
   dashed: /* @__PURE__ */ cx(
     "after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:content-['']",
     "after:bg-sherick-rim",
@@ -287,30 +287,31 @@ export const state = {
      composite field focuses its outer surface while the input inside stays
      borderless; an expanded control holds the engaged step while its popup is
      open. Tonality carries the state, so no border appears and disappears. */
-  /* A field is a tray: the `matteHigh` tone a groove holds, so it reads as a quiet recess in light
-     and a quiet step up in dark, exactly as a segmented control's track does. Engaging it deepens
-     the tray and steps its baseline up to `ink-muted`. An invalid field is the danger tray — the
-     role's soft surface with a danger baseline — because a baseline alone is a thin signal to carry
-     an error on; the tray, the danger placeholder and the field's message carry it together. The
-     soft surface is laid at about half strength, so an error reads as a warm tray rather than a
-     red block, and it holds still under the pointer: its colour is already what it has to say. */
+  /* A field is a tray in the `surface-high` tone, so it reads as a quiet recess in light and a
+     quiet step up in dark. It draws no line: its label and content identify it (see `rim`), so the
+     tray is laid at full strength to say "something goes here" on a card and on the page alike.
+     The pointer sinks it to the deep tray, and so does engagement — focus or an open popup — where
+     the focus ring is what says "this one is engaged"; an engaged field never falls back under the
+     pointer, because both states share the step. An invalid field is the danger tray — the role's
+     soft surface, at full strength like the neutral tray — and it holds still under the pointer:
+     its colour is already what it has to say, and the danger placeholder and the field's message
+     carry the error in words. */
   field: {
-    hover: "hover:bg-sherick-surface-high/[0.82] hover:border-b-sherick-ink-muted",
-    focus: "focus:bg-sherick-surface-high focus:border-b-sherick-ink-muted",
+    hover: "hover:bg-sherick-tray-deep",
+    focus: "focus:bg-sherick-tray-deep",
     /* A composite's engaged tone outranks hover, independent of variant emission order. */
-    focusWithin: "[&&]:focus-within:bg-sherick-surface-high [&&]:focus-within:border-b-sherick-ink-muted",
-    engaged: "bg-sherick-surface-high border-b-sherick-ink-muted",
-    errorHover: "hover:bg-sherick-danger-soft/[0.55]",
-    errorFocus: "focus:bg-sherick-danger-soft/[0.55]",
-    errorEngaged: "bg-sherick-danger-soft/[0.55]",
+    focusWithin: "[&&]:focus-within:bg-sherick-tray-deep",
+    engaged: "bg-sherick-tray-deep",
+    errorHover: "hover:bg-sherick-danger-soft",
+    errorFocus: "focus:bg-sherick-danger-soft",
+    errorEngaged: "bg-sherick-danger-soft",
     /* The error ladder again, keyed on Base UI's validity attribute for a part that learns its
        validity from the field it sits in. Two variants outrank the single-variant ladder above,
        so neither ladder has to be conditional. */
-    invalid: "data-[invalid]:bg-sherick-danger-soft/[0.55] data-[invalid]:border-b-sherick-danger",
-    invalidHover: "data-[invalid]:hover:bg-sherick-danger-soft/[0.55] data-[invalid]:hover:border-b-sherick-danger",
-    invalidEngaged: "data-[invalid]:bg-sherick-danger-soft/[0.55] data-[invalid]:border-b-sherick-danger",
-    invalidFocusWithin:
-      "[&&]:data-[invalid]:focus-within:bg-sherick-danger-soft/[0.55] [&&]:data-[invalid]:focus-within:border-b-sherick-danger",
+    invalid: "data-[invalid]:bg-sherick-danger-soft",
+    invalidHover: "data-[invalid]:hover:bg-sherick-danger-soft",
+    invalidEngaged: "data-[invalid]:bg-sherick-danger-soft",
+    invalidFocusWithin: "[&&]:data-[invalid]:focus-within:bg-sherick-danger-soft",
   },
 
 } as const;
@@ -442,10 +443,9 @@ export const hitArea =
    - matteHigh:   the second matte step, for nesting inside another matte surface.
    - matteInset:  a passive sheet tucked under a stronger control; subdued without
                   blending into the canvas or needing a drawn rim.
-   - control:     the fill every text control shares, plus its placeholder tone. It is a tray in
-                  the `matteHigh` tone a groove holds, so a field and a track are one family. The
-                  tray says "something goes here"; its baseline, not its fill, is what carries the
-                  3:1 boundary (see `rim`).
+   - control:     the fill every text control shares, plus its placeholder tone: an opaque tray
+                  in the `surface-high` tone. The tray says "something goes here"; the field's
+                  label and content, not a drawn edge, are what identify it (see `rim`).
    - handle:      the fill of a small part the user has to find — a value control's handle.
                   Surface steps sit within a few percent of their neighbours, so this role
                   takes the mid-emphasis tone, which inverts with the theme and separates in
@@ -478,15 +478,15 @@ export const material = {
   matteQuiet: "bg-sherick-surface/[0.42] text-sherick-ink",
   matte: "bg-sherick-surface/[0.78] text-sherick-ink",
   matteHigh: "bg-sherick-surface-high/[0.72] text-sherick-ink",
-  control: "bg-sherick-surface-high/[0.6] text-sherick-ink placeholder:text-sherick-ink-muted",
+  control: "bg-sherick-surface-high text-sherick-ink placeholder:text-sherick-ink-muted",
   /* The invalid fill carries its placeholder at the *full* danger tone, not at a fraction of it. A
      placeholder is text, so it answers to the same 4.5:1 the copy beside it does, and a partial
      opacity of an accent is a different colour from the accent: the 72%-opacity placeholder
-     measured 2.8–3.0:1 light and 3.4–3.9:1 dark on this fill, while the token it was mixed from
+     measured 2.8–3.0:1 light and 3.4–3.9:1 dark on the half-strength danger tray, while the token it was mixed from
      measures 4.1–4.7:1 light and 5.2–6.2:1 dark on it. There is no dimmer step of a semantic tone
      that is still readable, and a normal field's placeholder is `ink-muted` at full strength
      already — so the error form is the same rule, in the tone the field is in. */
-  controlError: "bg-sherick-danger-soft/[0.55] text-sherick-ink placeholder:text-sherick-danger",
+  controlError: "bg-sherick-danger-soft text-sherick-ink placeholder:text-sherick-danger",
   handle: "bg-sherick-ink-muted text-sherick-canvas",
   acrylic:
     "bg-sherick-surface-float/[var(--sui-glass-fill)] bg-[image:var(--sui-glass-gradient)] text-sherick-ink backdrop-blur-[var(--sui-glass-blur)] backdrop-saturate-[var(--sui-glass-saturation)] backdrop-brightness-[var(--sui-glass-brightness)]",
@@ -820,13 +820,23 @@ export const currentDestination = "bg-sherick-primary-soft text-sherick-ink font
    brightest surface and a white row on it would vanish. */
 export const puck = "bg-sherick-puck";
 
-/* A choice row that holds the selection — an opt-in `surface` row in a RadioGroup or CheckboxGroup —
-   takes the role's *soft* surface and stays flat. The row is a large surface and its mark already
-   carries the strong accent edge to edge, so the row only has to say "this one" quietly: the
-   selected step and a lift turned a whole card into an accent block, which outshouted the
-   priority action on the same view. */
-export const selectableRowSurface =
-  "has-[[data-checked]]:bg-sherick-primary-soft has-[[data-checked]]:text-sherick-ink";
+/* A choice row — an opt-in `surface` row in a RadioGroup or CheckboxGroup — rests on the
+   `matteHigh` tray, so every choice in the group reads as a target before any is chosen; it stays
+   light enough that the empty mark's rim still clears 3:1 against it. The row that holds the
+   selection takes the role's *soft* surface and the accent **selection rim**, and stays flat. The
+   soft surface is lighter than the resting tray, so the tint alone would make the chosen row the
+   quieter of the two; the rim is what says "this one". It is the row's selection mark, not an
+   outline drawn to separate a surface, and it belongs to the selected state only. Like an empty
+   mark's rim it is an overlay rather than a border, so the fill and the hover layer reach the row's
+   real edge, and it is transparent rather than absent at rest, so forced colors keeps every row's
+   outline. The selected step and a lift turned a whole card into an accent block, which outshouted
+   the priority action on the same view. */
+export const selectableRowSurface = /* @__PURE__ */ cx(
+  "has-[[data-checked]]:bg-sherick-primary-soft has-[[data-checked]]:text-sherick-ink",
+  "after:pointer-events-none after:absolute after:inset-0 after:box-border after:rounded-[inherit] after:border-[1.5px] after:border-transparent after:content-['']",
+  "has-[[data-checked]]:after:border-sherick-primary",
+  motionRim
+);
 
 /* Supporting copy inside such a row — a choice's description. `text.medium` clears 4.5:1 on the
    soft step at rest (5.7:1 light, 6.2:1 dark), but the row's press layer composites toward the label
@@ -905,8 +915,11 @@ const toneAlpha = (tone: string) => (recipe: string, label: string) => {
   if (!match) throw new Error(`recipe alpha missing for ${label}`);
   return match[1] === undefined ? 1 : Number(match[1]);
 };
-/* A field tray's `surface-high` step, and the canvas step an empty mark's interior holds. */
+/* A field tray's `surface-high` step, its deep step, its danger step, and the canvas step an empty
+   mark's interior holds. */
 const trayAlpha = toneAlpha("surface-high");
+const deepTrayAlpha = toneAlpha("tray-deep");
+const dangerTrayAlpha = toneAlpha("danger-soft");
 const markAlpha = toneAlpha("canvas");
 
 export const recipeAlphas = {
@@ -926,10 +939,10 @@ export const recipeAlphas = {
     card: fillAlpha(material.matte, "field.card"),
     groove: fillAlpha(material.matteHigh, "field.groove"),
     control: trayAlpha(material.control, "field.control"),
-    hover: trayAlpha(state.field.hover, "field.hover"),
-    engaged: trayAlpha(state.field.engaged, "field.engaged"),
+    hover: deepTrayAlpha(state.field.hover, "field.hover"),
+    engaged: deepTrayAlpha(state.field.engaged, "field.engaged"),
     mark: markAlpha(markWellFill, "field.mark"),
-    error: fillAlpha(material.controlError, "field.error"),
+    error: dangerTrayAlpha(material.controlError, "field.error"),
   },
 } as const;
 

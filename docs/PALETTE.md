@@ -32,6 +32,7 @@ warm neutrals read as yellowed beside a cool accent. The overhaul separates the 
 | `--sui-canvas` | `0.970 0.003 290` | `0.160 0.006 285` |
 | `--sui-surface` | `0.998 0.001 290` | `0.200 0.008 285` |
 | `--sui-surface-high` | `0.934 0.006 290` | `0.252 0.010 285` |
+| `--sui-tray-deep` | `0.900 0.008 290` | `0.290 0.011 285` |
 | `--sui-surface-float` | `0.999 0.001 290` | `0.226 0.009 285` |
 | `--sui-puck` | `1 0 0` | `0.315 0.012 285` |
 | `--sui-surface-overlay` | `0.995 0.002 290` | `0.214 0.008 285` |
@@ -60,9 +61,9 @@ warm neutrals read as yellowed beside a cool accent. The overhaul separates the 
 
 The contract is unchanged in method and in requirement, and every composition clears it in both
 themes. The binding compositions are still the filled press veil (light success 4.56, warning
-4.59, danger 4.64, primary 4.67; dark primary 4.51), the rim (3.28 light on the canvas) and a text
-field's baseline against its own tray (3.07 light, 3.28 dark), which is why the strong fills and the
-rim sit where they do. `bun run test` prints the full matrix.
+4.59, danger 4.64, primary 4.67; dark primary 4.51) and the rim (3.04 light on a choice row on the
+page, 3.22 dark on a choice row in a card), which is why the strong fills and the rim sit where they
+do, and why a choice row rests on `matteHigh` rather than the full field tray. `bun run test` prints the full matrix.
 
 The sections below are the decision record for the values this palette replaced. Their method — and
 every alternative they rejected — still governs how a value here may change.
@@ -219,6 +220,25 @@ thing a tint used to approximate — and the difference it makes is hue, not lig
 
 The field error ladder no longer composites `danger` over the field: an invalid field keeps its
 well and turns its rim to the danger tone (see below).
+
+## Fields without a line (2.8.0)
+
+**Decided and implemented** in 2.8.0. The baseline gave every text field a 3:1 underline, and a form
+read as a stack of ruled inputs. WCAG 1.4.11 asks for 3:1 only from the visual information that is
+*required* to identify a control; a text field is identified by its label and by its value or
+placeholder and its parts, so it needs no 3:1 edge. Fields now draw no line: the tray is opaque
+`surface-high` (1.21:1 light and 1.17:1 dark against the card, up from the 60% tray's 1.12 and
+1.08), and the pointer and engagement sink it to the new `tray-deep` step, with the focus ring as
+the engagement signal. An invalid field is the danger soft surface at full strength. The rim stays
+on the hollow controls that hold no content — the drop target and empty checkboxes and radios — and
+the `rim` composition now also covers an empty mark on a resting choice row.
+
+| Composition | Light | Dark |
+| --- | --- | --- |
+| `text.medium` on an engaged field (`tray-deep`) | **4.86** | **6.23** |
+| `tone.text.danger` on the danger tray | **6.62** | **6.73** |
+| an empty mark's rim on a choice row | **3.04** | **3.22** |
+| a choice row's selection rim, worst surface | ok | ok |
 
 ## The rim (hollow controls)
 
