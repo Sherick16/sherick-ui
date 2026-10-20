@@ -1,7 +1,8 @@
 "use client";
 
 import { NumberField as BaseNumberField } from "@base-ui/react/number-field";
-import { Minus, Plus } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { MinusSignIcon, PlusSignIcon } from "@hugeicons/core-free-icons";
 import React, { forwardRef, type ComponentProps, type PointerEvent, type ReactNode, type Ref } from "react";
 import { cn } from "@/libs/utils";
 import {
@@ -165,7 +166,7 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
         >
           <BaseNumberField.Decrement className={cn(stepperClassName)}>
             <span className={cn(stepperIconClassName)}>
-              <Minus aria-hidden="true" className={cn("size-5")} />
+              <HugeiconsIcon icon={MinusSignIcon} aria-hidden="true" className={cn("size-5")} />
             </span>
           </BaseNumberField.Decrement>
           {hasAffix ? (
@@ -218,7 +219,7 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
           )}
           <BaseNumberField.Increment className={cn(stepperClassName)}>
             <span className={cn(stepperIconClassName)}>
-              <Plus aria-hidden="true" className={cn("size-5")} />
+              <HugeiconsIcon icon={PlusSignIcon} aria-hidden="true" className={cn("size-5")} />
             </span>
           </BaseNumberField.Increment>
         </BaseNumberField.Group>

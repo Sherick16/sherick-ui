@@ -1,6 +1,7 @@
 "use client";
 
-import { Check as CheckIcon } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Tick02Icon } from "@hugeicons/core-free-icons";
 import React, { forwardRef, type ComponentProps, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import { elevation, focusRing, material, shape, state, stateLayer, text, tone, type } from "./ui.common";
@@ -131,7 +132,7 @@ const Stepper = forwardRef<HTMLElement, StepperProps>(
                   >
                     {complete && !current ? (
                       <>
-                        <CheckIcon aria-hidden="true" />
+                        <HugeiconsIcon icon={Tick02Icon} aria-hidden="true" />
                         <span className={cn("sr-only")}>Complete</span>
                       </>
                     ) : index + 1}

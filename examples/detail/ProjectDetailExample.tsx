@@ -1,6 +1,7 @@
 "use client";
 
-import { Ellipsis } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { MoreHorizontalIcon } from "@hugeicons/core-free-icons";
 import { useEffect, useRef, useState, type FormEvent } from "react";
 import { AlertDialog, Breadcrumb, Button, Dialog, IconButton, Input, Menu, Tabs, Textarea, useToast } from "sherick-ui";
 import "./detail.css";
@@ -76,7 +77,7 @@ export default function ProjectDetailExample({ projectsHref = "/projects" }: { p
             <div className="detail-actions">
               <Button appearance="filled" onClick={openEdit}>Edit project</Button>
               <Menu>
-                <Menu.Trigger render={<IconButton appearance="ghost" variant="secondary" icon={<Ellipsis />} aria-label="More project actions" />} />
+                <Menu.Trigger render={<IconButton appearance="ghost" variant="secondary" icon={<HugeiconsIcon icon={MoreHorizontalIcon} aria-hidden="true" />} aria-label="More project actions" />} />
                 <Menu.Content align="end">
                   <Menu.Item onClick={copyLink}>Copy link</Menu.Item>
                   <Menu.Separator />

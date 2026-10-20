@@ -2,7 +2,8 @@
 
 import { Accordion as BaseAccordion } from "@base-ui/react/accordion";
 import React, { createContext, useContext, type ReactNode } from "react";
-import { ChevronDown } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/libs/utils";
 import Divider from "./Divider";
 import { disclosure } from "./ui.common";
@@ -92,7 +93,7 @@ const AccordionTrigger = ({ children, className }: AccordionTriggerProps) => {
         <span className={cn("min-w-0 flex-1")}>{children}</span>
         {/* The affordance turns in place, so it takes `orient`: it is the same object before
             and after, and only its direction changes. */}
-        <ChevronDown
+        <HugeiconsIcon icon={ArrowDown01Icon}
           aria-hidden="true"
           className={cn("size-4 shrink-0", motionOrient, "group-data-[panel-open]:rotate-180")}
         />

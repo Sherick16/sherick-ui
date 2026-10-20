@@ -2,7 +2,8 @@
 
 import { Autocomplete as BaseAutocomplete } from "@base-ui/react/autocomplete";
 import React, { forwardRef, useId, useMemo, type ReactNode } from "react";
-import { Search as SearchIcon } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Search01Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/libs/utils";
 import { density, focusRingWithin, list, material, rim, shape, state, text, type } from "./ui.common";
 import { motionFeedback } from "./ui.motion";
@@ -227,7 +228,7 @@ const Command = forwardRef<HTMLInputElement, CommandProps>(({
             disabled ? state.disabled : state.text
           )}
         >
-          <SearchIcon aria-hidden="true" className={cn("size-5 shrink-0", text.medium)} />
+          <HugeiconsIcon icon={Search01Icon} aria-hidden="true" className={cn("size-5 shrink-0", text.medium)} />
           <BaseAutocomplete.Input
             ref={ref}
             id={inputId}

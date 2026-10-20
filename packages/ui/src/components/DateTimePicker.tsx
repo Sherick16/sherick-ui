@@ -2,7 +2,8 @@
 
 import { Field as BaseField } from "@base-ui/react/field";
 import { Popover as BasePopover } from "@base-ui/react/popover";
-import { CalendarClock } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { CalendarClockIcon } from "@hugeicons/core-free-icons";
 import React, {
   forwardRef,
   useEffect,
@@ -320,7 +321,7 @@ const DateTimePicker = forwardRef<HTMLInputElement, DateTimePickerProps>(({
           <DateFieldTrigger
             label={`Open ${label}`}
             disabled={disabled}
-            icon={<CalendarClock aria-hidden="true" />}
+            icon={<HugeiconsIcon icon={CalendarClockIcon} aria-hidden="true" />}
           />
         </div>
       </Field>

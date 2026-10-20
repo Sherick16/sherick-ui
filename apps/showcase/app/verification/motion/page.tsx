@@ -24,7 +24,8 @@ import {
   Tabs,
   Tooltip,
 } from "sherick-ui";
-import { Copy, Plus, Trash2 } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Copy01Icon, Delete02Icon, PlusSignIcon } from "@hugeicons/core-free-icons";
 
 type Speed = "normal" | "slow" | "reduce";
 
@@ -157,12 +158,12 @@ export default function MotionLabPage() {
           <Button appearance="filled">Filled</Button>
           <Button appearance="tonal">Tonal</Button>
           <Button appearance="text">Text</Button>
-          <IconButton variant="secondary" icon={<Copy className="size-5" />} aria-label="Copy" />
-          <IconButton appearance="ghost" variant="secondary" icon={<Plus className="size-5" />} aria-label="Add" />
+          <IconButton variant="secondary" icon={<HugeiconsIcon icon={Copy01Icon} aria-hidden="true" className="size-5" />} aria-label="Copy" />
+          <IconButton appearance="ghost" variant="secondary" icon={<HugeiconsIcon icon={PlusSignIcon} aria-hidden="true" className="size-5" />} aria-label="Add" />
           <IconButton
             appearance="acrylic"
             variant="secondary"
-            icon={<Trash2 className="size-5" />}
+            icon={<HugeiconsIcon icon={Delete02Icon} aria-hidden="true" className="size-5" />}
             aria-label="Delete"
           />
           <div className="w-40">

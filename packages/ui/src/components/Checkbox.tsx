@@ -1,7 +1,8 @@
 "use client";
 
 import { Checkbox as BaseCheckbox } from "@base-ui/react/checkbox";
-import { Check as CheckIcon, Minus } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { MinusSignIcon, Tick02Icon } from "@hugeicons/core-free-icons";
 import React, { forwardRef, type ButtonHTMLAttributes, type Ref } from "react";
 import { cn } from "@/libs/utils";
 import { groupFocusRing, hitArea, selectable, shape, state, stateLayer } from "./ui.common";
@@ -94,9 +95,9 @@ export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(
           <BaseCheckbox.Indicator className={cn("relative flex items-center justify-center", motionArrive)}>
             {/* A heavier stroke than the icon default: at 14px the default draws a hairline tick. */}
             {indeterminate ? (
-              <Minus className={cn("size-3.5")} strokeWidth={3} />
+              <HugeiconsIcon icon={MinusSignIcon} aria-hidden="true" className={cn("size-3.5")} strokeWidth={3} />
             ) : (
-              <CheckIcon className={cn("size-3.5")} strokeWidth={3} />
+              <HugeiconsIcon icon={Tick02Icon} aria-hidden="true" className={cn("size-3.5")} strokeWidth={3} />
             )}
           </BaseCheckbox.Indicator>
         </span>

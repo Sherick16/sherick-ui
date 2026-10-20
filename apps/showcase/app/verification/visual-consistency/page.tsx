@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { Check, Download, Heart } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Download04Icon, FavouriteIcon, Tick02Icon } from "@hugeicons/core-free-icons";
 import {
   Accordion, Alert, AlertDialog, Badge, Button, Card, Checkbox, Chip, Collapsible,
   Combobox, Dialog, Drawer, Field, IconButton, Input, Menu, NavGroup, NavItem,
@@ -39,10 +40,10 @@ export default function VisualConsistencyPage() {
           </header>
           <Band name="Actions">
             {(["tonal", "filled", "text"] as const).map((appearance) => <div key={appearance} data-appearance={appearance} className="flex flex-wrap items-center gap-4">
-              <Button appearance={appearance} icon={<Download />}>Export</Button>
-              <Button appearance={appearance} icon={<Download />} loading>Export</Button>
-              <Button appearance={appearance} icon={<Download />} disabled>Export</Button>
-              <IconButton appearance={appearance === "tonal" ? "tonal" : "ghost"} icon={<Download />} aria-label={`${appearance} icon`} />
+              <Button appearance={appearance} icon={<HugeiconsIcon icon={Download04Icon} aria-hidden="true" />}>Export</Button>
+              <Button appearance={appearance} icon={<HugeiconsIcon icon={Download04Icon} aria-hidden="true" />} loading>Export</Button>
+              <Button appearance={appearance} icon={<HugeiconsIcon icon={Download04Icon} aria-hidden="true" />} disabled>Export</Button>
+              <IconButton appearance={appearance === "tonal" ? "tonal" : "ghost"} icon={<HugeiconsIcon icon={Download04Icon} aria-hidden="true" />} aria-label={`${appearance} icon`} />
               <IconButton appearance={appearance === "tonal" ? "tonal" : "ghost"} loading aria-label={`${appearance} loading icon`} />
             </div>)}
           </Band>
@@ -68,7 +69,7 @@ export default function VisualConsistencyPage() {
               <div className="space-y-4"><Slider label="Budget" defaultValue={40} /><Slider label="Locked budget" defaultValue={40} disabled /></div>
             </div>
             <div className="flex flex-wrap items-center gap-5">
-              <Badge icon={<Check />}>Workspace</Badge><Chip icon={<Check />}>Workspace</Chip><Chip value="one" defaultChecked>Workspace</Chip><Chip value="two">Personal</Chip><Chip value="locked" disabled>Locked</Chip>
+              <Badge icon={<HugeiconsIcon icon={Tick02Icon} aria-hidden="true" />}>Workspace</Badge><Chip icon={<HugeiconsIcon icon={Tick02Icon} aria-hidden="true" />}>Workspace</Chip><Chip value="one" defaultChecked>Workspace</Chip><Chip value="two">Personal</Chip><Chip value="locked" disabled>Locked</Chip>
               <Chip onRemove={() => undefined}>Workspace</Chip>
               <div className="max-w-full overflow-x-auto"><SegmentedControl aria-label="Segments" options={options} /></div>
               <div className="max-w-full overflow-x-auto"><ToggleGroup aria-label="Toggles" defaultValue={["one"]}><ToggleGroup.Item value="one">Workspace</ToggleGroup.Item><ToggleGroup.Item value="two">Personal</ToggleGroup.Item><ToggleGroup.Item value="three" disabled>Locked</ToggleGroup.Item></ToggleGroup></div>
@@ -77,7 +78,7 @@ export default function VisualConsistencyPage() {
           <Band name="Rows">
             <Tabs ariaLabel="Sections" tabs={options.map(({ value, label, disabled }) => ({ id: value, label, disabled, content: label }))} />
             <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-              <div><NavGroup title="Destinations" activeHref="#one" items={options.map(({value,label}) => ({href: `#${value}`,label}))} /><NavItem href="#icon" icon={<Heart />}>With an icon</NavItem></div>
+              <div><NavGroup title="Destinations" activeHref="#one" items={options.map(({value,label}) => ({href: `#${value}`,label}))} /><NavItem href="#icon" icon={<HugeiconsIcon icon={FavouriteIcon} aria-hidden="true" />}>With an icon</NavItem></div>
               <Accordion defaultValue={["one"]}><Accordion.Item value="one"><Accordion.Trigger>Workspace settings with a label that can wrap</Accordion.Trigger><Accordion.Panel>Supporting copy for the open region.</Accordion.Panel></Accordion.Item><Accordion.Item value="two"><Accordion.Trigger>Personal projects</Accordion.Trigger><Accordion.Panel>Personal settings</Accordion.Panel></Accordion.Item></Accordion>
               <Collapsible defaultOpen><Collapsible.Trigger>Workspace settings with a label that can wrap</Collapsible.Trigger><Collapsible.Panel>Supporting copy for the open region.</Collapsible.Panel></Collapsible>
             </div>

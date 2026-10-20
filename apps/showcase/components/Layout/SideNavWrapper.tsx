@@ -1,7 +1,8 @@
 'use client';
 import { useState } from "react";
 import { cn } from "sherick-ui/dev";
-import { PanelRightClose } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { SidebarRight01Icon } from "@hugeicons/core-free-icons";
 import SideNav from "./SideNav";
 import { IconButton, Tooltip } from "sherick-ui";
 
@@ -28,7 +29,7 @@ const SideNavWrapper = ({
       {!open && (
         <div className="fixed top-8 left-6 z-50">
           <Tooltip content="Open sidebar" position="right">
-            <IconButton icon={<PanelRightClose className="w-6 h-6" />} variant="secondary" onClick={() => setOpen(true)} />
+            <IconButton icon={<HugeiconsIcon icon={SidebarRight01Icon} aria-hidden="true" className="w-6 h-6" />} variant="secondary" onClick={() => setOpen(true)} />
           </Tooltip>
         </div>
       )}

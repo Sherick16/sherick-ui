@@ -2,7 +2,8 @@
 
 import { Select as BaseSelect } from "@base-ui/react/select";
 import React, { type ButtonHTMLAttributes } from "react";
-import { Check, ChevronDown } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { ArrowDown01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/libs/utils";
 import {
   density,
@@ -81,7 +82,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
           {option.label}
         </BaseSelect.ItemText>
         <BaseSelect.ItemIndicator>
-          <Check aria-hidden="true" className={cn("size-4", motionArrive, tone.text[variant])} />
+          <HugeiconsIcon icon={Tick02Icon} aria-hidden="true" className={cn("size-4", motionArrive, tone.text[variant])} />
         </BaseSelect.ItemIndicator>
       </BaseSelect.Item>
     );
@@ -137,7 +138,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
               }
             />
             <BaseSelect.Icon className={cn("shrink-0")}>
-              <ChevronDown
+              <HugeiconsIcon icon={ArrowDown01Icon}
                 aria-hidden="true"
                 className={cn(
                   "size-5",

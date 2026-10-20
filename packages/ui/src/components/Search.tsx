@@ -9,7 +9,8 @@ import React, {
   useRef,
   type InputHTMLAttributes,
 } from "react";
-import { Search as SearchIcon } from "lucide-react";
+import { HugeiconsIcon } from "@hugeicons/react";
+import { Search01Icon } from "@hugeicons/core-free-icons";
 import { cn, type TimerHandle } from "@/libs/utils";
 import {
   density,
@@ -161,7 +162,7 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
             {loading ? (
               <Spinner className={cn("size-5")} size="small" />
             ) : (
-              <SearchIcon className={cn("size-5")} aria-hidden="true" />
+              <HugeiconsIcon icon={Search01Icon} className={cn("size-5")} aria-hidden="true" />
             )}
           </span>
         </Button>
