@@ -14,6 +14,7 @@ import { Spinner } from "./Spinner";
 import {
   density,
   focusRingInset,
+  iconStroke,
   overlay,
   shape,
   stacking,
@@ -156,7 +157,7 @@ const baseOf = (manager: ToastManager): BaseManager => {
    silently lose its mark and its tone. `loading` is the one that is not a status glyph — it is
    ongoing work, so it carries the same activity the library's `Spinner` does. */
 const markIcon = (icon: IconSvgElement, className: string) => (
-  <HugeiconsIcon icon={icon} aria-hidden="true" className={cn("size-5 shrink-0", className)} />
+  <HugeiconsIcon icon={icon} aria-hidden="true" className={cn(iconStroke.glyph, "size-5 shrink-0", className)} />
 );
 
 const toastMark = (type: string | undefined): ReactNode => {
@@ -312,14 +313,14 @@ export const ToastViewport = ({ position = "bottom-end", className }: ToastViewp
                     comes first — the title when there is one, the description otherwise — so the mark
                     is centred on that line and a wrapped toast never pulls it into the middle. */}
                 {mark ? (
-                  <span className={cn("inline-flex shrink-0 items-center", toast.title ? "h-[1.375rem]" : "h-6")}>{mark}</span>
+                  <span className={cn("inline-flex h-6 shrink-0 items-center")}>{mark}</span>
                 ) : null}
                 <div className={cn("flex min-w-0 flex-1 flex-col gap-0.5")}>
                   {toast.title ? (
                     <BaseToast.Title className={cn(type.title, text.high)} />
                   ) : null}
                   {toast.description ? (
-                    <BaseToast.Description className={cn("text-sm leading-6", text.medium)} />
+                    <BaseToast.Description className={cn(type.body, text.medium)} />
                   ) : null}
                   {toast.actionProps ? (
                     /* Actions follow the copy instead of squeezing it between three controls.
@@ -345,9 +346,9 @@ export const ToastViewport = ({ position = "bottom-end", className }: ToastViewp
                        The whole target stays intact, with an inset ring inside the clipped root.
                        Its inline end padding is compensated separately. */
                     "group -me-2 inline-flex shrink-0 items-center justify-center",
-                    /* Half the target minus half the first line: 11px under the 22px title, 10px under the
-                       24px description. */
-                    toast.title ? "-my-[0.6875rem]" : "-my-2.5",
+                    /* Half the target minus half the first line: the title and the description both
+                       set a 24px line, so the target gives back 10px either way. */
+                    "-my-2.5",
                     text.medium,
                     "hover:text-sherick-ink",
                     motionFeedback,
@@ -357,7 +358,7 @@ export const ToastViewport = ({ position = "bottom-end", className }: ToastViewp
                   )}
                 >
                   <span className={cn("inline-flex items-center justify-center", motionInkPress)}>
-                    <HugeiconsIcon icon={Cancel01Icon} className={cn("size-4")} aria-hidden="true" />
+                    <HugeiconsIcon icon={Cancel01Icon} className={cn(iconStroke.glyph, "size-4")} aria-hidden="true" />
                   </span>
                 </BaseToast.Close>
               </BaseToast.Content>

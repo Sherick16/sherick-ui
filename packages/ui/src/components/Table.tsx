@@ -44,7 +44,7 @@ export const Table = ({
             {columns.map((column) => (
               <th
                 key={column.key}
-                className={cn("px-4 py-3 text-start text-sm font-medium", text.medium, column.className)}
+                className={cn("px-4 py-3 text-start", type.label, text.medium, column.className)}
               >
                 {column.label}
               </th>

@@ -3,7 +3,7 @@
 import { Popover as BasePopover } from "@base-ui/react/popover";
 import React, { type ReactElement, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { overlay, stacking } from "./ui.common";
+import { overlay, stacking, text, type } from "./ui.common";
 import { motionPresenceAnchored } from "./ui.motion";
 import type { OverlayAlign, OverlaySide } from "./ui.types";
 
@@ -23,6 +23,16 @@ export interface PopoverTriggerProps {
   render?: ReactElement;
   children?: ReactNode;
   /** Adds to the rendered element. The trigger writes no visual rules of its own. */
+  className?: string;
+}
+
+export interface PopoverTitleProps {
+  children: ReactNode;
+  className?: string;
+}
+
+export interface PopoverDescriptionProps {
+  children: ReactNode;
   className?: string;
 }
 
@@ -52,6 +62,8 @@ export interface PopoverContentProps {
 type PopoverComponent = ((props: PopoverProps) => React.JSX.Element) & {
   Trigger: typeof PopoverTrigger;
   Content: typeof PopoverContent;
+  Title: typeof PopoverTitle;
+  Description: typeof PopoverDescription;
 };
 
 const PopoverTrigger = ({ ...props }: PopoverTriggerProps) => <BasePopover.Trigger {...props} />;
@@ -91,6 +103,16 @@ const PopoverContent = ({
   );
 };
 
+/* The surface's heading takes the `title` role, and the primitive names the popup from it. */
+const PopoverTitle = ({ children, className }: PopoverTitleProps) => (
+  <BasePopover.Title className={cn("m-0", type.title, text.high, className)}>{children}</BasePopover.Title>
+);
+
+/* The line under the title, which the primitive wires up as the popup's description. */
+const PopoverDescription = ({ children, className }: PopoverDescriptionProps) => (
+  <BasePopover.Description className={cn("m-0 mt-1", type.body, text.medium, className)}>{children}</BasePopover.Description>
+);
+
 const Popover = (({ children, open, defaultOpen, onOpenChange }: PopoverProps) => {
   return (
     <BasePopover.Root open={open} defaultOpen={defaultOpen} onOpenChange={onOpenChange}>
@@ -101,5 +123,7 @@ const Popover = (({ children, open, defaultOpen, onOpenChange }: PopoverProps) =
 
 Popover.Trigger = PopoverTrigger;
 Popover.Content = PopoverContent;
+Popover.Title = PopoverTitle;
+Popover.Description = PopoverDescription;
 
 export default Popover;

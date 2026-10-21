@@ -13,7 +13,7 @@ import {
   stateLayer,
   tone,
 } from "./ui.common";
-import { motionTactile } from "./ui.motion";
+import { motionInkPress, motionTactile } from "./ui.motion";
 import { Variant } from "./ui.types";
 import { Spinner } from "./Spinner";
 
@@ -49,10 +49,13 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
         disabled={isDisabled}
         aria-busy={loading || undefined}
         className={cn(
-          "inline-flex items-center justify-center p-2.5 [&>svg]:size-5",
+          "group inline-flex items-center justify-center p-2.5 [&>svg]:size-5",
           density.target,
           shape.circle,
-          motionTactile,
+          /* A ghost target shows only its 20px mark, so compressing the 44px target would shrink the
+             ground under the pointer for no visible gain: the mark takes the press, as a dialog's
+             close does. A tonal or acrylic disc *is* the visible target, and presses like a button. */
+          appearance !== "ghost" && motionTactile,
           focusRing,
           tone.text[variant],
           isTonal && tone.tonal[variant],
@@ -72,7 +75,7 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
         {loading ? (
           <Spinner size="small" className={cn("size-5")} />
         ) : icon ? (
-          <span className={cn("inline-flex size-5 shrink-0 items-center justify-center [&>svg]:size-5")} aria-hidden="true">
+          <span className={cn("inline-flex size-5 shrink-0 items-center justify-center [&>svg]:size-5", appearance === "ghost" && !isDisabled && motionInkPress)} aria-hidden="true">
             {icon}
           </span>
         ) : null}

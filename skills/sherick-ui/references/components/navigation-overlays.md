@@ -24,7 +24,8 @@ import {
   type DrawerProps, type DrawerSide, type DrawerTriggerProps, type MenuContentProps, type MenuItemProps,
   type MenuProps, type MenuSeparatorProps, type MenuTriggerProps, type NavGroupHeadingLevel,
   type NavGroupItem, type NavGroupProps, type NavItemProps, type OverlayAlign, type OverlaySide,
-  type PaginationProps, type PopoverContentProps, type PopoverProps, type PopoverTriggerProps,
+  type PaginationProps, type PopoverContentProps, type PopoverDescriptionProps, type PopoverProps,
+  type PopoverTitleProps, type PopoverTriggerProps,
   type StepperItem, type StepperProps, type Tab, type TabsProps, type TooltipProps,
   type TreeViewItem, type TreeViewProps,
 } from "sherick-ui";
@@ -550,6 +551,8 @@ controls.
 <Popover>
   <Popover.Trigger render={<Button appearance="tonal" variant="secondary">Filters</Button>} />
   <Popover.Content side="bottom" align="start">
+    <Popover.Title>Filter projects</Popover.Title>
+    <Popover.Description>Applied to the current result set.</Popover.Description>
     <Input label="Owner" value={owner} onValueChange={setOwner} />
     <Button appearance="filled" onClick={apply}>Apply</Button>
   </Popover.Content>
@@ -557,8 +560,10 @@ controls.
 ```
 
 - Root: `open?` / `defaultOpen?` / `onOpenChange?`. Parts: `Popover.Trigger` (`render` /
-  `children` / `className`) and `Popover.Content` (`side?` default `"bottom"`, `align?` default
-  `"start"`, `sideOffset?` default `8`, `alignOffset?`). No `ref`.
+  `children` / `className`), `Popover.Content` (`side?` default `"bottom"`, `align?` default
+  `"start"`, `sideOffset?` default `8`, `alignOffset?`), and the optional `Popover.Title` and
+  `Popover.Description` (`children` / `className`), which set the `title` and body type roles and
+  give the popup its accessible name and description. No `ref`.
 - It stays open while the reader interacts with its content — that is the distinction from a
   `Menu` — and Escape or an outside press dismisses it, with focus returning to the trigger.
 - Base owns the portal, anchor positioning, collision handling and the resulting flip; the
@@ -584,8 +589,9 @@ A short hint for a control.
   "left"`, default `"bottom"`) and `className?`.
 - **`position`, not `side`** — and `className` styles the inline wrapper span around the trigger,
   **not** the popup, whose shell is fixed. Both are easy to get backwards.
-- The hint appears immediately: the component carries its own provider with no delay and no close
-  delay, so there is no shared timing to configure and no grouping with other tooltips.
+- The hint opens after a 500ms hover delay and closes at once, so a pointer passing over a row of
+  icons does not flash a hint for each. The component carries its own provider, so there is no
+  shared timing to configure and no grouping with other tooltips.
 - `children` must be a single element that forwards ref and props — a Sherick `Button`,
   `IconButton`, or a native element. A string or a fragment cannot be the trigger.
 - A tooltip is **not** an accessible name: an icon-only control still needs its own `aria-label`.

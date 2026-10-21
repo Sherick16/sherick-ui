@@ -8,6 +8,7 @@ import { cn } from "@/libs/utils";
 import {
   density,
   focusRingWithin,
+  iconStroke,
   material,
   rim,
   shape,
@@ -166,7 +167,7 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
         >
           <BaseNumberField.Decrement className={cn(stepperClassName)}>
             <span className={cn(stepperIconClassName)}>
-              <HugeiconsIcon icon={MinusSignIcon} aria-hidden="true" className={cn("size-5")} />
+              <HugeiconsIcon icon={MinusSignIcon} aria-hidden="true" className={cn(iconStroke.glyph, "size-5")} />
             </span>
           </BaseNumberField.Decrement>
           {hasAffix ? (
@@ -219,7 +220,7 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
           )}
           <BaseNumberField.Increment className={cn(stepperClassName)}>
             <span className={cn(stepperIconClassName)}>
-              <HugeiconsIcon icon={PlusSignIcon} aria-hidden="true" className={cn("size-5")} />
+              <HugeiconsIcon icon={PlusSignIcon} aria-hidden="true" className={cn(iconStroke.glyph, "size-5")} />
             </span>
           </BaseNumberField.Increment>
         </BaseNumberField.Group>

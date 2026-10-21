@@ -3,7 +3,7 @@
 import { Field as BaseField } from "@base-ui/react/field";
 import React, { forwardRef, type ComponentProps, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { fieldLayout, fieldMessage, text } from "./ui.common";
+import { fieldLabel, fieldLayout, fieldMessage } from "./ui.common";
 
 export interface FieldProps
   extends Omit<ComponentProps<typeof BaseField.Root>, "children" | "className" | "ref"> {
@@ -51,7 +51,7 @@ export const Field = forwardRef<HTMLDivElement, FieldProps>(
         className={cn(fieldLayout, className)}
       >
         {label && (
-          <BaseField.Label className={cn("mb-2 text-sm font-medium", text.high)}>
+          <BaseField.Label className={cn(fieldLabel)}>
             {label}
             {required && (
               <span className={cn("ms-1 text-sherick-danger")} aria-hidden="true">

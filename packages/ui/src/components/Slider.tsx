@@ -5,12 +5,12 @@ import React, { forwardRef, type ComponentProps, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import {
   elevation,
+  fieldLabel,
   focusRingWithin,
   material,
   selectable,
   shape,
   state,
-  text,
   tone,
 } from "./ui.common";
 import { motionDirect } from "./ui.motion";
@@ -82,7 +82,7 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
         form={form}
         className={cn("flex w-full flex-col", state.effectiveDisabled, className)}
       >
-        {label && <BaseSlider.Label className={cn("mb-2 text-sm font-medium", text.high)}>{label}</BaseSlider.Label>}
+        {label && <BaseSlider.Label className={cn(fieldLabel)}>{label}</BaseSlider.Label>}
         <BaseSlider.Control className={cn("group flex touch-none select-none items-center py-3")}>
           {/* The groove is the matte step every sunk track takes; the handle separates from it by
               its own mid-emphasis fill and its control elevation. */}

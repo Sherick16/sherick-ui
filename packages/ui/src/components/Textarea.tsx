@@ -10,6 +10,7 @@ import React, {
 import { cn } from "@/libs/utils";
 import {
   density,
+  fieldLabel,
   fieldLayout,
   fieldMessage,
   focusRing,
@@ -17,7 +18,6 @@ import {
   rim,
   shape,
   state,
-  text,
 } from "./ui.common";
 import { motionFeedback } from "./ui.motion";
 
@@ -57,7 +57,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         invalid={error}
       >
         {label && (
-          <Field.Label className={cn("mb-2 text-sm font-medium", text.high)}>
+          <Field.Label className={cn(fieldLabel)}>
             {label}
             {required && <span className={cn("ms-1 text-sherick-danger")} aria-hidden="true">*</span>}
           </Field.Label>

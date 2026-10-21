@@ -25,8 +25,10 @@ import "prismjs/components/prism-sql.js";
 import "prismjs/components/prism-yaml.js";
 import { cn, type TimerHandle } from "@/libs/utils";
 import {
+  codeWell,
   edge,
   focusRing,
+  iconStroke,
   material,
   recessedTop,
   shape,
@@ -96,7 +98,7 @@ const CodeBlock = ({ inline = false, className, language = "text", children }: C
             state.enabled
           )}
         >
-          {copied ? <HugeiconsIcon icon={Tick02Icon} className={cn("size-3.5")} aria-hidden="true" /> : <HugeiconsIcon icon={Copy01Icon} className={cn("size-3.5")} aria-hidden="true" />}
+          {copied ? <HugeiconsIcon icon={Tick02Icon} className={cn(iconStroke.glyph, "size-3.5")} aria-hidden="true" /> : <HugeiconsIcon icon={Copy01Icon} className={cn(iconStroke.glyph, "size-3.5")} aria-hidden="true" />}
           <span>{copied ? "Copied" : "Copy"}</span>
         </Button>
       </div>
@@ -117,7 +119,7 @@ const CodeBlock = ({ inline = false, className, language = "text", children }: C
             className={cn(
               "overflow-x-auto border-t px-4 py-4 font-sherick-mono text-sm leading-6",
               edge.rule,
-              "bg-sherick-canvas/[0.28]",
+              codeWell,
               highlightClassName
             )}
             style={style}

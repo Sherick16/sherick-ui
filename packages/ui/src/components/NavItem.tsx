@@ -32,7 +32,7 @@ const NavItem = ({ children, icon, className, href, active = false, ...props }: 
       motionFeedback,
       focusRing,
       active
-        ? currentDestination
+        ? currentDestination.row
         : cn(text.medium, "hover:text-sherick-ink"),
       stateLayer.quiet,
       className

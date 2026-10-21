@@ -102,7 +102,7 @@ const MenuContent = ({
         <BaseMenu.Popup
           className={cn(
             list.sheet,
-            "w-max min-w-44 max-w-[min(20rem,var(--available-width))] space-y-1 p-1.5",
+            "w-max min-w-44 max-w-[min(20rem,var(--available-width))] space-y-1 p-1",
             overlay.menu,
             motionPresenceAnchored,
             className

@@ -228,7 +228,8 @@ export const TimePanel = ({
       {/* The reading, where the calendar writes its month: the two halves of the popup read across. */}
       <div
         className={cn(
-          "mb-2 flex min-h-11 items-center justify-center truncate text-center text-sm font-medium",
+          "mb-2 flex min-h-11 items-center justify-center truncate text-center",
+          type.label,
           type.numeric,
           hour !== null ? text.high : text.medium
         )}

@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from "react";
 import { cn } from "@/libs/utils";
-import { focusRing, text } from "./ui.common";
+import { focusRing, iconStroke, text, type } from "./ui.common";
 
 export interface BreadcrumbItem {
   label: ReactNode;
@@ -56,7 +56,7 @@ const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
         {...props}
         ref={ref}
         aria-label={ariaLabel ?? "Breadcrumb"}
-        className={cn("min-w-0 text-sm leading-6", className)}
+        className={cn("min-w-0", type.body, className)}
       >
         {/* A native ordered list: the trail has an order, and the order is the information. The row
             wraps rather than overflowing, so a long trail stays inside its column. `role="list"`
@@ -78,7 +78,7 @@ const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
                   /* One inherited line box centers the glyph on the label's first line, even when
                      the label wraps or a consumer changes the trail's line-height. */
                   <span aria-hidden="true" className={cn("inline-flex h-[1lh] w-4 shrink-0 items-center")}>
-                    <HugeiconsIcon icon={ArrowRight01Icon} aria-hidden="true" className={cn("size-4 rtl:-scale-x-100")} />
+                    <HugeiconsIcon icon={ArrowRight01Icon} aria-hidden="true" className={cn(iconStroke.glyph, "size-4 rtl:-scale-x-100")} />
                   </span>
                 )}
                 {isCurrent ? (

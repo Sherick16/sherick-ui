@@ -225,6 +225,12 @@ export const contrastCompositions = (variables, alphas) => {
     "a selected row, segment or chip: the label is the high text step over the selection tint",
     SEMANTIC.flatMap((role) => controlEntries.map(([where, base]) => [`${where} + ${role} selected`, colour("ink"), selected(role)]))
   );
+  add(
+    "an in-track current destination",
+    WCAG_TEXT,
+    "a pagination's current page or a Stepper's current mark (`currentDestination.inTrack`): the accent label on the primary selected step, which is what says \"you are here\" where the soft step matches the groove",
+    [["tone.text.primary on primary selected", colour("primary"), selected("primary")]]
+  );
 
   /* -- the code well, which is text on its own surface --------------------------------------- */
   const CODE_ROLES = ["text", "comment", "string", "number", "keyword", "function", "tag"];

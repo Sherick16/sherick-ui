@@ -122,14 +122,16 @@ export default function SettingsExample() {
               if (value === "private" || value === "workspace") update("projectVisibility", value);
             }}
             options={[
-              { value: "private", label: <span className="settings-choice-label">
-                <span className="settings-choice-title"><strong>Invite only</strong><Badge>Recommended</Badge></span>
-                <span>Only invited people can find and open the project.</span>
-              </span> },
-              { value: "workspace", label: <span className="settings-choice-label">
-                <strong>Everyone in the workspace</strong>
-                <span>Make new projects discoverable to all workspace members.</span>
-              </span> },
+              {
+                value: "private",
+                label: <span className="settings-choice-title">Invite only <Badge>Recommended</Badge></span>,
+                description: "Only invited people can find and open the project.",
+              },
+              {
+                value: "workspace",
+                label: "Everyone in the workspace",
+                description: "Make new projects discoverable to all workspace members.",
+              },
             ]}
           />
         </section>

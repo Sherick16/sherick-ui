@@ -16,7 +16,7 @@ import React, {
 import { cn } from "@/libs/utils";
 import Calendar from "./Calendar";
 import Field from "./Field";
-import { fieldMessage, state, text, tone } from "./ui.common";
+import { fieldMessage, state, text, tone, type } from "./ui.common";
 import {
   DateCalendarPopup,
   DateFieldTrigger,
@@ -289,7 +289,7 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(({
       aria-describedby={describedBy}
       className={cn("m-0 min-w-0 p-0", disabled && state.disabled, className)}
     >
-      <legend className={cn("p-0 text-sm font-medium", text.high)}>
+      <legend className={cn("p-0", type.label, text.high)}>
         {label}
         {required && (
           <span className={cn("ms-1", tone.text.danger)} aria-hidden="true">

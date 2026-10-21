@@ -5,7 +5,7 @@ import React, { forwardRef, useId, useMemo, type ReactNode } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Search01Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/libs/utils";
-import { density, focusRingWithin, list, material, rim, shape, state, text, type } from "./ui.common";
+import { density, focusRingWithin, iconStroke, list, material, rim, shape, state, text, type } from "./ui.common";
 import { motionFeedback } from "./ui.motion";
 
 export interface CommandItem {
@@ -228,7 +228,7 @@ const Command = forwardRef<HTMLInputElement, CommandProps>(({
             disabled ? state.disabled : state.text
           )}
         >
-          <HugeiconsIcon icon={Search01Icon} aria-hidden="true" className={cn("size-5 shrink-0", text.medium)} />
+          <HugeiconsIcon icon={Search01Icon} aria-hidden="true" className={cn(iconStroke.glyph, "size-5 shrink-0", text.medium)} />
           <BaseAutocomplete.Input
             ref={ref}
             id={inputId}
@@ -254,7 +254,7 @@ const Command = forwardRef<HTMLInputElement, CommandProps>(({
                 className={cn("space-y-1 [&:not(:first-child)]:pt-1")}
               >
                 {group.label !== undefined && (
-                  <BaseAutocomplete.GroupLabel className={cn("px-3 pt-3 pb-1 font-medium", type.caption, text.medium)}>
+                  <BaseAutocomplete.GroupLabel className={cn(list.groupLabel)}>
                     {group.label}
                   </BaseAutocomplete.GroupLabel>
                 )}

@@ -61,7 +61,7 @@ export type { AvatarProps } from "./Avatar";
 export type { BadgeProps } from "./Badge";
 export type { BreadcrumbItem, BreadcrumbProps } from "./Breadcrumb";
 export type { CalendarDate, CalendarLabels, CalendarProps, DateRange } from "./Calendar";
-export type { CardProps } from "./Card";
+export type { CardDescriptionProps, CardProps, CardTitleProps } from "./Card";
 export type { CheckboxProps } from "./Checkbox";
 export type { CheckboxGroupOption, CheckboxGroupProps } from "./CheckboxGroup";
 export type { ChipProps } from "./Chip";
@@ -97,7 +97,7 @@ export type { MenuContentProps, MenuItemProps, MenuProps, MenuSeparatorProps, Me
 export type { NavGroupHeadingLevel, NavGroupItem, NavGroupProps } from "./NavGroup";
 export type { NavItemProps } from "./NavItem";
 export type { PaginationProps } from "./Pagination";
-export type { PopoverContentProps, PopoverProps, PopoverTriggerProps } from "./Popover";
+export type { PopoverContentProps, PopoverDescriptionProps, PopoverProps, PopoverTitleProps, PopoverTriggerProps } from "./Popover";
 export type { ProgressProps } from "./Progress";
 export type { SearchProps } from "./Search";
 export type { SegmentedControlOption, SegmentedControlProps } from "./SegmentedControl";

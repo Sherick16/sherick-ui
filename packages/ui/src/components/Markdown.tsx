@@ -4,7 +4,7 @@ import remarkGfm from "remark-gfm";
 import rehypeKatex from "rehype-katex";
 import remarkMath from "remark-math";
 import { cn } from "@/libs/utils";
-import { edge, text, tone } from "./ui.common";
+import { edge, richText, text, tone } from "./ui.common";
 import CodeBlock from "./CodeBlock";
 
 /* Markdown sets its own type scale but takes every color, shape and rule from the
@@ -14,7 +14,7 @@ const components: Components = {
   h2: ({ className, ...props }) => <h2 className={cn("mb-3 mt-7 text-2xl font-semibold tracking-[-0.025em] first:mt-0", text.high, className)} {...props} />,
   h3: ({ className, ...props }) => <h3 className={cn("mb-2 mt-6 text-xl font-medium first:mt-0", text.high, className)} {...props} />,
   p: ({ className, ...props }) => <p className={cn("my-3 leading-7", text.high, className)} {...props} />,
-  a: ({ className, ...props }) => <a className={cn("font-medium underline decoration-sherick-primary/[0.35] underline-offset-4 hover:decoration-sherick-primary", tone.text.primary, className)} {...props} />,
+  a: ({ className, ...props }) => <a className={cn("font-medium underline underline-offset-4", richText.linkUnderline, tone.text.primary, className)} {...props} />,
   /* Every asymmetry a reader meets is a *writing-direction* asymmetry: a list indents from its own
      start edge, a quote's rule is drawn on that same edge, and both follow the document rather than
      the page. §17 states it as a rule, so nothing here may name a physical side. */
@@ -22,7 +22,7 @@ const components: Components = {
   ol: ({ className, ...props }) => <ol className={cn("my-4 list-decimal space-y-2 ps-6", text.high, className)} {...props} />,
   li: ({ className, ...props }) => <li className={cn("ms-1 leading-7 marker:text-sherick-primary", className)} {...props} />,
   /* A quote is content emphasis, not a surface: an accent rule and the supporting tone, no fill. */
-  blockquote: ({ className, ...props }) => <blockquote className={cn("my-5 border-s-2 border-sherick-primary/[0.45] py-1 ps-4", text.medium, className)} {...props} />,
+  blockquote: ({ className, ...props }) => <blockquote className={cn("my-5 border-s-2 py-1 ps-4", richText.quoteRule, text.medium, className)} {...props} />,
   hr: ({ className, ...props }) => <hr className={cn("my-7 h-0 border-0 border-t", edge.rule, className)} {...props} />,
   strong: ({ className, ...props }) => <strong className={cn("font-semibold", text.high, className)} {...props} />,
   /* A fenced block reaches `code` wrapped in `pre`, which would nest a second `pre`
