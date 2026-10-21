@@ -187,8 +187,10 @@ test("focused composite fields keep their engaged tone under the pointer", async
     expect(hovered).not.toBe(resting);
     await page.mouse.move(0, 0);
     await input.focus();
+    // Engagement shares the deep tray with hover, and the focus ring is what marks it.
     const focused = await css(row, "background-color");
-    expect(focused).not.toBe(hovered);
+    expect(focused).not.toBe(resting);
+    expect(await css(row, "outline-style")).toBe("solid");
     await input.hover();
     expect(await css(row, "background-color")).toBe(focused);
   }

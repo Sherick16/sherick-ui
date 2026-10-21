@@ -4,6 +4,7 @@ const colorNames = [
   "canvas",
   "surface",
   "surface-high",
+  "tray-deep",
   "surface-float",
   "surface-overlay",
   "puck",

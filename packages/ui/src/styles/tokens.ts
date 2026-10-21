@@ -9,6 +9,11 @@ export const lightTokens = {
   "canvas": "0.970 0.003 290",
   "surface": "0.998 0.001 290",
   "surface-high": "0.934 0.006 290",
+  /* The deep tray: the step a text field sinks to under the pointer and while it is engaged. A
+     field is identified by its label, its value or placeholder and its parts rather than by a drawn
+     edge, so its states are carried by its tray and the focus ring; this is the one neutral step
+     below `surface-high`, and it is a field's alone. */
+  "tray-deep": "0.900 0.008 290",
   "surface-float": "0.999 0.001 290",
   /* The puck: a held choice that rides in a track — a selected segment, the tab indicator. It is
      the one surface lit *above* every sheet in both themes, because a puck is a part lifted out of
@@ -22,7 +27,7 @@ export const lightTokens = {
      third step of the text ladder. It answers to the 3:1 non-text requirement wherever it carries
      meaning; anything a reader must read uses `ink` or `ink-muted`. */
   "detail": "0.590 0.012 285",
-  /* The rim of a hollow control — a field, a drop target, an empty checkbox or radio. It is the
+  /* The rim of a hollow control — a drop target, an empty checkbox or radio. It is the
      only border a control carries, so it is tuned to clear the 3:1 non-text requirement against
      every surface a control sits on with a small margin and no more: at `detail` strength the rim
      outshone the labels beside it. Hover steps it to `ink-muted`. */
@@ -113,6 +118,7 @@ export const darkTokens = {
   "canvas": "0.160 0.006 285",
   "surface": "0.200 0.008 285",
   "surface-high": "0.252 0.010 285",
+  "tray-deep": "0.290 0.011 285",
   "surface-float": "0.226 0.009 285",
   "puck": "0.315 0.012 285",
   "media": "0.160 0.006 285",

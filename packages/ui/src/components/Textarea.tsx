@@ -83,7 +83,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
               motionFeedback,
               focusRing,
               invalid ? material.controlError : material.control,
-              invalid ? rim.fieldError : rim.field,
+              rim.field,
               !disabled && (invalid ? state.field.errorHover : state.field.hover),
               !disabled && (invalid ? state.field.errorFocus : state.field.focus),
               disabled ? state.disabled : state.text,

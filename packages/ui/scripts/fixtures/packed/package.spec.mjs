@@ -25,21 +25,16 @@ test("no-reset CSS, consumer ownership, and className overrides", async ({ page 
   expect(await style(button, "borderTopWidth")).toBe("0px");
   expect(await style(button, "fontFamily")).toBe("monospace");
   expect(await style(button, "minHeight")).toBe("48px");
-  // A field's only border is Sherick's own rim — never one a host stylesheet or a reset adds. It is
-  // a real border on every side, so forced colors can repaint it, but only the baseline carries the
-  // rim tone; the other sides are transparent. The 1.5px rim snaps to whole device pixels at 1x.
+  // A field's only border is Sherick's own — never one a host stylesheet or a reset adds. It is a real
+  // border on every side, so forced colors can repaint it, and it is transparent on every side: a
+  // field is identified by its label and content, not by a drawn line. The 1.5px border snaps to
+  // whole device pixels at 1x.
   const field = page.getByRole("textbox", { name: "Name" });
   expect(await style(field, "borderTopStyle")).toBe("solid");
   expect(await style(field, "borderTopWidth")).toMatch(/^1(\.5)?px$/);
-  expect(await style(field, "borderTopColor")).toBe("rgba(0, 0, 0, 0)");
-  expect(await field.evaluate((element) => {
-    const probe = document.createElement("div");
-    probe.style.color = "oklch(var(--sui-rim))";
-    document.body.appendChild(probe);
-    const rim = getComputedStyle(probe).color;
-    probe.remove();
-    return getComputedStyle(element).borderBottomColor === rim;
-  })).toBe(true);
+  for (const side of ["Top", "Right", "Bottom", "Left"]) {
+    expect(await style(field, `border${side}Color`)).toBe("rgba(0, 0, 0, 0)");
+  }
   expect(await style(page.getByRole("separator"), "borderTopStyle")).toBe("solid");
   expect(await style(page.getByRole("separator"), "borderTopWidth")).toBe("1px");
   expect(await style(page.getByText("Package badge", { exact: true }), "boxSizing")).toBe("border-box");

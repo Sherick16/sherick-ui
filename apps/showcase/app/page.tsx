@@ -255,10 +255,11 @@ export default function Home() {
 
               <Specimen title="Tonality">
                 <div className="space-y-5">
-                  <div className={cn("grid grid-cols-2 gap-3 p-3 sm:grid-cols-5", shape.control, material.canvas)}>
+                  <div className={cn("grid grid-cols-2 gap-3 p-3 sm:grid-cols-3 lg:grid-cols-6", shape.control, material.canvas)}>
                     <Swatch label="Canvas" className={cn(material.canvas, "outline outline-1 outline-dashed outline-sherick-edge/[0.25]")} />
                     <Swatch label="Surface" className="bg-sherick-surface" />
                     <Swatch label="Surface high" className="bg-sherick-surface-high" />
+                    <Swatch label="Tray deep" className="bg-sherick-tray-deep" />
                     <Swatch label="Surface float" className="bg-sherick-surface-float" />
                     <Swatch label="Puck" className={cn(puck, elevation.control)} />
                   </div>

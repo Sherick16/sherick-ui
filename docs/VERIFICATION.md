@@ -66,7 +66,8 @@ Both consume `sherick-ui` through package exports after the library build.
   a semantic foreground on its own tint and through its hover and pressed states, an on-colour on its
   strong fill through the filled states, the marks that carry a selection, the error placeholder, the
   non-text `detail` role, the `CodeBlock` syntax palette and a Prism namespace token on the code
-  well, the rim of every hollow control and the danger rim of an invalid field, and the focus indicator
+  well, the rim of every hollow control (including an empty mark on a resting choice row), a choice
+  row's selection rim, a field's placeholder on its resting and deep tray, and the focus indicator
   against every surface and every fill an inset ring is drawn over. **Every composition is pass or
   fail: there is no allowlist.** One module owns the colour math and one owns the description of the
   compositions; the state, tint and field alphas it measures are derived from the published recipes,
