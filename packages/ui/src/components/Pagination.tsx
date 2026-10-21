@@ -1,7 +1,7 @@
 "use client";
 
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowLeft02Icon, ArrowRight02Icon } from "@hugeicons/core-free-icons";
+import { ArrowLeft01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import {
   forwardRef,
   useState,
@@ -10,7 +10,7 @@ import {
   type ReactNode,
 } from "react";
 import { cn, cx } from "@/libs/utils";
-import { currentDestination, density, focusRingInset, selectable, shape, state, stateLayer, text } from "./ui.common";
+import { currentDestination, density, focusRingInset, iconStroke, selectable, shape, state, stateLayer, text } from "./ui.common";
 import { motionFeedback, motionInkPress } from "./ui.motion";
 
 export interface PaginationProps
@@ -78,8 +78,9 @@ const boundedItems = (count: number, current: number, siblings: number): Paginat
   return items;
 };
 
-/* Numbered segments share the recessed-track / raised-selection anatomy of ToggleGroup.
-   Native navigation still owns behavior; stable targets press only their number or arrow. */
+/* Numbered destinations sit in a recessed track; the current page is a destination rather than a
+   held value, so it stays flat and takes the in-track form of the current-destination role.
+   Native navigation still owns behavior; stable targets press only their number or chevron. */
 const controlBase = /* @__PURE__ */ cx(
   "inline-flex shrink-0 select-none items-center justify-center text-sm tabular-nums no-underline",
   density.target,
@@ -209,7 +210,7 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
               className={cn(
                 controlBase,
                 "group shrink break-all px-3",
-                isCurrent && currentDestination,
+                isCurrent && currentDestination.inTrack,
                 controlState(false)
               )}
               onClick={(event) => activateFromAnchor(event, page)}
@@ -225,7 +226,7 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
               className={cn(
                 controlBase,
                 "group shrink break-all px-3",
-                isCurrent && currentDestination,
+                isCurrent && currentDestination.inTrack,
                 controlState(false)
               )}
               onClick={() => activate(page)}
@@ -275,14 +276,14 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
             previousPage,
             previousLabel,
             previousBoundary,
-            <HugeiconsIcon icon={ArrowLeft02Icon} aria-hidden="true" className={cn("rtl:-scale-x-100")} />
+            <HugeiconsIcon icon={ArrowLeft01Icon} aria-hidden="true" className={cn(iconStroke.glyph, "rtl:-scale-x-100")} />
           )}
           {items.map((item) => (typeof item === "number" ? pageControl(item) : gap(item)))}
           {step(
             nextPage,
             nextLabel,
             nextBoundary,
-            <HugeiconsIcon icon={ArrowRight02Icon} aria-hidden="true" className={cn("rtl:-scale-x-100")} />
+            <HugeiconsIcon icon={ArrowRight01Icon} aria-hidden="true" className={cn(iconStroke.glyph, "rtl:-scale-x-100")} />
           )}
         </ol>
       </nav>

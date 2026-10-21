@@ -9,6 +9,7 @@ import {
   density,
   elevation,
   focusRingHeld,
+  iconStroke,
   list,
   material,
   overlay,
@@ -82,7 +83,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
           {option.label}
         </BaseSelect.ItemText>
         <BaseSelect.ItemIndicator>
-          <HugeiconsIcon icon={Tick02Icon} aria-hidden="true" className={cn("size-4", motionArrive, tone.text[variant])} />
+          <HugeiconsIcon icon={Tick02Icon} aria-hidden="true" className={cn(iconStroke.glyph, "size-4", motionArrive, tone.text[variant])} />
         </BaseSelect.ItemIndicator>
       </BaseSelect.Item>
     );
@@ -140,7 +141,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
             <BaseSelect.Icon className={cn("shrink-0")}>
               <HugeiconsIcon icon={ArrowDown01Icon}
                 aria-hidden="true"
-                className={cn(
+                className={cn(iconStroke.glyph, 
                   "size-5",
                   text.high,
                   motionOrient,

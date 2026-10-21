@@ -5,7 +5,7 @@ import React, { type ReactNode } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/libs/utils";
-import { disclosure } from "./ui.common";
+import { disclosure, iconStroke } from "./ui.common";
 import { motionOrient } from "./ui.motion";
 
 export interface CollapsibleProps {
@@ -46,7 +46,7 @@ const CollapsibleTrigger = ({ children, className }: CollapsibleTriggerProps) =>
         object at two scopes. */}
     <HugeiconsIcon icon={ArrowDown01Icon}
       aria-hidden="true"
-      className={cn("size-4 shrink-0", motionOrient, "group-data-[panel-open]:rotate-180")}
+      className={cn(iconStroke.glyph, "size-4 shrink-0", motionOrient, "group-data-[panel-open]:rotate-180")}
     />
   </BaseCollapsible.Trigger>
 );

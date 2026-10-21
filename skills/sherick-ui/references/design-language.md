@@ -7,9 +7,12 @@ UI's canonical language, not a second set of component-authoring rules.
 
 Ordinary information and fields stay neutral and matte. Reserve the strong accent
 fill for the primary task; supporting actions should not compete with it. `primary`
-carries interaction and priority, `accent` supporting emphasis, and danger/warning/
-success task or data meaning. Put semantic emphasis on the relevant alert, badge or
-cell, not an entire page or table.
+carries interaction and priority — what the reader acts on, a made selection, a
+value's range, focus — and danger/warning/success carry task or data meaning. There is
+no decorative accent: `--sui-accent` is reserved and no component uses it. Passive
+information is neutral by default (`Alert`, `Badge`); choose a semantic variant only
+when the colour says something, and put it on the relevant alert, badge or cell, not an
+entire page or table.
 
 Material, elevation and edge answer different questions: what fills a surface, how
 far it sits from the page, and where two parts meet. A different surface tone does

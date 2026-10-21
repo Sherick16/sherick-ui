@@ -14,10 +14,14 @@ and `--sui-<role>-selected` theme variables; `2.4.0` the rim on hollow controls;
 `DateTimePicker`; and `2.6.0` the form wave: `Form`, `CheckboxGroup`, multiple and creatable
 `Combobox`, option groups in `Select` and `Combobox`, and units on `Input` and `NumberField`. `2.7.0` was the graphite-and-iris visual overhaul: recalibrated theme values, tighter container
 corners, a refined elevation ladder, quieter selected choice rows and the additive `--sui-puck`
-theme variable; `2.7.1` moved the icons to Hugeicons. The current source package version is `2.8.0`:
-text fields draw no line — the tray carries them, with the additive `--sui-tray-deep` theme
-variable for hover and engagement — and surface choice rows rest on a tray, with an accent rim on
-the selected row. It changes no component, prop or export. Version `2.4.0` remains the published baseline until the
+theme variable; `2.7.1` moved the icons to Hugeicons; and `2.8.0` removed the line from text
+fields — the tray carries them, with the additive `--sui-tray-deep` theme variable for hover and
+engagement — and rested surface choice rows on a tray, with an accent rim on the selected row. The
+current source package version is `2.9.0`, a design-language refinement: the additive
+`Card.Title`, `Card.Description`, `Popover.Title` and `Popover.Description` parts; neutral defaults
+for `Alert` and `Badge`; the in-track form of the current destination; label and body type roles
+with a 16/24 title; one rendered icon stroke and one directional vocabulary; and option rows aligned
+to their trigger's text. It removes no component, prop or export. Version `2.4.0` remains the published baseline until the
 release owner approves a staged version. An installed package's actual version and exports, not this
 checkout, determine availability.
 

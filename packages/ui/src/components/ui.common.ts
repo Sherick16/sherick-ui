@@ -10,16 +10,18 @@ import { motionDisclose, motionFeedback, motionRim, motionRowLayer, motionStateL
 
      material   what a surface is made of          (canvas, matte, control, acrylic)
      elevation  how far it sits off the page       (flat, raised, floating, control, recessed)
-     shape      its corner role                    (control, prominent, surface, expressive, pill, circle)
+     shape      its corner role                    (mark, row, control, prominent, surface, sheet, expressive, pill, circle)
      edge       the hairline between stacked parts (row, header, rule)
      state      how it responds                    (rest, hover, pressed, selected, disabled, focus)
-     stateLayer the composited hover/press overlay (quiet, tonal, filled, track, activeRow)
+     stateLayer the composited hover/press overlay (quiet, tonal, filled, track, mark, activeRow, fieldPart)
      disclosure one expandable region and its row (trigger, panel)
      tone       its color role                     (text, soft, tonal, selected, strong)
      text       the readable emphasis ladder       (high, medium)
-     density    how tightly it is packed           (compact, normal, prominent, target)
+     type       the recurring kinds of copy        (control, label, body, supporting, caption, title, heading, numeric)
+     density    how tightly it is packed           (compact, normal, prominent, target, part)
+     iconStroke the one rendered stroke of a glyph (glyph, mark)
      overlay    floating shells                    (menu, tooltip, popup, toast, sheet, dialog)
-    focusRing  the one focus language             (focusRing, focusRingInset, focusRingHeld, focusRingWithin, groupFocusRing)
+     focusRing  the one focus language             (focusRing, focusRingInset, focusRingHeld, focusRingWithin, groupFocusRing)
 
    Temporal behavior is deliberately not here: `ui.motion.ts` owns every transition,
    duration, curve and reduced-motion rule, and a recipe below names one of its recipes
@@ -143,8 +145,8 @@ export const recessedTop = "shadow-sherick-recessed-top";
    an almost-button beside a real one. Nested roles stay concentric: an inner corner is the outer
    corner minus the inset between them (a 16px track around a 12px indicator at 4px, a 20px list
    sheet around 12px options at 8px).
-   - control:     ordinary controls and dense data regions — fields, rows, options,
-                  chips, tables.
+   - control:     ordinary containers and dense data regions — fields, alerts, tables, segment
+                  tracks and full-width option rows. Chips and badges are capsules (`pill`).
    - mark:        a compact square selection mark — a 20px checkbox box. `control` is a role
                   for objects the size of a field; its radius exceeds the half-extent of a
                   20px square, so a mark needs a step of its own — a corner under a third of
@@ -282,11 +284,10 @@ export const state = {
   text: "cursor-text",
   /* Quiet scan feedback for non-interactive data rows: tonality only. */
   rowHover: "hover:bg-sherick-ink/[0.05]",
-  /* The matte field family — one tonality ladder, four triggers, no rims. A field
-     steps its surface up once on hover and once more while it is engaged; a
-     composite field focuses its outer surface while the input inside stays
-     borderless; an expanded control holds the engaged step while its popup is
-     open. Tonality carries the state, so no border appears and disappears. */
+  /* The field family — one tray, one deeper step, no visible rims. Hover and engagement share the
+     deep step; a composite field engages its outer surface while the input inside stays borderless;
+     an expanded control holds the engaged step while its popup is open. Tonality and the focus ring
+     carry the state, so no border appears and disappears. */
   /* A field is a tray in the `surface-high` tone, so it reads as a quiet recess in light and a
      quiet step up in dark. It draws no line: its label and content identify it (see `rim`), so the
      tray is laid at full strength to say "something goes here" on a card and on the page alike.
@@ -504,9 +505,17 @@ export const matteInset = "bg-sherick-surface-high/[0.35] text-sherick-ink";
    where the role owns it, one weight. A component still owns copy that only it renders; these are
    the roles that recur across families and have to agree wherever they appear:
    - control:    the type step of a control, owned through `density` below.
+   - label:      the name above a control — a field's label, a progress label, a column header. It is
+                 the medium weight of the compact step, so a label leads the value beneath it without
+                 being as large as it.
+   - body:       a sentence or a paragraph set inside a component — an alert, a toast's description, a
+                 dialog's description and content, an open disclosure panel. Long-form Markdown keeps
+                 its own reading rhythm; this is the rhythm of copy *in* an interface.
    - supporting: a field's description, hint and error, and the secondary line under a row's label.
    - caption:    compact labels — a badge, a tooltip, a group label, a calendar weekday.
-   - title:      the heading of a compact surface — a popover, a toast, a command palette.
+   - title:      the heading of a compact surface — a card, a popover, a toast, a command palette. It
+                 is one step above the 15px control text it usually sits over, so a heading reads as a
+                 heading by size and not by weight alone.
    - heading:    the title of a surface that owns the viewport — a dialog, an alert dialog, a drawer.
    - numeric:    figures that are compared down a column or updated in place.
    Every size lands on a whole-pixel line box, so stacked rows keep one rhythm. */
@@ -516,9 +525,11 @@ export const type = {
     normal: "text-[0.9375rem] leading-[1.375rem]",
     prominent: "text-lg",
   },
+  label: "text-sm leading-5 font-medium",
+  body: "text-sm leading-6",
   supporting: "text-[0.8125rem] leading-5",
   caption: "text-xs leading-4",
-  title: "text-[0.9375rem] leading-[1.375rem] font-semibold tracking-[-0.011em]",
+  title: "text-base leading-6 font-semibold tracking-[-0.011em]",
   heading: "text-xl leading-7 font-semibold tracking-[-0.02em]",
   numeric: "tabular-nums",
 } as const;
@@ -558,6 +569,20 @@ export const iconSlot = {
   compact: "inline-flex size-4 shrink-0 items-center justify-center [&>svg]:size-4",
   normal: "inline-flex size-5 shrink-0 items-center justify-center [&>svg]:size-5",
   prominent: "inline-flex size-6 shrink-0 items-center justify-center [&>svg]:size-6",
+} as const;
+
+/* Icon stroke — the one rendered weight of a library glyph. The artwork is drawn on a 24-unit grid,
+   so a stroke written in the artwork's own units renders thinner at 16px and thicker at 24px: the
+   same set read 1.0px in a dismiss and 1.75px in a tick. A glyph the library draws holds its stroke
+   in screen pixels instead, so a 14px chevron and a 20px close mark have one weight, close to the
+   stem of the medium label beside them. A selection mark — the tick or minus inside a filled
+   checkbox — is the one deliberately heavier glyph: it sits on the strong accent and has to read as
+   the mark itself, not as a hairline drawn on it.
+   Apply it to the `svg` a component renders. It is not applied to artwork a consumer hands into a
+   slot: that artwork's weight is the consumer's choice. */
+export const iconStroke = {
+  glyph: "[&_*]:[vector-effect:non-scaling-stroke] [&_*]:[stroke-width:1.5px]",
+  mark: "[&_*]:[vector-effect:non-scaling-stroke] [&_*]:[stroke-width:1.75px]",
 } as const;
 
 /* Stacking level — where anything that floats sits relative to the application.
@@ -679,8 +704,11 @@ export const list = {
      both, a selected row keeps its selection tint under the ring, and a disabled-but-navigable
      row still shows where the navigation is while saying it cannot be used. The ring is inset
      because the row lives inside the sheet it belongs to, as a segment does in its track. */
+  /* The option's start inset is the field's: a sheet's 8px inset plus the row's 12px puts every
+     option label on the same 20px edge as the value in the trigger that opened it, so the list
+     reads as the field opening rather than a second surface beside it. */
   option: /* @__PURE__ */ cx(
-    "flex w-full items-center justify-between gap-4 px-4 py-3 text-start outline-none",
+    "flex w-full items-center justify-between gap-4 px-3 py-3 text-start outline-none",
     type.control.normal,
     shape.control,
     motionFeedback,
@@ -697,7 +725,7 @@ export const list = {
      enters the group. Its inline padding is the option's, so a heading and the labels beneath it
      share one start edge, and the space above it is what separates one group from the last: a
      group inside a sheet is grouped by spacing and a type role, never by a rule or a nested card. */
-  groupLabel: /* @__PURE__ */ cx("px-4 pb-1 pt-3 font-medium", type.caption, text.medium),
+  groupLabel: /* @__PURE__ */ cx("px-3 pb-1 pt-3 font-medium", type.caption, text.medium),
   /* The same object at the density a list of short actions wants, where the row is scanned
      rather than read and the list is a control rather than a page. `shape.row` keeps the
      command's corner proportional to its own height, so its highlight nests in the tighter
@@ -723,17 +751,27 @@ export const list = {
    component maps its own primitive's panel variable onto, because the measured geometry is
    anatomy and only the interpolation is temporal. */
 export const disclosure = {
-  /* The row: a full-width row in a stacked group, activated like a selectable row. Its own focus
+  /* The row: a full-width row in a stacked group, activated like a selectable row. It is an option
+     row at the 16px inset of the surface it usually sits on directly — no sheet inset precedes it —
+     so its label shares an edge with the panel copy beneath it. Its own focus
      indicator is the shared inset ring, because an offset one drawn outside the row would land on
      the divider or the panel beside it rather than around the row it belongs to — which is the same
      reason a segment inside a track takes the inset form. The chevron the component puts in the
      row is the disclosure's own affordance and turns in place under `motionOrient`. */
   trigger: /* @__PURE__ */ cx(
-    "group [overflow-wrap:anywhere]",
-    list.option,
+    "group flex w-full items-center justify-between gap-4 px-4 py-3 text-start outline-none [overflow-wrap:anywhere]",
+    type.control.normal,
+    shape.control,
+    motionFeedback,
+    focusRingInset,
+    text.high,
+    stateLayer.quiet,
+    stateLayer.activeRow,
+    motionRowLayer,
+    state.effectiveDisabled,
     state.enabled
   ),
-  panel: /* @__PURE__ */ cx("h-[var(--sui-disclose-height)] overflow-hidden text-sm leading-7 [overflow-wrap:anywhere]", text.medium, motionDisclose),
+  panel: /* @__PURE__ */ cx("h-[var(--sui-disclose-height)] overflow-hidden [overflow-wrap:anywhere]", type.body, text.medium, motionDisclose),
 } as const;
 
 /* Tone hierarchy — the color roles a surface can take, in rising strength:
@@ -798,11 +836,17 @@ export const tone = {
   },
 } satisfies Record<string, Record<Variant, string>>;
 
-/* Current location — where the reader is, as opposed to a value they chose. A navigation row, the
-   current page of a pagination and any other `aria-current` destination hold the role's soft
-   container, full ink and a touch of weight, and stay flat: depth and the stronger selected step
-   belong to held values (`tone.selected` with `elevation.control`). */
-export const currentDestination = "bg-sherick-primary-soft text-sherick-ink font-medium";
+/* Current location — where the reader is, as opposed to a value they chose. Both forms stay flat:
+   depth belongs to held values (`tone.selected` with `elevation.control`).
+   - row:     a navigation row on a sheet — the role's soft container, full ink and a touch of weight.
+   - inTrack: a destination inside a recessed track, or the mark of a track's current stage — a
+              pagination's current page, a Stepper's current step. The soft step is the groove's own
+              lightness (1.00:1 in light), so there the fill steps up to `selected` and the label
+              takes the accent: the label, not the fill, says "you are here". */
+export const currentDestination = {
+  row: "bg-sherick-primary-soft text-sherick-ink font-medium",
+  inTrack: "bg-sherick-primary-selected text-sherick-primary font-semibold",
+} as const;
 
 /* Selectable surface — the recessed surface of a control that fills once it is selected: a
    switch track, a checkbox box, a radio circle, a slider groove. Selection is keyed on the
@@ -952,7 +996,22 @@ export const fieldLayout = "flex min-w-0 w-full flex-col [overflow-wrap:anywhere
 
 /* The messages under a field: its description or hint, and its error. One role for every field in
    the family, so a hint reads the same under a text field, a date range and a file chooser. */
+/* The label above a field: the `label` role at full ink, with the one gap every field family keeps
+   between its name and its control. */
+export const fieldLabel = /* @__PURE__ */ cx("mb-2", type.label, text.high);
+
 export const fieldMessage = {
   description: /* @__PURE__ */ cx("mt-2", type.supporting, text.medium),
   error: /* @__PURE__ */ cx("mt-2", type.supporting, tone.text.danger),
+} as const;
+
+/* The code well — the quiet recess a code block's lines sit in. It is the canvas showing through the
+   block's own matte shell, so a well reads as sunk into the block on a card and on the page alike. */
+export const codeWell = "bg-sherick-canvas/[0.28]";
+
+/* Rich-text accents — content-level emphasis in rendered prose, not structural edges: a quote's rule
+   on its start edge, and a link's underline at rest and under the pointer. */
+export const richText = {
+  quoteRule: "border-sherick-primary/[0.45]",
+  linkUnderline: "decoration-sherick-primary/[0.35] hover:decoration-sherick-primary",
 } as const;

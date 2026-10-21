@@ -17,7 +17,7 @@ import { cn } from "@/libs/utils";
 import Button from "./Button";
 import Calendar from "./Calendar";
 import Field from "./Field";
-import { edge, state } from "./ui.common";
+import { edge, iconStroke, state } from "./ui.common";
 import {
   DateCalendarPopup,
   DateFieldTrigger,
@@ -321,7 +321,7 @@ const DateTimePicker = forwardRef<HTMLInputElement, DateTimePickerProps>(({
           <DateFieldTrigger
             label={`Open ${label}`}
             disabled={disabled}
-            icon={<HugeiconsIcon icon={CalendarClockIcon} aria-hidden="true" />}
+            icon={<HugeiconsIcon icon={CalendarClockIcon} aria-hidden="true" className={cn(iconStroke.glyph)} />}
           />
         </div>
       </Field>

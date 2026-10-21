@@ -6,13 +6,13 @@ import { RadioGroup as BaseRadioGroup } from "@base-ui/react/radio-group";
 import React, { forwardRef, useId, type ComponentProps, type ReactNode, type Ref } from "react";
 import { cn } from "@/libs/utils";
 import {
+  fieldLabel,
   fieldLayout,
   fieldMessage,
   groupFocusRing,
   selectable,
   shape,
   stateLayer,
-  text,
 } from "./ui.common";
 import { motionArrive } from "./ui.motion";
 import {
@@ -93,7 +93,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
       // option's label to its own `Field.Item`, which has to sit inside a `Field.Root`.
       <Field.Root className={cn(fieldLayout, className)} invalid={error ? true : undefined}>
         {label && (
-          <Field.Label className={cn("mb-2 text-sm font-medium", text.high)}>
+          <Field.Label className={cn(fieldLabel)}>
             {label}
             {required && (
               <span className={cn("ms-1 text-sherick-danger")} aria-hidden="true">

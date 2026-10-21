@@ -53,7 +53,8 @@ export const motionFeedback =
  *  distance only once it meets a size, so the amplitude comes in tiers chosen by the control's role:
  *
  *  - `motionTactile`: a content-width control — a button, a chip, a segment — compresses 4%, about
- *    two pixels at the size of the ink it moves.
+ *    two pixels at the size of the ink it moves. Stretched to its container (`w-full`), the same
+ *    control takes the wide tier's 1.5%.
  *  - `motionTactileWide`: a control that spans a track — a tab — compresses 1.5%, so its edges move
  *    about as far as a button's.
  *  - `motionTactileField`: a list-opening field — a Select trigger, an editable Combobox — spans
@@ -71,7 +72,11 @@ const tactileTiming =
 
 export const motionTactile = /* @__PURE__ */ cx(
   tactileTiming,
-  "motion-safe:[&:not([data-disabled],:disabled,:has(>[role=combobox][data-disabled]))]:active:scale-[0.96]"
+  "motion-safe:[&:not([data-disabled],:disabled,:has(>[role=combobox][data-disabled]))]:active:scale-[0.96]",
+  /* A content-width control a layout has stretched to its container is no longer content-width: 4%
+     of a 240px action moved each edge 4.8px. The stretch is the caller's `w-full`, so the control
+     reads it from its own class and takes the wide tier — still a press, at a button's distance. */
+  "motion-safe:[&.w-full:not([data-disabled],:disabled,:has(>[role=combobox][data-disabled]))]:active:scale-[0.985]"
 );
 
 export const motionTactileWide = /* @__PURE__ */ cx(

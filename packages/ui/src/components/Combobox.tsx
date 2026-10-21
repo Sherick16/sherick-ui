@@ -11,6 +11,7 @@ import {
   fieldMessage,
   focusRingInset,
   focusRingWithin,
+  iconStroke,
   list,
   material,
   overlay,
@@ -22,6 +23,7 @@ import {
   stateLayer,
   text,
   tone,
+  type,
 } from "./ui.common";
 import {
   motionArrive,
@@ -308,7 +310,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>((props, ref) => {
   const renderItem = (option: ComboboxOption) =>
     isCreateItem(option) ? (
       <BaseCombobox.Item key="sui-create" value={option} className={cn(list.option, "justify-start gap-3")}>
-        <HugeiconsIcon icon={PlusSignIcon} aria-hidden="true" className={cn("size-4 shrink-0", tone.text.primary)} />
+        <HugeiconsIcon icon={PlusSignIcon} aria-hidden="true" className={cn(iconStroke.glyph, "size-4 shrink-0", tone.text.primary)} />
         <span className={cn("min-w-0 flex-1 truncate")}>{createLabel(option.label)}</span>
       </BaseCombobox.Item>
     ) : (
@@ -322,7 +324,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>((props, ref) => {
       >
         <span className={cn("min-w-0 flex-1 truncate")}>{option.label}</span>
         <BaseCombobox.ItemIndicator>
-          <HugeiconsIcon icon={Tick02Icon} aria-hidden="true" className={cn("size-4", motionArrive, tone.text.primary)} />
+          <HugeiconsIcon icon={Tick02Icon} aria-hidden="true" className={cn(iconStroke.glyph, "size-4", motionArrive, tone.text.primary)} />
         </BaseCombobox.ItemIndicator>
       </BaseCombobox.Item>
     );
@@ -476,7 +478,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>((props, ref) => {
                 {!readOnly && !disabled && (
                   <BaseCombobox.ChipRemove aria-label={`Remove ${option.label}`} className={cn(chipRemoveClassName)}>
                     <span className={cn("inline-flex items-center justify-center", motionInkPress)}>
-                      <HugeiconsIcon icon={Cancel01Icon} aria-hidden="true" className={cn("size-4")} />
+                      <HugeiconsIcon icon={Cancel01Icon} aria-hidden="true" className={cn(iconStroke.glyph, "size-4")} />
                     </span>
                   </BaseCombobox.ChipRemove>
                 )}
@@ -494,10 +496,10 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>((props, ref) => {
           disabled={disabled || readOnly}
           className={cn(partClassName)}
         >
-          <HugeiconsIcon icon={Cancel01Icon} aria-hidden="true" />
+          <HugeiconsIcon icon={Cancel01Icon} aria-hidden="true" className={cn(iconStroke.glyph)} />
         </BaseCombobox.Clear>
         <BaseCombobox.Trigger aria-label="Show options" className={cn(partClassName, "group")}>
-          <HugeiconsIcon icon={ArrowDown01Icon} aria-hidden="true" className={cn("size-5", motionOrient, "group-data-[popup-open]:rotate-180")} />
+          <HugeiconsIcon icon={ArrowDown01Icon} aria-hidden="true" className={cn(iconStroke.glyph, "size-5", motionOrient, "group-data-[popup-open]:rotate-180")} />
         </BaseCombobox.Trigger>
       </BaseCombobox.InputGroup>
 
@@ -542,7 +544,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>((props, ref) => {
               <BaseCombobox.Status className={cn("sr-only")}>{notice.announced}</BaseCombobox.Status>
             )}
             <BaseCombobox.Empty>
-              <div className={cn("px-4 py-3 text-sm", text.medium)}>
+              <div className={cn("px-3 py-3", type.body, text.medium)}>
                 {emptyMessage ?? (creatable ? "Type to add an entry." : "No results found.")}
               </div>
             </BaseCombobox.Empty>

@@ -4,7 +4,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Tick02Icon } from "@hugeicons/core-free-icons";
 import React, { forwardRef, type ComponentProps, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { elevation, focusRing, material, shape, state, stateLayer, text, tone, type } from "./ui.common";
+import { currentDestination, elevation, focusRing, iconStroke, material, shape, state, stateLayer, text, tone, type } from "./ui.common";
 import { motionFeedback, motionInkPress } from "./ui.motion";
 
 export interface StepperItem {
@@ -119,20 +119,23 @@ const Stepper = forwardRef<HTMLElement, StepperProps>(
                   <span
                     data-sui-step-mark=""
                     className={cn(
-                      /* The index is a mark of its own, centred on the label's first line: the current
-                         step holds the strong fill, a completed step its selected tone, and a step
-                         still ahead the neutral well its connector runs in. */
+                      /* The index is a mark of its own, centred on the label's first line. The current
+                         step is where the reader is (`aria-current`), so its mark takes the in-track
+                         destination — the selected step with an accent numeral — rather than the strong
+                         fill the priority action owns; a completed step holds the selected tone with an
+                         ink tick, and a step still ahead the neutral well its connector runs in. The
+                         track segment above it is the workflow's range, and keeps the range's fill. */
                       "inline-flex size-5 shrink-0 items-center justify-center font-medium [&>svg]:size-3.5",
                       type.caption,
                       type.numeric,
                       shape.circle,
-                      current ? tone.strong.primary : complete ? tone.selected.primary : cn(material.matteHigh, text.medium),
+                      current ? currentDestination.inTrack : complete ? tone.selected.primary : cn(material.matteHigh, text.medium),
                       interactive && !unavailable && motionInkPress
                     )}
                   >
                     {complete && !current ? (
                       <>
-                        <HugeiconsIcon icon={Tick02Icon} aria-hidden="true" />
+                        <HugeiconsIcon icon={Tick02Icon} aria-hidden="true" className={cn(iconStroke.glyph)} />
                         <span className={cn("sr-only")}>Complete</span>
                       </>
                     ) : index + 1}

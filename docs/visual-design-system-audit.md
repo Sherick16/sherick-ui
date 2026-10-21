@@ -1,5 +1,9 @@
 # Visual design-system audit
 
+> **Historical record.** This audit describes the library as it stood at its baseline. The
+> palette, radii and several findings below were superseded by 2.7.0–2.9.0; the canonical rules are
+> in [DESIGN_LANGUAGE.md](DESIGN_LANGUAGE.md). Do not read the measurements here as current.
+
 **Status:** analysis and recommendations only. No component, token or recipe changes were made in
 this pass. [`DESIGN_LANGUAGE.md`](DESIGN_LANGUAGE.md) stays the canonical visual authority. Any item
 below that adopts a new system-level rule must be written there first (AGENTS.md, "If a genuinely new

@@ -6,7 +6,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/libs/utils";
 import Divider from "./Divider";
-import { disclosure } from "./ui.common";
+import { disclosure, iconStroke } from "./ui.common";
 import { motionFeedback, motionOrient } from "./ui.motion";
 
 /** A heading level for the groups of an `Accordion`. Base renders a heading around every panel
@@ -95,7 +95,7 @@ const AccordionTrigger = ({ children, className }: AccordionTriggerProps) => {
             and after, and only its direction changes. */}
         <HugeiconsIcon icon={ArrowDown01Icon}
           aria-hidden="true"
-          className={cn("size-4 shrink-0", motionOrient, "group-data-[panel-open]:rotate-180")}
+          className={cn(iconStroke.glyph, "size-4 shrink-0", motionOrient, "group-data-[panel-open]:rotate-180")}
         />
       </BaseAccordion.Trigger>
     </BaseAccordion.Header>

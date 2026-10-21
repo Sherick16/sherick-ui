@@ -15,7 +15,7 @@ verify the consuming application's installed exports before using it. Import fro
 import {
   Alert, Avatar, Badge, Button, Card, Divider, IconButton, Media, Progress, Skeleton, Spinner, Table,
   type AlertProps, type AvatarProps, type BadgeProps, type ButtonAppearance, type ButtonProps,
-  type ButtonSize, type CardProps, type DividerProps, type DividerWeight, type IconButtonAppearance,
+  type ButtonSize, type CardDescriptionProps, type CardProps, type CardTitleProps, type DividerProps, type DividerWeight, type IconButtonAppearance,
   type IconButtonProps, type MediaImageProps, type MediaVideoProps, type ProgressProps,
   type SkeletonProps, type SpinnerProps, type TableColumn, type TableProps,
   type Variant,
@@ -110,7 +110,7 @@ points at the `<button>`.
 | Prop | Type | Default |
 | --- | --- | --- |
 | `children` | `ReactNode` (required) | — |
-| `variant` | `Variant` | `"primary"` |
+| `variant` | `Variant` | `"secondary"` |
 | `icon` | `ReactNode` | — |
 
 Also accepts `HTMLAttributes<HTMLSpanElement>` (`BadgeProps`); it renders a plain
@@ -119,7 +119,8 @@ Also accepts `HTMLAttributes<HTMLSpanElement>` (`BadgeProps`); it renders a plai
 - A passive tag: no hover, press, focus or dismissal state. For a removable or
   selectable tag use `Chip`/`ChipGroup`, not a Badge with a click handler.
 - The pill is a `soft` tone tint at a 28px minimum height with a neutral readable label;
-  only the leading 14px icon slot takes the semantic tone. The label truncates instead of
+  only the leading 14px icon slot takes the semantic tone. The default is neutral: a badge is
+  passive information, so choose a semantic variant only when the colour carries meaning. The label truncates instead of
   wrapping, so keep badge copy short.
 
 ## Avatar
@@ -212,8 +213,8 @@ aspect for portrait/landscape containment, or choose a frame aspect deliberately
 
 ```tsx
 <Card variant="secondary">
-  <h3 className="font-medium">Workspace</h3>
-  <p className="mt-2 text-sm">Supporting copy.</p>
+  <Card.Title>Workspace</Card.Title>
+  <Card.Description>Supporting copy.</Card.Description>
   <Divider className="my-4" />
   <Button appearance="text" variant="secondary">Manage</Button>
 </Card>
@@ -226,12 +227,19 @@ aspect for portrait/landscape containment, or choose a frame aspect deliberately
 
 Also accepts `HTMLAttributes<HTMLDivElement>` (`CardProps`); one `<div>`, no `ref`.
 
+| Part | Props | Renders |
+| --- | --- | --- |
+| `Card.Title` | `headingLevel?` (`2`–`6`, default `3`) plus heading attributes (`CardTitleProps`) | the `title` type role at full ink |
+| `Card.Description` | paragraph attributes (`CardDescriptionProps`) | body copy in the supporting tone, 4px under the title |
+
 - A matte tonal surface with `surface` corners and no elevation or rim: the tone separates
   it from the canvas, and it lifts only when something inside it does.
 - `p-6` is built-in component padding, so a card needs no inner wrapper. Override it with
   `className` (e.g. `p-4`) when the surrounding density demands it.
-- No `Header`/`Content`/`Footer` parts: headings, copy and actions are ordinary children,
-  and a join inside the card is a `Divider`. The semantic element is the page's choice —
+- `Card.Title` and `Card.Description` give the card's own heading the library's type roles;
+  everything else — further copy, actions, a join (`Divider`) — is ordinary children. There is no
+  `Header`/`Content`/`Footer` wrapper.
+- A tinted variant says something about the content; it is not a way to make a card stand out. The semantic element is the page's choice —
   wrap the card, or keep the card as the visual surface inside a `<section>`.
 
 ## Divider
@@ -275,7 +283,7 @@ Renders `role="separator"` with `aria-orientation`. No children, no `ref`.
 | Prop | Type | Default |
 | --- | --- | --- |
 | `children` | `ReactNode` (required) | — |
-| `variant` | `Variant` | `"primary"` |
+| `variant` | `Variant` | `"secondary"` |
 | `closeable` | `boolean` | `false` |
 | `onDismiss` | `() => void` | — |
 | `className` | `string` | — |
@@ -285,7 +293,9 @@ Inline and non-portaled; no `ref`, no title or actions prop — the whole copy i
 - Role follows the tone: `danger` and `warning` render `role="alert"` (assertive),
   everything else `role="status"`.
 - The status icon is fixed per variant and `aria-hidden`; there is no prop to replace or
-  remove it. Semantic colour stays on that mark and the surface tint.
+  remove it. Semantic colour stays on that mark and the surface tint. The default is the neutral
+  surface with an accent information mark: an alert reports, so it does not compete with the
+  view's primary action. Warning uses the triangle glyph, as the warning toast does.
 - With `closeable`, the dismiss control calls `onDismiss?.()` and then hides the alert
   itself. That hidden state is internal and one-way: to show the same message again,
   remount the alert (a new `key`) or render it conditionally from your own state.

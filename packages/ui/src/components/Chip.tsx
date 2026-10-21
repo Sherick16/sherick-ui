@@ -17,6 +17,7 @@ import {
   focusRing,
   focusRingInset,
   hitArea,
+  iconStroke,
   shape,
   state,
   stateLayer,
@@ -230,7 +231,7 @@ export const Chip = forwardRef<HTMLElement, ChipProps>(
                 press. The dismiss control is a part of the chip the pointer is already in, so it
                 clears the pointer-target minimum rather than the standalone target floor. */}
             <span className={cn("inline-flex items-center justify-center", motionInkPress)}>
-              <HugeiconsIcon icon={Cancel01Icon} className={cn("size-4")} aria-hidden="true" />
+              <HugeiconsIcon icon={Cancel01Icon} className={cn(iconStroke.glyph, "size-4")} aria-hidden="true" />
             </span>
           </BaseButton>
         )}

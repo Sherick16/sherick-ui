@@ -3,7 +3,8 @@
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import React, { createContext, useContext, useRef, type ComponentProps, type ReactElement, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { text, type } from "./ui.common";
+import { DialogDescription } from "./DialogDescription";
+import { DialogHeader } from "./DialogHeader";
 import { DialogDismiss, DialogSurface, type DialogAttachment } from "./DialogSurface";
 
 /**
@@ -102,20 +103,14 @@ const DrawerContent = ({ children, className }: DrawerContentProps) => {
   );
 };
 
+/* A sheet is a dialog with an edge, so its title and description are the dialog's own parts rather
+   than copies that could drift from them. */
 const DrawerHeader = ({ children, className }: DrawerHeaderProps) => (
-  <div className={cn("pt-5 pb-2 ps-6 pe-16 sm:ps-7", className)}>
-    <BaseDialog.Title className={cn("m-0", type.heading, text.high)}>
-      {children}
-    </BaseDialog.Title>
-  </div>
+  <DialogHeader className={cn(className)}>{children}</DialogHeader>
 );
 
 const DrawerDescription = ({ children, className }: DrawerDescriptionProps) => (
-  <BaseDialog.Description
-    className={cn("px-6 pt-2 text-sm leading-7 sm:px-7", text.medium, className)}
-  >
-    {children}
-  </BaseDialog.Description>
+  <DialogDescription className={cn(className)}>{children}</DialogDescription>
 );
 
 /* Actions stay on the sheet's own surface: no divider, no second layer. */

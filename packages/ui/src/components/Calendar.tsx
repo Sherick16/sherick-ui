@@ -2,7 +2,7 @@
 
 import { useDirection } from "@base-ui/react/direction-provider";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowLeft02Icon, ArrowRight02Icon } from "@hugeicons/core-free-icons";
+import { ArrowLeft01Icon, ArrowRight01Icon } from "@hugeicons/core-free-icons";
 import React, {
   forwardRef,
   useCallback,
@@ -15,7 +15,7 @@ import React, {
   type KeyboardEvent,
 } from "react";
 import { cn } from "@/libs/utils";
-import { density, elevation, focusRingInset, shape, state, stateLayer, text, tone, type } from "./ui.common";
+import { density, elevation, focusRingInset, iconStroke, shape, state, stateLayer, text, tone, type } from "./ui.common";
 import { motionFeedback, motionInkPress, motionTactile } from "./ui.motion";
 import {
   addCalendarDays,
@@ -426,7 +426,7 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
           )}
         >
           <span className={cn("inline-flex", !disabled && !atFirstMonth && motionInkPress)}>
-            <HugeiconsIcon icon={ArrowLeft02Icon} aria-hidden="true" className={cn("size-5 rtl:-scale-x-100")} />
+            <HugeiconsIcon icon={ArrowLeft01Icon} aria-hidden="true" className={cn(iconStroke.glyph, "size-5 rtl:-scale-x-100")} />
           </span>
         </button>
 
@@ -434,7 +434,7 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
         <div
           id={captionId}
           aria-live="polite"
-          className={cn("min-w-0 flex-1 truncate text-center text-sm font-medium", text.high)}
+          className={cn("min-w-0 flex-1 truncate text-center", type.label, text.high)}
         >
           {format.formatMonthYear(view)}
         </div>
@@ -450,7 +450,7 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
           )}
         >
           <span className={cn("inline-flex", !disabled && !atLastMonth && motionInkPress)}>
-            <HugeiconsIcon icon={ArrowRight02Icon} aria-hidden="true" className={cn("size-5 rtl:-scale-x-100")} />
+            <HugeiconsIcon icon={ArrowRight01Icon} aria-hidden="true" className={cn(iconStroke.glyph, "size-5 rtl:-scale-x-100")} />
           </span>
         </button>
       </div>

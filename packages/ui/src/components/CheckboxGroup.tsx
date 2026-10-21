@@ -8,13 +8,14 @@ import { Tick02Icon } from "@hugeicons/core-free-icons";
 import React, { forwardRef, useId, type ComponentProps, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import {
+  fieldLabel,
   fieldLayout,
   fieldMessage,
   groupFocusRing,
+  iconStroke,
   selectable,
   shape,
   stateLayer,
-  text,
 } from "./ui.common";
 import { motionArrive } from "./ui.motion";
 import {
@@ -112,7 +113,7 @@ export const CheckboxGroup = forwardRef<HTMLDivElement, CheckboxGroupProps>(
         }
       >
         {label && (
-          <Field.Label className={cn("mb-2 text-sm font-medium", text.high)}>
+          <Field.Label className={cn(fieldLabel)}>
             {label}
             {required && (
               <span className={cn("ms-1 text-sherick-danger")} aria-hidden="true">
@@ -168,7 +169,7 @@ export const CheckboxGroup = forwardRef<HTMLDivElement, CheckboxGroupProps>(
                         {/* Positioned so the tick paints above the box's hover layer. */}
                         <BaseCheckbox.Indicator className={cn("relative flex items-center justify-center", motionArrive)}>
                           {/* A heavier stroke than the icon default: at 14px the default draws a hairline tick. */}
-                          <HugeiconsIcon icon={Tick02Icon} aria-hidden="true" className={cn("size-3.5")} strokeWidth={3} />
+                          <HugeiconsIcon icon={Tick02Icon} aria-hidden="true" className={cn("size-3.5", iconStroke.mark)} />
                         </BaseCheckbox.Indicator>
                       </span>
                     </BaseCheckbox.Root>

@@ -127,6 +127,18 @@ Version 2.5.0 adds `DateTimePicker`: a native `datetime-local` field whose popup
 
 Version 2.4.0 gives hollow controls a rim. Text fields, the file drop target and empty checkboxes and radios carry one 1.5px border in a new `--sui-rim` theme variable, tuned to clear 3:1 on every surface; fields become canvas-toned wells below the card; an invalid field turns only its rim to the danger tone; and the drop target has a custom dashed rim. Checkbox and RadioGroup marks are 20px, with an accent fill when selected. No component or prop is removed.
 
+Version 2.9.0 refines the design language without removing anything. `Card` gains `Card.Title` and
+`Card.Description`, and `Popover` gains `Popover.Title` and `Popover.Description`, so a surface's
+heading takes the library's `title` role (now 16/24px) and names the popup. `Alert` and `Badge`
+default to the neutral `secondary` variant — the iris accent is kept for what the reader acts on —
+so pass `variant="primary"` where the accent was intended. A pagination's current page and a
+Stepper's current step take a stronger in-track destination with an accent label. Library glyphs
+render one 1.5px stroke at every size, paging uses chevrons, and the warning glyph is the triangle
+everywhere. Option labels line up with the text of the field that opened them, a Menu's rows nest
+concentrically at 4px, dialog descriptions and disclosure panels set 14/24px body copy, a stretched
+`w-full` button presses at the wide tier, and a ghost `IconButton` presses its mark instead of its
+target.
+
 Version 2.8.0 removes the line from text fields. A field is identified by its label and content, as
 WCAG 1.4.11 allows, so it is a quiet tray with no underline: the tray is a step deeper at rest, sinks
 to a new `--sui-tray-deep` theme variable under the pointer and while focused, and the focus ring

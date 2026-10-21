@@ -1,5 +1,9 @@
 # Motion audit
 
+> **Historical record.** This audit describes the library as it stood at its baseline. The
+> palette, radii and several findings below were superseded by 2.7.0–2.9.0; the canonical rules are
+> in [DESIGN_LANGUAGE.md](DESIGN_LANGUAGE.md). Do not read the measurements here as current.
+
 **Status:** analysis and recommendations only. No motion recipe, token or component was changed
 in this pass. [`DESIGN_LANGUAGE.md`](DESIGN_LANGUAGE.md) §12 and `ui.motion.ts` remain the
 authority; any rule adopted from this audit is written there first. It is the companion to the

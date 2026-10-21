@@ -1,7 +1,7 @@
 import React from "react";
 import { cn } from "@/libs/utils";
 import NavItem from "./NavItem";
-import { text } from "./ui.common";
+import { text, type } from "./ui.common";
 
 export interface NavGroupItem {
   label: string;
@@ -39,7 +39,7 @@ const NavGroup = ({ title, items, activeHref, headingLevel = 3, className }: Nav
     {/* The heading is the group's own; the level follows the document it was placed in rather than
         a level this component assumed. Creating the element directly is the same approach an
         accordion heading takes, so both read the same way. */}
-    {React.createElement(`h${headingLevel}`, { className: cn("px-3 pb-1 text-sm font-medium", text.high) }, title)}
+    {React.createElement(`h${headingLevel}`, { className: cn("px-3 pb-1 font-medium", type.caption, text.medium) }, title)}
     {items.map((item) => (
       <NavItem key={item.href} href={item.href} active={item.href === activeHref}>
         {item.label}

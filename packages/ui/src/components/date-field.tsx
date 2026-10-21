@@ -5,7 +5,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Calendar03Icon } from "@hugeicons/core-free-icons";
 import React, { useEffect, useRef, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { density, focusRingWithin, material, overlay, rim, shape, stacking, state, stateLayer, text } from "./ui.common";
+import { density, focusRingWithin, iconStroke, material, overlay, rim, shape, stacking, state, stateLayer, text } from "./ui.common";
 import { motionFeedback, motionInkPress, motionPresenceAnchored } from "./ui.motion";
 
 /* The parts the two date pickers share.
@@ -78,7 +78,7 @@ export interface DateFieldTriggerProps {
  * `aria-expanded`, `aria-controls`) and the pointer and keyboard activation that opens the
  * surface; the button itself only carries the type it needs to stay out of form submission.
  */
-export const DateFieldTrigger = ({ label, disabled = false, icon = <HugeiconsIcon icon={Calendar03Icon} aria-hidden="true" /> }: DateFieldTriggerProps) => (
+export const DateFieldTrigger = ({ label, disabled = false, icon = <HugeiconsIcon icon={Calendar03Icon} aria-hidden="true" className={cn(iconStroke.glyph)} /> }: DateFieldTriggerProps) => (
   <BasePopover.Trigger
     disabled={disabled}
     render={<button type="button" aria-label={label} disabled={disabled} className={cn(datePartClassName)} />}

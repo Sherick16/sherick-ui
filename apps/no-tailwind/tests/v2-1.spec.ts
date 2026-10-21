@@ -265,18 +265,21 @@ test("pagination and step tracks match the existing segmented and progress famil
       expect(await css(pages.getByRole("list"), property)).toBe(await css(segments, property));
       expect(await css(pages.getByRole("list"), property)).toBe(await css(tabs, property));
     }
-    /* The current page is a navigation destination (DESIGN_LANGUAGE §10): the primary soft
-       container, flat, with a segment's corner. A selected segment is a held value and keeps its
-       control elevation, so the two share geometry but not depth. */
-    const soft = await page.evaluate(() => {
+    /* The current page is a navigation destination inside a track (DESIGN_LANGUAGE §10): the
+       in-track form — the primary selected step with an accent label — flat, with a segment's
+       corner. The soft step matches the groove, so it cannot carry the location there. A selected
+       segment is a held value and keeps its control elevation, so the two share geometry but not
+       depth. */
+    const [selectedStep, accent] = await page.evaluate(() => ["--sui-primary-selected", "--sui-primary"].map((name) => {
       const probe = document.createElement("div");
-      probe.style.backgroundColor = "oklch(var(--sui-primary-soft))";
+      probe.style.color = `oklch(var(${name}))`;
       document.body.appendChild(probe);
-      const value = getComputedStyle(probe).backgroundColor;
+      const value = getComputedStyle(probe).color;
       probe.remove();
       return value;
-    });
-    expect(await css(selected, "background-color")).toBe(soft);
+    }));
+    expect(await css(selected, "background-color")).toBe(selectedStep);
+    expect(await css(selected, "color")).toBe(accent);
     expect(await css(selected, "box-shadow")).toBe("none");
     expect(await css(segment, "box-shadow")).not.toBe("none");
     expect(await css(selected, "border-radius")).toBe(await css(segment, "border-radius"));
@@ -346,7 +349,8 @@ test("dates hold control elevation, with one seamless surface for each selected 
     await popup.getByRole("button", { name: "Next month", exact: true }).focus();
     await popup.getByRole("button", { name: "Previous month", exact: true }).hover();
     expect(await css(popup.locator('[aria-selected="true"] button'), "box-shadow")).toBe(raised);
-    expect(await popup.getByRole("button", { name: "Previous month", exact: true }).locator("svg path").count()).toBe(2);
+    /* Paging takes the chevron (DESIGN_LANGUAGE §13): one stroke, no stem. */
+    expect(await popup.getByRole("button", { name: "Previous month", exact: true }).locator("svg path").count()).toBe(1);
     await page.keyboard.press("Escape");
     await page.getByRole("button", { name: "Open Start", exact: true }).click();
     const range = page.getByRole("dialog", { name: "Date range", exact: true });

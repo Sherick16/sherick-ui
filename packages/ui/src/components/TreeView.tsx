@@ -16,7 +16,7 @@ import React, {
   type ReactNode,
 } from "react";
 import { cn } from "@/libs/utils";
-import { density, elevation, material, parentFocusRingInset, shape, state, stateLayer, text, tone } from "./ui.common";
+import { density, elevation, iconStroke, material, parentFocusRingInset, shape, state, stateLayer, text, tone } from "./ui.common";
 import { motionDisclose, motionFeedback, motionOrient } from "./ui.motion";
 import {
   flattenTree,
@@ -346,7 +346,7 @@ const TreeView = forwardRef<HTMLDivElement, TreeViewProps>(function TreeView(
             >
               <HugeiconsIcon icon={ArrowRight01Icon}
                 aria-hidden="true"
-                className={cn(
+                className={cn(iconStroke.glyph, 
                   "size-4",
                   text.medium,
                   motionOrient,

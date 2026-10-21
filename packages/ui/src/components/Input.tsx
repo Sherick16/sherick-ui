@@ -11,6 +11,7 @@ import React, {
 import { cn } from "@/libs/utils";
 import {
   density,
+  fieldLabel,
   fieldLayout,
   fieldMessage,
   focusRing,
@@ -82,7 +83,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         invalid={error}
       >
         {label && (
-          <Field.Label className={cn("mb-2 text-sm font-medium", text.high)}>
+          <Field.Label className={cn(fieldLabel)}>
             {label}
             {required && <span className={cn("ms-1 text-sherick-danger")} aria-hidden="true">*</span>}
           </Field.Label>
@@ -165,7 +166,8 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         {/* Mounted whether or not a message was passed, as `Field`'s is: without `match` this part
             renders what Base reports — a failed constraint, or the error a `Form` returns for this
             field's name — and `match` pins the caller's own message in its place. A field marked
-            invalid with no message of its own shows only its rim, as it always has. */}
+            invalid with no message of its own shows only its danger tray, so give an invalid
+            field a message that says how to recover. */}
         {!(error && !errorMessage) && (
           <Field.Error
             match={error ? true : undefined}

@@ -16,6 +16,7 @@ import {
   density,
   focusRingInset,
   focusRingWithin,
+  iconStroke,
   material,
   rim,
   shape,
@@ -162,7 +163,7 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
             {loading ? (
               <Spinner className={cn("size-5")} size="small" />
             ) : (
-              <HugeiconsIcon icon={Search01Icon} className={cn("size-5")} aria-hidden="true" />
+              <HugeiconsIcon icon={Search01Icon} className={cn(iconStroke.glyph, "size-5")} aria-hidden="true" />
             )}
           </span>
         </Button>

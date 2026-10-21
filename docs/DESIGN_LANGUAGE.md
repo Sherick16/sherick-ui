@@ -195,6 +195,14 @@ nests `control` in a 20px `surface` list sheet at 8px; a time reading nests `row
 rounded-rectangle targets; its current page is a navigation destination (§10), so it is flat.
 Do not use literal radii or invent per-theme corner offsets in components.
 
+**A sheet's inset follows from its corners.** A sheet that holds rows insets them by its corner
+minus theirs, so the two curves stay concentric: a Select or Combobox list is 8px (20 − 12), the
+date popup 12px (20 − 8) and a Menu 4px (12 − 8). A sheet that holds content rather than rows —
+a Popover, a Card — insets it by at least its own corner (Popover 20px, Card 24px), so copy never
+sits inside the curve. A list's row then carries the remainder of its field's text inset: 8px of
+sheet and 12px of row put every option label on the trigger's own 20px edge, so an open list
+reads as the field opening rather than as a second surface beside it.
+
 ## 10. Tonal hierarchy
 
 There are **two readable text roles**: `text.high` for labels and values, `text.medium`
@@ -226,14 +234,25 @@ Supporting copy inside a row that holds a selection takes full ink (`selectableR
 step, so the supporting type step, not a dimmer tone, keeps it subordinate there.
 
 Primary marks interaction, and danger/warning/success carry meaning rather than decoration.
+**Spend iris where the reader acts, not where they read.** Passive information is neutral by
+default: an Alert rests on the neutral soft surface with only its status mark in the accent, and a
+Badge is neutral. A semantic variant is chosen because the colour says something, never to make a
+passive surface stand out; a tinted Card says something about its content. Iris then remains what
+it is in the thesis — the priority action, a made selection, a value's range and the focus ring.
 `--sui-accent` and `--sui-outline` are reserved: they are published for compatibility, no
 component consumes them, and a new use needs a role written here first. Semantic color belongs to the relevant icon,
 control or small region, not a whole table or page. Readable copy on passive semantic
 regions keeps normal text emphasis.
 
-**Where the reader is differs from what they chose.** A navigation destination — a current
-navigation row, the current page of a pagination, any `aria-current` location — takes
-`currentDestination`: the primary soft container, full ink and a touch of weight, flat. A held
+**Where the reader is differs from what they chose.** A navigation destination stays flat and
+takes `currentDestination` in one of two forms. A row on a sheet — a current navigation row —
+takes `currentDestination.row`: the primary soft container, full ink and a touch of weight. A
+destination inside a recessed track — a pagination's current page, a Stepper's current mark —
+takes `currentDestination.inTrack`: the soft step is the groove's own lightness, so there the fill
+steps up to `selected` and the label takes the accent, and the label, not the fill, says "you are
+here". A text trail marks its location with ink and weight alone: a Breadcrumb's last item is the
+page, not a row, and takes no fill. A Stepper's track segment is the workflow's range, not its
+location, and keeps the range's fill. A held
 value takes `tone.selected` with `elevation.control`. Tabs are the one deliberate exception:
 a tab list is a held choice of *view* inside a recessed track, so its indicator is the same puck
 a segment is, and it is sized as a tab (normal density) rather than a segment.
@@ -246,14 +265,18 @@ Text takes a **role**, not a size chosen per component. The roles live in `type`
 | Role | Size / line | Use |
 | --- | --- | --- |
 | `control` | by density (§13) | a control's own label or value; an option row matches the field that opened it |
+| `label` | 14 / 20px medium | the name above a control (`fieldLabel`), a progress label, a column header, a calendar's month |
+| `body` | 14 / 24px | a sentence inside a component: an alert, a toast's description, a dialog's description and content, an open disclosure panel |
 | `supporting` | 13 / 20px | field descriptions, hints and errors (`fieldMessage`), a row's secondary line |
 | `caption` | 12 / 16px | badges, group labels (an option group's heading is `list.groupLabel`), calendar weekdays, a code language label |
-| `title` | 15 / 22px semibold | the heading of a compact surface: popover, toast, command palette |
+| `title` | 16 / 24px semibold | the heading of a compact surface: card, popover, toast, command palette |
 | `heading` | 20 / 28px semibold | the title of a viewport-owning surface: dialog, alert dialog, drawer |
 | `numeric` | tabular figures | table cells, a number field, progress and pagination values |
 
 A command palette is a utility surface whose content is its search, so it takes `title`, not
-`heading`. Every role lands on a whole-pixel line box. Sans text inherits the host typeface
+`heading`. A title is one step above the 15px control text it usually sits over, so it reads as a
+heading by size and not by weight alone. Long-form Markdown keeps its own reading rhythm; `body` is
+the rhythm of copy *in* an interface. Every role lands on a whole-pixel line box. Sans text inherits the host typeface
 (the library is tuned for a neo-grotesque such as Inter and never sets one); code uses the
 `--sui-font-mono` stack.
 
@@ -381,6 +404,10 @@ release settles on the release timing. Its amplitude is a distance, so it is cho
 rather than written as one percentage for every width: a content-width control compresses 4%
 (`motionTactile`), a control spanning a track such as a tab 1.5% (`motionTactileWide`), and a
 list-opening field 0.7% (`motionTactileField`), which keeps every tier near two pixels per edge.
+A content-width control stretched to its container (`w-full`) is no longer content-width and takes
+the wide tier. A ghost IconButton shows only its 20px mark, so the mark takes the press
+(`motionInkPress`) and the 44px target stays still; a tonal or acrylic IconButton is a visible disc
+and presses like a button.
 Rows — navigation, options, commands, disclosure and tree rows — answer with tone, not
 compression. A row's highlight moves in one step (`motionRowLayer`): it marks where the
 reader is, so arrowing through a list never leaves a fading trail.
@@ -403,7 +430,7 @@ leaves in one frame, and the content below closes the space at once. Base provid
 lifecycle for in-flow lists, and components add no exit timers of their own, so this stays a
 documented gap rather than a local fix in one component.
 
-## 13. Density
+## 13. Density and iconography
 
 | Step | Minimum height | Type | Use |
 | --- | --- | --- | --- |
@@ -411,7 +438,7 @@ documented gap rather than a local fix in one component.
 | `normal` | 3rem | 0.9375rem / 1.375rem | default fields and controls |
 | `prominent` | 3.5rem | 1.125rem | larger actions |
 | `target` | 2.75rem square | inherited | standalone icon-only hit area |
-| `part` | 2.75rem high, 2.25rem wide | inherited | embedded part of a composite field |
+| `part` | 2.75rem high, 2rem wide | inherited | embedded part of a composite field |
 
 Density owns control height and type scale; each component owns its own padding. The
 embedded `part` is narrower than a standalone target because its surrounding field is
@@ -421,6 +448,29 @@ hit targets for phone layouts or create a fourth size step to solve a local spac
 A leading or trailing mark takes the `iconSlot` for the type step beside it: 16px beside a
 14px label (`compact`), 20px beside 15px (`normal`), 24px beside 18px (`prominent`) and 14px
 beside a 12px caption. An icon-only target keeps its own 20px mark inside the 44px target.
+
+### Iconography
+
+The library draws one family, Hugeicons' stroke set, and holds it to three rules.
+
+- **One rendered stroke.** The artwork is drawn on a 24-unit grid, so a stroke written in its own
+  units renders thinner as a slot shrinks: the same set measured 1.0px in a 16px dismiss and
+  1.25px in a 20px close. Every glyph the library draws takes `iconStroke.glyph`, a 1.5px stroke in
+  screen pixels at every slot, close to the stem of the medium label beside it. The tick and minus
+  inside a filled checkbox take the slightly heavier `iconStroke.mark` (1.75px), because they *are*
+  the selection mark on the strong accent rather than a hairline drawn on it. Artwork a consumer
+  hands into a slot keeps its own weight.
+- **One vocabulary.** A chevron moves *through* a sequence — paging, months, crumbs, tree branches,
+  disclosure — and turns in place to say open or closed. A stemmed arrow *leaves*: an external
+  link, a step out of the current flow. One meaning takes one glyph: information, success and
+  danger are circled marks, and warning is the triangle in every feedback surface, so its
+  silhouette differs from its neighbours before its colour does.
+- **Two dismiss sizes, by target.** A dismiss inside a compact surface or control — a chip, an
+  alert, a toast, a combobox's clear — is 16px; a standalone close that owns a full 44px target — a
+  dialog's close, a file row's removal — is 20px.
+
+When not to use: do not draw a second icon family, do not set a per-icon `strokeWidth`, and do not
+use a stemmed arrow for paging.
 
 ## 14. Accessibility and focus
 
@@ -516,9 +566,10 @@ consumers and for the repository's own examples, not new primitives.
 - **A surface sits on canvas.** A card is a matte surface on the canvas. Do not nest a card in a
   card to group content: inside a surface, group with spacing, a type role and an `edge.rule`.
   Specimens of surfaces are shown on a canvas band, not inside another card.
-- **Headings step down, never up.** A page heading, then a section heading, then `type.title`
-  for a surface's own heading. A heading inside a surface is never larger than the surface's
-  title; below `title`, label a group with `caption` or a medium-weight supporting line.
+- **Headings step down, never up.** A page heading, then a section heading, then the surface's
+  own title — `Card.Title`, `Popover.Title`, a dialog's header — which sets the `title` or
+  `heading` role for you. A heading inside a surface is never larger than the surface's title;
+  below the title, label a group with a smaller medium-weight line, as a NavGroup does.
 - **A setting row.** A binary setting puts its label and description at the start and its
   Switch at the end of one row, rather than a switch alone on a line beneath its label.
 - **A filter bar.** Filters, and the sort that orders their result, share one row of fields
@@ -529,6 +580,7 @@ consumers and for the repository's own examples, not new primitives.
   below, and a unit named in the label. The submit action closes the column; it never answers a
   press with nothing — the first invalid field takes focus.
 - **Actions.** One filled action per view. Secondary actions are tonal or text; a text action
-  that shares an edge with text hangs its padding (§17).
+  that shares an edge with text hangs its padding (§17). Status beside the action — an Alert, a
+  Badge — stays neutral unless its colour carries meaning (§10).
 - **Page backgrounds are full-bleed.** A page's canvas reaches the viewport edges and its
   content is centred within it; a column with its own background leaves a seam against the host.

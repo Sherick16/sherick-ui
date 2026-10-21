@@ -3,7 +3,7 @@
 import { Progress as BaseProgress } from "@base-ui/react/progress";
 import React, { forwardRef, type ComponentProps, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { elevation, material, shape, text, tone } from "./ui.common";
+import { elevation, material, shape, text, tone, type } from "./ui.common";
 import { motionActivityIndeterminate, motionRelocate } from "./ui.motion";
 import { Variant } from "./ui.types";
 
@@ -71,7 +71,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
         {(label || showFormattedValue) && (
           <div className={cn("flex items-baseline justify-between gap-3")}>
             {label ? (
-              <BaseProgress.Label className={cn("text-sm font-medium", text.high)}>
+              <BaseProgress.Label className={cn(type.label, text.high)}>
                 {label}
               </BaseProgress.Label>
             ) : null}

@@ -20,11 +20,13 @@ import Button from "./Button";
 import {
   density,
   edge,
+  fieldLabel,
   fieldLayout,
   fieldMessage,
   focusRingDrag,
   focusRingInset,
   focusRingWithin,
+  iconStroke,
   material,
   matteInset,
   recessedTop,
@@ -307,7 +309,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
         invalid={Boolean(error)}
         className={cn(fieldLayout, className)}
       >
-        <Field.Label className={cn("mb-2 text-sm font-medium", text.high)}>{label}</Field.Label>
+        <Field.Label className={cn(fieldLabel)}>{label}</Field.Label>
 
         {/* One compact chooser/drop surface. The native label retains picker and keyboard behavior;
             it is a field well like every other input, and its dashed rim and quiet state layer make
@@ -339,7 +341,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             className={cn("inline-flex size-8 shrink-0 items-center justify-center [&>svg]:size-7", text.medium)}
             aria-hidden="true"
           >
-            <HugeiconsIcon icon={Upload04Icon} aria-hidden="true" />
+            <HugeiconsIcon icon={Upload04Icon} aria-hidden="true" className={cn(iconStroke.glyph)} />
           </span>
           <span className={cn("flex min-w-0 flex-col items-center gap-1")}>
             <span className={cn("text-base font-semibold", text.high)}>
@@ -377,9 +379,9 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                     className={cn("flex min-w-0 items-start gap-3 py-2 ps-3", edge.row, text.high)}
                   >
                     <span aria-hidden="true" className={cn("inline-flex h-11 w-5 shrink-0 items-center [&>svg]:size-5", text.medium)}>
-                      {file.type.startsWith("image/") ? <HugeiconsIcon icon={Image01Icon} aria-hidden="true" /> : <HugeiconsIcon icon={File01Icon} aria-hidden="true" />}
+                      {file.type.startsWith("image/") ? <HugeiconsIcon icon={Image01Icon} aria-hidden="true" className={cn(iconStroke.glyph)} /> : <HugeiconsIcon icon={File01Icon} aria-hidden="true" className={cn(iconStroke.glyph)} />}
                     </span>
-                    <span className={cn("flex min-w-0 flex-1 flex-col text-sm leading-6 [overflow-wrap:anywhere]")}>
+                    <span className={cn("flex min-w-0 flex-1 flex-col [overflow-wrap:anywhere]", type.body)}>
                       <span>{file.name}</span>
                       <span className={cn(type.supporting, text.medium)}>{formatBytes(file.size)} · {fileType}</span>
                     </span>
@@ -405,7 +407,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                       )}
                     >
                       <span className={cn("inline-flex items-center justify-center", motionInkPress)}>
-                        <HugeiconsIcon icon={Cancel01Icon} className={cn("size-5")} aria-hidden="true" />
+                        <HugeiconsIcon icon={Cancel01Icon} className={cn(iconStroke.glyph, "size-5")} aria-hidden="true" />
                       </span>
                     </BaseButton>
                   </li>
@@ -418,7 +420,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                 type="button"
                 appearance="text"
                 variant="danger"
-                icon={<HugeiconsIcon icon={Delete02Icon} aria-hidden="true" />}
+                icon={<HugeiconsIcon icon={Delete02Icon} aria-hidden="true" className={cn(iconStroke.glyph)} />}
                 size="sm"
                 disabled={disabled}
                 onClick={clearFiles}

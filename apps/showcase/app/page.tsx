@@ -244,7 +244,10 @@ export default function Home() {
 
               <Specimen title="Shape">
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
+                  <Tile label="0.375rem" caption="Mark" className={cn(material.matteHigh, shape.mark)} />
+                  <Tile label="0.5rem" caption="Row" className={cn(material.matteHigh, shape.row)} />
                   <Tile label="0.75rem" caption="Control" className={cn(material.matteHigh, shape.control)} />
+                  <Tile label="0.75rem" caption="Sheet" className={cn(material.matteHigh, shape.sheet)} />
                   <Tile label="1rem" caption="Prominent" className={cn(material.matteHigh, shape.prominent)} />
                   <Tile label="1.25rem" caption="Surface" className={cn(material.matteHigh, shape.surface)} />
                   <Tile label="1.5rem" caption="Expressive" className={cn(material.matteHigh, shape.expressive)} />
@@ -300,7 +303,7 @@ export default function Home() {
               <Specimen title="Interaction states">
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                   <Tile label="Rest" className={cn(material.control, text.high)} />
-                  <Tile label="Hover" className={cn(material.control, "bg-sherick-canvas/[0.85]", text.high)} />
+                  <Tile label="Hover" className={cn(material.control, state.field.engaged, text.high)} />
                   <Tile label="Pressed" className={cn(material.control, text.high, stateLayer.tonal, "before:opacity-[0.15]")} />
                   <Tile label="Selected" className={cn(shape.control, tone.selected.primary)} />
                   <Tile label="Disabled" disabled className={cn(material.control, state.disabled)} />
@@ -391,7 +394,7 @@ export default function Home() {
               <Specimen title="Text input">
                 <div className="space-y-4">
                   <Input label="Project name" placeholder="Sherick UI" />
-                  <Input label="Invalid" placeholder="Required value" error />
+                  <Input label="Project slug" placeholder="my-project" error errorMessage="Enter a slug of lowercase letters, numbers and hyphens." />
                   <Input label="Invite link" prefix="https://" suffix=".discord.gg" placeholder="sherick" />
                 </div>
               </Specimen>
@@ -614,7 +617,7 @@ export default function Home() {
             <div className="mt-6 columns-1 gap-4 xl:columns-2 [&>*]:mb-4 [&>*]:break-inside-avoid">
               <Specimen title="Alerts">
                 <div className="space-y-3">
-                  <Alert variant="primary">A useful piece of information.</Alert>
+                  <Alert>A useful piece of information.</Alert>
                   <Alert variant="success" closeable>Changes were saved successfully.</Alert>
                   <Alert variant="warning">Review these settings before continuing.</Alert>
                   <Alert variant="danger" closeable>
@@ -699,8 +702,8 @@ export default function Home() {
             <div className="mt-6 grid gap-4 xl:grid-cols-2">
               <Specimen title="Cards">
                 <div className={cn("grid gap-3 p-3 sm:grid-cols-2", shape.control, material.canvas)}>
-                  <Card variant="secondary"><div className="font-medium">Neutral card</div><p className={cn("mt-2 text-sm leading-6", text.medium)}>Body copy goes here.</p></Card>
-                  <Card variant="primary"><div className="font-medium">Tonal card</div><p className={cn("mt-2 text-sm leading-6", text.medium)}>Body copy goes here.</p></Card>
+                  <Card variant="secondary"><Card.Title>Neutral card</Card.Title><Card.Description>Body copy goes here.</Card.Description></Card>
+                  <Card variant="primary"><Card.Title>Tonal card</Card.Title><Card.Description>Body copy goes here.</Card.Description></Card>
                 </div>
               </Specimen>
 
@@ -740,7 +743,7 @@ export default function Home() {
               <Specimen title="Table">
                 <Table headers={["Project", "Owner", "Status"]} rows={[
                   ["Design system", "Ana", <Badge key="design" variant="success">Live</Badge>],
-                  ["Marketing site", "Bruno", <Badge key="marketing" variant="primary">In review</Badge>],
+                  ["Marketing site", "Bruno", <Badge key="marketing" variant="warning">In review</Badge>],
                   ["Documentation", "Chen", <Badge key="docs" variant="secondary">Draft</Badge>],
                 ]} />
               </Specimen>
@@ -762,8 +765,8 @@ export default function Home() {
                     }
                   />
                   <Popover.Content className="w-72">
-                    <div className="space-y-3">
-                      <p className={cn("text-sm font-medium", text.high)}>Refine results</p>
+                    <Popover.Title>Refine results</Popover.Title>
+                    <div className="mt-4 space-y-3">
                       <Input label="Owner" placeholder="Anyone" />
                       <Field label="Status">
                         <Select options={selectOptions} defaultValue="design" />
@@ -945,9 +948,14 @@ function ShowcaseSection({
 
 function Specimen({ title, className = "", children }: { title: string; className?: string; children: React.ReactNode }) {
   return (
-    <div className={cn(shape.surface, material.matte, "min-w-0 self-start p-5 sm:p-7", className)}>
-      <h3 className={cn("mb-6", type.title)}>{title}</h3>
-      {children}
+    /* The surface takes the library's recipes through `cn`; the workbench's own responsive padding
+       sits on an unscoped inner box, so the package's scoped `.p-5` can never outrank the host's
+       `sm:p-7` on the same element. */
+    <div className={cn(shape.surface, material.matte, "min-w-0 self-start", className)}>
+      <div className="p-5 sm:p-7">
+        <h3 className={cn("mb-6", type.title)}>{title}</h3>
+        {children}
+      </div>
     </div>
   );
 }

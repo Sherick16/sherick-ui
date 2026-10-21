@@ -3,6 +3,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Loading03Icon } from "@hugeicons/core-free-icons";
 import { type VariantProps, cva } from "class-variance-authority";
 import { cn } from "@/libs/utils";
+import { iconStroke } from "./ui.common";
 import { motionActivitySpin } from "./ui.motion";
 
 /* The mark's box belongs to the slot a control puts around it, not to this component: a labelled
@@ -43,7 +44,7 @@ export interface SpinnerProps
 export function Spinner({ size, show, children, className }: SpinnerProps) {
   return (
     <span className={cn(spinnerVariants({ show }))} role="status" aria-live="polite">
-      <HugeiconsIcon icon={Loading03Icon} aria-hidden="true" className={cn(loaderVariants({ size }), className)} />
+      <HugeiconsIcon icon={Loading03Icon} aria-hidden="true" className={cn(iconStroke.glyph, loaderVariants({ size }), className)} />
       {children}
     </span>
   );
