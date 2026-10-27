@@ -108,14 +108,14 @@ A destination in a navigation list: one flat row, a real `<a>`.
 
 - `href` and `children` are required; `icon?` occupies one 20px, `aria-hidden` slot (a direct
   `svg` is normalized to 20px); `active?` (default `false`) publishes `aria-current="page"` and
-  adds the quietest primary tint plus medium weight. Colour is never the only carrier.
+  takes the primary selected step with its iris label and a semibold weight. Colour is never the only carrier.
 - It extends `AnchorHTMLAttributes`, so `onClick`, `target`, `rel`, `aria-*` and the rest land on
   the anchor. There is no `ref`. Nothing here detects the current route — you pass `active`.
 - The row is `max-w-xs` single-line with truncation: a long label is clipped, not wrapped. Keep
   destination labels short, and let the surrounding column own the width.
 - It is a row, not a control the size of a field: density owns its height, depth never says
-  "current", and the current step is deliberately quieter than an opaque accent fill (that fill
-  belongs to the one primary *action* in a view).
+  "current", and the current step is deliberately quieter than the opaque accent fill of the one
+  primary *action* in a view.
 
 ### `NavGroup`
 

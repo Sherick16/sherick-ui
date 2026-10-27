@@ -232,8 +232,9 @@ Also accepts `HTMLAttributes<HTMLDivElement>` (`CardProps`); one `<div>`, no `re
 | `Card.Title` | `headingLevel?` (`2`–`6`, default `3`) plus heading attributes (`CardTitleProps`) | the `title` type role at full ink |
 | `Card.Description` | paragraph attributes (`CardDescriptionProps`) | body copy in the supporting tone, 4px under the title |
 
-- A matte tonal surface with `surface` corners and no elevation or rim: the tone separates
-  it from the canvas, and it lifts only when something inside it does.
+- The neutral card is a matte sheet with `surface` corners. Its tone and its lift separate it
+  from the canvas, and it has no rim. A semantic variant is its role's soft container and stays
+  flat.
 - `p-6` is built-in component padding, so a card needs no inner wrapper. Override it with
   `className` (e.g. `p-4`) when the surrounding density demands it.
 - `Card.Title` and `Card.Description` give the card's own heading the library's type roles;

@@ -18,8 +18,9 @@ Material, elevation and edge answer different questions: what fills a surface, h
 far it sits from the page, and where two parts meet. A different surface tone does
 not imply a different elevation.
 
-- Grounded content uses matte surfaces, separated by tone. Passive cards stay flat;
-  grooves and wells can be recessed because that is their anatomy.
+- Grounded content uses matte surfaces, separated by tone. A neutral card is a matte sheet
+  that lifts (`elevation.surface`); a semantic card is its role's soft container and stays
+  flat. Grooves and wells can be recessed because that is their anatomy.
 - Tactile controls have shallow depth. Held choices have a selected surface, while
   transient hover/highlight and navigation-only current rows do not acquire depth.
 - Acrylic belongs to genuinely floating UI, not an important-looking grounded card.
@@ -79,8 +80,10 @@ additional wrapper opacity.
 Motion follows intent: feedback, tactile response, mark arrival, orientation,
 relocation, direct manipulation, disclosure, surface presence or activity. Preserve
 the library's existing responses instead of layering on row staggering, bouncing
-panels or a second transform on an animated part. Large surfaces and moving value
-controls do not spring past their destination. Reduced-motion behavior belongs to
+panels or a second transform on an animated part. A pressed control's release and a
+tab indicator's or switch thumb's travel settle on a spring, overshooting by a few
+percent; large surfaces, panels, segments, checkboxes, radios and measured quantities
+such as a progress width do not spring past their destination. Reduced-motion behavior belongs to
 [accessibility](accessibility.md#protect-targets-and-perceptual-states).
 
 Source: [canonical design language, sections 1–13 and 16–19](https://github.com/Sherick16/sherick-ui/blob/b1c201bc0ef2c755b508a968b90f8a02f2cd2d85/docs/DESIGN_LANGUAGE.md).
