@@ -249,3 +249,46 @@ At this Phase B checkpoint, the Base UI open editable Combobox isolation defect 
 Phase E later resolved it with a patched dependency bundled into the tarball. Current evidence lives in
 `RELEASE.md`. The counts above are point-in-time Phase B evidence, not current Phase E gate totals.
 No package was published in this phase.
+
+## Direction D (2.11.0) restyle baselines
+
+This record covers the screenshot and style-contract baselines re-recorded for the direction D restyle
+(2.11.0). The restyle is deliberate: it changes the canvas, the sheets, the iris selection and the type
+roles. Each re-record below was inspected before it was accepted.
+
+**Screenshot baselines (`apps/showcase/tests/browser/visual.spec.ts-snapshots`).** The four core and
+dialog baselines were re-recorded for light and dark: `core-light`, `core-dark`, `dialog-light` and
+`dialog-dark`, Linux Chromium. They were written with `--update-snapshots=all`, because Playwright
+rewrites only the snapshots that fail by default, and the restyle had to replace every one of them.
+The new renders were read before recording: the core light and press states, and the 1280px light
+dialog with its key-lit Confirm action. Their differences from the old baselines are the restyle's
+colour, lift and type changes; the layout was unchanged in the renders reviewed.
+
+**A tolerance finding.** Before the re-record, the restyled render passed the old baseline. The gate
+reported 169 differing pixels, because `toHaveScreenshot` compares with `maxDiffPixelRatio` 0.002 and
+pixelmatch's threshold of 0.2, which treats a white-to-light-iris change as anti-aliasing noise. The
+gate is not blind: a blank render failed the same comparison with 1,141,708 differing pixels. It is
+tone-blind. A palette or lightness change of this size passes unless it moves enough pixels. So the
+screenshot gate proves layout and styling distribution, and the palette is held by the style contract
+(`bun run visual`) and the contrast contract (`bun run test`). This is recorded in
+[VERIFICATION.md](VERIFICATION.md#deterministic-style-contract-snapshots). Tightening the threshold is a
+separate change and is not made here.
+
+**Style-contract baseline (`packages/ui/scripts/visual-baselines/visual-regression.json`).** The
+generated record was refreshed with `visual --update` after the 235 changed keys were reviewed by
+category, not key by key. The categories:
+
+- token values in both themes (the canvas, sheet, tray, iris, ink-heading and spring tokens);
+- new utilities: the hover tint at 0.07, the one-pixel press (`motion-safe:` `translate-y-px`), the
+  `bg-[image:…]` lighting gradients, the spring duration and easing lists, the quiet iris `before:` tint,
+  `text-sherick-primary-selected-ink`, the 18px and 22px sizes with their tracking, `shadow-sherick-surface`,
+  `bg-sherick-tray` and the selected-row `has-[[data-checked]]` tint;
+- specimen class fingerprints: a card gains its lift and its forced-colors outline, a code block's
+  block fill moves from the old 0.78 to the 0.97 matte step as `matteFlat`, and buttons, toggles and chips
+  carry the new press transitions.
+
+**Browser contracts updated with it.** `motion.spec.ts` reads the spring timing on the tab indicator,
+the switch thumb and the select trigger, and it reads the progress width on the release timing.
+`styling-contract.spec.ts` and `visual-consistency.spec.ts` take the quiet hover step at 0.07, and the
+current destination probes its selected step and its iris label. Each of these was a stale contract for
+the restyle, and each keeps the intent of the assertion it replaces.

@@ -31,9 +31,24 @@ a consumer can see them: `Avatar` rest props now land on the root and no longer 
 `className` now sizes its wrapper, and `Accordion` joins are no longer `separator` roles. Toasts with an
 action or a danger type are now sticky by default. If the owner judges any of these breaking, the bump is
 major rather than minor. The `overlay`, `toggles` and `stylesCss` budgets in `bundle-budget.json` rose with the
-new surface, and that change records the reason. The current source version is `2.10.0`, and npm's `latest` is
+new surface, and that change records the reason. The current source version is `2.11.0`, and npm's `latest` is
 `2.9.0`. An installed package's actual version and exports, not this
 checkout, determine availability.
+
+`2.11.0` is the direction D restyle, a minor bump. It changes what a consumer sees: the light canvas
+steps down and the dark canvas deepens; a neutral card or matte sheet lifts (`elevation.surface`); a
+primary held choice and a selected choice row take the iris selected step; a text field sits on its
+own `tray` step; quiet targets take a faintly stronger iris hover; `title` is 18/24 and `heading` is
+22/28 in a deeper `ink-heading`; and a press release, a tab indicator and a switch thumb settle on a
+spring. It adds the theme variables `--sui-tray`, `--sui-ink-heading`, `--sui-primary-selected-ink` and
+the lighting gradients and spring curves that sit beside them. It removes no component, prop, export,
+selector or `--sui-*` variable, so it is not a breaking change under the definition above, and it does
+not raise the runtime baseline. Consumers who retuned `--sui-canvas`, `--sui-primary`, `--sui-focus`,
+`--sui-surface-high` or `--sui-tray-deep` should re-check their override against the contrast gate in
+both themes, because the values they replaced have moved (see [PALETTE.md](PALETTE.md#changed-values-2100-to-2110)).
+The owner-layer values that changed are listed there with their 2.10.0 values. The change is visible, so
+the release owner should review the screenshots of the core and dialog baselines before approval; see
+[VISUAL_CONSISTENCY.md](VISUAL_CONSISTENCY.md#direction-d-2110-restyle-baselines).
 
 `packages/ui/package.json` owns the release version and `publishConfig.tag` remains `latest`.
 The packed-package gate rejects prereleases under `latest` and stable versions under
@@ -303,6 +318,25 @@ already measured 126.8 kB raw (as the gate reports it) against a 128.9 kB limit,
 refinements took it to 128.6 kB. The motion passes add the scrim's start and end states, the
 TreeView branch panel, the tactile duration and two further press-amplitude tiers
 (`motionTactileWide`, `motionTactileField`), each a scoped rule with its disabled-state gate.
+
+The 2.11.0 direction D restyle re-records **`stylesCss`** and **`themeCss`**, and no other record, by
+editing those two entries in `bundle-budget.json` to the measured values. Only these two exceeded their
+recorded budgets, so only they moved; the JavaScript budgets stayed inside tolerance and were not
+re-recorded.
+
+- **component stylesheet** `144099 / 18487 / 15168` → `154617 / 19486 / 15928` (+10518 bytes raw, about
+  7.3%; +999 gzip, about 5.4%). The reason is additive recipe output, not a dependency or a relaxed
+  tree-shaking contract: the lifted-sheet `surface` elevation and its light face, the iris selected and
+  primary held states, the tray and its deep step, the key light on strong fills, the quiet iris hover,
+  the title and heading roles, and the press and travel spring recipes with their scoped rules.
+- **theme stylesheet** `11715 / 1978 / 1609` → `14874 / 2405 / 1927` (+3159 bytes raw, about 27%; +427
+  gzip). Every value is emitted three times, light, explicit dark and system dark. The new tokens are
+  the `tray` step and its light gradient, `ink-heading`, `primary-selected-ink`, the `key-light` and
+  `surface-light` gradients, the `surface` elevation, and the two spring `linear()` curves with their
+  durations.
+
+Both raises are the measured size of the restyle and are recorded here as the reason. Neither is a
+routine refresh, and the stale-shrink rule still applies to them.
 
 The 2.7.0 visual overhaul re-records **`themeCss`** with `--update=themeCss`: `10776 / 1900 / 1572`
 → `11447 / 1978 / 1627` (+78 bytes gzip). Every value is emitted three times — light, explicit dark
