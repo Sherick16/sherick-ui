@@ -1,6 +1,6 @@
 {
   "name": "sherick-ui",
-  "version": "2.9.0",
+  "version": "2.9.1",
   "description": "A React component library in graphite and iris, with light and dark themes.",
   "repository": {
     "type": "git",

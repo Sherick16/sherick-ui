@@ -434,9 +434,9 @@ roving focus, dismissal ordering, focus restoration, form participation and cont
 remain the job of the interaction suite. A green axe run is never accepted as evidence that a
 behaviour works.
 
-#### Narrow viewport and RTL (`responsive.spec.ts`)
+#### Narrow viewport, RTL and text spacing (`responsive.spec.ts`)
 
-`apps/showcase/tests/browser/responsive.spec.ts` covers the two layout contracts that
+`apps/showcase/tests/browser/responsive.spec.ts` covers the layout contracts that
 ordinary desktop browser tests cannot see:
 
 - **narrow viewport** — at a 320px viewport the page renders no page-level horizontal
@@ -451,8 +451,13 @@ ordinary desktop browser tests cannot see:
   test time, so direction-sensitive layout, overflow and control ordering are checked without
   a separate fixture. The fixture avoids anything meaningless under RTL, which is why it is a
   dedicated verification page rather than a copy of the showcase.
+- **text spacing** — the same page is re-verified with the WCAG 1.4.12 minimums applied to every
+  element (line height 1.5, letter spacing 0.12em, word spacing 0.16em, paragraph spacing 2em),
+  closed and with its narrow dialog open. The page and controls must stay contained, and no box
+  that hides overflow may cut its text. Deliberate ellipsis truncation and 1px visually hidden
+  text are exempt.
 
-Both checks read geometry from the real rendered DOM; they do not snapshot a screenshot, so a
+These checks read geometry from the real rendered DOM; they do not snapshot a screenshot, so a
 styling change cannot silently satisfy them by shifting pixels.
 
 ### No-Tailwind consumer

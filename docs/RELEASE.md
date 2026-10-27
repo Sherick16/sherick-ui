@@ -16,12 +16,11 @@ and `--sui-<role>-selected` theme variables; `2.4.0` the rim on hollow controls;
 corners, a refined elevation ladder, quieter selected choice rows and the additive `--sui-puck`
 theme variable; `2.7.1` moved the icons to Hugeicons; and `2.8.0` removed the line from text
 fields — the tray carries them, with the additive `--sui-tray-deep` theme variable for hover and
-engagement — and rested surface choice rows on a tray, with an accent rim on the selected row. The
-current source package version is `2.9.0`, a design-language refinement: the additive
+engagement — and rested surface choice rows on a tray, with an accent rim on the selected row. `2.9.0` was a design-language refinement: the additive
 `Card.Title`, `Card.Description`, `Popover.Title` and `Popover.Description` parts; neutral defaults
 for `Alert` and `Badge`; the in-track form of the current destination; label and body type roles
 with a 16/24 title; one rendered icon stroke and one directional vocabulary; and option rows aligned
-to their trigger's text. It removes no component, prop or export. Version `2.4.0` remains the published baseline until the
+to their trigger's text. It removes no component, prop or export. The current source package version is `2.9.1`: a `Drawer`'s footer is now the dialog's own footer, so its bottom inset matches a dialog's 20px rather than 24px. Version `2.4.0` remains the published baseline until the
 release owner approves a staged version. An installed package's actual version and exports, not this
 checkout, determine availability.
 

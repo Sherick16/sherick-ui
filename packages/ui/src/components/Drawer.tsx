@@ -4,6 +4,7 @@ import { Dialog as BaseDialog } from "@base-ui/react/dialog";
 import React, { createContext, useContext, useRef, type ComponentProps, type ReactElement, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import { DialogDescription } from "./DialogDescription";
+import { DialogFooter } from "./DialogFooter";
 import { DialogHeader } from "./DialogHeader";
 import { DialogDismiss, DialogSurface, type DialogAttachment } from "./DialogSurface";
 
@@ -113,11 +114,10 @@ const DrawerDescription = ({ children, className }: DrawerDescriptionProps) => (
   <DialogDescription className={cn(className)}>{children}</DialogDescription>
 );
 
-/* Actions stay on the sheet's own surface: no divider, no second layer. */
+/* The dialog's own footer, so a sheet's actions keep the dialog's insets. Like an AlertDialog's,
+   it follows content with no padded body below it, so it opens its own space above. */
 const DrawerFooter = ({ children, className }: DrawerFooterProps) => (
-  <div className={cn("mt-auto flex flex-wrap items-center justify-end gap-3 px-6 pb-6 pt-4 sm:px-7", className)}>
-    {children}
-  </div>
+  <DialogFooter className={cn("pt-4", className)}>{children}</DialogFooter>
 );
 
 /* The dismissal control as a part, for an action that closes the sheet from its own footer: Base

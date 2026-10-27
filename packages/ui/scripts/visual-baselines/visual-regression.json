@@ -1361,9 +1361,6 @@
     ":where(.sui-scope).pb-5": [
       "padding-bottom: 1.25rem"
     ],
-    ":where(.sui-scope).pb-6": [
-      "padding-bottom: 1.5rem"
-    ],
     ":where(.sui-scope).pe-0\\.5": [
       "padding-inline-end: 0.125rem"
     ],

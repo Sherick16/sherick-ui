@@ -147,6 +147,58 @@ test("controls stay contained when the document direction is RTL", async ({ page
   expect(errors).toEqual([]);
 });
 
+/* WCAG 1.4.12 Text Spacing: a reader's own style sheet may raise these four properties at once,
+   and no content or function may be lost. The values are the criterion's own minimums. */
+const WCAG_TEXT_SPACING = `
+  * {
+    line-height: 1.5 !important;
+    letter-spacing: 0.12em !important;
+    word-spacing: 0.16em !important;
+  }
+  p { margin-bottom: 2em !important; }
+`;
+
+/* A box that hides overflow must still hold its text. A compact value slot that truncates with an
+   ellipsis is a declared choice (§19 of the design language), and a 1px visually hidden box exists
+   only for assistive technology, so both are left out. */
+const assertNoClippedText = async (root: Locator, context: string) => {
+  const clipped = await root.evaluate((container) =>
+    [container, ...container.querySelectorAll<HTMLElement>("*")]
+      .filter((element) => {
+        if (!element.textContent?.trim()) return false;
+        const css = getComputedStyle(element);
+        if (css.textOverflow === "ellipsis") return false;
+        if (element.clientWidth <= 1 && element.clientHeight <= 1) return false;
+        const hidesY = ["hidden", "clip"].includes(css.overflowY);
+        const hidesX = ["hidden", "clip"].includes(css.overflowX);
+        return (
+          (hidesY && element.scrollHeight > element.clientHeight + 1) ||
+          (hidesX && element.scrollWidth > element.clientWidth + 1)
+        );
+      })
+      .map((element) => `${element.tagName.toLowerCase()} "${element.textContent!.trim().slice(0, 40)}"`)
+  );
+
+  expect(clipped, `${context}: text is clipped in`).toEqual([]);
+};
+
+test("text stays whole and contained under WCAG 1.4.12 text spacing", async ({ page, errors }) => {
+  await openFixture(page);
+  await page.addStyleTag({ content: WCAG_TEXT_SPACING });
+
+  await assertNoPageOverflow(page, "text spacing");
+  await assertControlsFitNarrowContainer(page, "text spacing");
+  await assertNoClippedText(page.getByTestId("narrow-container"), "text spacing");
+
+  await page.getByRole("button", { name: "Open narrow dialog" }).click();
+  const dialog = page.getByRole("dialog");
+  await expect(dialog).toBeVisible();
+  await assertNoPageOverflow(page, "text spacing, open dialog");
+  await assertNoClippedText(dialog, "text spacing, open dialog");
+
+  expect(errors).toEqual([]);
+});
+
 test("anchored popups stay inside a narrow viewport with long labels", async ({ page, errors }) => {
   await page.setViewportSize(NARROW_VIEWPORT);
   await page.goto("/verification/responsive");

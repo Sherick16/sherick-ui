@@ -449,6 +449,26 @@ A leading or trailing mark takes the `iconSlot` for the type step beside it: 16p
 14px label (`compact`), 20px beside 15px (`normal`), 24px beside 18px (`prominent`) and 14px
 beside a 12px caption. An icon-only target keeps its own 20px mark inside the 44px target.
 
+### Surface insets
+
+A surface's inset is component anatomy, but surfaces of one role share one inset. The inset grows
+with how much a surface holds and how long it is read:
+
+| Surface | Inset | Why |
+| --- | --- | --- |
+| `Menu` | 4px around its rows | the rows carry their own padding; the sheet only frames them |
+| `Tooltip` | 12px inline, 8px block | one short hint, read at a glance |
+| `Alert` | 16px inline, 14px block | a status in the page flow, kept slimmer than a card; a one-line alert is 52px high |
+| `Toast` | 16px | a brief message beside the work, not over it |
+| `Popover`, `CommandPalette` | 20px | an anchored or command sheet that holds a few parts |
+| `Card` | 24px | a matte surface that groups a section of a page |
+| `Dialog`, `Drawer`, `AlertDialog` | 24px inline (28px from `sm`), 20px top and bottom | a modal surface read in full; the header reserves 64px at its end for the dismissal target |
+
+`Drawer` and `AlertDialog` build on the dialog's own header, description and footer, so the three
+cannot drift apart. A footer after a padded `DialogContent` opens 4px above itself, because the body
+already gives 20px; after a description or a sheet's own content it opens 16px. Do not invent a new
+inset for one instance; choose the role in this table that the surface plays.
+
 ### Iconography
 
 The library draws one family, Hugeicons' stroke set, and holds it to three rules.
