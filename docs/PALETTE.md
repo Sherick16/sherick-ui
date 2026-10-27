@@ -8,47 +8,59 @@ rejected. The rules that consume these values are [`DESIGN_LANGUAGE.md`](DESIGN_
 
 ## Graphite and iris (current)
 
-**Decided and implemented** in 2.7.0, as the library's visual overhaul. The earlier palette was a
+**Decided and implemented** in 2.7.0 as the library's visual overhaul, and retuned in 2.11.0 by the
+direction D restyle, recorded in [Direction D](#direction-d-2110) below. The earlier palette was a
 blue-grey family end to end: a navy accent (`0.42 0.14 255`) on blue-tinted neutrals, so every
 surface, tint and shadow shared the accent's hue and the page read as one cool wash with weak
 figure/ground. A warm "paper and ultramarine" palette was drafted first and rejected on review: the
 warm neutrals read as yellowed beside a cool accent. The overhaul separates the two jobs colour does:
 
-- **Neutrals are graphite.** Canvas, sheets, ink, rims and the shadow umbra sit at hue 285 with
-  chroma under 0.015 — they read as true greys, but they share the accent's family instead of
-  pulling against it. Sheets are white, and the card separates from the canvas by tone alone.
-- **One vivid accent.** `primary` is an iris violet (hue 292, chroma 0.205), the most saturated value
-  the filled press veil allows at that lightness. In dark it is a luminous lavender fill with
-  graphite labels.
+- **Neutrals are graphite.** Canvas, sheets, ink, rims and the shadow umbra sit at hue 285 to 290
+  with chroma under 0.015 — they read as true greys, but they share the accent's family instead of
+  pulling against it. Sheets are white, and a sheet lifts off the canvas by tone as well as by shadow.
+- **One vivid accent.** `primary` is an iris violet: a saturated value, close to the sRGB edge at its
+  lightness, that still reads as a violet rather than a blue. In dark it is a luminous lavender fill
+  with graphite labels.
 - **Containers are quiet.** The soft and selected steps keep their designed, opaque role (below) at
   low chroma, so an alert or a badge is a tint rather than a pastel block.
 - **A puck surface.** `--sui-puck` is the brightest surface in both themes, for a choice held in a
   track (see DESIGN_LANGUAGE §5). In dark mode no sheet tone can play that part, because a lifted
   object is lighter there and every sheet sits below the track that holds it. It is a contract
-  surface: both text roles, every semantic foreground and the detail role are measured on it.
+  surface: both text roles, every semantic foreground and the detail role are measured on it. A
+  primary held choice takes the iris selected step instead of the puck (2.11.0).
+
+The values below are the authored values in `packages/ui/src/styles/tokens.ts` at 2.11.0. Every
+token that changed in 2.11.0 is listed with its 2.10.0 value in [Direction D](#direction-d-2110).
 
 | Token | Light | Dark |
 | --- | --- | --- |
-| `--sui-canvas` | `0.970 0.003 290` | `0.160 0.006 285` |
-| `--sui-surface` | `0.998 0.001 290` | `0.200 0.008 285` |
-| `--sui-surface-high` | `0.934 0.006 290` | `0.252 0.010 285` |
-| `--sui-tray-deep` | `0.900 0.008 290` | `0.290 0.011 285` |
-| `--sui-surface-float` | `0.999 0.001 290` | `0.226 0.009 285` |
-| `--sui-puck` | `1 0 0` | `0.315 0.012 285` |
-| `--sui-surface-overlay` | `0.995 0.002 290` | `0.214 0.008 285` |
+| `--sui-canvas` | `0.949 0.005 288` | `0.120 0.006 285` |
+| `--sui-surface` | `0.999 0.001 290` | `0.262 0.011 285` |
+| `--sui-surface-high` | `0.905 0.009 288` | `0.315 0.012 285` |
+| `--sui-tray` | `0.884 0.011 288` | `0.218 0.010 285` |
+| `--sui-tray-deep` | `0.866 0.012 288` | `0.196 0.009 285` |
+| `--sui-surface-float` | `0.999 0.001 290` | `0.280 0.011 285` |
+| `--sui-surface-overlay` | `0.995 0.002 290` | `0.272 0.011 285` |
+| `--sui-puck` | `1 0 0` | `0.335 0.012 285` |
+| `--sui-media` | `0.200 0.008 285` | `0.160 0.006 285` |
 | `--sui-ink` | `0.200 0.012 285` | `0.950 0.004 285` |
-| `--sui-ink-muted` | `0.480 0.014 285` | `0.745 0.010 285` |
-| `--sui-detail` | `0.590 0.012 285` | `0.605 0.010 285` |
-| `--sui-rim` | `0.625 0.012 285` | `0.535 0.010 285` |
+| `--sui-ink-heading` | `0.130 0.018 285` | `0.992 0.002 285` |
+| `--sui-ink-muted` | `0.432 0.014 285` | `0.765 0.010 285` |
+| `--sui-detail` | `0.555 0.012 285` | `0.640 0.010 285` |
+| `--sui-rim` | `0.580 0.012 285` | `0.580 0.010 285` |
 | `--sui-edge` | `0.400 0.012 285` | `0.930 0.006 285` |
-| `--sui-light-bottom` | `0.280 0.025 290` | `0.070 0.008 285` |
+| `--sui-outline` | `0.500 0.012 285` | `0.745 0.010 285` |
 | `--sui-scrim` | `0.200 0.006 285` | `0.060 0.006 285` |
-| `--sui-primary` | `0.490 0.205 292` | `0.780 0.125 292` |
-| `--sui-primary-strong` | `0.430 0.200 292` | `0.720 0.160 292` |
-| `--sui-focus` | `0.490 0.205 292` | `0.780 0.125 292` |
-| `--sui-primary-soft` | `0.952 0.024 292` | `0.300 0.075 292` |
-| `--sui-primary-selected` | `0.905 0.052 292` | `0.375 0.105 292` |
-| `--sui-danger` | `0.465 0.180 27` | `0.775 0.130 25` |
+| `--sui-light-top` | `1 0 0` | `1 0 0` |
+| `--sui-light-bottom` | `0.280 0.025 290` | `0.070 0.008 285` |
+| `--sui-primary` | `0.470 0.255 290` | `0.755 0.135 290` |
+| `--sui-primary-strong` | `0.440 0.235 290` | `0.715 0.158 290` |
+| `--sui-primary-soft` | `0.946 0.027 292` | `0.300 0.110 291` |
+| `--sui-primary-selected` | `0.858 0.074 291` | `0.380 0.150 291` |
+| `--sui-primary-selected-ink` | `0.420 0.225 290` | `0.905 0.060 291` |
+| `--sui-focus` | `0.470 0.255 290` | `0.755 0.135 290` |
+| `--sui-accent` (reserved, unused by components) | `0.620 0.120 230` | `0.800 0.080 215` |
+| `--sui-danger` | `0.452 0.180 27` | `0.775 0.130 25` |
 | `--sui-danger-soft` | `0.952 0.020 30` | `0.260 0.040 25` |
 | `--sui-danger-selected` | `0.900 0.042 30` | `0.330 0.062 25` |
 | `--sui-warning` | `0.398 0.086 68` | `0.830 0.120 80` |
@@ -57,16 +69,122 @@ warm neutrals read as yellowed beside a cool accent. The overhaul separates the 
 | `--sui-success` | `0.390 0.088 158` | `0.780 0.120 158` |
 | `--sui-success-soft` | `0.952 0.024 165` | `0.260 0.040 160` |
 | `--sui-success-selected` | `0.900 0.046 165` | `0.330 0.060 160` |
-| `--sui-on-primary` | `0.990 0.003 290` | `0.160 0.006 285` |
+| `--sui-on-primary`, `--sui-on-danger`, `--sui-on-warning`, `--sui-on-success` | `0.990 0.003 290` | `0.095 0.010 285` (on-primary); `0.160 0.006 285` (the others) |
+| `--sui-code-comment` | `oklch(0.505 0.012 285)` | `#9d9aa9` |
 
-The contract is unchanged in method and in requirement, and every composition clears it in both
-themes. The binding compositions are still the filled press veil (light success 4.56, warning
-4.59, danger 4.64, primary 4.67; dark primary 4.51) and the rim (3.04 light on a choice row on the
-page, 3.22 dark on a choice row in a card), which is why the strong fills and the rim sit where they
-do, and why a choice row rests on `matteHigh` rather than the full field tray. `bun run test` prints the full matrix.
+The surfaces, the elevation ladder, the glass family and the code syntax palette are in
+`tokens.ts` and are not repeated as a table here. The contract is unchanged in method and in
+requirement. At 2.11.0, `bun run test` measures **142 compositions in both themes, 0 failing**. The
+binding margins are in [Direction D](#direction-d-2110).
 
 The sections below are the decision record for the values this palette replaced. Their method — and
 every alternative they rejected — still governs how a value here may change.
+
+## Direction D (2.11.0)
+
+**Decided and implemented** in 2.11.0. Direction D is a restyle of tone, selection, depth and type,
+with no component, prop or export removed. It was prototyped first and then built into the owner
+layers. The rules it sets, and why:
+
+- **A light canvas under white sheets.** The light canvas steps down a little, so a white sheet lifts
+  off it by tone as well as by its shadow, and a page with no sheets on it still reads light. The dark
+  canvas deepens, and dark sheets sit a step above it. Why: a card has to read as a lifted sheet in
+  both themes, and the page must not read as grey.
+- **Matte sheets lift.** `material.matte`, which every neutral card and sheet is built on, carries
+  `elevation.surface`: a grounded shadow, a lit upper lip and a light face (`surface-light`). Semantic
+  cards are the role's soft container and stay flat. Why: a card separated by tone alone read as a
+  page, not as an object. This is the one material that carries elevation; DESIGN_LANGUAGE §2 says so.
+- **Iris selection.** A primary held choice takes the `primary-selected` step with the
+  `primary-selected-ink` label, in a track as well as in a sheet. A selected choice row takes the same
+  step with the accent selection rim, and it stays flat. Neutral and semantic held choices keep the
+  puck and their own tone, so an iris fill never sits under a danger or success label. Why: a made
+  choice is the one place the reader should see the accent at rest, and the tint is quieter than a fill.
+- **Key light on strong fills.** A strong fill carries `key-light`: lit at its top, shaded at its base.
+  A raised control's press takes the light out (`state.recess`). Why: a filled action reads as a key,
+  and the press still answers with the recess.
+- **A tray for fields.** A text field's resting well is its own `tray` step, below the sheet it sits
+  on in both themes. The pointer, focus and an open popup sink it to `tray-deep`. Why: the field is
+  identified by its label and content, so its state needs its own step, not a line.
+- **Quiet iris tint.** A quiet target (a row, a ghost action, a tab, a field part) answers the pointer
+  with a faint iris tint: the quiet hover step is 0.07, up from 0.05. A target whose label is a
+  semantic tone keeps that tone. Why: the accent marks where the reader is about to act.
+- **Type roles.** `title` is 18/24 semibold, up from 16/24. `heading` is 22/28 semibold, up from
+  20/28. A heading's ink is `ink-heading`, a deeper ink in light and a brighter one in dark. Why: a
+  heading has to read as a heading by size, and its ink is set apart from body copy.
+- **Springs.** A pressed control's release settles on a spring (`ease-spring-press`, 460ms, about 15%
+  of its travel past rest). A tab indicator and a switch thumb ride `ease-spring-travel` (420ms, about
+  6% past their stop). Every other motion keeps its curve. Reduced motion removes both springs'
+  travel. The one rule this changes is the "stable selection boundaries do not bounce" line in
+  DESIGN_LANGUAGE §12: a tab indicator and a switch thumb are the exception. Layout edges and tone keep
+  the glide, and a measured quantity such as a progress width never overshoots.
+
+### Changed values, 2.10.0 to 2.11.0
+
+Read from the authored values in git (`2ab53ae` to the 2.11.0 head). The contract was not run
+against the 2.10.0 values, so this table states authored values only, not before measurements.
+
+| Token | Light 2.10.0 → 2.11.0 | Dark 2.10.0 → 2.11.0 |
+| --- | --- | --- |
+| `canvas` | `0.970 0.003 290` → `0.949 0.005 288` | `0.160 0.006 285` → `0.120 0.006 285` |
+| `surface` | `0.998 0.001 290` → `0.999 0.001 290` | `0.200 0.008 285` → `0.262 0.011 285` |
+| `surface-high` | `0.934 0.006 290` → `0.905 0.009 288` | `0.252 0.010 285` → `0.315 0.012 285` |
+| `tray-deep` | `0.900 0.008 290` → `0.866 0.012 288` | `0.290 0.011 285` → `0.196 0.009 285` |
+| `surface-float` | unchanged | `0.226 0.009 285` → `0.280 0.011 285` |
+| `surface-overlay` | unchanged | `0.214 0.008 285` → `0.272 0.011 285` |
+| `puck` | unchanged | `0.315 0.012 285` → `0.335 0.012 285` |
+| `ink-muted` | `0.480 0.014 285` → `0.432 0.014 285` | `0.745 0.010 285` → `0.765 0.010 285` |
+| `detail` | `0.590 0.012 285` → `0.555 0.012 285` | `0.605 0.010 285` → `0.640 0.010 285` |
+| `rim` | `0.625 0.012 285` → `0.580 0.012 285` | `0.535 0.010 285` → `0.580 0.010 285` |
+| `primary` | `0.490 0.205 292` → `0.470 0.255 290` | `0.780 0.125 292` → `0.755 0.135 290` |
+| `primary-strong` | `0.430 0.200 292` → `0.440 0.235 290` | `0.720 0.160 292` → `0.715 0.158 290` |
+| `primary-soft` | `0.952 0.024 292` → `0.946 0.027 292` | `0.300 0.075 292` → `0.300 0.110 291` |
+| `primary-selected` | `0.905 0.052 292` → `0.858 0.074 291` | `0.375 0.105 292` → `0.380 0.150 291` |
+| `focus` | `0.490 0.205 292` → `0.470 0.255 290` | `0.780 0.125 292` → `0.755 0.135 290` |
+| `danger` | `0.465 0.180 27` → `0.452 0.180 27` | unchanged |
+| `on-primary` | unchanged | `0.160 0.006 285` → `0.095 0.010 285` |
+| `code-comment` | `oklch(0.52 0.012 285)` → `oklch(0.505 0.012 285)` | `#928f9e` → `#9d9aa9` |
+
+New in 2.11.0: `tray`, `ink-heading`, `primary-selected-ink`, and the lighting gradients `key-light`, `surface-light` and `tray-light`, plus
+`elevation-surface` and the spring tokens `duration-spring-press`, `ease-spring-press`,
+`duration-spring-travel` and `ease-spring-travel`. The light `elevation-raised` and the dark elevation
+shadows also changed; they are in `tokens.ts`.
+
+### Measured compositions, 2.11.0
+
+Each row is the lowest value the contract measured for that composition across the states it is
+checked in, with the surface or state that binds it. They come from `scripts/contrast-contract.mjs`
+over the built `dist/theme.css`, the same run that reports 142 compositions and 0 failing.
+
+| Composition | Light | Dark |
+| --- | --- | --- |
+| held-choice iris label on the selected step (tonal pressed) | **4.77** | **5.58** |
+| text on a quiet target under the iris layer (`ink-muted`, field hover pressed / held puck pressed) | **4.64** | **4.84** |
+| `tone.text.primary` on a surface, through the quiet states (field hover pressed / held puck pressed) | **4.53** | **4.51** |
+| `tone.text.primary` on its own tint, through its states (canvas pressed) | **5.16** | **4.73** |
+| `tone.text.primary` on its selected tint | **5.03** | **4.72** |
+| in-track current destination | **5.03** | **4.72** |
+| a choice row's selection rim | **5.03** | **4.72** |
+| focus indicator over the primary selected tint | **5.03** | **4.72** |
+| on-colour on its strong fill through the pressed veil (success light, primary dark) | **4.56** | **4.56** |
+| on-colour on the lit key face through the hovered state (success light, primary dark) | **4.84** | **5.74** |
+| a selection mark on its selected fill, pressed (success light, primary dark) | **4.56** | **4.56** |
+| a hollow control's rim (unselected mark on a choice row on the page / in a card) | **3.36** | **3.19** |
+| the detail role (field hover / held puck) | **3.17** | **3.56** |
+| `tone.text.primary` on every authored surface (field hover / held puck) | **5.24** | **5.30** |
+| the focus indicator against every authored surface (field hover / held puck) | **5.24** | **5.30** |
+| the focus indicator over a highlighted primary row | **6.61** | **5.51** |
+| `text.medium` on an invalid or engaged field (light: engaged in canvas; dark: at rest in canvas) | **5.36** | **8.24** |
+| `tone.text.danger` in an invalid field (danger tray in canvas) | **7.00** | **7.34** |
+| the heading ink on every authored surface (field hover / held puck) | **13.39** | **11.74** |
+| `text.high` on a semantic tint, selected step | **11.58** | **9.23** |
+| `text.high` on a semantic tint, soft step | **15.40** | **12.24** |
+| a progress fill against its track (primary) | **6.91** | **5.17** |
+| text on a data row under the pointer | **6.42** | **7.54** |
+| the code syntax palette on the code well (comment) | **4.80** | **4.97** |
+
+The tightest margins are primary text through the quiet states (4.51 dark, 4.53 light), the
+on-colour through the pressed veil (4.56 on both a light success and a dark primary fill), and the
+hollow rim (3.19 dark). Those are the compositions a palette change has to re-measure first.
 
 ## What the palette answers to
 
