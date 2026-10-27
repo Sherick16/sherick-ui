@@ -63,6 +63,24 @@ test("narrow controls fit without widening the page", async ({ page, errors }) =
   expect(errors).toEqual([]);
 });
 
+test("a horizontal field wraps its control rather than squeezing its label", async ({ page, errors }) => {
+  await openFixture(page);
+
+  const row = page.getByTestId("narrow-setting-row");
+  const label = row.getByText("Narrow workspace name");
+  const input = row.getByRole("textbox");
+  const [rowBox, labelBox, inputBox] = await Promise.all([row.boundingBox(), label.boundingBox(), input.boundingBox()]);
+
+  /* The label keeps a readable measure: at most two lines, never a letter per line. */
+  const lineHeight = await label.evaluate((element) => parseFloat(getComputedStyle(element).lineHeight));
+  expect(labelBox!.height, "the setting-row label wrapped to more than two lines").toBeLessThanOrEqual(lineHeight * 2 + 1);
+  /* With no room beside the label, the control takes its own line, inside the row. */
+  expect(inputBox!.y).toBeGreaterThanOrEqual(labelBox!.y + labelBox!.height);
+  expect(inputBox!.x + inputBox!.width).toBeLessThanOrEqual(rowBox!.x + rowBox!.width + 1);
+
+  expect(errors).toEqual([]);
+});
+
 test("the dialog opens without widening the page at the narrow viewport", async ({ page, errors }) => {
 
   await openFixture(page);

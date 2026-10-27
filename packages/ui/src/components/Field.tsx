@@ -19,7 +19,9 @@ export const fieldDensity: Record<FieldSize, string> = {
 /* A setting row: its label and description at the start, its control at the end, centred on the
    block of text. The gap is the one a row of settings needs, and the text block keeps the column
    rhythm of `fieldLayout`, so the label and its description still touch at 4px. */
-const settingRow = "flex min-w-0 w-full items-center justify-between gap-6";
+/* A setting row wraps rather than squeezing its label: when the container cannot hold a readable label
+   beside the control, the control moves to its own line, still at the end. */
+const settingRow = "flex min-w-0 w-full flex-wrap items-center justify-between gap-x-6 gap-y-2";
 
 export interface FieldProps
   extends Omit<ComponentProps<typeof BaseField.Root>, "children" | "className" | "ref"> {
@@ -97,12 +99,12 @@ export const Field = forwardRef<HTMLDivElement, FieldProps>(
         {horizontal ? (
           <>
             {/* The text block is one column, so its label, description and error keep the vertical rhythm. */}
-            <div className={cn(fieldLayout, "flex-1")}>
+            <div className={cn(fieldLayout, "min-w-[min(12rem,100%)] flex-1")}>
               {labelNode}
               {descriptionNode}
               {errorNode}
             </div>
-            <div className={cn("flex shrink-0 items-center")}>{children}</div>
+            <div className={cn("ms-auto flex max-w-full shrink-0 items-center")}>{children}</div>
           </>
         ) : (
           <>

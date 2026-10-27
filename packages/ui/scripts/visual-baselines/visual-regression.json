@@ -493,6 +493,9 @@
     ":where(.sui-scope).ms-3": [
       "margin-inline-start: 0.75rem"
     ],
+    ":where(.sui-scope).ms-auto": [
+      "margin-inline-start: auto"
+    ],
     ":where(.sui-scope).mt-1": [
       "margin-top: 0.25rem"
     ],
@@ -772,6 +775,9 @@
     ":where(.sui-scope).min-w-\\[1ch\\]": [
       "min-width: 1ch"
     ],
+    ":where(.sui-scope).min-w-\\[min\\(12rem\\2c 100\\%\\)\\]": [
+      "min-width: min(12rem, 100%)"
+    ],
     ":where(.sui-scope).min-w-\\[var\\(--anchor-width\\)\\]": [
       "min-width: var(--anchor-width)"
     ],
@@ -986,8 +992,14 @@
     ":where(.sui-scope).gap-x-4": [
       "column-gap: 1rem"
     ],
+    ":where(.sui-scope).gap-x-6": [
+      "column-gap: 1.5rem"
+    ],
     ":where(.sui-scope).gap-y-1": [
       "row-gap: 0.25rem"
+    ],
+    ":where(.sui-scope).gap-y-2": [
+      "row-gap: 0.5rem"
     ],
     ":where(.sui-scope).gap-y-3": [
       "row-gap: 0.75rem"
