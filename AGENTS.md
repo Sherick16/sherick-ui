@@ -68,7 +68,9 @@ first — never write the rule into a component:
 Motion has one additional rule: **components decide what changes; the motion system decides
 how change moves.** Target geometry may remain component anatomy, but timing/easing/transition
 ownership does not. One DOM node has one spatial-motion owner. Direct manipulation never
-interpolates pointer-driven geometry. Stable selection boundaries do not bounce. Base UI owns
+interpolates pointer-driven geometry. Stable selection boundaries do not bounce; the only exception is
+the tab indicator's and switch thumb's travel, which settles with a small documented overshoot
+(`docs/DESIGN_LANGUAGE.md` §12, Springs). Base UI owns
 popup placement/lifecycle; Sherick owns the Popup's visual presence and never animates the
 Positioner or adds exit timers.
 
