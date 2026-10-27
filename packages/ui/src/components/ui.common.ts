@@ -113,6 +113,7 @@ export const groupFocusRing =
 /* Elevation — distance from the surface plane, and nothing else. Three depth roles
    exist, and the last two are a single tactile pair:
    - flat:     at rest on the page. Separation comes from tone alone.
+   - surface:  a grounded sheet, a card or a panel, lifted off the page by its own light.
    - raised:   a manipulated control, lifted a hair above its own track so it feels
                touchable; pressing it returns it to the track.
    - floating: a surface that genuinely sits above the application.
@@ -121,9 +122,9 @@ export const groupFocusRing =
    - recessed: the other half of that pair: a groove, a track or a well, which is
                recessed by definition, and a raised control while it is held, which
                lands at the same depth.
-   A passive surface is flat unless its anatomy is sunk by design: a well, a groove and
-   a code well are `recessed` while they sit there, and `flat` is the default for
-   everything else passive. A flat control never gains depth by being pressed. */
+   A passive sheet lifts with `surface`, which the matte material carries. A well, a groove and a
+   code well are `recessed` while they sit there, and `flat` is the default for everything else
+   passive. A flat control never gains depth by being pressed. */
 /* Forced colors removes shadows and tones, so a shell that separates from the page by depth alone
    loses its boundary. Every shell that carries elevation draws its own system-coloured outline
    there: `outline` is drawn in CanvasText by the platform and `outline-offset` pulls it onto the
@@ -136,9 +137,9 @@ export const elevation = {
   flat: "shadow-sherick-flat",
   raised: /* @__PURE__ */ cx("shadow-sherick-raised", forcedBoundary),
   floating: /* @__PURE__ */ cx("shadow-sherick-floating", forcedBoundary),
-  /* D: a grounded sheet — a card, a panel — lifted off the canvas by a soft ambient fall and a lit
-     upper lip, with the light on its face (`surface-light`). It is passive depth: a sheet never
-     recesses. `material.matte` carries it, so every sheet built on that material lifts. */
+  /* A grounded sheet — a card, a panel — lifted off the canvas by a soft ambient fall and a lit upper
+     lip, with the light on its face (`surface-light`). It is passive depth: a sheet never recesses.
+     `material.matte` carries it, so every sheet built on that material lifts. */
   surface: /* @__PURE__ */ cx("shadow-sherick-surface bg-[image:var(--sui-surface-light)]", forcedBoundary),
   control: "shadow-sherick-control",
   recessed: "shadow-sherick-recessed",
@@ -318,9 +319,9 @@ export const state = {
      deep step; a composite field engages its outer surface while the input inside stays borderless;
      an expanded control holds the engaged step while its popup is open. Tonality and the focus ring
      carry the state, so no border appears and disappears. */
-  /* A field is a tray in the `surface-high` tone, so it reads as a quiet recess in light and a
-     quiet step up in dark. It draws no line: its label and content identify it (see `rim`), so the
-     tray is laid at full strength to say "something goes here" on a card and on the page alike.
+  /* A field is a tray: its own `tray` step, below the sheet it sits on in both themes, so it reads as
+     a quiet well. It draws no line: its label and content identify it (see `rim`), so the tray is
+     laid at full strength to say "something goes here" on a card and on the page alike.
      The pointer sinks it to the deep tray, and so does engagement — focus or an open popup — where
      the focus ring is what says "this one is engaged"; an engaged field never falls back under the
      pointer, because both states share the step. An invalid field is the danger tray — the role's
@@ -402,16 +403,16 @@ const pressTrack = "group-[:not([data-disabled]):not([aria-disabled=true]):not([
 const hoverMark =
   "[@media(hover:hover)_and_(pointer:fine)]:group-[:not([data-disabled]):not([data-readonly]):not([aria-disabled=true]):not(:disabled):hover]:before:opacity-[0.09]";
 
-/* A labelled control surface paints its state on a row that owns the pointer area while the
-   actual disabled marker belongs to a descendant control. Gate the same quiet response on that
-   descendant so a disabled or read-only choice does not advertise a press it cannot accept. */
-/* D: the quiet layer is iris rather than ink. A quiet target — a row, a ghost action, a tab, a field
-   part — answers the pointer with a faint accent tint, so iris marks where the reader is about to act
-   as well as what they chose. A target whose label is a semantic tone keeps its own colour, so a
-   destructive command never hovers violet. */
+/* The quiet layer is the iris, not the ink. A quiet target — a row, a ghost action, a tab, a field
+   part — answers the pointer with a faint accent tint, so the accent marks where the reader is about
+   to act as well as what they chose. A target whose label is a semantic tone keeps its own colour,
+   so a destructive command never hovers violet. */
 const quietTint =
   "before:bg-sherick-primary [&.text-sherick-danger]:before:bg-current [&.text-sherick-warning]:before:bg-current [&.text-sherick-success]:before:bg-current";
 
+/* A labelled control surface paints its state on a row that owns the pointer area while the
+   actual disabled marker belongs to a descendant control. Gate the same quiet response on that
+   descendant so a disabled or read-only choice does not advertise a press it cannot accept. */
 export const stateLayerQuietComposite = /* @__PURE__ */ cx(
   "relative",
   stateLayerBase,
@@ -473,18 +474,22 @@ export const stateLayer = {
 export const hitArea =
   "relative after:pointer-events-auto after:absolute after:inset-[min(0px,calc((100%-2.75rem)/2))] after:content-['']";
 
-/* Material — fill only. No material carries elevation or a rim: the same matte
-   fill appears flat in a card, lifted on a button and recessed in a groove.
+/* Material — fill, and the lift of a sheet. No material carries a rim. The matte sheet is the one
+   material that also carries elevation (`elevation.surface`), because a sheet is what lifts; every
+   other material is a fill, and its depth comes from the anatomy that holds it: a button is raised,
+   a groove is recessed.
    - canvas:      the page itself.
    - matteQuiet:  the quietest matte step, for dense data regions and wells that
                   should sit back from the surface around them.
-   - matte:       a matte surface that separates from the canvas by tone alone.
+   - matte:       the sheet: nearly opaque and lifted off the canvas, with a lit face.
+   - matteFlat:   the matte fill without its lift, for a block that is sunk into the page.
    - matteHigh:   the second matte step, for nesting inside another matte surface.
    - matteInset:  a passive sheet tucked under a stronger control; subdued without
                   blending into the canvas or needing a drawn rim.
-   - control:     the fill every text control shares, plus its placeholder tone: an opaque tray
-                  in the `surface-high` tone. The tray says "something goes here"; the field's
-                  label and content, not a drawn edge, are what identify it (see `rim`).
+   - control:     the fill every text control shares, plus its placeholder tone: an opaque
+                  `tray` step with its shaded upper wall. The tray says "something goes here";
+                  the field's label and content, not a drawn edge, are what identify it (see
+                  `rim`).
    - handle:      the fill of a small part the user has to find — a value control's handle.
                   Surface steps sit within a few percent of their neighbours, so this role
                   takes the mid-emphasis tone, which inverts with the theme and separates in
@@ -512,12 +517,15 @@ export const hitArea =
                   sheet — which is how it separates without leaning on its shadow, and
                   `--sui-overlay-fill` tunes how much of the sheet is its own tone rather
                   than the page behind it — a large overlay leans on that, not on blur. */
+const matteFill = "bg-sherick-surface/[0.97] text-sherick-ink";
+
 export const material = {
   canvas: "bg-sherick-canvas text-sherick-ink",
   matteQuiet: "bg-sherick-surface/[0.42] text-sherick-ink",
-  /* D: a matte sheet is nearly opaque, so it stays white on the deeper canvas, and it carries the
-     sheet's lift and face light (`elevation.surface`). */
-  matte: /* @__PURE__ */ cx("bg-sherick-surface/[0.97] text-sherick-ink", elevation.surface),
+  /* Nearly opaque, so the sheet stays white on the canvas, and lifted by `elevation.surface`. */
+  matte: /* @__PURE__ */ cx(matteFill, elevation.surface),
+  /* The same fill with no lift: a block sunk into the page takes its shaded wall from `recessedTop`. */
+  matteFlat: matteFill,
   matteHigh: "bg-sherick-surface-high/[0.72] text-sherick-ink",
   control: "bg-sherick-tray bg-[image:var(--sui-tray-light)] text-sherick-ink placeholder:text-sherick-ink-muted",
   /* The invalid fill carries its placeholder at the *full* danger tone, not at a fraction of it. A
@@ -576,9 +584,9 @@ export const type = {
   body: "text-sm leading-6 text-pretty",
   supporting: "text-[0.8125rem] leading-5 text-pretty",
   caption: "text-xs leading-4 text-pretty",
-  /* D: a title is 18/24 and a heading 22/28, both semibold with tight tracking, and both take the
-     heading ink: the role points `--sui-ink` at `--sui-ink-heading` for its own box, so the
-     `text.high` a caller pairs with it renders the deeper ink without a second colour class. */
+  /* A title is 18/24 and a heading 22/28, both semibold with tight tracking, and both take the heading
+     ink: the role points `--sui-ink` at `--sui-ink-heading` for its own box, so the `text.high` a
+     caller pairs with it renders the deeper ink without a second colour class. */
   title: "text-lg leading-6 font-semibold tracking-[-0.018em] text-balance [--sui-ink:var(--sui-ink-heading)]",
   heading: "text-[1.375rem] leading-7 font-semibold tracking-[-0.022em] text-balance [--sui-ink:var(--sui-ink-heading)]",
   /* Figures carry their own size: a table cell, a stepper value or a time reading is 14px tabular
@@ -890,8 +898,8 @@ export const tone = {
     warning: "bg-sherick-warning-selected text-sherick-ink",
     success: "bg-sherick-success-selected text-sherick-ink",
   },
-  /* D: a semantic strong fill is a lit key — its face carries `key-light`, lit at the top and shaded
-     at its base — which a press puts out (`state.recess`). */
+  /* A strong fill is a lit key: its face carries `key-light`, lit at the top and shaded at its base,
+     and a raised control's press puts that light out (`state.recess`). */
   strong: {
     primary: "bg-sherick-primary-strong bg-[image:var(--sui-key-light)] text-sherick-on-primary",
     secondary: "bg-sherick-surface-high text-sherick-ink",
@@ -915,7 +923,8 @@ export const tone = {
 
 /* Current location — where the reader is, as opposed to a value they chose. Both forms stay flat:
    depth belongs to held values (`tone.selected` with `elevation.control`).
-   - row:     a navigation row on a sheet — the role's soft container, full ink and a touch of weight.
+   - row:     a navigation row on a sheet — the primary selected step with its iris label, and a touch
+              of weight.
    - inTrack: a destination inside a recessed track, or the mark of a track's current stage — a
               pagination's current page, a Stepper's current step. The soft step is the groove's own
               lightness (1.00:1 in light), so there the fill steps up to `selected` and the label
@@ -935,15 +944,15 @@ export const currentDestination = {
    Keep this independent so unrelated consumers of the mark recipes can tree-shake it. */
 /* The puck — a held choice that rides in a track: a selected segment, the tab indicator. A choice
    held *in a groove* is a part lifted out of it, so it is the brightest surface in the view, raised
-   at `elevation.control`, and its label takes the role's text tone (`tone.text`): the lift says
-   "this one" and the label's colour says which family it belongs to. A held choice in a *sheet* —
-   an option, a tree row, a date — keeps `tone.selected`, because a list sheet is already the
-   brightest surface and a white row on it would vanish. */
+   at `elevation.control`. The neutral and semantic variants keep the puck, and their label takes the
+   role's text tone (`tone.text`): the lift says "this one" and the label's colour says which family
+   it belongs to. A held choice in a *sheet* — an option, a tree row, a date — keeps `tone.selected`,
+   because a list sheet is already the brightest surface and a white row on it would vanish. */
 export const puck = "bg-sherick-puck";
 
-/* D: a held choice in a track takes the iris selected step with the iris label when it is primary,
-   and stays the lifted puck with its role's text tone otherwise, so a semantic segment never sits on
-   an iris fill. */
+/* A primary held choice in a track takes the iris selected step with the iris label instead of the
+   puck, so a made selection reads in the accent. A semantic segment keeps the puck and its own tone:
+   an iris fill under a danger or success label would mix two families into one choice. */
 export const heldFill = {
   primary: "bg-sherick-primary-selected",
   secondary: puck,
@@ -963,14 +972,13 @@ export const heldLabel = {
 /* A choice row — an opt-in `surface` row in a RadioGroup or CheckboxGroup — rests on the
    `matteHigh` tray, so every choice in the group reads as a target before any is chosen; it stays
    light enough that the empty mark's rim still clears 3:1 against it. The row that holds the
-   selection takes the role's *soft* surface and the accent **selection rim**, and stays flat. The
-   soft surface is lighter than the resting tray, so the tint alone would make the chosen row the
-   quieter of the two; the rim is what says "this one". It is the row's selection mark, not an
-   outline drawn to separate a surface, and it belongs to the selected state only. Like an empty
-   mark's rim it is an overlay rather than a border, so the fill and the hover layer reach the row's
-   real edge, and it is transparent rather than absent at rest, so forced colors keeps every row's
-   outline. The selected step and a lift turned a whole card into an accent block, which outshouted
-   the priority action on the same view. */
+   selection takes the primary *selected* step and the accent **selection rim**, and stays flat. The
+   selected step is a clear iris tint over the resting tray, and the rim is the row's selection mark:
+   it is not an outline drawn to separate a surface, and it belongs to the selected state only. Like
+   an empty mark's rim it is an overlay rather than a border, so the fill and the hover layer reach
+   the row's real edge, and it is transparent rather than absent at rest, so forced colors keeps every
+   row's outline. No lift is added: a lifted, filled row would turn a whole card into an accent block
+   and outshout the priority action on the same view. */
 export const selectableRowSurface = /* @__PURE__ */ cx(
   "has-[[data-checked]]:bg-sherick-primary-selected has-[[data-checked]]:text-sherick-ink",
   "after:pointer-events-none after:absolute after:inset-0 after:box-border after:rounded-[inherit] after:border-[1.5px] after:border-transparent after:content-['']",
@@ -1055,8 +1063,8 @@ const toneAlpha = (tone: string) => (recipe: string, label: string) => {
   if (!match) throw new Error(`recipe alpha missing for ${label}`);
   return match[1] === undefined ? 1 : Number(match[1]);
 };
-/* A field tray's `surface-high` step, its deep step, its danger step, and the canvas step an empty
-   mark's interior holds. */
+/* A field tray's `tray` step, its deep step, its danger step, and the canvas step an empty mark's
+   interior holds. */
 const trayAlpha = toneAlpha("tray");
 const deepTrayAlpha = toneAlpha("tray-deep");
 const dangerTrayAlpha = toneAlpha("danger-soft");

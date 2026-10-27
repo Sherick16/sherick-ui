@@ -136,7 +136,7 @@ const CodeBlock = ({
   return (
     /* A wide well shows only its shaded upper wall: the full recessed pair is calibrated for narrow
        tracks, and drawn around a wide panel it reads as an outline. */
-    <div className={cn("mt-4 overflow-hidden", shape.prominent, material.matte, recessedTop, className)}>
+    <div className={cn("mt-4 overflow-hidden", shape.prominent, material.matteFlat, recessedTop, className)}>
       <div className={cn("flex min-h-11 items-center justify-between gap-4 px-4 py-2")}>
         <span className={cn("font-sherick-mono", type.caption, text.medium)}>
           {language}

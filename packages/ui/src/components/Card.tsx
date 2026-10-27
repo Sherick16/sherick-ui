@@ -16,10 +16,10 @@ export interface CardTitleProps extends HTMLAttributes<HTMLHeadingElement> {
 
 export type CardDescriptionProps = HTMLAttributes<HTMLParagraphElement>;
 
-/* A card is a large matte surface: tone separates it from the canvas, and it carries
-   no elevation until something lifts it. A neutral card *is* the matte surface; the semantic
-   variants are that role's soft container, and they carry meaning rather than decoration — a
-   tinted card says something about its content, so it is not a way to make a card stand out. */
+/* A card is a large matte sheet: its tone and its lift separate it from the canvas. A neutral card
+   *is* the matte sheet, which lifts with `elevation.surface`. The semantic variants are that role's
+   soft container and stay flat; they carry meaning rather than decoration — a tinted card says
+   something about its content, so it is not a way to make a card stand out. */
 const CardRoot = forwardRef<HTMLDivElement, CardProps>(
   ({ children, variant = "secondary", className, ...props }, ref) => {
     return (

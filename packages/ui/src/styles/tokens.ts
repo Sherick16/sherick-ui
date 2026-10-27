@@ -1,7 +1,7 @@
 export type ThemeName = "light" | "dark";
 
-/* The palette is "graphite and iris": a graphite ink on a near-white canvas, white sheets, and one
-   vivid iris violet that is spent only on what the reader acts on. The neutrals carry a bare trace
+/* The palette is "graphite and iris": a graphite ink on a light canvas, white sheets lifted above it,
+   and one vivid iris violet that is spent only on what the reader acts on. The neutrals carry a bare trace
    of the accent's hue (285, chroma under 0.015), so they read as true greys yet sit in the same
    family as the accent instead of fighting it; shadows are a violet-graphite umbra for the same
    reason. Every value is measured by the contrast contract (docs/PALETTE.md). */
@@ -41,7 +41,7 @@ export const lightTokens = {
      every surface a control sits on with a small margin and no more: at `detail` strength the rim
      outshone the labels beside it. Hover steps it to `ink-muted`. */
   "rim": "0.580 0.012 285",
-  /* D: a more saturated iris, close to the sRGB edge at each lightness, still a violet. */
+  /* A saturated iris: close to the sRGB edge at its lightness, and still a violet rather than a blue. */
   "primary": "0.470 0.255 290",
   "primary-strong": "0.440 0.235 290",
   /* The designed surfaces of each semantic role. A soft container is what a tinted surface is
@@ -98,8 +98,8 @@ export const lightTokens = {
   "elevation-recessed": "inset 0 1px 2px oklch(var(--sui-light-bottom) / 0.18), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.55)",
   "elevation-recessed-top": "inset 0 5px 8px -5px oklch(var(--sui-light-bottom) / 0.18)",
   "elevation-well": "inset 0 2px 4px oklch(var(--sui-light-bottom) / 0.34), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.55)",
-  /* D: a card or panel lifts off the canvas — a soft key, a long faint ambient fall and a lit upper
-     lip. Its face carries `surface-light`. */
+  /* A card or panel lifts off the canvas: a soft key, a long faint ambient fall and a lit upper lip.
+     Its face carries `surface-light`, and `material.matte` applies both together. */
   "elevation-surface": "0 1px 2px oklch(var(--sui-light-bottom) / 0.06), 0 6px 14px -6px oklch(var(--sui-light-bottom) / 0.10), 0 18px 36px -18px oklch(var(--sui-light-bottom) / 0.18), inset 0 1px 0 oklch(var(--sui-light-top) / 0.95)",
   /* The face light of a lit object: `key-light` lights a filled action from above and shades its
      base; `surface-light` does the same, gently, for a sheet; `tray-light` is the reversed light of
@@ -138,8 +138,8 @@ export const lightTokens = {
    floor, the accent is a luminous lavender iris that glows rather than shouts, and the floating
    edge is a line of light rather than a shadow. */
 export const darkTokens = {
-  /* D: a deeper floor, and sheets a clear step above it. A field's tray sits between the two, so it
-     is a well in a card. */
+  /* A deeper floor, with sheets a clear step above it. A field's tray sits between the two, so a
+     field reads as a well on a card as well as on the page. */
   "canvas": "0.120 0.006 285",
   "surface": "0.262 0.011 285",
   "surface-high": "0.315 0.012 285",
@@ -277,15 +277,15 @@ export const sharedTokens = {
      there at half time (measured in the motion audit), so the start of the movement is visible
      rather than skipped. It never overshoots. */
   "ease-glide": "cubic-bezier(0.32, 0, 0.24, 1)",
-  /* The one overshooting curve in the system: a part that travels a little past where it lands
-     and settles back. It is what makes a selection feel made and a released press feel answered,
-     and it is deliberately reserved for the parts that carry that meaning. */
+  /* The arrival curve: a part that travels a little past where it lands and settles back. It makes a
+     new mark feel made, and it is the curve a subordinate part arrives on. The springs below are the
+     only other overshooting curves, and each is named for the event it answers. */
   "ease-spring": "cubic-bezier(0.34, 1.56, 0.64, 1)",
-  /* D: sampled damped springs. Each is the step response of a spring written as a `linear()` curve,
-     and its duration is the spring's settle time, not a choice of pace.
-     - press:  the release of a pressed control, about 15% past rest and back (damping 0.52). A
-               press travels two pixels, so the overshoot is a fraction of a pixel that reads as a
-               rebound, not a wobble.
+  /* Sampled damped springs. Each is the step response of a spring written as a `linear()` curve, and
+     its duration is the time the spring takes to settle rather than a chosen pace.
+     - press:  the release of a pressed control, about 15% of its travel past rest and back (damping
+               0.52). A press travels only a few pixels, so the overshoot is a fraction of a pixel
+               that reads as a rebound, not a wobble.
      - travel: a selection indicator or a switch thumb crossing its track, about 6% past its stop
                (damping 0.67), so the choice is felt as thrown and caught. */
   "duration-spring-press": "460ms",

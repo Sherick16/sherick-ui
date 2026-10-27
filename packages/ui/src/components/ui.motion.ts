@@ -61,15 +61,15 @@ export const motionFeedback =
  *    its whole container, and 4% of a 580px field moved each edge 11.6px. It compresses 0.7%, about
  *    two pixels at that width: the field acknowledges the press without lurching.
  *
- *  The press leg runs on `duration-tactile`, short enough to land inside a tap; the release settles
- *  on the release timing. A control whose visible ink is far smaller than its target takes
- *  `motionInkPress` on that ink instead, so the target itself never moves. The interpolation and
- *  the compression are neutralised together under reduced motion. */
+ *  The press leg runs on `duration-tactile`, short enough to land inside a tap. The release settles
+ *  on a spring for the transform alone: the control comes back about 15% of its travel past rest and
+ *  settles, while its tone and depth return on the release curve, so a colour or a shadow never
+ *  overshoots.
+ *  A control whose visible ink is far smaller than its target takes `motionInkPress` on that ink
+ *  instead, so the target itself never moves. The interpolation and the compression are neutralised
+ *  together under reduced motion. */
 /* Base may disable the surface itself or the value control inside a Select wrapper.
    Neither is a pressable surface. Timing is otherwise shared by every tier. */
-/* D: the press leg is unchanged, and the release is a spring. Only the transform rides it — the
-   control comes back a little past rest and settles — while tone and depth return on the ordinary
-   release curve, so a colour or a shadow never overshoots. */
 const tactileTiming =
   "transition-[transform,background-color,color,box-shadow,opacity] duration-[var(--sui-duration-spring-press),var(--sui-duration-release),var(--sui-duration-release),var(--sui-duration-release),var(--sui-duration-release)] ease-[var(--sui-ease-spring-press),var(--sui-ease-release),var(--sui-ease-release),var(--sui-ease-release),var(--sui-ease-release)] active:duration-tactile active:ease-press motion-reduce:transition-none";
 
@@ -120,8 +120,8 @@ export const motionInkPress =
    word is the same press the field already answers, and distinguishing it would take pointer
    bookkeeping inside a component for a case that reads as one interaction either way. */
 
-/** A meaningful subordinate part arrives. Spring is reserved for this intent: a mark is
- *  made by overshooting the position it lands in. It leaves without the overshoot, and
+/** A meaningful subordinate part arrives. A mark is made by overshooting the position it lands in,
+ *  on the arrival curve. It leaves without the overshoot, and
  *  reduced motion lands it in one step — which takes a *state-specific* override, because the
  *  starting state is a higher-specificity rule than a plain `transform: none` and would otherwise
  *  win under reduced motion while the transition was gone, turning a spring into an instant jump. */
@@ -133,22 +133,18 @@ export const motionArrive =
 export const motionOrient =
   "transition-transform duration-release ease-release motion-reduce:transition-none";
 
-/** A persistent object travels between stable destinations: a tab indicator, a switch
- *  thumb. The travel itself is the event, so it takes the glide curve rather than the
- *  arrival curve, and it never overshoots: a destination that is passed and come back
- *  from reads as a defect. Position, size and the tone the object picks up on the way
- *  settle together, and an interrupted move retargets from wherever it currently is
- *  because it is a transition and not a keyframe. */
-/* D: a switch thumb's travel is its transform, and it rides the travel spring — it runs a little
-   past its stop and settles. Layout edges (a progress fill's width) and tone keep the glide, so a
-   measured value never overshoots. */
+/** A persistent object travels between stable destinations: a switch thumb, a tab indicator.
+ *  The travel itself is the event. Its position rides the travel spring, which carries the object
+ *  about 6% past its stop and settles, so a choice is felt as thrown and caught. Layout edges and
+ *  tone keep the glide, so a measured quantity such as a progress width never overshoots. Position,
+ *  size and the tone the object picks up on the way settle together, and an interrupted move
+ *  retargets from wherever it currently is because it is a transition and not a keyframe. */
 export const motionRelocate =
   "transition-[transform,left,inset-inline-start,top,width,height,background-color,color,box-shadow,opacity] duration-[var(--sui-duration-spring-travel),var(--sui-duration-release),var(--sui-duration-release),var(--sui-duration-release),var(--sui-duration-release),var(--sui-duration-release),var(--sui-duration-release),var(--sui-duration-release),var(--sui-duration-release),var(--sui-duration-release)] ease-[var(--sui-ease-spring-travel),var(--sui-ease-glide),var(--sui-ease-glide),var(--sui-ease-glide),var(--sui-ease-glide),var(--sui-ease-glide),var(--sui-ease-glide),var(--sui-ease-glide),var(--sui-ease-glide),var(--sui-ease-glide)] motion-reduce:transition-none";
 
-/** The same travel across a whole track — a tab indicator — on the longer travel timing, so a
- *  movement of hundreds of pixels is followed rather than skipped. */
-/* D: the indicator is thrown across the track and caught: its geometry rides the travel spring, about
-   6% past its stop, and its tone keeps the glide. */
+/** The same travel across a whole track — a tab indicator. A movement of hundreds of pixels is
+ *  followed rather than skipped, so its geometry rides the travel spring, about 6% past its stop,
+ *  and settles on the spring's own timing. Its tone keeps the glide. */
 export const motionRelocateLong =
   "transition-[left,inset-inline-start,top,width,height,transform,background-color,color,box-shadow,opacity] duration-[var(--sui-duration-spring-travel),var(--sui-duration-spring-travel),var(--sui-duration-spring-travel),var(--sui-duration-spring-travel),var(--sui-duration-spring-travel),var(--sui-duration-spring-travel),var(--sui-duration-travel),var(--sui-duration-travel),var(--sui-duration-travel),var(--sui-duration-travel)] ease-[var(--sui-ease-spring-travel),var(--sui-ease-spring-travel),var(--sui-ease-spring-travel),var(--sui-ease-spring-travel),var(--sui-ease-spring-travel),var(--sui-ease-spring-travel),var(--sui-ease-glide),var(--sui-ease-glide),var(--sui-ease-glide),var(--sui-ease-glide)] motion-reduce:transition-none";
 
