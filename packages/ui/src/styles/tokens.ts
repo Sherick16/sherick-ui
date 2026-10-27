@@ -6,9 +6,9 @@ export type ThemeName = "light" | "dark";
    family as the accent instead of fighting it; shadows are a violet-graphite umbra for the same
    reason. Every value is measured by the contrast contract (docs/PALETTE.md). */
 export const lightTokens = {
-  /* D: the canvas is a clearly deeper neutral step, so a white sheet lifts off it by tone as well as
-     by its shadow. */
-  "canvas": "0.928 0.007 287",
+  /* The canvas sits a clear step below the white sheet, so a sheet lifts off it by tone as well as by
+     its shadow, yet a page with no sheets on it still reads light rather than grey. */
+  "canvas": "0.949 0.005 288",
   "surface": "0.999 0.001 290",
   "surface-high": "0.905 0.009 288",
   /* The tray: a text field's resting well. It is its own step, below the canvas and well below the
