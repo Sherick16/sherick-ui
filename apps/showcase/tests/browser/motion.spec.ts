@@ -38,7 +38,8 @@ const token = (page: Page, variable: string) =>
  *  compared numerically, because a browser may print `.16` where the token says `0.16`. */
 const firstTiming = (value: string) => {
   const match = /^[a-z-]+\(([^)]*)\)/i.exec(value.trim());
-  const args = (match?.[1] ?? value).split(",").map((part) => Number(part));
+  /* A computed `linear()` stop may carry its position as a percentage after the value; only the value counts. */
+  const args = (match?.[1] ?? value).split(",").map((part) => Number(part.trim().split(/\s+/)[0]));
   return args.some(Number.isNaN) ? value.trim().toLowerCase() : args.map((part) => part.toFixed(3)).join(",");
 };
 
@@ -56,6 +57,47 @@ const expectDuration = async (page: Page, locator: Locator, variable: string) =>
 const expectTiming = async (page: Page, locator: Locator, variable: string) => {
   const { timing } = await motionOf(locator);
   expect(firstTiming(timing)).toBe(firstTiming(await token(page, variable)));
+};
+
+/** Splits a computed list at its top-level commas only, so a `linear()` or `cubic-bezier()` stays whole. */
+const splitTopLevel = (value: string) => {
+  const parts: string[] = [];
+  let depth = 0;
+  let current = "";
+  for (const character of value) {
+    if (character === "(") depth += 1;
+    if (character === ")") depth -= 1;
+    if (character === "," && depth === 0) {
+      parts.push(current.trim());
+      current = "";
+    } else {
+      current += character;
+    }
+  }
+  parts.push(current.trim());
+  return parts;
+};
+
+/** The slot a named property holds in a transition list. A list shorter than the property list repeats,
+ *  as the browser's own cascade does. */
+const slotFor = async (locator: Locator, property: string) => {
+  const motion = await motionOf(locator);
+  const names = splitTopLevel(motion.property);
+  const index = names.indexOf(property);
+  if (index < 0) throw new Error(`no transition on ${property}`);
+  return { duration: splitTopLevel(motion.duration), timing: splitTopLevel(motion.timing), index };
+};
+
+/** A named property takes the duration its own slot holds, not the first slot in the list. */
+const expectPropertyDuration = async (page: Page, locator: Locator, property: string, variable: string) => {
+  const { duration, index } = await slotFor(locator, property);
+  expect(toMs(duration[index % duration.length])).toBe(toMs(await token(page, variable)));
+};
+
+/** A named property takes the curve its own slot holds. */
+const expectPropertyTiming = async (page: Page, locator: Locator, property: string, variable: string) => {
+  const { timing, index } = await slotFor(locator, property);
+  expect(firstTiming(timing[index % timing.length])).toBe(firstTiming(await token(page, variable)));
 };
 
 /**
@@ -249,8 +291,11 @@ test("a tab indicator travels on every axis it changes", async ({ page, errors }
   for (const axis of ["left", "top", "width", "height"]) {
     expect(property, `the indicator must relocate ${axis}`).toContain(axis);
   }
-  /* It crosses a whole track, so it takes the longer travel timing rather than the local one. */
-  await expectDuration(page, indicator, "--sui-duration-travel");
+  /* It crosses a whole track, so its geometry rides the travel spring and its tone keeps the
+     longer travel timing rather than the local one. */
+  await expectPropertyDuration(page, indicator, "left", "--sui-duration-spring-travel");
+  await expectPropertyTiming(page, indicator, "left", "--sui-ease-spring-travel");
+  await expectPropertyDuration(page, indicator, "background-color", "--sui-duration-travel");
 
   const geometry = () =>
     indicator.evaluate((element) => {
@@ -318,7 +363,9 @@ test("Select carries tactile, orientation, arrival and anchored presence", async
   const field = trigger.locator("xpath=..");
   const fieldMotion = await motionOf(field);
   expect(fieldMotion.property, "the field is what presses").toContain("transform");
-  await expectDuration(page, field, "--sui-duration-release");
+  /* The field's press release is a spring on its transform alone. */
+  await expectPropertyDuration(page, field, "transform", "--sui-duration-spring-press");
+  await expectPropertyTiming(page, field, "transform", "--sui-ease-spring-press");
   expect((await motionOf(trigger)).property, "the trigger itself only carries tone").not.toContain("transform");
 
   const chevron = trigger.locator("svg");
@@ -771,7 +818,7 @@ test("Select and Combobox are the same control in two forms", async ({ page, err
   const selectTrigger = page.getByRole("combobox", { name: "Select", exact: true });
   const selectField = selectTrigger.locator("xpath=..");
   expect((await motionOf(selectField)).property, "the field is what presses").toContain("transform");
-  await expectDuration(page, selectField, "--sui-duration-release");
+  await expectPropertyDuration(page, selectField, "transform", "--sui-duration-spring-press");
   expect((await motionOf(selectTrigger)).property, "the trigger itself only carries tone").not.toContain("transform");
   const selectPress = await pressDelta(page, selectTrigger, selectField);
 
@@ -779,7 +826,7 @@ test("Select and Combobox are the same control in two forms", async ({ page, err
   const comboboxInput = page.locator('input[role="combobox"]').first();
   const comboboxField = comboboxInput.locator("xpath=..");
   expect((await motionOf(comboboxField)).property, "the field is what presses").toContain("transform");
-  await expectDuration(page, comboboxField, "--sui-duration-release");
+  await expectPropertyDuration(page, comboboxField, "transform", "--sui-duration-spring-press");
   const comboboxPress = await pressDelta(page, comboboxInput, comboboxField);
 
   /* A list-opening field takes the field tier: it spans its whole container, so a press compresses
@@ -884,7 +931,7 @@ test("a selection mark starts small and lands with an overshoot", async ({ page,
   expect(errors).toEqual([]);
 });
 
-test("a switch thumb relocates in place without overshooting", async ({ page, errors }) => {
+test("a switch thumb relocates in place on the travel spring", async ({ page, errors }) => {
   await openLab(page);
   const control = page.getByRole("switch", { name: "Motion lab switch" });
   const thumb = control.locator(".shadow-sherick-control");
@@ -911,17 +958,17 @@ test("a switch thumb relocates in place without overshooting", async ({ page, er
       const transform = getComputedStyle(element).transform;
       return Number(new DOMMatrix(transform === "none" ? "" : transform).e.toFixed(2));
     };
-    const start = translateAt(0);
-    const middle = translateAt(0.5);
-    const end = translateAt(1);
+    const samples = Array.from({ length: 51 }, (_, step) => translateAt(step / 50));
     for (const animation of animations) animation.cancel();
-    return { start, middle, end };
+    return { start: samples[0], middle: samples[25], end: samples[50], peak: Math.max(...samples) };
   });
 
+  /* The thumb is thrown across its track and caught: it runs a few percent past its stop and settles
+     back onto it, so the overshoot is bounded and the end is the destination. */
   expect(travel.start).toBeLessThan(travel.middle);
-  expect(travel.middle).toBeLessThan(travel.end);
-  expect(firstTiming((await motionOf(thumb)).timing)).toBe(firstTiming(await token(page, "--sui-ease-glide")));
-  expect(firstTiming((await motionOf(thumb)).timing)).not.toBe(firstTiming(await token(page, "--sui-ease-spring")));
+  expect(travel.peak).toBeGreaterThan(travel.end);
+  expect(travel.peak).toBeLessThan(travel.end * 1.08);
+  await expectPropertyTiming(page, thumb, "transform", "--sui-ease-spring-travel");
 
   expect(errors).toEqual([]);
 });
@@ -952,11 +999,13 @@ test("a relocated indicator is mid-travel in the middle of its own motion", asyn
   const middle = await leftAt(0.5);
   const after = await leftAt(1);
 
-  /* The indicator is somewhere between its two destinations halfway through, and never beyond
-     the one it is heading for — a travel, not a snap and not a bounce. */
+  /* The indicator is on its way halfway through: it has left the destination it came from and has
+     not yet snapped to the one it is heading for. The travel spring may carry it a few percent past
+     that destination, and it settles there, so the overshoot is bounded rather than a bounce. */
+  const distance = after - before;
   expect(middle).toBeGreaterThan(before);
-  expect(middle).toBeLessThan(after);
-  expect(firstTiming((await motionOf(indicator)).timing)).toBe(firstTiming(await token(page, "--sui-ease-glide")));
+  expect(middle).toBeLessThan(before + distance * 1.1);
+  await expectPropertyTiming(page, indicator, "left", "--sui-ease-spring-travel");
 
   expect(errors).toEqual([]);
 });
@@ -1337,7 +1386,7 @@ test("a known progress value travels to its new width", async ({ page, errors })
   const indicator = page.locator("#feedback [role=progressbar] [data-sui-progress-indicator]").first();
   const { property } = await motionOf(indicator);
   expect(property).toContain("width");
-  await expectDuration(page, indicator, "--sui-duration-release");
+  await expectPropertyDuration(page, indicator, "width", "--sui-duration-release");
   expect(errors).toEqual([]);
 });
 

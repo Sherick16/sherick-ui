@@ -191,7 +191,7 @@ for (const theme of ["light", "dark"] as const) {
       const controls = [page.getByRole("tab", {name:"Workspace",exact:true}),page.getByRole("link", {name:"Workspace",exact:true}),page.getByRole("group", {name:"Segments",exact:true}).getByRole("button", {name:"Workspace",exact:true})];
       for (const control of controls) {
         await control.hover();
-        expect(await layer(control)).toBe(0.05);
+        expect(await layer(control)).toBe(0.07);
         await page.mouse.down();
         expect(await layer(control)).toBe(0.09);
         await page.mouse.up();

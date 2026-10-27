@@ -53,7 +53,7 @@ test("interactive surfaces tint on hover and stay inert while disabled", async (
   for (const [name, step] of [
     ["Primary", "0.18"],
     ["Tonal", "0.09"],
-    ["Quiet", "0.05"],
+    ["Quiet", "0.07"],
   ] as const) {
     const button = page.getByRole("button", { name, exact: true });
     await expect(button).toBeVisible();
@@ -103,26 +103,33 @@ test("a current destination is a row carrying the quiet tint, not a pill or a ca
   /* And flat: depth never announces which page you are on. */
   expect(surface.shadow).toBe("none");
 
-  /* The current destination holds the role's soft container, read from the token itself, and a
-     resting destination holds nothing. */
-  const tint = await page.evaluate(() => {
-    const probe = document.createElement("div");
-    probe.style.backgroundColor = "oklch(var(--sui-primary-soft))";
-    document.body.appendChild(probe);
-    const value = getComputedStyle(probe).backgroundColor;
-    probe.remove();
-    return value;
+  /* The current destination holds the primary selected step with its iris label, read from the
+     tokens themselves, and a resting destination holds nothing. */
+  const computed = (declaration: string) =>
+    page.evaluate((value) => {
+      const probe = document.createElement("div");
+      probe.style.cssText = value;
+      document.body.appendChild(probe);
+      const style = getComputedStyle(probe);
+      const result = { background: style.backgroundColor, color: style.color };
+      probe.remove();
+      return result;
+    }, declaration);
+  const tint = await computed("background-color: oklch(var(--sui-primary-selected))");
+  const label = await computed("color: oklch(var(--sui-primary-selected-ink))");
+  const currentStyle = await current.evaluate((element) => {
+    const style = getComputedStyle(element);
+    return { background: style.backgroundColor, color: style.color };
   });
-  const background = (locator: ReturnType<Page["getByRole"]>) =>
-    locator.evaluate((element) => getComputedStyle(element).backgroundColor);
-  expect(await background(current)).toBe(tint);
-  expect(await background(resting)).toBe("rgba(0, 0, 0, 0)");
+  expect(currentStyle.background).toBe(tint.background);
+  expect(currentStyle.color).toBe(label.color);
+  expect(await resting.evaluate((element) => getComputedStyle(element).backgroundColor)).toBe("rgba(0, 0, 0, 0)");
 
   /* Hover is the shared quiet layer on top of that, not a change of fill. */
   await page.mouse.move(0, 0);
   expect(await layerOpacity(resting)).toBe("0");
   await resting.hover();
-  await expect.poll(() => layerOpacity(resting)).toBe("0.05");
+  await expect.poll(() => layerOpacity(resting)).toBe("0.07");
 
   expect(errors).toEqual([]);
 });
