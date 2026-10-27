@@ -4,8 +4,8 @@
 color, motion and depth are reserved for selection, manipulation and surfaces that float.
 Consistency means using the same roles, not giving every component identical anatomy.
 
-**Graphite and iris.** The page is a near-white canvas; content sits on white sheets; copy is a
-graphite ink; and one vivid iris violet is spent only on what the reader acts on — the priority
+**Graphite and iris.** The page is a light graphite canvas; content sits on white sheets lifted above
+it; copy is a graphite ink; and one vivid iris violet is spent only on what the reader acts on — the priority
 action, a made selection, a value's range, the focus ring. The neutrals carry only a bare trace of
 the accent's hue, so they read as true greys that belong to the accent's family rather than as a
 tinted wash, and shadows are a graphite umbra for the same reason. Dark mode is a graphite room,
@@ -23,16 +23,19 @@ consumer integration are described in [ARCHITECTURE.md](ARCHITECTURE.md); valida
 ## 1. Governing rule
 
 Start at flat matte. Lift a control only when it is manipulated; recess a track or well
-because it is sunk; use acrylic only when a surface actually floats above the page. A hover
+because it is sunk; use acrylic only when a surface actually floats above the page. A grounded sheet,
+a neutral card or panel, is the one passive surface that lifts: it lifts once, as a sheet (§5). A hover
 or keyboard highlight never earns a new level of depth. Let one primary action hold the
 strong fill in a view rather than making every control compete for attention.
 
 ## 2. Material, elevation and edge
 
 These roles are independent: **material** fills a surface, **elevation** gives it distance
-from the page, and **edge** marks a structural join. A card may be matte and flat, a tonal
-button matte and raised, and a switch track matte and recessed. A material contains no
-shadow, radius or rim. Add a line only where two parts of the same surface meet, or where a
+from the page, and **edge** marks a structural join. A neutral card may be matte and lifted, a
+tonal button matte and raised, and a switch track matte and recessed. A material contains no
+shadow, radius or rim. The matte sheet is the one material that also carries elevation
+(`elevation.surface`), because a sheet is what lifts; `matteFlat` is the same fill without that
+lift, for a block sunk into the page. Add a line only where two parts of the same surface meet, or where a
 hollow control needs its rim (§8).
 
 ## 3. Light model
@@ -48,9 +51,10 @@ a sideways shadow or an upward-lit gradient to one component.
 | Recipe | Use | Not for |
 | --- | --- | --- |
 | `canvas` | application background | nested content |
-| `matteQuiet`, `matte`, `matteHigh` | quiet, ordinary and stronger grounded surfaces; every sunk track (slider groove, progress track, segment track) is `matteHigh`, so its full extent stays visible on a card | floating UI |
+| `matteQuiet`, `matte`, `matteHigh` | quiet, ordinary and stronger grounded surfaces; `matte` is the sheet and carries `elevation.surface`; every sunk track (slider groove, progress track, segment track) is `matteHigh`, so its full extent stays visible on a card | floating UI |
+| `matteFlat` | the `matte` fill without its lift: a block sunk into the page, such as a code block's shell | a card or panel that should lift |
 | `matteInset` | a passive sheet tucked beneath a stronger control, visible but quieter than that control | independent cards or fields |
-| `control`, `controlError` | text fields and the file drop target: an opaque **tray** in the `surface-high` tone, which under the pointer and while engaged sinks to `tray-deep`; the invalid form is the danger soft surface, with a danger placeholder. (An empty checkbox or radio keeps its canvas-toned well.) | passive cards, buttons |
+| `control`, `controlError` | text fields and the file drop target: an opaque **tray** (the `tray` step, below the sheet it sits on in both themes), which under the pointer and while engaged sinks to `tray-deep`; the invalid form is the danger soft surface, with a danger placeholder. (An empty checkbox or radio keeps its canvas-toned well.) | passive cards, buttons |
 | `handle` | a small value-control part that must remain findable, even disabled | large surfaces |
 | `acrylic`, `acrylicDense`, `acrylicHero` | anchored sheets, compact hints, viewport-owning overlays respectively | grounded content |
 
@@ -64,8 +68,9 @@ general-purpose dark surface for cards or controls. The frame takes `shape.surfa
 and clips its contents; constrained media fits inside that frame without changing the
 source's semantics. Video defaults to its source ratio and containment, never implicit cropping.
 
-A code well is the `matteHigh` step too, sunk beneath the block's `recessedTop` wall, so it reads as a
-recess on a card and on the page alike. Its tone is a quiet step over the card, not a translucent wash.
+A code block's shell is `matteFlat` with the `recessedTop` wall, so the block sits sunk into its card or
+the page rather than lifting from it. Its well is the `matteHigh` step over the card, a quiet step and not
+a translucent wash, so it reads as a recess on a card and on the page alike.
 
 ## 5. Elevation
 
@@ -73,6 +78,7 @@ recess on a card and on the page alike. Its tone is a quiet step over the card, 
 | --- | --- | --- |
 | `flat` | grounded passive surfaces | a recessed track |
 | `raised` | tactile tonal actions at rest | hover or passive data |
+| `surface` | a grounded sheet at rest: a neutral card, a panel or a matte sheet (`material.matte` carries it) | a recessed track, a flat row, or a control's press or hover |
 | `control` | switch thumb, a puck held in a track, or a held selection inside a list or calendar | keyboard highlight |
 | `recessed` | grooves, tracks, a checkbox or radio at rest, and a raised control while pressed | fields or flat cards |
 | `recessedTop` | the upper wall of an inset sheet continuing directly below a control, without a lower rim | standalone tracks or wells |
@@ -81,10 +87,12 @@ recess on a card and on the page alike. Its tone is a quiet step over the card, 
 
 Actions follow one depth ladder: a text action sits flat, and tonal and filled actions are
 `raised` at rest and `recessed` while held. `raised` carries the light model's lit upper lip — one
-inset line of `light-top` — so a filled action reads as a key rather than a flat swatch; `control`
+inset line of `light-top`, brighter in 2.11.0 — so a filled action reads as a key rather than a flat swatch; `control`
 adds a half-pixel contact edge so a white puck keeps its outline on a pale track; and
 `floating` holds a hairline contact edge (an umbra line in light, a line of light in dark) so a
-white sheet over a white card never loses its boundary. These lines belong to the elevation, not to
+white sheet over a white card never loses its boundary. `surface` is the sheet's own lift: a soft
+ambient fall, a lit upper lip and a light face (`surface-light`). It is passive depth, so a sheet never
+recesses when it is pressed or hovered. These lines belong to the elevation, not to
 the component: no component draws a rim to separate a surface. The priority action is never flatter than the
 secondary one beside it, so depth never contradicts the fill hierarchy. `raised` is a contact
 shadow, not a float: a row of raised actions sits on the page. `raised` and `floating` also draw a
@@ -92,10 +100,14 @@ system-coloured outline under forced colors (§14), because forced colors remove
 their boundary.
 
 Held choices take `elevation.control`, and their fill depends on what holds them. **A choice
-held in a track is a puck**: the selected segment of a ToggleGroup or SegmentedControl, the Tabs
-indicator and a value chip in a multiple Combobox's field tray take `puck` — the one surface lit above every sheet in both themes — and the label takes
-the variant's text tone, so the lift says "this one" and the colour says which family it belongs
-to. **A choice held in a sheet is a tint**: options, tree rows, calendar days and time readings
+held in a track is a puck**: a value chip in a multiple Combobox's field tray takes `puck` — the one
+surface lit above every sheet in both themes — and so does a neutral or semantic segment of a
+ToggleGroup or SegmentedControl, or a neutral or semantic Tabs indicator. The label takes the
+variant's text tone, so the lift says "this one" and the colour says which family it belongs to.
+**A primary held choice in a track takes the iris selected step** (`heldFill.primary`, with
+`heldLabel.primary`) instead of the puck, so a made selection reads in the accent. A semantic choice
+keeps the puck, because an iris fill under a danger or success label would mix two families into one
+choice. **A choice held in a sheet is a tint**: options, tree rows, calendar days and time readings
 combine `tone.selected` with the same elevation, because a list sheet is already the brightest
 surface and a white row on it would vanish. A continuous date range makes one band per week rather than
 seven separately elevated cells. The mark itself, a check or a date, remains another
@@ -156,8 +168,9 @@ to identify a control, and a field identified by its label and content needs no 
 underline or box on every field is what made a form read as a stack of ruled inputs; the tray
 alone says "something goes here".
 
-- the tray is opaque `surface-high`, the same on a card and on the page; the pointer, focus and an
-  open popup sink it to `tray-deep`, and the focus ring (§14) is what says the field is engaged;
+- the tray is the opaque `tray` step, below the sheet it sits on in both themes, so it reads as a well
+  on the page and in a card alike; the pointer, focus and an open popup sink it to `tray-deep`, and
+  the focus ring (§14) is what says the field is engaged;
 - an invalid field is the danger tray — the danger soft surface — with a danger placeholder and the
   message beneath, which carries the error in words;
 - `rim.field` is a transparent border on every side: forced colors discards the tray and repaints
@@ -218,8 +231,9 @@ reads as the field opening rather than as a second surface beside it.
 There are **two readable text roles**: `text.high` for labels and values, `text.medium`
 for descriptions, placeholders and supporting copy. `detail.mark` and `detail.fill`
 are non-text furniture roles, never a third step for readable text. Surface tones
-(`canvas`, `surface`, `surface-high`, `tray-deep`, `surface-float`, `puck`) are not elevations.
-`tray-deep` belongs only to a text field under the pointer or engaged (§8). `puck` is the
+(`canvas`, `surface`, `surface-high`, `tray`, `tray-deep`, `surface-float`, `puck`) are not elevations.
+`tray` is a text field's resting well and `tray-deep` belongs only to a text field under the pointer or
+engaged (§8). `puck` is the
 brightest surface in both themes and belongs only to a choice held in a track (§5).
 
 | Tone | Meaning |
@@ -243,12 +257,17 @@ Supporting copy inside a row that holds a selection takes full ink (`selectableR
 `text.medium` is measured against resting surfaces and falls just short of 4.5:1 on the selected
 step, so the supporting type step, not a dimmer tone, keeps it subordinate there.
 
+The selected step of `primary` takes its own label, `--sui-primary-selected-ink`, measured on that step
+(deeper than `primary` in light, lighter in dark). A `strong` fill is a lit key: its face carries
+`key-light`, and a raised control's press takes that light out (§11).
+
 Primary marks interaction, and danger/warning/success carry meaning rather than decoration.
 **Spend iris where the reader acts, not where they read.** Passive information is neutral by
 default: an Alert rests on the neutral soft surface with only its status mark in the accent, and a
 Badge is neutral. A semantic variant is chosen because the colour says something, never to make a
 passive surface stand out; a tinted Card says something about its content. Iris then remains what
-it is in the thesis — the priority action, a made selection, a value's range and the focus ring.
+it is in the thesis — the priority action, a made selection, a value's range, the focus ring and
+the faint hover tint of a quiet target (§11).
 `--sui-accent` and `--sui-outline` are reserved: they are published for compatibility, no
 component consumes them, and a new use needs a role written here first. Semantic color belongs to the relevant icon,
 control or small region, not a whole table or page. Readable copy on passive semantic
@@ -256,7 +275,7 @@ regions keeps normal text emphasis.
 
 **Where the reader is differs from what they chose.** A navigation destination stays flat and
 takes `currentDestination` in one of two forms. A row on a sheet — a current navigation row —
-takes `currentDestination.row`: the primary soft container, full ink and a touch of weight. A
+takes `currentDestination.row`: the primary selected step with its iris label, and a semibold weight. A
 destination inside a recessed track — a pagination's current page, a Stepper's current mark —
 takes `currentDestination.inTrack`: the soft step is the groove's own lightness, so there the fill
 steps up to `selected` and the label takes the accent, and the label, not the fill, says "you are
@@ -264,8 +283,9 @@ here". A text trail marks its location with ink and weight alone: a Breadcrumb's
 page, not a row, and takes no fill. A Stepper's track segment is the workflow's range, not its
 location, and keeps the range's fill. A held
 value takes `tone.selected` with `elevation.control`. Tabs are the one deliberate exception:
-a tab list is a held choice of *view* inside a recessed track, so its indicator is the same puck
-a segment is, and it is sized as a tab (normal density) rather than a segment.
+a tab list is a held choice of *view* inside a recessed track, so its indicator is the same held
+choice a segment is (the puck for neutral and semantic tabs, the iris selected step for primary, §5), and
+it is sized as a tab (normal density) rather than a segment.
 
 ### Type roles
 
@@ -279,12 +299,13 @@ Text takes a **role**, not a size chosen per component. The roles live in `type`
 | `body` | 14 / 24px | a sentence inside a component: an alert, a toast's description, a dialog's description and content, an open disclosure panel |
 | `supporting` | 13 / 20px | field descriptions, hints and errors (`fieldMessage`), a row's secondary line |
 | `caption` | 12 / 16px | badges, group labels (an option group's heading is `list.groupLabel`), calendar weekdays, a code language label |
-| `title` | 16 / 24px semibold | the heading of a compact surface: card, popover, toast, command palette |
-| `heading` | 20 / 28px semibold | the title of a viewport-owning surface: dialog, alert dialog, drawer |
+| `title` | 18 / 24px semibold | the heading of a compact surface: card, popover, toast, command palette |
+| `heading` | 22 / 28px semibold | the title of a viewport-owning surface: dialog, alert dialog, drawer |
 | `numeric` | 14 / 20px, tabular figures | table cells, a number field, progress and pagination values |
 
-A command palette is a utility surface whose content is its search, so it takes `title`, not
-`heading`. A title is one step above the 15px control text it usually sits over, so it reads as a
+`title` and `heading` set their ink to `--sui-ink-heading`, a deeper ink than body copy in light and a
+brighter one in dark, so a heading is set apart by ink as well as by size. A command palette is a
+utility surface whose content is its search, so it takes `title`, not `heading`. A title is one step above the 15px control text it usually sits over, so it reads as a
 heading by size and not by weight alone. Long-form Markdown keeps its own reading rhythm; `body` is
 the rhythm of copy *in* an interface. Headings balance their lines (`text-balance` on `title` and `heading`), and running copy avoids a
 one-word last line (`text-pretty` on `body`, `supporting` and `caption`). The roles carry both, so no
@@ -296,7 +317,10 @@ a stepper value or a time reading writes no size of its own. Every role lands on
 ## 11. Interaction states
 
 Hover is a tonal step over the resting fill. `stateLayer.quiet`, `tonal`, `filled` and
-`track` composite the response without replacing that fill. Hover is a pointer response: every `hover:` step
+`track` composite the response without replacing that fill. A quiet target — a row, a ghost action, a
+tab or a field part — answers the pointer with a faint iris tint at 0.07 (up from 0.05), and its
+pressed step is 0.09; a target whose label is a semantic tone keeps its own colour, so a destructive
+command never hovers violet. Hover is a pointer response: every `hover:` step
 compiles inside `(hover: hover)`, so a tap on a touch screen leaves no hover tone behind, and a touch
 answers with press and focus instead (§12). A part embedded in a field — a
 combobox's clear and trigger, a number field's steppers, a search field's submit, a date field's
@@ -307,8 +331,9 @@ highlight equal to pointer hover on a collection row; keyboard focus also adds t
 ring. Disabled rows lose interactive hover/press but remain discoverable by keyboard when
 the primitive permits it, so a disabled highlighted row still shows navigation.
 
-A raised control recesses while held; a flat or floating one retains its depth and
-answers with the pressed state layer plus tactile motion. A neutral (`secondary`) tonal fill
+A raised control recesses while held, and a strong fill's key light goes out with the recess
+(`state.recess`); a flat or floating one retains its depth and answers with the pressed state layer plus
+tactile motion. A neutral (`secondary`) tonal fill
 takes the lighter `stateLayer.tonalNeutral` press: its label is ink, and a full ink veil on top
 of the recess and compression turns the control a flat grey for the length of the click. Disabled controls keep resting
 anatomy and take **one** 45% opacity step, with no pointer affordance. A control that stays focusable while disabled
@@ -336,7 +361,8 @@ its matte handle remains separable from that range, including when disabled.
 
 Chips and ToggleGroup segments both hold selection: an unselected toggle stays neutral,
 a selected chip uses the primitive's pressed marker and `tone.selected`, and a selected segment
-is the track's puck (§5). A segment's selection
+is the track's held choice (§5): the puck for a neutral or semantic variant, the iris selected step
+for `primary`. A segment's selection
 changes **in place** — the old fill and the new one exchange on the feedback timing — while a
 tab indicator **relocates** across its track. The difference is deliberate for now: Base
 `ToggleGroup` publishes no indicator geometry, and measuring segment positions locally would be
@@ -354,10 +380,9 @@ as a dismiss glyph, takes `state.quietInk`: its ink rises from `text.medium` to 
 layer is drawn behind it.
 
 RadioGroup's opt-in surface rows rest on the `matteHigh` tray, so every choice reads as a target
-before any is chosen, and the row that holds the selection takes the primary *soft* surface and the
-accent selection rim (§8), and stays flat. The soft surface is lighter than the resting tray, so the
-rim, not the tint, is what says "this one"; the selected step and a lift turned a whole card into an
-accent block that outshouted the priority action beside it. The resting tray stays light enough
+before any is chosen, and the row that holds the selection takes the primary *selected* step (an iris
+tint over the resting tray) and the accent selection rim (§8). It stays flat, with no lift: a lifted,
+filled row turned a whole card into an accent block that outshouted the priority action beside it. The resting tray stays light enough
 that an empty mark's rim still clears 3:1 against it.
 The complete row remains the label; passive badges are consumer content. The selection mark and
 target boundary stay still, and the original plain radio rows remain available. Surface selection
@@ -406,9 +431,9 @@ One module, `ui.motion.ts`, chooses timing, easing and amplitude by **intent**:
 | --- | --- |
 | `feedback` | non-spatial tone, focus and highlight |
 | `tactile` | press/release in three amplitude tiers by role; compact mark-only press when its target must stay still |
-| `arrive` | a newly made selection mark; the sole restrained spring |
+| `arrive` | a newly made selection mark, on the arrival curve, which overshoots its landing |
 | `orient` | chevron turning in place |
-| `relocate` | tab indicator or switch thumb traveling between stable destinations |
+| `relocate` | tab indicator or switch thumb traveling between stable destinations, on the travel spring (`duration-spring-travel`, 420ms, about 6% past its stop) |
 | `direct` | pointer-owned slider geometry without interpolation |
 | `disclose` | measured in-flow panel height |
 | `presence` | popup, tooltip, modal, sheet, toast and scrim entrances/exits; a surface opened from the keyboard takes the quick utility tier (`motionPresenceUtility`) |
@@ -418,14 +443,18 @@ A component decides **what** changes; motion decides **how** it moves. One node 
 spatial owner, though feedback may accompany it. A pointer's target never moves beneath
 it: small dismiss and stepper glyphs compress inside stable hit areas. Boundaries of
 checkboxes and radios stay still. Stable selections do not bounce, while a mark being
-made may spring. A dragged handle follows the pointer without lag. Base owns overlay
+made may spring. The one exception is the travel of a tab indicator or a switch thumb, which settles
+with about 6% overshoot (§12, Springs); segments, checkboxes and radios still change in place and do
+not move. A dragged handle follows the pointer without lag. Base owns overlay
 lifecycle and placement; Sherick adds no exit timer or parallel presence state. Under
-reduced motion, states remain visible immediately and spatial travel is removed; a
+reduced motion, states remain visible immediately, spatial travel is removed, and so is the overshoot; a
 loading glyph keeps its loop as an opacity change. Do not author literal duration/easing/transition/animation
 classes or keyframes in components.
 
 A press answers inside a tap: its leg runs on the short `duration-tactile` (80ms), and the
-release settles on the release timing. Its amplitude is a distance, so it is chosen by role
+release settles on the press spring (`duration-spring-press`, 460ms, `ease-spring-press`): about 15% of
+its travel past rest and back. Its tone and depth return on the release timing, so a colour or a
+shadow never overshoots. A press also sinks the control one pixel (`translate-y-px`). Its amplitude is a distance, so it is chosen by role
 rather than written as one percentage for every width: a content-width control compresses 4%
 (`motionTactile`), a control spanning a track such as a tab 1.5% (`motionTactileWide`), and a
 list-opening field 0.7% (`motionTactileField`), which keeps every tier near two pixels per edge.
@@ -438,10 +467,19 @@ compression. A row's highlight moves in one step (`motionRowLayer`): it marks wh
 reader is, so arrowing through a list never leaves a fading trail.
 
 Duration grows with travel in two steps. An indicator crossing a whole track takes
-`motionRelocateLong` (`duration-travel`, 300ms), and a sheet crossing a viewport edge takes the
-sheet timing (320ms in, 200ms out); short travel keeps the local and overlay timings. Every exit
-accelerates away on `ease-exit`, including a disclosure panel closing. A known progress value
-relocates to its new width rather than jumping.
+`motionRelocateLong`: its geometry rides the travel spring (`duration-spring-travel`, 420ms), and its
+tone keeps `duration-travel` (300ms). A sheet crossing a viewport edge takes the sheet timing (320ms in,
+200ms out); short travel keeps the local and overlay timings. Every exit accelerates away on `ease-exit`,
+including a disclosure panel closing. A known progress value relocates to its new width rather than
+jumping, on the release timing, so a measured width never overshoots.
+
+**Springs.** Two sampled damped springs, written as `linear()` curves, are the only overshooting curves
+besides the arrival curve, and each is named for the event it answers. `ease-spring-press` is the release
+of a pressed control: about 15% of its travel past rest and back, in 460ms. `ease-spring-travel` is a
+selection indicator or a switch thumb crossing its track: about 6% past its stop, in 420ms. A spring
+moves only the transform or the geometry of its own object; colour, depth and measured quantities keep
+their glide. Reduced motion removes the travel and the overshoot together, so the indicator or the
+thumb lands at once.
 
 The scrim fades with the surface it sits behind; it never appears or disappears in one frame. Its blur
 sits on the plane, and only the tint fades, on the plane's own `::before`; under `(pointer: coarse)` the
@@ -566,8 +604,8 @@ keyboard mechanics, form participation and restoration where available. Forced c
 replace lost tone/depth with system-color boundaries for selection, highlight and focus. A Switch track takes
 `forced-colors:border`, and its thumb opts out of forced-color adjustment and paints `Highlight` in both states; a rim is
 a real border (or a masked fill with a system colour), so hollow controls keep theirs. A shell that separates by depth alone carries its boundary in its recipe:
-`elevation.floating` and `elevation.raised` both include `forcedBoundary`, a system-coloured outline, so
-overlays and raised actions keep their edge. A control that draws no outline of its own writes
+`elevation.floating`, `elevation.raised` and `elevation.surface` all include `forcedBoundary`, a
+system-coloured outline, so overlays, raised actions and sheets keep their edge. A control that draws no outline of its own writes
 `[outline-style:none]`, never `outline-none` or a bare `outline-0`: a transparent two-pixel outline is
 painted as a box in forced colors, and a zero width does not stop the browser's own `:focus-visible`
 ring, whose `auto` style ignores width. A style of `none` paints nothing in either mode.
