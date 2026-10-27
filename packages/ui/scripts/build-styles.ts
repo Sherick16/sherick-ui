@@ -257,12 +257,8 @@ output.append(
   }
 
   /* A *resting* mark keeps its own rim, a real border that forced colors repaints in a system
-     colour, so an unchecked box and an unselected radio need no extra boundary — and a radio's
-     transparent utility outline, which forced colors would make opaque, must not become a second
-     ring around that rim. */
-  :where(.${SUI_SCOPE_CLASS})[role="radio"][aria-checked="false"]:not(:focus-visible) {
-    outline: none;
-  }
+     colour, so an unchecked box and an unselected radio need no extra boundary. Resting controls
+     write outline-style none, which paints nothing, so no rule has to cancel a utility outline. */
 
   /* A slider conveys its value through the fill of its groove and the depth of its handle, and
      forced colors flattens both. The handle carries a Sherick-owned marker, because Base's
@@ -303,12 +299,10 @@ output.append(
   }
 
   /* A tree's focus owner contains its descendants. Match parentFocusRingInset: only the
-     direct row gets the boundary, and focus takes precedence over its selection outline.
-     Also remove inactive options' transparent utility outlines, which forced colors makes
-     opaque: only the active descendant should acquire a keyboard-target boundary. */
-  :where(.${SUI_SCOPE_CLASS})[data-sui-tree-value],
-  :where(.${SUI_SCOPE_CLASS})[role="option"]:not([data-highlighted]):not(:focus-visible) {
-    outline: none;
+     direct row gets the boundary, and focus takes precedence over its selection outline. The owner
+     itself draws none, or the general focus rule above would trace its whole subtree. */
+  :where(.${SUI_SCOPE_CLASS})[data-sui-tree-value] {
+    outline-style: none;
   }
   :where(.${SUI_SCOPE_CLASS})[data-sui-tree-value]:focus-visible > :where(.${SUI_SCOPE_CLASS}):first-child,
   /* Autocomplete keeps focus in its input; the highlighted option is still Enter's target,

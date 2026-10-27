@@ -98,8 +98,9 @@ for (const removed of ["ActionButton", "Dropdown", "Modal", "TabGroup", "Markdow
 
 assert.equal(typeof Button, "object");
 assert.equal(typeof Dialog, "object");
-assert.equal(typeof Dialog.Header, "function");
-assert.equal(typeof Dialog.Content, "function");
+// Parts are forwardRef components from 2.10.0, so they are objects; either shape is a React component.
+assert.ok(["function", "object"].includes(typeof Dialog.Header), "Dialog.Header is a component");
+assert.ok(["function", "object"].includes(typeof Dialog.Content), "Dialog.Content is a component");
 assert.equal(typeof Select, "object");
 assert.equal(typeof root.DirectionProvider, "function");
 assert.equal(renderToStaticMarkup(React.createElement(root.DirectionProvider, { direction: "rtl" }, "content")), "content");

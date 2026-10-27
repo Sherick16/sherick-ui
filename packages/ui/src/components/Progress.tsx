@@ -76,7 +76,7 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
               </BaseProgress.Label>
             ) : null}
             {showFormattedValue ? (
-              <BaseProgress.Value className={cn("text-sm tabular-nums", text.medium)} />
+              <BaseProgress.Value className={cn(type.numeric, text.medium)} />
             ) : null}
           </div>
         )}
@@ -115,8 +115,10 @@ export const Progress = forwardRef<HTMLDivElement, ProgressProps>(
                 tone.strong[variant],
                 /* The measure itself is Base's: it writes the indicator's own width. A known value
                    that changes is a persistent part moving between stable states, so it relocates
-                   rather than jumping; the indeterminate sweep is the activity loop's. */
-                indeterminate ? "w-2/5" : cn("w-full", motionRelocate)
+                   rather than jumping; the indeterminate sweep is the activity loop's. Under reduced
+                   motion the sweep is gone, so the fill spans the track and the loop breathes on the
+                   box that holds it (`motionActivityIndeterminate`). */
+                indeterminate ? "w-2/5 motion-reduce:w-full" : cn("w-full", motionRelocate)
               )}
             />
           </div>

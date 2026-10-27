@@ -1,18 +1,23 @@
 "use client";
 
-import React, { type HTMLAttributes } from "react";
+import React, { forwardRef } from "react";
 import { cn } from "@/libs/utils";
-import { text, type } from "./ui.common";
+import { headingRhythm, text, type } from "./ui.common";
+import type { PartProps } from "./ui.types";
 
-export type DialogContentProps = HTMLAttributes<HTMLDivElement>;
+/** The body's own `div`. It keeps the body meaning it has always had. */
+export type DialogContentProps = PartProps<"div">;
 
-export const DialogContent = ({ children, className, ...props }: DialogContentProps) => {
-  return (
-    <div
-      className={cn("px-6 pt-2 pb-5 sm:px-7", type.body, text.medium, className)}
-      {...props}
-    >
-      {children}
-    </div>
-  );
-};
+/* The body opens on the same 8px rhythm the description takes below a heading, so it is never flush
+   against the header or the description before it, and it carries no top padding of its own. */
+export const DialogContent = forwardRef<HTMLDivElement, DialogContentProps>(({ children, className, ...props }, ref) => (
+  <div
+    {...props}
+    ref={ref}
+    className={cn("px-6 pb-5 sm:px-7", headingRhythm.heading, type.body, text.medium, className)}
+  >
+    {children}
+  </div>
+));
+
+DialogContent.displayName = "DialogContent";

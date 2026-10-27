@@ -6,8 +6,8 @@
  so installing the package installs it regardless. The subpath is ESM-only because those
  dependencies publish no CommonJS build; see `docs/RELEASE.md`.
 */
-export { default as CodeBlock } from "./components/CodeBlock";
+export { default as CodeBlock, InlineCode } from "./components/CodeBlock";
 export { default as Markdown } from "./components/Markdown";
 
-export type { CodeBlockProps } from "./components/CodeBlock";
+export type { CodeBlockProps, InlineCodeProps } from "./components/CodeBlock";
 export type { MarkdownProps } from "./components/Markdown";

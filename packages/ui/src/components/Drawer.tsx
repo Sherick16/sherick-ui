@@ -1,12 +1,22 @@
 "use client";
 
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
-import React, { createContext, useContext, useRef, type ComponentProps, type ReactElement, type ReactNode } from "react";
+import React, {
+  createContext,
+  forwardRef,
+  useContext,
+  useMemo,
+  useRef,
+  type ComponentProps,
+  type ReactElement,
+  type ReactNode,
+} from "react";
 import { cn } from "@/libs/utils";
 import { DialogDescription } from "./DialogDescription";
 import { DialogFooter } from "./DialogFooter";
 import { DialogHeader } from "./DialogHeader";
-import { DialogDismiss, DialogSurface, type DialogAttachment } from "./DialogSurface";
+import { DialogSurface, type DialogAttachment } from "./DialogSurface";
+import type { PartProps } from "./ui.types";
 
 /**
  * The viewport edge a sheet is attached to. Sides are **physical** rather than logical: the
@@ -24,6 +34,8 @@ export interface DrawerProps {
   onOpenChange?: BaseDialog.Root.Props["onOpenChange"];
   /** The edge the sheet is attached to. */
   side?: DrawerSide;
+  /** The accessible name of the sheet's dismissal control. Defaults to "Close". */
+  closeLabel?: string;
 }
 
 export interface DrawerTriggerProps {
@@ -37,26 +49,17 @@ export interface DrawerTriggerProps {
   className?: string;
 }
 
-export interface DrawerContentProps {
-  children: ReactNode;
-  /** Adds to the sheet's own surface. Its shell, elevation and presence are the recipe's. */
-  className?: string;
-}
+/** The sheet's own surface element: the popup, which takes the rest props and the ref. */
+export type DrawerContentProps = PartProps<"div">;
 
-export interface DrawerHeaderProps {
-  children: ReactNode;
-  className?: string;
-}
+/** The header's own `div`. */
+export type DrawerHeaderProps = PartProps<"div">;
 
-export interface DrawerDescriptionProps {
-  children: ReactNode;
-  className?: string;
-}
+/** The supporting line's own `p`. */
+export type DrawerDescriptionProps = PartProps<"p">;
 
-export interface DrawerFooterProps {
-  children: ReactNode;
-  className?: string;
-}
+/** The footer's own `div`. */
+export type DrawerFooterProps = PartProps<"div">;
 
 type DrawerComponent = ((props: DrawerProps) => React.JSX.Element) & {
   Trigger: typeof DrawerTrigger;
@@ -67,10 +70,13 @@ type DrawerComponent = ((props: DrawerProps) => React.JSX.Element) & {
   Close: typeof DrawerClose;
 };
 
-/* Base's dialog root has no notion of an edge, so the side a sheet was given travels down to the
-   sheet's own part through context rather than through a second prop a consumer would have to
-   keep in step with the first. */
-const SideContext = createContext<DrawerSide>("bottom");
+/* Base's dialog root has no notion of an edge, so the side a sheet was given, and the name of its
+   dismissal control, travel down to the sheet's own parts through context rather than through a second
+   prop a consumer would have to keep in step with the root. */
+const DrawerContext = createContext<{ side: DrawerSide; closeLabel: string }>({
+  side: "bottom",
+  closeLabel: "Close",
+});
 
 const DrawerTrigger = ({ ...props }: DrawerTriggerProps) => <BaseDialog.Trigger {...props} />;
 
@@ -84,41 +90,51 @@ const DrawerTrigger = ({ ...props }: DrawerTriggerProps) => <BaseDialog.Trigger 
  * traps focus, restores it, locks the page and dismisses exactly as a dialog does. Use a `Dialog`
  * when the surface has no edge.
  */
-const DrawerContent = ({ children, className }: DrawerContentProps) => {
-  const side = useContext(SideContext);
+const DrawerContent = forwardRef<HTMLDivElement, DrawerContentProps>(({ children, className, ...props }, ref) => {
+  const { side, closeLabel } = useContext(DrawerContext);
   const contentRef = useRef<HTMLDivElement | null>(null);
 
   return (
     /* Focus the reading region, so native PageDown/Space scroll the sheet before a control
        has been visited. Base still owns initial focus and the focus trap. */
     <DialogSurface
+      {...props}
       attachment={side}
       className={cn(className)}
+      popupRef={ref}
       initialFocus={contentRef}
+      closeLabel={closeLabel}
     >
-      <DialogDismiss label="Close" />
-      <div ref={contentRef} tabIndex={-1} className={cn("flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain outline-none")}>
+      <div ref={contentRef} tabIndex={-1} className={cn("flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain [outline-style:none]")}>
         {children}
       </div>
     </DialogSurface>
   );
-};
+});
+
+DrawerContent.displayName = "DrawerContent";
 
 /* A sheet is a dialog with an edge, so its title and description are the dialog's own parts rather
    than copies that could drift from them. */
-const DrawerHeader = ({ children, className }: DrawerHeaderProps) => (
-  <DialogHeader className={cn(className)}>{children}</DialogHeader>
-);
+const DrawerHeader = forwardRef<HTMLDivElement, DrawerHeaderProps>(({ className, ...props }, ref) => (
+  <DialogHeader {...props} ref={ref} className={cn(className)} />
+));
 
-const DrawerDescription = ({ children, className }: DrawerDescriptionProps) => (
-  <DialogDescription className={cn(className)}>{children}</DialogDescription>
-);
+DrawerHeader.displayName = "DrawerHeader";
+
+const DrawerDescription = forwardRef<HTMLParagraphElement, DrawerDescriptionProps>(({ className, ...props }, ref) => (
+  <DialogDescription {...props} ref={ref} className={cn(className)} />
+));
+
+DrawerDescription.displayName = "DrawerDescription";
 
 /* The dialog's own footer, so a sheet's actions keep the dialog's insets. Like an AlertDialog's,
    it follows content with no padded body below it, so it opens its own space above. */
-const DrawerFooter = ({ children, className }: DrawerFooterProps) => (
-  <DialogFooter className={cn("pt-4", className)}>{children}</DialogFooter>
-);
+const DrawerFooter = forwardRef<HTMLDivElement, DrawerFooterProps>(({ className, ...props }, ref) => (
+  <DialogFooter {...props} ref={ref} className={cn("pt-4", className)} />
+));
+
+DrawerFooter.displayName = "DrawerFooter";
 
 /* The dismissal control as a part, for an action that closes the sheet from its own footer: Base
    hands the close behavior to whatever the caller renders. */
@@ -136,11 +152,13 @@ const DrawerClose = (props: ComponentProps<typeof BaseDialog.Close>) => (
  * Compose a `Drawer.Trigger` and a `Drawer.Content`; the header, description and footer parts
  * mirror a `Dialog`'s, because it is the same surface.
  */
-const Drawer = (({ children, side = "bottom", ...props }: DrawerProps) => {
+const Drawer = (({ children, side = "bottom", closeLabel = "Close", ...props }: DrawerProps) => {
+  const context = useMemo(() => ({ side, closeLabel }), [side, closeLabel]);
+
   return (
-    <SideContext.Provider value={side}>
+    <DrawerContext.Provider value={context}>
       <BaseDialog.Root {...props}>{children}</BaseDialog.Root>
-    </SideContext.Provider>
+    </DrawerContext.Provider>
   );
 }) as DrawerComponent;
 

@@ -6,25 +6,13 @@ import React, {
   type MouseEventHandler,
   type ReactNode,
 } from "react";
-import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
-import { Alert02Icon, Cancel01Icon, CancelCircleIcon, CheckmarkCircle02Icon, InformationCircleIcon } from "@hugeicons/core-free-icons";
 import { cn } from "@/libs/utils";
 import Button from "./Button";
+import DismissButton from "./DismissButton";
 import { Spinner } from "./Spinner";
-import {
-  density,
-  focusRingInset,
-  iconStroke,
-  overlay,
-  shape,
-  stacking,
-  state,
-  stateLayer,
-  text,
-  tone,
-  type,
-} from "./ui.common";
-import { motionFeedback, motionInkPress, motionPresenceToast } from "./ui.motion";
+import { StatusMark } from "./StatusMark";
+import { overlay, stacking, text, type } from "./ui.common";
+import { motionFeedback, motionPresenceToast } from "./ui.motion";
 
 /**
  * What a toast is reporting. The type lands on the toast's mark and its tone — never on the surface,
@@ -56,7 +44,11 @@ export interface ToastOptions {
   type?: ToastType;
   title?: ReactNode;
   description?: ReactNode;
-  /** How long it stays before dismissing itself. `0` keeps it until it is dismissed. */
+  /**
+   * How long it stays before dismissing itself. `0` keeps it until it is dismissed. Left unset, a
+   * toast with an action or a `danger` type is sticky: its action is a decision to make and its
+   * danger is one to acknowledge, so it waits. Any other toast keeps the provider's timeout.
+   */
   timeout?: number;
   /** How urgently it is announced. `high` interrupts rather than waiting its turn. */
   priority?: "low" | "high";
@@ -114,9 +106,28 @@ export interface ToastProviderProps {
   manager?: ToastManager;
 }
 
+/**
+ * The words a toast gives its own status when it has no title, so an assistive technology can name it.
+ * Each one is the English default, and each can be replaced with the application's own wording.
+ */
+export interface ToastLabels {
+  info: string;
+  success: string;
+  warning: string;
+  danger: string;
+  error: string;
+  loading: string;
+  /** The name of a toast that reports no type this library knows. */
+  notification: string;
+}
+
 export interface ToastViewportProps {
   /** The corner the stack grows from. It is also the edge a toast enters and leaves through. */
   position?: ToastPosition;
+  /** The accessible name of every toast's dismissal control. Defaults to "Dismiss". */
+  dismissLabel?: string;
+  /** The words a toast without a title is named by, one per status. Each one overrides its English default. */
+  labels?: Partial<ToastLabels>;
   /** Adds to the viewport's own layer. The toasts style themselves. */
   className?: string;
 }
@@ -134,11 +145,30 @@ type BaseManagerMethods = Omit<BaseManager, " subscribe">;
    public type free of anything a consumer could reach for and depend on. */
 const baseManagers = new WeakMap<ToastManager, BaseManager>();
 
+/* A toast that asks for a decision, or reports a failure, must not leave before it has been read: an
+   action waits to be taken and a danger waits to be acknowledged. A caller that names a timeout keeps
+   it, so this is a default and not a rule. */
+const stickyUnlessTimed = <T extends ToastUpdateOptions>(options: T): T =>
+  options.timeout === undefined && (options.actionProps !== undefined || options.type === "danger")
+    ? { ...options, timeout: 0 }
+    : options;
+
+/* A promise state is either a line, which needs no default, or an options object that can be sticky. */
+const stickyState = (state: string | ToastUpdateOptions): string | ToastUpdateOptions =>
+  typeof state === "string" ? state : stickyUnlessTimed(state);
+
 const narrow = (base: BaseManagerMethods): ToastManager => ({
-  add: (options) => base.add(options),
-  update: (id, options) => base.update(id, options),
+  add: (options) => base.add(stickyUnlessTimed(options)),
+  update: (id, options) => base.update(id, stickyUnlessTimed(options)),
   close: (id) => base.close(id),
-  promise: (value, options) => base.promise(value, options),
+  promise: (value, options) => {
+    const { loading, success, error } = options;
+    return base.promise(value, {
+      loading: stickyState(loading),
+      success: typeof success === "function" ? (result) => stickyState(success(result)) : stickyState(success),
+      error: typeof error === "function" ? (reason) => stickyState(error(reason)) : stickyState(error),
+    });
+  },
 });
 
 const baseOf = (manager: ToastManager): BaseManager => {
@@ -151,28 +181,25 @@ const baseOf = (manager: ToastManager): BaseManager => {
   return base;
 };
 
-/* The mark a toast takes from what it is reporting, and the tone that goes with it. Base's promise
-   states are in this map because `promise()` sets them itself: loading, success and error are
-   states of one lifecycle rather than roles a caller chose, and a state left out of the map would
-   silently lose its mark and its tone. `loading` is the one that is not a status glyph — it is
-   ongoing work, so it carries the same activity the library's `Spinner` does. */
-const markIcon = (icon: IconSvgElement, className: string) => (
-  <HugeiconsIcon icon={icon} aria-hidden="true" className={cn(iconStroke.glyph, "size-5 shrink-0", className)} />
-);
-
-const toastMark = (type: string | undefined): ReactNode => {
-  switch (type) {
+/* The mark a toast takes from what it is reporting. Base's promise states are in this map because
+   `promise()` sets them itself: loading, success and error are states of one lifecycle rather than
+   roles a caller chose, and a state left out of the map would silently lose its mark and its tone.
+   `loading` is the one that is not a status glyph — it is ongoing work, so it carries the same
+   activity the library's `Spinner` does. Every status glyph comes from `StatusMark`, so a toast and an
+   alert draw the same mark for the same status. */
+const toastMark = (status: string | undefined): ReactNode => {
+  switch (status) {
     case "loading":
-      return <Spinner size="small" className={cn("size-5")} />;
+      return <Spinner size="small" label="Loading" className={cn("size-5")} />;
     case "success":
-      return markIcon(CheckmarkCircle02Icon, tone.text.success);
+      return <StatusMark variant="success" />;
     case "error":
     case "danger":
-      return markIcon(CancelCircleIcon, tone.text.danger);
+      return <StatusMark variant="danger" />;
     case "warning":
-      return markIcon(Alert02Icon, tone.text.warning);
+      return <StatusMark variant="warning" />;
     case "info":
-      return markIcon(InformationCircleIcon, tone.text.primary);
+      return <StatusMark variant="primary" />;
     default:
       return null;
   }
@@ -182,16 +209,21 @@ const toastMark = (type: string | undefined): ReactNode => {
    so a toast raised with only a description would publish an unnamed dialog — a role with no
    accessible name. The state it reports names it instead in that case, which is what an
    assistive technology has left to announce; the description is still what it reads out, because
-   Base points the toast's own `aria-describedby` at it. A toast raised with a title is untouched.
-   The copy is this package's, like every other name the library gives a control it renders. */
-const toastTypeName: Record<string, string> = {
+   Base points the toast's own `aria-describedby` at it. A toast raised with a title is untouched. */
+const defaultLabels: ToastLabels = {
   info: "Information",
   success: "Success",
   warning: "Warning",
   danger: "Error",
   error: "Error",
   loading: "Working",
+  notification: "Notification",
 };
+
+const nameFor = (names: ToastLabels, status: string | undefined): string =>
+  status !== undefined && Object.prototype.hasOwnProperty.call(names, status)
+    ? names[status as keyof ToastLabels]
+    : names.notification;
 
 /* Where the stack sits, where a toast rests inside the viewport, and which way it grows. A stack
    anchored to the bottom grows upward and a toast leaves downward, so one signed factor carries
@@ -250,9 +282,15 @@ export const ToastProvider = ({ children, manager, ...props }: ToastProviderProp
  * is holding. Base provides F6 entry and focus restoration; the live region remains available
  * while a modal is open. Keep the keyboard shortcut discoverable without reimplementing it.
  */
-export const ToastViewport = ({ position = "bottom-end", className }: ToastViewportProps) => {
+export const ToastViewport = ({
+  position = "bottom-end",
+  dismissLabel = "Dismiss",
+  labels,
+  className,
+}: ToastViewportProps) => {
   const { toasts } = BaseToast.useToastManager();
   const geometry = positionLayout[position];
+  const names: ToastLabels = { ...defaultLabels, ...labels };
 
   return (
     <BaseToast.Portal>
@@ -272,7 +310,7 @@ export const ToastViewport = ({ position = "bottom-end", className }: ToastViewp
             <BaseToast.Root
               key={toast.id}
               toast={toast}
-              aria-label={toast.title ? undefined : toastTypeName[String(toast.type ?? "")] ?? "Notification"}
+              aria-label={toast.title ? undefined : nameFor(names, toast.type)}
               className={cn(
                 /* The stack's own geometry: each toast is anchored to the same viewport corner,
                    sits one shortened step behind the one in front of it, and the stack clamps every
@@ -315,7 +353,9 @@ export const ToastViewport = ({ position = "bottom-end", className }: ToastViewp
                 {mark ? (
                   <span className={cn("inline-flex h-6 shrink-0 items-center")}>{mark}</span>
                 ) : null}
-                <div className={cn("flex min-w-0 flex-1 flex-col gap-0.5")}>
+                {/* The copy beneath the title is one title rhythm (4px) below it, so the two read as one
+                    message; the action follows the copy at the next step up. */}
+                <div className={cn("flex min-w-0 flex-1 flex-col gap-1")}>
                   {toast.title ? (
                     <BaseToast.Title className={cn(type.title, text.high)} />
                   ) : null}
@@ -327,7 +367,7 @@ export const ToastViewport = ({ position = "bottom-end", className }: ToastViewp
                        Give back the small text button's start padding, moving the whole target. */
                     <BaseToast.Action
                       render={
-                        <Button appearance="text" variant="primary" size="sm" className={cn("-ms-4 mt-2 self-start")}>
+                        <Button appearance="text" variant="primary" size="sm" className={cn("-ms-4 mt-1 self-start")}>
                           {toast.actionProps.children}
                         </Button>
                       }
@@ -335,32 +375,22 @@ export const ToastViewport = ({ position = "bottom-end", className }: ToastViewp
                   ) : null}
                 </div>
                 {/* The stack has a close control of its own, so a toast can always be dismissed
-                    without reaching for the action it happens to carry. */}
+                    without reaching for the action it happens to carry. Its target is centred on
+                    the first line, with its excess given back on both vertical edges: a top-only
+                    offset leaves 10–12px below a one-line toast. The 44px target stays intact, and
+                    its inline end padding is compensated separately. */}
                 <BaseToast.Close
-                  aria-label="Dismiss"
-                  className={cn(
-                    density.target,
-                    shape.circle,
-                    /* Centre the 44px target on the first line and give back its excess on BOTH
-                       vertical edges: a top-only offset leaves 10–12px below a one-line toast.
-                       The whole target stays intact, with an inset ring inside the clipped root.
-                       Its inline end padding is compensated separately. */
-                    "group -me-2 inline-flex shrink-0 items-center justify-center",
-                    /* Half the target minus half the first line: the title and the description both
-                       set a 24px line, so the target gives back 10px either way. */
-                    "-my-2.5",
-                    text.medium,
-                    "hover:text-sherick-ink",
-                    motionFeedback,
-                    focusRingInset,
-                    stateLayer.quiet,
-                    state.enabled
-                  )}
-                >
-                  <span className={cn("inline-flex items-center justify-center", motionInkPress)}>
-                    <HugeiconsIcon icon={Cancel01Icon} className={cn(iconStroke.glyph, "size-4")} aria-hidden="true" />
-                  </span>
-                </BaseToast.Close>
+                  render={
+                    <DismissButton
+                      label={dismissLabel}
+                      size="compact"
+                      inRow
+                      /* Half the target minus half the first line: the title and the description both
+                         set a 24px line, so the target gives back 10px either way. */
+                      className={cn("-me-2 -my-2.5")}
+                    />
+                  }
+                />
               </BaseToast.Content>
             </BaseToast.Root>
           );

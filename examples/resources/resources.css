@@ -170,3 +170,29 @@
 .resources-column-action { width: 17%; }
 .resources-name { white-space: normal; overflow-wrap: anywhere; }
 .resources-cell-placeholder { width: 75%; height: 1.25rem; }
+
+/* The loading announcement is read by assistive technology and is not shown. */
+.resources-visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* The refresh status line sits between the filters and the results, in the supporting role. */
+.resources-status {
+  margin: 0 0 0.5rem;
+  font-size: 0.8125rem;
+  line-height: 1.25rem;
+  color: oklch(var(--sui-ink-muted));
+}
+
+/* The heading closes on the same 8px gap a dialog heading uses before the table beneath it. */
+.resources-heading {
+  margin-bottom: 0.5rem;
+}

@@ -177,7 +177,7 @@ test("a status mark and a dismissal hold the first line of copy that wraps", asy
 
 test("a one-line alert is sized by its copy, not by its dismissal target", async ({ page }) => {
   const section = await openShowcase(page, "feedback");
-  const alert = section.getByRole("status").filter({ hasText: "Changes were saved successfully." });
+  const alert = section.getByRole("status").filter({ hasText: "Changes were saved successfully." }).first();
   await expect(alert).toBeVisible();
 
   /* The dismissal is 44px tall where the line it belongs to is 24px. It gives that excess back on
@@ -263,14 +263,16 @@ test("a toast's dismissal keeps its ring inside the stack that clips it", async 
     return {
       focusVisible: button.matches(":focus-visible"),
       shadow: style.boxShadow,
-      outlineColor: style.outlineColor,
+      outlineStyle: style.outlineStyle,
       clearance: [inner.top - outer.top, inner.left - outer.left, outer.right - inner.right, outer.bottom - inner.bottom],
     };
   });
 
   expect(ring.focusVisible, "the ring only exists while the dismissal is visibly focused").toBe(true);
   expect(ring.shadow, "the visible ring is drawn inside the target").toContain("inset");
-  expect(ring.outlineColor, "and nothing is painted outside the target the stack clips").toBe("rgba(0, 0, 0, 0)");
+  /* A focused dismissal resets the outline style (DESIGN_LANGUAGE.md §14), so no outline is painted at
+     all, including the browser's own `:focus-visible` ring. */
+  expect(ring.outlineStyle, "and nothing is painted outside the target the stack clips").toBe("none");
   expect(Math.min(...ring.clearance)).toBeGreaterThanOrEqual(0);
 });
 

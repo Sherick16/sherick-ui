@@ -295,12 +295,13 @@ const DateTimePicker = forwardRef<HTMLInputElement, DateTimePickerProps>(({
         validate={validateValue}
         validationMode="onChange"
         actionsRef={fieldActionsRef}
-        className={cn(disabled && state.disabled, className)}
+        className={cn(className)}
       >
+        {/* The dim belongs to the row, the control part: the label, description and error keep their ink. */}
         <div
           data-disabled={disabled || undefined}
           data-invalid={fieldInvalid || undefined}
-          className={cn(dateFieldRowClassName(disabled))}
+          className={cn(dateFieldRowClassName(disabled), disabled && state.disabled)}
         >
           <div dir={dateInputDirection} className={cn("min-w-0 flex-1 overflow-hidden")}>
             <BaseField.Control

@@ -43,7 +43,8 @@ for (const theme of ["light", "dark"] as const) {
         const style = getComputedStyle(header);
         return { top: el.getBoundingClientRect().top - header.getBoundingClientRect().top, padding: style.paddingTop, bottom: style.paddingBottom };
       });
-      expect(geometry).toEqual({ top: 20, padding: "20px", bottom: "8px" });
+      /* The header has no bottom padding: the gap under the title belongs to the line that follows it. */
+      expect(geometry).toEqual({ top: 20, padding: "20px", bottom: "0px" });
       if (role === "dialog") {
         const titleBox = await title.boundingBox();
         const closeBox = await surface.getByRole("button", { name: trigger === "Open dialog" ? "Close dialog" : "Close", exact: true }).first().boundingBox();
@@ -120,9 +121,12 @@ test("shadow, ring and backdrop plumbing works without Tailwind preflight", asyn
     };
   });
 
+  /* The surface separates by its shadow and fill; it carries no backdrop filter, because it animates
+     its own node and only the scrim behind it blurs (DESIGN_LANGUAGE.md §6). */
   expect(dialogVisuals.boxShadow).not.toBe("none");
-  expect(dialogVisuals.backdropFilter).not.toBe("none");
-  expect(dialogVisuals.backdropFilter).toContain("blur");
+  expect(dialogVisuals.backdropFilter).toBe("none");
+  const scrimBlur = await page.locator('[class*="--sui-scrim-blur"]').evaluate((element) => getComputedStyle(element).backdropFilter);
+  expect(scrimBlur).toContain("blur");
 
   expect(errors).toEqual([]);
 });
@@ -178,7 +182,7 @@ test("portaled Wave B surfaces remain scoped and styled", async ({ page }) => {
   expect(popover.portaled).toBe(true);
   expect(popover.radius).toBeGreaterThan(0);
   expect(popover.shadow).not.toBe("none");
-  expect(popover.backdrop).toContain("blur");
+  expect(popover.backdrop, "the glass is a fill with no backdrop filter (DESIGN_LANGUAGE.md §6)").toBe("none");
   await page.keyboard.press("Escape");
 
   await page.getByRole("button", { name: "Portaled menu" }).click();

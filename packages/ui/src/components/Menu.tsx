@@ -4,9 +4,9 @@ import { Menu as BaseMenu } from "@base-ui/react/menu";
 import React, { type MouseEventHandler, type ReactElement, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import Divider from "./Divider";
-import { list, overlay, stacking, tone } from "./ui.common";
+import { list, overlay, stacking, text, tone, type } from "./ui.common";
 import { motionPresenceAnchored } from "./ui.motion";
-import type { OverlayAlign, OverlaySide, Variant } from "./ui.types";
+import type { OverlayAlign, OverlaySide, PartProps, Variant } from "./ui.types";
 
 export interface MenuProps {
   children: ReactNode;
@@ -27,7 +27,7 @@ export interface MenuTriggerProps {
   className?: string;
 }
 
-export interface MenuContentProps {
+export interface MenuContentProps extends Omit<PartProps<"div">, "children" | "className"> {
   children: ReactNode;
   /** Adds to the popup's own shell. The sheet's material, shape and elevation are the recipe's. */
   className?: string;
@@ -55,11 +55,26 @@ export interface MenuItemProps {
   disabled?: boolean;
   /** What choosing the action does. The menu closes afterwards; that is Base's contract. */
   onClick?: MouseEventHandler<HTMLDivElement>;
+  /** The row's leading mark. It takes the command icon's slot, beside the label. */
+  icon?: ReactNode;
+  /** The gesture that runs this action elsewhere. It is a hint, and the menu registers no shortcut. */
+  shortcut?: ReactNode;
+  /**
+   * Renders the row as another element, such as a link. Base hands the row's own attributes and its
+   * handlers to that element, so the row keeps its menu behaviour.
+   */
+  render?: ReactElement;
 }
 
 export interface MenuSeparatorProps {
   className?: string;
 }
+
+/** A group of rows, announced under its label. */
+export type MenuGroupProps = PartProps<"div">;
+
+/** The heading of a group. Base names the group from it, so it is read as the group begins. */
+export type MenuLabelProps = PartProps<"div">;
 
 /**
  * A surface of actions. Each item acts and the menu closes; nothing here holds a value, so a
@@ -76,8 +91,12 @@ type MenuComponent = ((props: MenuProps) => React.JSX.Element) & {
   Content: typeof MenuContent;
   Item: typeof MenuItem;
   Separator: typeof MenuSeparator;
+  Group: typeof MenuGroup;
+  Label: typeof MenuLabel;
 };
 
+/* The popup takes the rest props, so an `id` or an `aria-label` names the menu for a reader who
+   cannot see a heading. */
 const MenuContent = ({
   children,
   className,
@@ -85,6 +104,7 @@ const MenuContent = ({
   align = "start",
   sideOffset = 8,
   alignOffset,
+  ...props
 }: MenuContentProps) => {
   return (
     <BaseMenu.Portal>
@@ -100,6 +120,7 @@ const MenuContent = ({
         className={cn(stacking.float)}
       >
         <BaseMenu.Popup
+          {...props}
           className={cn(
             list.sheet,
             "w-max min-w-44 max-w-[min(20rem,var(--available-width))] space-y-1 p-1",
@@ -122,18 +143,44 @@ const MenuTrigger = ({ ...props }: MenuTriggerProps) => <BaseMenu.Trigger {...pr
 
 /* A command row: `list.command` owns its shape, motion, tone and interactive states. A
    destructive command adds only the danger tone to its own label — the row's highlight is then
-   a restrained tint of that tone, and the sheet around it stays neutral. */
+   a restrained tint of that tone, and the sheet around it stays neutral. The icon and the shortcut
+   take the same anatomy as a palette command, so a menu and a palette read the same. */
 
-const MenuItem = ({ variant, className, children, ...props }: MenuItemProps) => (
+const MenuItem = ({ variant, className, children, icon, shortcut, render, ...props }: MenuItemProps) => (
   <BaseMenu.Item
     {...props}
+    render={render}
     className={cn(list.command, variant === "danger" && tone.text.danger, className)}
   >
+    {icon !== undefined ? (
+      /* A danger row's mark takes the row's own tone, so the mark and the label say the same thing. */
+      <span aria-hidden="true" className={cn(list.commandIcon, variant !== "danger" && text.medium)}>
+        {icon}
+      </span>
+    ) : null}
     <span className={cn("min-w-0 flex-1 truncate")}>{children}</span>
+    {shortcut !== undefined ? (
+      <span className={cn("ms-3 shrink-0 font-sherick-mono", type.caption, text.medium)}>{shortcut}</span>
+    ) : null}
   </BaseMenu.Item>
 );
 
 MenuItem.displayName = "MenuItem";
+
+/* A group is the menu's own structure: its rows sit together under one label, and the label is the
+   group's name for assistive technology. */
+const MenuGroup = ({ className, ...props }: MenuGroupProps) => (
+  <BaseMenu.Group {...props} className={cn("space-y-1", className)} />
+);
+
+MenuGroup.displayName = "MenuGroup";
+
+/* The label is the command-list heading recipe, so a group's heading in a menu and in a palette match. */
+const MenuLabel = ({ className, ...props }: MenuLabelProps) => (
+  <BaseMenu.GroupLabel {...props} className={cn(list.groupLabel, className)} />
+);
+
+MenuLabel.displayName = "MenuLabel";
 
 /* Base's menu separator *is* the shared Base separator, which is the component `Divider`
    renders: the menu uses the public divider rather than re-deriving a line. The margin is the
@@ -154,5 +201,7 @@ Menu.Trigger = MenuTrigger;
 Menu.Content = MenuContent;
 Menu.Item = MenuItem;
 Menu.Separator = MenuSeparator;
+Menu.Group = MenuGroup;
+Menu.Label = MenuLabel;
 
 export default Menu;

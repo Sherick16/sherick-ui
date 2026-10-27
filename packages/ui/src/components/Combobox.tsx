@@ -1,9 +1,9 @@
 "use client";
 
 import { Combobox as BaseCombobox } from "@base-ui/react/combobox";
-import React, { forwardRef, useState, type ClipboardEvent, type ReactNode } from "react";
+import React, { forwardRef, useEffect, useRef, useState, type ClipboardEvent, type ReactNode } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { ArrowDown01Icon, Cancel01Icon, PlusSignIcon, Tick02Icon } from "@hugeicons/core-free-icons";
+import { ArrowDown01Icon, PlusSignIcon, Tick02Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/libs/utils";
 import {
   density,
@@ -28,12 +28,14 @@ import {
 import {
   motionArrive,
   motionFeedback,
-  motionInkPress,
   motionOrient,
   motionPresenceAnchored,
   motionTactileField,
 } from "./ui.motion";
 import { flattenOptions, hasOptionGroups, toOptionSections, type OptionGroup } from "./option-groups";
+import DismissButton from "./DismissButton";
+import { Spinner } from "./Spinner";
+import { fieldDensity, type FieldSize } from "./Field";
 
 export interface ComboboxOption {
   label: string;
@@ -43,6 +45,28 @@ export interface ComboboxOption {
 
 /** Options filed under one heading, such as channels under their category. */
 export type ComboboxOptionGroup = OptionGroup<ComboboxOption>;
+
+/** The copy of the control's own parts. Each default is the text the control has always shown. */
+export interface ComboboxLabels {
+  /** The accessible name of one chip's dismiss control. */
+  removeChip: (label: string) => string;
+  /** The clear control of a multiple combobox. */
+  clearAll: string;
+  /** The clear control of a single combobox. */
+  clearSelection: string;
+  /** The trigger that opens the list. */
+  showOptions: string;
+  /** Shown in the list when the query matches nothing. `emptyMessage` replaces it. */
+  noResults: string;
+}
+
+const defaultComboboxLabels: ComboboxLabels = {
+  removeChip: (label: string) => `Remove ${label}`,
+  clearAll: "Clear all",
+  clearSelection: "Clear selection",
+  showOptions: "Show options",
+  noResults: "No results found.",
+};
 
 /* Every pass-through is declared here rather than inherited wholesale. Base's combobox root
    renders no element of its own and ignores props it does not destructure: inheriting its type
@@ -69,8 +93,16 @@ interface ComboboxCommonProps {
   placeholder?: string;
   /** Shown in place of the list when the query matches no option. */
   emptyMessage?: ReactNode;
+  /** Waiting for its options: a spinner takes the chevron's place and the trigger reports itself busy. */
+  loading?: boolean;
+  /** The field's density: `sm` for a dense filter row, `md` (the default) or `lg`. */
+  size?: FieldSize;
+  /** The copy of the control's own parts, for a locale or a product's wording. */
+  labels?: Partial<ComboboxLabels>;
   /** Styles the control's own box. The popup and its rows style themselves. */
   className?: string;
+  /** Styles the list's own sheet. The rows style themselves. */
+  popupClassName?: string;
   /** Custom matching, when the default label search is not what the list needs. */
   filter?: ((option: ComboboxOption, query: string) => boolean) | null;
   open?: boolean;
@@ -153,7 +185,7 @@ const sameText = (a: string, b: string) => a.localeCompare(b, undefined, { sensi
    a read-only combobox still opens and browses, only its value is fixed. The clear control is
    handed its own `disabled` for that case because Base itself refuses to clear a read-only
    control; nothing here has to be derived from Sherick's props. */
-const partClassName = `inline-flex shrink-0 items-center justify-center ${density.part} ${shape.circle} ${text.medium} [&>svg]:size-5 ${motionFeedback} ${stateLayer.fieldPart} ${state.enabled} ${state.disabledPart} [&:not([data-disabled]):not(:disabled)]:hover:text-sherick-ink`;
+const partClassName = `inline-flex shrink-0 items-center justify-center ${density.part} ${shape.circle} ${state.quietInk} [&>svg]:size-5 ${motionFeedback} ${stateLayer.fieldPart} ${state.enabled} ${state.disabledPart} ${state.busy}`;
 
 /* A chosen value inside the field is a held choice riding in the field's tray, so it is the tray's
    puck: the brightest surface in the view, at `elevation.control`, with its copy at full emphasis. A
@@ -164,8 +196,9 @@ const partClassName = `inline-flex shrink-0 items-center justify-center ${densit
    walk the row, so the focused chip takes the inset ring — the one this chip is, inside the field's
    own ring, which keeps marking the field as engaged. */
 const valueChipClassName = cn(
-  "inline-flex h-7 min-w-0 max-w-full items-center gap-0.5 ps-3 pe-0.5 text-sm leading-5 font-medium outline-none",
+  "inline-flex h-7 min-w-0 max-w-full items-center gap-0.5 ps-3 pe-0.5 [outline-style:none]",
   shape.pill,
+  type.label,
   puck,
   elevation.control,
   text.high,
@@ -173,19 +206,14 @@ const valueChipClassName = cn(
 );
 
 /* The dismiss target is a part of the chip the pointer is already in: 24px clears the pointer
-   minimum, its circle nests in the chip's pill at the chip's own 2px end inset, and the glyph inside
-   it takes the press so the target never moves. Base keeps it out of the tab order — Backspace and
-   Delete remove a focused chip — and marks it disabled with the combobox. */
-const chipRemoveClassName = cn(
-  "group inline-flex size-6 shrink-0 items-center justify-center",
-  shape.circle,
-  text.medium,
-  "[&:not([data-disabled]):not(:disabled)]:hover:text-sherick-ink",
-  motionFeedback,
-  stateLayer.quiet,
-  state.enabled,
-  state.disabledPart
-);
+   minimum, its circle nests in the chip's pill at the chip's own 2px end inset, and the 16px mark
+   inside it takes the press so the target never moves. `DismissButton` supplies the mark and the
+   quiet ink; these classes give it the chip's own geometry in place of the standalone 44px floor. */
+const chipRemoveClassName = "size-6 min-h-0 min-w-0 shrink-0";
+
+/* The clear control is one part of the field, so it keeps the part's 32px cluster and its 32px hover
+   circle, with the 16px dismiss mark inside it. */
+const clearClassName = cn(density.part, stateLayer.fieldPart, state.enabled, state.disabledPart);
 
 /**
  * A text field that filters a list of options and selects one of them, or several. It is the
@@ -209,7 +237,11 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>((props, ref) => {
     chipsLabel = "Selected",
     placeholder = "Select an option",
     emptyMessage,
+    loading = false,
+    size = "md",
+    labels,
     className,
+    popupClassName,
     disabled,
     readOnly,
     filter,
@@ -220,6 +252,24 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>((props, ref) => {
     onOpenChange,
     ...rootProps
   } = props;
+
+  const copy: ComboboxLabels = { ...defaultComboboxLabels, ...labels };
+  /* The field's own box, so a chip that is removed can find the chips and the input that remain. */
+  const fieldRef = useRef<HTMLDivElement | null>(null);
+  /* Set when a chip is removed while it holds focus: focus then moves to the chip that takes its place,
+     or to the input when the last chip went. Applied after the new value has rendered. */
+  const focusAfterRemoval = useRef<number | null>(null);
+
+  useEffect(() => {
+    const index = focusAfterRemoval.current;
+    if (index === null) return;
+    focusAfterRemoval.current = null;
+    const field = fieldRef.current;
+    if (!field) return;
+    const chips = field.querySelectorAll<HTMLElement>("[data-sui-value-chip]");
+    const target = chips[index] ?? field.querySelector<HTMLInputElement>("input");
+    target?.focus();
+  });
 
   const flatOptions = flattenOptions(options);
   const optionByValue = new Map(flatOptions.map((option) => [option.value, option]));
@@ -335,7 +385,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>((props, ref) => {
       placeholder={chosenCount > 0 ? undefined : placeholder}
       onPaste={handlePaste}
       className={cn(
-        "min-w-0 flex-1 bg-transparent outline-none placeholder:text-sherick-ink-muted disabled:cursor-not-allowed",
+        "min-w-0 flex-1 bg-transparent [outline-style:none] placeholder:text-sherick-ink-muted disabled:cursor-not-allowed",
         multiple && "h-7 min-w-16"
       )}
     />
@@ -380,10 +430,18 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>((props, ref) => {
             flagNotice(0, [trimmedQuery]);
             return;
           }
+          /* A chip removed while it holds focus would take focus with it, so the request is recorded here
+             and applied once the chip is gone. A chip that was not focused leaves focus where it was. */
+          const removedIndex = removed.length === 1 ? values.indexOf(removed[0]) : -1;
+          const focusedChip = document.activeElement?.closest("[data-sui-value-chip]") ?? null;
+          const chipsNow = Array.from(fieldRef.current?.querySelectorAll("[data-sui-value-chip]") ?? []);
           const applied = commitValues(
             next.map((option) => option.value),
             eventDetails
           );
+          if (applied && removedIndex >= 0 && focusedChip !== null && chipsNow[removedIndex] === focusedChip) {
+            focusAfterRemoval.current = removedIndex;
+          }
           if (applied && created) {
             /* Base keeps the typed filter while the list stays open, so several matches can be
                chosen from one query. A created entry used the query up, so it starts over. */
@@ -428,6 +486,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>((props, ref) => {
       readOnly={readOnly}
     >
       <BaseCombobox.InputGroup
+        ref={fieldRef}
         className={({ open, disabled: fieldDisabled }) =>
           cn(
             /* The field's own inline padding is what places the trailing cluster, and it is set on the
@@ -439,7 +498,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>((props, ref) => {
                start as from its top. */
             "group/field flex min-w-0 w-full items-center ps-5 pe-3.5",
             multiple && "has-[[data-sui-value-chip]]:ps-2.5",
-            density.normal,
+            fieldDensity[size],
             shape.control,
             material.control,
             rim.field,
@@ -476,11 +535,16 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>((props, ref) => {
               >
                 <span className={cn("min-w-0 truncate")}>{option.label}</span>
                 {!readOnly && !disabled && (
-                  <BaseCombobox.ChipRemove aria-label={`Remove ${option.label}`} className={cn(chipRemoveClassName)}>
-                    <span className={cn("inline-flex items-center justify-center", motionInkPress)}>
-                      <HugeiconsIcon icon={Cancel01Icon} aria-hidden="true" className={cn(iconStroke.glyph, "size-4")} />
-                    </span>
-                  </BaseCombobox.ChipRemove>
+                  <BaseCombobox.ChipRemove
+                    render={
+                      <DismissButton
+                        label={copy.removeChip(option.label)}
+                        size="compact"
+                        inRow
+                        className={cn(chipRemoveClassName)}
+                      />
+                    }
+                  />
                 )}
               </BaseCombobox.Chip>
             ))}
@@ -490,16 +554,28 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>((props, ref) => {
           input(0)
         )}
         <BaseCombobox.Clear
-          aria-label={multiple ? "Clear all" : "Clear selection"}
           // Clearing changes the value, so a read-only control cannot offer it — which is Base's own
           // reading of the same state, since its clear control refuses the press.
           disabled={disabled || readOnly}
-          className={cn(partClassName)}
+          render={
+            <DismissButton
+              label={multiple ? copy.clearAll : copy.clearSelection}
+              size="compact"
+              inRow
+              className={cn(clearClassName)}
+            />
+          }
+        />
+        <BaseCombobox.Trigger
+          aria-label={copy.showOptions}
+          aria-busy={loading || undefined}
+          className={cn(partClassName, "group")}
         >
-          <HugeiconsIcon icon={Cancel01Icon} aria-hidden="true" className={cn(iconStroke.glyph)} />
-        </BaseCombobox.Clear>
-        <BaseCombobox.Trigger aria-label="Show options" className={cn(partClassName, "group")}>
-          <HugeiconsIcon icon={ArrowDown01Icon} aria-hidden="true" className={cn(iconStroke.glyph, "size-5", motionOrient, "group-data-[popup-open]:rotate-180")} />
+          {loading ? (
+            <Spinner className={cn("size-5", text.high)} size="small" />
+          ) : (
+            <HugeiconsIcon icon={ArrowDown01Icon} aria-hidden="true" className={cn(iconStroke.glyph, "size-5", motionOrient, "group-data-[popup-open]:rotate-180")} />
+          )}
         </BaseCombobox.Trigger>
       </BaseCombobox.InputGroup>
 
@@ -508,7 +584,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>((props, ref) => {
            duplicate reports itself. Only the skipped entries are shown: the chips already show what
            was added. While the list is open Base hides everything outside it from assistive
            technology, so the same report is also made from inside the list (below). */
-        <div role="status" className={cn(notice.visible !== "" && fieldMessage.description)}>
+        <div role="status" className={cn(notice.visible !== "" ? fieldMessage.description : "absolute")}>
           {notice.announced === notice.visible ? (
             notice.visible
           ) : (
@@ -533,7 +609,8 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>((props, ref) => {
               list.sheet,
               "w-max min-w-[var(--anchor-width)] p-2",
               overlay.popup,
-              motionPresenceAnchored
+              motionPresenceAnchored,
+              popupClassName
             )}
           >
             {/* Base keeps this element mounted so a screen reader hears the change, and renders
@@ -545,7 +622,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>((props, ref) => {
             )}
             <BaseCombobox.Empty>
               <div className={cn("px-3 py-3", type.body, text.medium)}>
-                {emptyMessage ?? (creatable ? "Type to add an entry." : "No results found.")}
+                {emptyMessage ?? (creatable ? "Type to add an entry." : copy.noResults)}
               </div>
             </BaseCombobox.Empty>
             <BaseCombobox.List className={cn("space-y-1")}>

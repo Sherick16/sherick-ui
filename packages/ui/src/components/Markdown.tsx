@@ -5,7 +5,8 @@ import rehypeKatex from "rehype-katex";
 import remarkMath from "remark-math";
 import { cn } from "@/libs/utils";
 import { edge, richText, text, tone } from "./ui.common";
-import CodeBlock from "./CodeBlock";
+import CodeBlock, { InlineCode } from "./CodeBlock";
+import ScrollRegion from "./scroll-region";
 
 /* Markdown sets its own type scale but takes every color, shape and rule from the
    primitives, so dropping it into a new surface needs no visual decisions. */
@@ -29,17 +30,23 @@ const components: Components = {
      inside the code surface and inherit the browser's monospace block styling. The
      block wrapper is dropped so `CodeBlock` owns the whole treatment. */
   pre: ({ children }) => <>{children}</>,
-  table: ({ children }) => <div className={cn("min-w-0 overflow-x-auto [overflow-wrap:normal]")}><table className={cn("w-full")}>{children}</table></div>,
+  /* A wide table scrolls inside its own region, which is named and reachable by keyboard only while it
+     overflows (§19). A markdown table has no caption of its own, so the region is named for what it is. */
+  table: ({ children }) => (
+    <ScrollRegion label="Table" className={cn("min-w-0 [overflow-wrap:normal]")}>
+      <table className={cn("w-full")}>{children}</table>
+    </ScrollRegion>
+  ),
   /* Without `inline` (removed in react-markdown 9), a block is a fenced one: it carries
      a `language-*` class or, when the fence is bare, the trailing newline markdown
      always leaves on the last line. Anything else is an inline chip. */
-  code: ({ className, children, ...props }) => {
+  code: ({ className, children }) => {
     const language = /language-(\w+)/.exec(className ?? "")?.[1];
     const code = String(children ?? "");
     return language !== undefined || code.endsWith("\n") ? (
       <CodeBlock language={language ?? "text"}>{code}</CodeBlock>
     ) : (
-      <CodeBlock inline className={cn(className)} {...props}>{children}</CodeBlock>
+      <InlineCode className={cn(className)}>{children}</InlineCode>
     );
   },
 };

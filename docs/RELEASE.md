@@ -20,8 +20,19 @@ engagement — and rested surface choice rows on a tray, with an accent rim on t
 `Card.Title`, `Card.Description`, `Popover.Title` and `Popover.Description` parts; neutral defaults
 for `Alert` and `Badge`; the in-track form of the current destination; label and body type roles
 with a 16/24 title; one rendered icon stroke and one directional vocabulary; and option rows aligned
-to their trigger's text. It removes no component, prop or export. The current source package version is `2.9.1`: a `Drawer`'s footer is now the dialog's own footer, so its bottom inset matches a dialog's 20px rather than 24px. Version `2.4.0` remains the published baseline until the
-release owner approves a staged version. An installed package's actual version and exports, not this
+to their trigger's text. It removes no component, prop or export.
+
+`2.10.0` is the spacing-contract wave. Its additions are public props and parts: `Dialog.Trigger`,
+`Dialog.Close`, `AlertDialog.Trigger`, `Popover.Close`, `Menu.Group`, `Menu.Label`, `TooltipProvider`,
+`Field orientation`, `size` on the fields, `labels` on Combobox, Breadcrumb, Pagination, Command, Tabs and
+FileUpload, `render` on Button, IconButton and NavItem, `InlineCode` on the content subpath, and loading and
+empty states on Select and Combobox. Three changes need the release owner's review before approval, because
+a consumer can see them: `Avatar` rest props now land on the root and no longer reach the image, `Spinner`
+`className` now sizes its wrapper, and `Accordion` joins are no longer `separator` roles. Toasts with an
+action or a danger type are now sticky by default. If the owner judges any of these breaking, the bump is
+major rather than minor. The `overlay`, `toggles` and `stylesCss` budgets in `bundle-budget.json` rose with the
+new surface, and that change records the reason. The current source version is `2.10.0`, and npm's `latest` is
+`2.9.0`. An installed package's actual version and exports, not this
 checkout, determine availability.
 
 `packages/ui/package.json` owns the release version and `publishConfig.tag` remains `latest`.

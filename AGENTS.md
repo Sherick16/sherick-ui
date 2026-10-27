@@ -166,7 +166,7 @@ for them explicitly.
 The package publishes exactly five subpaths, and they are settled:
 
 - `sherick-ui` — the core barrel, with the canonical component and prop-type exports;
-- `sherick-ui/content` — the rich-content boundary, **ESM only**: `Markdown`, `CodeBlock`, `MarkdownProps`, `CodeBlockProps`;
+- `sherick-ui/content` — the rich-content boundary, **ESM only**: `Markdown`, `CodeBlock`, `InlineCode`, `MarkdownProps`, `CodeBlockProps`, `InlineCodeProps`;
 - `sherick-ui/dev` — development-only helper exports for this repository's workbench. Unstable, unsupported, and not part of the consumer contract;
 - `sherick-ui/styles.css` — the complete published component stylesheet;
 - `sherick-ui/theme.css` — token-only theme output.

@@ -1,9 +1,8 @@
 "use client";
 
-import { Button as BaseButton } from "@base-ui/react/button";
 import { Field } from "@base-ui/react/field";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Cancel01Icon, Delete02Icon, File01Icon, Image01Icon, Upload04Icon } from "@hugeicons/core-free-icons";
+import { Delete02Icon, File01Icon, Image01Icon, Upload04Icon } from "@hugeicons/core-free-icons";
 import React, {
   forwardRef,
   useEffect,
@@ -17,14 +16,14 @@ import React, {
 } from "react";
 import { cn } from "@/libs/utils";
 import Button from "./Button";
+import DismissButton from "./DismissButton";
+import FieldLabel from "./FieldLabel";
 import {
-  density,
   edge,
   fieldLabel,
   fieldLayout,
   fieldMessage,
   focusRingDrag,
-  focusRingInset,
   focusRingWithin,
   iconStroke,
   material,
@@ -38,7 +37,7 @@ import {
   tone,
   type,
 } from "./ui.common";
-import { motionFeedback, motionInkPress } from "./ui.motion";
+import { motionFeedback } from "./ui.motion";
 import {
   fileKey,
   formatBytes,
@@ -49,6 +48,26 @@ import {
 } from "./fileUpload.rules";
 
 export type { FileRejection } from "./fileUpload.rules";
+
+/** The copy of the selection's announcements. Each default is the text the field has always announced. */
+export interface FileUploadLabels {
+  /** Announced when one file is removed. */
+  removedFile: (name: string) => string;
+  /** Announced when several files are removed. */
+  removedFiles: (count: number) => string;
+  /** Announced when files are added. */
+  addedFiles: (count: number) => string;
+}
+
+/* The noun follows the count through the locale's own plural rules, so "1 file" and "2 files" come from
+   the platform rather than from a test on `=== 1`. */
+const fileNoun = (count: number) => (new Intl.PluralRules().select(count) === "one" ? "file" : "files");
+
+const defaultFileUploadLabels: FileUploadLabels = {
+  removedFile: (name: string) => `Removed ${name}.`,
+  removedFiles: (count: number) => `Removed ${count} ${fileNoun(count)}.`,
+  addedFiles: (count: number) => `Added ${count} ${fileNoun(count)}.`,
+};
 
 /**
  * A labelled field that selects files from the native picker or by dropping them on its zone.
@@ -66,8 +85,8 @@ export type { FileRejection } from "./fileUpload.rules";
  */
 export interface FileUploadProps
   extends Omit<HTMLAttributes<HTMLDivElement>, "children" | "onChange" | "defaultValue"> {
-  /** The field's label. It names the picker. */
-  label: string;
+  /** The field's label. It names the picker when it is text, and is absent when the zone speaks for itself. */
+  label?: ReactNode;
   /** Supporting copy beneath the field. */
   description?: ReactNode;
   /**
@@ -102,6 +121,8 @@ export interface FileUploadProps
   removeLabel?: (file: File) => string;
   /** The accessible name of the control that empties the selection. */
   clearLabel?: string;
+  /** The copy of the selection's announcements, for a locale or a product's wording. */
+  labels?: Partial<FileUploadLabels>;
 }
 
 type FocusRequest =
@@ -127,11 +148,13 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
       selectLabel = "Select files",
       removeLabel,
       clearLabel = "Clear files",
+      labels,
       className,
       ...rootProps
     },
     forwardedRef
   ) => {
+    const copy: FileUploadLabels = { ...defaultFileUploadLabels, ...labels };
     const baseId = useId();
     const hintId = `${baseId}-hint`;
 
@@ -171,9 +194,9 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
       const added = selected.filter((file) => !beforeKeys.has(fileKey(file))).length;
       const removed = before.filter((file) => !afterKeys.has(fileKey(file)));
       const parts: string[] = [];
-      if (removed.length === 1) parts.push(`Removed ${removed[0].name}.`);
-      else if (removed.length > 1) parts.push(`Removed ${removed.length} files.`);
-      if (added > 0) parts.push(`Added ${added} file${added === 1 ? "" : "s"}.`);
+      if (removed.length === 1) parts.push(copy.removedFile(removed[0].name));
+      else if (removed.length > 1) parts.push(copy.removedFiles(removed.length));
+      if (added > 0) parts.push(copy.addedFiles(added));
       setAnnouncement(parts.join(" "));
 
       if (!focus || removed.length === 0) return;
@@ -309,7 +332,11 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
         invalid={Boolean(error)}
         className={cn(fieldLayout, className)}
       >
-        <Field.Label className={cn(fieldLabel)}>{label}</Field.Label>
+        {label && (
+          <Field.Label className={cn(fieldLabel)}>
+            <FieldLabel>{label}</FieldLabel>
+          </Field.Label>
+        )}
 
         {/* One compact chooser/drop surface. The native label retains picker and keyboard behavior;
             it is a field well like every other input, and its dashed rim and quiet state layer make
@@ -344,10 +371,10 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
             <HugeiconsIcon icon={Upload04Icon} aria-hidden="true" className={cn(iconStroke.glyph)} />
           </span>
           <span className={cn("flex min-w-0 flex-col items-center gap-1")}>
-            <span className={cn("text-base font-semibold", text.high)}>
+            <span className={cn(type.title, text.high)}>
               {dragging ? (multiple ? "Drop files here" : "Drop the file here") : selectLabel}
             </span>
-            <span className={cn("text-sm leading-5", text.medium)}>
+            <span className={cn(type.body, text.medium)}>
               {multiple ? "or drag and drop files" : "or drag and drop a file"}
             </span>
           </span>
@@ -367,7 +394,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
         </label>
 
         {selected.length > 0 && (
-          <div className={cn("mx-4 min-w-0 overflow-hidden", shape.control, "rounded-t-none", matteInset, recessedTop)}>
+          <div className={cn("-mt-2 mx-4 min-w-0 overflow-hidden", shape.control, "rounded-t-none", matteInset, recessedTop)}>
             <ul role="list" className={cn("m-0 min-w-0 list-none px-3 pt-3")}>
               {selected.map((file, index) => {
                 const key = fileKey(file);
@@ -385,31 +412,17 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
                       <span>{file.name}</span>
                       <span className={cn(type.supporting, text.medium)}>{formatBytes(file.size)} · {fileType}</span>
                     </span>
-                    <BaseButton
+                    <DismissButton
                       ref={(node: HTMLButtonElement | null) => {
                         if (node) removalRefs.current.set(key, node);
                         else removalRefs.current.delete(key);
                       }}
-                      type="button"
-                      aria-label={removeLabel ? removeLabel(file) : `Remove ${file.name}`}
+                      label={removeLabel ? removeLabel(file) : `Remove ${file.name}`}
+                      inRow
                       disabled={disabled}
                       onClick={() => removeFile(index)}
-                      className={cn(
-                        "group inline-flex shrink-0 items-center justify-center",
-                        density.target,
-                        shape.circle,
-                        text.medium,
-                        !disabled && "hover:text-sherick-ink",
-                        motionFeedback,
-                        focusRingInset,
-                        stateLayer.quiet,
-                        disabled ? state.disabled : state.enabled
-                      )}
-                    >
-                      <span className={cn("inline-flex items-center justify-center", motionInkPress)}>
-                        <HugeiconsIcon icon={Cancel01Icon} className={cn(iconStroke.glyph, "size-5")} aria-hidden="true" />
-                      </span>
-                    </BaseButton>
+                      className={cn(disabled ? state.disabled : undefined)}
+                    />
                   </li>
                 );
               })}
@@ -451,7 +464,7 @@ const FileUpload = forwardRef<HTMLInputElement, FileUploadProps>(
 
         {/* Selection changes are live feedback for screen readers, not a visible activity log.
             Rejections remain visible and are announced in the same mounted region. */}
-        <div role="status" className={cn(rejections.length > 0 && cn("mt-2 flex flex-col gap-1", type.supporting))}>
+        <div role="status" className={cn(rejections.length > 0 ? cn("flex flex-col gap-1", type.supporting) : "absolute")}>
           {announcement !== "" && <span className={cn("sr-only")}>{announcement}</span>}
           {rejections.length > 0 && (
             <span key={attempt} className={cn("text-sherick-danger")}>

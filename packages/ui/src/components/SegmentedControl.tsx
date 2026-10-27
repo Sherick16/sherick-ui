@@ -4,6 +4,7 @@ import type { ToggleGroup as BaseToggleGroup } from "@base-ui/react/toggle-group
 import React, { forwardRef, type ComponentProps, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import ToggleGroup from "./ToggleGroup";
+import { iconSlot } from "./ui.common";
 import { Variant } from "./ui.types";
 
 export interface SegmentedControlOption {
@@ -95,10 +96,7 @@ export const SegmentedControl = forwardRef<HTMLDivElement, SegmentedControlProps
             className={cn("flex-1")}
           >
             {option.icon && (
-              <span
-                className={cn("inline-flex size-4 shrink-0 items-center justify-center [&>svg]:size-4")}
-                aria-hidden="true"
-              >
+              <span className={cn(iconSlot.compact)} aria-hidden="true">
                 {option.icon}
               </span>
             )}

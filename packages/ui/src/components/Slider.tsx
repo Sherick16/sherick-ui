@@ -6,6 +6,7 @@ import { cn } from "@/libs/utils";
 import {
   elevation,
   fieldLabel,
+  fieldLayout,
   focusRingWithin,
   material,
   selectable,
@@ -80,10 +81,12 @@ export const Slider = forwardRef<HTMLDivElement, SliderProps>(
         disabled={disabled}
         name={name}
         form={form}
-        className={cn("flex w-full flex-col", state.effectiveDisabled, className)}
+        className={cn(fieldLayout, className)}
       >
         {label && <BaseSlider.Label className={cn(fieldLabel)}>{label}</BaseSlider.Label>}
-        <BaseSlider.Control className={cn("group flex touch-none select-none items-center py-3")}>
+        {/* The disabled step belongs to the groove and the handle, the control part. The label keeps its
+            ink, so a disabled slider still names itself at full strength. */}
+        <BaseSlider.Control className={cn("group flex touch-none select-none items-center py-3", state.effectiveDisabled)}>
           {/* The groove is the matte step every sunk track takes; the handle separates from it by
               its own mid-emphasis fill and its control elevation. */}
           {/* The reservation the range leaves for the handle: its half-width (10px) plus 4px of

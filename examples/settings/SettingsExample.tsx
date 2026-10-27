@@ -85,8 +85,7 @@ export default function SettingsExample() {
               maxLength={60}
               value={draft.name}
               onValueChange={(value) => update("name", value)}
-              error={Boolean(errors.name)}
-              errorMessage={errors.name}
+              error={errors.name}
             />
             <Input
               ref={emailRef}
@@ -97,8 +96,7 @@ export default function SettingsExample() {
               required
               value={draft.email}
               onValueChange={(value) => update("email", value)}
-              error={Boolean(errors.email)}
-              errorMessage={errors.email}
+              error={errors.email}
             />
             <Textarea
               label="Description"
@@ -138,9 +136,8 @@ export default function SettingsExample() {
 
         <section className="settings-section" aria-labelledby="settings-notifications">
           <h2 id="settings-notifications">Notifications</h2>
-          <Field className="settings-toggle" label="Weekly summary" description="Email a summary of workspace activity each week.">
+          <Field orientation="horizontal" label="Weekly summary" description="Email a summary of workspace activity each week.">
             <Switch
-              className="settings-switch"
               checked={draft.weeklySummary}
               onCheckedChange={(checked) => update("weeklySummary", checked)}
             />

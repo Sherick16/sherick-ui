@@ -1,18 +1,25 @@
 "use client";
 
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
-import React, { type ComponentProps, type ReactNode, type Ref } from "react";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Cancel01Icon } from "@hugeicons/core-free-icons";
+import React, {
+  Children,
+  isValidElement,
+  type ComponentProps,
+  type ReactElement,
+  type ReactNode,
+  type Ref,
+} from "react";
 import { cn } from "@/libs/utils";
-import { density, focusRing, iconStroke, overlay, shape, stacking, state, stateLayer, text } from "./ui.common";
+import DismissButton from "./DismissButton";
+import { overlay, stacking } from "./ui.common";
 import {
-  motionFeedback,
-  motionInkPress,
   motionPresenceModal,
   motionPresenceScrim,
+  motionPresenceScrimUtility,
   motionPresenceSheet,
+  motionPresenceUtility,
 } from "./ui.motion";
+import type { PartProps, TriggerProps } from "./ui.types";
 
 /**
  * Where a viewport-owning surface is attached. `center` is a dialog: it has no edge, so it rises
@@ -21,7 +28,7 @@ import {
  */
 export type DialogAttachment = "center" | "bottom" | "top" | "left" | "right";
 
-export interface DialogSurfaceProps {
+export interface DialogSurfaceProps extends Omit<PartProps<"div">, "children" | "className"> {
   children: ReactNode;
   /** Adds to the popup's own shell. The surface's shape, material and elevation are the recipe's. */
   className?: string;
@@ -35,6 +42,19 @@ export interface DialogSurfaceProps {
   initialFocus?: ComponentProps<typeof BaseDialog.Popup>["initialFocus"];
   /** The edge the surface is attached to. `center` is the default, and is a dialog. */
   attachment?: DialogAttachment;
+  /**
+   * The entrance tier. `modal` is the surface's own rise or slide. `utility` is the quick tier for a
+   * surface a reader opened from the keyboard: opacity only, so it is there as soon as the key is
+   * answered.
+   */
+  presence?: "modal" | "utility";
+  /**
+   * The accessible name of the dismissal control. Omitted, the surface carries none: an alert
+   * dialog answers with its own actions and must not offer a second way out.
+   */
+  closeLabel?: string;
+  /** Places the dismissal control where a surface's own title line sits, when that is not the dialog's. */
+  closeClassName?: string;
 }
 
 /* Which way the surface is placed, how much room it takes, and the offset it arrives from. A
@@ -78,6 +98,12 @@ const attachmentLayout: Record<
   },
 };
 
+/* The dismissal sits on the dialog's first header line. That line starts at the header's `pt-5` and is
+   28px tall, so a 44px target centred on it sits at `top-3` rather than `top-4`, and it is placed on the
+   logical end so it follows the writing direction. The target's own state layer is `relative`, and this
+   position comes after it, so `tailwind-merge` keeps it. */
+const dismissPlacement = "absolute end-4 top-3 z-10";
+
 /**
  * The visual shell every Sherick surface that owns the viewport shares: the scrim, the viewport
  * and the popup — a dialog in the middle, or a sheet attached to an edge. Base UI owns presence,
@@ -94,34 +120,49 @@ export const DialogSurface = ({
   popupRef,
   initialFocus,
   attachment = "center",
+  presence = "modal",
+  closeLabel,
+  closeClassName,
+  ...props
 }: DialogSurfaceProps) => {
   const geometry = attachmentLayout[attachment];
   /* A surface with no edge is a dialog; one attached to an edge is a sheet, and the two shells
      differ only in the corner role they take. */
   const shell = attachment === "center" ? overlay.dialog : overlay.sheet;
+  const entrance = presence === "utility" ? motionPresenceUtility : geometry.presence;
+  /* The plane follows the surface it sits behind: a utility surface fades its scrim on the utility timing. */
+  const scrim = presence === "utility" ? motionPresenceScrimUtility : motionPresenceScrim;
 
   return (
     <BaseDialog.Portal>
-      <BaseDialog.Backdrop className={cn(overlay.scrim, motionPresenceScrim)} />
+      <BaseDialog.Backdrop className={cn(overlay.scrim, scrim)} />
       <BaseDialog.Viewport
         className={cn("fixed inset-0 flex", stacking.float, geometry.viewport)}
       >
         <BaseDialog.Popup
+          {...props}
           ref={popupRef}
           initialFocus={initialFocus}
           tabIndex={-1}
           className={cn(
-            "relative min-w-0 w-full outline-none [overflow-wrap:anywhere]",
+            "relative min-w-0 w-full [outline-style:none] [overflow-wrap:anywhere]",
             geometry.from,
             shell,
             /* The attachment's own sizing and its squared edge come after the shell: `cn` keeps the
                last class of a conflicting group, so a directional radius written before the
                shell's corner role would be dropped by the shell rather than override it. */
             geometry.popup,
-            geometry.presence,
+            entrance,
             className
           )}
         >
+          {closeLabel !== undefined ? (
+            /* The dismissal is the surface's first part, so it is the first control a reader reaches
+               after the surface itself, and it is the same control on every surface. */
+            <BaseDialog.Close
+              render={<DismissButton label={closeLabel} className={cn(dismissPlacement, closeClassName)} />}
+            />
+          ) : null}
           {children}
         </BaseDialog.Popup>
       </BaseDialog.Viewport>
@@ -129,47 +170,32 @@ export const DialogSurface = ({
   );
 };
 
-export interface DialogDismissProps {
-  /**
-   * The control's accessible name. It is required rather than derived: the mark is the only thing
-   * rendered, and what it dismisses is the caller's fact — a dialog, a sheet, or a surface whose
-   * own wording is better than a generic one.
-   */
-  label: string;
-  className?: string;
-}
+export type DialogTriggerProps = TriggerProps & {
+  /** The element the trigger's own props are handed to — usually a Sherick `Button`. */
+  render?: ReactElement;
+};
 
 /**
- * The dismissal control every viewport-owning surface carries, in the same place and with the
- * same press. It is a part rather than something the shell renders itself, because an
- * `AlertDialog` answers with its own actions and must not offer a second way out.
+ * The control that opens a dialog-family surface. It renders in the page rather than in the portal,
+ * so the reader sees the control they pressed and the surface arrives from it. Base's trigger closes
+ * the surface through its own root, so no open state is needed beside it.
  */
-export const DialogDismiss = ({ label, className }: DialogDismissProps) => (
-  <BaseDialog.Close
-    aria-label={label}
-    className={cn(
-      density.target,
-      shape.circle,
-      text.medium,
-      "hover:text-sherick-ink",
-      motionFeedback,
-      focusRing,
-      stateLayer.quiet,
-      state.enabled,
-      /* The mark is centred on the header's first line: the title's line box starts at the header's
-         `pt-5` and is 28px tall, so a 44px target centred on it sits at `top-3` rather than `top-4`,
-         and it is placed on the logical end so it follows the writing direction. Written after the
-         state layer, which is `relative` itself, so `tailwind-merge` keeps this position. */
-      "group absolute end-4 top-3 z-10 inline-flex items-center justify-center",
-      className
-    )}
-  >
-    {/* The target stays exactly where the pointer found it; the mark inside it carries the
-        press. */}
-    <span className={cn("inline-flex items-center justify-center", motionInkPress)}>
-      <HugeiconsIcon icon={Cancel01Icon} className={cn(iconStroke.glyph, "size-5")} aria-hidden="true" />
-    </span>
-  </BaseDialog.Close>
+export const DialogTrigger = ({ render, ...props }: DialogTriggerProps) => (
+  <BaseDialog.Trigger render={render} {...props} />
 );
+
+/**
+ * Splits a surface's children into its triggers and its content. A trigger has to stay in the page,
+ * because the portal holds only what the surface shows; everything else is the surface's own content.
+ */
+export const splitTriggers = (children: ReactNode, trigger: unknown) => {
+  const triggers: ReactNode[] = [];
+  const content: ReactNode[] = [];
+  for (const child of Children.toArray(children)) {
+    if (isValidElement(child) && child.type === trigger) triggers.push(child);
+    else content.push(child);
+  }
+  return { triggers, content };
+};
 
 export default DialogSurface;

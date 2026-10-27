@@ -145,7 +145,7 @@ Everything else is the rest of `Omit<ImgHTMLAttributes<HTMLImageElement>, "src" 
   image fades out while loading or after an error.
 - `alt=""` makes the avatar decorative: it drops `role="img"` and gets `aria-hidden`
   instead of a name. Pass a real `alt` when the person or brand is the content.
-- There is no fallback or initials slot. An empty or broken `src` leaves the matte surface
+- `fallback` (from 2.10.0) replaces the initials shown when there is no picture. An empty or broken `src` leaves the matte surface
   blank; render initials or an icon yourself (from `onError`) if you need one.
 - The root is a `<span>`. Its `h-*`/`w-*` utilities only take effect where the context
   blockifies it — a flex/grid row, as the specimens place it, or an added `inline-flex`.
@@ -322,6 +322,11 @@ Inline and non-portaled; no `ref`, no title or actions prop — the whole copy i
 | `rows` | `ReactNode[][]` | required |
 | `className` | `string` (scroll wrapper) | — |
 | `tableClassName` | `string` (native table, from 2.2.0) | — |
+| `caption` | `string` (names the scroll region; from 2.10.0) | — |
+| `aria-label` | `string` (names the scroll region when there is no caption; from 2.10.0) | `"Table"` |
+| `emptyMessage` | `ReactNode` (one spanning row when there are no rows; from 2.10.0) | — |
+| `getRowKey` | `(row, index) => Key` (stable keys for reordered rows; from 2.10.0) | index |
+| `rowHeader` | `TableColumn.rowHeader` (the column's cells become `th scope="row"`; from 2.10.0) | — |
 
 - The scroll wrapper is keyboard focusable, including for passive cells.
 - String headers remain supported. Starting in **2.2.0**, `TableColumn` is
@@ -433,12 +438,12 @@ and the ref is the root `HTMLDivElement`.
 
 ## Known gaps to plan around
 
-- `Table` has no caption, label or ARIA pass-through; wrap it in a named region.
+- `Table` names its scroll region through `caption` or `aria-label`, and takes a tab stop only while its content overflows. Rest props and the ref reach the root from 2.10.0.
 - `Alert`'s dismissal name is fixed English and there is no `aria-label` prop for it.
-- `Avatar` has no fallback slot, and its root is a `<span>` that needs a blockifying
+- The `Avatar` root is a `<span>` that needs a blockifying
   context to hold its size.
 - `Button`, `IconButton`, `Progress` and `Media` expose refs; `Card`, `Badge`, `Alert`,
-  `Table`, `Divider`, `Skeleton`, `Spinner` and `Avatar` cannot be given one.
+  `Divider`, `Skeleton`, `Spinner` and `Avatar` cannot be given one before 2.10.0, when they forward refs to their root.
 - `Skeleton` ships no dimensions and no preset shapes; every skeleton is sized by the
   caller.
 

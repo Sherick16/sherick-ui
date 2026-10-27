@@ -15,6 +15,7 @@ import { cn } from "@/libs/utils";
 import Calendar from "./Calendar";
 import Field from "./Field";
 import { state } from "./ui.common";
+import { fieldDensity, type FieldSize } from "./Field";
 import {
   DateCalendarPopup,
   DateFieldTrigger,
@@ -38,7 +39,11 @@ export interface DatePickerProps {
   /** Receives the next date, or `null` when the field is cleared. */
   onValueChange?: (value: CalendarDate | null) => void;
   /** The field's label. It names the native field, its control and the calendar popup. */
-  label: string;
+  label?: ReactNode;
+  /** Names the field when `label` is absent or is not text, since the popup and its control need words. */
+  "aria-label"?: string;
+  /** The field's density: `sm` for a dense filter row, `md` (the default) or `lg`. */
+  size?: FieldSize;
   description?: ReactNode;
   error?: ReactNode;
   required?: boolean;
@@ -82,6 +87,8 @@ const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(({
   defaultValue,
   onValueChange,
   label,
+  "aria-label": ariaLabel,
+  size = "md",
   description,
   error,
   required = false,
@@ -102,6 +109,9 @@ const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(({
   labels: labelsProp,
 }, ref) => {
   const labels = useMemo(() => resolveCalendarLabels(labelsProp), [labelsProp]);
+  /* The words the trigger and the popup are named by. A label that is a node still names the native
+     field through its element, so these fall back to `aria-label` and then to a plain name. */
+  const spokenName = typeof label === "string" ? label : ariaLabel;
   const isControlled = value !== undefined;
   const [internalValue, setInternalValue] = useState<CalendarDate | null>(() =>
     normalizeCalendarDate(defaultValue)
@@ -183,7 +193,7 @@ const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(({
       validate={validateValue}
       validationMode="onChange"
       actionsRef={fieldActionsRef}
-      className={cn(disabled && state.disabled, className)}
+      className={cn(className)}
     >
       <BasePopover.Root
         open={open}
@@ -194,10 +204,11 @@ const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(({
            while the grid is open. */
         modal={false}
       >
+        {/* The dim belongs to the row, the control part: the label, description and error keep their ink. */}
         <div
           data-disabled={disabled || undefined}
           data-invalid={fieldInvalid || undefined}
-          className={cn(dateFieldRowClassName(disabled))}
+          className={cn(dateFieldRowClassName(disabled), fieldDensity[size], disabled && state.disabled)}
         >
           <div dir={dateInputDirection} className={cn("min-w-0 flex-1 overflow-hidden")}>
             <BaseField.Control
@@ -212,13 +223,14 @@ const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(({
               max={maxDate ?? undefined}
               value={displayText}
               onChange={handleInputChange}
+              aria-label={label ? undefined : ariaLabel}
               className={cn(dateInputClassName)}
             />
           </div>
-          <DateFieldTrigger label={`Open ${label}`} disabled={disabled} />
+          <DateFieldTrigger label={spokenName ? `Open ${spokenName}` : "Open calendar"} disabled={disabled} />
         </div>
 
-        <DateCalendarPopup title={label} anchor={() => inputRef.current?.parentElement?.parentElement ?? null}>
+        <DateCalendarPopup title={spokenName ?? "Calendar"} anchor={() => inputRef.current?.parentElement?.parentElement ?? null}>
           <Calendar
             mode="single"
             value={currentValue}

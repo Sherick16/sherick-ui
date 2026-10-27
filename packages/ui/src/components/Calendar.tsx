@@ -15,7 +15,7 @@ import React, {
   type KeyboardEvent,
 } from "react";
 import { cn } from "@/libs/utils";
-import { density, elevation, focusRingInset, iconStroke, shape, state, stateLayer, text, tone, type } from "./ui.common";
+import { density, elevation, focusRingInset, iconSlot, iconStroke, shape, state, stateLayer, text, tone, type } from "./ui.common";
 import { motionFeedback, motionInkPress, motionTactile } from "./ui.motion";
 import {
   addCalendarDays,
@@ -24,6 +24,8 @@ import {
   createCalendarFormat,
   dayOfWeek,
   daysInMonth,
+  localCalendarDate,
+  millisecondsUntilLocalMidnight,
   normalizeCalendarDate,
   normalizeDateRange,
   parseCalendarDate,
@@ -65,7 +67,10 @@ interface CalendarBaseProps
   locale?: string;
   /** Which weekday a row starts on: 0 is Sunday. */
   weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
-  /** The civil day this application calls today; defaults to the current UTC day. */
+  /**
+   * The civil day this application calls today. Left unset, it is the viewer's own local day, refreshed at
+   * local midnight; an application whose day is elsewhere passes its own.
+   */
   today?: CalendarDate;
   labels?: Partial<CalendarLabels>;
 }
@@ -106,7 +111,7 @@ const todayButtonClassName = `inline-flex shrink-0 items-center justify-center p
 
 /* A chosen day holds the same shallow surface as an option. The square target yields with its
    column without changing the seven-day grid; selection and focus boundaries never compress. */
-const dayButtonClassName = `relative inline-flex aspect-square w-full max-w-10 select-none items-center justify-center text-sm tabular-nums ${shape.circle} ${motionFeedback} ${focusRingInset}`;
+const dayButtonClassName = `relative inline-flex aspect-square w-full max-w-10 select-none items-center justify-center ${type.numeric} ${shape.circle} ${motionFeedback} ${focusRingInset}`;
 
 /**
  * One month of a Gregorian calendar, navigated as a keyboard grid.
@@ -160,7 +165,11 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
   /* Which way a horizontal arrow walks in *time*: the page's reading direction, not the screen's. */
   const mirror = direction === "rtl" ? -1 : 1;
 
-  const today = useMemo(() => normalizeCalendarDate(todayProp) ?? todayCalendarDate(), [todayProp]);
+  /* Today is the viewer's own civil day. The first render reads it in UTC, the reading the server shares, so
+     the markup agrees with what hydrates; the effects below move it to the local day. The `today` prop
+     overrides all of it. */
+  const [clockToday, setClockToday] = useState<CalendarDate>(() => todayCalendarDate());
+  const today = useMemo(() => normalizeCalendarDate(todayProp) ?? clockToday, [todayProp, clockToday]);
   const todayParts = parseCalendarDate(today)!;
   const minDate = useMemo(() => normalizeCalendarDate(min), [min]);
   const maxDate = useMemo(() => normalizeCalendarDate(max), [max]);
@@ -251,6 +260,29 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
     }
     setPendingDayFocus(null);
   }, [pendingDayFocus, view.year, view.month]);
+
+  /* The viewer's day is read on mount and again at each local midnight, when the civil day turns over. A
+     timer that waits for midnight is the only clock the calendar keeps; it never ticks in between. */
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const readClock = () => {
+      const now = new Date();
+      setClockToday(localCalendarDate(now));
+      timer = setTimeout(readClock, millisecondsUntilLocalMidnight(now));
+    };
+    readClock();
+    return () => clearTimeout(timer);
+  }, []);
+
+  /* A grid with nothing to anchor it opens on the viewer's month, not on the UTC month it was first drawn
+     with. Only that first local reading may move it: a reader who has walked away from today is never
+     brought back to it by a later midnight. */
+  useEffect(() => {
+    if (monthProp !== undefined || todayProp !== undefined || anchorParts !== null || defaultMonthParts !== null) return;
+    const local = parseCalendarDate(localCalendarDate())!;
+    setInternalMonth({ year: local.year, month: local.month, day: 1 });
+    setActiveDayState(local.day);
+  }, []);
 
   const isUnavailableDate = useCallback(
     (date: CalendarDate) => {
@@ -415,18 +447,24 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
       )}
     >
       <div className={cn("mb-2 flex items-center justify-between gap-2")}>
+        {/* A step at the edge of the calendar stays focusable under `aria-disabled`, so a reader who reached the
+            last month keeps focus on Next. Its activation is blocked here, because a focusable control still
+            receives the click. A disabled calendar stays native. */}
         <button
           type="button"
           aria-label={labels.previousMonth}
-          disabled={disabled || atFirstMonth}
-          onClick={() => walkMonth(-1)}
+          disabled={disabled}
+          aria-disabled={atFirstMonth || undefined}
+          onClick={() => {
+            if (!atFirstMonth) walkMonth(-1);
+          }}
           className={cn(
             navigationButtonClassName,
             disabled ? state.disabledDescendant : atFirstMonth ? state.disabled : state.enabled
           )}
         >
-          <span className={cn("inline-flex", !disabled && !atFirstMonth && motionInkPress)}>
-            <HugeiconsIcon icon={ArrowLeft01Icon} aria-hidden="true" className={cn(iconStroke.glyph, "size-5 rtl:-scale-x-100")} />
+          <span className={cn(iconSlot.normal, !disabled && !atFirstMonth && motionInkPress)}>
+            <HugeiconsIcon icon={ArrowLeft01Icon} aria-hidden="true" className={cn(iconStroke.glyph, "rtl:-scale-x-100")} />
           </span>
         </button>
 
@@ -442,15 +480,18 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
         <button
           type="button"
           aria-label={labels.nextMonth}
-          disabled={disabled || atLastMonth}
-          onClick={() => walkMonth(1)}
+          disabled={disabled}
+          aria-disabled={atLastMonth || undefined}
+          onClick={() => {
+            if (!atLastMonth) walkMonth(1);
+          }}
           className={cn(
             navigationButtonClassName,
             disabled ? state.disabledDescendant : atLastMonth ? state.disabled : state.enabled
           )}
         >
-          <span className={cn("inline-flex", !disabled && !atLastMonth && motionInkPress)}>
-            <HugeiconsIcon icon={ArrowRight01Icon} aria-hidden="true" className={cn(iconStroke.glyph, "size-5 rtl:-scale-x-100")} />
+          <span className={cn(iconSlot.normal, !disabled && !atLastMonth && motionInkPress)}>
+            <HugeiconsIcon icon={ArrowRight01Icon} aria-hidden="true" className={cn(iconStroke.glyph, "rtl:-scale-x-100")} />
           </span>
         </button>
       </div>
@@ -556,8 +597,10 @@ const Calendar = forwardRef<HTMLDivElement, CalendarProps>((props, ref) => {
                       className={cn(
                         dayButtonClassName,
                         text.high,
-                        isToday && `${tone.text.primary} underline underline-offset-4`,
                         selected && isEdge && "font-medium",
+                        /* Today is marked in ink, never in the accent: iris is spent where the reader acts (§10), and
+                           a day is not an action. A weight step and an underline say "today" without a colour. */
+                        isToday && "font-semibold underline underline-offset-4",
                         selected && !joinedRange && cn(invalid ? tone.selected.danger : tone.selected.primary, elevation.control),
                         !disabled && !unavailable && `${stateLayer.quiet} ${state.enabled}`,
                         unavailable && !disabled && state.disabled,

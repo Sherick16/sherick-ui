@@ -91,7 +91,7 @@ for (const removed of [
   assert.equal(library[removed], undefined, `${removed} must not remain on the root barrel`);
 }
 
-for (const exportName of ["Markdown", "CodeBlock"]) {
+for (const exportName of ["Markdown", "CodeBlock", "InlineCode"]) {
   assert.ok(content[exportName], `missing content export: ${exportName}`);
 }
 assert.ok(contentDeclarations.includes("MarkdownProps"), "content declarations should expose Markdown props");
@@ -485,11 +485,11 @@ const describedTableMarkup = renderToStaticMarkup(
     tableClassName: "packed-table-fixed",
   })
 );
-assert.match(describedTableMarkup, /<div tabindex="0" class="[^"]*max-w-lg[^"]*">/);
+assert.match(describedTableMarkup, /<div role="region" aria-label="Table" class="[^"]*max-w-lg[^"]*">/);
 assert.match(describedTableMarkup, /<table class="[^"]*packed-table-fixed[^"]*">/);
-assert.match(describedTableMarkup, /<th class="[^"]*text-center[^"]*">Name<\/th>/);
+assert.match(describedTableMarkup, /<th scope="col" class="[^"]*text-center[^"]*">Name<\/th>/);
 assert.match(describedTableMarkup, /<td class="[^"]*text-center[^"]*">Ada<\/td>/);
-assert.match(describedTableMarkup, /<th class="[^"]*text-end[^"]*">Profile<\/th>/);
+assert.match(describedTableMarkup, /<th scope="col" class="[^"]*text-end[^"]*">Profile<\/th>/);
 assert.match(describedTableMarkup, /<td class="[^"]*text-end[^"]*"><a href="\/people\/ada">Open profile<\/a><\/td>/);
 assert.ok(declarations.includes("TableColumn"), "declarations should expose TableColumn");
 

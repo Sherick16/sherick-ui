@@ -4,11 +4,13 @@ import { Toggle } from "@base-ui/react/toggle";
 import { ToggleGroup as BaseToggleGroup } from "@base-ui/react/toggle-group";
 import React, {
   forwardRef,
+  useCallback,
   type ForwardRefExoticComponent,
   type ReactNode,
   type RefAttributes,
 } from "react";
 import { cn } from "@/libs/utils";
+import { useEdgeFade, withEdgeFade } from "./edge-fade";
 import {
   density,
   elevation,
@@ -68,7 +70,7 @@ const ToggleGroupItem = forwardRef<HTMLButtonElement, ToggleGroupItemProps>(
             state.effectiveDisabled,
             toggleState.pressed
               ? cn(puck, tone.text[variant], elevation.control, !toggleState.disabled && state.recess)
-              : cn(text.medium, !toggleState.disabled && "hover:text-sherick-ink"),
+              : toggleState.disabled ? text.medium : state.quietInk,
             /* A held segment still answers the pointer: hover is one tonality step over whatever
                fill it holds, and selection is not a reason to stop responding. */
             !toggleState.disabled && stateLayer.quiet,
@@ -99,11 +101,24 @@ type ToggleGroupComponent = ForwardRefExoticComponent<
  * this group and its items rather than a second implementation.
  */
 const ToggleGroup = forwardRef<HTMLDivElement, ToggleGroupProps>(
-  ({ className, ...groupProps }, ref) => {
+  ({ className, style, ...groupProps }, ref) => {
+    /* The track scrolls inside itself when its segments do not fit, so it carries the overflow cue: a fade on
+       each edge that has segments beyond it. The caller's ref and the measured track are the same element. */
+    const edge = useEdgeFade<HTMLDivElement>();
+    const setRef = useCallback(
+      (node: HTMLDivElement | null) => {
+        edge.ref(node);
+        if (typeof ref === "function") ref(node);
+        else if (ref) ref.current = node;
+      },
+      [edge.ref, ref]
+    );
+
     return (
       <BaseToggleGroup
         {...groupProps}
-        ref={ref}
+        ref={setRef}
+        style={withEdgeFade(style, edge.mask)}
         className={cn(
           "relative inline-flex min-w-0 max-w-full items-center gap-1 overflow-x-auto p-1",
           "data-[orientation=vertical]:flex-col data-[orientation=vertical]:items-stretch",

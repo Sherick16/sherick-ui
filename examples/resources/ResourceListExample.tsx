@@ -133,7 +133,9 @@ export default function ResourceListExample({ initialProjects = sampleProjects, 
       </Alert>}
       {!read.hasLoaded ? (
         read.status === "loading" && <section className="resources-results" aria-label="Project results" aria-busy="true">
-          <p role="status">Loading projects</p>
+          {/* The skeleton already says that the table is loading, so the status is announced but not
+              drawn: a line of unstyled copy above the skeleton read as a stray sentence. */}
+          <p role="status" className="resources-visually-hidden">Loading projects</p>
           <Table headers={columns} tableClassName="resources-table" rows={Array.from({ length: PAGE_SIZE }, () =>
             columns.map((column) => <Skeleton key={column.id} className="resources-cell-placeholder" />)
           )} />
@@ -191,7 +193,7 @@ export default function ResourceListExample({ initialProjects = sampleProjects, 
             ].filter(Boolean).join(" · ")}
           </p>}
           <section className="resources-results" aria-label="Project results" aria-busy={read.status === "loading"}>
-            {read.status === "loading" && <p role="status">Refreshing projects; previous results remain visible.</p>}
+            {read.status === "loading" && <p role="status" className="resources-status">Refreshing projects; previous results remain visible.</p>}
             <div className="resources-results-bar">
               <p role="status">
                 {matches.length}{activeFilters ? ` of ${projects.length}` : ""} {projects.length === 1 ? "project" : "projects"}

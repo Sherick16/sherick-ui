@@ -40,6 +40,10 @@ const colorNames = [
 module.exports = {
   content: ["./src/**/*.{js,ts,jsx,tsx}"],
   corePlugins: { preflight: false },
+  /* Hover is a pointer response. Every `hover:` variant, including `group-[...]:hover`, compiles
+     inside `@media (hover: hover)`, so a tap on a touch screen never leaves a hover tone behind;
+     touch answers with press and focus instead (docs/DESIGN_LANGUAGE.md §11). */
+  future: { hoverOnlyWhenSupported: true },
   theme: {
     extend: {
       colors: {
@@ -71,6 +75,8 @@ module.exports = {
         travel: "var(--sui-duration-travel)",
         sheet: "var(--sui-duration-sheet)",
         "sheet-exit": "var(--sui-duration-sheet-exit)",
+        utility: "var(--sui-duration-utility)",
+        "utility-exit": "var(--sui-duration-utility-exit)",
       },
       transitionTimingFunction: {
         press: "var(--sui-ease-press)",
@@ -91,9 +97,23 @@ module.exports = {
           "0%": { transform: "translateX(calc(-100% * var(--sui-indeterminate-direction, 1)))" },
           "100%": { transform: "translateX(calc(100% * var(--sui-indeterminate-direction, 1)))" },
         },
+        /* The reduced-motion form of an activity loop: opacity only, so a spinner, a skeleton or an
+           indeterminate fill keeps saying that work is happening without any travel or rotation.
+           `breathe` is the slow loop a spinner takes; `soft-pulse` is a skeleton's pulse at a lower
+           amplitude, because a block that fades to half is a loud placeholder rather than a quiet one. */
+        "sherick-breathe": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.4" },
+        },
+        "sherick-soft-pulse": {
+          "0%, 100%": { opacity: "1" },
+          "50%": { opacity: "0.7" },
+        },
       },
       animation: {
         "sherick-indeterminate": "sherick-indeterminate var(--sui-duration-activity) linear infinite",
+        "sherick-breathe": "sherick-breathe var(--sui-duration-breathe) var(--sui-ease-pulse) infinite",
+        "sherick-soft-pulse": "sherick-soft-pulse var(--sui-duration-pulse) var(--sui-ease-pulse) infinite",
         /* Tailwind's own spin and pulse keyframes, on the system's authored pace and curve. */
         spin: "spin var(--sui-duration-spin) linear infinite",
         pulse: "pulse var(--sui-duration-pulse) var(--sui-ease-pulse) infinite",

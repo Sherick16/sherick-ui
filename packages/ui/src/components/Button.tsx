@@ -1,7 +1,7 @@
 "use client";
 
 import { Button as BaseButton } from "@base-ui/react/button";
-import React, { forwardRef, type ButtonHTMLAttributes, type ReactNode } from "react";
+import React, { forwardRef, type ButtonHTMLAttributes, type ReactElement, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import {
   density,
@@ -27,6 +27,11 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   size?: ButtonSize;
   icon?: ReactNode;
   loading?: boolean;
+  /**
+   * The element the button renders as, such as a router link. The button's classes and its own props
+   * are merged onto it, so the link looks and presses like a button and keeps its own navigation.
+   */
+  render?: ReactElement;
 }
 
 /* The mark follows the type step beside it (§10): a compact label takes the compact slot. */
@@ -53,20 +58,32 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     loading = false,
     disabled,
     type = "button",
+    render,
     ...props
   }, ref) => {
-    const isDisabled = disabled || loading;
+    /* A busy button is inert for hover and press, but it is not disabled. Only a real `disabled` takes
+       the native attribute and the dimmed step. A loading button stays focusable, so Enter keeps focus
+       on it, and Base's disabled gate stops its click handler from running a second time. */
+    const isNativeButton = render === undefined || render.type === "button";
+    /* An element that carries an `href` is a link, so it keeps its link semantics; Base UI would otherwise
+       give it `role="button"`. Any other element is a button to Base UI. */
+    const isLink = render !== undefined && (render.props as { href?: unknown }).href !== undefined;
+    const isInert = disabled || loading;
     /* The action ladder: text sits flat, tonal and filled are raised and recess while held. The
        priority action is never flatter than the one beside it. */
     const isRaised = appearance !== "text";
-    const isTactile = isRaised && !isDisabled;
+    const isTactile = isRaised && !isInert;
 
     return (
       <BaseButton
         {...props}
-        render={<button ref={ref} />}
-        type={type}
-        disabled={isDisabled}
+        {...(isLink ? { role: undefined } : undefined)}
+        ref={ref}
+        render={render}
+        nativeButton={isNativeButton}
+        type={isNativeButton ? type : undefined}
+        disabled={isInert}
+        focusableWhenDisabled={loading && !disabled}
         aria-busy={loading || undefined}
         className={cn(
           "relative inline-flex min-w-0 max-w-full items-center justify-center gap-2 font-medium tracking-[-0.01em]",
@@ -75,15 +92,15 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           motionTactile,
           focusRing,
           appearance === "filled" && tone.strong[variant],
-          appearance === "filled" && !isDisabled && stateLayer.filled,
+          appearance === "filled" && !isInert && stateLayer.filled,
           appearance === "tonal" && tone.tonal[variant],
           appearance === "tonal" && tone.text[variant],
-          appearance === "tonal" && !isDisabled && (variant === "secondary" ? stateLayer.tonalNeutral : stateLayer.tonal),
+          appearance === "tonal" && !isInert && (variant === "secondary" ? stateLayer.tonalNeutral : stateLayer.tonal),
           appearance === "text" && tone.text[variant],
-          appearance === "text" && !isDisabled && stateLayer.quiet,
+          appearance === "text" && !isInert && stateLayer.quiet,
           isRaised && elevation.raised,
           isTactile && state.recess,
-          isDisabled ? state.disabled : state.enabled,
+          disabled ? state.disabled : loading ? state.busy : state.enabled,
           className
         )}
       >

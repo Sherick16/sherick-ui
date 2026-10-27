@@ -1,9 +1,6 @@
 "use client";
 
-import { Button as BaseButton } from "@base-ui/react/button";
 import { Toggle } from "@base-ui/react/toggle";
-import { HugeiconsIcon } from "@hugeicons/react";
-import { Cancel01Icon } from "@hugeicons/core-free-icons";
 import React, {
   forwardRef,
   type ButtonHTMLAttributes,
@@ -11,21 +8,11 @@ import React, {
   type ReactNode,
 } from "react";
 import { cn } from "@/libs/utils";
-import {
-  density,
-  elevation,
-  focusRing,
-  focusRingInset,
-  hitArea,
-  iconStroke,
-  shape,
-  state,
-  stateLayer,
-  text,
-  tone,
-} from "./ui.common";
-import { motionFeedback, motionInkPress, motionTactile } from "./ui.motion";
+import { density, elevation, focusRing, hitArea, iconSlot, shape, state, stateLayer, text, tone } from "./ui.common";
+import { motionTactile } from "./ui.motion";
 import { Variant } from "./ui.types";
+import DismissButton from "./DismissButton";
+import { focusNeighbour } from "./Alert";
 
 /** The parts every chip has, whichever of its two forms it takes. */
 interface ChipAnatomy {
@@ -36,210 +23,196 @@ interface ChipAnatomy {
 }
 
 /**
- * A chip is one of two things, and never both.
- *
- * * A **toggle chip** holds a selection. Supplying any of `checked`, `defaultChecked`,
- *   `onCheckedChange` or `value` makes it a toggle button, and it takes the props of one; inside a
- *   `ChipGroup` the group owns the value, exactly as it does for any grouped control.
- * * A **tag** holds no selection and may be dismissed. `onRemove` renders the dismiss control, and
- *   the tag takes the props of the passive element it is.
- *
- * The two cannot be combined: a control that both holds a value and deletes itself is one target
- * with two meanings, and a toggle is a `<button>` while a tag is a `<span>` containing its dismiss
- * control — a button cannot legally nest inside a button.
+ * A toggle chip holds a selection. Supplying any of `checked`, `defaultChecked`, `onCheckedChange` or
+ * `value` makes it a toggle button, and it takes the props of one; inside a `ChipGroup` the group owns
+ * the value, exactly as it does for any grouped control.
  */
-export type ChipProps =
-  | (ChipAnatomy &
-      Omit<ButtonHTMLAttributes<HTMLButtonElement>, "value" | "type"> & {
-        /** The controlled counterpart of `defaultChecked`. */
-        checked?: boolean;
-        defaultChecked?: boolean;
-        /** Fires when the chip's selection changes. Base UI's own callback, event details included. */
-        onCheckedChange?: Toggle.Props<string>["onPressedChange"];
-        /** The chip's identity inside a `ChipGroup`. */
-        value?: string;
-        /** A toggle is a button; it carries no dismiss control. Give the row a `ChipGroup`. */
-        onRemove?: never;
-        removeLabel?: never;
-      })
-  | (ChipAnatomy &
-      HTMLAttributes<HTMLSpanElement> & {
-        /** Renders a dismiss control. */
-        onRemove?: () => void;
-        /**
-         * The dismiss control's accessible name. Defaults to `Remove <text>` when the chip's
-         * children are a string, and to `Remove` otherwise.
-         */
-        removeLabel?: string;
-        /** A tag holds nothing to select. */
-        checked?: never;
-        defaultChecked?: never;
-        onCheckedChange?: never;
-        value?: never;
-        disabled?: never;
-      });
+export type ChipToggleProps = ChipAnatomy &
+  Omit<ButtonHTMLAttributes<HTMLButtonElement>, "value" | "type"> & {
+    /** The controlled counterpart of `defaultChecked`. */
+    checked?: boolean;
+    defaultChecked?: boolean;
+    /** Fires when the chip's selection changes. Base UI's own callback, event details included. */
+    onCheckedChange?: Toggle.Props<string>["onPressedChange"];
+    /** The chip's identity inside a `ChipGroup`. */
+    value?: string;
+    /** A toggle is a button; it carries no dismiss control. Give the row a `ChipGroup`. */
+    onRemove?: never;
+    removeLabel?: never;
+  };
 
 /**
- * A compact control-sized object: a toggle button that holds a selection, or a tag that carries its
- * tone in its fill and can be dismissed.
- *
- * A toggle is raised and tactile because it is manipulated. A tag is flat because it is only read,
- * and it is passive in the markup as well: nothing about its own box is interactive, its copy keeps
- * its normal emphasis while its icon carries the semantic tone, and its only control is the dismiss
- * one. The ref points at the chip's own element — the button or the tag's span.
+ * A tag holds no selection and may be dismissed. It is a span, so it has no button role; its only
+ * control is the dismiss, which is what `onRemove` renders. A tag is `Chip.Tag`, or a `Chip` with
+ * `onRemove` and no value.
  */
-export const Chip = forwardRef<HTMLElement, ChipProps>(
-  (
-    {
-      children,
-      variant = "primary",
-      icon,
-      checked,
-      defaultChecked,
-      onCheckedChange,
-      value,
-      onRemove,
-      removeLabel,
-      className,
-      disabled,
-      ...chipProps
-    },
-    ref
-  ) => {
-    const isToggle =
-      value !== undefined ||
-      checked !== undefined ||
-      defaultChecked !== undefined ||
-      onCheckedChange !== undefined;
+export type ChipTagProps = ChipAnatomy &
+  HTMLAttributes<HTMLSpanElement> & {
+    /** Renders a dismiss control. */
+    onRemove?: () => void;
+    /**
+     * The dismiss control's accessible name. Defaults to `Remove <text>` when the chip's children are a
+     * string, and to `Remove` otherwise.
+     */
+    removeLabel?: string;
+    /** A tag holds nothing to select. */
+    checked?: never;
+    defaultChecked?: never;
+    onCheckedChange?: never;
+    value?: never;
+    disabled?: never;
+  };
 
-    /* One ref for two elements: whichever one the chip turned out to be is what a caller means by
-       "the chip". A callback ref is what keeps a hook-free component free of a conditional hook. */
-    const setRef = (node: HTMLElement | null) => {
-      if (typeof ref === "function") ref(node);
-      else if (ref) ref.current = node;
-    };
+/**
+ * A chip is one of two things, and never both. A toggle is a `<button>`, and a tag is a `<span>`
+ * containing its dismiss control: a button cannot legally nest inside a button, and a control that both
+ * holds a value and deletes itself is one target with two meanings.
+ */
+export type ChipProps = ChipToggleProps | ChipTagProps;
 
-    const content = (
-      <>
-        {icon && (
-          <span
-            className={cn(
-              "inline-flex size-4 shrink-0 items-center justify-center [&>svg]:size-4",
-              !isToggle && tone.text[variant]
-            )}
-            aria-hidden="true"
-          >
-            {icon}
-          </span>
-        )}
-        <span className={cn("min-w-0 truncate")}>{children}</span>
-      </>
-    );
+const isToggle = (props: ChipProps): props is ChipToggleProps =>
+  props.value !== undefined ||
+  props.checked !== undefined ||
+  props.defaultChecked !== undefined ||
+  props.onCheckedChange !== undefined;
 
-    if (isToggle) {
-      return (
-        <Toggle
-          {...chipProps}
-          ref={setRef}
-          value={value}
-          pressed={checked}
-          defaultPressed={defaultChecked}
-          onPressedChange={onCheckedChange}
-          disabled={disabled}
-          className={(toggleState) =>
-            cn(
-              "inline-flex min-w-0 max-w-full items-center gap-1.5 px-4 py-1.5 font-medium",
-              density.compact,
-              shape.pill,
-              motionTactile,
-              focusRing,
-              state.enabled,
-              state.effectiveDisabled,
-              /* Selection is a tone the chip takes, never a depth: the rest fill is the neutral
-                 matte control step and the variant names the tone of the held state, exactly as a
-                 segment inside its track and a switch inside its groove resolve it. The two fills
-                 are alternatives rather than a stack — written as a stack, the rest step is the
-                 last background in the list and `tailwind-merge` would keep it, leaving a held
-                 chip neutral. */
-              toggleState.pressed
-                ? tone.selected[variant]
-                : cn(
-                    tone.tonal.secondary,
-                    text.medium,
-                    !toggleState.disabled && "hover:text-sherick-ink"
-                  ),
-              !toggleState.disabled && (toggleState.pressed ? stateLayer.tonal : stateLayer.tonalNeutral),
-              elevation.raised,
-              !toggleState.disabled && state.recess,
-              className
-            )
-          }
-        >
-          {content}
-        </Toggle>
-      );
-    }
+const dismissLabelFor = (children: ReactNode, removeLabel?: string) =>
+  removeLabel ?? (typeof children === "string" ? `Remove ${children}` : "Remove");
 
-    const dismissLabel =
-      removeLabel ??
-      (typeof children === "string" ? `Remove ${children}` : "Remove");
+/* The icon and the label, whichever form the chip takes. A tag's icon carries the variant's tone, while a
+   toggle's keeps the ink of its own state. */
+const chipContent = (children: ReactNode, icon: ReactNode, variant: Variant, inTag: boolean) => (
+  <>
+    {icon && (
+      <span className={cn(iconSlot.compact, inTag && tone.text[variant])} aria-hidden="true">
+        {icon}
+      </span>
+    )}
+    <span className={cn("min-w-0 truncate")}>{children}</span>
+  </>
+);
 
-    /* A tag's dismiss control is not one of a group's items, so the keys aimed at it are its own.
-       The composite root answers Arrow/Home/End for its items in the bubble phase, and without
-       this its roving navigation would take focus away from the control the user is standing on. */
-    const keepOwnKeys = (event: React.KeyboardEvent<HTMLButtonElement>) =>
-      event.stopPropagation();
+/*
+ * A tag: passive, dismissible and flat. Its copy keeps its normal emphasis and its icon carries the
+ * semantic tone, and its dismiss is the only control it owns. The dismiss is a 44px target like every
+ * dismiss (§13), so only its 16px mark is compact: the target is pulled back at the chip's end edge
+ * until the mark sits at the chip's own 16px inset, and it is not allowed to add a trailing void.
+ */
+const ChipTag = forwardRef<HTMLElement, ChipTagProps>(
+  ({ children, variant = "primary", icon, onRemove, removeLabel, className, ...tagProps }, ref) => (
+    <span
+      {...tagProps}
+      ref={ref}
+      className={cn(
+        "inline-flex min-w-0 max-w-full items-center gap-1.5 px-4 py-1.5 font-medium",
+        density.compact,
+        shape.pill,
+        tone.tonal[variant],
+        text.high,
+        className
+      )}
+    >
+      {chipContent(children, icon, variant, true)}
+      {onRemove && (
+        <DismissButton
+          label={dismissLabelFor(children, removeLabel)}
+          size="compact"
+          inRow
+          /* Inside a 40px chip the dismiss keeps its 28px visible circle and reaches the 44px target
+             through `hitArea`, so the chip keeps its height and the inset ring stays inside it. The
+             6px either side of the 16px mark is compensated at the chip's end edge. */
+          className={cn("-me-1.5 size-7 min-h-7 min-w-7", hitArea)}
+          /* A tag's dismiss is not one of a group's items, so the keys aimed at it are its own. The
+             composite root answers Arrow, Home and End for its items in the bubble phase, and without
+             this its roving navigation would take focus away from the control the reader is on. */
+          onKeyDown={(event) => event.stopPropagation()}
+          onClick={(event) => {
+            /* The dismiss is a direct child of its tag, so the tag is the node that is leaving. */
+            if (event.currentTarget.parentElement) focusNeighbour(event.currentTarget.parentElement);
+            onRemove();
+          }}
+        />
+      )}
+    </span>
+  )
+);
 
-    return (
-      <span
-        {...(chipProps as HTMLAttributes<HTMLSpanElement>)}
-        ref={setRef}
-        className={cn(
+ChipTag.displayName = "Chip.Tag";
+
+/**
+ * A compact control-sized object: a toggle button that holds a selection, or a tag that carries its tone
+ * in its fill and can be dismissed. A toggle is raised and tactile because it is manipulated, and a tag
+ * is flat because it is only read. The ref points at the chip's own element: the button or the tag's span.
+ */
+const ChipRoot = forwardRef<HTMLElement, ChipProps>((props, ref) => {
+  /* One ref for two elements: whichever one the chip turned out to be is what a caller means by "the chip".
+     A callback ref is what keeps a hook-free component free of a conditional hook. */
+  const setRef = (node: HTMLElement | null) => {
+    if (typeof ref === "function") ref(node);
+    else if (ref) ref.current = node;
+  };
+
+  if (!isToggle(props)) return <ChipTag {...props} ref={setRef} />;
+
+  const {
+    children,
+    variant = "primary",
+    icon,
+    checked,
+    defaultChecked,
+    onCheckedChange,
+    value,
+    className,
+    disabled,
+    ...toggleProps
+  } = props;
+
+  return (
+    <Toggle
+      {...toggleProps}
+      ref={setRef}
+      value={value}
+      pressed={checked}
+      defaultPressed={defaultChecked}
+      onPressedChange={onCheckedChange}
+      disabled={disabled}
+      className={(toggleState) =>
+        cn(
           "inline-flex min-w-0 max-w-full items-center gap-1.5 px-4 py-1.5 font-medium",
           density.compact,
           shape.pill,
-          tone.tonal[variant],
-          text.high,
+          motionTactile,
+          focusRing,
+          state.enabled,
+          state.effectiveDisabled,
+          /* Selection is a tone the chip takes, never a depth: the rest fill is the neutral matte control
+             step and the variant names the tone of the held state, exactly as a segment inside its track
+             and a switch inside its groove resolve it. The two fills are alternatives rather than a stack —
+             written as a stack, the rest step is the last background in the list and `tailwind-merge` would
+             keep it, leaving a held chip neutral. */
+          toggleState.pressed
+            ? tone.selected[variant]
+            : cn(
+                tone.tonal.secondary,
+                text.medium,
+                !toggleState.disabled && "hover:text-sherick-ink"
+              ),
+          !toggleState.disabled && (toggleState.pressed ? stateLayer.tonal : stateLayer.tonalNeutral),
+          elevation.raised,
+          !toggleState.disabled && state.recess,
           className
-        )}
-      >
-        {content}
-        {onRemove && (
-          <BaseButton
-            type="button"
-            aria-label={dismissLabel}
-            onKeyDown={keepOwnKeys}
-            onClick={onRemove}
-            className={cn(
-              /* The visible X is placed by the mark's own box, so the dismiss control's target padding —
-                 the 6px of it on each side of a 16px glyph in this 28px target — is compensated at the
-                 chip's end edge instead of reading as a trailing void. `size-7` plus `hitArea` keeps the
-                 pointer target clear of the 24px minimum while the visible mark sits at the same edge
-                 distance as the chip's leading content. */
-              "group -me-1.5 inline-flex size-7 shrink-0 items-center justify-center",
-              shape.circle,
-              text.medium,
-              "hover:text-sherick-ink",
-              motionFeedback,
-              focusRingInset,
-              stateLayer.quiet,
-              state.enabled,
-              hitArea
-            )}
-          >
-            {/* The target stays exactly where the pointer found it; the mark inside it carries the
-                press. The dismiss control is a part of the chip the pointer is already in, so it
-                clears the pointer-target minimum rather than the standalone target floor. */}
-            <span className={cn("inline-flex items-center justify-center", motionInkPress)}>
-              <HugeiconsIcon icon={Cancel01Icon} className={cn(iconStroke.glyph, "size-4")} aria-hidden="true" />
-            </span>
-          </BaseButton>
-        )}
-      </span>
-    );
-  }
-);
+        )
+      }
+    >
+      {chipContent(children, icon, variant, false)}
+    </Toggle>
+  );
+});
 
-Chip.displayName = "Chip";
+ChipRoot.displayName = "Chip";
+
+/* `Chip.Tag` is the passive form on its own, so a tag reads as a tag at the call site and a toggle can never
+   be written where a tag was meant. A `Chip` with `onRemove` and no value is the same tag. */
+export const Chip = Object.assign(ChipRoot, { Tag: ChipTag });
 
 export default Chip;

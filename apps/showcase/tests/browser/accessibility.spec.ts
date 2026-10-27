@@ -21,7 +21,7 @@ const gotoTheme = async (page: Page, theme: Theme, url: string) => {
    contrast contract in `bun run test` is what keeps the theme able to satisfy it. The scan runs in
    both authored themes rather than one browser theme plus the mathematical contract, because a
    state the contract cannot see is a state a regression can hide in. */
-const expectNoA11yViolations = async (page: Page, theme: Theme) => {
+const expectNoA11yViolations = async (page: Page, theme: string, disabledRules: readonly string[] = []) => {
   /* Base UI wires every generated ARIA relationship on the client: the server-rendered shell
      carries none of them, so a field that is named a moment later looks unnamed to a scan that
      races hydration. The wait is for hydration itself — the marker the root layout sets once the
@@ -45,7 +45,10 @@ const expectNoA11yViolations = async (page: Page, theme: Theme) => {
       runOnly: { type: "tag", values: WCAG_TAGS },
       /* Axe 4.13 still ships `target-size` disabled, and `AxeBuilder.options()` replaces the whole
          option object, so the tag filter and the enabling override are set together. */
-      rules: { "target-size": { enabled: true } },
+      rules: {
+        "target-size": { enabled: true },
+        ...Object.fromEntries(disabledRules.map((rule) => [rule, { enabled: false }])),
+      },
     })
     .analyze();
   const summary = results.violations
@@ -189,6 +192,94 @@ for (const theme of THEMES) {
     expect(errors).toEqual([]);
   });
 }
+
+/* The breadth gate. Every route is scanned at a phone width and a desktop width, in light, dark and
+   forced colours. The phone width is where a row of controls overflows and a region becomes
+   scrollable, and forced colours is where a fill or a shadow stops carrying a state, so neither is
+   a variant of the desktop scan: each is a failure the single-width scan above cannot see. Forced
+   colours runs in light because the system palette, not the page's theme, decides its colours. */
+const ROUTES = [
+  "/",
+  "/verification/core",
+  "/verification/dialog",
+  "/verification/forms",
+  "/verification/interactions",
+  "/verification/motion",
+  "/verification/radio-group",
+  "/verification/responsive",
+  "/verification/rich-content",
+  "/verification/theme-torture",
+  "/verification/visual-consistency",
+  "/verification/date-time",
+  "/verification/v2-1-a",
+  "/verification/v2-1-b",
+  "/verification/v2-1-c",
+  "/verification/v2-1-d",
+  "/verification/v2-1-e",
+  "/verification/v2-1-f",
+  "/examples/settings",
+  "/examples/resources",
+  "/examples/sidebar/overview",
+] as const;
+const VIEWPORTS = [
+  { width: 375, height: 812 },
+  { width: 1280, height: 900 },
+] as const;
+const MODES = [
+  { name: "light", colorScheme: "light", forcedColors: "none" },
+  { name: "dark", colorScheme: "dark", forcedColors: "none" },
+  { name: "forced colors", colorScheme: "light", forcedColors: "active" },
+] as const;
+
+/* A route whose first paint is a loading state is scanned once its content has arrived: the
+   skeleton table has no targets for the target-size rule to measure, and the loaded list is what a
+   reader actually uses. */
+const READY: Partial<Record<(typeof ROUTES)[number], (page: Page) => Promise<void>>> = {
+  "/examples/resources": (page) => expect(page.getByRole("button", { name: "New project" })).toBeVisible(),
+};
+
+/* Contrast is the one rule a mode can make meaningless:
+   - in forced colours the system palette paints every colour, and axe reads the author colour the
+     platform replaced (a filled button reports its white label on the forced white canvas while it
+     renders CanvasText on Canvas). The boundaries forced colours needs are pinned by the
+     forced-colours screenshots and probes in `styling-contract.spec.ts` instead;
+   - the theme-torture fixture sets deliberately hostile `--sui-*` values to prove the components
+     follow a consumer's theme, so its contrast is the consumer's, not the library's. */
+const disabledRulesFor = (route: string, forcedColors: string) =>
+  forcedColors === "active" || route === "/verification/theme-torture" ? ["color-contrast"] : [];
+
+for (const route of ROUTES) {
+  for (const viewport of VIEWPORTS) {
+    for (const mode of MODES) {
+      test(`${route} has no WCAG A/AA violations at ${viewport.width}px in ${mode.name}`, async ({ page, errors }) => {
+        await page.setViewportSize(viewport);
+        await page.emulateMedia({ colorScheme: mode.colorScheme, forcedColors: mode.forcedColors });
+        await page.goto(route);
+        await READY[route]?.(page);
+
+        await expectNoA11yViolations(
+          page,
+          `${mode.name} at ${viewport.width}px`,
+          disabledRulesFor(route, mode.forcedColors)
+        );
+
+        expect(errors).toEqual([]);
+      });
+    }
+  }
+}
+
+/* One engine beyond Chromium. Axe reads the accessibility tree the engine builds, so a rule can pass
+   in Chromium and fail where the tree is built differently; a single scan here is the cheapest
+   check of that, and the `webkit` project runs only tests carrying this tag. */
+test("the core fixture has no WCAG A/AA violations in WebKit @webkit", async ({ page, errors }) => {
+  await gotoTheme(page, "dark", "/verification/core");
+  await expect(page.getByTestId("verification-core")).toBeVisible();
+
+  await expectNoA11yViolations(page, "dark in WebKit");
+
+  expect(errors).toEqual([]);
+});
 
 test("an open Combobox preserves tab-order isolation for its full open lifetime", async ({
   page,

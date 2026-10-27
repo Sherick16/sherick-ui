@@ -154,6 +154,84 @@ field was still at scale 0.99966 (352px wide, read as 351.91px) after the poll h
 Both occurrences now await the box the assertion is about and confirm the scale afterwards, so the
 exact comparison is no longer racing a looser wait.
 
+## Polish review: dismiss mark, live regions and a deliberate baseline refresh
+
+**Alert dismissal is 16px.** An alert's dismiss is the compact mark (`DismissButton size="compact"`),
+as DESIGN_LANGUAGE.md §13 sets for an alert, chip, toast and combobox clear. The 44px target is
+unchanged. Rendered check: a 44×44 target around a 16×16 mark.
+
+**Empty live regions take no height.** The FileUpload and creatable Combobox status regions stay
+mounted for announcements. While empty they are `absolute`, so the column gap adds nothing. A
+rejection is an ordinary flow item with no top margin, so the 8px column gap alone sets its rhythm.
+A rejection sits 8px below its description. The selected-files sheet takes `-mt-2` so it stays flush
+under the drop zone, as before the column gap.
+
+**Deliberate style-contract refresh.** `scripts/visual-baselines/visual-regression.json` was regenerated
+with `visual --update`. Every change traces to the uncommitted polish pass and is recorded in its docs:
+
+- dark danger, warning and success soft and selected steps retuned (PALETTE.md, "Dark semantic containers are tints");
+- three motion tokens added: `duration-breathe`, `duration-utility` and `duration-utility-exit`;
+- backdrop filters removed from the glass recipes (DESIGN_LANGUAGE.md §6 and §12);
+- resting controls stop writing `outline-none` (DESIGN_LANGUAGE.md §14; later corrected to `[outline-style:none]`, see below);
+- component specimens and utility rules for the anatomy changes above, including the dismiss, file-upload and combobox fixes.
+
+The refresh reads 124 specimens, 33 overlay recipes, 781 scoped rules and four token blocks. The
+changes were checked by category against these docs, not read key by key. No browser screenshot
+baseline changed.
+
+**Two browser assertions were updated.** The one-line alert locator takes `.first()`, because the
+feedback section now carries a second identical alert. The toast dismissal ring asserts that no outline
+is painted, as §14 requires for a control that draws no outline of its own.
+
+## Full-suite verification: the outline reset, forced-colors focus and two baselines
+
+The first full browser run of the polish pass (all three Playwright projects) found three regressions
+that the focused specs had not reached, and several assertions made stale by deliberate changes.
+
+**`outline-0` did not reset the browser's ring.** A zero width leaves the browser's own
+`:focus-visible` style in place, and that style is `auto`, which Chromium paints at its own width. Every
+element that wrote a bare `outline-0` — an initially-open dialog, the inputs inside composite fields, a
+Switch, checkbox and radio marks — showed the platform ring beside Sherick's own. Resets now write
+`[outline-style:none]` (§14), which paints nothing in normal or forced colors. `focusRingHeld` drops its
+leading reset, because a reset written as an arbitrary property sorts after `focus:outline` and would
+win. The Checkbox control resets its ring too: its keyboard ring is the mark's.
+
+**Inset focus vanished in forced colors.** `focusRingInset` is a box shadow, and forced colors removes
+box shadows; the transparent two-pixel outline that used to stand in for it was gone. The recipe now
+draws a 2px inset outline under `forced-colors:` while focus is visible.
+
+**Layout regressions.** The Accordion join took the `rule` tone instead of the lightest `row`
+tone. The Stepper's hang reached past its own box and failed the narrow-column containment check;
+it keeps its padding inside its box again. The disclosure row's `-mx-4` hang overflowed a page at
+200% text when an Accordion sat flush in its column, and it put the row label 16px left of the panel
+copy it opens; the row no longer hangs (§17 now says so for both). A removable Chip grew from 40px to
+56px because its dismiss took the whole 44px target as layout; it keeps a 28px circle and reaches the
+44px target through `hitArea`, as before. The forced-colors tree rule that keeps a tree item's owner
+from tracing its whole subtree was restored.
+
+**Style contract.** `visual --update` was run again for these fixes; the 115 changed keys are the
+outline reset, the removed hang utilities and the chip dismiss.
+
+**Deliberate baseline change.** `visual.spec.ts` dialog light and dark were re-recorded. The only
+difference is the shared header rhythm: the title sits 4px lower, the description 4px nearer it, and
+the surface is 8px shorter. Before re-recording, the same diff showed the platform focus ring around
+the dialog; it was fixed first, not accepted. The core baselines were unchanged.
+
+**New baselines.** The forced-colors screenshots in `styling-contract.spec.ts` (core, theme torture,
+dialog) are new tests, recorded and inspected in this pass. Playwright now names every screenshot
+without the project, so these and the existing baselines resolve to the same files under each project.
+
+**Scoped, not removed.** The breadth axe scan disables `color-contrast` in forced colors, where axe
+reads the author colour the platform replaced (a filled button renders CanvasText on Canvas but is
+reported as its white label on white), and on the theme-torture fixture, whose hostile palette is the
+consumer's. `/examples/resources` is scanned after its simulated load, so the target-size rule has
+targets to measure.
+
+**Stale assertions updated to the new contract:** the scrim fade is read from the tint on its
+`::before`; the popover shell carries no backdrop filter; reduced motion keeps activity as an opacity
+loop; a Select mark's arrival is on its indicator; an alert dialog's focus ring is checked after a
+keyboard open; the overflow Tabs specimen has its own labels, so it no longer duplicates the first.
+
 ## Verification and release gate
 
 Final `bun run verify`: **passed**. This includes lint, temporal ownership, workspace typechecks,

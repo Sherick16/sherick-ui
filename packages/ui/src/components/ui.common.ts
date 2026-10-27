@@ -69,10 +69,12 @@ import { motionDisclose, motionFeedback, motionRim, motionRowLayer, motionStateL
    rest, both look ringed the moment either is used, and both lose it together. `groupFocusRing`
    draws it from the wrapping control instead of the track it contains. */
 export const focusRing =
-  "focus:outline-none focus-visible:outline focus-visible:outline-2 focus-visible:outline-sherick-focus focus-visible:outline-offset-[3px]";
+  "focus:[outline-style:none] focus-visible:outline focus-visible:outline-2 focus-visible:outline-sherick-focus focus-visible:outline-offset-[3px]";
 
+/* The inset ring is a box shadow, and forced colors removes every box shadow, so the same 2px ring
+   is drawn there as an inset outline instead, which the platform paints in a system colour. */
 export const focusRingInset =
-  "focus:outline-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-focus";
+  "focus:[outline-style:none] focus-visible:[outline-style:none] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-focus forced-colors:focus-visible:outline forced-colors:focus-visible:outline-2 forced-colors:focus-visible:outline-offset-[-2px]";
 
 /* A focus owner that also contains a subtree paints the inset ring on its direct row only. */
 export const parentFocusRingInset =
@@ -84,7 +86,7 @@ export const parentFocusRingInset =
    engagement rather than the focus — which is exactly what a native `select` shows, and the only
    focus indication the field has left once the list has taken over. */
 export const focusRingHeld =
-  "focus:outline-none focus:outline focus:outline-2 focus:outline-sherick-focus focus:outline-offset-[3px] data-[popup-open]:outline data-[popup-open]:outline-2 data-[popup-open]:outline-sherick-focus data-[popup-open]:outline-offset-[3px]";
+  "focus:outline focus:outline-2 focus:outline-sherick-focus focus:outline-offset-[3px] data-[popup-open]:outline data-[popup-open]:outline-2 data-[popup-open]:outline-sherick-focus data-[popup-open]:outline-offset-[3px]";
 
 /* The same ring for a value control whose focus lives in a borderless input inside it. It follows
    **visible** focus rather than any focus, which is what makes a field and a slider differ for
@@ -122,10 +124,18 @@ export const groupFocusRing =
    A passive surface is flat unless its anatomy is sunk by design: a well, a groove and
    a code well are `recessed` while they sit there, and `flat` is the default for
    everything else passive. A flat control never gains depth by being pressed. */
+/* Forced colors removes shadows and tones, so a shell that separates from the page by depth alone
+   loses its boundary. Every shell that carries elevation draws its own system-coloured outline
+   there: `outline` is drawn in CanvasText by the platform and `outline-offset` pulls it onto the
+   border box, so it traces the object's own corner. The outline has no width in normal colors, so
+   it costs nothing on screen; `forced-colors:` is the only place it appears. */
+export const forcedBoundary =
+  "forced-colors:outline forced-colors:outline-1 forced-colors:outline-offset-[-1px]";
+
 export const elevation = {
   flat: "shadow-sherick-flat",
-  raised: "shadow-sherick-raised",
-  floating: "shadow-sherick-floating",
+  raised: /* @__PURE__ */ cx("shadow-sherick-raised", forcedBoundary),
+  floating: /* @__PURE__ */ cx("shadow-sherick-floating", forcedBoundary),
   control: "shadow-sherick-control",
   recessed: "shadow-sherick-recessed",
   /* One rung further down: the depth a small selection mark sinks to while it is held. A mark
@@ -242,7 +252,7 @@ export const edge = {
 } as const;
 
 const effectiveDisabled =
-  "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-45 disabled:cursor-not-allowed disabled:opacity-45";
+  "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-45 aria-disabled:cursor-not-allowed aria-disabled:opacity-45 disabled:cursor-not-allowed disabled:opacity-45";
 
 /* Interaction states:
      rest       the material, at whatever elevation its anatomy calls for
@@ -260,19 +270,30 @@ export const state = {
      it belongs with the tactile intent in `ui.motion.ts`. */
   recess: "active:shadow-sherick-recessed",
   /* The disabled step for a control whose disabled state is a Sherick prop. */
-  disabled: "cursor-not-allowed opacity-45",
+  disabled: "cursor-not-allowed opacity-45 aria-disabled:cursor-not-allowed aria-disabled:opacity-45",
+  /* A control that is busy is still working for the reader, so it is not dimmed: it keeps its full
+     strength and its cursor says work is happening. It stays focusable, and it takes no hover layer
+     and no press (`motionTactile` and the state layers withhold both on `aria-busy`). A busy
+     control is marked with `aria-busy="true"`, which is what Button and IconButton already carry. */
+  busy: "aria-busy:cursor-progress aria-busy:opacity-100",
   /* The same step, keyed on the primitive's own markers rather than on a Sherick prop: Base marks
      an effectively disabled control — including one disabled by the field around it — with
-     `data-disabled`, and a part that disables itself at a bound carries `disabled` as well. */
+     `data-disabled`, and a part that disables itself at a bound carries `disabled` as well. A
+     control that stays focusable while disabled sets `aria-disabled="true"` instead, and it dims
+     exactly once, on the same step. */
   effectiveDisabled,
   /* A row whose control is disabled by any means — its own option, its group, or the field around
      it — dims from the control's own marker rather than from a Sherick prop. */
-  disabledRow: "has-[[data-disabled]]:cursor-not-allowed has-[[data-disabled]]:opacity-45",
+  disabledRow:
+    "has-[[data-disabled]]:cursor-not-allowed has-[[data-disabled]]:opacity-45 has-[[aria-disabled=true]]:cursor-not-allowed has-[[aria-disabled=true]]:opacity-45",
   /* A control nested inside a disabled composite. The composite already applied the opacity step,
      and a second one would dim the field unevenly; this carries only the disabled cursor. */
   disabledDescendant: "cursor-not-allowed",
   /* A part dims independently at a bound, but never a second time inside a disabled field. */
-  disabledPart: /* @__PURE__ */ cx(effectiveDisabled, "group-data-[disabled]/field:opacity-100"),
+  disabledPart: /* @__PURE__ */ cx(
+    effectiveDisabled,
+    "group-data-[disabled]/field:opacity-100 group-data-[disabled]/field:aria-disabled:opacity-100"
+  ),
   /* A part the pointer is engaging — the handle of a value control. It sits matte and settled at
      rest and takes its accent, a little larger, while the pointer is on it. Drag covers the case
      where the pointer has been captured and left the control. */
@@ -282,6 +303,11 @@ export const state = {
   enabled: "cursor-pointer",
   /* A text field: the normal text cursor, never a pointer. */
   text: "cursor-text",
+  /* A muted label that is also a quiet target: it rests at `text.medium` and rises to `text.high` on
+     hover and on keyboard focus, with no state layer. A dismiss glyph or a secondary link takes it,
+     so the response is the ink itself rather than a tint behind it. Hover is a pointer response
+     (§11), so a touch screen only ever sees the focus step. */
+  quietInk: "text-sherick-ink-muted hover:text-sherick-ink focus-visible:text-sherick-ink",
   /* Quiet scan feedback for non-interactive data rows: tonality only. */
   rowHover: "hover:bg-sherick-ink/[0.05]",
   /* The field family — one tray, one deeper step, no visible rims. Hover and engagement share the
@@ -351,18 +377,18 @@ const stateLayerBase = /* @__PURE__ */ cx(
    a suffix, because the stylesheet compiler reads class names as literal text: a name that only
    exists once the recipe is evaluated compiles to no rule at all, and the step silently disappears.
    Interpolating one of these consts is safe — the name is still written here in full. */
-const hoverQuiet = "[&:not([data-disabled]):not(:disabled)]:hover:before:opacity-[0.05]";
-const hoverTonal = "[&:not([data-disabled]):not(:disabled)]:hover:before:opacity-[0.09]";
-const hoverFilled = "[&:not([data-disabled]):not(:disabled)]:hover:before:opacity-[0.18]";
-const hoverTrack = "group-[:not([data-disabled]):not(:disabled)]:hover:before:opacity-[0.18]";
-const pressQuiet = "[&:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.09]";
-const pressTonal = "[&:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.15]";
+const hoverQuiet = "[&:not([data-disabled]):not([aria-disabled=true]):not([aria-busy=true]):not(:disabled)]:hover:before:opacity-[0.05]";
+const hoverTonal = "[&:not([data-disabled]):not([aria-disabled=true]):not([aria-busy=true]):not(:disabled)]:hover:before:opacity-[0.09]";
+const hoverFilled = "[&:not([data-disabled]):not([aria-disabled=true]):not([aria-busy=true]):not(:disabled)]:hover:before:opacity-[0.18]";
+const hoverTrack = "group-[:not([data-disabled]):not([aria-disabled=true]):not([aria-busy=true]):not(:disabled)]:hover:before:opacity-[0.18]";
+const pressQuiet = "[&:not([data-disabled]):not([aria-disabled=true]):not([aria-busy=true]):not(:disabled)]:active:before:opacity-[0.09]";
+const pressTonal = "[&:not([data-disabled]):not([aria-disabled=true]):not([aria-busy=true]):not(:disabled)]:active:before:opacity-[0.15]";
 /* A neutral fill's label is ink, so a 15% ink veil turns the whole control a flat grey while it is
    held — and the recess and the compression already say "pressed". The neutral press is lighter;
    coloured fills keep the stronger step their labels were measured through. */
-const pressTonalNeutral = "[&:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.12]";
-const pressFilled = "[&:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.26]";
-const pressTrack = "group-[:not([data-disabled]):not(:disabled)]:active:before:opacity-[0.26]";
+const pressTonalNeutral = "[&:not([data-disabled]):not([aria-disabled=true]):not([aria-busy=true]):not(:disabled)]:active:before:opacity-[0.12]";
+const pressFilled = "[&:not([data-disabled]):not([aria-disabled=true]):not([aria-busy=true]):not(:disabled)]:active:before:opacity-[0.26]";
+const pressTrack = "group-[:not([data-disabled]):not([aria-disabled=true]):not([aria-busy=true]):not(:disabled)]:active:before:opacity-[0.26]";
 /* A selection mark answers hover with the light tonal step: it is a 20px glyph beside its own
    label, and the track's step would turn an empty well into a grey disc. Its press is depth, not
    a heavier veil — `selectable.markSurface` sinks the well — so the layer only holds its hover
@@ -370,7 +396,7 @@ const pressTrack = "group-[:not([data-disabled]):not(:disabled)]:active:before:o
    The pseudo-class sits *inside* the group selector: written after it, as `…]:hover:`, it would
    match the mark's own 20px box rather than the control and the row around it. */
 const hoverMark =
-  "group-[:not([data-disabled]):not([data-readonly]):not(:disabled):hover]:before:opacity-[0.09]";
+  "[@media(hover:hover)_and_(pointer:fine)]:group-[:not([data-disabled]):not([data-readonly]):not([aria-disabled=true]):not(:disabled):hover]:before:opacity-[0.09]";
 
 /* A labelled control surface paints its state on a row that owns the pointer area while the
    actual disabled marker belongs to a descendant control. Gate the same quiet response on that
@@ -379,8 +405,8 @@ export const stateLayerQuietComposite = /* @__PURE__ */ cx(
   "relative",
   stateLayerBase,
   "before:rounded-[inherit] before:bg-current",
-  "[&:not([data-disabled]):not([data-readonly]):not(:disabled):not(:has([data-disabled])):not(:has([data-readonly]))]:hover:before:opacity-[0.05]",
-  "[&:not([data-disabled]):not([data-readonly]):not(:disabled):not(:has([data-disabled])):not(:has([data-readonly]))]:active:before:opacity-[0.09]"
+  "[&:not([data-disabled]):not([data-readonly]):not([aria-disabled=true]):not([aria-busy=true]):not(:disabled):not(:has([data-disabled])):not(:has([data-readonly]))]:hover:before:opacity-[0.05]",
+  "[&:not([data-disabled]):not([data-readonly]):not([aria-disabled=true]):not([aria-busy=true]):not(:disabled):not(:has([data-disabled])):not(:has([data-readonly]))]:active:before:opacity-[0.09]"
 );
 
 export const stateLayer = {
@@ -452,8 +478,8 @@ export const hitArea =
                   takes the mid-emphasis tone, which inverts with the theme and separates in
                   both.
    - acrylic:     a translucent sheet lit from above, for surfaces that float above
-                  the application. The gradient, fill, blur and saturation are part of
-                  the material. A gradient arrives as a typed image arbitrary value
+                  the application. The gradient and fill are part of the material; it carries
+                  no backdrop filter (see `acrylic` below). A gradient arrives as a typed image arbitrary value
                   rather than through the colour scale, because `tailwind-merge`
                   collapses two background utilities into one and would silently drop
                   either the fill or the gradient. Each one is written out literally, so
@@ -467,13 +493,13 @@ export const hitArea =
    - acrylicHero: the large-overlay sheet, for a surface that owns the viewport. It is
                   markedly more opaque and calmer than the smaller sheets: it has to
                   read first as a physical surface and only secondarily as glass, so the
-                  scrim behind it does the separating, the blur only defocuses, and the
+                  scrim behind it does the separating, and the
                   gradient is a restrained top-to-bottom light rather than a frosted
                   haze. Its tone is a subtle step above the canvas in every theme —
                   in dark mode a small step above the canvas rather than a light grey
                   sheet — which is how it separates without leaning on its shadow, and
                   `--sui-overlay-fill` tunes how much of the sheet is its own tone rather
-                  than the defocused page — a large overlay leans on that, not on blur. */
+                  than the page behind it — a large overlay leans on that, not on blur. */
 export const material = {
   canvas: "bg-sherick-canvas text-sherick-ink",
   matteQuiet: "bg-sherick-surface/[0.42] text-sherick-ink",
@@ -489,12 +515,16 @@ export const material = {
      already — so the error form is the same rule, in the tone the field is in. */
   controlError: "bg-sherick-danger-soft text-sherick-ink placeholder:text-sherick-danger",
   handle: "bg-sherick-ink-muted text-sherick-canvas",
+  /* The glass carries no backdrop filter. Every presence recipe animates the popup node itself, and a
+     backdrop filter on an animated node re-blurs the page on each frame (DL §12). The fill is 0.98 to
+     0.99 opaque, so the blur showed only one or two percent of what lay behind; the plane's scrim keeps
+     the blur where it is static. */
   acrylic:
-    "bg-sherick-surface-float/[var(--sui-glass-fill)] bg-[image:var(--sui-glass-gradient)] text-sherick-ink backdrop-blur-[var(--sui-glass-blur)] backdrop-saturate-[var(--sui-glass-saturation)] backdrop-brightness-[var(--sui-glass-brightness)]",
+    "bg-sherick-surface-float/[var(--sui-glass-fill)] bg-[image:var(--sui-glass-gradient)] text-sherick-ink",
   acrylicDense:
-    "bg-sherick-surface-float/[var(--sui-glass-dense-fill)] bg-[image:var(--sui-glass-gradient-dense)] text-sherick-ink backdrop-blur-[var(--sui-glass-dense-blur)] backdrop-saturate-[var(--sui-glass-dense-saturation)] backdrop-brightness-[var(--sui-glass-dense-brightness)]",
+    "bg-sherick-surface-float/[var(--sui-glass-dense-fill)] bg-[image:var(--sui-glass-gradient-dense)] text-sherick-ink",
   acrylicHero:
-    "bg-sherick-surface-overlay/[var(--sui-overlay-fill)] bg-[image:var(--sui-glass-hero-gradient)] text-sherick-ink backdrop-blur-[var(--sui-glass-hero-blur)] backdrop-saturate-[var(--sui-glass-hero-saturation)] backdrop-brightness-[var(--sui-glass-hero-brightness)]",
+    "bg-sherick-surface-overlay/[var(--sui-overlay-fill)] bg-[image:var(--sui-glass-hero-gradient)] text-sherick-ink",
 } as const;
 /* Dark neutral behind native video, including poster loading and letterboxing. */
 export const mediaCanvas = "bg-sherick-media";
@@ -526,12 +556,17 @@ export const type = {
     prominent: "text-lg",
   },
   label: "text-sm leading-5 font-medium",
-  body: "text-sm leading-6",
-  supporting: "text-[0.8125rem] leading-5",
-  caption: "text-xs leading-4",
-  title: "text-base leading-6 font-semibold tracking-[-0.011em]",
-  heading: "text-xl leading-7 font-semibold tracking-[-0.02em]",
-  numeric: "tabular-nums",
+  /* Wrapping copy keeps its line breaks even: `text-pretty` stops a sentence ending on one word,
+     and a heading balances its own lines (`text-balance`). Both are CSS `text-wrap`, so no line is
+     forced and a short string is unchanged. */
+  body: "text-sm leading-6 text-pretty",
+  supporting: "text-[0.8125rem] leading-5 text-pretty",
+  caption: "text-xs leading-4 text-pretty",
+  title: "text-base leading-6 font-semibold tracking-[-0.011em] text-balance",
+  heading: "text-xl leading-7 font-semibold tracking-[-0.02em] text-balance",
+  /* Figures carry their own size: a table cell, a stepper value or a time reading is 14px tabular
+     copy wherever it sits, so a site composes this role and does not write its own `text-sm`. */
+  numeric: "text-sm leading-5 tabular-nums",
 } as const;
 
 /* Density — three control steps plus the accessible hit target.
@@ -612,7 +647,14 @@ export const stacking = {
    alert dialog separate from the page identically. */
 export const overlay = {
   /* The plane behind a surface that owns the viewport. */
-  scrim: /* @__PURE__ */ cx("fixed inset-0", stacking.float, "bg-sherick-scrim/[0.30] backdrop-blur-[var(--sui-scrim-blur)]"),
+  scrim: /* @__PURE__ */ cx(
+    "fixed inset-0",
+    stacking.float,
+    "backdrop-blur-[var(--sui-scrim-blur)] [@media(pointer:coarse)]:[backdrop-filter:none]",
+    /* The tint is the plane's `::before`, so `motionPresenceScrim` can fade it without animating the
+       node that carries the blur. */
+    "before:absolute before:inset-0 before:content-[''] before:bg-sherick-scrim/[0.30]"
+  ),
   /* An anchored surface with room to breathe: a selection list (Select, Combobox) or
      structured content (Popover). It grows out of its trigger and carries the softer
      surface corner, because what it holds is read rather than scanned.
@@ -671,6 +713,15 @@ export const detail = {
   fill: "bg-sherick-detail",
 } as const;
 
+/* The gap between a heading and the supporting line beneath it. It is applied to the supporting
+   line, never to the heading, and it is the only such gap: a header takes no paired padding on its
+   own edges. A title-role surface (a card, a popover, a toast, a command palette) takes 4px; a
+   dialog or drawer heading, which is the larger `heading` role, takes 8px. */
+export const headingRhythm = {
+  title: "mt-1",
+  heading: "mt-2",
+} as const;
+
 /* A list surface — the sheet a collection of rows sits in, and the two row densities it can
    hold. Select, Combobox and Menu all compose these, so an option and a command are the same
    object at two densities instead of three independent designs.
@@ -693,6 +744,9 @@ export const detail = {
    performed", never "cannot be found". */
 export const list = {
   sheet: "max-w-[var(--available-width)] max-h-[var(--available-height)] overflow-y-auto",
+  /* The leading mark of a command row: the 14px command text takes the compact slot, so the mark is
+     16px and sits in the same box every command's icon does. */
+  commandIcon: iconSlot.compact,
   /* A row in a selection list: one line, read one at a time and chosen.
      The row carries two separate things that both have to be visible. Its *navigation highlight*
      is the state layer — one tone shared with the pointer, because a row under the pointer and a
@@ -708,7 +762,7 @@ export const list = {
      option label on the same 20px edge as the value in the trigger that opened it, so the list
      reads as the field opening rather than a second surface beside it. */
   option: /* @__PURE__ */ cx(
-    "flex w-full items-center justify-between gap-4 px-3 py-3 text-start outline-none",
+    "flex w-full items-center justify-between gap-4 px-3 py-3 text-start [outline-style:none]",
     type.control.normal,
     shape.control,
     motionFeedback,
@@ -731,7 +785,7 @@ export const list = {
      command's corner proportional to its own height, so its highlight nests in the tighter
      sheet the menu is. */
   command: /* @__PURE__ */ cx(
-    "flex w-full items-center gap-3 px-3 py-2 text-start outline-none",
+    "flex w-full items-center gap-3 px-3 py-2 text-start [outline-style:none]",
     type.control.compact,
     shape.row,
     motionFeedback,
@@ -751,6 +805,10 @@ export const list = {
    component maps its own primitive's panel variable onto, because the measured geometry is
    anatomy and only the interpolation is temporal. */
 export const disclosure = {
+  /* The chevron of a disclosure row. The row's label is 15px, so the mark takes the normal slot
+     (20px); the row owns the affordance, so the chevron follows the whole row rather than the first
+     line of a wrapping label (§17). */
+  chevron: iconSlot.normal,
   /* The row: a full-width row in a stacked group, activated like a selectable row. It is an option
      row at the 16px inset of the surface it usually sits on directly — no sheet inset precedes it —
      so its label shares an edge with the panel copy beneath it. Its own focus
@@ -759,7 +817,7 @@ export const disclosure = {
      reason a segment inside a track takes the inset form. The chevron the component puts in the
      row is the disclosure's own affordance and turns in place under `motionOrient`. */
   trigger: /* @__PURE__ */ cx(
-    "group flex w-full items-center justify-between gap-4 px-4 py-3 text-start outline-none [overflow-wrap:anywhere]",
+    "group flex w-full items-center justify-between gap-4 px-4 py-3 text-start [outline-style:none] [overflow-wrap:anywhere]",
     type.control.normal,
     shape.control,
     motionFeedback,
@@ -902,7 +960,7 @@ export const selectable = {
   markSurface: /* @__PURE__ */ cx(
     "relative",
     elevation.recessed,
-    "group-[:not([data-disabled]):not([data-readonly]):not(:disabled):active]:shadow-sherick-well",
+    "group-[:not([data-disabled]):not([data-readonly]):not([aria-disabled=true]):not(:disabled):active]:shadow-sherick-well",
     motionFeedback
   ),
   /* The resting fill a *groove* holds — a segmented control's track, a tab list — and nothing more.
@@ -925,7 +983,7 @@ export const selectable = {
     text.medium,
     "after:pointer-events-none after:absolute after:inset-0 after:box-border after:rounded-[inherit] after:border-[1.5px] after:content-['']",
     "after:border-sherick-rim",
-    "group-[:not([data-disabled]):not([data-readonly]):not(:disabled):hover]:after:border-sherick-ink-muted",
+    "[@media(hover:hover)_and_(pointer:fine)]:group-[:not([data-disabled]):not([data-readonly]):not(:disabled):hover]:after:border-sherick-ink-muted",
     motionRim
   ),
   /* A selected mark is the strong accent, edge to edge, and it settles flat: it is identified by
@@ -978,6 +1036,11 @@ export const recipeAlphas = {
     neutralSoft: fillAlpha(tone.soft.secondary, "tint.neutralSoft"),
     neutralRest: fillAlpha(tone.tonal.secondary, "tint.neutralRest"),
   },
+  /* The code well is the `matteHigh` step over the card that holds it, so the contract reads its
+     alpha from the same recipe the CodeBlock renders. */
+  code: {
+    well: fillAlpha(material.matteHigh, "code.well"),
+  },
   field: {
     quiet: fillAlpha(material.matteQuiet, "field.quiet"),
     card: fillAlpha(material.matte, "field.card"),
@@ -992,22 +1055,26 @@ export const recipeAlphas = {
 
 /* A labelled field is a shrinkable column. Its explanatory copy wraps, including identifiers;
    the input itself keeps its native single-line scrolling behavior. */
-export const fieldLayout = "flex min-w-0 w-full flex-col [overflow-wrap:anywhere]";
+export const fieldLayout =
+  "flex min-w-0 w-full flex-col gap-2 [overflow-wrap:anywhere] [&>label+p]:-mt-1";
 
 /* The messages under a field: its description or hint, and its error. One role for every field in
    the family, so a hint reads the same under a text field, a date range and a file chooser. */
 /* The label above a field: the `label` role at full ink, with the one gap every field family keeps
    between its name and its control. */
-export const fieldLabel = /* @__PURE__ */ cx("mb-2", type.label, text.high);
+export const fieldLabel = /* @__PURE__ */ cx(type.label, text.high);
 
+/* The field column owns the gap between its parts (`fieldLayout`), so a label, a control and a
+   message are each eight pixels from the next, and a label that is followed straight by its
+   description takes four through the layout's sibling rule. No part carries its own margin. */
 export const fieldMessage = {
-  description: /* @__PURE__ */ cx("mt-2", type.supporting, text.medium),
-  error: /* @__PURE__ */ cx("mt-2", type.supporting, tone.text.danger),
+  description: /* @__PURE__ */ cx(type.supporting, text.medium),
+  error: /* @__PURE__ */ cx(type.supporting, tone.text.danger),
 } as const;
 
 /* The code well — the quiet recess a code block's lines sit in. It is the canvas showing through the
    block's own matte shell, so a well reads as sunk into the block on a card and on the page alike. */
-export const codeWell = "bg-sherick-canvas/[0.28]";
+export const codeWell = material.matteHigh;
 
 /* Rich-text accents — content-level emphasis in rendered prose, not structural edges: a quote's rule
    on its start edge, and a link's underline at rest and under the pointer. */

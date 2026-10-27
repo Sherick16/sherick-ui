@@ -10,8 +10,30 @@ import {
   type ReactNode,
 } from "react";
 import { cn, cx } from "@/libs/utils";
-import { currentDestination, density, focusRingInset, iconStroke, selectable, shape, state, stateLayer, text } from "./ui.common";
+import { currentDestination, density, focusRingInset, iconSlot, iconStroke, selectable, shape, state, stateLayer, text, type } from "./ui.common";
 import { motionFeedback, motionInkPress } from "./ui.motion";
+
+/** The English copy a pagination names itself and its parts with. Any of it can be replaced. */
+export interface PaginationLabels {
+  /** The landmark's accessible name. */
+  navigation: string;
+  /** The accessible name of the step back. */
+  previous: string;
+  /** The accessible name of the step forward. */
+  next: string;
+  /** The accessible name of a page control. */
+  page: (page: number) => string;
+  /** Read before the page total, so the current page reads as "3 of 12". */
+  of: string;
+}
+
+const defaultPaginationLabels: PaginationLabels = {
+  navigation: "Pagination",
+  previous: "Previous page",
+  next: "Next page",
+  page: (page) => `Page ${page}`,
+  of: "of",
+};
 
 export interface PaginationProps
   extends Omit<ComponentPropsWithoutRef<"nav">, "children" | "defaultValue" | "onChange"> {
@@ -28,12 +50,20 @@ export interface PaginationProps
   disabled?: boolean;
   /** Renders every available page as a real anchor to the href this returns. */
   getPageHref?: (page: number) => string;
+  /**
+   * Renders each of those anchors as the caller's own link, such as a router link, in place of the plain
+   * anchor. It receives the page and the anchor's props — the href, the accessible name, the shared classes,
+   * the page's content and the activation handler — and it only applies where `getPageHref` gives an href.
+   */
+  renderLink?: (page: number, props: ComponentPropsWithoutRef<"a">) => ReactNode;
   /** The accessible name of a page control. Defaults to `Page {page}`. */
   getPageLabel?: (page: number) => string;
   /** Defaults to `Previous page`. */
   previousLabel?: string;
   /** Defaults to `Next page`. */
   nextLabel?: string;
+  /** The English copy the pagination names itself with. The props above take precedence over it. */
+  labels?: Partial<PaginationLabels>;
 }
 
 /* What the bounded set is built from: a page, or the gap the set leaves where pages are missing. A
@@ -82,7 +112,8 @@ const boundedItems = (count: number, current: number, siblings: number): Paginat
    held value, so it stays flat and takes the in-track form of the current-destination role.
    Native navigation still owns behavior; stable targets press only their number or chevron. */
 const controlBase = /* @__PURE__ */ cx(
-  "inline-flex shrink-0 select-none items-center justify-center text-sm tabular-nums no-underline",
+  "inline-flex shrink-0 select-none items-center justify-center no-underline",
+  type.numeric,
   density.target,
   shape.row,
   focusRingInset,
@@ -100,8 +131,9 @@ const controlBase = /* @__PURE__ */ cx(
    router the consumer owns, to do the navigating — and a modified click stays the browser's own
    gesture: it opens a new tab or window, and the page the reader is on has not changed, so nothing is
    reported. A boundary control and a disabled pagination are never anchors: they have no actionable
-   href, and every control in a disabled pagination is a natively disabled button, so the state sits
-   on the controls rather than being announced on the landmark around them.
+   href. A boundary control is a button that stays focusable under `aria-disabled`, and every control in a
+   disabled pagination is a natively disabled button, so the state sits on the controls rather than being
+   announced on the landmark around them.
 
    Which page is current is published rather than implied by colour alone, and exactly one control
    carries it. A zero-page pagination has no current page and no activation at all. */
@@ -115,15 +147,18 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
       siblingCount = 1,
       disabled = false,
       getPageHref,
+      renderLink,
       getPageLabel,
-      previousLabel = "Previous page",
-      nextLabel = "Next page",
+      previousLabel,
+      nextLabel,
+      labels,
       className,
       "aria-label": ariaLabel,
       ...props
     },
     ref
   ) => {
+    const copy = { ...defaultPaginationLabels, ...labels };
     const [uncontrolledPage, setUncontrolledPage] = useState(() => normalizePage(defaultValue));
 
     const pageCount = normalizeCount(count);
@@ -163,29 +198,41 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
     const stepHref = (page: number, onBoundary: boolean) =>
       getPageHref && !disabled && !onBoundary ? getPageHref(page) : undefined;
 
+    /* An anchor is the caller's own link when it supplies one, so a router keeps client-side navigation
+       and the component still only reports the activation. */
+    const pageLink = (page: number, props: ComponentPropsWithoutRef<"a">) =>
+      renderLink ? renderLink(page, props) : <a {...props} />;
+
+    /* A boundary step keeps focus: it is focusable and marked `aria-disabled`, so a reader on the last
+       page who presses Next still has Next under focus. Its activation is blocked here, because a
+       focusable control in that state still receives the click. A disabled pagination, or one with no pages,
+       stays native. */
     const step = (page: number, label: string, onBoundary: boolean, icon: ReactNode) => {
       const href = stepHref(page, onBoundary);
 
       return (
         <li className={cn("absolute top-1 flex first:start-1 last:end-1")}>
           {href !== undefined ? (
-            <a
-              href={href}
-              aria-label={label}
-              className={cn(controlBase, "group", controlState(onBoundary))}
-              onClick={(event) => activateFromAnchor(event, page)}
-            >
-              <span className={cn("inline-flex size-5 items-center justify-center [&>svg]:size-5", motionInkPress)}>{icon}</span>
-            </a>
+            pageLink(page, {
+              href,
+              "aria-label": label,
+              className: cn(controlBase, "group", controlState(onBoundary)),
+              onClick: (event) => activateFromAnchor(event, page),
+              children: <span className={cn(iconSlot.normal, motionInkPress)}>{icon}</span>,
+            })
           ) : (
             <button
               type="button"
-              disabled={onBoundary || disabled}
+              /* A pagination with no pages has no boundary to keep focus on, so its steps stay native. */
+              disabled={disabled || current === null}
+              aria-disabled={onBoundary || undefined}
               aria-label={label}
               className={cn(controlBase, "group", controlState(onBoundary))}
-              onClick={() => activate(page)}
+              onClick={() => {
+                if (!onBoundary) activate(page);
+              }}
             >
-              <span className={cn("inline-flex size-5 items-center justify-center [&>svg]:size-5", !disabled && !onBoundary && motionInkPress)}>{icon}</span>
+              <span className={cn(iconSlot.normal, !disabled && !onBoundary && motionInkPress)}>{icon}</span>
             </button>
           )}
         </li>
@@ -194,7 +241,7 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
 
     const pageControl = (page: number) => {
       const isCurrent = page === current;
-      const label = getPageLabel ? getPageLabel(page) : `Page ${page}`;
+      const label = getPageLabel ? getPageLabel(page) : copy.page(page);
       const href = stepHref(page, false);
 
       return (
@@ -203,20 +250,19 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
           isCurrent ? "flex" : "hidden [@container(min-width:32rem)]:flex"
         )}>
           {href !== undefined ? (
-            <a
-              href={href}
-              aria-current={isCurrent ? "page" : undefined}
-              aria-label={label}
-              className={cn(
+            pageLink(page, {
+              href,
+              "aria-current": isCurrent ? "page" : undefined,
+              "aria-label": label,
+              className: cn(
                 controlBase,
                 "group shrink break-all px-3",
                 isCurrent && currentDestination.inTrack,
                 controlState(false)
-              )}
-              onClick={(event) => activateFromAnchor(event, page)}
-            >
-              <span className={cn(motionInkPress)}>{page}</span>
-            </a>
+              ),
+              onClick: (event) => activateFromAnchor(event, page),
+              children: <span className={cn(motionInkPress)}>{page}</span>,
+            })
           ) : (
             <button
               type="button"
@@ -235,8 +281,8 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
             </button>
           )}
           {isCurrent && (
-            <span className={cn("min-w-0 break-all pe-2 text-sm tabular-nums [@container(min-width:32rem)]:hidden", text.medium)}>
-              <span aria-hidden="true">/ </span><span className={cn("sr-only")}>of </span>{pageCount}
+            <span className={cn("min-w-0 break-all pe-2 [@container(min-width:32rem)]:hidden", type.numeric, text.medium)}>
+              <span aria-hidden="true">/ </span><span className={cn("sr-only")}>{copy.of} </span>{pageCount}
             </span>
           )}
         </li>
@@ -258,7 +304,7 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
       <nav
         {...props}
         ref={ref}
-        aria-label={ariaLabel ?? "Pagination"}
+        aria-label={ariaLabel ?? copy.navigation}
         className={cn(
           "w-full min-w-0 max-w-full [container-type:inline-size] [contain-intrinsic-inline-size:14rem]",
           disabled && state.disabled,
@@ -274,14 +320,14 @@ const Pagination = forwardRef<HTMLElement, PaginationProps>(
         >
           {step(
             previousPage,
-            previousLabel,
+            previousLabel ?? copy.previous,
             previousBoundary,
             <HugeiconsIcon icon={ArrowLeft01Icon} aria-hidden="true" className={cn(iconStroke.glyph, "rtl:-scale-x-100")} />
           )}
           {items.map((item) => (typeof item === "number" ? pageControl(item) : gap(item)))}
           {step(
             nextPage,
-            nextLabel,
+            nextLabel ?? copy.next,
             nextBoundary,
             <HugeiconsIcon icon={ArrowRight01Icon} aria-hidden="true" className={cn(iconStroke.glyph, "rtl:-scale-x-100")} />
           )}

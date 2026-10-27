@@ -18,6 +18,7 @@ import {
   stateLayer,
 } from "./ui.common";
 import { motionArrive } from "./ui.motion";
+import FieldLabel from "./FieldLabel";
 import {
   ChoiceCopy,
   choiceItemClasses,
@@ -114,12 +115,7 @@ export const CheckboxGroup = forwardRef<HTMLDivElement, CheckboxGroupProps>(
       >
         {label && (
           <Field.Label className={cn(fieldLabel)}>
-            {label}
-            {required && (
-              <span className={cn("ms-1 text-sherick-danger")} aria-hidden="true">
-                *
-              </span>
-            )}
+            <FieldLabel required={required}>{label}</FieldLabel>
           </Field.Label>
         )}
         <BaseCheckboxGroup
@@ -149,7 +145,7 @@ export const CheckboxGroup = forwardRef<HTMLDivElement, CheckboxGroupProps>(
                       className={cn(
                         // The control takes the mark's corner so a forced-colors outline follows the
                         // box rather than squaring it off. The whole row is its label and its target.
-                        "group relative my-0.5 flex size-5 shrink-0 items-center justify-center outline-none",
+                        "group relative my-0.5 flex size-5 shrink-0 items-center justify-center [outline-style:none]",
                         shape.mark
                       )}
                     >

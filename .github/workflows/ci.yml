@@ -33,9 +33,10 @@ jobs:
       - name: Verify package and types
         run: |
           bun run lint
-          bun run test:motion
           bun --filter sherick-ui typecheck
           bun --filter sherick-ui build
+          # After the build, so the motion policy can read the compiled stylesheet's hover guards.
+          bun run test:motion
           bun --filter @sherick-ui/showcase typecheck
           bun --filter @sherick-ui/no-tailwind typecheck
           bun run test
@@ -59,7 +60,8 @@ jobs:
       # Install the browsers of the Playwright the lockfile pins. The workspace root has no
       # `playwright` bin, so a bare `bunx playwright` downloads whatever npm calls latest and
       # installs a Chromium build the pinned test runner cannot find.
-      - run: ./node_modules/.bin/playwright install --with-deps chromium
+      # WebKit is installed for the one `@webkit` axe scan; the chromium and touch projects need only Chromium.
+      - run: ./node_modules/.bin/playwright install --with-deps chromium webkit
         working-directory: apps/showcase
       - run: bun --filter @sherick-ui/showcase test:browser
       - name: Capture browser diff artifacts

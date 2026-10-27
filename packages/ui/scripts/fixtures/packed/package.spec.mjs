@@ -184,7 +184,8 @@ test("document themes and overrides reach styled portals", async ({ page }) => {
   await expect(dialog).toBeVisible();
   expect(await dialog.evaluate(el => el.closest("main"))).toBeNull();
   expect(await style(dialog, "boxShadow")).not.toBe("none");
-  expect(await style(dialog, "backdropFilter")).toContain("blur");
+  /* The popup animates its own presence, so it carries no backdrop filter (DL section 12). The blur sits on the scrim. */
+  expect(await style(dialog, "backdropFilter")).toBe("none");
   expect(await style(page.locator("#portal-primary"), "backgroundColor")).toBe(custom);
   expect(await dialog.evaluate(el => getComputedStyle(el).getPropertyValue("--sui-surface-overlay").trim())).toBe("0.4 0.1 145");
   await page.locator("#portal-primary").click();
