@@ -706,7 +706,7 @@ test("a repositioned or rapidly reversed surface never replays or queues", async
 /*
  The tests below prove geometry rather than taxonomy: that the anchored family really shares one
  entrance, that a press really moves a control, and that a relocation really travels between its
- two destinations without overshooting.
+ two destinations and settles on the second, springing past it only where the travel spring does.
 */
 
 const lab = "/verification/motion";

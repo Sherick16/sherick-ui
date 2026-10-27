@@ -301,9 +301,11 @@ because the subject is a physical contract rather than a pixel:
   with no side;
 - **the entrance grows rather than slides** — the painted edge moves more than the travel it is
   given, so the scale is what the eye reads;
-- **a relocation is complete and never overshoots** — a tab indicator interpolates every geometry
-  property it changes, is strictly between its two destinations halfway through, and rides the
-  glide curve rather than the arrival curve; a keyboard selection relocates it without the newly
+- **a relocation lands on its stop** — a tab indicator interpolates every geometry property it
+  changes and is strictly between its two destinations halfway through. Its position and a switch
+  thumb's ride the travel spring, which passes its stop by about 6% and settles (the test bounds the
+  peak between the stop and 8% past it); colour and tone keep the glide. A measured quantity such as a
+  progress width never overshoots. A keyboard selection relocates the indicator without the newly
   selected tab gaining any press geometry;
 - **a selection mark is made, not faded** — it arrives from half its size, passes slightly beyond
   it and settles, while the boundary it lands inside never moves;
