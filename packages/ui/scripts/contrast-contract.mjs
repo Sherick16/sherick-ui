@@ -88,6 +88,13 @@ export const WCAG_NON_TEXT = 3;
    instead of leaving a second handwritten copy behind. */
 
 const SEMANTIC = ["primary", "danger", "warning", "success"];
+/** The `key-light` lift where a label's upper edge sits: a third of the way down a face whose light
+    fades from its top stop to nothing at its second stop. */
+const keyLightAtLabel = (variables) => {
+  const stops = [...variables["--sui-key-light"].matchAll(/light-top\) \/ (\d*\.?\d+)\) (\d+)%/g)].map((m) => [Number(m[1]), Number(m[2])]);
+  const [[top], [, end]] = stops;
+  return Math.max(0, top * (1 - 33 / end));
+};
 /** The opaque fill each semantic role takes: `primary` has a deeper fill token, the others are their own fill. */
 const opaqueFill = (name) => (name === "primary" ? "primary-strong" : name);
 
@@ -124,11 +131,12 @@ export const contrastCompositions = (variables, alphas) => {
   const overlayFill = Number(variables["--sui-overlay-fill"]);
   /* A field is a tray in the `surface-high` tone over whatever holds it; the common case is a card.
      Under the pointer and while engaged it sinks to the deep tray. A choice row rests on the
-     `matteHigh` tray. An empty mark's interior is a canvas-toned well. */
+     `matteHigh` tray. An empty mark's interior is a canvas-toned well. A field's tray is its own
+     `tray` step. */
   const card = composite(surface, FIELD.card, canvas);
   /* The code well is the `matteHigh` step over the card (`recipeAlphas.code.well`), not a canvas tint. */
   const codeWell = composite(surfaceHigh, alphas.code.well, card);
-  const tray = (alpha, base = card) => composite(surfaceHigh, alpha, base);
+  const tray = (alpha, base = card) => composite(colour("tray"), alpha, base);
   const deepTray = (alpha, base = card) => composite(colour("tray-deep"), alpha, base);
   const choiceRow = (base = card) => composite(surfaceHigh, FIELD.groove, base);
   const markWell = composite(canvas, FIELD.mark, card);
@@ -232,6 +240,40 @@ export const contrastCompositions = (variables, alphas) => {
     [["tone.text.primary on primary selected", colour("primary"), selected("primary")]]
   );
 
+  add(
+    "the held-choice iris label on the selected step, through its states",
+    WCAG_TEXT,
+    "a selected segment, tab, chip, option or current navigation row: the iris label over the primary selected step, under the iris quiet layer and a chip's own tonal layer",
+    (() => {
+      const fg = colour("primary-selected-ink");
+      const fill = selected("primary");
+      return [
+        ["at rest", fg, fill],
+        ["quiet hovered", fg, composite(colour("primary"), STATE.quiet.hover, fill)],
+        ["quiet pressed", fg, composite(colour("primary"), STATE.quiet.press, fill)],
+        ["tonal hovered", fg, composite(fg, STATE.tonal.hover, fill)],
+        ["tonal pressed", fg, composite(fg, STATE.tonal.press, fill)],
+      ];
+    })()
+  );
+  add(
+    "the heading ink on every authored surface",
+    WCAG_TEXT,
+    "a title or heading role points `--sui-ink` at the deeper heading ink",
+    surfaceEntries.map(([where, base]) => [where, colour("ink-heading"), base])
+  );
+  add(
+    "text on a quiet target under the iris layer",
+    WCAG_TEXT,
+    "a row, a ghost control or a tab answers the pointer with a quiet step of the accent, under an ink or muted label",
+    surfaceEntries.flatMap(([where, base]) =>
+      ["ink", "ink-muted"].flatMap((role) => [
+        [`${role} on ${where} hovered`, colour(role), composite(colour("primary"), STATE.quiet.hover, base)],
+        [`${role} on ${where} pressed`, colour(role), composite(colour("primary"), STATE.quiet.press, base)],
+      ])
+    )
+  );
+
   /* -- the code well, which is text on its own surface --------------------------------------- */
   const CODE_ROLES = ["text", "comment", "string", "number", "keyword", "function", "tag"];
   add(
@@ -308,6 +350,20 @@ export const contrastCompositions = (variables, alphas) => {
           ["at rest", on, fill],
           ["hovered", on, composite(on, STATE.filled.hover, fill)],
           ["pressed", on, composite(on, STATE.filled.press, fill)],
+        ];
+      })()
+    );
+    add(
+      `on-colour on the lit key face, through the filled states [${role}]`,
+      WCAG_TEXT,
+      "a filled action's face carries `key-light`: its top lip is lit, and the label's upper edge sits about a third of the way down, where the light still adds to the fill; a press puts the light out",
+      (() => {
+        const fill = colour(opaqueFill(role));
+        const on = colour(`on-${role}`);
+        const lit = composite(colour("light-top"), keyLightAtLabel(variables), fill);
+        return [
+          ["at rest", on, lit],
+          ["hovered", on, composite(on, STATE.filled.hover, lit)],
         ];
       })()
     );
@@ -396,6 +452,7 @@ export const contrastCompositions = (variables, alphas) => {
     "the accent rim a selected choice row carries, against the soft surface inside it and the surfaces outside it",
     [
       ["primary soft inside the row", colour("primary"), soft("primary")],
+      ["primary selected inside the row", colour("primary"), selected("primary")],
       ...controlEntries.map(([where, base]) => [where, colour("primary"), base]),
     ]
   );

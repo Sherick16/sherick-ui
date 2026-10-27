@@ -6,14 +6,20 @@ export type ThemeName = "light" | "dark";
    family as the accent instead of fighting it; shadows are a violet-graphite umbra for the same
    reason. Every value is measured by the contrast contract (docs/PALETTE.md). */
 export const lightTokens = {
-  "canvas": "0.970 0.003 290",
-  "surface": "0.998 0.001 290",
-  "surface-high": "0.934 0.006 290",
+  /* D: the canvas is a clearly deeper neutral step, so a white sheet lifts off it by tone as well as
+     by its shadow. */
+  "canvas": "0.928 0.007 287",
+  "surface": "0.999 0.001 290",
+  "surface-high": "0.905 0.009 288",
+  /* The tray: a text field's resting well. It is its own step, below the canvas and well below the
+     sheet, so a field reads as a well on the page and in a card alike; `tray-light` draws its shaded
+     upper wall. */
+  "tray": "0.884 0.011 288",
   /* The deep tray: the step a text field sinks to under the pointer and while it is engaged. A
      field is identified by its label, its value or placeholder and its parts rather than by a drawn
      edge, so its states are carried by its tray and the focus ring; this is the one neutral step
      below `surface-high`, and it is a field's alone. */
-  "tray-deep": "0.900 0.008 290",
+  "tray-deep": "0.866 0.012 288",
   "surface-float": "0.999 0.001 290",
   /* The puck: a held choice that rides in a track — a selected segment, the tab indicator. It is
      the one surface lit *above* every sheet in both themes, because a puck is a part lifted out of
@@ -22,18 +28,22 @@ export const lightTokens = {
   "puck": "1 0 0",
   "media": "0.200 0.008 285",
   "ink": "0.200 0.012 285",
-  "ink-muted": "0.480 0.014 285",
+  /* Heading ink: titles and headings take a deeper, higher-contrast ink than body copy, so a
+     surface's name leads by tone as well as by size. */
+  "ink-heading": "0.130 0.018 285",
+  "ink-muted": "0.432 0.014 285",
   /* The detail role is non-text furniture: it carries a mark, a rail or a gutter, and it is not a
      third step of the text ladder. It answers to the 3:1 non-text requirement wherever it carries
      meaning; anything a reader must read uses `ink` or `ink-muted`. */
-  "detail": "0.590 0.012 285",
+  "detail": "0.555 0.012 285",
   /* The rim of a hollow control — a drop target, an empty checkbox or radio. It is the
      only border a control carries, so it is tuned to clear the 3:1 non-text requirement against
      every surface a control sits on with a small margin and no more: at `detail` strength the rim
      outshone the labels beside it. Hover steps it to `ink-muted`. */
-  "rim": "0.625 0.012 285",
-  "primary": "0.490 0.205 292",
-  "primary-strong": "0.430 0.200 292",
+  "rim": "0.580 0.012 285",
+  /* D: a more saturated iris, close to the sRGB edge at each lightness, still a violet. */
+  "primary": "0.470 0.255 290",
+  "primary-strong": "0.440 0.235 290",
   /* The designed surfaces of each semantic role. A soft container is what a tinted surface is
      made of — a tonal control, an Alert, a Badge, a quiet Card — and the selected step is the held
      choice one rung stronger. They are authored rather than derived as a fraction of the role's
@@ -41,8 +51,12 @@ export const lightTokens = {
      iris is a dusty mauve and a fraction of a deep ochre is a grey, so every contrast retune
      used to recolour every tinted surface. Each value clears the contrast contract with its own
      foreground, `ink` and the focus ring through the tonal states. */
-  "primary-soft": "0.952 0.024 292",
-  "primary-selected": "0.905 0.052 292",
+  "primary-soft": "0.946 0.027 292",
+  "primary-selected": "0.858 0.074 291",
+  /* The iris label a held choice carries on the selected step — a selected segment, tab, chip,
+     option or current navigation row. It clears 4.5:1 on the selected step through the quiet and
+     tonal state layers in both themes. */
+  "primary-selected-ink": "0.420 0.225 290",
   "danger-soft": "0.952 0.020 30",
   "danger-selected": "0.900 0.042 30",
   "warning-soft": "0.955 0.032 82",
@@ -50,14 +64,14 @@ export const lightTokens = {
   "success-soft": "0.952 0.024 165",
   "success-selected": "0.900 0.046 165",
   "accent": "0.62 0.12 230",
-  "danger": "0.465 0.180 27",
+  "danger": "0.452 0.180 27",
   "warning": "0.398 0.086 68",
   "success": "0.390 0.088 158",
   "on-primary": "0.990 0.003 290",
   "on-danger": "0.990 0.003 290",
   "on-warning": "0.990 0.003 290",
   "on-success": "0.990 0.003 290",
-  "focus": "0.490 0.205 292",
+  "focus": "0.470 0.255 290",
   "outline": "0.500 0.012 285",
   "scrim": "0.200 0.006 285",
   "edge": "0.400 0.012 285",
@@ -68,7 +82,7 @@ export const lightTokens = {
      actions sits on the page rather than hovering over it. The inset line is the lit upper lip of a
      key — the light model's upper edge, drawn once — so a filled action reads as a pressable object
      rather than a flat swatch. Floating depth is `elevation-floating`'s. */
-  "elevation-raised": "0 1px 1px oklch(var(--sui-light-bottom) / 0.10), 0 2px 5px -1px oklch(var(--sui-light-bottom) / 0.12), inset 0 1px 0 oklch(var(--sui-light-top) / 0.24)",
+  "elevation-raised": "0 1px 1px oklch(var(--sui-light-bottom) / 0.12), 0 2px 5px -1px oklch(var(--sui-light-bottom) / 0.14), inset 0 1px 0 oklch(var(--sui-light-top) / 0.38), inset 0 -1px 0 oklch(var(--sui-light-bottom) / 0.10)",
   /* A floating surface holds a hairline contact edge in the umbra, so it keeps its boundary over any
      content it covers — a white sheet over a white card has nothing else to separate it — and then
      two layers of depth: a close penumbra and a long, soft ambient fall. */
@@ -84,6 +98,15 @@ export const lightTokens = {
   "elevation-recessed": "inset 0 1px 2px oklch(var(--sui-light-bottom) / 0.18), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.55)",
   "elevation-recessed-top": "inset 0 5px 8px -5px oklch(var(--sui-light-bottom) / 0.18)",
   "elevation-well": "inset 0 2px 4px oklch(var(--sui-light-bottom) / 0.34), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.55)",
+  /* D: a card or panel lifts off the canvas — a soft key, a long faint ambient fall and a lit upper
+     lip. Its face carries `surface-light`. */
+  "elevation-surface": "0 1px 2px oklch(var(--sui-light-bottom) / 0.06), 0 6px 14px -6px oklch(var(--sui-light-bottom) / 0.10), 0 18px 36px -18px oklch(var(--sui-light-bottom) / 0.18), inset 0 1px 0 oklch(var(--sui-light-top) / 0.95)",
+  /* The face light of a lit object: `key-light` lights a filled action from above and shades its
+     base; `surface-light` does the same, gently, for a sheet; `tray-light` is the reversed light of
+     a recess, the shaded upper wall of a field's well. */
+  "key-light": "linear-gradient(180deg, oklch(var(--sui-light-top) / 0.20) 0%, oklch(var(--sui-light-top) / 0) 50%, oklch(var(--sui-light-bottom) / 0.08) 100%)",
+  "surface-light": "linear-gradient(180deg, oklch(var(--sui-light-top) / 0.85) 0%, oklch(var(--sui-light-top) / 0) 40%, oklch(var(--sui-light-bottom) / 0.03) 100%)",
+  "tray-light": "linear-gradient(180deg, oklch(var(--sui-light-bottom) / 0.13) 0px, oklch(var(--sui-light-bottom) / 0.04) 3px, oklch(var(--sui-light-bottom) / 0) 9px)",
   /* Fill isolates content even without backdrop filtering; blur only enriches the remaining light. */
   "glass-fill": "0.98",
   "glass-blur": "28px",
@@ -103,7 +126,7 @@ export const lightTokens = {
   "overlay-fill": "0.99",
   "scrim-blur": "8px",
   "code-text": "oklch(0.27 0.012 285)",
-  "code-comment": "oklch(0.52 0.012 285)",
+  "code-comment": "oklch(0.505 0.012 285)",
   "code-string": "oklch(0.47 0.10 158)",
   "code-number": "oklch(0.51 0.13 55)",
   "code-keyword": "oklch(0.47 0.19 300)",
@@ -115,21 +138,26 @@ export const lightTokens = {
    floor, the accent is a luminous lavender iris that glows rather than shouts, and the floating
    edge is a line of light rather than a shadow. */
 export const darkTokens = {
-  "canvas": "0.160 0.006 285",
-  "surface": "0.200 0.008 285",
-  "surface-high": "0.252 0.010 285",
-  "tray-deep": "0.290 0.011 285",
-  "surface-float": "0.226 0.009 285",
-  "puck": "0.315 0.012 285",
+  /* D: a deeper floor, and sheets a clear step above it. A field's tray sits between the two, so it
+     is a well in a card. */
+  "canvas": "0.120 0.006 285",
+  "surface": "0.262 0.011 285",
+  "surface-high": "0.315 0.012 285",
+  "tray": "0.218 0.010 285",
+  "tray-deep": "0.196 0.009 285",
+  "surface-float": "0.280 0.011 285",
+  "puck": "0.335 0.012 285",
   "media": "0.160 0.006 285",
   "ink": "0.950 0.004 285",
-  "ink-muted": "0.745 0.010 285",
-  "detail": "0.605 0.010 285",
-  "rim": "0.535 0.010 285",
-  "primary": "0.780 0.125 292",
-  "primary-strong": "0.720 0.160 292",
-  "primary-soft": "0.300 0.075 292",
-  "primary-selected": "0.375 0.105 292",
+  "ink-heading": "0.992 0.002 285",
+  "ink-muted": "0.765 0.010 285",
+  "detail": "0.640 0.010 285",
+  "rim": "0.580 0.010 285",
+  "primary": "0.755 0.135 290",
+  "primary-strong": "0.715 0.158 290",
+  "primary-soft": "0.300 0.110 291",
+  "primary-selected": "0.380 0.150 291",
+  "primary-selected-ink": "0.905 0.060 291",
   /* The dark semantic containers are tints, not slabs. An Alert or Badge sits on the same graphite
      room as the neutral one beside it, so its soft step stays close to the sheet's own lightness
      and carries only a little of its hue; the selected step is one rung lighter and a touch more
@@ -144,23 +172,29 @@ export const darkTokens = {
   "danger": "0.775 0.130 25",
   "warning": "0.830 0.120 80",
   "success": "0.780 0.120 158",
-  "on-primary": "0.160 0.006 285",
+  "on-primary": "0.095 0.010 285",
   "on-danger": "0.160 0.006 285",
   "on-warning": "0.160 0.006 285",
   "on-success": "0.160 0.006 285",
-  "focus": "0.780 0.125 292",
+  "focus": "0.755 0.135 290",
   "outline": "0.745 0.010 285",
   "scrim": "0.060 0.006 285",
   "edge": "0.930 0.006 285",
   "light-top": "1 0 0",
   "light-bottom": "0.070 0.008 285",
   "elevation-flat": "none",
-  "elevation-raised": "0 1px 2px oklch(var(--sui-light-bottom) / 0.40), 0 3px 8px -2px oklch(var(--sui-light-bottom) / 0.30), inset 0 1px 0 oklch(var(--sui-light-top) / 0.08)",
+  "elevation-raised": "0 1px 2px oklch(var(--sui-light-bottom) / 0.45), 0 3px 8px -2px oklch(var(--sui-light-bottom) / 0.34), inset 0 1px 0 oklch(var(--sui-light-top) / 0.16), inset 0 -1px 0 oklch(var(--sui-light-bottom) / 0.24)",
   "elevation-floating": "0 0 0 1px oklch(var(--sui-light-top) / 0.08), 0 6px 14px -4px oklch(var(--sui-light-bottom) / 0.40), 0 26px 56px -12px oklch(var(--sui-light-bottom) / 0.65), inset 0 1px 0 oklch(var(--sui-light-top) / 0.06)",
   "elevation-control": "0 0 0 0.5px oklch(var(--sui-light-bottom) / 0.40), 0 1px 3px oklch(var(--sui-light-bottom) / 0.45), inset 0 1px 0 oklch(var(--sui-light-top) / 0.09)",
   "elevation-recessed": "inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.42), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.05)",
   "elevation-recessed-top": "inset 0 5px 8px -5px oklch(var(--sui-light-bottom) / 0.40)",
   "elevation-well": "inset 0 2px 4px oklch(var(--sui-light-bottom) / 0.62), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.05)",
+  /* In the graphite room a shadow barely reads, so a sheet is lifted by its lit upper lip — a line
+     of light — and a deep, short shadow at its foot. */
+  "elevation-surface": "0 1px 2px oklch(var(--sui-light-bottom) / 0.45), 0 10px 24px -10px oklch(var(--sui-light-bottom) / 0.70), inset 0 1px 0 oklch(var(--sui-light-top) / 0.10)",
+  "key-light": "linear-gradient(180deg, oklch(var(--sui-light-top) / 0.16) 0%, oklch(var(--sui-light-top) / 0) 50%, oklch(var(--sui-light-bottom) / 0.12) 100%)",
+  "surface-light": "linear-gradient(180deg, oklch(var(--sui-light-top) / 0.05) 0%, oklch(var(--sui-light-top) / 0) 40%, oklch(var(--sui-light-bottom) / 0.10) 100%)",
+  "tray-light": "linear-gradient(180deg, oklch(var(--sui-light-bottom) / 0.70) 0px, oklch(var(--sui-light-bottom) / 0.22) 3px, oklch(var(--sui-light-bottom) / 0) 10px)",
   "glass-fill": "0.98",
   "glass-blur": "32px",
   "glass-saturation": "1.12",
@@ -175,11 +209,11 @@ export const darkTokens = {
   "glass-hero-saturation": "1.03",
   "glass-hero-brightness": "1.0",
   "glass-hero-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.035) 0%, rgb(255 255 255 / 0.01) 12%, rgb(255 255 255 / 0) 44%, rgb(0 0 0 / 0.16) 100%)",
-  "surface-overlay": "0.214 0.008 285",
+  "surface-overlay": "0.272 0.011 285",
   "overlay-fill": "0.99",
   "scrim-blur": "8px",
   "code-text": "#dfdee6",
-  "code-comment": "#928f9e",
+  "code-comment": "#9d9aa9",
   "code-string": "#7dd3a3",
   "code-number": "#f3ad66",
   "code-keyword": "#c8a8ff",
@@ -247,6 +281,17 @@ export const sharedTokens = {
      and settles back. It is what makes a selection feel made and a released press feel answered,
      and it is deliberately reserved for the parts that carry that meaning. */
   "ease-spring": "cubic-bezier(0.34, 1.56, 0.64, 1)",
+  /* D: sampled damped springs. Each is the step response of a spring written as a `linear()` curve,
+     and its duration is the spring's settle time, not a choice of pace.
+     - press:  the release of a pressed control, about 15% past rest and back (damping 0.52). A
+               press travels two pixels, so the overshoot is a fraction of a pixel that reads as a
+               rebound, not a wobble.
+     - travel: a selection indicator or a switch thumb crossing its track, about 6% past its stop
+               (damping 0.67), so the choice is felt as thrown and caught. */
+  "duration-spring-press": "460ms",
+  "ease-spring-press": "linear(0, 0.049, 0.172, 0.335, 0.513, 0.683, 0.833, 0.955, 1.045, 1.105, 1.137, 1.148, 1.141, 1.124, 1.1, 1.074, 1.048, 1.026, 1.008, 0.994, 0.985, 0.98, 0.978, 0.979, 0.982, 0.985, 0.989, 0.993, 1)",
+  "duration-spring-travel": "420ms",
+  "ease-spring-travel": "linear(0, 0.027, 0.097, 0.194, 0.305, 0.42, 0.533, 0.639, 0.733, 0.814, 0.883, 0.938, 0.98, 1.012, 1.034, 1.048, 1.056, 1.059, 1.058, 1.054, 1.048, 1.042, 1.035, 1.028, 1.022, 1.016, 1.012, 1.007, 1)",
 } as const satisfies Record<string, string>;
 
 export const themes = {

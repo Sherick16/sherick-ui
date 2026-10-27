@@ -136,6 +136,10 @@ export const elevation = {
   flat: "shadow-sherick-flat",
   raised: /* @__PURE__ */ cx("shadow-sherick-raised", forcedBoundary),
   floating: /* @__PURE__ */ cx("shadow-sherick-floating", forcedBoundary),
+  /* D: a grounded sheet — a card, a panel — lifted off the canvas by a soft ambient fall and a lit
+     upper lip, with the light on its face (`surface-light`). It is passive depth: a sheet never
+     recesses. `material.matte` carries it, so every sheet built on that material lifts. */
+  surface: /* @__PURE__ */ cx("shadow-sherick-surface bg-[image:var(--sui-surface-light)]", forcedBoundary),
   control: "shadow-sherick-control",
   recessed: "shadow-sherick-recessed",
   /* One rung further down: the depth a small selection mark sinks to while it is held. A mark
@@ -268,7 +272,7 @@ export const state = {
   /* A raised matte control presses back into the track beneath it — the same physical
      depth a groove or a well sits at. How far the press itself travels is motion amplitude, and
      it belongs with the tactile intent in `ui.motion.ts`. */
-  recess: "active:shadow-sherick-recessed",
+  recess: "active:shadow-sherick-recessed active:bg-none",
   /* The disabled step for a control whose disabled state is a Sherick prop. */
   disabled: "cursor-not-allowed opacity-45 aria-disabled:cursor-not-allowed aria-disabled:opacity-45",
   /* A control that is busy is still working for the reader, so it is not dimmed: it keeps its full
@@ -377,7 +381,7 @@ const stateLayerBase = /* @__PURE__ */ cx(
    a suffix, because the stylesheet compiler reads class names as literal text: a name that only
    exists once the recipe is evaluated compiles to no rule at all, and the step silently disappears.
    Interpolating one of these consts is safe — the name is still written here in full. */
-const hoverQuiet = "[&:not([data-disabled]):not([aria-disabled=true]):not([aria-busy=true]):not(:disabled)]:hover:before:opacity-[0.05]";
+const hoverQuiet = "[&:not([data-disabled]):not([aria-disabled=true]):not([aria-busy=true]):not(:disabled)]:hover:before:opacity-[0.07]";
 const hoverTonal = "[&:not([data-disabled]):not([aria-disabled=true]):not([aria-busy=true]):not(:disabled)]:hover:before:opacity-[0.09]";
 const hoverFilled = "[&:not([data-disabled]):not([aria-disabled=true]):not([aria-busy=true]):not(:disabled)]:hover:before:opacity-[0.18]";
 const hoverTrack = "group-[:not([data-disabled]):not([aria-disabled=true]):not([aria-busy=true]):not(:disabled)]:hover:before:opacity-[0.18]";
@@ -401,6 +405,13 @@ const hoverMark =
 /* A labelled control surface paints its state on a row that owns the pointer area while the
    actual disabled marker belongs to a descendant control. Gate the same quiet response on that
    descendant so a disabled or read-only choice does not advertise a press it cannot accept. */
+/* D: the quiet layer is iris rather than ink. A quiet target — a row, a ghost action, a tab, a field
+   part — answers the pointer with a faint accent tint, so iris marks where the reader is about to act
+   as well as what they chose. A target whose label is a semantic tone keeps its own colour, so a
+   destructive command never hovers violet. */
+const quietTint =
+  "before:bg-sherick-primary [&.text-sherick-danger]:before:bg-current [&.text-sherick-warning]:before:bg-current [&.text-sherick-success]:before:bg-current";
+
 export const stateLayerQuietComposite = /* @__PURE__ */ cx(
   "relative",
   stateLayerBase,
@@ -411,7 +422,7 @@ export const stateLayerQuietComposite = /* @__PURE__ */ cx(
 
 export const stateLayer = {
   /* Quiet surfaces — ghost controls, navigation rows, menu options. */
-  quiet: /* @__PURE__ */ cx("relative", stateLayerBase, "before:rounded-[inherit] before:bg-current", hoverQuiet, pressQuiet),
+  quiet: /* @__PURE__ */ cx("relative", stateLayerBase, "before:rounded-[inherit]", quietTint, hoverQuiet, pressQuiet),
   /* Tinted containers: the fill is nearly page color already, so the container's own
      on-color (`current`) carries the state at a light step. Shared by every matte
      control with a fill — tonal buttons, icon buttons, acrylic buttons. */
@@ -436,7 +447,7 @@ export const stateLayer = {
      It is deliberately not gated on the disabled markers: a disabled command stays reachable by
      keyboard so it can be discovered and announced as unavailable, and a reader still has to see
      which row the navigation is on when it lands there. */
-  activeRow: "data-[highlighted]:before:opacity-[0.05]",
+  activeRow: "data-[highlighted]:before:opacity-[0.07]",
   /* A control that is one part of a field — a combobox's clear and trigger, a number field's
      steppers, a search field's submit, a date field's calendar glyph. Its target keeps the height
      the field's row needs, but its surface does not: a hover layer that filled a 44px target painted
@@ -446,7 +457,8 @@ export const stateLayer = {
   fieldPart: /* @__PURE__ */ cx(
     "relative",
     stateLayerBase,
-    "before:m-auto before:size-8 before:rounded-full before:bg-current",
+    "before:m-auto before:size-8 before:rounded-full",
+    quietTint,
     hoverQuiet,
     pressQuiet
   ),
@@ -503,9 +515,11 @@ export const hitArea =
 export const material = {
   canvas: "bg-sherick-canvas text-sherick-ink",
   matteQuiet: "bg-sherick-surface/[0.42] text-sherick-ink",
-  matte: "bg-sherick-surface/[0.78] text-sherick-ink",
+  /* D: a matte sheet is nearly opaque, so it stays white on the deeper canvas, and it carries the
+     sheet's lift and face light (`elevation.surface`). */
+  matte: /* @__PURE__ */ cx("bg-sherick-surface/[0.97] text-sherick-ink", elevation.surface),
   matteHigh: "bg-sherick-surface-high/[0.72] text-sherick-ink",
-  control: "bg-sherick-surface-high text-sherick-ink placeholder:text-sherick-ink-muted",
+  control: "bg-sherick-tray bg-[image:var(--sui-tray-light)] text-sherick-ink placeholder:text-sherick-ink-muted",
   /* The invalid fill carries its placeholder at the *full* danger tone, not at a fraction of it. A
      placeholder is text, so it answers to the same 4.5:1 the copy beside it does, and a partial
      opacity of an accent is a different colour from the accent: the 72%-opacity placeholder
@@ -513,7 +527,7 @@ export const material = {
      measures 4.1–4.7:1 light and 5.2–6.2:1 dark on it. There is no dimmer step of a semantic tone
      that is still readable, and a normal field's placeholder is `ink-muted` at full strength
      already — so the error form is the same rule, in the tone the field is in. */
-  controlError: "bg-sherick-danger-soft text-sherick-ink placeholder:text-sherick-danger",
+  controlError: "bg-sherick-danger-soft bg-[image:var(--sui-tray-light)] text-sherick-ink placeholder:text-sherick-danger",
   handle: "bg-sherick-ink-muted text-sherick-canvas",
   /* The glass carries no backdrop filter. Every presence recipe animates the popup node itself, and a
      backdrop filter on an animated node re-blurs the page on each frame (DL §12). The fill is 0.98 to
@@ -555,15 +569,18 @@ export const type = {
     normal: "text-[0.9375rem] leading-[1.375rem]",
     prominent: "text-lg",
   },
-  label: "text-sm leading-5 font-medium",
+  label: "text-sm leading-5 font-medium tracking-[-0.006em]",
   /* Wrapping copy keeps its line breaks even: `text-pretty` stops a sentence ending on one word,
      and a heading balances its own lines (`text-balance`). Both are CSS `text-wrap`, so no line is
      forced and a short string is unchanged. */
   body: "text-sm leading-6 text-pretty",
   supporting: "text-[0.8125rem] leading-5 text-pretty",
   caption: "text-xs leading-4 text-pretty",
-  title: "text-base leading-6 font-semibold tracking-[-0.011em] text-balance",
-  heading: "text-xl leading-7 font-semibold tracking-[-0.02em] text-balance",
+  /* D: a title is 18/24 and a heading 22/28, both semibold with tight tracking, and both take the
+     heading ink: the role points `--sui-ink` at `--sui-ink-heading` for its own box, so the
+     `text.high` a caller pairs with it renders the deeper ink without a second colour class. */
+  title: "text-lg leading-6 font-semibold tracking-[-0.018em] text-balance [--sui-ink:var(--sui-ink-heading)]",
+  heading: "text-[1.375rem] leading-7 font-semibold tracking-[-0.022em] text-balance [--sui-ink:var(--sui-ink-heading)]",
   /* Figures carry their own size: a table cell, a stepper value or a time reading is 14px tabular
      copy wherever it sits, so a site composes this role and does not write its own `text-sm`. */
   numeric: "text-sm leading-5 tabular-nums",
@@ -867,18 +884,20 @@ export const tone = {
     success: "bg-sherick-success-soft",
   },
   selected: {
-    primary: "bg-sherick-primary-selected text-sherick-ink",
+    primary: "bg-sherick-primary-selected text-sherick-primary-selected-ink",
     secondary: "bg-sherick-surface-high/[0.82] text-sherick-ink",
     danger: "bg-sherick-danger-selected text-sherick-ink",
     warning: "bg-sherick-warning-selected text-sherick-ink",
     success: "bg-sherick-success-selected text-sherick-ink",
   },
+  /* D: a semantic strong fill is a lit key — its face carries `key-light`, lit at the top and shaded
+     at its base — which a press puts out (`state.recess`). */
   strong: {
-    primary: "bg-sherick-primary-strong text-sherick-on-primary",
+    primary: "bg-sherick-primary-strong bg-[image:var(--sui-key-light)] text-sherick-on-primary",
     secondary: "bg-sherick-surface-high text-sherick-ink",
-    danger: "bg-sherick-danger text-sherick-on-danger",
-    warning: "bg-sherick-warning text-sherick-on-warning",
-    success: "bg-sherick-success text-sherick-on-success",
+    danger: "bg-sherick-danger bg-[image:var(--sui-key-light)] text-sherick-on-danger",
+    warning: "bg-sherick-warning bg-[image:var(--sui-key-light)] text-sherick-on-warning",
+    success: "bg-sherick-success bg-[image:var(--sui-key-light)] text-sherick-on-success",
   },
   /* The strong fills again, keyed on the primitive's own selection marker rather than on a
      Sherick prop. A control that holds its selection in the primitive — an uncontrolled
@@ -902,7 +921,7 @@ export const tone = {
               lightness (1.00:1 in light), so there the fill steps up to `selected` and the label
               takes the accent: the label, not the fill, says "you are here". */
 export const currentDestination = {
-  row: "bg-sherick-primary-soft text-sherick-ink font-medium",
+  row: "bg-sherick-primary-selected text-sherick-primary-selected-ink font-semibold",
   inTrack: "bg-sherick-primary-selected text-sherick-primary font-semibold",
 } as const;
 
@@ -922,6 +941,25 @@ export const currentDestination = {
    brightest surface and a white row on it would vanish. */
 export const puck = "bg-sherick-puck";
 
+/* D: a held choice in a track takes the iris selected step with the iris label when it is primary,
+   and stays the lifted puck with its role's text tone otherwise, so a semantic segment never sits on
+   an iris fill. */
+export const heldFill = {
+  primary: "bg-sherick-primary-selected",
+  secondary: puck,
+  danger: puck,
+  warning: puck,
+  success: puck,
+} as const satisfies Record<Variant, string>;
+
+export const heldLabel = {
+  primary: "text-sherick-primary-selected-ink",
+  secondary: "text-sherick-ink",
+  danger: "text-sherick-danger",
+  warning: "text-sherick-warning",
+  success: "text-sherick-success",
+} as const satisfies Record<Variant, string>;
+
 /* A choice row — an opt-in `surface` row in a RadioGroup or CheckboxGroup — rests on the
    `matteHigh` tray, so every choice in the group reads as a target before any is chosen; it stays
    light enough that the empty mark's rim still clears 3:1 against it. The row that holds the
@@ -934,7 +972,7 @@ export const puck = "bg-sherick-puck";
    outline. The selected step and a lift turned a whole card into an accent block, which outshouted
    the priority action on the same view. */
 export const selectableRowSurface = /* @__PURE__ */ cx(
-  "has-[[data-checked]]:bg-sherick-primary-soft has-[[data-checked]]:text-sherick-ink",
+  "has-[[data-checked]]:bg-sherick-primary-selected has-[[data-checked]]:text-sherick-ink",
   "after:pointer-events-none after:absolute after:inset-0 after:box-border after:rounded-[inherit] after:border-[1.5px] after:border-transparent after:content-['']",
   "has-[[data-checked]]:after:border-sherick-primary",
   motionRim
@@ -1019,7 +1057,7 @@ const toneAlpha = (tone: string) => (recipe: string, label: string) => {
 };
 /* A field tray's `surface-high` step, its deep step, its danger step, and the canvas step an empty
    mark's interior holds. */
-const trayAlpha = toneAlpha("surface-high");
+const trayAlpha = toneAlpha("tray");
 const deepTrayAlpha = toneAlpha("tray-deep");
 const dangerTrayAlpha = toneAlpha("danger-soft");
 const markAlpha = toneAlpha("canvas");

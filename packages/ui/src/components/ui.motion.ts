@@ -67,12 +67,17 @@ export const motionFeedback =
  *  the compression are neutralised together under reduced motion. */
 /* Base may disable the surface itself or the value control inside a Select wrapper.
    Neither is a pressable surface. Timing is otherwise shared by every tier. */
+/* D: the press leg is unchanged, and the release is a spring. Only the transform rides it — the
+   control comes back a little past rest and settles — while tone and depth return on the ordinary
+   release curve, so a colour or a shadow never overshoots. */
 const tactileTiming =
-  "transition-[background-color,color,box-shadow,transform,opacity] duration-release ease-release active:duration-tactile active:ease-press motion-reduce:transition-none";
+  "transition-[transform,background-color,color,box-shadow,opacity] duration-[var(--sui-duration-spring-press),var(--sui-duration-release),var(--sui-duration-release),var(--sui-duration-release),var(--sui-duration-release)] ease-[var(--sui-ease-spring-press),var(--sui-ease-release),var(--sui-ease-release),var(--sui-ease-release),var(--sui-ease-release)] active:duration-tactile active:ease-press motion-reduce:transition-none";
 
 export const motionTactile = /* @__PURE__ */ cx(
   tactileTiming,
   "motion-safe:[&:not([data-disabled],:disabled,[aria-disabled=true],[aria-busy=true],:has(>[role=combobox][data-disabled]))]:active:scale-[0.96]",
+  /* The key sinks as it shrinks: one pixel down, toward the shadow it presses into. */
+  "motion-safe:[&:not([data-disabled],:disabled,[aria-disabled=true],[aria-busy=true],:has(>[role=combobox][data-disabled]))]:active:translate-y-px",
   /* A content-width control a layout has stretched to its container is no longer content-width: 4%
      of a 240px action moved each edge 4.8px. The stretch is the caller's `w-full`, so the control
      reads it from its own class and takes the wide tier — still a press, at a button's distance. */
@@ -99,7 +104,7 @@ export const motionTactileField = /* @__PURE__ */ cx(
  *  target still owns the focus ring and the state layer, and still carries the tone and depth
  *  response, so the boundary a press happens inside never moves. */
 export const motionInkPress =
-  "transition-transform duration-release ease-release group-active:duration-tactile group-active:ease-press group-active:scale-[0.88] motion-reduce:transition-none motion-reduce:group-active:scale-100";
+  "transition-transform duration-[var(--sui-duration-spring-press)] ease-[var(--sui-ease-spring-press)] group-active:duration-tactile group-active:ease-press group-active:scale-[0.88] motion-reduce:transition-none motion-reduce:group-active:scale-100";
 
 /* Motion is not owned here — but the recipes above are the whole vocabulary: every press, arrival,
    travel, presence and activity in the library is one of these names plus its owner's own target
@@ -134,13 +139,18 @@ export const motionOrient =
  *  from reads as a defect. Position, size and the tone the object picks up on the way
  *  settle together, and an interrupted move retargets from wherever it currently is
  *  because it is a transition and not a keyframe. */
+/* D: a switch thumb's travel is its transform, and it rides the travel spring — it runs a little
+   past its stop and settles. Layout edges (a progress fill's width) and tone keep the glide, so a
+   measured value never overshoots. */
 export const motionRelocate =
-  "transition-[left,inset-inline-start,top,width,height,transform,background-color,color,box-shadow,opacity] duration-release ease-glide motion-reduce:transition-none";
+  "transition-[transform,left,inset-inline-start,top,width,height,background-color,color,box-shadow,opacity] duration-[var(--sui-duration-spring-travel),var(--sui-duration-release),var(--sui-duration-release),var(--sui-duration-release),var(--sui-duration-release),var(--sui-duration-release),var(--sui-duration-release),var(--sui-duration-release),var(--sui-duration-release),var(--sui-duration-release)] ease-[var(--sui-ease-spring-travel),var(--sui-ease-glide),var(--sui-ease-glide),var(--sui-ease-glide),var(--sui-ease-glide),var(--sui-ease-glide),var(--sui-ease-glide),var(--sui-ease-glide),var(--sui-ease-glide),var(--sui-ease-glide)] motion-reduce:transition-none";
 
 /** The same travel across a whole track — a tab indicator — on the longer travel timing, so a
  *  movement of hundreds of pixels is followed rather than skipped. */
+/* D: the indicator is thrown across the track and caught: its geometry rides the travel spring, about
+   6% past its stop, and its tone keeps the glide. */
 export const motionRelocateLong =
-  "transition-[left,inset-inline-start,top,width,height,transform,background-color,color,box-shadow,opacity] duration-travel ease-glide motion-reduce:transition-none";
+  "transition-[left,inset-inline-start,top,width,height,transform,background-color,color,box-shadow,opacity] duration-[var(--sui-duration-spring-travel),var(--sui-duration-spring-travel),var(--sui-duration-spring-travel),var(--sui-duration-spring-travel),var(--sui-duration-spring-travel),var(--sui-duration-spring-travel),var(--sui-duration-travel),var(--sui-duration-travel),var(--sui-duration-travel),var(--sui-duration-travel)] ease-[var(--sui-ease-spring-travel),var(--sui-ease-spring-travel),var(--sui-ease-spring-travel),var(--sui-ease-spring-travel),var(--sui-ease-spring-travel),var(--sui-ease-spring-travel),var(--sui-ease-glide),var(--sui-ease-glide),var(--sui-ease-glide),var(--sui-ease-glide)] motion-reduce:transition-none";
 
 /** Direct manipulation: the pointer owns the geometry, so a positional transition would be
  *  lag. While the primitive reports a drag, position and size are removed from the

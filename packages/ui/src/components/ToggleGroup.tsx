@@ -15,13 +15,13 @@ import {
   density,
   elevation,
   focusRingInset,
-  puck,
+  heldFill,
+  heldLabel,
   selectable,
   shape,
   state,
   stateLayer,
   text,
-  tone,
 } from "./ui.common";
 import { motionTactile } from "./ui.motion";
 import { Variant } from "./ui.types";
@@ -69,7 +69,7 @@ const ToggleGroupItem = forwardRef<HTMLButtonElement, ToggleGroupItemProps>(
             state.enabled,
             state.effectiveDisabled,
             toggleState.pressed
-              ? cn(puck, tone.text[variant], elevation.control, !toggleState.disabled && state.recess)
+              ? cn(heldFill[variant], heldLabel[variant], elevation.control, !toggleState.disabled && state.recess)
               : toggleState.disabled ? text.medium : state.quietInk,
             /* A held segment still answers the pointer: hover is one tonality step over whatever
                fill it holds, and selection is not a reason to stop responding. */

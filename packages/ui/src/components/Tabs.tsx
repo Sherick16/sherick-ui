@@ -8,14 +8,14 @@ import {
   density,
   elevation,
   focusRingInset,
+  heldFill,
+  heldLabel,
   iconSlot,
-  puck,
   selectable,
   shape,
   state,
   stateLayer,
   text,
-  tone,
 } from "./ui.common";
 import { motionRelocateLong, motionTactileWide } from "./ui.motion";
 import { Variant } from "./ui.types";
@@ -117,7 +117,7 @@ export const Tabs = ({
             className={cn(
               "absolute left-[var(--active-tab-left)] top-[var(--active-tab-top)] h-[var(--active-tab-height)] w-[var(--active-tab-width)]",
               shape.control,
-              puck,
+              heldFill[variant],
               elevation.control,
               motionRelocateLong
             )}
@@ -135,7 +135,7 @@ export const Tabs = ({
                   shape.control,
                   motionTactileWide,
                   focusRingInset,
-                  active ? tone.text[variant] : disabled ? text.medium : state.quietInk,
+                  active ? heldLabel[variant] : disabled ? text.medium : state.quietInk,
                   !disabled && stateLayer.quiet,
                   disabled && state.disabled
                 )
