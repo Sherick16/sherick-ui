@@ -137,6 +137,15 @@ until dismissed. `InlineCode` joins the `sherick-ui/content` subpath. Three beha
 consumers, so review them before upgrading: `Avatar` rest props land on the root, `Spinner` `className` sizes the
 wrapper, and an `Accordion` join is no longer a separator role.
 
+Version 2.11.0 restyles the default look without removing anything. The canvas is a light graphite
+and content sits on white sheets that lift off it, so a neutral `Card` or panel now carries a lift.
+A primary selection, a selected choice row and the current navigation row take a soft iris step with an
+iris label, and quiet targets hover with a faint iris tint. Text fields sit on their own tray, titles are
+18/24px and headings 22/28px in a deeper ink, and a press release, a tab indicator and a switch thumb
+settle on a spring. The API is unchanged. Consumers who retune `--sui-canvas`, `--sui-primary`,
+`--sui-focus` or `--sui-tray-deep` should check their values against the contrast contract in both
+themes; `--sui-tray` and `--sui-ink-heading` are new variables for the same purpose.
+
 Version 2.9.0 refines the design language without removing anything. `Card` gains `Card.Title` and
 `Card.Description`, and `Popover` gains `Popover.Title` and `Popover.Description`, so a surface's
 heading takes the library's `title` role (now 16/24px) and names the popup. `Alert` and `Badge`

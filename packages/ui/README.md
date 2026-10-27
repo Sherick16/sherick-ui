@@ -2,7 +2,7 @@
 
 A React 18/19 component library in graphite and iris, with deliberate
 shape contrast and restrained motion. `2.0.0` established the stable line; `1.x` is frozen.
-This package source is `2.7.0`; verified `main` stages new versions via npm trusted
+This package source is `2.11.0`; verified `main` stages new versions via npm trusted
 publishing for maintainer approval. Check the installed version for availability.
 
 ## Install and style
@@ -175,6 +175,10 @@ not as a `separator` role. Toasts with an action or a danger type are sticky by 
 With no root `data-sherick-theme`, the library follows `prefers-color-scheme`. Set
 `"light"` or `"dark"` to override it. Retune `--sui-*` variables at the document
 root; nested theme islands are not supported because overlays portal to the body.
+Version 2.11.0 restyles the default values without changing the API: the canvas, the sheets, the iris
+selection and the field tray moved, and `--sui-tray` and `--sui-ink-heading` are new. Re-check any
+override of `--sui-canvas`, `--sui-primary`, `--sui-focus` or `--sui-tray-deep` against the contrast
+contract in both themes.
 The [token source](https://github.com/Sherick16/sherick-ui/blob/main/packages/ui/src/styles/tokens.ts)
 contains the defaults; custom accent values should pass the
 [contrast contract](https://github.com/Sherick16/sherick-ui/blob/main/docs/VERIFICATION.md#fast-package-smoke-checks)
