@@ -3,6 +3,7 @@
 .hostile-page { margin: 16px; }
 .hostile-page h1 { font-size: 1.5rem; }
 .hostile-grid { display: grid; grid-template-columns: 1fr; width: min(100%, 220px); gap: 24px; }
+.hostile-inset { padding-inline: 1rem; }
 .hostile-stack { display: flex; flex-direction: column; gap: 16px; margin-block: 24px; }
 .hostile-row { display: flex; align-items: center; gap: 24px; }
 .hostile-anchor { display: flex; flex-direction: column; gap: 12px; width: 180px; margin-block: 24px; }

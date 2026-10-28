@@ -324,6 +324,10 @@ One group of sections whose triggers are headings.
   to the group's own column.
 - Parts: `Accordion.Item` (`value?`, `disabled?`, `className?`), `Accordion.Trigger`,
   `Accordion.Panel`. A panel belongs to exactly one item.
+- Placement (from 2.10.1): the rows and panels of an `Accordion` or `Collapsible` hang their 1rem
+  inset outside their column, so the labels and chevrons line up with the content beside them.
+  Put the disclosure inside a parent with at least 1rem of inline padding, such as a card, sheet or
+  dialog. Flush against a viewport edge, it scrolls the page. Do not wrap it in your own padding.
 - The accessible structure is the component's, not yours: the trigger is a `<button>` inside a
   heading (`aria-expanded`/`aria-controls`) and the panel is the region it names. Never rebuild
   that by hand, and never put an interactive control inside a trigger row.

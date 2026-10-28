@@ -166,8 +166,8 @@ alone says "something goes here".
   give it a placeholder or a part where the form allows, and never place it where the tray is lost
   (on a `surface-high` fill);
 - a selected checkbox or radio is identified by its accent fill, and its rim fades into it;
-- a selected surface choice row (§11) carries the accent **selection rim**: it is the row's
-  selection mark, not an outline drawn to separate a surface, and a resting row has none;
+- a surface choice row (§11) has no visible rim in any state: the mark it houses says which row
+  is chosen, and its transparent overlay keeps the row's outline in forced colors;
 - the drop target's rim is dashed (`rim.dashed`): a 7px mask over its own overlay, never the
   platform's `dashed` style, so the rhythm is fixed and the dashes follow the `control` corner.
 
@@ -354,10 +354,10 @@ as a dismiss glyph, takes `state.quietInk`: its ink rises from `text.medium` to 
 layer is drawn behind it.
 
 RadioGroup's opt-in surface rows rest on the `matteHigh` tray, so every choice reads as a target
-before any is chosen, and the row that holds the selection takes the primary *soft* surface and the
-accent selection rim (§8), and stays flat. The soft surface is lighter than the resting tray, so the
-rim, not the tint, is what says "this one"; the selected step and a lift turned a whole card into an
-accent block that outshouted the priority action beside it. The resting tray stays light enough
+before any is chosen, and the row that holds the selection takes the primary *soft* surface and stays
+flat. The mark the row houses is what says "this one"; an accent rim around the row repeated it, and
+the selected step and a lift turned a whole card into an accent block that outshouted the priority
+action beside it. The resting tray stays light enough
 that an empty mark's rim still clears 3:1 against it.
 The complete row remains the label; passive badges are consumer content. The selection mark and
 target boundary stay still, and the original plain radio rows remain available. Surface selection
@@ -622,8 +622,10 @@ start/end properties so RTL reads equally well. A text action that shares an edg
 action under its column header, a toast action under its copy — **hangs** its inline padding
 outside that edge (a negative start margin equal to its padding), so its label, not its hit
 area, lines up with the text. Code wells alone remain LTR. A row with a hover or selection fill hangs the same way. A TreeView row hangs its fill into the list's own padding, so the label aligns with the title beside it; a Stepper keeps each step's padding inside its own box, because a step list has to fit whatever column it is given (§19); an Accordion join is the top border of each section after the first, with no hang of its own. A disclosure row
-does not hang: its 16px inset is shared with the panel copy beneath it, so the label and the copy it
-opens keep one edge, and an Accordion placed flush in a narrow column never reaches past it (§19). A table's cells and the table's
+hangs its 16px inset past both edges of its column, and its panel hangs with it, so the label, the
+chevron and the copy it opens share the edges of the content beside them. Its parent owns at least
+1rem of padding on each side for the fill to reach into; flush against a viewport edge, the row
+would scroll the page. A table's cells and the table's
 scroll wrapper hang likewise, and the wrapper keeps its own overflow. A local
 correction should follow the actual geometry, not a global optical-offset token.
 

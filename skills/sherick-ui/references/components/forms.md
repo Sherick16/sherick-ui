@@ -307,7 +307,8 @@ versions, let supporting text inherit the row ink; use size and weight for hiera
 
 After verifying the installed version, use `appearance="surface"` for substantial
 single choices such as plans or shipping methods. Omit it for the original plain rows.
-Sherick owns selected/hover/pressed/focus/disabled treatment and full-row activation;
+Sherick owns selected/hover/pressed/focus/disabled treatment and full-row activation (from
+2.10.1 the selected row takes a soft fill with no accent border; its mark shows the choice);
 continue using `options[].label` for rich content. Labels expand and wrap naturally:
 
 ```tsx

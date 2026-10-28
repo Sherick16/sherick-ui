@@ -105,8 +105,11 @@ export default function Hostile() {
       <Card><Input label="Card field" /><p>{token}</p></Card>
       <NavGroup title={long} items={[{ href: "#destination", label: token }]} />
       <NavItem href="#destination">{token}</NavItem>
-      <Accordion><Accordion.Item value="one"><Accordion.Trigger>{token}</Accordion.Trigger><Accordion.Panel>{token}</Accordion.Panel></Accordion.Item></Accordion>
-      <Collapsible defaultOpen><Collapsible.Trigger>{long}</Collapsible.Trigger><Collapsible.Panel>{token}</Collapsible.Panel></Collapsible>
+      {/* A disclosure row hangs its 1rem inset past its column, so its parent owns that padding (§17). */}
+      <div className="hostile-inset">
+        <Accordion><Accordion.Item value="one"><Accordion.Trigger>{token}</Accordion.Trigger><Accordion.Panel>{token}</Accordion.Panel></Accordion.Item></Accordion>
+        <Collapsible defaultOpen><Collapsible.Trigger>{long}</Collapsible.Trigger><Collapsible.Panel>{token}</Collapsible.Panel></Collapsible>
+      </div>
       <Alert closeable>{token} {long}</Alert>
       <Progress label={long} value={45} showValue />
       <RadioGroup aria-label="Stress radios" options={options.slice(0, 2)} />

@@ -391,15 +391,6 @@ export const contrastCompositions = (variables, alphas) => {
     })
   );
   add(
-    "a choice row's selection rim",
-    WCAG_NON_TEXT,
-    "the accent rim a selected choice row carries, against the soft surface inside it and the surfaces outside it",
-    [
-      ["primary soft inside the row", colour("primary"), soft("primary")],
-      ...controlEntries.map(([where, base]) => [where, colour("primary"), base]),
-    ]
-  );
-  add(
     "the detail role on the surfaces it is permitted on",
     WCAG_NON_TEXT,
     "non-text furniture that still carries meaning: gutters, rails, secondary graphical detail, a status mark's frame",
