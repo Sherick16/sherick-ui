@@ -36,20 +36,15 @@ test("surface rows keep the rich label and the whole padded row selects and subm
   expect(selectedSurface.background).not.toBe("rgba(0, 0, 0, 0)");
   expect(selectedSurface.background).not.toBe((await surfaceOf(dailyRow)).background);
   expect(selectedSurface.shadow).toBe("none");
-  // The held row carries the accent selection rim; a resting row's rim is transparent, kept only for
-  // forced colors to repaint.
+  // The mark says which row is held, so no row draws a visible rim; the transparent one is kept only
+  // for forced colors to repaint.
   const rimOf = (row: Locator) => row.evaluate((element) => {
-    const probe = document.createElement("div");
-    probe.style.color = "oklch(var(--sui-primary))";
-    element.appendChild(probe);
-    const primary = getComputedStyle(probe).color;
-    probe.remove();
     const rim = getComputedStyle(element, "::after");
-    return { colour: rim.borderTopColor, width: rim.borderTopWidth, primary };
+    return { colour: rim.borderTopColor, width: rim.borderTopWidth };
   });
   const selectedRim = await rimOf(rowFor(weekly));
   expect(Number.parseFloat(selectedRim.width)).toBeGreaterThan(0);
-  expect(selectedRim.colour).toBe(selectedRim.primary);
+  expect(selectedRim.colour).toBe("rgba(0, 0, 0, 0)");
   expect((await rimOf(dailyRow)).colour).toBe("rgba(0, 0, 0, 0)");
 
   await dailyRow.hover();

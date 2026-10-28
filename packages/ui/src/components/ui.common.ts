@@ -809,15 +809,16 @@ export const disclosure = {
      (20px); the row owns the affordance, so the chevron follows the whole row rather than the first
      line of a wrapping label (§17). */
   chevron: iconSlot.normal,
-  /* The row: a full-width row in a stacked group, activated like a selectable row. It is an option
-     row at the 16px inset of the surface it usually sits on directly — no sheet inset precedes it —
-     so its label shares an edge with the panel copy beneath it. Its own focus
+  /* The row: a full-width row in a stacked group, activated like a selectable row. It hangs its 16px
+     inset past both edges of its column (§17), so its label and chevron share the edges of the content
+     beside it and only the fill reaches into the surface's padding. The panel hangs by the same amount,
+     so the label still shares an edge with the panel copy beneath it. Its own focus
      indicator is the shared inset ring, because an offset one drawn outside the row would land on
      the divider or the panel beside it rather than around the row it belongs to — which is the same
      reason a segment inside a track takes the inset form. The chevron the component puts in the
      row is the disclosure's own affordance and turns in place under `motionOrient`. */
   trigger: /* @__PURE__ */ cx(
-    "group flex w-full items-center justify-between gap-4 px-4 py-3 text-start [outline-style:none] [overflow-wrap:anywhere]",
+    "group -mx-4 flex w-[calc(100%+2rem)] items-center justify-between gap-4 px-4 py-3 text-start [outline-style:none] [overflow-wrap:anywhere]",
     type.control.normal,
     shape.control,
     motionFeedback,
@@ -829,7 +830,9 @@ export const disclosure = {
     state.effectiveDisabled,
     state.enabled
   ),
-  panel: /* @__PURE__ */ cx("h-[var(--sui-disclose-height)] overflow-hidden [overflow-wrap:anywhere]", type.body, text.medium, motionDisclose),
+  /* The panel hangs with the row and pads its copy back in, so its clip leaves the 16px a field's
+     focus ring inside it needs. */
+  panel: /* @__PURE__ */ cx("-mx-4 h-[var(--sui-disclose-height)] overflow-hidden [overflow-wrap:anywhere]", type.body, text.medium, motionDisclose),
 } as const;
 
 /* Tone hierarchy — the color roles a surface can take, in rising strength:
@@ -925,19 +928,14 @@ export const puck = "bg-sherick-puck";
 /* A choice row — an opt-in `surface` row in a RadioGroup or CheckboxGroup — rests on the
    `matteHigh` tray, so every choice in the group reads as a target before any is chosen; it stays
    light enough that the empty mark's rim still clears 3:1 against it. The row that holds the
-   selection takes the role's *soft* surface and the accent **selection rim**, and stays flat. The
-   soft surface is lighter than the resting tray, so the tint alone would make the chosen row the
-   quieter of the two; the rim is what says "this one". It is the row's selection mark, not an
-   outline drawn to separate a surface, and it belongs to the selected state only. Like an empty
-   mark's rim it is an overlay rather than a border, so the fill and the hover layer reach the row's
-   real edge, and it is transparent rather than absent at rest, so forced colors keeps every row's
-   outline. The selected step and a lift turned a whole card into an accent block, which outshouted
-   the priority action on the same view. */
+   selection takes the role's *soft* surface and stays flat. The mark it houses is what says "this
+   one": an accent rim around the row repeated it and made the chosen row the loudest object on a
+   quiet form, and the selected step and a lift turned a whole card into an accent block. The
+   transparent overlay stays, so forced colors keeps every row's outline, and the fill and the hover
+   layer still reach the row's real edge. */
 export const selectableRowSurface = /* @__PURE__ */ cx(
   "has-[[data-checked]]:bg-sherick-primary-soft has-[[data-checked]]:text-sherick-ink",
-  "after:pointer-events-none after:absolute after:inset-0 after:box-border after:rounded-[inherit] after:border-[1.5px] after:border-transparent after:content-['']",
-  "has-[[data-checked]]:after:border-sherick-primary",
-  motionRim
+  "after:pointer-events-none after:absolute after:inset-0 after:box-border after:rounded-[inherit] after:border-[1.5px] after:border-transparent after:content-['']"
 );
 
 /* Supporting copy inside such a row — a choice's description. `text.medium` clears 4.5:1 on the

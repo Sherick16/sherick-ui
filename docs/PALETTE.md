@@ -245,7 +245,6 @@ the `rim` composition now also covers an empty mark on a resting choice row.
 | `text.medium` on an engaged field (`tray-deep`) | **4.86** | **6.23** |
 | `tone.text.danger` on the danger tray | **6.62** | **6.73** |
 | an empty mark's rim on a choice row | **3.04** | **3.22** |
-| a choice row's selection rim, worst surface | ok | ok |
 
 ## The rim (hollow controls)
 

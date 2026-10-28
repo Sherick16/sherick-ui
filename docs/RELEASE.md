@@ -31,7 +31,10 @@ a consumer can see them: `Avatar` rest props now land on the root and no longer 
 `className` now sizes its wrapper, and `Accordion` joins are no longer `separator` roles. Toasts with an
 action or a danger type are now sticky by default. If the owner judges any of these breaking, the bump is
 major rather than minor. The `overlay`, `toggles` and `stylesCss` budgets in `bundle-budget.json` rose with the
-new surface, and that change records the reason. The current source version is `2.10.0`, and npm's `latest` is
+new surface, and that change records the reason. `2.10.1` aligns disclosures and quiets choice rows:
+`Accordion` and `Collapsible` rows and panels hang their 1rem inset, so a disclosure's parent needs
+that much inline padding, and a selected surface choice row drops its accent rim. The current source
+version is `2.10.1`, and npm's `latest` is
 `2.9.0`. An installed package's actual version and exports, not this
 checkout, determine availability.
 
