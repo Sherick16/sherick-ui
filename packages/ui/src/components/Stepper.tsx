@@ -31,6 +31,8 @@ export interface StepperProps
   /** Horizontal when the container has room; otherwise the same sequence stacks vertically. */
   orientation?: "horizontal" | "vertical";
   disabled?: boolean;
+  /** The name a completed step's mark carries for a screen reader. Defaults to `Complete`. */
+  completeLabel?: string;
 }
 
 /* A discrete progress track, not a row of floating badges. The groove and fill are the
@@ -44,6 +46,7 @@ const Stepper = forwardRef<HTMLElement, StepperProps>(
       onValueChange,
       orientation = "horizontal",
       disabled = false,
+      completeLabel = "Complete",
       className,
       "aria-label": ariaLabel,
       ...navProps
@@ -57,7 +60,8 @@ const Stepper = forwardRef<HTMLElement, StepperProps>(
        a wider content band before their labels share a line. No measuring or duplicate controls. */
     const long = items.length > 4;
     const rowLayout = cn(
-      "grid min-w-0 w-full grid-cols-[0.375rem_minmax(0,1fr)] gap-x-4 gap-y-3 px-2 py-3 text-start text-sm",
+      "grid min-w-0 w-full grid-cols-[0.375rem_minmax(0,1fr)] gap-x-4 gap-y-3 px-2 py-3 text-start",
+      type.body,
       !stack && (long
         ? "[@container(min-width:64rem)]:grid-cols-1"
         : "[@container(min-width:32rem)]:grid-cols-1")
@@ -136,7 +140,7 @@ const Stepper = forwardRef<HTMLElement, StepperProps>(
                     {complete && !current ? (
                       <>
                         <HugeiconsIcon icon={Tick02Icon} aria-hidden="true" className={cn(iconStroke.glyph)} />
-                        <span className={cn("sr-only")}>Complete</span>
+                        <span className={cn("sr-only")}>{completeLabel}</span>
                       </>
                     ) : index + 1}
                   </span>

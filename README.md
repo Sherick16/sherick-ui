@@ -127,6 +127,16 @@ Version 2.5.0 adds `DateTimePicker`: a native `datetime-local` field whose popup
 
 Version 2.4.0 gives hollow controls a rim. Text fields, the file drop target and empty checkboxes and radios carry one 1.5px border in a new `--sui-rim` theme variable, tuned to clear 3:1 on every surface; fields become canvas-toned wells below the card; an invalid field turns only its rim to the danger tone; and the drop target has a custom dashed rim. Checkbox and RadioGroup marks are 20px, with an accent fill when selected. No component or prop is removed.
 
+Version 2.10.0 tightens the spacing contracts and adds public parts without removing anything. `Dialog`,
+`AlertDialog` and `Popover` gain `Trigger` and `Close` parts, `Menu` gains `Group` and `Label`, and
+`TooltipProvider` shares a warm-up across tooltips. Fields take `orientation="horizontal"` for setting rows
+and `size` (`sm`, `md`, `lg`), and Select and Combobox take `emptyMessage` and `loading`. `className` styles the
+element it always styled, and `popupClassName` and `fieldClassName` style the sheet and the inner column. Loading
+buttons keep focus and full strength under `aria-busy`. Toasts with an action or a danger type stay on screen
+until dismissed. `InlineCode` joins the `sherick-ui/content` subpath. Three behaviours are visible to
+consumers, so review them before upgrading: `Avatar` rest props land on the root, `Spinner` `className` sizes the
+wrapper, and an `Accordion` join is no longer a separator role.
+
 Version 2.9.0 refines the design language without removing anything. `Card` gains `Card.Title` and
 `Card.Description`, and `Popover` gains `Popover.Title` and `Popover.Description`, so a surface's
 heading takes the library's `title` role (now 16/24px) and names the popup. `Alert` and `Badge`

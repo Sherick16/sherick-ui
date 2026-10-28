@@ -1,11 +1,18 @@
 "use client";
 
 import { Dialog as BaseDialog } from "@base-ui/react/dialog";
-import React, { forwardRef, useRef, type ReactElement, type ReactNode } from "react";
+import React, {
+  forwardRef,
+  useRef,
+  type ForwardRefExoticComponent,
+  type ReactElement,
+  type ReactNode,
+  type RefAttributes,
+} from "react";
 import { cn } from "@/libs/utils";
 import Command, { type CommandProps } from "./Command";
-import { DialogDismiss, DialogSurface } from "./DialogSurface";
-import { text, type } from "./ui.common";
+import { DialogSurface, DialogTrigger } from "./DialogSurface";
+import { headingRhythm, shape, text, type } from "./ui.common";
 
 export interface CommandPaletteProps extends Omit<CommandProps, "className" | "id"> {
   /** The surface's own heading. It names the dialog. */
@@ -15,15 +22,24 @@ export interface CommandPaletteProps extends Omit<CommandProps, "className" | "i
   /**
    * The element the trigger's own props are handed to — usually a Sherick `Button`. The palette
    * opens from whatever this renders, so the control that opens it looks like the control it is.
+   * It is a convenience over `CommandPalette.Trigger`, which does the same thing as a part.
    */
   trigger?: ReactElement;
+  /** `CommandPalette.Trigger` parts that open the palette. They render in the page, beside the trigger. */
+  children?: ReactNode;
   open?: boolean;
   defaultOpen?: boolean;
   /** Base's own open-change callback, event details included. */
   onOpenChange?: BaseDialog.Root.Props["onOpenChange"];
   /** Adds to the dialog surface's own shell. */
   className?: string;
+  /** The accessible name of the dismissal control. Defaults to "Close command palette". */
+  closeLabel?: string;
 }
+
+type CommandPaletteComponent = ForwardRefExoticComponent<CommandPaletteProps & RefAttributes<HTMLInputElement>> & {
+  Trigger: typeof DialogTrigger;
+};
 
 /**
  * The same command list as a surface that owns the viewport: a palette. It is a `Dialog` — Base's
@@ -45,10 +61,12 @@ const CommandPalette = forwardRef<HTMLInputElement, CommandPaletteProps>(({
   title,
   description,
   trigger,
+  children,
   open,
   defaultOpen,
   onOpenChange,
   className,
+  closeLabel = "Close command palette",
   onAction,
   ...commandProps
 }, forwardedRef) => {
@@ -68,17 +86,25 @@ const CommandPalette = forwardRef<HTMLInputElement, CommandPaletteProps>(({
       onOpenChange={onOpenChange}
       actionsRef={actionsRef}
     >
-      {trigger && <BaseDialog.Trigger render={trigger} />}
+      {children}
+      {trigger && <DialogTrigger render={trigger} />}
 
       {/* The search field is the initial focus, and Base still owns everything else the surface
-          does: the trap, the dismissal, the restoration to whatever opened it. */}
-      <DialogSurface className={cn("max-w-xl", className)} initialFocus={searchRef}>
-        {/* 20px title line at y=20: center the 44px dismissal on y=30. */}
-        <DialogDismiss label="Close command palette" className={cn("top-2 end-2")} />
+          does: the trap, the dismissal, the restoration to whatever opened it. The palette is typed
+          into, so it takes the quick tier rather than the dialog's rise, and its corner is the
+          Popover's: an anchored sheet of a few parts, not a page. */}
+      <DialogSurface
+        className={cn("max-w-xl", shape.surface, className)}
+        initialFocus={searchRef}
+        presence="utility"
+        closeLabel={closeLabel}
+        /* 20px title line at y=20: centre the 44px dismissal on y=30. */
+        closeClassName="top-2 end-2"
+      >
         <div className={cn("px-5 pt-5 pe-16")}>
           <BaseDialog.Title className={cn("m-0", type.title, text.high)}>{title}</BaseDialog.Title>
           {description && (
-            <BaseDialog.Description className={cn("mt-1 mb-0", type.supporting, text.medium)}>
+            <BaseDialog.Description className={cn("mb-0", headingRhythm.title, type.supporting, text.medium)}>
               {description}
             </BaseDialog.Description>
           )}
@@ -100,8 +126,9 @@ const CommandPalette = forwardRef<HTMLInputElement, CommandPaletteProps>(({
       </DialogSurface>
     </BaseDialog.Root>
   );
-});
+}) as CommandPaletteComponent;
 
 CommandPalette.displayName = "CommandPalette";
+CommandPalette.Trigger = DialogTrigger;
 
 export default CommandPalette;

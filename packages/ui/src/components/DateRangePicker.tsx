@@ -16,7 +16,8 @@ import React, {
 import { cn } from "@/libs/utils";
 import Calendar from "./Calendar";
 import Field from "./Field";
-import { fieldMessage, state, text, tone, type } from "./ui.common";
+import { fieldLabel, fieldLayout, fieldMessage, state } from "./ui.common";
+import FieldLabel from "./FieldLabel";
 import {
   DateCalendarPopup,
   DateFieldTrigger,
@@ -257,10 +258,11 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(({
       actionsRef={inputRef === startInputRef ? startFieldActions : endFieldActions}
       error={typedIssue === (inputRef === startInputRef ? "start" : "end") ? labels.unavailableRange : undefined}
       validate={validate} validationMode="onChange">
+      {/* The dim belongs to each row, the control part: the legend, description and error keep their ink. */}
       <div
         data-disabled={disabled || undefined}
         data-invalid={invalid || undefined}
-        className={cn(dateFieldRowClassName(disabled))}
+        className={cn(dateFieldRowClassName(disabled), disabled && state.disabled)}
       >
         <div dir={dateInputDirection} className={cn("min-w-0 flex-1 overflow-hidden")}>
           <BaseField.Control
@@ -287,74 +289,73 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(({
     <fieldset
       disabled={disabled || undefined}
       aria-describedby={describedBy}
-      className={cn("m-0 min-w-0 p-0", disabled && state.disabled, className)}
+      className={cn("m-0 min-w-0 p-0", className)}
     >
-      <legend className={cn("p-0", type.label, text.high)}>
-        {label}
-        {required && (
-          <span className={cn("ms-1", tone.text.danger)} aria-hidden="true">
-            *
-          </span>
-        )}
+      <legend className={cn("p-0", fieldLabel)}>
+        <FieldLabel required={required}>{label}</FieldLabel>
       </legend>
 
-      <BasePopover.Root
-        open={open}
-        defaultOpen={defaultOpen}
-        onOpenChange={onOpenChange}
-        actionsRef={popupActionsRef}
-        modal={false}
-      >
-        <div ref={calendarAnchorRef} className={cn("mt-2 grid grid-cols-[repeat(auto-fit,minmax(min(100%,14rem),1fr))] gap-3")}>
-          {row(
-            startInputRef,
-            id,
-            startName,
-            startLabel,
-            displayedRange.start,
-            typedIssue === "start" || Boolean(error) || !isRangeAcceptable(currentRange),
-            validateStart,
-            (event) => handleEndpointChange("start", event)
-          )}
-          {row(
-            endInputRef,
-            id ? `${id}-end` : undefined,
-            endName,
-            endLabel,
-            displayedRange.end,
-            typedIssue === "end" || Boolean(error) || !isRangeAcceptable(currentRange),
-            validateEnd,
-            (event) => handleEndpointChange("end", event)
-          )}
-        </div>
+      {/* The rows, description and error share one column, so their gaps are the field's own. The column
+          sits 8px beneath the legend. */}
+      <div className={cn(fieldLayout, "mt-2")}>
+        <BasePopover.Root
+          open={open}
+          defaultOpen={defaultOpen}
+          onOpenChange={onOpenChange}
+          actionsRef={popupActionsRef}
+          modal={false}
+        >
+          <div ref={calendarAnchorRef} className={cn("grid grid-cols-[repeat(auto-fit,minmax(min(100%,14rem),1fr))] gap-3")}>
+            {row(
+              startInputRef,
+              id,
+              startName,
+              startLabel,
+              displayedRange.start,
+              typedIssue === "start" || Boolean(error) || !isRangeAcceptable(currentRange),
+              validateStart,
+              (event) => handleEndpointChange("start", event)
+            )}
+            {row(
+              endInputRef,
+              id ? `${id}-end` : undefined,
+              endName,
+              endLabel,
+              displayedRange.end,
+              typedIssue === "end" || Boolean(error) || !isRangeAcceptable(currentRange),
+              validateEnd,
+              (event) => handleEndpointChange("end", event)
+            )}
+          </div>
 
-        <DateCalendarPopup title={label} anchor={calendarAnchorRef}>
-          <Calendar
-            mode="range"
-            value={currentRange}
-            onValueChange={handleCalendarChange}
-            disabled={disabled}
-            min={min}
-            max={max}
-            isDateUnavailable={isDateUnavailable}
-            locale={locale}
-            weekStartsOn={weekStartsOn}
-            today={today}
-            labels={labelsProp}
-          />
-        </DateCalendarPopup>
-      </BasePopover.Root>
+          <DateCalendarPopup title={label} anchor={calendarAnchorRef}>
+            <Calendar
+              mode="range"
+              value={currentRange}
+              onValueChange={handleCalendarChange}
+              disabled={disabled}
+              min={min}
+              max={max}
+              isDateUnavailable={isDateUnavailable}
+              locale={locale}
+              weekStartsOn={weekStartsOn}
+              today={today}
+              labels={labelsProp}
+            />
+          </DateCalendarPopup>
+        </BasePopover.Root>
 
-      {description && (
-        <p id={descriptionId} className={cn(fieldMessage.description)}>
-          {description}
-        </p>
-      )}
-      {error && (
-        <p id={errorId} className={cn(fieldMessage.error)}>
-          {error}
-        </p>
-      )}
+        {description && (
+          <p id={descriptionId} className={cn(fieldMessage.description)}>
+            {description}
+          </p>
+        )}
+        {error && (
+          <p id={errorId} className={cn(fieldMessage.error)}>
+            {error}
+          </p>
+        )}
+      </div>
     </fieldset>
   );
 });

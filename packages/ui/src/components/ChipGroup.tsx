@@ -1,8 +1,13 @@
 "use client";
 
 import { ToggleGroup as BaseToggleGroup } from "@base-ui/react/toggle-group";
-import React, { forwardRef, type ReactNode } from "react";
+import React, { Children, forwardRef, isValidElement, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
+import { Chip, type ChipProps } from "./Chip";
+
+/* The one development check here. Bundlers replace `process.env.NODE_ENV` in published code, and the
+   `typeof` guard keeps an unbundled page from throwing on it. */
+declare const process: { env: { NODE_ENV?: string } } | undefined;
 
 export interface ChipGroupProps
   extends Omit<BaseToggleGroup.Props<string>, "multiple" | "className" | "render"> {
@@ -17,6 +22,25 @@ export interface ChipGroupProps
   className?: string;
 }
 
+/* A toggle chip without a value is a control the group cannot hold: its selection never reaches the
+   group's value, so it looks chosen and is not. A tag is not a toggle, so a dismissible tag is exempt, and
+   a passive tag is `Chip.Tag`. Only direct children are checked, the ones the caller wrote. */
+const warnWithoutValue = (children: ReactNode) => {
+  if (typeof process === "undefined" || process.env.NODE_ENV === "production") return;
+  Children.forEach(children, (child) => {
+    if (
+      isValidElement<ChipProps>(child) &&
+      child.type === Chip &&
+      child.props.value === undefined &&
+      child.props.onRemove === undefined
+    ) {
+      console.warn(
+        "ChipGroup: a Chip inside a group needs a `value`, so the group can hold its selection. Use `Chip.Tag` for a passive tag."
+      );
+    }
+  });
+};
+
 /**
  * A row of chips sharing one value. It is the primitive's group with a chip row's own anatomy:
  * no track, because a chip is a control in its own right rather than a segment of one — and
@@ -27,6 +51,8 @@ export interface ChipGroupProps
  */
 export const ChipGroup = forwardRef<HTMLDivElement, ChipGroupProps>(
   ({ children, multiple = true, className, ...groupProps }, ref) => {
+    warnWithoutValue(children);
+
     return (
       <BaseToggleGroup
         {...groupProps}

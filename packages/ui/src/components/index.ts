@@ -24,7 +24,7 @@ export { default as Field } from "./Field";
 export { default as FileUpload } from "./FileUpload";
 export { default as Form } from "./Form";
 export type { FormErrors, FormProps } from "./Form";
-export type { FileUploadProps, FileRejection } from "./FileUpload";
+export type { FileUploadLabels, FileUploadProps, FileRejection } from "./FileUpload";
 export { default as IconButton } from "./IconButton";
 export { default as Input } from "./Input";
 export { default as Dialog } from "./Dialog";
@@ -48,7 +48,7 @@ export { Tabs } from "./Tabs";
 export { default as ToggleGroup } from "./ToggleGroup";
 export { Table } from "./Table";
 export { default as Textarea } from "./Textarea";
-export { default as Tooltip } from "./Tooltip";
+export { default as Tooltip, TooltipProvider } from "./Tooltip";
 export { default as TreeView } from "./TreeView";
 export type { TreeViewItem, TreeViewProps } from "./TreeView";
 export { default as Drawer } from "./Drawer";
@@ -56,10 +56,10 @@ export { ToastProvider, ToastViewport, useToast, createToastManager } from "./To
 
 export type { ButtonProps, ButtonAppearance, ButtonSize } from "./Button";
 export type { AlertProps } from "./Alert";
-export type { AlertDialogProps } from "./AlertDialog";
+export type { AlertDialogProps, AlertDialogTriggerProps } from "./AlertDialog";
 export type { AvatarProps } from "./Avatar";
 export type { BadgeProps } from "./Badge";
-export type { BreadcrumbItem, BreadcrumbProps } from "./Breadcrumb";
+export type { BreadcrumbItem, BreadcrumbLabels, BreadcrumbProps } from "./Breadcrumb";
 export type { CalendarDate, CalendarLabels, CalendarProps, DateRange } from "./Calendar";
 export type { CardDescriptionProps, CardProps, CardTitleProps } from "./Card";
 export type { CheckboxProps } from "./Checkbox";
@@ -67,6 +67,7 @@ export type { CheckboxGroupOption, CheckboxGroupProps } from "./CheckboxGroup";
 export type { ChipProps } from "./Chip";
 export type { ChipGroupProps } from "./ChipGroup";
 export type {
+  ComboboxLabels,
   ComboboxMultipleProps,
   ComboboxOption,
   ComboboxOptionGroup,
@@ -74,30 +75,47 @@ export type {
   ComboboxProps,
   ComboboxSingleProps,
 } from "./Combobox";
-export type { CommandItem, CommandProps } from "./Command";
+export type { CommandItem, CommandLabels, CommandProps } from "./Command";
 export type { CommandPaletteProps } from "./CommandPalette";
 export type { DatePickerProps } from "./DatePicker";
 export type { DateRangePickerProps } from "./DateRangePicker";
 export type { CalendarDateTime, DateTimePickerLabels, DateTimePickerProps } from "./DateTimePicker";
 export type { DividerProps, DividerWeight } from "./Divider";
-export type { FieldProps } from "./Field";
+export type { FieldProps, FieldSize } from "./Field";
 export type { RadioGroupOption, RadioGroupProps } from "./RadioGroup";
+export type { ChoiceAppearance } from "./choice-row";
 export type { SliderProps } from "./Slider";
 export type { NumberFieldProps } from "./NumberField";
 export type { SelectOption, SelectOptionGroup, SelectProps } from "./Select";
-export type { IconButtonAppearance, IconButtonProps } from "./IconButton";
+export type { IconButtonAppearance, IconButtonProps, IconButtonSize } from "./IconButton";
 export type { InputProps } from "./Input";
-export type { DialogProps } from "./Dialog";
+export type { DialogCloseProps, DialogProps } from "./Dialog";
+export type { DialogAttachment, DialogTriggerProps } from "./DialogSurface";
 export type { DialogContentProps } from "./DialogContent";
 export type { DialogDescriptionProps } from "./DialogDescription";
 export type { DialogFooterProps } from "./DialogFooter";
 export type { DialogHeaderProps } from "./DialogHeader";
 export type { MediaImageProps, MediaVideoProps } from "./Media";
-export type { MenuContentProps, MenuItemProps, MenuProps, MenuSeparatorProps, MenuTriggerProps } from "./Menu";
+export type {
+  MenuContentProps,
+  MenuGroupProps,
+  MenuItemProps,
+  MenuLabelProps,
+  MenuProps,
+  MenuSeparatorProps,
+  MenuTriggerProps,
+} from "./Menu";
 export type { NavGroupHeadingLevel, NavGroupItem, NavGroupProps } from "./NavGroup";
 export type { NavItemProps } from "./NavItem";
-export type { PaginationProps } from "./Pagination";
-export type { PopoverContentProps, PopoverDescriptionProps, PopoverProps, PopoverTitleProps, PopoverTriggerProps } from "./Popover";
+export type { PaginationLabels, PaginationProps } from "./Pagination";
+export type {
+  PopoverCloseProps,
+  PopoverContentProps,
+  PopoverDescriptionProps,
+  PopoverProps,
+  PopoverTitleProps,
+  PopoverTriggerProps,
+} from "./Popover";
 export type { ProgressProps } from "./Progress";
 export type { SearchProps } from "./Search";
 export type { SegmentedControlOption, SegmentedControlProps } from "./SegmentedControl";
@@ -105,12 +123,12 @@ export type { SkeletonProps } from "./Skeleton";
 export type { SpinnerProps } from "./Spinner";
 export type { StepperItem, StepperProps } from "./Stepper";
 export type { SwitchProps } from "./Switch";
-export type { Tab, TabsProps } from "./Tabs";
+export type { Tab, TabsLabels, TabsProps } from "./Tabs";
 export type { ToggleGroupItemProps, ToggleGroupProps } from "./ToggleGroup";
 export type { TableColumn, TableProps } from "./Table";
 export type { TextareaProps } from "./Textarea";
-export type { TooltipProps } from "./Tooltip";
-export type { OverlayAlign, OverlaySide, Variant } from "./ui.types";
+export type { TooltipProps, TooltipProviderProps } from "./Tooltip";
+export type { OverlayAlign, OverlaySide, PartProps, TriggerProps, Variant } from "./ui.types";
 export type { AccordionHeadingLevel, AccordionItemProps, AccordionPanelProps, AccordionProps, AccordionTriggerProps } from "./Accordion";
 export type { CollapsiblePanelProps, CollapsibleProps, CollapsibleTriggerProps } from "./Collapsible";
 export type {
@@ -124,6 +142,7 @@ export type {
 } from "./Drawer";
 export type {
   ToastActionOptions,
+  ToastLabels,
   ToastManager,
   ToastOptions,
   ToastPosition,

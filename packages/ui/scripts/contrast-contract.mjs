@@ -114,8 +114,7 @@ export const contrastCompositions = (variables, alphas) => {
   /* Every surface a component composites a fill over. An *opaque fill* is not a surface: the neutral
      fill a `secondary` control takes is listed where it is actually used. The acrylic fills are read
      from the theme's own `--sui-glass-*` / `--sui-overlay-fill` values; the code well is the
-     `material.matte` shell a `CodeBlock` wears with its own `bg-sherick-canvas/[0.28]` code fill
-     over it. */
+     `material.matteHigh` step a `CodeBlock` paints over the card that holds it. */
   const ACRYLIC = "acrylic sheet";
   const ACRYLIC_DENSE = "acrylic dense / tooltip";
   const HERO_SHEET = "hero sheet / dialog";
@@ -123,11 +122,12 @@ export const contrastCompositions = (variables, alphas) => {
   const acrylicFill = Number(variables["--sui-glass-fill"]);
   const acrylicDenseFill = Number(variables["--sui-glass-dense-fill"]);
   const overlayFill = Number(variables["--sui-overlay-fill"]);
-  const codeWell = composite(canvas, 0.28, composite(surface, FIELD.card, canvas));
   /* A field is a tray in the `surface-high` tone over whatever holds it; the common case is a card.
      Under the pointer and while engaged it sinks to the deep tray. A choice row rests on the
      `matteHigh` tray. An empty mark's interior is a canvas-toned well. */
   const card = composite(surface, FIELD.card, canvas);
+  /* The code well is the `matteHigh` step over the card (`recipeAlphas.code.well`), not a canvas tint. */
+  const codeWell = composite(surfaceHigh, alphas.code.well, card);
   const tray = (alpha, base = card) => composite(surfaceHigh, alpha, base);
   const deepTray = (alpha, base = card) => composite(colour("tray-deep"), alpha, base);
   const choiceRow = (base = card) => composite(surfaceHigh, FIELD.groove, base);
@@ -237,7 +237,7 @@ export const contrastCompositions = (variables, alphas) => {
   add(
     "the code syntax palette on the code well",
     WCAG_TEXT,
-    "a CodeBlock's plain text and every Prism syntax role, read against the well its own matte shell and its `bg-sherick-canvas/[0.28]` fill composite to",
+    "a CodeBlock's plain text and every Prism syntax role, read against the `matteHigh` well over its card",
     CODE_ROLES.map((role) => [`code.${role}`, colour(`code-${role}`), surfaces[CODE_WELL]])
   );
   add(

@@ -3,6 +3,7 @@
 import { Switch as BaseSwitch } from "@base-ui/react/switch";
 import React, {
   forwardRef,
+  useRef,
   type ButtonHTMLAttributes,
   type Ref,
 } from "react";
@@ -17,6 +18,7 @@ import {
   tone,
 } from "./ui.common";
 import { motionFeedback, motionRelocate } from "./ui.motion";
+import { useControlNameWarning } from "./Field";
 import { Variant } from "./ui.types";
 
 export interface SwitchProps
@@ -49,10 +51,19 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(({
   inputRef,
   ...buttonProps
 }, ref) => {
+  /* The visible button is both the forwarded ref and the element the name check reads. */
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+  const setButtonRef = (node: HTMLButtonElement | null) => {
+    buttonRef.current = node;
+    if (typeof ref === "function") ref(node);
+    else if (ref) ref.current = node;
+  };
+  useControlNameWarning(buttonRef, "Switch", Boolean(buttonProps["aria-label"] || buttonProps["aria-labelledby"]));
+
   return (
     <BaseSwitch.Root
       nativeButton
-      render={<button {...buttonProps} ref={ref} type="button" />}
+      render={<button {...buttonProps} ref={setButtonRef} type="button" />}
       checked={checked}
       defaultChecked={defaultChecked}
       disabled={disabled}
@@ -65,7 +76,7 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(({
       inputRef={inputRef}
       onCheckedChange={onCheckedChange}
       className={cn(
-        "group inline-flex min-h-12 min-w-14 items-center justify-center outline-none",
+        "group inline-flex min-h-12 min-w-14 items-center justify-center [outline-style:none]",
         shape.pill,
         state.enabled,
         state.effectiveDisabled,
@@ -86,7 +97,11 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(({
           tone.strong.secondary,
           text.medium,
           tone.strongChecked[variant],
-          stateLayer.track
+          stateLayer.track,
+          /* Forced colors removes the track's fill and its shadow, so the track keeps its boundary as a
+             border the browser repaints. In normal colors the track still has no rim: its thumb and its
+             range identify it. */
+          "forced-colors:border"
         )}
       >
         <BaseSwitch.Thumb
@@ -95,7 +110,11 @@ export const Switch = forwardRef<HTMLButtonElement, SwitchProps>(({
             "group-data-[checked]:h-6 group-data-[checked]:w-6 group-data-[checked]:translate-x-5 rtl:group-data-[checked]:-translate-x-5",
             shape.circle,
             elevation.control,
-            motionRelocate
+            motionRelocate,
+            /* The thumb's fill is a background, and forced colors removes every background unless the part
+               opts out of colour adjustment, so the thumb opts out and paints a system colour in both
+               states. Its position still says on or off. */
+            "forced-color-adjust-none forced-colors:[background-color:Highlight]"
           )}
         />
       </span>

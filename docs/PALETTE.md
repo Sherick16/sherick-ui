@@ -49,14 +49,14 @@ warm neutrals read as yellowed beside a cool accent. The overhaul separates the 
 | `--sui-primary-soft` | `0.952 0.024 292` | `0.300 0.075 292` |
 | `--sui-primary-selected` | `0.905 0.052 292` | `0.375 0.105 292` |
 | `--sui-danger` | `0.465 0.180 27` | `0.775 0.130 25` |
-| `--sui-danger-soft` | `0.952 0.020 30` | `0.290 0.060 25` |
-| `--sui-danger-selected` | `0.900 0.042 30` | `0.360 0.085 25` |
+| `--sui-danger-soft` | `0.952 0.020 30` | `0.260 0.040 25` |
+| `--sui-danger-selected` | `0.900 0.042 30` | `0.330 0.062 25` |
 | `--sui-warning` | `0.398 0.086 68` | `0.830 0.120 80` |
-| `--sui-warning-soft` | `0.955 0.032 82` | `0.300 0.050 75` |
-| `--sui-warning-selected` | `0.905 0.058 80` | `0.370 0.070 75` |
+| `--sui-warning-soft` | `0.955 0.032 82` | `0.260 0.040 75` |
+| `--sui-warning-selected` | `0.905 0.058 80` | `0.330 0.060 75` |
 | `--sui-success` | `0.390 0.088 158` | `0.780 0.120 158` |
-| `--sui-success-soft` | `0.952 0.024 165` | `0.290 0.050 160` |
-| `--sui-success-selected` | `0.900 0.046 165` | `0.360 0.070 160` |
+| `--sui-success-soft` | `0.952 0.024 165` | `0.260 0.040 160` |
+| `--sui-success-selected` | `0.900 0.046 165` | `0.330 0.060 160` |
 | `--sui-on-primary` | `0.990 0.003 290` | `0.160 0.006 285` |
 
 The contract is unchanged in method and in requirement, and every composition clears it in both
@@ -218,6 +218,13 @@ This is not the role split rejected above. That proposal separated a role's *for
 *strong fill* for a 0.04 lightness difference. The container is a third, different surface — the
 thing a tint used to approximate — and the difference it makes is hue, not lightness.
 
+**Dark semantic containers are tints.** In dark mode the danger, warning and success soft
+steps sat at lightness 0.29–0.30 and read as slabs beside the neutral Alert. They are now lightness 0.26
+with chroma 0.040 (hues 25, 75 and 160), and their selected steps lightness 0.33 with chroma 0.060–0.062.
+Against the dark surface a soft container measures 1.15–1.18:1, so it reads as a tint; its selected step
+sits 1.25–1.29:1 above the soft step; `ink` on a soft step measures 13.2–13.6:1, and the role's own text
+measures 7.3–9.2:1 on it. The light values are unchanged. The contrast contract passes with no allowlist.
+
 The field error ladder no longer composites `danger` over the field: an invalid field keeps its
 well and turns its rim to the danger tone (see below).
 
@@ -270,3 +277,22 @@ outshone the labels beside it.
 Fields themselves are canvas-toned wells (`material.control`), below the card in both themes, so
 the rim rather than the fill separates them; the placeholder and danger texts are measured on that
 well, at rest and engaged.
+
+## The code well
+
+**Decided.** A code well was the canvas at 28% over its card. That composite measured
+1.02:1 against the card in both themes, so a code block read as part of its card, and only its Prism
+colours marked it as code. The well is now the `matteHigh` step over the card (`surface-high` at 72%), so
+it reads as a recess, with the `recessedTop` wall as the second cue.
+
+| Composition | Light | Dark |
+| --- | --- | --- |
+| the card against the well (was 1.02 in both themes) | **1.13** | **1.11** |
+| the code text on the well | 13.05 | 12.49 |
+| the comment role on the well | 4.77 | 5.28 |
+| the namespace token (text at 0.7) on the well | 5.25 | 6.77 |
+
+The tonal separation is modest by design: a solid `surface-high` fill separates a little more (1.19 light,
+1.16 dark), but its comment role falls to 4.54:1 in light, so the translucent step keeps the margin.
+`scripts/contrast-contract.mjs` still measures the old `canvas` at 28%. `recipeAlphas.code.well` now
+carries the published alpha, so that composition should be read from it.

@@ -207,7 +207,7 @@ test("progress measures a known value and sweeps an unknown one", async ({ page,
   expect(errors).toEqual([]);
 });
 
-test("reduced motion leaves the indeterminate bar a static status glyph", async ({ page, errors }) => {
+test("reduced motion turns the indeterminate sweep into a full-width breathe", async ({ page, errors }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/verification/interactions");
   const fill = page
@@ -215,16 +215,18 @@ test("reduced motion leaves the indeterminate bar a static status glyph", async 
     .getByRole("progressbar")
     .locator("[data-sui-progress-indicator]");
 
-  expect(await animationName(fill.locator("xpath=.."))).toBe("none");
+  /* The sweep's travel is what reduced motion removes; the loop stays as an opacity breathe, so the
+     bar keeps saying that work is running (DESIGN_LANGUAGE.md §12). */
+  expect(await animationName(fill.locator("xpath=.."))).toBe("sherick-breathe");
 
-  /* The loop stops, but the bar still reports work: the fill rests where it starts, as one bar's
-     worth of the track rather than as nothing at all. */
+  /* With no travel, the fill holds the whole track rather than one bar's worth of it, so a bar that
+     is busy never reads as a bar that is 40% done. */
   const fillBox = await fill.boundingBox();
   const trackBox = await page
     .getByTestId("progress-indeterminate")
     .locator(".shadow-sherick-recessed")
     .boundingBox();
-  expect((fillBox?.width ?? 0) / (trackBox?.width ?? 1)).toBeCloseTo(0.4, 1);
+  expect((fillBox?.width ?? 0) / (trackBox?.width ?? 1)).toBeCloseTo(1, 1);
 
   expect(errors).toEqual([]);
 });

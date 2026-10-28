@@ -52,8 +52,8 @@ Exports: `Calendar`, `DatePicker`, `DateRangePicker`; `CalendarDate`, `DateRange
 - Shared calendar props: `month?`, `defaultMonth?`, `onMonthChange?(month)` (same date format,
   normalized to day 01); `min?`, `max?` inclusive; `isDateUnavailable?(date):boolean`;
   `disabled?`, `invalid?`, `locale?:string` (deterministic default `en-US`);
-  `weekStartsOn?:0|1|2|3|4|5|6` (default 1); `today?:CalendarDate` (default current UTC day;
-  applications can pass their civil today for their locale); `labels?:Partial<CalendarLabels>`.
+  `weekStartsOn?:0|1|2|3|4|5|6` (default 1); `today?:CalendarDate` (default the viewer's local
+  civil day, refreshed at local midnight; the prop overrides it); `labels?:Partial<CalendarLabels>`.
   Labels: `previousMonth`, `nextMonth`, `today`, `selectDate`, `selectRange`,
   `unavailableRange`. Defaults are English. Intl formats month/year, weekday and full-date
   accessible names with Gregorian calendar and UTC; locale never changes value semantics.

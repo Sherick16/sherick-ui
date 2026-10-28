@@ -138,6 +138,38 @@ enough. Put `Select`, `Combobox`, `NumberField`, `Checkbox`, `Switch` and `Slide
 choice. Option `description` names nothing: the label is the accessible name and the description
 is announced as its description.
 
+## Spacing, labels and states (from 2.10.0)
+
+Additive props follow the same names as the rest of the library. Nothing here renames or removes a prop.
+
+- **`className` styles the element it always styled.** On `Select` that is the trigger, on `Combobox` the
+  box, on `Search` the tray and on `NumberField` the root. A composite's other parts take their own props:
+  `fieldClassName` styles the outer column of `Search` and the tray of `NumberField`, and `popupClassName`
+  styles the sheet of `Select` and `Combobox`.
+- **`Field orientation="horizontal"`** puts a setting's label and description at the start and its control at
+  the end of one row. The label and description keep their 4px gap.
+- **`size`** on `Input`, `Select`, `Combobox`, `NumberField`, `Search` and `DatePicker` is `sm`, `md` or `lg`
+  (default `md`). `sm` is a 40px row, `md` 48px and `lg` 56px.
+- **`emptyMessage` and `loading`** on `Select` and `Combobox`. With no options and no message, `Select` opens no
+  popup. While `loading`, a spinner replaces the chevron and the trigger is `aria-busy`.
+- **`labels`** on `Combobox` and `FileUpload` sets the announced and visible copy. Each key has today's English
+  default, so an existing app keeps its wording.
+- **`error` takes a node** on `Input` and `Textarea`, so a message can carry a link. `error={true}` with
+  `errorMessage` still works.
+- **`label`** is optional on `DatePicker` and `FileUpload`, and is a node when given.
+
+Other additions: `Dialog.Trigger`, `Dialog.Close`, `AlertDialog.Trigger`, `Popover.Close`, `Menu.Group`, `Menu.Label`,
+`TooltipProvider`, `Tooltip align`, `Button` and `IconButton` `render`, `IconButton size` (`target` or `compact`)
+and `appearance="text"` and `filled`, `Alert` `open`, `onOpenChange` and `announce`, `Table` `caption`,
+`emptyMessage`, `getRowKey` and `rowHeader`, `Spinner` `label` and `size` (`sm`, `md`, `lg`), `Avatar` `fallback`,
+`Stepper completeLabel`, `NavGroup renderLink` and `Pagination renderLink`, `Tab` `icon`, and `Tabs` `labels`.
+`InlineCode` is exported from `sherick-ui/content`.
+
+Three behaviours changed for existing code, and each has a reason in [the design language](../../docs/DESIGN_LANGUAGE.md).
+`Avatar` rest props now land on the root span, so an image-only prop such as `loading` no longer reaches the image. `src` and `alt` still do. `Spinner`
+`className` sizes the wrapper, which a bare spinner fills. `Accordion` draws each join as a border on its section,
+not as a `separator` role. Toasts with an action or a danger type are sticky by default.
+
 ## Themes and direction
 
 With no root `data-sherick-theme`, the library follows `prefers-color-scheme`. Set

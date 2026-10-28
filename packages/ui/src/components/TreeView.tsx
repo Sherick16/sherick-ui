@@ -16,7 +16,7 @@ import React, {
   type ReactNode,
 } from "react";
 import { cn } from "@/libs/utils";
-import { density, elevation, iconStroke, material, parentFocusRingInset, shape, state, stateLayer, text, tone } from "./ui.common";
+import { density, disclosure, elevation, iconSlot, iconStroke, material, parentFocusRingInset, shape, state, stateLayer, text, tone } from "./ui.common";
 import { motionDisclose, motionFeedback, motionOrient } from "./ui.motion";
 import {
   flattenTree,
@@ -313,7 +313,10 @@ const TreeView = forwardRef<HTMLDivElement, TreeViewProps>(function TreeView(
           data-highlighted={active ? "" : undefined}
           onClick={() => selectNode(item)}
           className={cn(
-            "flex min-w-0 items-center gap-2 pe-3",
+            /* A row hangs its 8px of start padding past the tree's content edge, the way a disclosure row hangs
+               its own inset (§17): the row's hover fill reaches the tree's edge, and the branch mark keeps its
+               own place inside the row. */
+            "-mx-2 flex w-[calc(100%+1rem)] min-w-0 items-center gap-2 pe-3",
             indent(depth),
             density.compact,
             shape.row,
@@ -344,15 +347,19 @@ const TreeView = forwardRef<HTMLDivElement, TreeViewProps>(function TreeView(
                 !rowDisabled && "cursor-pointer"
               )}
             >
-              <HugeiconsIcon icon={ArrowRight01Icon}
-                aria-hidden="true"
-                className={cn(iconStroke.glyph, 
-                  "size-4",
-                  text.medium,
-                  motionOrient,
-                  branchExpanded ? "rotate-90" : direction === "rtl" ? "rotate-180" : "rotate-0"
-                )}
-              />
+              {/* The branch chevron is a disclosure mark at its own slot size. It turns in place, so it takes
+                  `orient`, and the turn is the only thing that changes on it. */}
+              <span className={cn(disclosure.chevron, text.medium)}>
+                <HugeiconsIcon
+                  icon={ArrowRight01Icon}
+                  aria-hidden="true"
+                  className={cn(
+                    iconStroke.glyph,
+                    motionOrient,
+                    branchExpanded ? "rotate-90" : direction === "rtl" ? "rotate-180" : "rotate-0"
+                  )}
+                />
+              </span>
             </span>
           ) : (
             /* A leaf keeps the affordance's own box, so every label in the tree starts at the same
@@ -361,12 +368,7 @@ const TreeView = forwardRef<HTMLDivElement, TreeViewProps>(function TreeView(
           )}
 
           {item.icon ? (
-            <span
-              aria-hidden="true"
-              className={cn(
-                "inline-flex size-4 shrink-0 items-center justify-center [&>svg]:size-4"
-              )}
-            >
+            <span aria-hidden="true" className={cn(iconSlot.compact)}>
               {item.icon}
             </span>
           ) : null}
@@ -424,11 +426,11 @@ const TreeView = forwardRef<HTMLDivElement, TreeViewProps>(function TreeView(
     };
 
     return branch ? (
-      <BaseCollapsible.Root key={item.value} open={branchExpanded} {...itemProps} className={cn("flex min-w-0 flex-col outline-none")}>
+      <BaseCollapsible.Root key={item.value} open={branchExpanded} {...itemProps} className={cn("flex min-w-0 flex-col [outline-style:none]")}>
         {content}
       </BaseCollapsible.Root>
     ) : (
-      <div key={item.value} {...itemProps} className={cn("flex min-w-0 flex-col outline-none")}>
+      <div key={item.value} {...itemProps} className={cn("flex min-w-0 flex-col [outline-style:none]")}>
         {content}
       </div>
     );

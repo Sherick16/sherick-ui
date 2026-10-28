@@ -44,6 +44,7 @@ import {
   ToastViewport,
   ToggleGroup,
   Tooltip,
+  TooltipProvider,
   useToast,
 } from "sherick-ui";
 import type { DrawerSide } from "sherick-ui";
@@ -127,7 +128,6 @@ const applyTheme = (theme: ThemeMode) => {
 };
 
 export default function Home() {
-  const [dialogOpen, setDialogOpen] = useState(false);
   const [switchOn, setSwitchOn] = useState(true);
   const [selection, setSelection] = useState("design");
   const [alertOpen, setAlertOpen] = useState(false);
@@ -161,14 +161,18 @@ export default function Home() {
         <div className="mx-auto flex h-16 w-full max-w-[1440px] items-center gap-4 px-5 sm:px-8">
           <a href="#top" className={cn("flex items-center gap-3", shape.row, `${focusRing} focus-visible:outline-offset-4`)}>
             <BrandMark />
-            <span className="text-[0.9375rem] font-semibold tracking-[-0.02em]">Sherick UI</span>
+            {/* Below `sm` the mark alone carries the identity: the wordmark is what the 375px header
+                has no room for beside the jump control and the 44px theme toggles. It stays in the
+                link's accessible name, so the link is still named "Sherick UI". */}
+            <span className="sr-only text-[0.9375rem] font-semibold tracking-[-0.02em] sm:not-sr-only">Sherick UI</span>
           </a>
           <span aria-hidden="true" className={`hidden h-4 border-l sm:block ${edge.rule}`} />
           <span className={`hidden font-showcase-mono text-[0.6875rem] uppercase tracking-[0.14em] sm:block ${text.medium}`}>
             Workbench
           </span>
           <div className="ml-auto flex items-center gap-2 sm:gap-4">
-            <div className="min-[1440px]:hidden">
+            {/* One line at every width: a narrow header wraps the control to two lines otherwise. */}
+            <div className="shrink-0 whitespace-nowrap min-[1440px]:hidden">
               <ShowcaseJumpNav activeId={activeSection} />
             </div>
             <a
@@ -355,6 +359,9 @@ export default function Home() {
                   <Button appearance="tonal" variant="secondary">Tonal</Button>
                   <Button appearance="text" variant="secondary">Text</Button>
                   <Button appearance="tonal" variant="danger" icon={<HugeiconsIcon icon={Delete02Icon} aria-hidden="true" />}>Delete</Button>
+                  {/* `render` hands the button's own classes and state to a link, so a navigation action
+                      keeps a button's anatomy and focus ring rather than an underlined text link. */}
+                  <Button appearance="tonal" variant="secondary" render={<a href="#top" />}>Back to top</Button>
                 </div>
               </Specimen>
 
@@ -438,6 +445,10 @@ export default function Home() {
                 <div className="space-y-5">
                   <Field label="Quantity" description="Between 1 and 10.">
                     <NumberField min={1} max={10} defaultValue={4} />
+                  </Field>
+                  {/* A horizontal field sets its label beside a short control, the way a setting reads on one row. */}
+                  <Field label="Workspace name" orientation="horizontal">
+                    <Input placeholder="Sherick UI" />
                   </Field>
                   <div className="grid gap-4 sm:grid-cols-2">
                     <Field label="Price (€)">
@@ -581,10 +592,21 @@ export default function Home() {
 
               <Specimen title="Tabs">
                 <Tabs tabs={[
-                  { id: "one", label: "Overview", content: <p className={cn("text-sm", text.medium)}>Overview content</p> },
+                  { id: "one", label: "Overview", icon: <HugeiconsIcon icon={Notification03Icon} aria-hidden="true" />, content: <p className={cn("text-sm", text.medium)}>Overview content</p> },
                   { id: "two", label: "Activity", content: <p className={cn("text-sm", text.medium)}>Activity content</p> },
                   { id: "three", label: "Members", content: <p className={cn("text-sm", text.medium)}>Members content</p> },
                 ]} />
+                {/* A track wider than its box scrolls inside itself, and says so with an edge fade on the
+                    side the rest of the tabs lie on. The fade belongs to the track, not to a control. */}
+                <div className="mt-5 max-w-xs">
+                  <Tabs tabs={[
+                    { id: "one", label: "Summary", content: <p className={cn("text-sm", text.medium)}>Summary content</p> },
+                    { id: "two", label: "History", content: <p className={cn("text-sm", text.medium)}>History content</p> },
+                    { id: "three", label: "People", content: <p className={cn("text-sm", text.medium)}>People content</p> },
+                    { id: "four", label: "Billing", content: <p className={cn("text-sm", text.medium)}>Billing content</p> },
+                    { id: "five", label: "Integrations", content: <p className={cn("text-sm", text.medium)}>Integrations content</p> },
+                  ]} />
+                </div>
               </Specimen>
 
               <Specimen title="Navigation groups">
@@ -624,6 +646,10 @@ export default function Home() {
                     The connection dropped before the file was sent. Retry the upload, or split the
                     file and add each part to the workspace again.
                   </Alert>
+                  {/* A status that arrives while the reader works is announced politely, so it does not
+                      interrupt them. The default `alert` is for a failure the reader must hear now. */}
+                  <Alert announce="status">Sync continues in the background.</Alert>
+                  <ControlledAlertSpecimen />
                 </div>
               </Specimen>
 
@@ -741,7 +767,7 @@ export default function Home() {
               </Specimen>
 
               <Specimen title="Table">
-                <Table headers={["Project", "Owner", "Status"]} rows={[
+                <Table caption="Active projects" headers={["Project", "Owner", "Status"]} rows={[
                   ["Design system", "Ana", <Badge key="design" variant="success">Live</Badge>],
                   ["Marketing site", "Bruno", <Badge key="marketing" variant="warning">In review</Badge>],
                   ["Documentation", "Chen", <Badge key="docs" variant="secondary">Draft</Badge>],
@@ -799,16 +825,40 @@ export default function Home() {
               </Specimen>
 
               <Specimen title="Tooltip">
-                <div className="flex flex-wrap items-center gap-3">
-                  <Tooltip content="Creates a copy in the same workspace">
-                    <Button appearance="tonal" variant="secondary">Duplicate project</Button>
-                  </Tooltip>
-                </div>
+                {/* One provider governs the hints beside it: a hint that closes lets the next open
+                    at once, so a row of hints is read as one group rather than a delay per button. */}
+                <TooltipProvider>
+                  <div className="flex flex-wrap items-center gap-3">
+                    <Tooltip content="Creates a copy in the same workspace">
+                      <Button appearance="tonal" variant="secondary">Duplicate project</Button>
+                    </Tooltip>
+                    <Tooltip content="Moves it to the archive" position="top">
+                      <Button appearance="text" variant="secondary">Archive</Button>
+                    </Tooltip>
+                  </div>
+                </TooltipProvider>
               </Specimen>
 
               <Specimen title="Dialog & alert dialog">
                 <div className="flex flex-wrap items-center gap-3">
-                  <Button appearance="tonal" variant="secondary" onClick={() => setDialogOpen(true)}>Open dialog</Button>
+                  {/* The trigger and the close control belong to the dialog they open, so the page holds no
+                      open state of its own. The surface is portaled, and the trigger stays where it is. */}
+                  <Dialog>
+                    <Dialog.Trigger render={<Button appearance="tonal" variant="secondary">Open dialog</Button>} />
+                    <Dialog.Header>Dialog specimen</Dialog.Header>
+                    <Dialog.Content>
+                      <div className="space-y-5">
+                        <p>Overlay specimen content.</p>
+                        <Field label="Dialog project type">
+                          <Combobox options={comboboxOptions} defaultValue="design" />
+                        </Field>
+                      </div>
+                    </Dialog.Content>
+                    <Dialog.Footer>
+                      <Dialog.Close render={<Button appearance="text" variant="secondary">Cancel</Button>} />
+                      <Dialog.Close render={<Button appearance="filled">Confirm</Button>} />
+                    </Dialog.Footer>
+                  </Dialog>
                   <Button appearance="filled" variant="danger" icon={<HugeiconsIcon icon={Delete02Icon} aria-hidden="true" />} onClick={() => setAlertOpen(true)}>Delete project</Button>
                 </div>
               </Specimen>
@@ -832,22 +882,6 @@ export default function Home() {
         </div>
         </div>
       </div>
-
-      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-        <Dialog.Header>Dialog specimen</Dialog.Header>
-        <Dialog.Content>
-          <div className="space-y-5">
-            <p>Overlay specimen content.</p>
-            <Field label="Dialog project type">
-              <Combobox options={comboboxOptions} defaultValue="design" />
-            </Field>
-          </div>
-        </Dialog.Content>
-        <Dialog.Footer>
-          <Button appearance="text" variant="secondary" onClick={() => setDialogOpen(false)}>Cancel</Button>
-          <Button appearance="filled" onClick={() => setDialogOpen(false)}>Confirm</Button>
-        </Dialog.Footer>
-      </Dialog>
 
       <AlertDialog
         open={alertOpen}
@@ -895,7 +929,8 @@ function ThemePicker({ theme, onChange }: { theme: ThemeMode; onChange: (theme: 
             title={label}
             onClick={() => onChange(value)}
             className={cn(
-              "inline-flex size-8 items-center justify-center",
+              /* The 44px floor (§13): the mark stays 16px and the target is the whole square. */
+              "inline-flex size-11 items-center justify-center",
               shape.circle,
               motionFeedback,
               `${focusRing} focus-visible:outline-offset-2`,
@@ -904,7 +939,7 @@ function ThemePicker({ theme, onChange }: { theme: ThemeMode; onChange: (theme: 
                 : cn(text.medium, "hover:text-sherick-ink")
             )}
           >
-            <HugeiconsIcon icon={icon} className="size-4" aria-hidden="true" />
+            <HugeiconsIcon icon={icon} className="size-5" aria-hidden="true" />
           </button>
         );
       })}
@@ -1036,27 +1071,32 @@ function MarkStates({
   rows: { label: string; render: (cell: MarkStateCell) => React.ReactNode }[];
   className?: string;
 }) {
+  /* Six columns do not fit a 375px card beside its labels, so the matrix scrolls inside its own
+     container (§19) and the page never does. The padding and negative margin keep the focus ring,
+     which sits 3px outside each mark, inside the scroll box rather than clipped by it. */
   return (
-    <div className={cn("grid grid-cols-[auto_repeat(5,minmax(2.75rem,1fr))] items-center gap-x-3 gap-y-2", className)}>
-      <span />
-      {markStateColumns.map((column) => (
-        <span key={column.label} className={cn("text-center", type.caption, text.medium)}>{column.label}</span>
-      ))}
-      {rows.map((row) => (
-        <Fragment key={row.label}>
-          <span className={cn("text-sm", text.medium)}>{row.label}</span>
-          {markStateColumns.map((column) => (
-            <div key={column.label} className="flex min-h-12 items-center justify-center">
-              {row.render({
-                label: column.label.toLowerCase(),
-                disabled: column.disabled ?? false,
-                readOnly: column.label !== "Rest",
-                className: (mark) => pinnedMarkClasses[mark]?.[column.label] ?? "",
-              })}
-            </div>
-          ))}
-        </Fragment>
-      ))}
+    <div className={cn("-m-1.5 min-w-0 overflow-x-auto p-1.5", className)}>
+      <div className="grid grid-cols-[auto_repeat(5,minmax(2.75rem,1fr))] items-center gap-x-3 gap-y-2">
+        <span />
+        {markStateColumns.map((column) => (
+          <span key={column.label} className={cn("text-center", type.caption, text.medium)}>{column.label}</span>
+        ))}
+        {rows.map((row) => (
+          <Fragment key={row.label}>
+            <span className={cn("text-sm", text.medium)}>{row.label}</span>
+            {markStateColumns.map((column) => (
+              <div key={column.label} className="flex min-h-12 items-center justify-center">
+                {row.render({
+                  label: column.label.toLowerCase(),
+                  disabled: column.disabled ?? false,
+                  readOnly: column.label !== "Rest",
+                  className: (mark) => pinnedMarkClasses[mark]?.[column.label] ?? "",
+                })}
+              </div>
+            ))}
+          </Fragment>
+        ))}
+      </div>
     </div>
   );
 }
@@ -1253,6 +1293,21 @@ function MotionStage({ label, children }: { label: string; children: React.React
 
 /* `direct` is the one intent a still stage cannot fake: while the pointer owns the geometry the
    positional transition is removed, and the mark settles to the nearest destination on release. */
+/* An alert whose visibility the page holds. Dismissing it reports through `onOpenChange`, and the page
+   decides whether it comes back, so the alert never removes itself from a state the page cannot see. */
+function ControlledAlertSpecimen() {
+  const [open, setOpen] = useState(true);
+
+  return (
+    <div className="space-y-3">
+      <Alert variant="success" closeable open={open} onOpenChange={setOpen}>Changes were saved successfully.</Alert>
+      {!open && (
+        <Button appearance="text" variant="secondary" onClick={() => setOpen(true)}>Show the saved alert</Button>
+      )}
+    </div>
+  );
+}
+
 function SheetSpecimen() {
   const [side, setSide] = useState<DrawerSide>("bottom");
   const [open, setOpen] = useState(false);

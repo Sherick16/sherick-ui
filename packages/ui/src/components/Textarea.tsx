@@ -20,12 +20,18 @@ import {
   state,
 } from "./ui.common";
 import { motionFeedback } from "./ui.motion";
+import FieldLabel from "./FieldLabel";
 
 export interface TextareaProps
   extends TextareaHTMLAttributes<HTMLTextAreaElement> {
   label?: ReactNode;
   description?: ReactNode;
-  error?: boolean;
+  /**
+   * Marks the field invalid. A message is shown beneath it, so a `ReactNode` here is both the flag and
+   * its message. `true` marks the field without one, and `errorMessage` supplies the message.
+   */
+  error?: ReactNode;
+  /** The message for `error={true}`. A message passed as `error` takes its place. */
   errorMessage?: ReactNode;
   textareaClassName?: string;
   /** Base's value-change callback, event details included. */
@@ -39,7 +45,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     className,
     textareaClassName,
     required,
-    error = false,
+    error,
     errorMessage,
     id,
     name,
@@ -49,17 +55,20 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     defaultValue,
     ...textareaProps
   }, ref) => {
+    /* An `error` that is a message, or a flag with the message beside it: both mark the field invalid. */
+    const invalidByProp = Boolean(error);
+    const errorText = typeof error === "boolean" || error == null ? errorMessage : error;
+
     return (
       <Field.Root
         className={cn(fieldLayout, className)}
         name={name}
         disabled={disabled}
-        invalid={error}
+        invalid={invalidByProp}
       >
         {label && (
           <Field.Label className={cn(fieldLabel)}>
-            {label}
-            {required && <span className={cn("ms-1 text-sherick-danger")} aria-hidden="true">*</span>}
+            <FieldLabel required={required}>{label}</FieldLabel>
           </Field.Label>
         )}
         <Field.Control
@@ -74,7 +83,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           className={(controlState) => {
             /* Invalid by its own prop, or by what Base reports — a failed constraint, or the error a
                `Form` returns for this field's name: one field, one ladder. */
-            const invalid = error || controlState.valid === false;
+            const invalid = invalidByProp || controlState.valid === false;
             return cn(
               "min-w-0 w-full resize-y",
               density.normal,
@@ -98,11 +107,11 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
         )}
         {/* Mounted whether or not a message was passed, as `Field`'s is: without `match` this part
             renders what Base reports, including the error a `Form` returns for this field's name. */}
-        {!(error && !errorMessage) && (
+        {!(invalidByProp && !errorText) && (
           <Field.Error
-            match={error ? true : undefined}
+            match={invalidByProp ? true : undefined}
             className={cn(fieldMessage.error)}
-            {...(error ? { children: errorMessage } : {})}
+            {...(invalidByProp ? { children: errorText } : {})}
           />
         )}
       </Field.Root>

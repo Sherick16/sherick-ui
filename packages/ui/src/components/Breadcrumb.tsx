@@ -7,12 +7,22 @@ import {
   type ReactNode,
 } from "react";
 import { cn } from "@/libs/utils";
-import { focusRing, iconStroke, text, type } from "./ui.common";
+import { focusRing, iconSlot, iconStroke, state, text, type } from "./ui.common";
 
 export interface BreadcrumbItem {
   label: ReactNode;
   href?: string;
 }
+
+/** The English copy a trail names itself with. */
+export interface BreadcrumbLabels {
+  /** The trail's accessible name. */
+  navigation: string;
+}
+
+const defaultBreadcrumbLabels: BreadcrumbLabels = {
+  navigation: "Breadcrumb",
+};
 
 export interface BreadcrumbProps extends Omit<ComponentPropsWithoutRef<"nav">, "children"> {
   items: BreadcrumbItem[];
@@ -22,6 +32,8 @@ export interface BreadcrumbProps extends Omit<ComponentPropsWithoutRef<"nav">, "
    * spreads them onto its element.
    */
   renderLink?: (item: BreadcrumbItem, props: AnchorHTMLAttributes<HTMLAnchorElement>) => ReactNode;
+  /** The English copy the trail names itself with. `aria-label` takes precedence over it. */
+  labels?: Partial<BreadcrumbLabels>;
 }
 
 /* The trail of places a reader came through. It is **passive**: links and text, no state, no effect
@@ -41,13 +53,15 @@ export interface BreadcrumbProps extends Omit<ComponentPropsWithoutRef<"nav">, "
    collapsing, truncating or hiding a place — which places are behind the reader is information, and a
    breadcrumb that hides one is a breadcrumb that lies. */
 const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
-  ({ items, renderLink, className, "aria-label": ariaLabel, ...props }, ref) => {
+  ({ items, renderLink, labels, className, "aria-label": ariaLabel, ...props }, ref) => {
+    const copy = { ...defaultBreadcrumbLabels, ...labels };
+
     /* The props an intermediate destination is rendered from, composed once so the caller's own link
        and the default anchor are the same object: the same destination, the same content and the same
        shared classes — including the focus ring the keyboard needs to see. */
     const linkProps = (item: BreadcrumbItem): AnchorHTMLAttributes<HTMLAnchorElement> => ({
       href: item.href,
-      className: cn("min-w-0 no-underline [overflow-wrap:anywhere]", focusRing, text.medium, "hover:text-sherick-ink"),
+      className: cn("min-w-0 no-underline [overflow-wrap:anywhere]", focusRing, state.quietInk),
       children: item.label,
     });
 
@@ -55,7 +69,7 @@ const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
       <nav
         {...props}
         ref={ref}
-        aria-label={ariaLabel ?? "Breadcrumb"}
+        aria-label={ariaLabel ?? copy.navigation}
         className={cn("min-w-0", type.body, className)}
       >
         {/* A native ordered list: the trail has an order, and the order is the information. The row
@@ -77,8 +91,8 @@ const Breadcrumb = forwardRef<HTMLElement, BreadcrumbProps>(
                 {index > 0 && (
                   /* One inherited line box centers the glyph on the label's first line, even when
                      the label wraps or a consumer changes the trail's line-height. */
-                  <span aria-hidden="true" className={cn("inline-flex h-[1lh] w-4 shrink-0 items-center")}>
-                    <HugeiconsIcon icon={ArrowRight01Icon} aria-hidden="true" className={cn(iconStroke.glyph, "size-4 rtl:-scale-x-100")} />
+                  <span aria-hidden="true" className={cn(iconSlot.compact, "h-[1lh] w-4")}>
+                    <HugeiconsIcon icon={ArrowRight01Icon} aria-hidden="true" className={cn(iconStroke.glyph, "rtl:-scale-x-100")} />
                   </span>
                 )}
                 {isCurrent ? (

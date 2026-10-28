@@ -85,7 +85,7 @@ export function ChoiceCopy({ appearance, label, description, labelId }: ChoiceCo
       {/* A label holds phrasing content only, so the description renders as a span. */}
       <Field.Description
         render={<span />}
-        className={cn("mt-0.5 block", type.supporting, text.medium, appearance === "surface" && selectableRowSupporting)}
+        className={cn("mt-1 block", type.supporting, text.medium, appearance === "surface" && selectableRowSupporting)}
       >
         {description}
       </Field.Description>

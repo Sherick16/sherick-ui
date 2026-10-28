@@ -15,6 +15,7 @@ import {
   stateLayer,
 } from "./ui.common";
 import { motionArrive } from "./ui.motion";
+import FieldLabel from "./FieldLabel";
 import {
   ChoiceCopy,
   choiceItemClasses,
@@ -94,12 +95,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
       <Field.Root className={cn(fieldLayout, className)} invalid={error ? true : undefined}>
         {label && (
           <Field.Label className={cn(fieldLabel)}>
-            {label}
-            {required && (
-              <span className={cn("ms-1 text-sherick-danger")} aria-hidden="true">
-                *
-              </span>
-            )}
+            <FieldLabel required={required}>{label}</FieldLabel>
           </Field.Label>
         )}
         <BaseRadioGroup
@@ -131,7 +127,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
                       disabled={option.disabled}
                       {...(option.description != null ? { "aria-labelledby": labelId } : {})}
                       className={cn(
-                        "group relative my-0.5 flex size-5 shrink-0 items-center justify-center outline-none",
+                        "group relative my-0.5 flex size-5 shrink-0 items-center justify-center [outline-style:none]",
                         shape.circle
                       )}
                     >

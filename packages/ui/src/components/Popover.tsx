@@ -1,11 +1,11 @@
 "use client";
 
 import { Popover as BasePopover } from "@base-ui/react/popover";
-import React, { type ReactElement, type ReactNode } from "react";
+import React, { forwardRef, type ComponentProps, type ReactElement, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { overlay, stacking, text, type } from "./ui.common";
+import { headingRhythm, overlay, stacking, text, type } from "./ui.common";
 import { motionPresenceAnchored } from "./ui.motion";
-import type { OverlayAlign, OverlaySide } from "./ui.types";
+import type { OverlayAlign, OverlaySide, PartProps } from "./ui.types";
 
 export interface PopoverProps {
   children: ReactNode;
@@ -26,17 +26,16 @@ export interface PopoverTriggerProps {
   className?: string;
 }
 
-export interface PopoverTitleProps {
-  children: ReactNode;
-  className?: string;
-}
+/** The close control of a popover, as Base's own close part. It closes the surface through Base. */
+export type PopoverCloseProps = ComponentProps<typeof BasePopover.Close>;
 
-export interface PopoverDescriptionProps {
-  children: ReactNode;
-  className?: string;
-}
+/** The heading's own `h2`. Base names the popup from it when it is present. */
+export type PopoverTitleProps = PartProps<"h2">;
 
-export interface PopoverContentProps {
+/** The line under the title, as the element Base wires up as the popup's description. */
+export type PopoverDescriptionProps = PartProps<"p">;
+
+export interface PopoverContentProps extends Omit<PartProps<"div">, "children" | "className"> {
   children: ReactNode;
   /** Adds to the popup's own shell. The sheet's material, shape and elevation are the recipe's. */
   className?: string;
@@ -64,18 +63,24 @@ type PopoverComponent = ((props: PopoverProps) => React.JSX.Element) & {
   Content: typeof PopoverContent;
   Title: typeof PopoverTitle;
   Description: typeof PopoverDescription;
+  Close: typeof PopoverClose;
 };
 
 const PopoverTrigger = ({ ...props }: PopoverTriggerProps) => <BasePopover.Trigger {...props} />;
 
-const PopoverContent = ({
+const PopoverClose = (props: PopoverCloseProps) => <BasePopover.Close {...props} />;
+
+/* The popup is the element a popover's attributes reach: `id` and `aria-label` name it when there is no
+   title, and a ref reaches the same node. */
+const PopoverContent = forwardRef<HTMLDivElement, PopoverContentProps>(({
   children,
   className,
   side = "bottom",
   align = "start",
   sideOffset = 8,
   alignOffset,
-}: PopoverContentProps) => {
+  ...props
+}, ref) => {
   return (
     <BasePopover.Portal>
       {/* The whole popup is one fixed layer: its own height beyond the viewport scrolls inside the
@@ -89,6 +94,8 @@ const PopoverContent = ({
         className={cn(stacking.float)}
       >
         <BasePopover.Popup
+          {...props}
+          ref={ref}
           className={cn(
             "w-max max-w-[min(24rem,var(--available-width))] max-h-[var(--available-height)] overflow-y-auto p-5 [overflow-wrap:anywhere]",
             overlay.popup,
@@ -101,17 +108,23 @@ const PopoverContent = ({
       </BasePopover.Positioner>
     </BasePopover.Portal>
   );
-};
+});
+
+PopoverContent.displayName = "PopoverContent";
 
 /* The surface's heading takes the `title` role, and the primitive names the popup from it. */
-const PopoverTitle = ({ children, className }: PopoverTitleProps) => (
-  <BasePopover.Title className={cn("m-0", type.title, text.high, className)}>{children}</BasePopover.Title>
-);
+const PopoverTitle = forwardRef<HTMLHeadingElement, PopoverTitleProps>(({ children, className, ...props }, ref) => (
+  <BasePopover.Title {...props} ref={ref} className={cn("m-0", type.title, text.high, className)}>{children}</BasePopover.Title>
+));
+
+PopoverTitle.displayName = "PopoverTitle";
 
 /* The line under the title, which the primitive wires up as the popup's description. */
-const PopoverDescription = ({ children, className }: PopoverDescriptionProps) => (
-  <BasePopover.Description className={cn("m-0 mt-1", type.body, text.medium, className)}>{children}</BasePopover.Description>
-);
+const PopoverDescription = forwardRef<HTMLParagraphElement, PopoverDescriptionProps>(({ children, className, ...props }, ref) => (
+  <BasePopover.Description {...props} ref={ref} className={cn("m-0", headingRhythm.title, type.body, text.medium, className)}>{children}</BasePopover.Description>
+));
+
+PopoverDescription.displayName = "PopoverDescription";
 
 const Popover = (({ children, open, defaultOpen, onOpenChange }: PopoverProps) => {
   return (
@@ -125,5 +138,6 @@ Popover.Trigger = PopoverTrigger;
 Popover.Content = PopoverContent;
 Popover.Title = PopoverTitle;
 Popover.Description = PopoverDescription;
+Popover.Close = PopoverClose;
 
 export default Popover;

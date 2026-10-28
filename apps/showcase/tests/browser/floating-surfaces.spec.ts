@@ -45,7 +45,9 @@ test.describe("Popover", () => {
     expect(shell.portaled, "the popover must be portaled out of the page subtree").toBe(true);
     expect(shell.radius).toBeGreaterThan(16);
     expect(shell.shadow).not.toBe("none");
-    expect(shell.blur).toContain("blur");
+    /* The glass is an opaque-enough fill with no backdrop filter, because the shell animates its
+       own node and a filter there would re-blur the page every frame (DESIGN_LANGUAGE.md §6). */
+    expect(shell.blur).toBe("none");
 
     await page.getByRole("textbox", { name: "Popover owner" }).fill("Dana");
     await expect(page.getByTestId("popover-owner")).toHaveText("Dana");

@@ -161,8 +161,8 @@ export const rangeIncludesDate = (
   return true;
 };
 
-/** Today in UTC calendar fields — the value an application overrides through `today` when its own
- *  civil day differs from UTC. */
+/** Today in UTC calendar fields. It is the first reading a calendar takes, because the server and the
+ *  first client render share it, so the markup agrees before the viewer's own day is known. */
 export const todayCalendarDate = (): CalendarDate => {
   const now = new Date();
   return toCalendarDate({
@@ -170,6 +170,21 @@ export const todayCalendarDate = (): CalendarDate => {
     month: now.getUTCMonth(),
     day: now.getUTCDate(),
   });
+};
+
+/** Today on the viewer's own clock, in local calendar fields: the civil day a reader means by "today". */
+export const localCalendarDate = (now: Date = new Date()): CalendarDate =>
+  toCalendarDate({
+    year: now.getFullYear(),
+    month: now.getMonth(),
+    day: now.getDate(),
+  });
+
+/** Milliseconds from `now` until the next local midnight, which is when the civil day turns over. */
+export const millisecondsUntilLocalMidnight = (now: Date): number => {
+  const midnight = new Date(now);
+  midnight.setHours(24, 0, 0, 0);
+  return midnight.getTime() - now.getTime();
 };
 
 /* A `Date` only so `Intl` can format; the calendar fields are set through `setUTCFullYear`, which

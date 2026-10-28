@@ -72,6 +72,12 @@ export default function VerificationResponsivePage() {
 
           <Textarea label="Narrow notes" defaultValue="A short note." />
 
+          {/* A setting row with a wide control: in a column too narrow for both, the control wraps
+              below its label instead of squeezing the label to a letter per line. */}
+          <Field label="Narrow workspace name" orientation="horizontal" data-testid="narrow-setting-row">
+            <Input placeholder="Sherick UI" />
+          </Field>
+
           <Search
             aria-label="Narrow search"
             value={query}

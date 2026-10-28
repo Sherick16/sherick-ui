@@ -1,4 +1,4 @@
-import { expect, test, type Page } from "./fixtures";
+import { expect, test, type Locator, type Page } from "./fixtures";
 
 /* The state layer is a composited `::before` overlay, so its opacity is what carries hover and
    press. Reading it from the rendered element is the only check that proves the layer's step
@@ -9,6 +9,43 @@ const layerOpacity = (locator: ReturnType<Page["getByRole"]>) =>
     const style = getComputedStyle(element, "::before");
     return style.content === "none" ? "none" : style.opacity;
   });
+
+/* Forced colours removes fills, shadows and the theme's tones, so the computed outline *style* says
+   little: a zero-width outline has one, and paints nothing. A boundary is judged by what is drawn: a
+   border or an outline with width, a line style, and a colour that differs from the element's own
+   background. Reading that is the only check that a reader in forced colours sees an edge. */
+const drawnBoundary = (element: Element) => {
+  const style = getComputedStyle(element);
+  const drawn = (width: string, lineStyle: string, colour: string) =>
+    lineStyle !== "none" && parseFloat(width) > 0 && colour !== style.backgroundColor;
+  return {
+    outline: drawn(style.outlineWidth, style.outlineStyle, style.outlineColor),
+    border: drawn(style.borderTopWidth, style.borderTopStyle, style.borderTopColor),
+  };
+};
+
+const hasPaintedBoundary = async (locator: Locator) => {
+  const boundary = await locator.evaluate(drawnBoundary);
+  return boundary.outline || boundary.border;
+};
+
+/* A focus ring settles on the motion layer, so it is polled rather than read once. It must be a
+   drawn outline at least 2px wide in a colour that is not the background. */
+const expectFocusRing = async (locator: Locator, name: string) => {
+  await expect
+    .poll(() =>
+      locator.evaluate((element) => {
+        const style = getComputedStyle(element);
+        return (
+          style.outlineStyle !== "none" &&
+          parseFloat(style.outlineWidth) >= 2 &&
+          style.outlineColor !== style.backgroundColor
+        );
+      }),
+      { message: `${name} needs a drawn focus ring` }
+    )
+    .toBe(true);
+};
 
 test("interactive surfaces tint on hover and stay inert while disabled", async ({ page, errors }) => {
   await page.goto("/verification/core");
@@ -170,20 +207,15 @@ test("forced-colors preserves canonical focus and important state boundaries", a
 
   const primary = page.getByRole("button", { name: "Primary" });
   await primary.focus();
-  const focus = await primary.evaluate((element) => {
-    const style = getComputedStyle(element);
-    return { style: style.outlineStyle, width: style.outlineWidth };
-  });
-  expect(focus.style).not.toBe("none");
-  expect(parseFloat(focus.width)).toBeGreaterThanOrEqual(2);
+  await expectFocusRing(primary, "Primary");
 
   const selectedTab = page.getByRole("tab", { name: "Selected" });
   await expect(selectedTab).toHaveAttribute("aria-selected", "true");
-  expect(await selectedTab.evaluate((element) => getComputedStyle(element).outlineStyle)).not.toBe("none");
+  expect(await hasPaintedBoundary(selectedTab), "the selected tab needs a drawn boundary").toBe(true);
 
   const checkedSwitch = page.getByRole("switch", { name: "Success switch" });
   await expect(checkedSwitch).toHaveAttribute("aria-checked", "true");
-  expect(await checkedSwitch.evaluate((element) => getComputedStyle(element).outlineStyle)).not.toBe("none");
+  expect(await hasPaintedBoundary(checkedSwitch), "the checked switch needs a drawn boundary").toBe(true);
 
   // A selected mark's identity is carried by its fill, which forced colors removes, so it needs an
   // authored boundary. A *resting* checkbox or radio is identified by its own rim — a real border,
@@ -206,61 +238,53 @@ test("forced-colors preserves canonical focus and important state boundaries", a
   for (const mark of marks) {
     await expect(mark.locator, `${mark.name} should be ${mark.checked}`).toHaveAttribute("aria-checked", mark.checked);
     const boundary = await mark.locator.evaluate((element) => {
-      const style = getComputedStyle(element);
       const rim = getComputedStyle(element.querySelector(':scope > span[aria-hidden="true"]') as Element, "::after");
-      return { outline: style.outlineStyle, rim: rim.borderTopStyle, rimOpacity: rim.opacity, rimColour: rim.borderTopColor };
+      return { rim: rim.borderTopStyle, rimOpacity: rim.opacity, rimColour: rim.borderTopColor };
     });
+    /* The control's own boundary, or the drawn rim of its mark: either one identifies the mark in
+       forced colours, and the check passes if the reader can see one. */
+    const control = await mark.locator.evaluate(drawnBoundary);
+    const markRim = await mark.locator.locator(':scope > span[aria-hidden="true"]').evaluate(drawnBoundary);
+    const painted = control.outline || control.border || markRim.border;
     if (mark.checked === "false") {
       expect(boundary.rim, `${mark.name} keeps its rim`).toBe("solid");
       expect(boundary.rimOpacity, `${mark.name}'s rim is drawn`).toBe("1");
       expect(boundary.rimColour, `${mark.name} should use CanvasText, not Highlight`).toBe(canvasText);
     } else {
-      expect(boundary.outline, `${mark.name} needs a forced-colors boundary`).not.toBe("none");
+      expect(painted, `${mark.name} needs a drawn forced-colors boundary`).toBe(true);
     }
   }
 
-  // A focused resting mark still shows the canonical focus ring alongside its rim, polled because
-  // the outline settles on the motion layer.
+  // A focused resting mark still shows the canonical focus ring alongside its rim.
   const focusedUnchecked = page.getByRole("checkbox", { name: "Torture unchecked checkbox" });
   await focusedUnchecked.focus();
-  await expect
-    .poll(async () => parseFloat(await focusedUnchecked.evaluate((element) => getComputedStyle(element).outlineWidth)))
-    .toBeGreaterThanOrEqual(2);
+  await expectFocusRing(focusedUnchecked, "A focused unchecked checkbox");
 
   const thumb = page.getByRole("slider", { name: "Torture slider" }).locator("..");
-  expect(await thumb.evaluate((element) => getComputedStyle(element).borderStyle)).not.toBe("none");
+  expect(await hasPaintedBoundary(thumb), "the slider thumb needs a drawn boundary").toBe(true);
 
   // A pressed toggle and a progress fill carry their meaning in tone alone, so forced colors has
   // to give each of them a boundary of its own.
   const pressedChip = page.getByRole("button", { name: "Alpha", exact: true });
   await expect(pressedChip).toHaveAttribute("aria-pressed", "true");
-  expect(
-    await pressedChip.evaluate((element) => getComputedStyle(element).outlineStyle)
-  ).not.toBe("none");
+  expect(await hasPaintedBoundary(pressedChip), "the pressed chip needs a drawn boundary").toBe(true);
 
   const progressFill = page
     .getByRole("progressbar", { name: "Torture progress" })
     .locator("[data-sui-progress-indicator]");
-  expect(await progressFill.evaluate((element) => getComputedStyle(element).borderStyle)).not.toBe(
-    "none"
-  );
+  expect(await hasPaintedBoundary(progressFill), "the progress fill needs a drawn boundary").toBe(true);
 
   // A focused control keeps the canonical focus ring even when it is also selected: the focus rule
   // is emitted after the selection boundaries, which it shares its specificity with.
   const selectedSegment = page.getByRole("button", { name: "List", exact: true });
   await expect(selectedSegment).toHaveAttribute("aria-pressed", "true");
   await selectedSegment.focus();
-  const segmentFocus = await selectedSegment.evaluate((element) => {
-    const style = getComputedStyle(element);
-    return { style: style.outlineStyle, width: style.outlineWidth };
-  });
-  expect(segmentFocus.style).not.toBe("none");
-  expect(parseFloat(segmentFocus.width)).toBeGreaterThanOrEqual(2);
+  await expectFocusRing(selectedSegment, "A focused selected segment");
 
   await page.getByRole("button", { name: "Open torture dialog" }).click();
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
-  expect(await dialog.evaluate((element) => getComputedStyle(element).borderStyle)).not.toBe("none");
+  expect(await hasPaintedBoundary(dialog), "the dialog needs a drawn boundary").toBe(true);
 
   expect(errors).toEqual([]);
 });
@@ -342,19 +366,55 @@ test("forced-colors gives an alert dialog its boundary and its confirm action it
   await page.emulateMedia({ forcedColors: "active" });
   await page.goto("/verification/theme-torture");
 
-  await page.getByRole("button", { name: "Open torture alert" }).click();
+  /* Opened from the keyboard, so focus inside it is keyboard focus: a ring is the keyboard's
+     signal, and a pointer-opened dialog's programmatic focus rightly draws none. */
+  await page.getByRole("button", { name: "Open torture alert" }).focus();
+  await page.keyboard.press("Enter");
   const surface = page.getByRole("alertdialog");
   await expect(surface).toBeVisible();
-  expect(await surface.evaluate((element) => getComputedStyle(element).borderStyle)).not.toBe("none");
+  expect(await hasPaintedBoundary(surface), "the alert dialog needs a drawn boundary").toBe(true);
 
   const confirm = surface.getByRole("button", { name: "Torture confirm" });
   await confirm.focus();
-  const focus = await confirm.evaluate((element) => {
-    const style = getComputedStyle(element);
-    return { style: style.outlineStyle, width: style.outlineWidth };
-  });
-  expect(focus.style).not.toBe("none");
-  expect(parseFloat(focus.width)).toBeGreaterThanOrEqual(2);
+  await expectFocusRing(confirm, "The alert dialog's confirm action");
+
+  expect(errors).toEqual([]);
+});
+
+/* Forced colours is where a theme's fills and shadows are removed, so what remains to identify a
+   control is the boundary the recipes draw in system colours. Three fixtures pin that as pixels:
+   the core controls, the theme torture page where every semantic family meets the same mode, and
+   one overlay, whose shell has no shadow to fall back on under forced colours. Each waits for hydration
+   so the screenshot is the settled state, not a server-rendered shell. */
+const forcedColoursPage = async (page: Page, url: string) => {
+  await page.emulateMedia({ colorScheme: "light", forcedColors: "active" });
+  await page.goto(url);
+  await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
+};
+
+test("core controls keep their drawn boundaries in forced colours", async ({ page, errors }) => {
+  await forcedColoursPage(page, "/verification/core");
+  await expect(page.getByTestId("verification-core")).toBeVisible();
+
+  await expect(page).toHaveScreenshot("core-forced-colors.png", { fullPage: true });
+
+  expect(errors).toEqual([]);
+});
+
+test("the theme torture fixture keeps its drawn boundaries in forced colours", async ({ page, errors }) => {
+  await forcedColoursPage(page, "/verification/theme-torture");
+  await expect(page.getByRole("button", { name: "Primary" })).toBeVisible();
+
+  await expect(page).toHaveScreenshot("theme-torture-forced-colors.png", { fullPage: true });
+
+  expect(errors).toEqual([]);
+});
+
+test("an open dialog keeps its drawn shell in forced colours", async ({ page, errors }) => {
+  await forcedColoursPage(page, "/verification/dialog");
+  await expect(page.getByRole("dialog")).toBeVisible();
+
+  await expect(page).toHaveScreenshot("dialog-forced-colors.png", { fullPage: true });
 
   expect(errors).toEqual([]);
 });

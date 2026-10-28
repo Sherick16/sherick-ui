@@ -42,12 +42,15 @@ type CollapsibleComponent = ((props: CollapsibleProps) => React.JSX.Element) & {
 const CollapsibleTrigger = ({ children, className }: CollapsibleTriggerProps) => (
   <BaseCollapsible.Trigger className={cn(disclosure.trigger, className)}>
     <span className={cn("min-w-0 flex-1")}>{children}</span>
-    {/* The same affordance, and the same in-place turn, as an `Accordion` row: the two are one
-        object at two scopes. */}
-    <HugeiconsIcon icon={ArrowDown01Icon}
-      aria-hidden="true"
-      className={cn(iconStroke.glyph, "size-4 shrink-0", motionOrient, "group-data-[panel-open]:rotate-180")}
-    />
+    {/* The same affordance, at the same slot size and with the same in-place turn, as an `Accordion` row:
+        the two are one object at two scopes. */}
+    <span className={cn(disclosure.chevron)} aria-hidden="true">
+      <HugeiconsIcon
+        icon={ArrowDown01Icon}
+        aria-hidden="true"
+        className={cn(iconStroke.glyph, motionOrient, "group-data-[panel-open]:rotate-180")}
+      />
+    </span>
   </BaseCollapsible.Trigger>
 );
 

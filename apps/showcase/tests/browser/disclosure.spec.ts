@@ -126,7 +126,7 @@ test("a disclosure row paints the shared focus ring when the keyboard reaches it
         return widths.length === 4 ? widths[3] : 0;
       };
       const inset = layers.filter((layer) => /inset/.test(layer) && spread(layer) > 0);
-      return { painted: inset.length > 0, outline: style.outlineColor, ring: inset.join(" | ") };
+      return { painted: inset.length > 0, outline: style.outlineStyle, ring: inset.join(" | ") };
     });
 
   /* A pointer press focuses the row without the keyboard's ring: the row does not announce itself
@@ -141,7 +141,7 @@ test("a disclosure row paints the shared focus ring when the keyboard reaches it
   await page.keyboard.press("Tab");
 
   const focused = await ring(details);
-  expect(focused.outline, "the outside of the row is left alone").toBe("rgba(0, 0, 0, 0)");
+  expect(focused.outline, "the outside of the row is left alone").toBe("none");
   expect(focused.painted, "keyboard focus paints the shared inset ring").toBe(true);
   expect(focused.ring, "at the ring's own width").toContain("2px");
 
@@ -152,25 +152,21 @@ test("a disclosure row paints the shared focus ring when the keyboard reaches it
   expect(errors).toEqual([]);
 });
 
-test("the group's own line is inset, at the lightest role, and yields to the section beside it", async ({
+test("the join between sections is the lightest structural line, and it yields to a closed neighbour", async ({
   page,
   errors,
 }) => {
-  const dividers = page.getByRole("separator");
-  await expect(dividers).toHaveCount(2);
+  /* A section's join is the top border of every section after the first. It is the item's own line, so
+     no separator element is rendered between sections and no separator role is announced. */
+  const section = (name: string) => page.getByRole("button", { name }).locator("xpath=../..");
+  const join = (name: string) =>
+    section(name).evaluate((element) => {
+      const style = getComputedStyle(element);
+      return { width: style.borderTopWidth, color: style.borderTopColor };
+    });
 
-  /* Inset to the band the row and the panel content share, so the line marks the join between two
-     sections rather than the width of the surface. */
-  const geometry = await dividers.nth(0).evaluate((element) => {
-    const parent = element.parentElement;
-    return {
-      width: (element as HTMLElement).offsetWidth,
-      container: parent ? (parent as HTMLElement).offsetWidth : 0,
-      margin: Number.parseFloat(getComputedStyle(element).marginLeft),
-    };
-  });
-  expect(geometry.container - geometry.width).toBe(32);
-  expect(geometry.margin).toBe(16);
+  expect((await join("First section")).width, "the first section has no join above it").toBe("0px");
+  expect((await join("Second section")).width).toBe("1px");
 
   /* The lightest structural role, read from the token itself rather than trusted as a name: this
      is the line between the rows of one stacked list, not the general section rule. */
@@ -182,25 +178,22 @@ test("the group's own line is inset, at the lightest role, and yields to the sec
     probe.remove();
     return value;
   });
-  const lineTone = await dividers.nth(0).evaluate((element) => getComputedStyle(element).borderTopColor);
-  expect(lineTone).toBe(rowTone);
+  expect((await join("Second section")).color).toBe(rowTone);
 
-  const opacity = (index: number) =>
-    dividers.nth(index).evaluate((element) => getComputedStyle(element).opacity);
-
-  /* The boundary yields while a closed section beside it is hovered, so the line and the row the
-     pointer is on never compete. */
+  /* The join yields while a closed section beside it is hovered: the section's own line above it, and the
+     line below it, which belongs to the next section. */
+  const transparent = "rgba(0, 0, 0, 0)";
   await page.getByRole("button", { name: "Second section" }).hover();
-  await expect.poll(() => opacity(0)).toBe("0");
-  await expect.poll(() => opacity(1)).toBe("0");
+  await expect.poll(async () => (await join("Second section")).color).toBe(transparent);
+  await expect.poll(async () => (await join("Locked section")).color).toBe(transparent);
 
   await page.mouse.move(0, 0);
-  await expect.poll(() => opacity(0)).toBe("1");
+  await expect.poll(async () => (await join("Second section")).color).toBe(rowTone);
 
   /* An open section is excluded from the yield: the line beneath expanded content is what keeps
      the expanded section reading as one unit before the next one begins. */
   await page.getByRole("button", { name: "First section" }).hover();
-  await expect.poll(() => opacity(0)).toBe("1");
+  await expect.poll(async () => (await join("Second section")).color).toBe(rowTone);
 
   expect(errors).toEqual([]);
 });

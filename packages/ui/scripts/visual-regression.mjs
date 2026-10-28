@@ -25,9 +25,10 @@ import { fileURLToPath } from "node:url";
 import postcss from "postcss";
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { disclosure, overlay } from "../src/components/ui.common.ts";
+import { disclosure, forcedBoundary, headingRhythm, iconSlot, overlay, state } from "../src/components/ui.common.ts";
 import {
   motionActivityIndeterminate,
+  motionActivityIndeterminateReduced,
   motionActivityPulse,
   motionActivitySpin,
   motionArrive,
@@ -41,10 +42,15 @@ import {
   motionPresenceSheet,
   motionPresenceToast,
   motionPresenceTooltip,
+  motionPresenceUtility,
   motionRelocate,
   motionStateLayer,
   motionTactile,
 } from "../src/components/ui.motion.ts";
+/* The two internal parts every dismiss and every status mark is drawn by. They are not exported from
+   the package, so they are pinned here: an Alert or a Toast that adopts them cannot draw its own. */
+import DismissButton from "../src/components/DismissButton.tsx";
+import StatusMark from "../src/components/StatusMark.tsx";
 
 const library = await import("../dist/esm/index.js");
 const content = await import("../dist/esm/content.js");
@@ -129,6 +135,12 @@ const specimens = {
   "alert.danger.closeable": h(Alert, { variant: "danger", closeable: true }, "Something needs your attention."),
   "alert.success": h(Alert, { variant: "success" }, "Changes were saved."),
   /* The first-line mark and the first-line dismissal control, pinned where the copy actually wraps. */
+  /* The dismiss target and the status mark: one 44px target whatever the mark size, and one glyph and
+     tone per variant. Pinned on their own, because an Alert or a Toast renders them inside a surface. */
+  "dismiss.target": h(DismissButton, { label: "Dismiss" }),
+  "dismiss.compact.row": h(DismissButton, { label: "Remove", size: "compact", inRow: true }),
+  "status-mark.warning": h(StatusMark, { variant: "warning" }),
+  "status-mark.success": h(StatusMark, { variant: "success" }),
   "alert.multiline": h(
     Alert,
     { variant: "warning", closeable: true },
@@ -410,10 +422,19 @@ const overlayRecipes = {
   "motion.presence.sheet": motionPresenceSheet,
   "motion.presence.toast": motionPresenceToast,
   "motion.presence.scrim": motionPresenceScrim,
+  "motion.presence.utility": motionPresenceUtility,
   "motion.activity.spin": motionActivitySpin,
   "motion.activity.pulse": motionActivityPulse,
   "motion.activity.indeterminate": motionActivityIndeterminate,
+  "motion.activity.indeterminateReduced": motionActivityIndeterminateReduced,
   "motion.stateLayer": motionStateLayer,
+  /* The forced-colours boundary every shell and raised action carries, the busy and quiet-ink states,
+     the header rhythm and the one icon-slot scale marks are sized from. */
+  forcedBoundary,
+  headingRhythm,
+  iconSlot,
+  "state.busy": state.busy,
+  "state.quietInk": state.quietInk,
 };
 
 const collectDeclarations = (rule) => {

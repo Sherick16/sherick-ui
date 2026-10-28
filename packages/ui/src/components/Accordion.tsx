@@ -5,9 +5,8 @@ import React, { createContext, useContext, type ReactNode } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { ArrowDown01Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/libs/utils";
-import Divider from "./Divider";
-import { disclosure, iconStroke } from "./ui.common";
-import { motionFeedback, motionOrient } from "./ui.motion";
+import { disclosure, edgeTone, iconStroke } from "./ui.common";
+import { motionOrient } from "./ui.motion";
 
 /** A heading level for the groups of an `Accordion`. Base renders a heading around every panel
  *  trigger, because that is what makes the group navigable as a set of sections; which level it
@@ -62,9 +61,23 @@ export interface AccordionPanelProps {
 
 /* One section of an `Accordion`. The trigger and the panel it opens are `Accordion.Trigger` and
    `Accordion.Panel`; the heading that labels them is the trigger's own, so a consumer never has
-   to build an accessible accordion structure by hand. */
+   to build an accessible accordion structure by hand.
+
+   The join between two sections belongs to the section below it: every item after the first draws
+   a line on its top edge, in the lightest `row` tone, because the sections are rows of one stacked
+   list rather than separate parts of a surface. The line is the item's own, so a fragment or a
+   wrapper around items gets the same joins as a flat list.
+
+   The join yields to a closed neighbour under the pointer: a closed item that is hovered hides the line
+   above it and the line below it, while an open section keeps its line, so expanded content reads as one
+   unit. Both selectors sit inside the pointer media query, so a tap leaves no hover tone behind. */
+const joinYield =
+  "[@media(hover:hover)_and_(pointer:fine)]:[&:not([data-open]):hover]:border-transparent [@media(hover:hover)_and_(pointer:fine)]:[&:not([data-open]):hover+*]:border-transparent";
 const AccordionItem = ({ children, className, ...props }: AccordionItemProps) => (
-  <BaseAccordion.Item {...props} className={cn("min-w-0", className)}>
+  <BaseAccordion.Item
+    {...props}
+    className={cn("min-w-0 [&:not(:first-child)]:border-t", joinYield, edgeTone.row, className)}
+  >
     {children}
   </BaseAccordion.Item>
 );
@@ -91,12 +104,15 @@ const AccordionTrigger = ({ children, className }: AccordionTriggerProps) => {
     <BaseAccordion.Header render={headingRender(headingLevel)} className={cn("m-0")}>
       <BaseAccordion.Trigger className={cn(disclosure.trigger, className)}>
         <span className={cn("min-w-0 flex-1")}>{children}</span>
-        {/* The affordance turns in place, so it takes `orient`: it is the same object before
-            and after, and only its direction changes. */}
-        <HugeiconsIcon icon={ArrowDown01Icon}
-          aria-hidden="true"
-          className={cn(iconStroke.glyph, "size-4 shrink-0", motionOrient, "group-data-[panel-open]:rotate-180")}
-        />
+        {/* The affordance is a disclosure chevron at its own slot size. It turns in place, so it takes
+            `orient`: it is the same object before and after, and only its direction changes. */}
+        <span className={cn(disclosure.chevron)} aria-hidden="true">
+          <HugeiconsIcon
+            icon={ArrowDown01Icon}
+            aria-hidden="true"
+            className={cn(iconStroke.glyph, motionOrient, "group-data-[panel-open]:rotate-180")}
+          />
+        </span>
       </BaseAccordion.Trigger>
     </BaseAccordion.Header>
   );
@@ -118,39 +134,6 @@ const AccordionPanel = ({ children, className }: AccordionPanelProps) => (
 );
 
 
-/* One hairline where two sections meet. The line belongs to the group rather than to a section,
-   so a section never draws its own edge, and it is the public `Divider` at its lightest role —
-   the line between the rows of one stacked list.
-
-   Three of its properties are the accordion's own anatomy: it is inset to the band the trigger and
-   the panel content share, so it marks the join between two sections rather than the width of the
-   surface; it keeps air above and below, so the hover tint never sits on a rule; and it yields
-   while either section beside it is hovered, so the boundary reads when the group is scanned
-   without competing with the row the pointer is on. A section that is already open is excluded
-   from the yield, because the line beneath expanded content is what keeps the expanded section
-   reading as one unit. */
-const withDividers = (children: ReactNode) =>
-  React.Children.toArray(children).flatMap((child, index) =>
-    index === 0
-      ? [child]
-      : [
-          <Divider
-            key={`divider-${index}`}
-            weight="row"
-            className={cn(
-              /* `w-auto` in place of the shared full width: the column stretches it across the
-                 band the margins leave, so the inset is real geometry rather than a full-width
-                 line that overshoots its own margins. */
-              "w-auto mx-4 my-2",
-              motionFeedback,
-              "[&:has(+div:not([data-open]):hover)]:opacity-0",
-              "[div:not([data-open]):hover+&]:opacity-0"
-            )}
-          />,
-          child,
-        ]
-  );
-
 const Accordion = (({
   children,
   multiple = false,
@@ -167,7 +150,7 @@ const Accordion = (({
         disabled={disabled}
         className={cn("flex min-w-0 flex-col", className)}
       >
-        {withDividers(children)}
+        {children}
       </BaseAccordion.Root>
     </HeadingLevelContext.Provider>
   );

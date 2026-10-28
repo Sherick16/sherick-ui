@@ -72,21 +72,21 @@ const tactileTiming =
 
 export const motionTactile = /* @__PURE__ */ cx(
   tactileTiming,
-  "motion-safe:[&:not([data-disabled],:disabled,:has(>[role=combobox][data-disabled]))]:active:scale-[0.96]",
+  "motion-safe:[&:not([data-disabled],:disabled,[aria-disabled=true],[aria-busy=true],:has(>[role=combobox][data-disabled]))]:active:scale-[0.96]",
   /* A content-width control a layout has stretched to its container is no longer content-width: 4%
      of a 240px action moved each edge 4.8px. The stretch is the caller's `w-full`, so the control
      reads it from its own class and takes the wide tier — still a press, at a button's distance. */
-  "motion-safe:[&.w-full:not([data-disabled],:disabled,:has(>[role=combobox][data-disabled]))]:active:scale-[0.985]"
+  "motion-safe:[&.w-full:not([data-disabled],:disabled,[aria-disabled=true],[aria-busy=true],:has(>[role=combobox][data-disabled]))]:active:scale-[0.985]"
 );
 
 export const motionTactileWide = /* @__PURE__ */ cx(
   tactileTiming,
-  "motion-safe:[&:not([data-disabled],:disabled)]:active:scale-[0.985]"
+  "motion-safe:[&:not([data-disabled],:disabled,[aria-disabled=true],[aria-busy=true])]:active:scale-[0.985]"
 );
 
 export const motionTactileField = /* @__PURE__ */ cx(
   tactileTiming,
-  "motion-safe:[&:not([data-disabled],:disabled,:has(>[role=combobox][data-disabled]))]:active:scale-[0.993]"
+  "motion-safe:[&:not([data-disabled],:disabled,[aria-disabled=true],[aria-busy=true],:has(>[role=combobox][data-disabled]))]:active:scale-[0.993]"
 );
 
 /** The spatial half of a compact press, applied to the *mark* rather than to the control.
@@ -222,14 +222,27 @@ export const motionPresenceAnchored = /* @__PURE__ */ cx(
 
 /** A tooltip: the same side-aware model and the same grow as an anchored popup, deliberately
  *  lighter — it settles on the local timing rather than the overlay timing, and it never
- *  bounces. */
+ *  bounces. A tooltip that Base opens during its warm-up (`data-instant`, because another tooltip
+ *  was just closed) takes no timing at all: the next hint is already where the reader moved to. */
 export const motionPresenceTooltip = /* @__PURE__ */ cx(
   "transition-[opacity,transform] duration-release ease-glide",
   "data-[ending-style]:duration-overlay-exit data-[ending-style]:ease-exit",
+  "data-[instant]:duration-0",
   "motion-reduce:transition-[opacity]",
   "[--sui-overlay-from-scale:0.94]",
   anchoredGeometry,
   anchoredFrom,
+);
+
+/** The utility tier: a small surface a reader opened from the keyboard, or a menu they asked for.
+ *  It is opacity only — no travel, no scale and no scrim ramp — on the short utility timing, so the
+ *  surface is there as soon as the key that opened it has been answered. */
+export const motionPresenceUtility = /* @__PURE__ */ cx(
+  "transition-opacity duration-utility ease-release",
+  "data-[ending-style]:duration-utility-exit data-[ending-style]:ease-exit",
+  "motion-reduce:transition-[opacity]",
+  "data-[starting-style]:opacity-0",
+  "data-[ending-style]:opacity-0",
 );
 
 /** A modal surface: anchored to the viewport rather than to a trigger, so it has no side
@@ -242,25 +255,54 @@ export const motionPresenceModal = /* @__PURE__ */ cx(
   modalFrom,
 );
 
-/** The plane behind a surface that owns the viewport. Opacity only: a blur or a filter is
- *  never animated, so the plane can never animate the page behind it. */
-export const motionPresenceScrim =
-  "transition-opacity duration-overlay ease-release data-[starting-style]:opacity-0 data-[ending-style]:opacity-0 data-[ending-style]:duration-overlay-exit data-[ending-style]:ease-exit";
+/** The plane behind a surface that owns the viewport. Only its tint fades, and the tint is the
+ *  `::before` layer `overlay.scrim` paints: the element itself carries the backdrop blur, and a
+ *  presence recipe never animates a node that carries `backdrop-filter`, because every frame of
+ *  such an animation re-blurs the page behind it. The blur therefore arrives with the plane, and
+ *  the tint fades in front of it. */
+export const motionPresenceScrim = cx(
+  "before:transition-opacity before:duration-overlay before:ease-release",
+  "data-[starting-style]:before:opacity-0 data-[ending-style]:before:opacity-0",
+  "data-[ending-style]:before:duration-overlay-exit data-[ending-style]:before:ease-exit"
+);
+
+/** The scrim of a utility surface. A surface the reader opened from the keyboard answers on the
+ *  utility timing, and its plane fades on that same timing, so the backdrop is not slower than the
+ *  surface it sits behind. */
+export const motionPresenceScrimUtility = cx(
+  "before:transition-opacity before:duration-utility before:ease-release",
+  "data-[starting-style]:before:opacity-0 data-[ending-style]:before:opacity-0",
+  "data-[ending-style]:before:duration-utility-exit data-[ending-style]:before:ease-exit"
+);
 
 /** Continuous activity is a distinct intent, not an exception to interaction motion: it
- *  reports work rather than answering an event, and it has no entrance of its own. */
-export const motionActivitySpin = "animate-spin motion-reduce:animate-none";
-export const motionActivityPulse = "animate-pulse motion-reduce:animate-none";
+ *  reports work rather than answering an event, and it has no entrance of its own.
+ *
+ *  Reduced motion removes the *travel* of an activity loop — the rotation, the sweep — and keeps
+ *  the loop as an opacity change. A spinner that simply stopped reads as finished, and a user who
+ *  asked for less motion still needs to know the work is running. The reduced form is therefore
+ *  a slow breathe for the spinner and a softer pulse for a skeleton, both on the authored pace. */
+export const motionActivitySpin = "animate-spin motion-reduce:animate-sherick-breathe";
+export const motionActivityPulse = "animate-pulse motion-reduce:animate-sherick-soft-pulse";
+
+/** The reduced form of an indeterminate bar. The sweep is removed — its travel is the thing reduced
+ *  motion takes away — and the fill is held at the full width of its track, where its opacity
+ *  breathes on the same slow loop the spinner takes. A progress part that owns this class sets its
+ *  fill to the whole track under `motion-reduce`, so the reader still sees a bar that is busy.
+ *  Exported separately so `Progress` can pair it with its own width rule. */
+export const motionActivityIndeterminateReduced = "motion-reduce:animate-sherick-breathe";
 
 /** The indeterminate half of a progress bar. A task with no known value cannot report a
  *  position, so it reports *work* instead: the fill sweeps across its own track on the one loop
  *  that is paced, because a loop that reports rather than answers cannot arrive. The travel is a
  *  composited transform rather than a laid-out edge, and an endless loop must never sit on the
  *  layout path; the direction is a value the recipe flips with the writing direction, because a
- *  transform is physical and the sweep follows the page. Under reduced motion the loop stops and
- *  the fill rests where it starts: a static status glyph, exactly as the spin and the pulse rest. */
-export const motionActivityIndeterminate =
-  "animate-sherick-indeterminate [[dir=rtl]_&]:[--sui-indeterminate-direction:-1] motion-reduce:animate-none";
+ *  transform is physical and the sweep follows the page. Under reduced motion the sweep gives way
+ *  to the opacity breathe above, so the bar keeps saying that work is running without moving. */
+export const motionActivityIndeterminate = /* @__PURE__ */ cx(
+  "animate-sherick-indeterminate [[dir=rtl]_&]:[--sui-indeterminate-direction:-1]",
+  motionActivityIndeterminateReduced
+);
 
 /** The state layer is a composited overlay, so its own opacity is the only thing that
  *  moves. Shared here because four interaction states across the library ride it. */

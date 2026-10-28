@@ -38,7 +38,7 @@ export const emptyTime: PartialTime = { hour: null, minute: null, afternoon: nul
    the pointer with tone, never compression. The column sits inside a `surface` sheet behind a 12px
    inset, so its rows take the nested `row` corner. */
 const optionClassName =
-  `relative flex h-10 w-full shrink-0 select-none items-center justify-center text-sm outline-none ${type.numeric} ${shape.row} ${text.high} ${motionFeedback} ${focusRingInset}`;
+  `relative flex h-10 w-full shrink-0 select-none items-center justify-center [outline-style:none] ${type.numeric} ${shape.row} ${text.high} ${motionFeedback} ${focusRingInset}`;
 
 interface TimeOption<Value> {
   value: Value;

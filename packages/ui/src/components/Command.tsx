@@ -5,8 +5,24 @@ import React, { forwardRef, useId, useMemo, type ReactNode } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Search01Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/libs/utils";
-import { density, focusRingWithin, iconStroke, list, material, rim, shape, state, text, type } from "./ui.common";
+import { density, focusRingWithin, iconSlot, iconStroke, list, material, rim, shape, state, text, type } from "./ui.common";
 import { motionFeedback } from "./ui.motion";
+
+/** The English copy a command list names itself and its parts with. */
+export interface CommandLabels {
+  /** The search field's accessible name, when the caller does not give one. */
+  search: string;
+  /** The search field's placeholder. */
+  placeholder: string;
+  /** Shown in place of the list when the query matches no command. */
+  empty: string;
+}
+
+const defaultCommandLabels: CommandLabels = {
+  search: "Search commands",
+  placeholder: "Search commands…",
+  empty: "No commands found.",
+};
 
 export interface CommandItem {
   /** The action's own identity. Values are unique across the list. */
@@ -39,9 +55,9 @@ export interface CommandProps {
   items: CommandItem[];
   /**
    * Names the search field for assistive technology. It is the field's own name — a palette's
-   * heading names the surface — so it is not rendered as visible copy.
+   * heading names the surface — so it is not rendered as visible copy. Defaults to "Search commands".
    */
-  label: string;
+  label?: string;
   /**
    * What choosing a command does. A command performs an action rather than holding a value, so
    * this is the next domain value rather than an event, and activating one leaves the query and
@@ -54,9 +70,12 @@ export interface CommandProps {
   defaultValue?: string;
   /** Base's own query-change callback, event details included. */
   onValueChange?: (value: string, eventDetails: CommandQueryChangeDetails) => void;
+  /** The search field's placeholder. Defaults to the placeholder in `labels`. */
   placeholder?: string;
-  /** Shown in place of the list when the query matches no command. */
+  /** Shown in place of the list when the query matches no command. Defaults to the empty text in `labels`. */
   emptyMessage?: ReactNode;
+  /** The English copy the list names itself and its parts with. The props above take precedence over it. */
+  labels?: Partial<CommandLabels>;
   disabled?: boolean;
   /** A string comparison locale for the default matching. */
   locale?: string;
@@ -104,8 +123,9 @@ const Command = forwardRef<HTMLInputElement, CommandProps>(({
   value,
   defaultValue,
   onValueChange,
-  placeholder = "Search commands…",
-  emptyMessage = "No commands found.",
+  placeholder,
+  emptyMessage,
+  labels,
   disabled = false,
   locale,
   filter,
@@ -114,6 +134,7 @@ const Command = forwardRef<HTMLInputElement, CommandProps>(({
   id,
   renderItem,
 }, ref) => {
+  const copy = { ...defaultCommandLabels, ...labels };
   /* The field's own name is a native label association: the control generates its id when the
      caller did not supply one, and the label points at that id. */
   const generatedId = useId();
@@ -165,13 +186,7 @@ const Command = forwardRef<HTMLInputElement, CommandProps>(({
       }}
     >
       {hasIcons && (
-        <span
-          aria-hidden="true"
-          className={cn(
-            "inline-flex size-5 shrink-0 items-center justify-center [&>svg]:size-5",
-            text.medium
-          )}
-        >
+        <span aria-hidden="true" className={cn(list.commandIcon, text.medium)}>
           {item.icon}
         </span>
       )}
@@ -193,7 +208,7 @@ const Command = forwardRef<HTMLInputElement, CommandProps>(({
       )}
     >
       <label htmlFor={inputId} className={cn("sr-only")}>
-        {label}
+        {label ?? copy.search}
       </label>
 
       {/* `open inline` is Base's own command-picker contract: the list is not a popup, so every
@@ -228,13 +243,15 @@ const Command = forwardRef<HTMLInputElement, CommandProps>(({
             disabled ? state.disabled : state.text
           )}
         >
-          <HugeiconsIcon icon={Search01Icon} aria-hidden="true" className={cn(iconStroke.glyph, "size-5 shrink-0", text.medium)} />
+          <span className={cn(iconSlot.normal, text.medium)} aria-hidden="true">
+            <HugeiconsIcon icon={Search01Icon} aria-hidden="true" className={cn(iconStroke.glyph)} />
+          </span>
           <BaseAutocomplete.Input
             ref={ref}
             id={inputId}
-            placeholder={placeholder}
+            placeholder={placeholder ?? copy.placeholder}
             className={cn(
-              "min-w-0 w-full bg-transparent py-3 text-inherit outline-none",
+              "min-w-0 w-full bg-transparent py-3 text-inherit [outline-style:none]",
               disabled ? state.disabledDescendant : state.text,
               inputClassName
             )}
@@ -267,7 +284,9 @@ const Command = forwardRef<HTMLInputElement, CommandProps>(({
               children only while the list is empty. It sits beside the listbox rather than inside
               it, so an empty list is still a list with no options in it. */}
           <BaseAutocomplete.Empty>
-            <div className={cn("px-3 py-3 text-sm", text.medium)}>{emptyMessage}</div>
+            <div className={cn("px-3 py-3", type.body, text.medium)}>
+              {emptyMessage !== undefined ? emptyMessage : copy.empty}
+            </div>
           </BaseAutocomplete.Empty>
         </div>
       </BaseAutocomplete.Root>

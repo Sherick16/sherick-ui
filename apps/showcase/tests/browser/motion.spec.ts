@@ -19,9 +19,9 @@ test.use({ reducedMotion: "no-preference" });
 
 const fixture = "/verification/interactions";
 
-const motionOf = (locator: Locator) =>
-  locator.evaluate((element) => {
-    const style = getComputedStyle(element);
+const motionOf = (locator: Locator, pseudo?: "::before") =>
+  locator.evaluate((element, pseudo) => {
+    const style = getComputedStyle(element, pseudo);
     return {
       property: style.transitionProperty,
       duration: style.transitionDuration,
@@ -29,7 +29,7 @@ const motionOf = (locator: Locator) =>
       transform: style.transform,
       animation: style.animationName,
     };
-  });
+  }, pseudo);
 
 const token = (page: Page, variable: string) =>
   page.evaluate((name) => getComputedStyle(document.documentElement).getPropertyValue(name).trim(), variable);
@@ -346,7 +346,8 @@ test("Select carries tactile, orientation, arrival and anchored presence", async
 
   const selected = page.getByRole("option", { name: "Design system" });
   await expect(selected).toHaveAttribute("aria-selected", "true");
-  await expectTiming(page, selected.locator("svg"), "--sui-ease-spring");
+  /* The arrival is on the indicator Base marks as arriving, the mark's own parent, not the svg. */
+  await expectTiming(page, selected.locator("svg").locator(".."), "--sui-ease-spring");
 
   await page.keyboard.press("Escape");
   /* Select keeps its popup in the document once it has closed, so the contract is that it is
@@ -485,9 +486,13 @@ test("Dialog and AlertDialog share one modal and one scrim presence", async ({ p
   expect(modal.property).toContain("transform");
   await expectDuration(page, dialog, "--sui-duration-overlay");
 
+  /* Only the scrim's tint fades, and the tint is its `::before`: the plane itself carries the
+     backdrop blur, which no presence may animate (DESIGN_LANGUAGE.md §12). */
   await expect(scrim).toHaveCount(1);
-  await expectDuration(page, scrim, "--sui-duration-overlay");
-  expect((await motionOf(scrim)).property).toBe("opacity");
+  const tint = await motionOf(scrim, "::before");
+  expect(toMs(firstDuration(tint.duration))).toBe(toMs(await token(page, "--sui-duration-overlay")));
+  expect(tint.property).toBe("opacity");
+  expect(toMs(firstDuration((await motionOf(scrim)).duration)), "the blurred plane itself does not animate").toBe(0);
 
   /* Static anatomy inside the surface: nothing in the dialog is staggered or choreographed. */
   const heading = page.getByRole("heading", { name: "Nested composition" });
@@ -575,11 +580,12 @@ test("reduced motion drops every spatial entrance and keeps the state response",
   });
   expect(centring).toBeLessThan(1);
 
-  /* Continuous activity becomes a static status glyph rather than a loop. */
+  /* Continuous activity loses its travel but keeps its loop as opacity: a spinner that stopped would
+     read as finished. The spinner breathes instead of turning, and a skeleton pulses more softly. */
   await page.goto("/verification/motion");
   await expect(page.getByTestId("motion-lab")).toBeVisible();
-  expect((await motionOf(page.getByTestId("lab-spinner").locator("svg"))).animation).toBe("none");
-  expect((await motionOf(page.getByTestId("lab-skeleton").locator("div"))).animation).toBe("none");
+  expect((await motionOf(page.getByTestId("lab-spinner").locator("svg"))).animation).toBe("sherick-breathe");
+  expect((await motionOf(page.getByTestId("lab-skeleton").locator("div"))).animation).toBe("sherick-soft-pulse");
 
   expect(errors).toEqual([]);
 });
@@ -1170,7 +1176,12 @@ test("a compact control keeps its target stable while its mark takes the press",
 /* Frame sampling. A recipe can name a transition and still paint nothing in between — the scrim
    once declared an opacity transition with no state to transition from — so these tests read the
    painted value on every animation frame of the event, not the class or the transition property. */
-const sampleFrames = (page: Page, selector: string, read: "opacity" | "height", durationMs: number) =>
+const sampleFrames = (
+  page: Page,
+  selector: string,
+  read: "opacity" | "beforeOpacity" | "height",
+  durationMs: number
+) =>
   page.evaluate(
     ({ selector, read, durationMs }) =>
       new Promise<number[]>((resolve) => {
@@ -1180,9 +1191,9 @@ const sampleFrames = (page: Page, selector: string, read: "opacity" | "height", 
           const element = document.querySelector(selector);
           if (element) {
             values.push(
-              read === "opacity"
-                ? Number.parseFloat(getComputedStyle(element).opacity)
-                : element.getBoundingClientRect().height
+              read === "height"
+                ? element.getBoundingClientRect().height
+                : Number.parseFloat(getComputedStyle(element, read === "beforeOpacity" ? "::before" : null).opacity)
             );
           }
           if (performance.now() - start < durationMs) requestAnimationFrame(frame);
@@ -1194,14 +1205,15 @@ const sampleFrames = (page: Page, selector: string, read: "opacity" | "height", 
   );
 
 test("the scrim fades with the surface it sits behind", async ({ page, errors }) => {
+  /* The tint on the plane's `::before` is what fades; the plane carries the blur and does not. */
   const scrim = '[class*="--sui-scrim-blur"]';
-  const opening = sampleFrames(page, scrim, "opacity", 600);
+  const opening = sampleFrames(page, scrim, "beforeOpacity", 600);
   await page.getByRole("button", { name: "Open dialog" }).click();
   const entrance = await opening;
   expect(entrance.some((value) => value > 0.02 && value < 0.98), `scrim entrance ${entrance.join(",")}`).toBe(true);
   expect(entrance.at(-1)).toBe(1);
 
-  const closing = sampleFrames(page, scrim, "opacity", 600);
+  const closing = sampleFrames(page, scrim, "beforeOpacity", 600);
   await page.keyboard.press("Escape");
   const exit = await closing;
   expect(exit.some((value) => value > 0.02 && value < 0.98), `scrim exit ${exit.join(",")}`).toBe(true);
@@ -1367,4 +1379,89 @@ test("a theme switch lands in one step rather than animating the old tones", asy
   const distinct = [...new Set(await fills)];
   expect(distinct.length, `fills seen during the switch: ${distinct.join(" | ")}`).toBeLessThanOrEqual(2);
   expect(errors).toEqual([]);
+});
+
+/*
+ Touch
+ =====
+ The `touch` project emulates Pixel 7: a touch screen, a coarse pointer and no hover. Playwright has
+ no option for hover, so these tests set the media features through the DevTools override, which is
+ what makes `(hover: hover)` false for the page under test. Every test here is tagged `@touch`, so
+ the desktop project does not run it and the touch project runs nothing else.
+ */
+
+const layerOpacity = (locator: Locator) =>
+  locator.evaluate((element) => {
+    const style = getComputedStyle(element, "::before");
+    return style.content === "none" ? "none" : style.opacity;
+  });
+
+const emulateTouch = (page: Page) =>
+  page.context().newCDPSession(page).then(async (session) => {
+    await session.send("Emulation.setEmulatedMedia", {
+      features: [
+        { name: "hover", value: "none" },
+        { name: "any-hover", value: "none" },
+        { name: "pointer", value: "coarse" },
+        { name: "any-pointer", value: "coarse" },
+      ],
+    });
+    await expect.poll(() => page.evaluate(() => matchMedia("(hover: none)").matches)).toBe(true);
+    return session;
+  });
+
+test.describe("touch input", () => {
+  test("a loading button keeps full strength on touch @touch", async ({ page, errors }) => {
+    await page.goto("/verification/visual-consistency");
+    await emulateTouch(page);
+
+    /* The second button in the tonal band is the loading one: the first is at rest, the third is
+       disabled. A busy control is working, not unavailable, so it must not be dimmed. */
+    const loading = page.locator('[data-appearance="tonal"]').getByRole("button", { name: "Export" }).nth(1);
+    await expect(loading).toBeVisible();
+    await expect(loading).toHaveCSS("opacity", "1");
+
+    expect(errors).toEqual([]);
+  });
+
+  test("a tap leaves no hover tone behind on touch @touch", async ({ page, errors }) => {
+    await page.goto("/verification/core");
+    await emulateTouch(page);
+
+    const button = page.getByRole("button", { name: "Tonal", exact: true });
+    await expect(button).toBeVisible();
+    expect(await layerOpacity(button), "a tonal button rests with no state layer").toBe("0");
+
+    await button.tap();
+    /* A touch browser keeps a hover state after a tap unless the hover rules are guarded. After the
+       tap the layer must be back at rest, not holding the hover step. */
+    await expect
+      .poll(() => layerOpacity(button), { message: "a tap must not leave the hover tone on the button" })
+      .toBe("0");
+
+    expect(errors).toEqual([]);
+  });
+
+  test.describe("reduced motion", () => {
+    test.use({ reducedMotion: "reduce" });
+
+    test("a reduced indeterminate bar fills its whole track @touch", async ({ page, errors }) => {
+      await page.goto("/verification/interactions");
+      await emulateTouch(page);
+
+      const bar = page.getByRole("progressbar", { name: "Interactions indeterminate" });
+      const fill = bar.locator("[data-sui-progress-indicator]");
+      await expect(fill).toBeVisible();
+
+      /* Under reduced motion the sweep gives way to a fill held at the whole track. A fill at its
+         resting `w-2/5` is a bar that reads as a fifth of a task, which is a different claim. */
+      const widths = await Promise.all([
+        bar.evaluate((element) => element.getBoundingClientRect().width),
+        fill.evaluate((element) => element.getBoundingClientRect().width),
+      ]);
+      expect(widths[1], "the reduced indeterminate fill spans the whole track").toBeCloseTo(widths[0], 0);
+
+      expect(errors).toEqual([]);
+    });
+  });
 });

@@ -16,9 +16,9 @@ import {
   stateLayer,
   text,
   tone,
-  type,
 } from "./ui.common";
 import { motionFeedback, motionInkPress } from "./ui.motion";
+import { fieldDensity, type FieldSize } from "./Field";
 
 export interface NumberFieldProps
   extends Omit<
@@ -50,6 +50,8 @@ export interface NumberFieldProps
    * name the unit in the label as well.
    */
   suffix?: ReactNode;
+  /** The field's density: `sm` for a dense filter row, `md` (the default) or `lg`. */
+  size?: FieldSize;
   disabled?: boolean;
   readOnly?: boolean;
   required?: boolean;
@@ -60,6 +62,8 @@ export interface NumberFieldProps
   inputRef?: Ref<HTMLInputElement>;
   /** Styles the field's own container. The text input is styled through `inputClassName`. */
   className?: string;
+  /** Styles the field's box: the tray that holds the steppers and the value. */
+  fieldClassName?: string;
   inputClassName?: string;
 }
 
@@ -110,7 +114,9 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
       name,
       form,
       inputRef,
+      size = "md",
       className,
+      fieldClassName,
       inputClassName,
       ...inputProps
     },
@@ -149,9 +155,9 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
       >
         <BaseNumberField.Group
           className={({ disabled: fieldDisabled }) => cn(
-            // The 44px targets fit the normal 48px field, inside its rim, without inflating its density.
+            // The 44px targets fit the field's own height, inside its rim, without inflating its density.
             "group/field flex w-full items-center gap-1 px-1.5",
-            density.normal,
+            fieldDensity[size],
             shape.control,
             motionFeedback,
             focusRingWithin,
@@ -162,7 +168,8 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
             !fieldDisabled && state.field.focusWithin,
             !fieldDisabled && state.field.invalidHover,
             !fieldDisabled && state.field.invalidFocusWithin,
-            fieldDisabled ? state.disabled : state.text
+            fieldDisabled ? state.disabled : state.text,
+            fieldClassName
           )}
         >
           <BaseNumberField.Decrement className={cn(stepperClassName)}>
@@ -184,8 +191,8 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
                 {...inputProps}
                 ref={ref}
                 className={cn(
-                  "absolute inset-0 min-w-0 w-full bg-transparent py-2 text-center text-inherit outline-none",
-                  type.numeric,
+                  "absolute inset-0 min-w-0 w-full bg-transparent py-2 text-center text-inherit [outline-style:none]",
+                  "tabular-nums",
                   state.text,
                   inputClassName
                 )}
@@ -196,7 +203,7 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
                   <span className={cn("relative inline-block min-w-[1ch] max-w-full")}>
                     <span
                       aria-hidden="true"
-                      className={cn("invisible block overflow-hidden whitespace-pre py-2", type.numeric)}
+                      className={cn("invisible block overflow-hidden whitespace-pre py-2 tabular-nums")}
                     >
                       {String(props.value ?? "") || props.placeholder || " "}
                     </span>
@@ -211,8 +218,8 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
               {...inputProps}
               ref={ref}
               className={cn(
-                "min-w-0 flex-1 bg-transparent py-2 text-center text-inherit outline-none",
-                type.numeric,
+                "min-w-0 flex-1 bg-transparent py-2 text-center text-inherit [outline-style:none]",
+                "tabular-nums",
                 state.text,
                 inputClassName
               )}

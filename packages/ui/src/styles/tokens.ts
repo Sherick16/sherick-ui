@@ -130,12 +130,16 @@ export const darkTokens = {
   "primary-strong": "0.720 0.160 292",
   "primary-soft": "0.300 0.075 292",
   "primary-selected": "0.375 0.105 292",
-  "danger-soft": "0.290 0.060 25",
-  "danger-selected": "0.360 0.085 25",
-  "warning-soft": "0.300 0.050 75",
-  "warning-selected": "0.370 0.070 75",
-  "success-soft": "0.290 0.050 160",
-  "success-selected": "0.360 0.070 160",
+  /* The dark semantic containers are tints, not slabs. An Alert or Badge sits on the same graphite
+     room as the neutral one beside it, so its soft step stays close to the sheet's own lightness
+     and carries only a little of its hue; the selected step is one rung lighter and a touch more
+     saturated, which is the same rule the light containers follow. */
+  "danger-soft": "0.260 0.040 25",
+  "danger-selected": "0.330 0.062 25",
+  "warning-soft": "0.260 0.040 75",
+  "warning-selected": "0.330 0.060 75",
+  "success-soft": "0.260 0.040 160",
+  "success-selected": "0.330 0.060 160",
   "accent": "0.80 0.08 215",
   "danger": "0.775 0.130 25",
   "warning": "0.830 0.120 80",
@@ -218,6 +222,15 @@ export const sharedTokens = {
      once every two turns, so two loading glyphs on one screen never beat against each other. */
   "duration-spin": "1000ms",
   "duration-pulse": "2000ms",
+  /* Reduced motion keeps activity visible as an opacity change. A spinner that stops entirely reads
+     as finished, so under `prefers-reduced-motion` it breathes on a slow two-second loop instead of
+     turning; the loop is paced like the pulse it resembles. */
+  "duration-breathe": "2000ms",
+  /* The utility presence tier: a small surface opened from the keyboard, or a tooltip answered on
+     the quick timing. Opacity only, so the pace is short enough that a keyboard user never waits on
+     a hint or a menu they just asked for. */
+  "duration-utility": "100ms",
+  "duration-utility-exit": "80ms",
   "ease-pulse": "cubic-bezier(0.4, 0, 0.6, 1)",
   "ease-press": "cubic-bezier(0.4, 0, 0.2, 1)",
   "ease-release": "cubic-bezier(0.16, 1, 0.3, 1)",

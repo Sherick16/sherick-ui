@@ -10,7 +10,6 @@ import React, {
 } from "react";
 import { cn } from "@/libs/utils";
 import {
-  density,
   fieldLabel,
   fieldLayout,
   fieldMessage,
@@ -23,11 +22,18 @@ import {
   text,
 } from "./ui.common";
 import { motionFeedback } from "./ui.motion";
+import FieldLabel from "./FieldLabel";
+import { fieldDensity, type FieldSize } from "./Field";
 
-export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "prefix"> {
+export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "prefix" | "size"> {
   label?: ReactNode;
   description?: ReactNode;
-  error?: boolean;
+  /**
+   * Marks the field invalid. A message is shown beneath it, so a `ReactNode` here is both the flag and
+   * its message. `true` marks the field without one, and `errorMessage` supplies the message.
+   */
+  error?: ReactNode;
+  /** The message for `error={true}`. A message passed as `error` takes its place. */
   errorMessage?: ReactNode;
   inputClassName?: string;
   /** Base's value-change callback, event details included. */
@@ -39,6 +45,11 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   prefix?: ReactNode;
   /** Text or a mark at the end of the field, such as `tickets` or `.discord.gg`. Presentation only. */
   suffix?: ReactNode;
+  /**
+   * The field's density: `sm` for a dense filter row, `md` (the default) or `lg`. A number is the
+   * native `size` attribute of the input, as it always was.
+   */
+  size?: FieldSize | number;
 }
 
 /* An affix is supporting copy on the value's own line: quieter than the value, never smaller. */
@@ -51,7 +62,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     className,
     inputClassName,
     required,
-    error = false,
+    error,
     errorMessage,
     id,
     name,
@@ -59,11 +70,20 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
     onValueChange,
     prefix,
     suffix,
+    size,
     ...props
   }, ref) => {
+    /* An `error` that is a message, or a flag with the message beside it: both mark the field invalid. */
+    const invalidByProp = Boolean(error);
+    const errorText = typeof error === "boolean" || error == null ? errorMessage : error;
+    const fieldSize: FieldSize = typeof size === "string" ? size : "md";
+    const nativeSize = typeof size === "number" ? size : undefined;
+    /* A compact field keeps its 40px height with a 20px line, so its vertical padding steps down with it. */
+    const padding = fieldSize === "sm" ? "py-2" : "py-3";
+
     /* A field marked invalid by its own prop and one that learns it from Base — a failed constraint,
        or an error a `Form` reports for its name — are the same field, so both take the same ladder. */
-    const isInvalid = (valid: boolean | null) => error || valid === false;
+    const isInvalid = (valid: boolean | null) => invalidByProp || valid === false;
 
     /* With an affix, the input is the borderless part of a composite field: the box, its rim and its
        focus ring belong to the row that holds the affixes, exactly as a Combobox's do. A press on an
@@ -80,12 +100,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
         className={cn(fieldLayout, className)}
         name={name}
         disabled={disabled}
-        invalid={error}
+        invalid={invalidByProp}
       >
         {label && (
           <Field.Label className={cn(fieldLabel)}>
-            {label}
-            {required && <span className={cn("ms-1 text-sherick-danger")} aria-hidden="true">*</span>}
+            <FieldLabel required={required}>{label}</FieldLabel>
           </Field.Label>
         )}
         {prefix != null || suffix != null ? (
@@ -96,10 +115,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             name={name}
             required={required}
             disabled={disabled}
+            size={nativeSize}
             onValueChange={onValueChange}
             className={(inputState) =>
               cn(
-                "min-w-0 flex-1 bg-transparent py-3 outline-none",
+                `min-w-0 flex-1 bg-transparent ${padding} [outline-style:none]`,
                 isInvalid(inputState.valid) ? "placeholder:text-sherick-danger" : "placeholder:text-sherick-ink-muted",
                 disabled ? state.disabledDescendant : state.text,
                 inputClassName
@@ -111,7 +131,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                 onPointerDown={focusInput}
                 className={cn(
                   "group/field flex min-w-0 w-full items-center gap-2 px-5",
-                  density.normal,
+                  fieldDensity[fieldSize],
                   shape.control,
                   motionFeedback,
                   focusRingWithin,
@@ -139,12 +159,13 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             name={name}
             required={required}
             disabled={disabled}
+            size={nativeSize}
             onValueChange={onValueChange}
             className={(inputState) => {
               const invalid = isInvalid(inputState.valid);
               return cn(
-                density.normal,
-                "min-w-0 w-full px-5 py-3",
+                fieldDensity[fieldSize],
+                `min-w-0 w-full px-5 ${padding}`,
                 shape.control,
                 motionFeedback,
                 focusRing,
@@ -168,11 +189,11 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
             field's name — and `match` pins the caller's own message in its place. A field marked
             invalid with no message of its own shows only its danger tray, so give an invalid
             field a message that says how to recover. */}
-        {!(error && !errorMessage) && (
+        {!(invalidByProp && !errorText) && (
           <Field.Error
-            match={error ? true : undefined}
+            match={invalidByProp ? true : undefined}
             className={cn(fieldMessage.error)}
-            {...(error ? { children: errorMessage } : {})}
+            {...(invalidByProp ? { children: errorText } : {})}
           />
         )}
       </Field.Root>

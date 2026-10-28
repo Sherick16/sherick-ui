@@ -1,14 +1,14 @@
 "use client";
 
 import { AlertDialog as BaseAlertDialog } from "@base-ui/react/alert-dialog";
-import React, { forwardRef, type ReactNode } from "react";
+import React, { forwardRef, type ForwardRefExoticComponent, type ReactElement, type ReactNode, type RefAttributes } from "react";
 import { cn } from "@/libs/utils";
 import Button from "./Button";
 import { DialogDescription } from "./DialogDescription";
 import { DialogFooter } from "./DialogFooter";
 import { DialogHeader } from "./DialogHeader";
 import { DialogSurface } from "./DialogSurface";
-import type { Variant } from "./ui.types";
+import type { TriggerProps, Variant } from "./ui.types";
 
 export interface AlertDialogProps {
   /** The question the dialog asks. Base makes it the surface's accessible name. */
@@ -35,7 +35,23 @@ export interface AlertDialogProps {
   defaultOpen?: boolean;
   /** Base's own open-change callback, event details included. */
   onOpenChange?: BaseAlertDialog.Root.Props["onOpenChange"];
+  /** The `AlertDialog.Trigger` that opens the dialog. It renders in the page, beside the trigger's own control. */
+  children?: ReactNode;
 }
+
+/** The control that opens an alert dialog. Base's trigger closes it again through the same root. */
+export type AlertDialogTriggerProps = TriggerProps & {
+  /** The element the trigger's own props are handed to — usually a Sherick `Button`. */
+  render?: ReactElement;
+};
+
+const AlertDialogTrigger = ({ render, ...props }: AlertDialogTriggerProps) => (
+  <BaseAlertDialog.Trigger render={render} {...props} />
+);
+
+type AlertDialogComponent = ForwardRefExoticComponent<AlertDialogProps & RefAttributes<HTMLDivElement>> & {
+  Trigger: typeof AlertDialogTrigger;
+};
 
 /**
  * A dialog that asks one question and requires one answer. Its interaction contract differs from
@@ -54,6 +70,7 @@ const AlertDialog = forwardRef<HTMLDivElement, AlertDialogProps>(({
   confirmVariant = "danger",
   className,
   onOpenChange,
+  children,
   ...rootProps
 }, ref) => {
   return (
@@ -67,6 +84,8 @@ const AlertDialog = forwardRef<HTMLDivElement, AlertDialogProps>(({
         onOpenChange?.(nextOpen, eventDetails);
       }}
     >
+      {/* The triggers come before the surface, so they stay in the page and the portal holds only the dialog. */}
+      {children}
       <DialogSurface className={cn(className)} popupRef={ref}>
         <DialogHeader>{title}</DialogHeader>
         {description ? <DialogDescription>{description}</DialogDescription> : null}
@@ -90,9 +109,9 @@ const AlertDialog = forwardRef<HTMLDivElement, AlertDialogProps>(({
       </DialogSurface>
     </BaseAlertDialog.Root>
   );
-});
+}) as AlertDialogComponent;
 
 AlertDialog.displayName = "AlertDialog";
-
+AlertDialog.Trigger = AlertDialogTrigger;
 
 export default AlertDialog;

@@ -3,10 +3,11 @@
 import { Checkbox as BaseCheckbox } from "@base-ui/react/checkbox";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { MinusSignIcon, Tick02Icon } from "@hugeicons/core-free-icons";
-import React, { forwardRef, type ButtonHTMLAttributes, type Ref } from "react";
+import React, { forwardRef, useRef, type ButtonHTMLAttributes, type Ref } from "react";
 import { cn } from "@/libs/utils";
 import { groupFocusRing, hitArea, iconStroke, selectable, shape, state, stateLayer } from "./ui.common";
 import { motionArrive } from "./ui.motion";
+import { useControlNameWarning } from "./Field";
 
 export interface CheckboxProps
   extends Omit<ButtonHTMLAttributes<HTMLButtonElement>, "value" | "type"> {
@@ -48,10 +49,19 @@ export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(
     },
     ref
   ) => {
+    /* The visible button is both the forwarded ref and the element the name check reads. */
+    const buttonRef = useRef<HTMLButtonElement | null>(null);
+    const setButtonRef = (node: HTMLButtonElement | null) => {
+      buttonRef.current = node;
+      if (typeof ref === "function") ref(node);
+      else if (ref) ref.current = node;
+    };
+    useControlNameWarning(buttonRef, "Checkbox", Boolean(buttonProps["aria-label"] || buttonProps["aria-labelledby"]));
+
     return (
       <BaseCheckbox.Root
         nativeButton
-        render={<button {...buttonProps} ref={ref} type="button" />}
+        render={<button {...buttonProps} ref={setButtonRef} type="button" />}
         checked={checked}
         defaultChecked={defaultChecked}
         indeterminate={indeterminate}
@@ -69,8 +79,9 @@ export const Checkbox = forwardRef<HTMLButtonElement, CheckboxProps>(
           // from its own children shifts the moment its mark appears or leaves, which is exactly what
           // a checkbox does.
           // The control takes the mark's corner so a boundary drawn on the control itself — the
-          // forced-colors outline — follows the box rather than squaring it off.
-          "group inline-flex w-fit align-middle",
+          // forced-colors outline — follows the box rather than squaring it off. The keyboard ring is
+          // the mark's (`groupFocusRing`), so the control resets the browser's own ring.
+          "group inline-flex w-fit align-middle [outline-style:none]",
           shape.mark,
           hitArea,
           state.enabled,

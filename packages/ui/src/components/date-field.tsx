@@ -5,7 +5,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Calendar03Icon } from "@hugeicons/core-free-icons";
 import React, { useEffect, useRef, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { density, focusRingWithin, iconStroke, material, overlay, rim, shape, stacking, state, stateLayer, text } from "./ui.common";
+import { density, focusRingWithin, iconStroke, material, overlay, rim, shape, stacking, state, stateLayer } from "./ui.common";
 import { motionFeedback, motionInkPress, motionPresenceAnchored } from "./ui.motion";
 
 /* The parts the two date pickers share.
@@ -49,8 +49,10 @@ export const dateFieldRowClassName = (disabled: boolean) =>
  *  Its slot takes `dateInputDirection`: the clip only lands on the affordance if every engine puts
  *  the affordance on the same physical side. */
 
+/* The input takes the row's height rather than its own padding, so the row's density (40, 48 or 56px) is the
+   one source of a date field's height at every size; a padded input made a small field taller than its row. */
 export const dateInputClassName =
-  "block w-[calc(100%+2.5rem)] min-w-0 bg-transparent py-2.5 text-inherit outline-none disabled:cursor-not-allowed";
+  "block w-[calc(100%+2.5rem)] min-w-0 self-stretch bg-transparent py-0 text-inherit [outline-style:none] disabled:cursor-not-allowed";
 
 /** A native date is a left-to-right run of figures in every page direction. Chromium lays its date
  *  inputs out left to right whatever `dir` says, with the affordance on the physical right, while
@@ -62,7 +64,7 @@ export const dateInputDirection = "ltr";
 
 /* The 32×44 target holds the field part's concentric 32px hover surface.
    Only the icon presses: the adjacent native text entry never activates this button. */
-const datePartClassName = `group inline-flex shrink-0 items-center justify-center ${density.part} ${shape.circle} ${text.medium} ${motionFeedback} ${stateLayer.fieldPart} ${state.enabled} ${state.disabledPart} [&:not([data-disabled]):not(:disabled)]:hover:text-sherick-ink`;
+const datePartClassName = `group inline-flex shrink-0 items-center justify-center ${density.part} ${shape.circle} ${state.quietInk} ${motionFeedback} ${stateLayer.fieldPart} ${state.enabled} ${state.disabledPart}`;
 
 export interface DateFieldTriggerProps {
   /** The control's accessible name. It has no visible label, so it has to be named. */

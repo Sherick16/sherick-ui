@@ -1,7 +1,7 @@
 "use client";
 
 import { Separator } from "@base-ui/react/separator";
-import React from "react";
+import React, { forwardRef, type ComponentPropsWithoutRef } from "react";
 import { cn } from "@/libs/utils";
 import { edgeTone } from "./ui.common";
 
@@ -12,23 +12,29 @@ import { edgeTone } from "./ui.common";
  */
 export type DividerWeight = keyof typeof edgeTone;
 
-export interface DividerProps {
+export interface DividerProps extends Omit<ComponentPropsWithoutRef<"div">, "className"> {
   className?: string;
   orientation?: "horizontal" | "vertical";
   /** The weight of the line. `rule` is the general section break. */
   weight?: DividerWeight;
 }
 
-const Divider = ({ className, orientation = "horizontal", weight = "rule" }: DividerProps) => (
-  <Separator
-    orientation={orientation}
-    className={cn(
-      "shrink-0",
-      orientation === "horizontal" ? "h-0 w-full border-t" : "h-full w-0 border-l",
-      edgeTone[weight],
-      className
-    )}
-  />
+const Divider = forwardRef<HTMLDivElement, DividerProps>(
+  ({ className, orientation = "horizontal", weight = "rule", ...props }, ref) => (
+    <Separator
+      {...props}
+      ref={ref}
+      orientation={orientation}
+      className={cn(
+        "shrink-0",
+        orientation === "horizontal" ? "h-0 w-full border-t" : "h-full w-0 border-l",
+        edgeTone[weight],
+        className
+      )}
+    />
+  )
 );
+
+Divider.displayName = "Divider";
 
 export default Divider;
