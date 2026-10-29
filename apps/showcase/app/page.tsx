@@ -2,7 +2,7 @@
 
 import { Fragment, useEffect, useRef, useState } from "react";
 import { HugeiconsIcon, type IconSvgElement } from "@hugeicons/react";
-import { ArrowDown01Icon, ArrowUpRight01Icon, ComputerIcon, Delete02Icon, Download04Icon, FavouriteIcon, FilterHorizontalIcon, Moon02Icon, MoreHorizontalIcon, Notification03Icon, Search01Icon, Sun03Icon, TextAlignCenterIcon, TextAlignLeftIcon, TextAlignRightIcon, Tick02Icon } from "@hugeicons/core-free-icons";
+import { ArrowDown01Icon, ArrowRight01Icon, ArrowUpRight01Icon, ComputerIcon, Delete02Icon, Download04Icon, FavouriteIcon, FilterHorizontalIcon, Moon02Icon, MoreHorizontalIcon, Notification03Icon, Search01Icon, Sun03Icon, TextAlignCenterIcon, TextAlignLeftIcon, TextAlignRightIcon, Tick02Icon } from "@hugeicons/core-free-icons";
 import {
   Accordion,
   Alert,
@@ -381,6 +381,15 @@ export default function Home() {
                   <Button appearance="filled" size="sm">Small</Button>
                   <Button appearance="filled" size="md">Medium</Button>
                   <Button appearance="filled" size="lg">Large</Button>
+                </div>
+              </Specimen>
+
+              <Specimen title="Marks">
+                <div className="flex flex-wrap items-center gap-6">
+                  <StateLabel label="Leading"><Button variant="secondary" icon={<HugeiconsIcon icon={FilterHorizontalIcon} aria-hidden="true" />}>Filter</Button></StateLabel>
+                  <StateLabel label="Trailing"><Button trailingIcon={<HugeiconsIcon icon={ArrowRight01Icon} aria-hidden="true" />}>Continue</Button></StateLabel>
+                  <StateLabel label="Trailing, loading"><Button trailingIcon={<HugeiconsIcon icon={ArrowRight01Icon} aria-hidden="true" />} loading>Continue</Button></StateLabel>
+                  <StateLabel label="Both"><Button variant="secondary" icon={<HugeiconsIcon icon={Download04Icon} aria-hidden="true" />} trailingIcon={<HugeiconsIcon icon={ArrowDown01Icon} aria-hidden="true" />}>Save as</Button></StateLabel>
                 </div>
               </Specimen>
 

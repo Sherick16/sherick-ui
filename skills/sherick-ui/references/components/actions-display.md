@@ -44,6 +44,7 @@ import {
 <Button appearance="tonal" variant="secondary">Cancel</Button>
 <Button appearance="text" variant="secondary" size="sm">Skip</Button>
 <Button type="submit" loading={saving} icon={<Download />}>Export</Button>
+<Button trailingIcon={<ArrowRight />}>Continue</Button>
 ```
 
 | Prop | Type | Default |
@@ -53,6 +54,7 @@ import {
 | `appearance` | `"filled" \| "tonal" \| "text"` | `"tonal"` |
 | `size` | `"sm" \| "md" \| "lg"` | `"md"` |
 | `icon` | `ReactNode` | — |
+| `trailingIcon` | `ReactNode` | — |
 | `loading` | `boolean` | `false` |
 | `type` | `"submit" \| "reset" \| "button"` | `"button"` |
 
@@ -63,12 +65,15 @@ native `<button>`; the ref points at that element.
   tinted matte raised control that recesses while held, `text` is a fill-less tone label.
 - `loading` also sets `disabled` and `aria-busy="true"`, so it blocks form submission and
   pointer input while it runs. The label stays in the DOM and keeps the accessible name;
-  with no `icon` it is only made invisible, which is why the control's width does not
+  with no `icon` or `trailingIcon` it is only made invisible, which is why the control's width does not
   change between its rest and loading states.
 - `icon` occupies one fixed 20px slot, so swapping an icon for the spinner cannot resize the
   control. A direct `svg` in the slot is normalized to 20px; a nested node must size itself —
   `Button` passes `size-5` to the spinner it substitutes, which is why a nested `Spinner` is a
   mark a plain `svg` selector cannot reach.
+- `trailingIcon` (from 2.11.0) is the mark after the label, such as an arrow or a chevron. It takes
+  the same slot as `icon` and follows the writing direction, so RTL puts it on the left. Both can be
+  set at once. While loading, the spinner replaces `icon`; with only a `trailingIcon` it replaces that.
 - Sizes are density floors on the control's height: sm ≥40px, md ≥48px, lg ≥56px.
 - For navigation use a real anchor or an anchor-preserving router adapter. A router helper wrapping `Button` does not change its button host; successful ordinary clicks do not prove link semantics. See [router composition](navigation-overlays.md#anchor-preserving-router-composition).
 
