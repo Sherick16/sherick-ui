@@ -75,6 +75,44 @@ test("a loading mark takes the slot its icon had, without changing the control",
   expect(iconBusy?.height).toBe(iconIdle?.height);
 });
 
+test("a trailing mark follows the label and keeps its slot while loading", async ({ page }) => {
+  const section = await openShowcase(page, "buttons");
+
+  // Two buttons share one label; the first is at rest and the second is loading.
+  const continues = section.getByRole("button", { name: "Continue", exact: true });
+  await expect(continues).toHaveCount(2);
+  const [idle, busy] = [continues.nth(0), continues.nth(1)];
+
+  const idleButton = await idle.boundingBox();
+  const busyButton = await busy.boundingBox();
+  expect(busyButton?.width, "the spinner takes the trailing slot, so the control keeps its width").toBe(idleButton?.width);
+
+  /** Where the trailing slot sits against the label, in the writing direction. */
+  const trailing = (control: Locator) =>
+    control.evaluate((element) => {
+      const label = element.children[0];
+      const slot = element.lastElementChild;
+      if (!label || !slot || label === slot) throw new Error("the control has a label and a trailing slot");
+      const labelBox = label.getBoundingClientRect();
+      const slotBox = slot.getBoundingClientRect();
+      const rtl = getComputedStyle(element).direction === "rtl";
+      return {
+        width: slotBox.width,
+        after: rtl ? slotBox.right <= labelBox.left : slotBox.left >= labelBox.right,
+      };
+    });
+
+  const idleSlot = await trailing(idle);
+  expect(idleSlot.width, "the trailing slot owns its own box").toBeCloseTo(20, 1);
+  expect(idleSlot.after, "the mark comes after the label").toBe(true);
+  expect((await trailing(busy)).width).toBeCloseTo(20, 1);
+
+  await page.evaluate(() => {
+    document.documentElement.dir = "rtl";
+  });
+  expect((await trailing(idle)).after, "RTL mirrors the trailing mark").toBe(true);
+});
+
 test("a chip's dismiss mark keeps its target and its edge distance", async ({ page }) => {
   const section = await openShowcase(page, "selection");
   const dismiss = section.getByRole("button", { name: "Remove Platform" });

@@ -25,7 +25,10 @@ export interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: Variant;
   appearance?: ButtonAppearance;
   size?: ButtonSize;
+  /** The mark before the label. */
   icon?: ReactNode;
+  /** The mark after the label, such as an arrow or a chevron. It follows the writing direction. */
+  trailingIcon?: ReactNode;
   loading?: boolean;
   /**
    * The element the button renders as, such as a router link. The button's classes and its own props
@@ -54,6 +57,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     appearance = "tonal",
     size = "md",
     icon,
+    trailingIcon,
     className,
     loading = false,
     disabled,
@@ -73,6 +77,9 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
        priority action is never flatter than the one beside it. */
     const isRaised = appearance !== "text";
     const isTactile = isRaised && !isInert;
+    /* The spinner takes the leading slot. With only a trailing mark it takes that slot instead, so the
+       control keeps its width; with no mark at all it covers the hidden label. */
+    const spinnerTrails = loading && !icon && Boolean(trailingIcon);
 
     return (
       <BaseButton
@@ -108,7 +115,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
             button's type step, so a nested node — a wrapped mark, a status dot — cannot change the
             control's width, and the loading mark lands in the box the icon had. `[&>svg]` normalizes
             direct SVG artwork; sizing nested artwork is the caller's business, as §17 says. */}
-        {loading ? (
+        {loading && !spinnerTrails ? (
           <span className={cn(slotMap[size], !icon && "absolute")}>
             <Spinner size="small" className={cn("size-full")} />
           </span>
@@ -118,7 +125,16 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           </span>
         ) : null}
         {/* Retain one label subtree and its accessible name while the spinner occupies its footprint. */}
-        <span className={cn("min-w-0 [overflow-wrap:anywhere]", loading && !icon && "opacity-0")}>{children}</span>
+        <span className={cn("min-w-0 [overflow-wrap:anywhere]", loading && !icon && !trailingIcon && "opacity-0")}>{children}</span>
+        {spinnerTrails ? (
+          <span className={cn(slotMap[size])}>
+            <Spinner size="small" className={cn("size-full")} />
+          </span>
+        ) : trailingIcon ? (
+          <span className={cn(slotMap[size])} aria-hidden="true">
+            {trailingIcon}
+          </span>
+        ) : null}
       </BaseButton>
     );
   }
