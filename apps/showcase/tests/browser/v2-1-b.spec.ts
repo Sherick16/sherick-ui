@@ -1,5 +1,4 @@
-import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Locator, type Page } from "./fixtures";
+import { AxeBuilder, expect, test, type Locator, type Page } from "./fixtures";
 
 /* WCAG A/AA plus the WCAG 2.2 target-size rule, enabled explicitly for the same reason
    `accessibility.spec.ts` enables it: Axe 4.13 still ships it disabled by default. */

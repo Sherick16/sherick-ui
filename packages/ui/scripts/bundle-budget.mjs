@@ -20,7 +20,8 @@ import { readFile, writeFile } from "node:fs/promises";
 import { createRequire } from "node:module";
 import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import { brotliCompressSync, gzipSync } from "node:zlib";
+import { promisify } from "node:util";
+import { brotliCompress, gzip } from "node:zlib";
 import { build } from "esbuild";
 
 const packageRoot = process.env.SHERICK_CONSUMER_DIR ?? fileURLToPath(new URL("..", import.meta.url));
@@ -29,8 +30,9 @@ const baselinePath = fileURLToPath(new URL("./bundle-budget.json", import.meta.u
 const updateOnly = process.argv.find(arg => arg.startsWith("--update="))?.slice("--update=".length).split(",");
 const update = process.argv.includes("--update") || updateOnly !== undefined;
 
-const gzipSize = (buffer) => gzipSync(buffer, { level: 9 }).length;
-const brotliSize = (buffer) => brotliCompressSync(buffer).length;
+// The asynchronous forms compress on libuv's thread pool, so the fixtures are measured side by side.
+const gzipSize = async (buffer) => (await promisify(gzip)(buffer, { level: 9 })).length;
+const brotliSize = async (buffer) => (await promisify(brotliCompress)(buffer)).length;
 const kb = (bytes) => `${(bytes / 1024).toFixed(1)} kB`;
 
 /* Runtime dependencies that only the `sherick-ui/content` subpath may reach. Importing
@@ -89,11 +91,17 @@ const bundleFixture = async (source) => {
 const measured = {};
 const failures = [];
 
-for (const [name, source] of Object.entries(fixtures)) {
-  const { contents, included, modules, bytes } = await bundleFixture(source);
+const bundles = await Promise.all(
+  Object.values(fixtures).map(async (source) => {
+    const bundle = await bundleFixture(source);
+    const [gzip, brotli] = await Promise.all([gzipSize(bundle.contents), brotliSize(bundle.contents)]);
+    return { ...bundle, gzip, brotli };
+  })
+);
+
+for (const [index, name] of Object.keys(fixtures).entries()) {
+  const { included, modules, bytes, gzip, brotli } = bundles[index];
   const richContentModules = included.filter((id) => richContentPattern.test(id));
-  const gzip = gzipSize(contents);
-  const brotli = brotliSize(contents);
   measured[name] = { raw: bytes, gzip, brotli, modules };
 
   const sherickModules = included.filter((id) => resolve(id).startsWith(`${stylesheetRoot}/`));
@@ -129,9 +137,10 @@ for (const [name, source] of Object.entries(fixtures)) {
 
 for (const [file, name] of [["styles.css", "stylesCss"], ["theme.css", "themeCss"]]) {
   const contents = await readFile(`${stylesheetRoot}/${file}`);
-  measured[name] = { raw: contents.length, gzip: gzipSize(contents), brotli: brotliSize(contents), modules: 0 };
+  const [gzip, brotli] = await Promise.all([gzipSize(contents), brotliSize(contents)]);
+  measured[name] = { raw: contents.length, gzip, brotli, modules: 0 };
   console.log(
-    `${name.padEnd(8)} raw ${kb(contents.length).padStart(10)}  gzip ${kb(gzipSize(contents)).padStart(9)}  brotli ${kb(brotliSize(contents)).padStart(9)}`
+    `${name.padEnd(8)} raw ${kb(contents.length).padStart(10)}  gzip ${kb(gzip).padStart(9)}  brotli ${kb(brotli).padStart(9)}`
   );
 }
 

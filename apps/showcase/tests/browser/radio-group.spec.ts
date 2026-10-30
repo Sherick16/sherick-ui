@@ -1,5 +1,4 @@
-import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Locator, type Page } from "./fixtures";
+import { AxeBuilder, expect, test, type Locator, type Page } from "./fixtures";
 
 const openFixture = async (page: Page) => {
   await page.goto("/verification/radio-group");

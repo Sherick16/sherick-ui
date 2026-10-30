@@ -1,3 +1,4 @@
+import AxeScan from "@axe-core/playwright";
 import { expect, test as base, type Locator, type Page } from "@playwright/test";
 
 /**
@@ -24,6 +25,34 @@ export const test = base.extend<{ errors: string[] }>({
 
 export { expect };
 export type { Locator, Page };
+
+/**
+ * The suite's axe scan. Every rule still runs and every violation is reported in full; two settings
+ * drop only work that no test reads:
+ * - a passing rule lists one example node, not every node it matched;
+ * - a page with no child frame runs `axe.run` in place. The default flow runs `axe.runPartial`,
+ *   copies every partial result into a second, blank page and finishes there, so that it can reach
+ *   cross-origin frames. With one frame it returns the same results at about a third of the cost,
+ *   and a page that embeds a frame keeps the default flow.
+ */
+export class AxeBuilder extends AxeScan {
+  readonly #page: Page;
+
+  constructor({ page }: { page: Page }) {
+    super({ page });
+    this.#page = page;
+    super.options({ resultTypes: ["violations"] });
+  }
+
+  options(options: Parameters<AxeScan["options"]>[0]) {
+    return super.options({ resultTypes: ["violations"], ...options });
+  }
+
+  analyze() {
+    this.setLegacyMode(this.#page.frames().length === 1);
+    return super.analyze();
+  }
+}
 
 /**
  * Whether `locator` is what the document actually hit-tests at its own center.

@@ -1,5 +1,9 @@
 import { defineConfig, devices } from "@playwright/test";
 
+/* `scripts/verify.mjs` passes a free port, so a server another checkout left on 3100 is never the
+   one under test. A server already on that port is not reused: it is not this checkout's. */
+const port = Number(process.env.BROWSER_TEST_PORT ?? 3100);
+
 /* Three projects, selected by tag rather than by file, so one spec can carry a check that only a
    given engine or input model can make:
    - `chromium` runs everything that is not tagged `@touch` or `@webkit`: the desktop pointer suite,
@@ -16,8 +20,10 @@ export default defineConfig({
      screenshots. */
   snapshotPathTemplate: "{testDir}/{testFilePath}-snapshots/{arg}-{platform}{ext}",
   timeout: 30_000,
-  fullyParallel: false,
-  workers: process.env.CI ? 2 : 1,
+  /* Every test opens its own page in a fresh context, so the runner spreads single tests, not whole
+     files, across the workers; the long specs no longer finish last on one worker. */
+  fullyParallel: true,
+  workers: process.env.CI ? 2 : undefined,
   expect: {
     timeout: 5_000,
     toHaveScreenshot: {
@@ -26,7 +32,7 @@ export default defineConfig({
     },
   },
   use: {
-    baseURL: "http://127.0.0.1:3100",
+    baseURL: `http://127.0.0.1:${port}`,
     browserName: "chromium",
     viewport: { width: 1280, height: 900 },
     deviceScaleFactor: 1,
@@ -50,9 +56,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "bunx next start -p 3100",
-    url: "http://127.0.0.1:3100/verification/core",
-    reuseExistingServer: !process.env.CI,
+    command: `node node_modules/next/dist/bin/next start -p ${port}`,
+    url: `http://127.0.0.1:${port}/verification/core`,
+    reuseExistingServer: !process.env.CI && !process.env.BROWSER_TEST_PORT,
     timeout: 120_000,
   },
 });

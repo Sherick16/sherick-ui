@@ -411,30 +411,40 @@ test("large pagination wraps only numbers while both directions keep their first
       for (const name of ["Large pages", "Disabled large pages"]) {
         const nav = page.getByRole("navigation", { name, exact: true });
         await nav.evaluate((element, width) => { element.style.width = `${width}px`; }, width);
-        const previous = (await nav.getByRole("button", { name: "Previous page" }).boundingBox())!;
-        const next = (await nav.getByRole("button", { name: "Next page" }).boundingBox())!;
-        const track = (await nav.getByRole("list").boundingBox())!;
+        /* The layout is settled once the width is set (the track switches by container query), so
+           the reads go out together instead of one round trip at a time. */
+        const [previousBox, nextBox, trackBox, targets, overflow, visiblePages, firstNumberBox] = await Promise.all([
+          nav.getByRole("button", { name: "Previous page" }).boundingBox(),
+          nav.getByRole("button", { name: "Next page" }).boundingBox(),
+          nav.getByRole("list").boundingBox(),
+          nav.getByRole("button").all(),
+          nav.evaluate(element => element.scrollWidth - element.clientWidth),
+          nav.getByRole("button", { name: /^Page / }).allTextContents(),
+          nav.getByRole("button", { name: width < 512 ? "Page 600" : "Page 1", exact: true }).boundingBox(),
+        ]);
+        const previous = previousBox!;
+        const next = nextBox!;
+        const track = trackBox!;
         expect(previous.y).toBeCloseTo(next.y, 1);
         expect(previous.y).toBeCloseTo(track.y + 4, 1);
         const left = direction === "ltr" ? previous : next;
         const right = direction === "ltr" ? next : previous;
         expect(left.x).toBeCloseTo(track.x + 4, 1);
         expect(right.x + right.width).toBeCloseTo(track.x + track.width - 4, 1);
-        for (const target of await nav.getByRole("button").all()) {
-          const box = (await target.boundingBox())!;
+        await Promise.all(targets.map(async target => {
+          const [targetBox, label] = await Promise.all([target.boundingBox(), target.getAttribute("aria-label")]);
+          const box = targetBox!;
           expect(box.width).toBeGreaterThanOrEqual(44);
           expect(box.height).toBeGreaterThanOrEqual(44);
-          if ((await target.getAttribute("aria-label"))?.startsWith("Page ")) {
+          if (label?.startsWith("Page ")) {
             expect(box.x).toBeGreaterThanOrEqual(left.x + left.width + 4 - 0.5);
             expect(box.x + box.width).toBeLessThanOrEqual(right.x - 4 + 0.5);
           }
           if (name === "Disabled large pages") await expect(target).toBeDisabled();
-        }
-        expect(await nav.evaluate(element => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
-        const visiblePages = await nav.getByRole("button", { name: /^Page / }).allTextContents();
+        }));
+        expect(overflow).toBeLessThanOrEqual(1);
         expect(visiblePages).toEqual(width < 512 ? ["600"] : ["1", "598", "599", "600", "601", "602", "1234"]);
-        const firstNumber = (await nav.getByRole("button", { name: width < 512 ? "Page 600" : "Page 1", exact: true }).boundingBox())!;
-        expect(firstNumber.y).toBeCloseTo(previous.y, 1);
+        expect(firstNumberBox!.y).toBeCloseTo(previous.y, 1);
       }
     }
   }
