@@ -58,37 +58,72 @@ const expectTiming = async (page: Page, locator: Locator, variable: string) => {
   expect(firstTiming(timing)).toBe(firstTiming(await token(page, variable)));
 };
 
+type Frame = {
+  scale: number;
+  translateX: number;
+  translateY: number;
+  left: number;
+  width: number;
+  side: string | null;
+  origin: string;
+  duration: string;
+  timing: string;
+};
+
 /**
- * The geometry a transition starts from, read from frame 0 of the transition itself.
+ * Arms a reader for the transition that moves `property` on the part `selector` matches. In the
+ * frame the transition starts, it pauses the part's transitions, seeks them to each fraction of
+ * their duration, reads the frame there and resumes playback where it was. Arm it before the
+ * action that starts the transition, and await the returned read after it.
  *
- * A transition that has already begun cannot be inspected at its `from` value through the
- * cascade — the running animation outranks it — so the animation is paused and seeked to 0,
- * which is the state the entrance really paints first. The decomposed matrix gives the scale and
- * the translation separately, because a growing surface and a sliding one can share an element.
+ * A read after the action races the Playwright round trips, which can outlast a 200ms transition
+ * under load. A transition that never runs never resolves, so the test times out instead of
+ * reading a settled frame. A running transition outranks the cascade, so its `from` value is only
+ * visible with the animation paused and seeked. The decomposed matrix gives the scale and the
+ * translation separately, because a growing surface and a sliding one can share an element.
  */
-const startingGeometry = async (locator: Locator) => {
-  await locator.evaluate((element) =>
-    element.getAnimations().forEach((animation) => {
-      animation.pause();
-      animation.currentTime = 0;
-    })
+const seekOnStart = async (page: Page, selector: string, property: string, fractions: number[]) => {
+  await page.evaluate(
+    ({ selector, property, fractions }) => {
+      const frames = new Promise((resolve) => {
+        const onRun = (event: TransitionEvent) => {
+          const element = event.target;
+          if (!(element instanceof Element) || !element.matches(selector) || event.propertyName !== property) return;
+          document.removeEventListener("transitionrun", onRun);
+          const animations = element.getAnimations();
+          const playing = animations.map((animation) => animation.currentTime);
+          const read = fractions.map((fraction) => {
+            for (const animation of animations) {
+              animation.pause();
+              animation.currentTime = fraction * (animation.effect?.getTiming().duration as number);
+            }
+            const style = getComputedStyle(element);
+            const matrix = new DOMMatrix(style.transform === "none" ? "" : style.transform);
+            return {
+              scale: Number(matrix.a.toFixed(3)),
+              translateX: Number(matrix.e.toFixed(2)),
+              translateY: Number(matrix.f.toFixed(2)),
+              left: Number.parseFloat(style.left),
+              width: Math.round(element.getBoundingClientRect().width),
+              side: element.getAttribute("data-side"),
+              origin: style.transformOrigin,
+              duration: style.transitionDuration.split(",")[0].trim(),
+              timing: style.transitionTimingFunction.split(/,(?=[^)]*(?:\(|$))/)[0].trim(),
+            };
+          });
+          animations.forEach((animation, index) => {
+            animation.currentTime = playing[index];
+            animation.play();
+          });
+          resolve(read);
+        };
+        document.addEventListener("transitionrun", onRun);
+      });
+      Reflect.set(window, "seekOnStart", frames);
+    },
+    { selector, property, fractions }
   );
-  const geometry = await locator.evaluate((element) => {
-    const style = getComputedStyle(element);
-    const matrix = new DOMMatrix(style.transform === "none" ? "" : style.transform);
-    return {
-      scale: Number(matrix.a.toFixed(3)),
-      translateX: Number(matrix.e.toFixed(2)),
-      translateY: Number(matrix.f.toFixed(2)),
-      side: element.getAttribute("data-side"),
-      origin: style.transformOrigin,
-      duration: style.transitionDuration.split(",")[0].trim(),
-      timing: style.transitionTimingFunction.split(/,(?=[^)]*(?:\(|$))/)[0].trim(),
-      width: Math.round(element.getBoundingClientRect().width),
-    };
-  });
-  await locator.evaluate((element) => element.getAnimations().forEach((animation) => animation.play()));
-  return geometry;
+  return () => page.evaluate(() => Reflect.get(window, "seekOnStart") as Promise<Frame[]>);
 };
 
 /** Whether a part is painting a focus ring: the recipes suppress the user agent's outline with a
@@ -325,6 +360,7 @@ test("Select carries tactile, orientation, arrival and anchored presence", async
   expect((await motionOf(chevron)).property).toBe("transform");
   await expectTiming(page, chevron, "--sui-ease-release");
 
+  const entrance = await seekOnStart(page, ".sui-scope.shadow-sherick-floating[data-base-ui-focusable]", "transform", [0]);
   await trigger.click();
   const popup = page.locator(".sui-scope.shadow-sherick-floating[data-base-ui-focusable]");
   await expect(popup).toBeVisible();
@@ -339,7 +375,7 @@ test("Select carries tactile, orientation, arrival and anchored presence", async
   /* The entrance really grows: it paints a surface six percent smaller and four pixels closer
      to its anchor, and the growth of the painted edge is larger than the travel that supports
      it — which is what makes the surface appear to open out of the trigger rather than slide. */
-  const start = await startingGeometry(popup);
+  const [start] = await entrance();
   expect(start.scale).toBe(0.94);
   expect(Math.abs(start.translateY)).toBe(4);
   expect(start.width * (1 - start.scale)).toBeGreaterThan(4 * Math.abs(start.translateY));
@@ -681,13 +717,13 @@ test("the anchored family opens with one shared entrance geometry", async ({ pag
     { name: "dialog", open: () => page.getByRole("button", { name: "Dialog", exact: true }).click() },
   ];
 
-  const geometry: Record<string, Awaited<ReturnType<typeof startingGeometry>>> = {};
+  const geometry: Record<string, Frame> = {};
   for (const { name, open } of cases) {
     await openLab(page);
+    const entrance = await seekOnStart(page, labPopupSelector, "transform", [0]);
     await open();
-    const popup = page.locator(labPopupSelector);
-    await expect(popup).toBeVisible();
-    geometry[name] = await startingGeometry(popup);
+    await expect(page.locator(labPopupSelector)).toBeVisible();
+    [geometry[name]] = await entrance();
   }
 
   const reference = geometry.select;
@@ -734,8 +770,8 @@ test("a tooltip is the same physical idea on the lighter timing", async ({ page,
   await page.getByRole("button", { name: "Hover", exact: true }).hover();
   const start = await mounted;
   /* Duration and curve are the settled element's declared timing, which the entrance never changes. */
-  const timing = await startingGeometry(page.locator(labPopupSelector));
-  const tooltip = { ...start, duration: timing.duration, timing: timing.timing };
+  const declared = await motionOf(page.locator(labPopupSelector));
+  const tooltip = { ...start, duration: declared.duration, timing: declared.timing };
   expect(tooltip.scale).toBe(0.94);
   expect(Math.abs(tooltip.translateY)).toBe(4);
   expect(toMs(tooltip.duration)).toBeLessThan(toMs(await token(page, "--sui-duration-overlay")));
@@ -854,32 +890,15 @@ test("a press inside a field's text is the same press", async ({ page, errors })
 
 test("a selection mark starts small and lands with an overshoot", async ({ page, errors }) => {
   await openLab(page);
+  const arrival = await seekOnStart(page, '[aria-label="Motion lab checkbox"] span span', "transform", [0, 0.65, 1]);
   await page.getByRole("checkbox", { name: "Motion lab checkbox" }).click();
-  await page.waitForTimeout(60);
-
-  const mark = page.locator('[aria-label="Motion lab checkbox"] span span').first();
-  const flight = await mark.evaluate((element) => {
-    const animations = element.getAnimations();
-    const scaleAt = (fraction: number) => {
-      for (const animation of animations) {
-        animation.pause();
-        animation.currentTime = fraction * (animation.effect?.getTiming().duration as number);
-      }
-      const transform = getComputedStyle(element).transform;
-      return Number(new DOMMatrix(transform === "none" ? "" : transform).a.toFixed(3));
-    };
-    const start = scaleAt(0);
-    const middle = scaleAt(0.65);
-    const end = scaleAt(1);
-    for (const animation of animations) animation.cancel();
-    return { start, middle, end };
-  });
+  const [start, middle, end] = (await arrival()).map((frame) => frame.scale);
 
   /* A mark is made, not faded: it arrives from half its size, passes slightly beyond it and
      settles — and the boundary it lands inside never moves. */
-  expect(flight.start).toBe(0.5);
-  expect(flight.middle).toBeGreaterThan(1);
-  expect(flight.end).toBe(1);
+  expect(start).toBe(0.5);
+  expect(middle).toBeGreaterThan(1);
+  expect(end).toBe(1);
 
   expect(errors).toEqual([]);
 });
@@ -890,6 +909,7 @@ test("a switch thumb relocates in place without overshooting", async ({ page, er
   const thumb = control.locator(".shadow-sherick-control");
 
   const atRest = await thumb.boundingBox();
+  const traveling = await seekOnStart(page, '[aria-label="Motion lab switch"] .shadow-sherick-control', "transform", [0, 0.5, 1]);
   await control.click();
   await page.waitForTimeout(80);
   const moving = await thumb.boundingBox();
@@ -901,25 +921,9 @@ test("a switch thumb relocates in place without overshooting", async ({ page, er
   expect(moving.x).toBeGreaterThan(atRest.x);
   expect(moving.width).toBeGreaterThan(atRest.width);
 
-  const travel = await thumb.evaluate((element) => {
-    const animations = element.getAnimations();
-    const translateAt = (fraction: number) => {
-      for (const animation of animations) {
-        animation.pause();
-        animation.currentTime = fraction * (animation.effect?.getTiming().duration as number);
-      }
-      const transform = getComputedStyle(element).transform;
-      return Number(new DOMMatrix(transform === "none" ? "" : transform).e.toFixed(2));
-    };
-    const start = translateAt(0);
-    const middle = translateAt(0.5);
-    const end = translateAt(1);
-    for (const animation of animations) animation.cancel();
-    return { start, middle, end };
-  });
-
-  expect(travel.start).toBeLessThan(travel.middle);
-  expect(travel.middle).toBeLessThan(travel.end);
+  const [start, middle, end] = (await traveling()).map((frame) => frame.translateX);
+  expect(start).toBeLessThan(middle);
+  expect(middle).toBeLessThan(end);
   expect(firstTiming((await motionOf(thumb)).timing)).toBe(firstTiming(await token(page, "--sui-ease-glide")));
   expect(firstTiming((await motionOf(thumb)).timing)).not.toBe(firstTiming(await token(page, "--sui-ease-spring")));
 
@@ -934,23 +938,10 @@ test("a relocated indicator is mid-travel in the middle of its own motion", asyn
      it: an indicator that has not been measured has no `left` at all. */
   await expect(indicator).toHaveAttribute("style", /--active-tab-left/);
 
-  const leftAt = (fraction: number) =>
-    indicator.evaluate((element, f) => {
-      const animations = element.getAnimations();
-      for (const animation of animations) {
-        animation.pause();
-        animation.currentTime = (f as number) * (animation.effect?.getTiming().duration as number);
-      }
-      const value = Number.parseFloat(getComputedStyle(element).left);
-      for (const animation of animations) animation.cancel();
-      return value;
-    }, fraction);
-
-  const before = await leftAt(1);
+  const before = await indicator.evaluate((element) => Number.parseFloat(getComputedStyle(element).left));
+  const travel = await seekOnStart(page, '[role="tablist"] > span', "left", [0.5, 1]);
   await page.getByRole("tab", { name: "Details" }).click();
-  await page.waitForTimeout(40);
-  const middle = await leftAt(0.5);
-  const after = await leftAt(1);
+  const [middle, after] = (await travel()).map((frame) => frame.left);
 
   /* The indicator is somewhere between its two destinations halfway through, and never beyond
      the one it is heading for — a travel, not a snap and not a bounce. */
@@ -1175,7 +1166,10 @@ test("a compact control keeps its target stable while its mark takes the press",
 
 /* Frame sampling. A recipe can name a transition and still paint nothing in between — the scrim
    once declared an opacity transition with no state to transition from — so these tests read the
-   painted value on every animation frame of the event, not the class or the transition property. */
+   painted value on every animation frame of the event, not the class or the transition property.
+   The window runs `durationMs` from the first frame whose value differs from the first one read
+   (the element appearing counts), so the time the triggering action takes to land never eats into
+   it. A motion that never starts ends the sampling after ten seconds. */
 const sampleFrames = (
   page: Page,
   selector: string,
@@ -1186,17 +1180,22 @@ const sampleFrames = (
     ({ selector, read, durationMs }) =>
       new Promise<number[]>((resolve) => {
         const values: number[] = [];
-        const start = performance.now();
-        const frame = () => {
+        const begin = performance.now();
+        const measure = () => {
           const element = document.querySelector(selector);
-          if (element) {
-            values.push(
-              read === "height"
-                ? element.getBoundingClientRect().height
-                : Number.parseFloat(getComputedStyle(element, read === "beforeOpacity" ? "::before" : null).opacity)
-            );
-          }
-          if (performance.now() - start < durationMs) requestAnimationFrame(frame);
+          if (!element) return undefined;
+          return read === "height"
+            ? element.getBoundingClientRect().height
+            : Number.parseFloat(getComputedStyle(element, read === "beforeOpacity" ? "::before" : null).opacity);
+        };
+        const initial = measure();
+        let start: number | undefined;
+        const frame = () => {
+          const value = measure();
+          if (value !== undefined) values.push(value);
+          if (start === undefined && value !== initial) start = performance.now();
+          const now = performance.now();
+          if (start === undefined ? now - begin < 10_000 : now - start < durationMs) requestAnimationFrame(frame);
           else resolve(values);
         };
         requestAnimationFrame(frame);

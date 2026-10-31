@@ -30,22 +30,17 @@ jobs:
       # installs a Chromium build the pinned test runner cannot find.
       - run: ./node_modules/.bin/playwright install --with-deps chromium
         working-directory: apps/showcase
+      # Every task of `bun run verify` but the browser suites, which have their own jobs; the
+      # runner starts each task as soon as the tasks it reads from have passed.
       - name: Verify package and types
-        run: |
-          bun run lint
-          bun --filter sherick-ui typecheck
-          bun --filter sherick-ui build
-          # After the build, so the motion policy can read the compiled stylesheet's hover guards.
-          bun run test:motion
-          bun --filter @sherick-ui/showcase typecheck
-          bun --filter @sherick-ui/no-tailwind typecheck
-          bun run test
-          bun run test:bundle
-          bun run test:packed
-          bun run visual
+        run: node scripts/verify.mjs --skip=browser:showcase,browser:no-tailwind,build:no-tailwind
 
   browser-showcase:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Playwright splits the suite's tests between the jobs.
+        shard: [1/2, 2/2]
     steps:
       - uses: actions/checkout@v7
       - uses: actions/setup-node@v7
@@ -55,20 +50,19 @@ jobs:
         with:
           bun-version: 1.3.14
       - run: bun install --frozen-lockfile
-      - run: bun --filter sherick-ui build
-      - run: bun --filter @sherick-ui/showcase build
       # Install the browsers of the Playwright the lockfile pins. The workspace root has no
       # `playwright` bin, so a bare `bunx playwright` downloads whatever npm calls latest and
       # installs a Chromium build the pinned test runner cannot find.
       # WebKit is installed for the one `@webkit` axe scan; the chromium and touch projects need only Chromium.
       - run: ./node_modules/.bin/playwright install --with-deps chromium webkit
         working-directory: apps/showcase
-      - run: bun --filter @sherick-ui/showcase test:browser
+      # Builds the package and the showcase, then runs this job's share of the suite.
+      - run: node scripts/verify.mjs browser:showcase --shard=${{ matrix.shard }}
       - name: Capture browser diff artifacts
         if: failure()
         uses: actions/upload-artifact@v7
         with:
-          name: showcase-browser-diffs
+          name: showcase-browser-diffs-${{ strategy.job-index }}
           path: apps/showcase/test-results
           if-no-files-found: ignore
 
@@ -86,9 +80,8 @@ jobs:
       # The Playwright image has no unzip; install Bun without setup-bun's zip extraction.
       - run: npm install --global bun@1.3.14
       - run: bun install --frozen-lockfile
-      - run: bun --filter sherick-ui build
-      - run: bun --filter @sherick-ui/no-tailwind build
-      - run: bun --filter @sherick-ui/no-tailwind test:browser
+      # Builds the package and the consumer app, then runs its browser suite.
+      - run: node scripts/verify.mjs browser:no-tailwind
         env:
           # GitHub's mounted /github/home is not owned by the container's root user.
           HOME: /root

@@ -1,5 +1,4 @@
-import AxeBuilder from "@axe-core/playwright";
-import { expect, test } from "./fixtures";
+import { AxeBuilder, expect, test } from "./fixtures";
 
 test.beforeEach(async ({ page, errors }) => {
   await page.goto("/examples/resources/customer-portal");

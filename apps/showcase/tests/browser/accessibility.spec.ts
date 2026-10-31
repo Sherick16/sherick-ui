@@ -1,5 +1,4 @@
-import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Page } from "./fixtures";
+import { AxeBuilder, expect, test, type Page } from "./fixtures";
 
 /* WCAG A/AA plus the WCAG 2.2 target-size rule (`wcag22aa`, SC 2.5.8). Axe 4.13 still ships
    `target-size` disabled by default, so the tag set selects it but does not run it: the scan turns it
@@ -70,74 +69,7 @@ const expectNoA11yViolations = async (page: Page, theme: string, disabledRules: 
   expect(targetSizeRan, `the target-size rule did not execute in ${theme}`).toBe(true);
 };
 
-/* The showcase is a page of interactive specimens, and it is the only place some states appear at
-   all — a motion stage with a real control in it, the toast stack, an open drawer. Scanning it is
-   what keeps a specimen from being the one thing no gate looks at.
-   The content renderer must hydrate without replacing React-owned or host-owned markup. */
-
 for (const theme of THEMES) {
-  test(`the showcase itself has no automatically detectable WCAG A/AA violations (${theme})`, async ({
-    page,
-    errors,
-  }) => {
-    await gotoTheme(page, theme, "/");
-    await expect(page.getByRole("heading", { name: "Design language", exact: true })).toBeVisible();
-
-    await expectNoA11yViolations(page, theme);
-
-    expect(errors).toEqual([]);
-  });
-
-  test(`core verification fixture has no automatically detectable WCAG A/AA violations (${theme})`, async ({
-    page,
-    errors,
-  }) => {
-    await gotoTheme(page, theme, "/verification/core");
-    await expect(page.getByTestId("verification-core")).toBeVisible();
-
-    await expectNoA11yViolations(page, theme);
-
-    expect(errors).toEqual([]);
-  });
-
-  test(`interactions verification fixture has no automatically detectable WCAG A/AA violations (${theme})`, async ({
-    page,
-    errors,
-  }) => {
-    await gotoTheme(page, theme, "/verification/interactions");
-    await expect(page.getByRole("textbox", { name: "Project name" })).toBeVisible();
-
-    await expectNoA11yViolations(page, theme);
-
-    expect(errors).toEqual([]);
-  });
-
-  test(`rich-content fixture has no automatically detectable WCAG A/AA violations (${theme})`, async ({
-    page,
-    errors,
-  }) => {
-    await gotoTheme(page, theme, "/verification/rich-content");
-    await expect(page.getByTestId("verification-rich-content")).toBeVisible();
-    await expect(page.getByText("A comment that has to stay readable")).toBeVisible();
-
-    await expectNoA11yViolations(page, theme);
-
-    expect(errors).toEqual([]);
-  });
-
-  test(`initially-open dialog has no automatically detectable WCAG A/AA violations (${theme})`, async ({
-    page,
-    errors,
-  }) => {
-    await gotoTheme(page, theme, "/verification/dialog");
-    await expect(page.getByRole("dialog")).toBeVisible();
-    await expect(page.getByRole("button", { name: "Close dialog" })).toBeVisible();
-
-    await expectNoA11yViolations(page, theme);
-
-    expect(errors).toEqual([]);
-  });
-
   test(`Select opened inside a dialog has no automatically detectable WCAG A/AA violations (${theme})`, async ({
     page,
     errors,
@@ -231,10 +163,27 @@ const MODES = [
   { name: "forced colors", colorScheme: "light", forcedColors: "active" },
 ] as const;
 
-/* A route whose first paint is a loading state is scanned once its content has arrived: the
-   skeleton table has no targets for the target-size rule to measure, and the loaded list is what a
-   reader actually uses. */
+/* What a route must show before its scan, so a scan never reads a page that has not rendered its
+   subject:
+   - the showcase is a page of interactive specimens, and it is the only place some states appear at
+     all — a motion stage with a real control in it, the toast stack, an open drawer. Scanning it is
+     what keeps a specimen from being the one thing no gate looks at. The content renderer must
+     hydrate without replacing React-owned or host-owned markup;
+   - a route whose first paint is a loading state is scanned once its content has arrived: the
+     skeleton table has no targets for the target-size rule to measure, and the loaded list is what
+     a reader actually uses. */
 const READY: Partial<Record<(typeof ROUTES)[number], (page: Page) => Promise<void>>> = {
+  "/": (page) => expect(page.getByRole("heading", { name: "Design language", exact: true })).toBeVisible(),
+  "/verification/core": (page) => expect(page.getByTestId("verification-core")).toBeVisible(),
+  "/verification/interactions": (page) => expect(page.getByRole("textbox", { name: "Project name" })).toBeVisible(),
+  "/verification/rich-content": async (page) => {
+    await expect(page.getByTestId("verification-rich-content")).toBeVisible();
+    await expect(page.getByText("A comment that has to stay readable")).toBeVisible();
+  },
+  "/verification/dialog": async (page) => {
+    await expect(page.getByRole("dialog")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Close dialog" })).toBeVisible();
+  },
   "/examples/resources": (page) => expect(page.getByRole("button", { name: "New project" })).toBeVisible(),
 };
 

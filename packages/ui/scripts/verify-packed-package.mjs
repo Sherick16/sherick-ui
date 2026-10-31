@@ -1,22 +1,70 @@
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
-import { access, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { spawn } from "node:child_process";
+import { access, lstat, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { fileURLToPath } from "node:url";
-import { verifyConsumers } from "./packed-consumers.mjs";
-import { restoreBundledBaseUi, stageBundledBaseUi } from "./stage-bundled-base-ui.mjs";
+import { axeVersion, playwrightVersion, verifyConsumers } from "./packed-consumers.mjs";
+import { restoreBundledBaseUi, stagePackageCopy } from "./stage-bundled-base-ui.mjs";
 
-const root = fileURLToPath(new URL("..", import.meta.url));
 const work = await mkdtemp(join(tmpdir(), "sherick-ui-packed-"));
 
-const run = (command, args, cwd, options = {}) =>
-  execFileSync(command, args, {
-    cwd,
-    encoding: "utf8",
-    stdio: options.capture ? "pipe" : "inherit",
-    env: { ...process.env, CI: "1", NEXT_TELEMETRY_DISABLED: "1", ...options.env },
+/* The consumer lanes run at the same time, so each command's output is held and printed as one
+   block when it ends, labelled with its lane. The first failure interrupts every other running
+   command's process group. Playwright answers an interrupt by stopping the server it started in a
+   group of its own; anything still running five seconds later is killed. */
+const running = new Set();
+let stopped = false;
+const run = (lane, command, args, cwd, options = {}) =>
+  new Promise((resolve, reject) => {
+    if (stopped) return reject(new Error(`${lane}: stopped after another lane failed`));
+    const started = performance.now();
+    const child = spawn(command, args, {
+      cwd,
+      detached: true,
+      stdio: ["ignore", "pipe", "pipe"],
+      env: { ...process.env, CI: "1", NEXT_TELEMETRY_DISABLED: "1", ...options.env },
+    });
+    running.add(child);
+    let stdout = "";
+    let output = "";
+    child.stdout.on("data", (chunk) => {
+      stdout += chunk;
+      output += chunk;
+    });
+    child.stderr.on("data", (chunk) => (output += chunk));
+    child.on("error", reject);
+    child.on("close", (code, signal) => {
+      running.delete(child);
+      const seconds = ((performance.now() - started) / 1000).toFixed(1);
+      const label = `[${lane}] ${[command.split("/").pop(), ...args].join(" ")} (${seconds}s)`;
+      if (code !== 0 || !options.capture) {
+        console.log(`${label}\n${output.replace(/^/gm, `[${lane}] `).trimEnd()}`);
+      }
+      if (code === 0) resolve(stdout);
+      else reject(new Error(`${label} failed with ${signal ?? `exit code ${code}`}`));
+    });
   });
+const signalAll = (signal) => {
+  for (const child of running) {
+    try {
+      process.kill(-child.pid, signal);
+    } catch {}
+  }
+};
+// Shorter than the grace `scripts/verify.mjs` gives this script before it kills this script's group.
+const stopAll = () => {
+  stopped = true;
+  signalAll("SIGINT");
+  setTimeout(() => signalAll("SIGKILL"), 4000).unref();
+};
+// An interrupt reaches only this script's group, so it is passed on to the lanes' groups.
+for (const name of ["SIGINT", "SIGTERM"]) {
+  process.once(name, () => {
+    process.exitCode = 130;
+    stopAll();
+  });
+}
 
 try {
   const packDir = join(work, "pack");
@@ -24,22 +72,28 @@ try {
   await mkdir(packDir, { recursive: true });
   await mkdir(consumerDir, { recursive: true });
 
-  /* npm cannot bundle Bun's dependency symlink directly. Stage the audited patched package as a
-     real directory for packlist, then restore the workspace link as soon as the tarball exists. */
-  await stageBundledBaseUi();
-  const packOutput = run(
+  /* npm cannot bundle Bun's dependency symlink directly, so a copy of the package stages the
+     audited patched package as a real directory through the `prepack` step, packs, and restores
+     the link through the `postpack` step. The workspace stays untouched for everything that runs
+     alongside. */
+  const copy = await stagePackageCopy(join(work, "repo"));
+  const packOutput = await run(
+    "pack",
     "npm",
     ["pack", "--json", "--ignore-scripts", "--pack-destination", packDir],
-    root,
+    copy,
     { capture: true }
   );
+  await restoreBundledBaseUi(copy);
+  const link = await lstat(join(copy, "node_modules/@base-ui/react"));
+  assert.ok(link.isSymbolicLink(), "postpack restores Bun's dependency link");
   const packed = JSON.parse(packOutput);
   assert.equal(packed.length, 1, "npm pack should produce exactly one artifact");
 
   const tarball = join(packDir, packed[0].filename);
   await access(tarball);
-  await restoreBundledBaseUi();
 
+  // Browser tools are fixture dependencies, not library dependencies; see packed-consumers.mjs.
   await writeFile(
     join(consumerDir, "package.json"),
     `${JSON.stringify(
@@ -54,15 +108,15 @@ try {
           typescript: "5.9.3",
           vite: "7.1.7",
           "@types/react": "19.3.0",
-          "@types/react-dom": "19.3.0"
+          "@types/react-dom": "19.3.0",
+          "@playwright/test": playwrightVersion,
+          "@axe-core/playwright": axeVersion
         }
       },
       null,
       2
     )}\n`
   );
-
-  run("npm", ["install", "--no-audit", "--no-fund"], consumerDir);
 
   const esmFixture = `
 import assert from "node:assert/strict";
@@ -670,9 +724,7 @@ export const fixture = (
     'export default { build: { chunkSizeWarningLimit: 1024 } };\n'
   );
 
-  run(process.execPath, ["esm.mjs"], consumerDir);
-  run(process.execPath, ["cjs.cjs"], consumerDir);
-  await verifyConsumers({ consumerDir, work, tarball, run });
+  await verifyConsumers({ consumerDir, work, tarball, run, stop: stopAll });
 
   const installedPackage = JSON.parse(
     await readFile(join(consumerDir, "node_modules", "sherick-ui", "package.json"), "utf8")
@@ -798,7 +850,9 @@ export const fixture = (
 
   console.log(`Packed package verification passed: ${packed[0].filename}`);
 } finally {
-  await restoreBundledBaseUi();
+  stopAll();
+  // A failed command can leave its lane's other commands running; they end before their directories go.
+  await Promise.all([...running].map((child) => new Promise((resolve) => child.once("close", resolve))));
   if (process.env.KEEP_PACKED_CONSUMERS) console.log(`Packed consumer artifacts retained: ${work}`);
   else await rm(work, { recursive: true, force: true });
 }

@@ -79,7 +79,7 @@ Both consume `sherick-ui` through package exports after the library build.
 
 ## Packed-package consumer checks
 
-`bun run test:packed` is the publication contract gate. It runs `npm pack` and installs the tarball into clean temporary npm consumers, never workspace links. Chromium must be installed with the repository Playwright bootstrap.
+`bun run test:packed` is the publication contract gate. It runs `npm pack` and installs the tarball into clean temporary npm consumers, never workspace links. It packs a temporary copy of the package, which stages the patched Base UI and restores Bun's link through the same functions as `prepack` and `postpack`, so the workspace stays untouched for the checks that run beside it. Chromium must be installed with the repository Playwright bootstrap.
 
 - React 18.0.0 (the runtime peer floor, with React 18.3 typings) and React 19.3.0 each run ESM/SSR, CJS/SSR, declaration checks and a production Vite browser fixture;
 - TypeScript 5.9 checks NodeNext, Bundler and Node16 `.cts` consumers without `skipLibCheck`; Node16 deliberately catches CJS declarations incorrectly published as ESM even where newer NodeNext permits `require(esm)`;
@@ -95,6 +95,8 @@ Both consume `sherick-ui` through package exports after the library build.
 - the tarball contains the exact patched `@base-ui/react@1.8.0` package, its license and complete
   runtime closure; all three production browser consumers run the exclusion-free open editable-Combobox
   axe scan plus tab-order restoration and non-modal pointer dismissal.
+
+The three consumers (React 19 with Vite, React 18 with Vite, React 19 with Next) install the same tarball into their own directories and run at the same time, each serving its fixture on a free port. Their output is held per lane and printed when a lane ends; the first failing lane stops the others and is the one reported.
 
 `packages/ui/scripts/packed-consumers.mjs` and `scripts/fixtures/packed` are fixtures within this existing publication gate, not a second behavioral suite. `KEEP_PACKED_CONSUMERS=1 bun run test:packed` retains temporary consumers for diagnosis. This layer catches publication problems direct workspace imports can hide; it does not repeat Phase C's complete cross-browser behavior matrix.
 
@@ -163,6 +165,12 @@ palette-only change is inside that tolerance.)
 For focused iteration, `bunx playwright test <spec> -g "<name>"` (from `apps/showcase`) reuses the
 already-built production server, so a test-only change needs no rebuild. `bun run test:browser`
 remains the gate, and `bun run verify` is the run that builds the artifact it serves.
+
+Both suites run single tests, not whole files, in parallel (`fullyParallel`): every test opens its
+own page in a fresh browser context. Without `--workers`, Playwright uses half the logical cores
+locally and two workers in CI. `bun run verify` passes each suite a free port in
+`BROWSER_TEST_PORT` and never reuses a server already on it, so a server another checkout left on
+the default port (3100 or 4173) is never the one under test.
 
 ### Next showcase
 
@@ -354,16 +362,25 @@ behaviour is verified above, with the preference emulated by the browser.
 in the same option object as the tag filter and asserts the rule appears in axe's results — that is
 what proves it actually executed rather than being silently skipped. axe runs in both authored
 themes (the platform colour scheme is emulated
-before the document loads, so no state is read mid-theme-switch) on representative reachable states
-rather than scanning the workbench indiscriminately:
+before the document loads, so no state is read mid-theme-switch). Every route is scanned at 375px
+and 1280px, in light, dark and forced colours, once the content it must show has rendered. That
+includes:
 
 - `/` — the showcase itself, which is where the interactive specimens live and therefore the only
   place some states appear at all (a motion stage holding a real control, the toast stack);
-- `/verification/core` in its default state;
-- `/verification/interactions` in its default state;
+- `/verification/core` and `/verification/interactions` in their default state;
 - `/verification/rich-content`, which renders the published `CodeBlock` and `Markdown`;
-- the initially-open dialog at `/verification/dialog`;
-- a Select opened inside the dialog on `/verification/interactions`.
+- the initially-open dialog at `/verification/dialog`.
+
+Open states get their own scans in both themes: a Select opened inside the dialog, an AlertDialog,
+a Menu and the editable Combobox on `/verification/interactions`.
+
+The suite's `AxeBuilder` (`tests/browser/fixtures.ts`) runs every rule and reports every violation
+in full, and drops two kinds of work no test reads. A passing rule lists one example node rather
+than every node it matched (`resultTypes: ["violations"]`). A page with no child frame runs
+`axe.run` in place; the default flow runs `axe.runPartial`, copies every partial result into a
+second, blank page and finishes there, which only a cross-origin frame needs. A page that embeds a
+frame keeps the default flow.
 
 The same spec adds direct assertions axe cannot make: accessible names on icon-only controls,
 `aria-busy` on the loading Search, and a visible keyboard focus ring on the core `Primary`
@@ -480,33 +497,62 @@ manual zoom or physical-device coverage. The existing consumer tests remain Chro
 
 All browser tests fail on page errors or error-level console output.
 
+## Local gate: `bun run verify`
+
+`bun run verify` (`scripts/verify.mjs`) runs every check as one dependency graph. A task starts
+as soon as the tasks it reads from have passed: the lints, the library typecheck and the library
+build start at once; the motion policy, smoke, bundle, packed, visual, consumer typecheck and
+build tasks follow the library build; the showcase typecheck and browser suite follow the showcase
+build, whose route types `next-env.d.ts` imports. The two browser suites share two thirds of the
+logical cores as Playwright workers, two to one in favour of the showcase, and the rest of the
+graph runs beside them. `bun run verify --list` prints the graph.
+
+Each task runs its package's own script, so a check's flags stay in its package. Output is held
+per task and saved under `node_modules/.cache/verify/logs`; a passing task prints one line and a
+failing task prints its full output. The first failure stops every running task with its whole
+process tree, skips the tasks that read from it, and exits non-zero. `--keep-going` lets the
+tasks that do not depend on the failure finish; the exit status is still non-zero.
+`scripts/verify.test.mjs`, itself a task of the graph, proves the exit status, the stop and the
+skip.
+
+Outside CI a task that passed does not run again until one of its inputs changes. Its key hashes
+the task's files (tracked and untracked, not ignored), the root manifest, lockfile, patches and
+scripts, the installed dependency store and every workspace's dependency links, the Playwright
+browsers, the Node, Bun and npm installs, the npm configuration, the environment variables the
+tools read (such as `NODE_OPTIONS`, `VISUAL_REVIEW` and the `PLAYWRIGHT_`, `NEXT_`, `npm_config_`
+and `SHERICK_` families) and the keys of the tasks it reads from. A build also has to find its
+output exactly as it left it, or it runs again; the showcase build's output includes the ignored
+`next-env.d.ts`, which `next dev` rewrites and the build writes back. The showcase typecheck also
+keys the route types `next dev` writes under `.next/dev/types`, which its tsconfig includes. The builds leave the tests out of their inputs, because no
+test is part of what they build; the typechecks and lints still read them. A browser suite keys
+each spec file, with its screenshot baselines, on its own: when nothing else changed, it runs only
+the spec files that changed since they last passed. A run records a pass only when the task's
+inputs did not change while it ran, and a task that runs and fails loses its earlier pass. A
+`--shard` run records nothing for the browser suites, because it ran only part of them. The packed
+check installs from the npm registry, so a cached pass does not see a new upstream release; CI
+does. The key does not read inside `node_modules`, so run `bun run verify --force` after a hand
+edit there. `--force` runs every task; CI never reads the cache. Name tasks to run only those
+and what they read from (`bun run verify browser:showcase`), or leave some out with
+`--skip=task,...`.
+
 ## CI execution
 
-CI starts three independent jobs on the same commit:
+CI starts three independent jobs on the same commit, each running part of the same graph:
 
-- `verify`: lint, motion policy, library and consumer typechecks, library build, smoke,
-  bundle budgets, packed-package matrix, and deterministic visual contract. Installs
-  Chromium for the packed browser fixtures.
-- `browser-showcase`: library and showcase builds, then the Chromium showcase suite.
+- `verify`: every task except the two browser suites and the no-Tailwind build
+  (`--skip=browser:showcase,browser:no-tailwind,build:no-tailwind`). Installs Chromium for the
+  packed browser fixtures.
+- `browser-showcase`: library and showcase builds, then the showcase suite, split by Playwright
+  `--shard` across two matrix jobs. Installs Chromium and WebKit for the one `@webkit` scan.
 - `browser-consumer`: library and no-Tailwind builds, then its Chromium/Firefox/WebKit suite.
 
-Each job installs from the committed frozen lockfile in its own checkout. The two
-browser suites run with two Playwright workers in CI (tests within a file remain serial);
-local iteration retains one worker. The release job waits for **all three** jobs.
-`verify` and `browser-showcase` install only Chromium. `browser-consumer` uses the official
+Each job installs from the committed frozen lockfile in its own checkout. The release job waits for
+**all** of them. `browser-consumer` uses the official
 `mcr.microsoft.com/playwright:v1.63.0-noble` image with Chromium, Firefox, WebKit and their OS
 dependencies preinstalled; keep its tag aligned with the Playwright version in `bun.lock`.
 This avoids reinstalling WebKit's system dependencies on every run (9–14 minutes in
 [the September 30 runs](https://github.com/Sherick16/sherick-ui/actions/runs/36773196053)),
 without dropping coverage or adding retries. Browser diff artifacts remain separate.
-
-`bun run verify` remains the serial, single-runner local gate:
-
-1. lint and motion policy;
-2. library typecheck and build;
-3. showcase and no-Tailwind typechecks and production builds;
-4. smoke, bundle, packed-package and deterministic visual checks;
-5. showcase and no-Tailwind browser suites.
 
 Each layer has a different failure meaning. A red bundle gate is a size or boundary
 regression, not a styling defect; a red browser suite is not a publication defect.

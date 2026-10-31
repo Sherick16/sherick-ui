@@ -1,5 +1,4 @@
-import AxeBuilder from "@axe-core/playwright";
-import { expect, test, type Locator, type Page } from "./fixtures";
+import { AxeBuilder, expect, test, type Locator, type Page } from "./fixtures";
 
 /* DateTimePicker — a native datetime-local field, the shared calendar and a column per part of
    the clock. Every assertion is made in the roles, names and values the picker publishes: the

@@ -67,7 +67,10 @@
   },
   "scripts": {
     "dev:watch": "bun scripts/build-styles.ts && rollup -c -w",
-    "build": "bun run clean && bun scripts/build-styles.ts && rollup -c",
+    "build": "bun run clean && bun run --parallel build:styles build:modules build:types",
+    "build:styles": "bun scripts/build-styles.ts",
+    "build:modules": "rollup -c --configTarget=modules",
+    "build:types": "rollup -c --configTarget=types",
     "prepack": "bun run build && node scripts/stage-bundled-base-ui.mjs stage",
     "postpack": "node scripts/stage-bundled-base-ui.mjs restore",
     "typecheck": "tsc --noEmit",
@@ -100,7 +103,6 @@
   },
   "devDependencies": {
     "@rollup/plugin-node-resolve": "^16.0.3",
-    "@rollup/plugin-typescript": "^12.3.0",
     "@types/node": "^24.13.4",
     "@types/prismjs": "^1.26.6",
     "@types/react": "^19.3.0",
