@@ -35,8 +35,9 @@ new surface, and that change records the reason. `2.10.1` aligns disclosures and
 `Accordion` and `Collapsible` rows and panels hang their 1rem inset, so a disclosure's parent needs
 that much inline padding, and a selected surface choice row drops its accent rim. `2.11.0` adds
 `trailingIcon` to `Button`, a mark after the label. `2.12.0` makes a text field a light well (the new
-`--sui-tray` token under `elevation.recessed`) and quiets an unselected surface choice row, so a form no
-longer reads as a stack of grey bars. An empty checkbox or radio becomes a soft well with no rim (the new
+`--sui-tray` token under `elevation.recessed`), so a form no
+longer reads as a stack of grey bars. An unselected surface choice row is the same well, and the chosen row
+lifts out of it on the primary soft surface with `elevation.control`. An empty checkbox or radio becomes a soft well with no rim (the new
 `--sui-mark-well` and `--sui-elevation-mark` tokens); the contrast contract exempts it from the 3:1 boundary
 rule by decision. A card is the opaque surface with the new `resting` contact shadow
 (`--sui-elevation-resting`) on a deeper canvas, and the dark ladder is wider: a deeper floor, a lighter sheet

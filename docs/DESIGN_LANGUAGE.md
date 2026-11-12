@@ -75,8 +75,8 @@ recess on a card and on the page alike. Its tone is a quiet step over the card, 
 | `flat` | passive parts inside a surface, and quiet sheets such as a table or a tree | a recessed track |
 | `resting` | a card on the page: a close contact shadow under its lower edge, which seats the sheet without lifting it | a control, a table, a nested sheet, anything that floats |
 | `raised` | tactile tonal actions at rest | hover or passive data |
-| `control` | switch thumb, a puck held in a track, or a held selection inside a list or calendar | keyboard highlight |
-| `recessed` | grooves, tracks, a text field's well, and a raised control while pressed | flat cards or choice rows |
+| `control` | switch thumb, a puck held in a track, a held selection inside a list or calendar, or the chosen row of a surface choice group | keyboard highlight |
+| `recessed` | grooves, tracks, a text field's well, an unselected surface choice row, and a raised control while pressed | flat cards |
 | `recessedTop` | the upper wall of an inset sheet continuing directly below a control, without a lower rim | standalone tracks or wells |
 | `mark` | an empty checkbox or radio at rest: a recess one step stronger than `recessed`, because a 20px well has no rim and is found by its depth | a field, a track, any wide groove |
 | `well` | a checkbox or radio while it is pressed: the floor sinks, the boundary stays | a resting mark, a wide groove |
@@ -373,12 +373,13 @@ own label, not the whole menu sheet. A quiet target whose label rises on hover a
 as a dismiss glyph, takes `state.quietInk`: its ink rises from `text.medium` to `text.high`, and no state
 layer is drawn behind it.
 
-RadioGroup's opt-in surface rows rest on `selectableRowRest` — the `tray` tone at 60%, flat — so
-every choice reads as a target before any is chosen, no row reads as a field, and the row that holds
-the selection is the strongest row in its group: it takes the primary *soft* surface and stays flat.
-An unselected row is never darker than the selected one. The mark the row houses is what says "this one"; an accent rim around the row repeated it, and
-the selected step and a lift turned a whole card into an accent block that outshouted the priority
-action beside it. The resting tray stays light enough
+RadioGroup's opt-in surface rows rest on `selectableRowRest` — the field's own `tray` under
+`recessed` — so a group of choices is a set of wells, in the same sunk family as the fields around
+it, and every choice reads as a target before any is chosen. The row that holds the selection lifts
+out of that family: it takes the primary *soft* surface and `elevation.control`, the lift every held
+choice has (§5). The mark the row houses still says "this one". The row keeps the soft step and draws
+no accent rim: the selected step and a rim turned a whole card into an accent block that outshouted
+the priority action beside it. The resting tray stays light enough
 that an empty mark's darker well still reads against it.
 The complete row remains the label; passive badges are consumer content. The selection mark and
 target boundary stay still, and the original plain radio rows remain available. Surface selection

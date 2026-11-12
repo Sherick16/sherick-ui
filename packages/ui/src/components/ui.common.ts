@@ -933,17 +933,16 @@ export const currentDestination = {
    brightest surface and a white row on it would vanish. */
 export const puck = "bg-sherick-puck";
 
-/* A choice row — an opt-in `surface` row in a RadioGroup or CheckboxGroup — rests on
-   `selectableRowRest`: a flat step quieter than a field's well, so every choice in the group reads
-   as a target before any is chosen, no row reads as a field, and the row that holds the selection
-   is the strongest row in the group. That row takes the role's *soft* surface and stays flat. The mark it houses is what says "this
-   one": an accent rim around the row repeated it and made the chosen row the loudest object on a
-   quiet form, and the selected step and a lift turned a whole card into an accent block. The
-   transparent overlay stays, so forced colors keeps every row's outline, and the fill and the hover
-   layer still reach the row's real edge. */
-export const selectableRowRest = "bg-sherick-tray/[0.6] text-sherick-ink";
+/* A choice row — an opt-in `surface` row in a RadioGroup or CheckboxGroup — is a well at rest: the
+   field's own `tray` under `recessed`, so a group of choices belongs to the same sunk family as the
+   fields around it. The row that holds the selection lifts out of that family: it takes the role's
+   *soft* surface and the `control` elevation, the same lift every held choice has. It keeps the
+   soft step, not the selected one, and draws no accent rim: the stronger step and a rim made the
+   chosen row the loudest object on a quiet form. The transparent overlay stays, so forced colors
+   keeps every row's outline. */
+export const selectableRowRest = /* @__PURE__ */ cx("bg-sherick-tray text-sherick-ink", elevation.recessed);
 export const selectableRowSurface = /* @__PURE__ */ cx(
-  "has-[[data-checked]]:bg-sherick-primary-soft has-[[data-checked]]:text-sherick-ink",
+  "has-[[data-checked]]:bg-sherick-primary-soft has-[[data-checked]]:text-sherick-ink has-[[data-checked]]:shadow-sherick-control",
   "after:pointer-events-none after:absolute after:inset-0 after:box-border after:rounded-[inherit] after:border-[1.5px] after:border-transparent after:content-['']"
 );
 
