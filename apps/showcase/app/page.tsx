@@ -1063,13 +1063,13 @@ const markStateColumns: { label: string; disabled?: boolean }[] = [
 /* Tailwind reads class names as literal text, so every pinned class is listed here in full. */
 const pinnedMarkClasses: Record<string, Record<string, string>> = {
   "[&>span]": {
-    Hover: "[&>span]:before:opacity-[0.09] [&>span]:bg-sherick-tray-deep",
-    Pressed: "[&>span]:before:opacity-[0.09] [&>span]:bg-sherick-tray-deep [&>span]:shadow-[var(--sui-elevation-well)]",
+    Hover: "[&>span]:before:opacity-[0.09]",
+    Pressed: "[&>span]:before:opacity-[0.09] [&>span]:shadow-[var(--sui-elevation-well)]",
     Focus: "[&>span]:outline [&>span]:outline-2 [&>span]:outline-sherick-focus [&>span]:outline-offset-[3px]",
   },
   "[&_[role=radio]>span]": {
-    Hover: "[&_[role=radio]>span]:before:opacity-[0.09] [&_[role=radio]>span]:bg-sherick-tray-deep",
-    Pressed: "[&_[role=radio]>span]:before:opacity-[0.09] [&_[role=radio]>span]:bg-sherick-tray-deep [&_[role=radio]>span]:shadow-[var(--sui-elevation-well)]",
+    Hover: "[&_[role=radio]>span]:before:opacity-[0.09]",
+    Pressed: "[&_[role=radio]>span]:before:opacity-[0.09] [&_[role=radio]>span]:shadow-[var(--sui-elevation-well)]",
     Focus: "[&_[role=radio]>span]:outline [&_[role=radio]>span]:outline-2 [&_[role=radio]>span]:outline-sherick-focus [&_[role=radio]>span]:outline-offset-[3px]",
   },
 };

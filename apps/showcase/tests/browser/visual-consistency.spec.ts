@@ -80,7 +80,7 @@ for (const theme of ["light", "dark"] as const) {
 
 const style = (control: Locator) => control.evaluate(el => {
   const css = getComputedStyle(el);
-  return {height: el.getBoundingClientRect().height, fontSize:css.fontSize, fill:css.backgroundColor, rim:css.borderBottomColor, opacity:css.opacity, shadow:css.boxShadow, radius:parseFloat(css.borderTopLeftRadius), align:css.textAlign};
+  return {height: el.getBoundingClientRect().height, fontSize:css.fontSize, fill:css.backgroundColor, rim:css.borderBottomWidth, opacity:css.opacity, shadow:css.boxShadow, radius:parseFloat(css.borderTopLeftRadius), align:css.textAlign};
 });
 const layer = (control: Locator) => control.evaluate(el => Number(getComputedStyle(el, "::before").opacity));
 const fieldSurfaces = (page: Page, state: string) => [
@@ -106,8 +106,8 @@ for (const theme of ["light", "dark"] as const) {
         expect(sibling.fill).toBe(defaults[0].fill);
         expect(sibling.rim).toBe(defaults[0].rim);
       }
-      // A field draws no visible line: its border is transparent, there for forced colors to repaint.
-      expect(defaults[0].rim).toBe("rgba(0, 0, 0, 0)");
+      // A field draws no line: it has no border in normal colours, and forced colors gives it one.
+      expect(defaults[0].rim).toBe("0px");
       // An invalid field is the danger tray: one danger fill across the family, and still no line.
       const invalid = await Promise.all(fieldSurfaces(page, "Invalid").slice(0,4).map(style));
       for (const sibling of invalid) {

@@ -25,15 +25,12 @@ test("no-reset CSS, consumer ownership, and className overrides", async ({ page 
   expect(await style(button, "borderTopWidth")).toBe("0px");
   expect(await style(button, "fontFamily")).toBe("monospace");
   expect(await style(button, "minHeight")).toBe("48px");
-  // A field's only border is Sherick's own — never one a host stylesheet or a reset adds. It is a real
-  // border on every side, so forced colors can repaint it, and it is transparent on every side: a
-  // field is identified by its label and content, not by a drawn line. The 1.5px border snaps to
-  // whole device pixels at 1x.
+  // A field draws no border in normal colours — not Sherick's, and not one a host stylesheet, a
+  // reset or the browser adds — so its recess starts at its real edge. Its border exists under
+  // forced colors only.
   const field = page.getByRole("textbox", { name: "Name" });
-  expect(await style(field, "borderTopStyle")).toBe("solid");
-  expect(await style(field, "borderTopWidth")).toMatch(/^1(\.5)?px$/);
   for (const side of ["Top", "Right", "Bottom", "Left"]) {
-    expect(await style(field, `border${side}Color`)).toBe("rgba(0, 0, 0, 0)");
+    expect(await style(field, `border${side}Width`)).toBe("0px");
   }
   expect(await style(page.getByRole("separator"), "borderTopStyle")).toBe("solid");
   expect(await style(page.getByRole("separator"), "borderTopWidth")).toBe("1px");
@@ -333,11 +330,13 @@ test("packed surface radio labels expand, select and keep their selected styling
   const express = choices.getByRole("radio", { name: /Express delivery/ });
   const label = express.locator("xpath=ancestor::label[1]");
   const row = label.locator("..");
+  const restingShadow = await style(row, "boxShadow");
   await label.click({ position: { x: 2, y: 2 } });
   await expect(express).toBeChecked();
-  // The held row takes the soft selection surface and stays flat.
+  // A resting row is a well. The held row takes the soft selection surface and lifts out of it.
   expect(await style(row, "backgroundColor")).not.toBe("rgba(0, 0, 0, 0)");
-  expect(await style(row, "boxShadow")).toBe("none");
+  expect(restingShadow).toContain("inset");
+  expect(await style(row, "boxShadow")).not.toBe(restingShadow);
   const box = await choices.boundingBox();
   expect(box.width).toBeLessThanOrEqual(260);
   await express.focus();

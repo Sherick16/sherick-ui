@@ -124,13 +124,13 @@ export const contrastCompositions = (variables, alphas) => {
   const overlayFill = Number(variables["--sui-overlay-fill"]);
   /* A field is a tray in the `tray` tone over whatever holds it; the common case is a card.
      Under the pointer and while engaged it sinks to the deep tray. A choice row rests on the
-     `selectableRowRest` step. An empty mark's floor is the `mark-well` tone. */
+     `selectableRowRest` step, the same tray; while that recipe is opaque, the row measures the same
+     in a card and on the page. An empty mark's floor is the `mark-well` tone. */
   const card = composite(surface, FIELD.card, canvas);
   /* The code well is the `matteHigh` step over the card (`recipeAlphas.code.well`), not a canvas tint. */
   const codeWell = composite(surfaceHigh, alphas.code.well, card);
   const tray = (alpha, base = card) => composite(colour("tray"), alpha, base);
   const deepTray = (alpha, base = card) => composite(colour("tray-deep"), alpha, base);
-  const choiceRow = (base = card) => composite(colour("tray"), FIELD.choiceRow, base);
   const markWell = composite(colour("mark-well"), FIELD.mark, card);
   const dangerTray = (base) => composite(colour("danger-soft"), FIELD.error, base);
   const surfaces = {
@@ -144,8 +144,8 @@ export const contrastCompositions = (variables, alphas) => {
     "empty mark": markWell,
     "field hover": deepTray(FIELD.hover),
     "engaged field": deepTray(FIELD.engaged),
-    "choice row in a card": choiceRow(),
-    "choice row on the page": choiceRow(canvas),
+    "choice row in a card": tray(FIELD.choiceRow),
+    "choice row on the page": tray(FIELD.choiceRow, canvas),
     [CODE_WELL]: codeWell,
     [ACRYLIC]: composite(surfaceFloat, acrylicFill, canvas),
     [ACRYLIC_DENSE]: composite(surfaceFloat, acrylicDenseFill, canvas),
@@ -378,7 +378,7 @@ export const contrastCompositions = (variables, alphas) => {
     WCAG_TEXT,
     "a surface choice row's label and description on the resting tray, under the row's hover and press layers, which composite toward the label",
     ["canvas", "matte card"].flatMap((where) => {
-      const row = choiceRow(surfaces[where]);
+      const row = tray(FIELD.choiceRow, surfaces[where]);
       return ["ink", "ink-muted"].flatMap((role) => [
         [`${role} on a row in ${where} at rest`, colour(role), row],
         [`${role} on a row in ${where} hovered`, colour(role), composite(colour("ink"), STATE.quiet.hover, row)],

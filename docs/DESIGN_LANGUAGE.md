@@ -159,10 +159,12 @@ a control has, and it belongs to the hollow state only.
 
 **An empty checkbox or radio is the recorded exception.** It is hollow, and it draws no rim: it
 is a soft well, the same sunk material a text field is, so that no control in a form is outlined.
-Its floor is the `mark-well` tone (the deepest neutral step in light, a pit below the card in
-dark) under the `mark` recess (§5), and its label names it. This does not reach 3:1 against the
-card or a choice row. The relaxation is deliberate and applies to the empty mark only; the
-contrast contract exempts it by name. Do not extend it to another control.
+Its floor is the `mark-well` tone (the deepest neutral step in light, the most lit one in dark,
+where a darker pit disappears on the canvas) under the `mark` recess (§5), and its label names
+it. This does not reach 3:1 against the card or a choice row. The relaxation is deliberate and
+applies to the empty mark only; the contrast contract exempts it by name. Do not extend it to
+another control. The floor that replaces 3:1 is a rendered one: on the page canvas, the mark's
+floor stays at least 0.05 OKLab lightness from the surface around it, in both themes.
 
 **A text field is not hollow, and draws no line.** Its label names it, and its value or
 placeholder and its parts — a chevron, a clear target, a calendar glyph, a stepper — show what it
@@ -348,8 +350,7 @@ separate calendar glyph, not its text field, owns the popup press.
 Checkboxes, radios, switch tracks and slider grooves retain their boundaries through state
 changes. Their selection fills or marks arrive **inside** the boundary; switch thumbs move, but
 tracks do not bounce. A checkbox or radio is a 20px mark: empty, it is a soft well with no rim, the `mark-well` floor under the `mark` recess (§8); under the
-pointer its floor takes the field's engaged step, `tray-deep`, beneath the light `stateLayer.mark` step, so
-the well lights up in dark, where the step alone would lift the floor to the card's tone; a press sinks it to the
+pointer it takes the light `stateLayer.mark` step; a press sinks it to the
 `well` rung without moving it; checked, mixed and selected marks are the strong accent edge to
 edge, flat, with a tick, a minus or a light dot. The accent belongs to a slider's range;
 its matte handle remains separable from that range, including when disabled.

@@ -425,35 +425,35 @@ test("NumberField types, steps and stops at its bounds", async ({ page, errors }
   expect(errors).toEqual([]);
 });
 
-/* An unchecked box and an unselected radio have no content of their own, and neither the neutral
-   ladder nor depth can identify them at the 3:1 WCAG asks. What identifies them is their *rim*: the
-   mark's own `::after` in the `rim` tone, over the field well a text field is made of. A selected
-   mark drops the rim and is identified by its accent fill instead. This reads the rendered styles
-   rather than class names; the contrast of the rim is the contrast contract's job, and the pixels
-   are the next test's. */
-test("a resting selection mark is identified by its rim, a selected one by its fill", async ({ page, errors }) => {
+/* An unchecked box and an unselected radio are soft wells with no rim: the `mark-well` floor under
+   the `mark` recess. Their transparent overlay border stays for forced colors to repaint. A selected
+   mark hides that overlay and is identified by its accent fill. This reads the rendered styles
+   rather than class names; the pixels are the next test's. */
+test("a resting selection mark is a rimless well, a selected one the accent fill", async ({ page, errors }) => {
   await page.goto("/verification/interactions");
   await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
 
   const readMark = (locator: ReturnType<Page["locator"]>) =>
     locator.evaluate((element) => {
-      const resolved = (value: string) => {
+      const resolved = (property: "backgroundColor" | "boxShadow", value: string) => {
         const probe = document.createElement("div");
-        probe.style.backgroundColor = value;
+        probe.style[property] = value;
         document.body.appendChild(probe);
-        const colour = getComputedStyle(probe).backgroundColor;
+        const computed = getComputedStyle(probe)[property];
         probe.remove();
-        return colour;
+        return computed;
       };
       const rim = getComputedStyle(element, "::after");
+      const style = getComputedStyle(element);
       return {
         rimWidth: rim.borderTopWidth,
         rimColour: rim.borderTopColor,
         rimOpacity: rim.opacity,
-        expectedRim: resolved("oklch(var(--sui-rim))"),
-        fill: getComputedStyle(element).backgroundColor,
-        well: resolved("oklch(var(--sui-canvas) / 0.7)"),
-        accent: resolved("oklch(var(--sui-primary-strong))"),
+        fill: style.backgroundColor,
+        shadow: style.boxShadow,
+        well: resolved("backgroundColor", "oklch(var(--sui-mark-well))"),
+        recess: resolved("boxShadow", "var(--sui-elevation-mark)"),
+        accent: resolved("backgroundColor", "oklch(var(--sui-primary-strong))"),
       };
     });
 
@@ -463,10 +463,10 @@ test("a resting selection mark is identified by its rim, a selected one by its f
   ] as const) {
     await locator.scrollIntoViewIfNeeded();
     const mark = await readMark(locator);
-    expect(Number.parseFloat(mark.rimWidth), `${name} carries a rim`).toBeGreaterThan(0);
-    expect(mark.rimColour, `${name}'s rim is the rim tone`).toBe(mark.expectedRim);
-    expect(mark.rimOpacity, `${name}'s rim is drawn`).toBe("1");
-    expect(mark.fill, `${name} is a field well`).toBe(mark.well);
+    expect(Number.parseFloat(mark.rimWidth), `${name} keeps a border for forced colors`).toBeGreaterThan(0);
+    expect(mark.rimColour, `${name} draws no rim`).toBe("rgba(0, 0, 0, 0)");
+    expect(mark.fill, `${name} is the mark well`).toBe(mark.well);
+    expect(mark.shadow, `${name} is sunk by the mark recess`).toContain(mark.recess);
   }
 
   for (const [name, locator] of [
@@ -475,18 +475,19 @@ test("a resting selection mark is identified by its rim, a selected one by its f
   ] as const) {
     await locator.scrollIntoViewIfNeeded();
     const mark = await readMark(locator);
-    expect(mark.rimOpacity, `${name} drops its rim`).toBe("0");
+    expect(mark.rimOpacity, `${name} hides its overlay`).toBe("0");
     expect(mark.fill, `${name} is the accent fill`).toBe(mark.accent);
   }
 
   expect(errors).toEqual([]);
 });
 
-/* The contrast contract measures the rim's *authored* tone against each surface; it cannot
-   see what the browser actually paints once a 1.5px rim is snapped to device pixels. This reads
-   real pixels from the rendered mark: the most extreme pixel of the mark, against the surface just
-   outside it, must clear the 3:1 WCAG asks of the cue that identifies an empty mark. */
-test("a resting selection mark's rim clears 3:1 as rendered", async ({ page, errors }) => {
+/* An empty mark is exempt from the 3:1 boundary rule (DESIGN_LANGUAGE §8), so nothing in the
+   contrast contract stops its well from fading into the surface around it. This reads real pixels
+   from the rendered mark instead: its floor must stay 0.05 OKLab lightness from the page canvas
+   just outside it, in both themes (the floor §8 records). The step is measured in OKLab lightness, because a WCAG ratio barely
+   moves between two dark tones that are plainly different. */
+test("a resting selection mark's well stays a visible step from its surface as rendered", async ({ page, errors }) => {
   await page.goto("/verification/interactions");
   await page.waitForFunction(() => document.documentElement.dataset.hydrated === "true");
 
@@ -531,23 +532,19 @@ test("a resting selection mark's rim clears 3:1 as rendered", async ({ page, err
       const channel = value / 255;
       return channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055) ** 2.4;
     };
-    const luminance = ([red, green, blue]: [number, number, number]) =>
-      0.2126 * linear(red) + 0.7152 * linear(green) + 0.0722 * linear(blue);
-    const contrast = (a: [number, number, number], b: [number, number, number]) => {
-      const [high, low] = [luminance(a), luminance(b)].sort((x, y) => y - x);
-      return (high + 0.05) / (low + 0.05);
+    const lightness = ([red, green, blue]: [number, number, number]) => {
+      const [r, g, b] = [linear(red), linear(green), linear(blue)];
+      const l = Math.cbrt(0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b);
+      const m = Math.cbrt(0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b);
+      const s = Math.cbrt(0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b);
+      return 0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s;
     };
 
-    /* The surface just outside the mark, sampled above its top edge where neither the rim nor its
-       inset shadow can reach. */
+    /* The surface just outside the mark, sampled above its top edge, against the floor at the
+       mark's centre, below the shaded upper wall. */
     const outside = pixel(Math.floor(margin + (box?.width ?? 0) / 2), margin - 3);
-    let worst = 0;
-    for (let y = margin; y < region.height - margin; y += 1) {
-      for (let x = margin; x < region.width - margin; x += 1) {
-        worst = Math.max(worst, contrast(pixel(x, y), outside));
-      }
-    }
-    return worst;
+    const floor = pixel(Math.floor(margin + (box?.width ?? 0) / 2), Math.floor(margin + (box?.height ?? 0) / 2));
+    return Math.abs(lightness(outside) - lightness(floor));
   };
 
   const marks = [
@@ -560,8 +557,8 @@ test("a resting selection mark's rim clears 3:1 as rendered", async ({ page, err
 
   for (const [name, locator] of marks) {
     for (const theme of ["light", "dark"] as const) {
-      const ratio = await measure(locator, theme);
-      expect(ratio, `${name} rim in ${theme} must clear 3:1`).toBeGreaterThanOrEqual(3);
+      const step = await measure(locator, theme);
+      expect(step, `${name}'s well in ${theme} must stay a visible step from its surface`).toBeGreaterThanOrEqual(0.05);
     }
   }
 

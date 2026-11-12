@@ -15,7 +15,7 @@ export const lightTokens = {
   "surface-high": "0.932 0.014 290",
   /* The tray: a text field's resting tone. A field is a well, sunk by `elevation-recessed`, so its
      tone is a light step under the card and the recess carries its boundary; at `surface-high`
-     strength a form read as a stack of grey bars. A choice row rests on a fraction of it. */
+     strength a form read as a stack of grey bars. A choice row rests on the same tone. */
   "tray": "0.949 0.011 290",
   /* The deep tray: the step a text field sinks to under the pointer and while it is engaged. A
      field is identified by its label, its value or placeholder and its parts rather than by a drawn
@@ -23,7 +23,8 @@ export const lightTokens = {
      alone. */
   "tray-deep": "0.920 0.015 290",
   /* The floor of an empty checkbox or radio. A mark is a soft well with no rim, so its floor is the
-     deepest neutral step: the tone and the `elevation-mark` recess are all that mark it. */
+     neutral step furthest from the sheet: the tone and the `elevation-mark` recess are all that
+     mark it. */
   "mark-well": "0.902 0.016 290",
   "surface-float": "0.999 0.001 290",
   /* The puck: a held choice that rides in a track — a selected segment, the tab indicator. It is
@@ -133,14 +134,15 @@ export const lightTokens = {
 export const darkTokens = {
   /* The dark ladder is wider than a mirror of the light one, because steps at the dark end are
      harder to see: the floor is well under the sheet, a field is a lit tray a step over the sheet
-     (a darker pit disappears on the floor), and the neutral parts built on `surface-high` — a tonal
-     button, a track, a badge — are never darker than the field. */
+     (a darker pit disappears on the floor), an empty mark is lit a step over the field for the same
+     reason, and the neutral parts built on `surface-high` — a tonal button, a track, a badge — are
+     never darker than the field. */
   "canvas": "0.145 0.016 285",
   "surface": "0.212 0.018 285",
   "surface-high": "0.310 0.022 285",
   "tray": "0.262 0.020 285",
   "tray-deep": "0.300 0.022 285",
-  "mark-well": "0.135 0.014 285",
+  "mark-well": "0.335 0.024 285",
   "surface-float": "0.238 0.019 285",
   "puck": "0.335 0.024 285",
   "media": "0.160 0.006 285",

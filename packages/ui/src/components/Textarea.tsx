@@ -10,13 +10,12 @@ import React, {
 import { cn } from "@/libs/utils";
 import {
   density,
-  elevation,
   fieldLabel,
   fieldLayout,
   fieldMessage,
+  fieldWell,
+  fieldWellError,
   focusRing,
-  material,
-  rim,
   shape,
   state,
 } from "./ui.common";
@@ -92,9 +91,7 @@ const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
               shape.control,
               motionFeedback,
               focusRing,
-              invalid ? material.controlError : material.control,
-              rim.field,
-              elevation.recessed,
+              invalid ? fieldWellError : fieldWell,
               !disabled && (invalid ? state.field.errorHover : state.field.hover),
               !disabled && (invalid ? state.field.errorFocus : state.field.focus),
               disabled ? state.disabled : state.text,
