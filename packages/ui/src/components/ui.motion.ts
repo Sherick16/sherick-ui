@@ -311,9 +311,8 @@ export const motionActivityIndeterminate = /* @__PURE__ */ cx(
  *  The row's layer therefore changes in one step, for the pointer and the keyboard alike. */
 export const motionRowLayer = "before:transition-none";
 
-/** A rim drawn as an overlay of its own — an empty selection mark's lip, a drop target's dashes —
- *  carries its own feedback timing: it steps up on hover and fades as a selection fill arrives,
- *  on the same press curve as the surface beneath it. */
+/** A rim drawn as an overlay of its own — a drop target's dashes — carries its own feedback
+ *  timing: it steps up on hover, on the same press curve as the surface beneath it. */
 export const motionRim =
   "after:transition-[background-color,border-color,opacity] after:duration-press after:ease-press motion-reduce:after:transition-none";
 

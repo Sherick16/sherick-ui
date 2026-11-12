@@ -131,7 +131,7 @@ export const RadioGroup = forwardRef<HTMLDivElement, RadioGroupProps>(
                         shape.circle
                       )}
                     >
-                      {/* An empty socket is identified by its rim; a selected one fills and holds a light thumb. */}
+                      {/* An empty socket is a rimless well; a selected one fills and holds a light thumb. */}
                       <span
                         aria-hidden="true"
                         className={cn(

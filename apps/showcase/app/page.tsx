@@ -239,6 +239,7 @@ export default function Home() {
               <Specimen title="Elevation">
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                   <Tile label="Flat" className={cn(material.matteHigh, elevation.flat)} />
+                  <Tile label="Resting" className={cn(material.matte, elevation.resting)} />
                   <Tile label="Raised" testId="tile-raised" className={cn(material.matteHigh, elevation.raised)} />
                   <Tile label="Control" className={cn(material.matteHigh, elevation.control)} />
                   <Tile label="Recessed" testId="tile-recessed" className={cn(material.matteHigh, elevation.recessed)} />
@@ -1062,13 +1063,13 @@ const markStateColumns: { label: string; disabled?: boolean }[] = [
 /* Tailwind reads class names as literal text, so every pinned class is listed here in full. */
 const pinnedMarkClasses: Record<string, Record<string, string>> = {
   "[&>span]": {
-    Hover: "[&>span]:before:opacity-[0.09] [&>span]:after:border-sherick-ink-muted",
-    Pressed: "[&>span]:before:opacity-[0.09] [&>span]:after:border-sherick-ink-muted [&>span]:shadow-[var(--sui-elevation-well)]",
+    Hover: "[&>span]:before:opacity-[0.09]",
+    Pressed: "[&>span]:before:opacity-[0.09] [&>span]:shadow-[var(--sui-elevation-well)]",
     Focus: "[&>span]:outline [&>span]:outline-2 [&>span]:outline-sherick-focus [&>span]:outline-offset-[3px]",
   },
   "[&_[role=radio]>span]": {
-    Hover: "[&_[role=radio]>span]:before:opacity-[0.09] [&_[role=radio]>span]:after:border-sherick-ink-muted",
-    Pressed: "[&_[role=radio]>span]:before:opacity-[0.09] [&_[role=radio]>span]:after:border-sherick-ink-muted [&_[role=radio]>span]:shadow-[var(--sui-elevation-well)]",
+    Hover: "[&_[role=radio]>span]:before:opacity-[0.09]",
+    Pressed: "[&_[role=radio]>span]:before:opacity-[0.09] [&_[role=radio]>span]:shadow-[var(--sui-elevation-well)]",
     Focus: "[&_[role=radio]>span]:outline [&_[role=radio]>span]:outline-2 [&_[role=radio]>span]:outline-sherick-focus [&_[role=radio]>span]:outline-offset-[3px]",
   },
 };

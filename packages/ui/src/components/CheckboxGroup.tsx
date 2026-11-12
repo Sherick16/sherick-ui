@@ -149,7 +149,7 @@ export const CheckboxGroup = forwardRef<HTMLDivElement, CheckboxGroupProps>(
                         shape.mark
                       )}
                     >
-                      {/* An empty box is identified by its rim; a ticked one fills edge to edge. */}
+                      {/* An empty box is a rimless well; a ticked one fills edge to edge. */}
                       <span
                         aria-hidden="true"
                         className={cn(

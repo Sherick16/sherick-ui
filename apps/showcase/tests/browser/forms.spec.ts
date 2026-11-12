@@ -237,7 +237,7 @@ test("Form focuses the first invalid field, shows errors where they are and acce
     return fill;
   });
   await expect(title).toHaveCSS("background-color", dangerTray);
-  await expect(title).toHaveCSS("border-bottom-color", "rgba(0, 0, 0, 0)");
+  await expect(title).toHaveCSS("border-bottom-width", "0px");
   const casinos = page.getByRole("group", { name: "Casinos" });
   await expect(page.getByText("Choose at least one option.")).toBeVisible();
   await expect(page.getByTestId("form-submitted")).toHaveText("Not submitted");

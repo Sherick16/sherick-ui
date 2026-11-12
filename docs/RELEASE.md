@@ -34,7 +34,17 @@ major rather than minor. The `overlay`, `toggles` and `stylesCss` budgets in `bu
 new surface, and that change records the reason. `2.10.1` aligns disclosures and quiets choice rows:
 `Accordion` and `Collapsible` rows and panels hang their 1rem inset, so a disclosure's parent needs
 that much inline padding, and a selected surface choice row drops its accent rim. `2.11.0` adds
-`trailingIcon` to `Button`, a mark after the label. The current source version is `2.11.0`, and
+`trailingIcon` to `Button`, a mark after the label. `2.12.0` makes a text field a light well (the new
+`--sui-tray` token under `elevation.recessed`), so a form no
+longer reads as a stack of grey bars. An unselected surface choice row is the same well, and the chosen row
+lifts out of it on the primary soft surface with `elevation.control`. An empty checkbox or radio becomes a soft well with no rim (the new
+`--sui-mark-well` and `--sui-elevation-mark` tokens); the contrast contract exempts it from the 3:1 boundary
+rule by decision. A card is the opaque surface with the new `resting` contact shadow
+(`--sui-elevation-resting`) on a deeper canvas, and the dark ladder is wider: a deeper floor, a lighter sheet
+and lighter neutral parts. A `CodeBlock` shell shares the card's opaque sheet, and in dark a raised control's
+lit lip is a little brighter. The neutral surfaces carry more of the iris hue (a lavender-grey page in light,
+an indigo graphite in dark), and the primary soft and selected surfaces are a little richer. Every `--sui-canvas`, `--sui-surface` and `--sui-surface-high` consumer sees the new
+tones. The `themeCss` budget rose with the four new tokens, and the size-budget section records it. The current source version is `2.12.0`, and
 npm's `latest` is `2.10.1`. An installed package's actual version and exports, not this
 checkout, determine availability.
 
@@ -338,6 +348,13 @@ The 2.6.0 form wave re-records **`form` and `barrel`** with `--update=form,barre
 Button still pulls no optional feature code (44 modules), no dependency is added, and the
 `button`, `overlay`, `disclosure`, `toast`, `toggles`, `content`, `stylesCss` and `themeCss`
 records, the 5% tolerance and the stale-shrink check are byte-for-byte unchanged.
+
+The 2.12.0 form refinement re-records **`themeCss`** with `--update=themeCss`:
+`11715 / 1978 / 1609` → `12696 / 2063 / 1699` (+85 bytes gzip). Four additive tokens cause it:
+`--sui-tray` (a text field's light well), `--sui-mark-well` and `--sui-elevation-mark` (the rimless
+well of an empty checkbox or radio) and `--sui-elevation-resting` (a card's contact shadow). Each
+value is emitted three times, and the first three alone were 6 bytes over the 5% tolerance. No
+other record moved.
 
 No other component budget is relaxed.
 

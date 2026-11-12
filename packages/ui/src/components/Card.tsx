@@ -1,6 +1,6 @@
 import React, { forwardRef, type ForwardRefExoticComponent, type HTMLAttributes, type ReactNode, type RefAttributes } from "react";
 import { cn } from "@/libs/utils";
-import { headingRhythm, material, shape, text, tone, type } from "./ui.common";
+import { elevation, headingRhythm, material, shape, text, tone, type } from "./ui.common";
 import { Variant } from "./ui.types";
 
 export interface CardProps extends HTMLAttributes<HTMLDivElement> {
@@ -16,8 +16,8 @@ export interface CardTitleProps extends HTMLAttributes<HTMLHeadingElement> {
 
 export type CardDescriptionProps = HTMLAttributes<HTMLParagraphElement>;
 
-/* A card is a large matte surface: tone separates it from the canvas, and it carries
-   no elevation until something lifts it. A neutral card *is* the matte surface; the semantic
+/* A card is a large matte surface at rest on the page: tone separates it from the canvas, and the
+   `resting` contact shadow seats it. A neutral card *is* the matte surface; the semantic
    variants are that role's soft container, and they carry meaning rather than decoration — a
    tinted card says something about its content, so it is not a way to make a card stand out. */
 const CardRoot = forwardRef<HTMLDivElement, CardProps>(
@@ -30,6 +30,7 @@ const CardRoot = forwardRef<HTMLDivElement, CardProps>(
           "min-w-0 p-6 [overflow-wrap:anywhere]",
           shape.surface,
           variant === "secondary" ? material.matte : tone.soft[variant],
+          elevation.resting,
           text.high,
           className
         )}

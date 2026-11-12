@@ -7,7 +7,7 @@ import { cn } from "@/libs/utils";
 import {
   density,
   focusRingWithin,
-  material,
+  selectableRowRest,
   selectableRowSupporting,
   selectableRowSurface,
   shape,
@@ -36,7 +36,7 @@ export const choiceItemClasses = (appearance: ChoiceAppearance): ClassValue[] =>
     cn(
       "relative min-w-0 forced-colors:has-[:focus-visible]:[outline-style:none]",
       shape.control,
-      material.matteHigh,
+      selectableRowRest,
       selectableRowSurface,
       stateLayerQuietComposite,
       focusRingWithin,

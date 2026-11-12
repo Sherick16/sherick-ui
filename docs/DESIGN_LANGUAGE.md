@@ -4,11 +4,12 @@
 color, motion and depth are reserved for selection, manipulation and surfaces that float.
 Consistency means using the same roles, not giving every component identical anatomy.
 
-**Graphite and iris.** The page is a near-white canvas; content sits on white sheets; copy is a
+**Graphite and iris.** The page is a pale lavender-grey canvas; content sits on white sheets; copy is a
 graphite ink; and one vivid iris violet is spent only on what the reader acts on — the priority
-action, a made selection, a value's range, the focus ring. The neutrals carry only a bare trace of
-the accent's hue, so they read as true greys that belong to the accent's family rather than as a
-tinted wash, and shadows are a graphite umbra for the same reason. Dark mode is a graphite room,
+action, a made selection, a value's range, the focus ring. The neutral surfaces carry a visible trace of
+the accent's hue: the page, a field's tray and a track are a lavender-grey in light and an indigo
+graphite in dark. That tint is the palette's character where no accent is spent. Ink and the white sheet
+stay neutral, so copy and cards take no colour cast, and shadows are a graphite umbra. Dark mode is a graphite room,
 not inverted light: sheets are lit a step above the floor, the accent glows rather than shouts, and
 a floating edge is a line of light. The palette record, with every measured composition, is
 [PALETTE.md](PALETTE.md).
@@ -22,7 +23,7 @@ consumer integration are described in [ARCHITECTURE.md](ARCHITECTURE.md); valida
 
 ## 1. Governing rule
 
-Start at flat matte. Lift a control only when it is manipulated; recess a track or well
+Start at matte. A card rests on the page and nothing more; lift a control only when it is manipulated; recess a track or well
 because it is sunk; use acrylic only when a surface actually floats above the page. A hover
 or keyboard highlight never earns a new level of depth. Let one primary action hold the
 strong fill in a view rather than making every control compete for attention.
@@ -30,7 +31,7 @@ strong fill in a view rather than making every control compete for attention.
 ## 2. Material, elevation and edge
 
 These roles are independent: **material** fills a surface, **elevation** gives it distance
-from the page, and **edge** marks a structural join. A card may be matte and flat, a tonal
+from the page, and **edge** marks a structural join. A card may be matte and at rest, a tonal
 button matte and raised, and a switch track matte and recessed. A material contains no
 shadow, radius or rim. Add a line only where two parts of the same surface meet, or where a
 hollow control needs its rim (§8).
@@ -50,7 +51,7 @@ a sideways shadow or an upward-lit gradient to one component.
 | `canvas` | application background | nested content |
 | `matteQuiet`, `matte`, `matteHigh` | quiet, ordinary and stronger grounded surfaces; every sunk track (slider groove, progress track, segment track) is `matteHigh`, so its full extent stays visible on a card | floating UI |
 | `matteInset` | a passive sheet tucked beneath a stronger control, visible but quieter than that control | independent cards or fields |
-| `control`, `controlError` | text fields and the file drop target: an opaque **tray** in the `surface-high` tone, which under the pointer and while engaged sinks to `tray-deep`; the invalid form is the danger soft surface, with a danger placeholder. (An empty checkbox or radio keeps its canvas-toned well.) | passive cards, buttons |
+| `control`, `controlError` | text fields and the file drop target: an opaque **tray** in the light `tray` tone. A text field sinks it with `recessed` (§5), so it is a well; under the pointer and while engaged it deepens to `tray-deep`; the invalid form is the danger soft surface, with a danger placeholder. (An empty checkbox or radio is a well of its own, the `mark-well` tone; see §8.) | passive cards, buttons |
 | `handle` | a small value-control part that must remain findable, even disabled | large surfaces |
 | `acrylic`, `acrylicDense`, `acrylicHero` | anchored sheets, compact hints, viewport-owning overlays respectively | grounded content |
 
@@ -71,13 +72,20 @@ recess on a card and on the page alike. Its tone is a quiet step over the card, 
 
 | Recipe | Use | Not for |
 | --- | --- | --- |
-| `flat` | grounded passive surfaces | a recessed track |
+| `flat` | passive parts inside a surface, and quiet sheets such as a table or a tree | a recessed track |
+| `resting` | a card on the page: a close contact shadow under its lower edge, which seats the sheet without lifting it | a control, a table, a nested sheet, anything that floats |
 | `raised` | tactile tonal actions at rest | hover or passive data |
-| `control` | switch thumb, a puck held in a track, or a held selection inside a list or calendar | keyboard highlight |
-| `recessed` | grooves, tracks, a checkbox or radio at rest, and a raised control while pressed | fields or flat cards |
+| `control` | switch thumb, a puck held in a track, a held selection inside a list or calendar, or the chosen row of a surface choice group | keyboard highlight |
+| `recessed` | grooves, tracks, a text field's well, an unselected surface choice row, and a raised control while pressed | flat cards |
 | `recessedTop` | the upper wall of an inset sheet continuing directly below a control, without a lower rim | standalone tracks or wells |
+| `mark` | an empty checkbox or radio at rest: a recess one step stronger than `recessed`, because a 20px well has no rim and is found by its depth | a field, a track, any wide groove |
 | `well` | a checkbox or radio while it is pressed: the floor sinks, the boundary stays | a resting mark, a wide groove |
 | `floating` | real overlay surfaces | anything in document flow |
+
+A card is separated from the page by tone first: the canvas sits a clear step under the white
+sheet in light, and the sheet is lit a clear step over the floor in dark. `resting` then seats it.
+It is weaker than `raised`, so a button on a card is still the lifted part, and it draws no line.
+Do not use it to make one card stand out from another.
 
 Actions follow one depth ladder: a text action sits flat, and tonal and filled actions are
 `raised` at rest and `recessed` while held. `raised` carries the light model's lit upper lip — one
@@ -100,8 +108,8 @@ combine `tone.selected` with the same elevation, because a list sheet is already
 surface and a white row on it would vanish. A continuous date range makes one band per week rather than
 seven separately elevated cells. The mark itself, a check or a date, remains another
 selection signal. Navigation-only current rows and unselected commands stay flat. An empty
-selection mark is identified by its rim (§8), not by its depth: depth alone cannot reach 3:1
-on a 20px mark without turning it into a shaded orb.
+selection mark is a soft well with no rim: the `mark-well` floor under the `mark` recess. Depth
+alone does not reach 3:1 on a 20px mark, and the language accepts that for an empty mark (§8).
 
 ## 6. Acrylic
 
@@ -144,10 +152,20 @@ roles by `weight`. Inset a divider to the content band it separates; let a row's
 yield to a hovered neighbour. A quote's accent is content emphasis, not a structural
 edge. **Never outline a filled control or a card just to distinguish it.**
 
-**A hollow control carries a rim.** The file drop target and an empty checkbox or radio have no
-content that says what they are, and no neutral fill step or depth reaches the 3:1 a control's
-boundary needs. Each carries one 1.5px rim in the `rim` tone, tuned to clear 3:1 by a small margin
-and no more. The rim is the only border a control has, and it belongs to the hollow state only.
+**A hollow control carries a rim.** The file drop target has no content that says what it is,
+and no neutral fill step or depth reaches the 3:1 a control's boundary needs. It carries one 1.5px
+rim in the `rim` tone, tuned to clear 3:1 by a small margin and no more. The rim is the only border
+a control has, and it belongs to the hollow state only.
+
+**An empty checkbox or radio is the recorded exception.** It is hollow, and it draws no rim: it
+is a soft well, the same sunk material a text field is, so that no field or mark in a form is
+outlined; the rim belongs to the drop target only.
+Its floor is the `mark-well` tone (the deepest neutral step in light, the most lit one in dark,
+where a darker pit disappears on the canvas) under the `mark` recess (§5), and its label names
+it. This does not reach 3:1 against the card or a choice row. The relaxation is deliberate and
+applies to the empty mark only; the contrast contract exempts it by name. Do not extend it to
+another control. The floor that replaces 3:1 is a rendered one: on the page canvas, the mark's
+floor stays at least 0.05 OKLab lightness from the surface around it, in both themes.
 
 **A text field is not hollow, and draws no line.** Its label names it, and its value or
 placeholder and its parts — a chevron, a clear target, a calendar glyph, a stepper — show what it
@@ -156,16 +174,21 @@ to identify a control, and a field identified by its label and content needs no 
 underline or box on every field is what made a form read as a stack of ruled inputs; the tray
 alone says "something goes here".
 
-- the tray is opaque `surface-high`, the same on a card and on the page; the pointer, focus and an
-  open popup sink it to `tray-deep`, and the focus ring (§14) is what says the field is engaged;
+- the tray is the opaque `tray` tone, a light step off the card (under it in light, over it in
+  dark), and `elevation.recessed` sinks
+  it: the recess, not a heavy fill, marks the field on a card and on the page alike, and at
+  `surface-high` strength a form read as a stack of grey bars; the pointer, focus and an open popup
+  deepen it to `tray-deep`, and the focus ring (§14) is what says the field is engaged;
 - an invalid field is the danger tray — the danger soft surface — with a danger placeholder and the
   message beneath, which carries the error in words;
-- `rim.field` is a transparent border on every side: forced colors discards the tray and repaints
-  the border in a system colour, so a field there keeps its whole outline;
+- `rim.field` is a border under forced colors only: forced colors discards the tray and its
+  recess, and the border, in a system colour, gives the field its whole outline. In normal colours
+  a field has no border, so the recess starts at the field's real edge;
 - a bare text field with no placeholder and no part is the one field its tray alone identifies:
   give it a placeholder or a part where the form allows, and never place it where the tray is lost
   (on a `surface-high` fill);
-- a selected checkbox or radio is identified by its accent fill, and its rim fades into it;
+- a selected checkbox or radio is identified by its accent fill; an empty one keeps a transparent
+  overlay border, which forced colors repaints as its outline;
 - a surface choice row (§11) has no visible rim in any state: the mark it houses says which row
   is chosen, and its transparent overlay keeps the row's outline in forced colors;
 - the drop target's rim is dashed (`rim.dashed`): a 7px mask over its own overlay, never the
@@ -218,8 +241,9 @@ reads as the field opening rather than as a second surface beside it.
 There are **two readable text roles**: `text.high` for labels and values, `text.medium`
 for descriptions, placeholders and supporting copy. `detail.mark` and `detail.fill`
 are non-text furniture roles, never a third step for readable text. Surface tones
-(`canvas`, `surface`, `surface-high`, `tray-deep`, `surface-float`, `puck`) are not elevations.
-`tray-deep` belongs only to a text field under the pointer or engaged (§8). `puck` is the
+(`canvas`, `surface`, `surface-high`, `tray`, `tray-deep`, `mark-well`, `surface-float`, `puck`) are not elevations.
+`tray` is a text field's resting tone and `tray-deep` its tone under the pointer or engaged; `mark-well` is
+an empty mark's floor (§8). `puck` is the
 brightest surface in both themes and belongs only to a choice held in a track (§5).
 
 | Tone | Meaning |
@@ -328,8 +352,8 @@ separate calendar glyph, not its text field, owns the popup press.
 
 Checkboxes, radios, switch tracks and slider grooves retain their boundaries through state
 changes. Their selection fills or marks arrive **inside** the boundary; switch thumbs move, but
-tracks do not bounce. A checkbox or radio is a 20px mark: empty, it is a well with a rim; hover
-lifts the rim and lays the light `stateLayer.mark` step inside it; a press sinks it to the
+tracks do not bounce. A checkbox or radio is a 20px mark: empty, it is a soft well with no rim, the `mark-well` floor under the `mark` recess (§8); under the
+pointer it takes the light `stateLayer.mark` step; a press sinks it to the
 `well` rung without moving it; checked, mixed and selected marks are the strong accent edge to
 edge, flat, with a tick, a minus or a light dot. The accent belongs to a slider's range;
 its matte handle remains separable from that range, including when disabled.
@@ -353,12 +377,14 @@ own label, not the whole menu sheet. A quiet target whose label rises on hover a
 as a dismiss glyph, takes `state.quietInk`: its ink rises from `text.medium` to `text.high`, and no state
 layer is drawn behind it.
 
-RadioGroup's opt-in surface rows rest on the `matteHigh` tray, so every choice reads as a target
-before any is chosen, and the row that holds the selection takes the primary *soft* surface and stays
-flat. The mark the row houses is what says "this one"; an accent rim around the row repeated it, and
-the selected step and a lift turned a whole card into an accent block that outshouted the priority
-action beside it. The resting tray stays light enough
-that an empty mark's rim still clears 3:1 against it.
+RadioGroup's opt-in surface rows rest on `selectableRowRest` — the field's own `tray` under
+`recessed` — so a group of choices is a set of wells, in the same sunk family as the fields around
+it, and every choice reads as a target before any is chosen. The row that holds the selection lifts
+out of that family: it takes the primary *soft* surface and `elevation.control`, the lift every held
+choice has (§5). The mark the row houses still says "this one". The row keeps the soft step and draws
+no accent rim: the selected step and a rim turned a whole card into an accent block that outshouted
+the priority action beside it. The resting tray stays light enough
+that an empty mark's well still reads against it.
 The complete row remains the label; passive badges are consumer content. The selection mark and
 target boundary stay still, and the original plain radio rows remain available. Surface selection
 is not a new card or option-content framework. `CheckboxGroup` is the same row with a checkbox

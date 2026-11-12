@@ -5,7 +5,7 @@ import { HugeiconsIcon } from "@hugeicons/react";
 import { Calendar03Icon } from "@hugeicons/core-free-icons";
 import React, { useEffect, useRef, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
-import { density, focusRingWithin, iconStroke, material, overlay, rim, shape, stacking, state, stateLayer } from "./ui.common";
+import { density, fieldWell, focusRingWithin, iconStroke, overlay, shape, stacking, state, stateLayer } from "./ui.common";
 import { motionFeedback, motionInkPress, motionPresenceAnchored } from "./ui.motion";
 
 /* The parts the two date pickers share.
@@ -31,8 +31,7 @@ export const dateFieldRowClassName = (disabled: boolean) =>
     "group/field flex min-w-0 w-full items-center ps-5 pe-3.5",
     density.normal,
     shape.control,
-    material.control,
-    rim.field,
+    fieldWell,
     motionFeedback,
     focusRingWithin,
     state.field.invalid,

@@ -7,12 +7,11 @@ import { ArrowDown01Icon, Tick02Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/libs/utils";
 import {
   elevation,
+  fieldWell,
   focusRingHeld,
   iconStroke,
   list,
-  material,
   overlay,
-  rim,
   shape,
   stacking,
   state,
@@ -149,8 +148,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                 padding,
                 fieldDensity[size],
                 shape.control,
-                material.control,
-                rim.field,
+                fieldWell,
                 motionFeedback,
                 focusRingHeld,
                 state.busy,

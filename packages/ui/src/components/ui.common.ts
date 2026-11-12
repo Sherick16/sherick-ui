@@ -110,9 +110,10 @@ export const groupFocusRing =
    interpolates one of those names; it never writes a duration, a curve, a transition or
    an animation of its own. */
 
-/* Elevation — distance from the surface plane, and nothing else. Three depth roles
-   exist, and the last two are a single tactile pair:
+/* Elevation — distance from the surface plane, and nothing else. These depth roles
+   exist, and `control` and `recessed` are a single tactile pair:
    - flat:     at rest on the page. Separation comes from tone alone.
+   - resting:  a card seated on the page by a close contact shadow, not lifted.
    - raised:   a manipulated control, lifted a hair above its own track so it feels
                touchable; pressing it returns it to the track.
    - floating: a surface that genuinely sits above the application.
@@ -121,12 +122,14 @@ export const groupFocusRing =
    - recessed: the other half of that pair: a groove, a track or a well, which is
                recessed by definition, and a raised control while it is held, which
                lands at the same depth.
-   A passive surface is flat unless its anatomy is sunk by design: a well, a groove and
-   a code well are `recessed` while they sit there, and `flat` is the default for
-   everything else passive. A flat control never gains depth by being pressed. */
+   - mark, well: an empty selection mark's recess, and the rung it sinks to while held.
+   A passive surface is flat unless it is a card (`resting`) or its anatomy is sunk by
+   design: a well, a groove and a code well are `recessed` while they sit there, and
+   `flat` is the default for everything else passive. A flat control never gains depth
+   by being pressed. */
 /* Forced colors removes shadows and tones, so a shell that separates from the page by depth alone
-   loses its boundary. Every shell that carries elevation draws its own system-coloured outline
-   there: `outline` is drawn in CanvasText by the platform and `outline-offset` pulls it onto the
+   loses its boundary. Every lifted shell (`raised`, `floating`) draws its own system-coloured outline
+   there; a `resting` card does not, as a flat card never did: `outline` is drawn in CanvasText by the platform and `outline-offset` pulls it onto the
    border box, so it traces the object's own corner. The outline has no width in normal colors, so
    it costs nothing on screen; `forced-colors:` is the only place it appears. */
 export const forcedBoundary =
@@ -134,14 +137,19 @@ export const forcedBoundary =
 
 export const elevation = {
   flat: "shadow-sherick-flat",
+  /* A card at rest on the page: a close contact shadow that seats the sheet without lifting it. */
+  resting: "shadow-sherick-resting",
   raised: /* @__PURE__ */ cx("shadow-sherick-raised", forcedBoundary),
   floating: /* @__PURE__ */ cx("shadow-sherick-floating", forcedBoundary),
   control: "shadow-sherick-control",
   recessed: "shadow-sherick-recessed",
   /* One rung further down: the depth a small selection mark sinks to while it is held. A mark
-     rests in the ordinary groove; this is its press, never its identity. See
+     rests at the `mark` rung; this is its press, never its identity. See
      `selectable.markSurface`. */
   well: "shadow-sherick-well",
+  /* An empty selection mark at rest: a recess stronger than `recessed`, for a 20px well that has
+     no rim and must be found by its depth. */
+  mark: "shadow-sherick-mark",
 } as const;
 /* An inset sheet's shaded upper wall, without a lower rim. Kept independent so
    unrelated components do not bundle this recipe. */
@@ -218,10 +226,12 @@ export const edgeTone = {
    chevron, a calendar glyph, a stepper — show what it is and where it is, which is how WCAG 1.4.11
    lets a control be identified without a 3:1 edge. Its tray says "something goes here", and its
    states ride on the tray and the focus ring (`state.field`). `rim.field` is therefore no visible
-   line: it is a transparent border on all four sides, because forced colors repaints even a
-   transparent border in a system colour, so a field there keeps its whole outline where the tray is
-   discarded; the scoped baseline sizes boxes by their border edge, so it never changes a field's
-   footprint. An invalid field takes the same transparent border.
+   line: it is a border that exists under forced colors only, where the tray and its recess are
+   discarded and the border, in a system colour, gives the field its whole outline. In normal
+   colours a field has no border at all: an inset shadow starts at the padding edge, so even a
+   transparent border leaves a band of plain tray outside the recess, which reads as a double edge.
+   The scoped baseline sizes boxes by their border edge, so the border never changes a field's
+   footprint. An invalid field takes the same border.
    A drop target's rim is dashed, and the dashes are a mask over an overlay rather than the native
    `dashed` style, whose dash length and corner joins the platform decides: the mask fixes the dash
    rhythm and follows the `control` corner exactly. The mask is authored in `tokens.ts`. */
@@ -229,7 +239,7 @@ const dashedRimMask =
   "after:[mask-image:var(--sui-rim-dashed)] after:[mask-size:100%_100%] after:[mask-repeat:no-repeat]";
 
 export const rim = {
-  field: "border-[1.5px] border-transparent",
+  field: "forced-colors:border-[1.5px]",
   dashed: /* @__PURE__ */ cx(
     "after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:content-['']",
     "after:bg-sherick-rim",
@@ -314,9 +324,9 @@ export const state = {
      deep step; a composite field engages its outer surface while the input inside stays borderless;
      an expanded control holds the engaged step while its popup is open. Tonality and the focus ring
      carry the state, so no border appears and disappears. */
-  /* A field is a tray in the `surface-high` tone, so it reads as a quiet recess in light and a
-     quiet step up in dark. It draws no line: its label and content identify it (see `rim`), so the
-     tray is laid at full strength to say "something goes here" on a card and on the page alike.
+  /* A field is a well: the light `tray` tone, sunk by `elevation.recessed`. It
+     draws no line: its label and content identify it (see `rim`), and the recess, not a heavy fill,
+     says "something goes here" on a card and on the page alike.
      The pointer sinks it to the deep tray, and so does engagement — focus or an open popup — where
      the focus ring is what says "this one is engaged"; an engaged field never falls back under the
      pointer, because both states share the step. An invalid field is the danger tray — the role's
@@ -471,8 +481,9 @@ export const hitArea =
    - matteInset:  a passive sheet tucked under a stronger control; subdued without
                   blending into the canvas or needing a drawn rim.
    - control:     the fill every text control shares, plus its placeholder tone: an opaque tray
-                  in the `surface-high` tone. The tray says "something goes here"; the field's
-                  label and content, not a drawn edge, are what identify it (see `rim`).
+                  in the `tray` tone, which a field sinks with `elevation.recessed`. The well says
+                  "something goes here"; the field's label and content, not a drawn edge, are what
+                  identify it (see `rim`).
    - handle:      the fill of a small part the user has to find — a value control's handle.
                   Surface steps sit within a few percent of their neighbours, so this role
                   takes the mid-emphasis tone, which inverts with the theme and separates in
@@ -503,9 +514,9 @@ export const hitArea =
 export const material = {
   canvas: "bg-sherick-canvas text-sherick-ink",
   matteQuiet: "bg-sherick-surface/[0.42] text-sherick-ink",
-  matte: "bg-sherick-surface/[0.78] text-sherick-ink",
+  matte: "bg-sherick-surface text-sherick-ink",
   matteHigh: "bg-sherick-surface-high/[0.72] text-sherick-ink",
-  control: "bg-sherick-surface-high text-sherick-ink placeholder:text-sherick-ink-muted",
+  control: "bg-sherick-tray text-sherick-ink placeholder:text-sherick-ink-muted",
   /* The invalid fill carries its placeholder at the *full* danger tone, not at a fraction of it. A
      placeholder is text, so it answers to the same 4.5:1 the copy beside it does, and a partial
      opacity of an accent is a different colour from the accent: the 72%-opacity placeholder
@@ -526,6 +537,13 @@ export const material = {
   acrylicHero:
     "bg-sherick-surface-overlay/[var(--sui-overlay-fill)] bg-[image:var(--sui-glass-hero-gradient)] text-sherick-ink",
 } as const;
+
+/* A text field's box: the tray, sunk by `recessed`, with the forced-colors border. Every field
+   takes this recipe, so the fill, the rim and the recess cannot drift apart between fields. The
+   file drop target is a hollow control, not a well: it keeps `material.control` alone. */
+export const fieldWell = /* @__PURE__ */ cx(material.control, rim.field, elevation.recessed);
+export const fieldWellError = /* @__PURE__ */ cx(material.controlError, rim.field, elevation.recessed);
+
 /* Dark neutral behind native video, including poster loading and letterboxing. */
 export const mediaCanvas = "bg-sherick-media";
 /* A passive sheet tucked below a stronger control; independently tree-shakeable. */
@@ -925,17 +943,23 @@ export const currentDestination = {
    brightest surface and a white row on it would vanish. */
 export const puck = "bg-sherick-puck";
 
-/* A choice row — an opt-in `surface` row in a RadioGroup or CheckboxGroup — rests on the
-   `matteHigh` tray, so every choice in the group reads as a target before any is chosen; it stays
-   light enough that the empty mark's rim still clears 3:1 against it. The row that holds the
-   selection takes the role's *soft* surface and stays flat. The mark it houses is what says "this
-   one": an accent rim around the row repeated it and made the chosen row the loudest object on a
-   quiet form, and the selected step and a lift turned a whole card into an accent block. The
-   transparent overlay stays, so forced colors keeps every row's outline, and the fill and the hover
-   layer still reach the row's real edge. */
+/* A boundary that only forced colors can see: a transparent border on an overlay. Forced colors
+   discards fills and shadows and repaints the border in a system colour, so a part that is
+   identified by tone and depth alone keeps an outline there. */
+const forcedColorsBorder =
+  "after:pointer-events-none after:absolute after:inset-0 after:box-border after:rounded-[inherit] after:border-[1.5px] after:border-transparent after:content-['']";
+
+/* A choice row — an opt-in `surface` row in a RadioGroup or CheckboxGroup — is a well at rest: the
+   field's own `tray` under `recessed`, so a group of choices belongs to the same sunk family as the
+   fields around it. The row that holds the selection lifts out of that family: it takes the role's
+   *soft* surface and the `control` elevation, the same lift every held choice has. It keeps the
+   soft step, not the selected one, and draws no accent rim: the stronger step and a rim made the
+   chosen row the loudest object on a quiet form. `forcedColorsBorder` keeps every row's outline in
+   forced colors. */
+export const selectableRowRest = /* @__PURE__ */ cx(material.control, elevation.recessed);
 export const selectableRowSurface = /* @__PURE__ */ cx(
-  "has-[[data-checked]]:bg-sherick-primary-soft has-[[data-checked]]:text-sherick-ink",
-  "after:pointer-events-none after:absolute after:inset-0 after:box-border after:rounded-[inherit] after:border-[1.5px] after:border-transparent after:content-['']"
+  "has-[[data-checked]]:bg-sherick-primary-soft has-[[data-checked]]:shadow-sherick-control",
+  forcedColorsBorder
 );
 
 /* Supporting copy inside such a row — a choice's description. `text.medium` clears 4.5:1 on the
@@ -945,19 +969,21 @@ export const selectableRowSurface = /* @__PURE__ */ cx(
    marker as the surface itself. */
 export const selectableRowSupporting = "group-has-[[data-checked]]:text-sherick-ink";
 
-/* An empty mark's interior: a canvas-toned well. Named on its own so the contrast model can read it
-   without retaining the whole `selectable` table in bundles that never draw a mark. */
-const markWellFill = "bg-sherick-canvas/[0.7]";
+/* An empty mark's floor: the `mark-well` tone, the deepest neutral step in light and the most lit
+   one in dark. Named on its own so the contrast model can read it without retaining the whole
+   `selectable` table in bundles that never draw a mark. */
+const markWellFill = "bg-sherick-mark-well";
 
 export const selectable = {
   surface: /* @__PURE__ */ cx("relative", elevation.recessed, motionFeedback),
-  /* A selection mark — a checkbox box, a radio socket — rests in the same groove a Switch track
-     does. While the wrapping control is held it sinks to the `well`: the floor darkens and the
-     boundary stays exactly where it was, which is how a mark that must not move under the pointer
-     answers a press. */
+  /* A selection mark — a checkbox box, a radio socket — rests at the `mark` rung: a recess one
+     step stronger than a field's, because a 20px well has to be found by its depth alone. While the
+     wrapping control is held it sinks to the `well`: the floor darkens and the boundary stays
+     exactly where it was, which is how a mark that must not move under the pointer answers a
+     press. */
   markSurface: /* @__PURE__ */ cx(
     "relative",
-    elevation.recessed,
+    elevation.mark,
     "group-[:not([data-disabled]):not([data-readonly]):not([aria-disabled=true]):not(:disabled):active]:shadow-sherick-well",
     motionFeedback
   ),
@@ -965,28 +991,20 @@ export const selectable = {
      A groove that holds labelled segments is identified by those segments, exactly as a tab list is
      identified by its labels, so it takes no boundary of its own. */
   rest: /* @__PURE__ */ cx(material.matteHigh, text.medium),
-  /* An *empty mark* — an unchecked box, an unselected radio — is a hollow control: nothing inside it
-     says what it is, and it still has to be identifiable at 3:1. Neither the neutral fill (about
-     1.3:1 against the surface around it) nor any depth the light model can draw gets it there
-     without turning the mark into a shaded orb. So an empty mark is the one control that carries
-     a **rim**: the `rim` tone, tuned to just clear 3:1 on every surface, drawn as the lip of the
-     recess it sits in rather than as an outline over a filled control. The rim belongs to the empty
-     state only — a selected mark is identified by its fill, and the rim dissolves into it.
-     The rim is an overlay rather than the mark's own border, so the fill, the hover layer and the
-     recess all reach the mark's real edge: a border would leave a 1.5px frame of untinted fill
-     around a hovered selected box. Hover steps the rim to the mid-emphasis tone — darker in light
-     mode, lighter in dark — which is a visible answer on a 20px mark where a tint alone is not. */
+  /* An *empty mark* — an unchecked box, an unselected radio — is a soft well, the same sunk
+     material a text field is, and it draws no rim. Its darker floor and the `mark` recess are what
+     make it findable, and its label names it. This is a deliberate relaxation: a 20px well does not
+     reach the 3:1 a control's boundary is normally held to, and the library accepts that for an
+     empty mark so that no control in a form is outlined. `forcedColorsBorder` keeps its outline
+     in forced colors. */
   mark: /* @__PURE__ */ cx(
     markWellFill,
     text.medium,
-    "after:pointer-events-none after:absolute after:inset-0 after:box-border after:rounded-[inherit] after:border-[1.5px] after:content-['']",
-    "after:border-sherick-rim",
-    "[@media(hover:hover)_and_(pointer:fine)]:group-[:not([data-disabled]):not([data-readonly]):not(:disabled):hover]:after:border-sherick-ink-muted",
-    motionRim
+    forcedColorsBorder
   ),
   /* A selected mark is the strong accent, edge to edge, and it settles flat: it is identified by
-     its fill and its glyph, and the rim fades out as the fill arrives. The rim fades by opacity
-     rather than by colour, so forced colors cannot repaint a transparent rim as a visible one. */
+     its fill and its glyph. The overlay is hidden by opacity as the fill arrives, so forced colors
+     cannot repaint its transparent border over a selected mark. */
   selected:
     "group-data-[checked]:bg-sherick-primary-strong group-data-[checked]:text-sherick-on-primary group-data-[checked]:shadow-sherick-flat group-data-[checked]:after:opacity-0",
   indeterminate:
@@ -1015,12 +1033,11 @@ const toneAlpha = (tone: string) => (recipe: string, label: string) => {
   if (!match) throw new Error(`recipe alpha missing for ${label}`);
   return match[1] === undefined ? 1 : Number(match[1]);
 };
-/* A field tray's `surface-high` step, its deep step, its danger step, and the canvas step an empty
-   mark's interior holds. */
-const trayAlpha = toneAlpha("surface-high");
+/* A field's `tray` step, its deep step, its danger step, and an empty mark's floor. */
+const trayAlpha = toneAlpha("tray");
 const deepTrayAlpha = toneAlpha("tray-deep");
+const markAlpha = toneAlpha("mark-well");
 const dangerTrayAlpha = toneAlpha("danger-soft");
-const markAlpha = toneAlpha("canvas");
 
 export const recipeAlphas = {
   state: {
@@ -1041,8 +1058,9 @@ export const recipeAlphas = {
   },
   field: {
     quiet: fillAlpha(material.matteQuiet, "field.quiet"),
-    card: fillAlpha(material.matte, "field.card"),
+    card: toneAlpha("surface")(material.matte, "field.card"),
     groove: fillAlpha(material.matteHigh, "field.groove"),
+    choiceRow: trayAlpha(selectableRowRest, "field.choiceRow"),
     control: trayAlpha(material.control, "field.control"),
     hover: deepTrayAlpha(state.field.hover, "field.hover"),
     engaged: deepTrayAlpha(state.field.engaged, "field.engaged"),

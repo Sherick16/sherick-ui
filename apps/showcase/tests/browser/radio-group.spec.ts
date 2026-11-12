@@ -26,7 +26,8 @@ test("surface rows keep the rich label and the whole padded row selects and subm
   await expect(daily).toHaveAccessibleName(/Daily field notes A short digest of recent observations/);
   await expect(weekly).toHaveAttribute("aria-checked", "true");
 
-  // The held row takes the soft selection surface, distinct from a resting row, and stays flat.
+  // A resting row is a well, as a field is. The held row takes the soft selection surface and lifts
+  // out of it: its shadow is the `control` elevation, not the recess.
   const surfaceOf = (row: Locator) => row.evaluate((element) => {
     const style = getComputedStyle(element);
     return { background: style.backgroundColor, shadow: style.boxShadow };
@@ -34,7 +35,16 @@ test("surface rows keep the rich label and the whole padded row selects and subm
   const selectedSurface = await surfaceOf(rowFor(weekly));
   expect(selectedSurface.background).not.toBe("rgba(0, 0, 0, 0)");
   expect(selectedSurface.background).not.toBe((await surfaceOf(dailyRow)).background);
-  expect(selectedSurface.shadow).toBe("none");
+  const elevationOf = (name: string) => page.evaluate((token) => {
+    const probe = document.createElement("div");
+    probe.style.boxShadow = `var(${token})`;
+    document.body.appendChild(probe);
+    const shadow = getComputedStyle(probe).boxShadow;
+    probe.remove();
+    return shadow;
+  }, name);
+  expect(selectedSurface.shadow).toContain(await elevationOf("--sui-elevation-control"));
+  expect((await surfaceOf(dailyRow)).shadow).toContain(await elevationOf("--sui-elevation-recessed"));
   // The mark says which row is held, so no row draws a visible rim; the transparent one is kept only
   // for forced colors to repaint.
   const rimOf = (row: Locator) => row.evaluate((element) => {
