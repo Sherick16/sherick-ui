@@ -1,29 +1,30 @@
 export type ThemeName = "light" | "dark";
 
-/* The palette is "graphite and iris": a graphite ink on a near-white canvas, white sheets, and one
-   vivid iris violet that is spent only on what the reader acts on. The neutrals carry a bare trace
-   of the accent's hue (285, chroma under 0.015), so they read as true greys yet sit in the same
-   family as the accent instead of fighting it; shadows are a violet-graphite umbra for the same
-   reason. Every value is measured by the contrast contract (docs/PALETTE.md). */
+/* The palette is "graphite and iris": a graphite ink on a pale canvas, white sheets, and one
+   vivid iris violet that is spent only on what the reader acts on. The neutral surfaces carry a
+   visible trace of the accent's hue (285 to 290, chroma 0.011 to 0.024): the page is a
+   lavender-grey in light and an indigo graphite in dark, which is the palette's character where no
+   accent is spent. Ink and the white sheet stay neutral, so text and cards do not take a colour
+   cast; shadows are a violet-graphite umbra for the same reason. Every value is measured by the contrast contract (docs/PALETTE.md). */
 export const lightTokens = {
   /* The page. It sits far enough under the white card that a card reads as a sheet on it by tone
      alone; at 0.970 a card faded into the page. A field's `tray` stays below it, so a field placed
      straight on the page is still a well. */
-  "canvas": "0.962 0.004 290",
+  "canvas": "0.960 0.011 290",
   "surface": "0.998 0.001 290",
-  "surface-high": "0.934 0.006 290",
+  "surface-high": "0.932 0.014 290",
   /* The tray: a text field's resting tone. A field is a well, sunk by `elevation-recessed`, so its
      tone is a light step under the card and the recess carries its boundary; at `surface-high`
      strength a form read as a stack of grey bars. A choice row rests on a fraction of it. */
-  "tray": "0.950 0.005 290",
+  "tray": "0.949 0.011 290",
   /* The deep tray: the step a text field sinks to under the pointer and while it is engaged. A
      field is identified by its label, its value or placeholder and its parts rather than by a drawn
      edge, so its states are carried by its tray and the focus ring; these two steps are a field's
      alone. */
-  "tray-deep": "0.922 0.007 290",
+  "tray-deep": "0.920 0.015 290",
   /* The floor of an empty checkbox or radio. A mark is a soft well with no rim, so its floor is the
      deepest neutral step: the tone and the `elevation-mark` recess are all that mark it. */
-  "mark-well": "0.900 0.008 290",
+  "mark-well": "0.902 0.016 290",
   "surface-float": "0.999 0.001 290",
   /* The puck: a held choice that rides in a track — a selected segment, the tab indicator. It is
      the one surface lit *above* every sheet in both themes, because a puck is a part lifted out of
@@ -51,8 +52,8 @@ export const lightTokens = {
      iris is a dusty mauve and a fraction of a deep ochre is a grey, so every contrast retune
      used to recolour every tinted surface. Each value clears the contrast contract with its own
      foreground, `ink` and the focus ring through the tonal states. */
-  "primary-soft": "0.952 0.024 292",
-  "primary-selected": "0.905 0.052 292",
+  "primary-soft": "0.944 0.040 292",
+  "primary-selected": "0.895 0.070 292",
   "danger-soft": "0.952 0.020 30",
   "danger-selected": "0.900 0.042 30",
   "warning-soft": "0.955 0.032 82",
@@ -134,14 +135,14 @@ export const darkTokens = {
      harder to see: the floor is well under the sheet, a field is a lit tray a step over the sheet
      (a darker pit disappears on the floor), and the neutral parts built on `surface-high` — a tonal
      button, a track, a badge — are never darker than the field. */
-  "canvas": "0.145 0.006 285",
-  "surface": "0.212 0.008 285",
-  "surface-high": "0.310 0.010 285",
-  "tray": "0.262 0.010 285",
-  "tray-deep": "0.300 0.011 285",
-  "mark-well": "0.135 0.006 285",
-  "surface-float": "0.238 0.009 285",
-  "puck": "0.335 0.012 285",
+  "canvas": "0.145 0.016 285",
+  "surface": "0.212 0.018 285",
+  "surface-high": "0.310 0.022 285",
+  "tray": "0.262 0.020 285",
+  "tray-deep": "0.300 0.022 285",
+  "mark-well": "0.135 0.014 285",
+  "surface-float": "0.238 0.019 285",
+  "puck": "0.335 0.024 285",
   "media": "0.160 0.006 285",
   "ink": "0.950 0.004 285",
   "ink-muted": "0.745 0.010 285",
@@ -149,8 +150,8 @@ export const darkTokens = {
   "rim": "0.535 0.010 285",
   "primary": "0.780 0.125 292",
   "primary-strong": "0.720 0.160 292",
-  "primary-soft": "0.300 0.075 292",
-  "primary-selected": "0.375 0.105 292",
+  "primary-soft": "0.310 0.098 292",
+  "primary-selected": "0.385 0.128 292",
   /* The dark semantic containers are tints, not slabs. An Alert or Badge sits on the same graphite
      room as the neutral one beside it, so its soft step stays close to the sheet's own lightness
      and carries only a little of its hue; the selected step is one rung lighter and a touch more
@@ -198,7 +199,7 @@ export const darkTokens = {
   "glass-hero-saturation": "1.03",
   "glass-hero-brightness": "1.0",
   "glass-hero-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.035) 0%, rgb(255 255 255 / 0.01) 12%, rgb(255 255 255 / 0) 44%, rgb(0 0 0 / 0.16) 100%)",
-  "surface-overlay": "0.226 0.008 285",
+  "surface-overlay": "0.226 0.018 285",
   "overlay-fill": "0.99",
   "scrim-blur": "8px",
   "code-text": "#dfdee6",

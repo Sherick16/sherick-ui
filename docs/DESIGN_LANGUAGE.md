@@ -4,11 +4,12 @@
 color, motion and depth are reserved for selection, manipulation and surfaces that float.
 Consistency means using the same roles, not giving every component identical anatomy.
 
-**Graphite and iris.** The page is a near-white canvas; content sits on white sheets; copy is a
+**Graphite and iris.** The page is a pale lavender-grey canvas; content sits on white sheets; copy is a
 graphite ink; and one vivid iris violet is spent only on what the reader acts on — the priority
-action, a made selection, a value's range, the focus ring. The neutrals carry only a bare trace of
-the accent's hue, so they read as true greys that belong to the accent's family rather than as a
-tinted wash, and shadows are a graphite umbra for the same reason. Dark mode is a graphite room,
+action, a made selection, a value's range, the focus ring. The neutral surfaces carry a visible trace of
+the accent's hue: the page, a field's tray and a track are a lavender-grey in light and an indigo
+graphite in dark. That tint is the palette's character where no accent is spent. Ink and the white sheet
+stay neutral, so copy and cards take no colour cast, and shadows are a graphite umbra. Dark mode is a graphite room,
 not inverted light: sheets are lit a step above the floor, the accent glows rather than shouts, and
 a floating edge is a line of light. The palette record, with every measured composition, is
 [PALETTE.md](PALETTE.md).

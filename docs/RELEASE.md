@@ -40,7 +40,8 @@ longer reads as a stack of grey bars. An empty checkbox or radio becomes a soft 
 `--sui-mark-well` and `--sui-elevation-mark` tokens); the contrast contract exempts it from the 3:1 boundary
 rule by decision. A card is the opaque surface with the new `resting` contact shadow
 (`--sui-elevation-resting`) on a deeper canvas, and the dark ladder is wider: a deeper floor, a lighter sheet
-and lighter neutral parts. Every `--sui-canvas`, `--sui-surface` and `--sui-surface-high` consumer sees the new
+and lighter neutral parts. The neutral surfaces carry more of the iris hue (a lavender-grey page in light,
+an indigo graphite in dark), and the primary soft and selected surfaces are a little richer. Every `--sui-canvas`, `--sui-surface` and `--sui-surface-high` consumer sees the new
 tones. The `themeCss` budget rose with the four new tokens, and the size-budget section records it. The current source version is `2.12.0`, and
 npm's `latest` is `2.10.1`. An installed package's actual version and exports, not this
 checkout, determine availability.
