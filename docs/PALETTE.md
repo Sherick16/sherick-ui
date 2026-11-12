@@ -29,15 +29,15 @@ warm neutrals read as yellowed beside a cool accent. The overhaul separates the 
 
 | Token | Light | Dark |
 | --- | --- | --- |
-| `--sui-canvas` | `0.970 0.003 290` | `0.160 0.006 285` |
-| `--sui-surface` | `0.998 0.001 290` | `0.200 0.008 285` |
-| `--sui-surface-high` | `0.934 0.006 290` | `0.252 0.010 285` |
-| `--sui-tray` | `0.950 0.005 290` | `0.252 0.010 285` |
-| `--sui-tray-deep` | `0.922 0.007 290` | `0.290 0.011 285` |
+| `--sui-canvas` | `0.962 0.004 290` | `0.145 0.006 285` |
+| `--sui-surface` | `0.998 0.001 290` | `0.212 0.008 285` |
+| `--sui-surface-high` | `0.934 0.006 290` | `0.310 0.010 285` |
+| `--sui-tray` | `0.950 0.005 290` | `0.262 0.010 285` |
+| `--sui-tray-deep` | `0.922 0.007 290` | `0.300 0.011 285` |
 | `--sui-mark-well` | `0.900 0.008 290` | `0.135 0.006 285` |
-| `--sui-surface-float` | `0.999 0.001 290` | `0.226 0.009 285` |
-| `--sui-puck` | `1 0 0` | `0.315 0.012 285` |
-| `--sui-surface-overlay` | `0.995 0.002 290` | `0.214 0.008 285` |
+| `--sui-surface-float` | `0.999 0.001 290` | `0.238 0.009 285` |
+| `--sui-puck` | `1 0 0` | `0.335 0.012 285` |
+| `--sui-surface-overlay` | `0.995 0.002 290` | `0.226 0.008 285` |
 | `--sui-ink` | `0.200 0.012 285` | `0.950 0.004 285` |
 | `--sui-ink-muted` | `0.480 0.014 285` | `0.745 0.010 285` |
 | `--sui-detail` | `0.590 0.012 285` | `0.605 0.010 285` |
@@ -65,7 +65,11 @@ The contract is unchanged in method and in requirement, and every composition cl
 themes. The binding compositions are still the filled press veil (light success 4.56, warning
 4.59, danger 4.64, primary 4.67; dark primary 4.51) and the drop target's rim, which is why the strong fills and the rim sit where they
 do. Since 2.12.0 an empty checkbox or radio draws no rim and is exempt from the 3:1 boundary rule
-(DESIGN_LANGUAGE §8), and a choice row rests on `selectableRowRest`. `bun run test` prints the full matrix.
+(DESIGN_LANGUAGE §8), and a choice row rests on `selectableRowRest`. 2.12.0 also widens the surface
+ladder: the light canvas is deeper and a card is the opaque `surface` with the `resting` contact shadow; the
+dark floor is deeper, the dark sheet lighter, and the dark neutral parts (`surface-high`, `puck`) lighter, with
+the puck held just under the point where the `detail` tone on it would fall below 3:1 and `surface-high` just
+under the point where a code comment on the code well would fall below 4.5:1. `bun run test` prints the full matrix.
 
 The sections below are the decision record for the values this palette replaced. Their method — and
 every alternative they rejected — still governs how a value here may change.

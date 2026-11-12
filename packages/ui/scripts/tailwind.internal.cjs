@@ -67,6 +67,7 @@ module.exports = {
         "sherick-recessed": "var(--sui-elevation-recessed)",
         "sherick-recessed-top": "var(--sui-elevation-recessed-top)",
         "sherick-well": "var(--sui-elevation-well)",
+        "sherick-resting": "var(--sui-elevation-resting)",
         "sherick-mark": "var(--sui-elevation-mark)",
       },
       transitionDuration: {

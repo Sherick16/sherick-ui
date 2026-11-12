@@ -6,7 +6,10 @@ export type ThemeName = "light" | "dark";
    family as the accent instead of fighting it; shadows are a violet-graphite umbra for the same
    reason. Every value is measured by the contrast contract (docs/PALETTE.md). */
 export const lightTokens = {
-  "canvas": "0.970 0.003 290",
+  /* The page. It sits far enough under the white card that a card reads as a sheet on it by tone
+     alone; at 0.970 a card faded into the page. A field's `tray` stays below it, so a field placed
+     straight on the page is still a well. */
+  "canvas": "0.962 0.004 290",
   "surface": "0.998 0.001 290",
   "surface-high": "0.934 0.006 290",
   /* The tray: a text field's resting tone. A field is a well, sunk by `elevation-recessed`, so its
@@ -71,6 +74,10 @@ export const lightTokens = {
   "light-top": "1 0 0",
   "light-bottom": "0.280 0.025 290",
   "elevation-flat": "none",
+  /* A card at rest on the page: a close contact shadow under its lower edge. It seats the sheet; it
+     does not lift it, so it stays well under `raised` and a button on a card is still the lifted
+     part. */
+  "elevation-resting": "0 1px 2px oklch(var(--sui-light-bottom) / 0.05), 0 3px 8px -3px oklch(var(--sui-light-bottom) / 0.08)",
   /* A contact shadow, not a float: the ambient layer stays close to the control, so a row of raised
      actions sits on the page rather than hovering over it. The inset line is the lit upper lip of a
      key — the light model's upper edge, drawn once — so a filled action reads as a pressable object
@@ -83,11 +90,9 @@ export const lightTokens = {
   /* A held selection — a puck in a track, a chosen option or date. It carries a half-pixel contact
      edge so a white puck holds its outline on the pale track around it. */
   "elevation-control": "0 0 0 0.5px oklch(var(--sui-light-bottom) / 0.10), 0 1px 3px oklch(var(--sui-light-bottom) / 0.16), inset 0 1px 0 oklch(var(--sui-light-top) / 0.70)",
-  /* The recessed rung, and the deeper `well` a small selection mark sinks to while it is held. A
-     checkbox box and a radio socket rest in the same groove a Switch track does — what identifies
-     an empty one is its rim, not its depth — so the well is a press response, not an identity. It
-     deepens the shaded floor and keeps the lit lower wall, so a held mark sinks without its
-     boundary moving. */
+  /* The recessed rung, and the deeper `well` a small selection mark sinks to while it is held. The
+     well is a press response: it deepens the shaded floor and keeps the lit lower wall, so a held
+     mark sinks without its boundary moving. */
   "elevation-recessed": "inset 0 1px 2px oklch(var(--sui-light-bottom) / 0.18), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.55)",
   "elevation-recessed-top": "inset 0 5px 8px -5px oklch(var(--sui-light-bottom) / 0.18)",
   "elevation-well": "inset 0 2px 4px oklch(var(--sui-light-bottom) / 0.34), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.80)",
@@ -125,14 +130,18 @@ export const lightTokens = {
    floor, the accent is a luminous lavender iris that glows rather than shouts, and the floating
    edge is a line of light rather than a shadow. */
 export const darkTokens = {
-  "canvas": "0.160 0.006 285",
-  "surface": "0.200 0.008 285",
-  "surface-high": "0.252 0.010 285",
-  "tray": "0.252 0.010 285",
-  "tray-deep": "0.290 0.011 285",
+  /* The dark ladder is wider than a mirror of the light one, because steps at the dark end are
+     harder to see: the floor is well under the sheet, a field is a lit tray a step over the sheet
+     (a darker pit disappears on the floor), and the neutral parts built on `surface-high` — a tonal
+     button, a track, a badge — are never darker than the field. */
+  "canvas": "0.145 0.006 285",
+  "surface": "0.212 0.008 285",
+  "surface-high": "0.310 0.010 285",
+  "tray": "0.262 0.010 285",
+  "tray-deep": "0.300 0.011 285",
   "mark-well": "0.135 0.006 285",
-  "surface-float": "0.226 0.009 285",
-  "puck": "0.315 0.012 285",
+  "surface-float": "0.238 0.009 285",
+  "puck": "0.335 0.012 285",
   "media": "0.160 0.006 285",
   "ink": "0.950 0.004 285",
   "ink-muted": "0.745 0.010 285",
@@ -167,7 +176,8 @@ export const darkTokens = {
   "light-top": "1 0 0",
   "light-bottom": "0.070 0.008 285",
   "elevation-flat": "none",
-  "elevation-raised": "0 1px 2px oklch(var(--sui-light-bottom) / 0.40), 0 3px 8px -2px oklch(var(--sui-light-bottom) / 0.30), inset 0 1px 0 oklch(var(--sui-light-top) / 0.08)",
+  "elevation-resting": "0 1px 2px oklch(var(--sui-light-bottom) / 0.45), 0 3px 8px -3px oklch(var(--sui-light-bottom) / 0.45)",
+  "elevation-raised": "0 1px 2px oklch(var(--sui-light-bottom) / 0.40), 0 3px 8px -2px oklch(var(--sui-light-bottom) / 0.30), inset 0 1px 0 oklch(var(--sui-light-top) / 0.13)",
   "elevation-floating": "0 0 0 1px oklch(var(--sui-light-top) / 0.08), 0 6px 14px -4px oklch(var(--sui-light-bottom) / 0.40), 0 26px 56px -12px oklch(var(--sui-light-bottom) / 0.65), inset 0 1px 0 oklch(var(--sui-light-top) / 0.06)",
   "elevation-control": "0 0 0 0.5px oklch(var(--sui-light-bottom) / 0.40), 0 1px 3px oklch(var(--sui-light-bottom) / 0.45), inset 0 1px 0 oklch(var(--sui-light-top) / 0.09)",
   "elevation-recessed": "inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.42), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.05)",
@@ -188,7 +198,7 @@ export const darkTokens = {
   "glass-hero-saturation": "1.03",
   "glass-hero-brightness": "1.0",
   "glass-hero-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.035) 0%, rgb(255 255 255 / 0.01) 12%, rgb(255 255 255 / 0) 44%, rgb(0 0 0 / 0.16) 100%)",
-  "surface-overlay": "0.214 0.008 285",
+  "surface-overlay": "0.226 0.008 285",
   "overlay-fill": "0.99",
   "scrim-blur": "8px",
   "code-text": "#dfdee6",

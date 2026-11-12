@@ -22,7 +22,7 @@ consumer integration are described in [ARCHITECTURE.md](ARCHITECTURE.md); valida
 
 ## 1. Governing rule
 
-Start at flat matte. Lift a control only when it is manipulated; recess a track or well
+Start at matte. A card rests on the page and nothing more; lift a control only when it is manipulated; recess a track or well
 because it is sunk; use acrylic only when a surface actually floats above the page. A hover
 or keyboard highlight never earns a new level of depth. Let one primary action hold the
 strong fill in a view rather than making every control compete for attention.
@@ -30,7 +30,7 @@ strong fill in a view rather than making every control compete for attention.
 ## 2. Material, elevation and edge
 
 These roles are independent: **material** fills a surface, **elevation** gives it distance
-from the page, and **edge** marks a structural join. A card may be matte and flat, a tonal
+from the page, and **edge** marks a structural join. A card may be matte and at rest, a tonal
 button matte and raised, and a switch track matte and recessed. A material contains no
 shadow, radius or rim. Add a line only where two parts of the same surface meet, or where a
 hollow control needs its rim (§8).
@@ -71,7 +71,8 @@ recess on a card and on the page alike. Its tone is a quiet step over the card, 
 
 | Recipe | Use | Not for |
 | --- | --- | --- |
-| `flat` | grounded passive surfaces | a recessed track |
+| `flat` | passive parts inside a surface, and quiet sheets such as a table or a tree | a recessed track |
+| `resting` | a card on the page: a close contact shadow under its lower edge, which seats the sheet without lifting it | a control, a table, a nested sheet, anything that floats |
 | `raised` | tactile tonal actions at rest | hover or passive data |
 | `control` | switch thumb, a puck held in a track, or a held selection inside a list or calendar | keyboard highlight |
 | `recessed` | grooves, tracks, a text field's well, and a raised control while pressed | flat cards or choice rows |
@@ -79,6 +80,11 @@ recess on a card and on the page alike. Its tone is a quiet step over the card, 
 | `mark` | an empty checkbox or radio at rest: a recess one step stronger than `recessed`, because a 20px well has no rim and is found by its depth | a field, a track, any wide groove |
 | `well` | a checkbox or radio while it is pressed: the floor sinks, the boundary stays | a resting mark, a wide groove |
 | `floating` | real overlay surfaces | anything in document flow |
+
+A card is separated from the page by tone first: the canvas sits a clear step under the white
+sheet in light, and the sheet is lit a clear step over the floor in dark. `resting` then seats it.
+It is weaker than `raised`, so a button on a card is still the lifted part, and it draws no line.
+Do not use it to make one card stand out from another.
 
 Actions follow one depth ladder: a text action sits flat, and tonal and filled actions are
 `raised` at rest and `recessed` while held. `raised` carries the light model's lit upper lip — one

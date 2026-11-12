@@ -252,6 +252,7 @@ for (const token of [
   "--sui-elevation-control",
   "--sui-elevation-recessed",
   "--sui-elevation-well",
+  "--sui-elevation-resting",
   "--sui-elevation-mark",
   "--sui-glass-fill",
   "--sui-glass-dense-fill",

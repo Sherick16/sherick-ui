@@ -134,6 +134,8 @@ export const forcedBoundary =
 
 export const elevation = {
   flat: "shadow-sherick-flat",
+  /* A card at rest on the page: a close contact shadow that seats the sheet without lifting it. */
+  resting: "shadow-sherick-resting",
   raised: /* @__PURE__ */ cx("shadow-sherick-raised", forcedBoundary),
   floating: /* @__PURE__ */ cx("shadow-sherick-floating", forcedBoundary),
   control: "shadow-sherick-control",
@@ -509,7 +511,7 @@ export const hitArea =
 export const material = {
   canvas: "bg-sherick-canvas text-sherick-ink",
   matteQuiet: "bg-sherick-surface/[0.42] text-sherick-ink",
-  matte: "bg-sherick-surface/[0.78] text-sherick-ink",
+  matte: "bg-sherick-surface text-sherick-ink",
   matteHigh: "bg-sherick-surface-high/[0.72] text-sherick-ink",
   control: "bg-sherick-tray text-sherick-ink placeholder:text-sherick-ink-muted",
   /* The invalid fill carries its placeholder at the *full* danger tone, not at a fraction of it. A
@@ -1046,7 +1048,7 @@ export const recipeAlphas = {
   },
   field: {
     quiet: fillAlpha(material.matteQuiet, "field.quiet"),
-    card: fillAlpha(material.matte, "field.card"),
+    card: toneAlpha("surface")(material.matte, "field.card"),
     groove: fillAlpha(material.matteHigh, "field.groove"),
     choiceRow: trayAlpha(selectableRowRest, "field.choiceRow"),
     control: trayAlpha(material.control, "field.control"),

@@ -239,6 +239,7 @@ export default function Home() {
               <Specimen title="Elevation">
                 <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
                   <Tile label="Flat" className={cn(material.matteHigh, elevation.flat)} />
+                  <Tile label="Resting" className={cn(material.matte, elevation.resting)} />
                   <Tile label="Raised" testId="tile-raised" className={cn(material.matteHigh, elevation.raised)} />
                   <Tile label="Control" className={cn(material.matteHigh, elevation.control)} />
                   <Tile label="Recessed" testId="tile-recessed" className={cn(material.matteHigh, elevation.recessed)} />
