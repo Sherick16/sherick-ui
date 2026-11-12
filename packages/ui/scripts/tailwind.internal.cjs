@@ -6,6 +6,7 @@ const colorNames = [
   "surface-high",
   "tray",
   "tray-deep",
+  "mark-well",
   "surface-float",
   "surface-overlay",
   "puck",
@@ -66,6 +67,7 @@ module.exports = {
         "sherick-recessed": "var(--sui-elevation-recessed)",
         "sherick-recessed-top": "var(--sui-elevation-recessed-top)",
         "sherick-well": "var(--sui-elevation-well)",
+        "sherick-mark": "var(--sui-elevation-mark)",
       },
       transitionDuration: {
         press: "var(--sui-duration-press)",

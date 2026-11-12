@@ -36,7 +36,9 @@ new surface, and that change records the reason. `2.10.1` aligns disclosures and
 that much inline padding, and a selected surface choice row drops its accent rim. `2.11.0` adds
 `trailingIcon` to `Button`, a mark after the label. `2.12.0` makes a text field a light well (the new
 `--sui-tray` token under `elevation.recessed`) and quiets an unselected surface choice row, so a form no
-longer reads as a stack of grey bars. The current source version is `2.12.0`, and
+longer reads as a stack of grey bars. An empty checkbox or radio becomes a soft well with no rim (the new
+`--sui-mark-well` and `--sui-elevation-mark` tokens); the contrast contract exempts it from the 3:1 boundary
+rule by decision. The `themeCss` budget rose with the three new tokens, and the size-budget section records it. The current source version is `2.12.0`, and
 npm's `latest` is `2.10.1`. An installed package's actual version and exports, not this
 checkout, determine availability.
 
@@ -340,6 +342,12 @@ The 2.6.0 form wave re-records **`form` and `barrel`** with `--update=form,barre
 Button still pulls no optional feature code (44 modules), no dependency is added, and the
 `button`, `overlay`, `disclosure`, `toast`, `toggles`, `content`, `stylesCss` and `themeCss`
 records, the 5% tolerance and the stale-shrink check are byte-for-byte unchanged.
+
+The 2.12.0 form refinement re-records **`themeCss`** with `--update=themeCss`:
+`11715 / 1978 / 1609` → `12306 / 2025 / 1649` (+47 bytes gzip). Three additive tokens cause it:
+`--sui-tray` (a text field's light well), `--sui-mark-well` and `--sui-elevation-mark` (the rimless
+well of an empty checkbox or radio). Each value is emitted three times, and the result was 6 bytes
+over the 5% tolerance. No other record moved.
 
 No other component budget is relaxed.
 

@@ -34,6 +34,7 @@ warm neutrals read as yellowed beside a cool accent. The overhaul separates the 
 | `--sui-surface-high` | `0.934 0.006 290` | `0.252 0.010 285` |
 | `--sui-tray` | `0.950 0.005 290` | `0.252 0.010 285` |
 | `--sui-tray-deep` | `0.922 0.007 290` | `0.290 0.011 285` |
+| `--sui-mark-well` | `0.900 0.008 290` | `0.135 0.006 285` |
 | `--sui-surface-float` | `0.999 0.001 290` | `0.226 0.009 285` |
 | `--sui-puck` | `1 0 0` | `0.315 0.012 285` |
 | `--sui-surface-overlay` | `0.995 0.002 290` | `0.214 0.008 285` |
@@ -62,9 +63,9 @@ warm neutrals read as yellowed beside a cool accent. The overhaul separates the 
 
 The contract is unchanged in method and in requirement, and every composition clears it in both
 themes. The binding compositions are still the filled press veil (light success 4.56, warning
-4.59, danger 4.64, primary 4.67; dark primary 4.51) and the rim (3.04 light on a choice row on the
-page, 3.22 dark on a choice row in a card), which is why the strong fills and the rim sit where they
-do, and why a choice row rests on `matteHigh` rather than the full field tray. `bun run test` prints the full matrix.
+4.59, danger 4.64, primary 4.67; dark primary 4.51) and the drop target's rim, which is why the strong fills and the rim sit where they
+do. Since 2.12.0 an empty checkbox or radio draws no rim and is exempt from the 3:1 boundary rule
+(DESIGN_LANGUAGE §8), and a choice row rests on `selectableRowRest`. `bun run test` prints the full matrix.
 
 The sections below are the decision record for the values this palette replaced. Their method — and
 every alternative they rejected — still governs how a value here may change.

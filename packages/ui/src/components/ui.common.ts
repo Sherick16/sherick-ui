@@ -142,6 +142,9 @@ export const elevation = {
      rests in the ordinary groove; this is its press, never its identity. See
      `selectable.markSurface`. */
   well: "shadow-sherick-well",
+  /* An empty selection mark at rest: a recess stronger than `recessed`, for a 20px well that has
+     no rim and must be found by its depth. */
+  mark: "shadow-sherick-mark",
 } as const;
 /* An inset sheet's shaded upper wall, without a lower rim. Kept independent so
    unrelated components do not bundle this recipe. */
@@ -949,21 +952,21 @@ export const selectableRowSurface = /* @__PURE__ */ cx(
    marker as the surface itself. */
 export const selectableRowSupporting = "group-has-[[data-checked]]:text-sherick-ink";
 
-/* An empty mark's interior: the same `tray` well a text field is, so a checkbox, a radio and a field
-   are one sunk material. A 20px well alone cannot be found, so the mark keeps its rim (see
-   `selectable.mark`). Named on its own so the contrast model can read it without retaining the whole
+/* An empty mark's floor: the `mark-well` tone, the deepest neutral step in light and a pit below
+   the card in dark. Named on its own so the contrast model can read it without retaining the whole
    `selectable` table in bundles that never draw a mark. */
-const markWellFill = "bg-sherick-tray";
+const markWellFill = "bg-sherick-mark-well";
 
 export const selectable = {
   surface: /* @__PURE__ */ cx("relative", elevation.recessed, motionFeedback),
-  /* A selection mark — a checkbox box, a radio socket — rests in the same groove a Switch track
-     does. While the wrapping control is held it sinks to the `well`: the floor darkens and the
-     boundary stays exactly where it was, which is how a mark that must not move under the pointer
-     answers a press. */
+  /* A selection mark — a checkbox box, a radio socket — rests at the `mark` rung: a recess one
+     step stronger than a field's, because a 20px well has to be found by its depth alone. While the
+     wrapping control is held it sinks to the `well`: the floor darkens and the boundary stays
+     exactly where it was, which is how a mark that must not move under the pointer answers a
+     press. */
   markSurface: /* @__PURE__ */ cx(
     "relative",
-    elevation.recessed,
+    elevation.mark,
     "group-[:not([data-disabled]):not([data-readonly]):not([aria-disabled=true]):not(:disabled):active]:shadow-sherick-well",
     motionFeedback
   ),
@@ -971,28 +974,25 @@ export const selectable = {
      A groove that holds labelled segments is identified by those segments, exactly as a tab list is
      identified by its labels, so it takes no boundary of its own. */
   rest: /* @__PURE__ */ cx(material.matteHigh, text.medium),
-  /* An *empty mark* — an unchecked box, an unselected radio — is a hollow control: nothing inside it
-     says what it is, and it still has to be identifiable at 3:1. Neither the neutral fill (about
-     1.3:1 against the surface around it) nor any depth the light model can draw gets it there
-     without turning the mark into a shaded orb. So an empty mark is the one control that carries
-     a **rim**: the `rim` tone, tuned to just clear 3:1 on every surface, drawn as the lip of the
-     recess it sits in rather than as an outline over a filled control. The rim belongs to the empty
-     state only — a selected mark is identified by its fill, and the rim dissolves into it.
-     The rim is an overlay rather than the mark's own border, so the fill, the hover layer and the
-     recess all reach the mark's real edge: a border would leave a 1.5px frame of untinted fill
-     around a hovered selected box. Hover steps the rim to the mid-emphasis tone — darker in light
-     mode, lighter in dark — which is a visible answer on a 20px mark where a tint alone is not. */
+  /* An *empty mark* — an unchecked box, an unselected radio — is a soft well, the same sunk
+     material a text field is, and it draws no rim. Its darker floor and the `mark` recess are what
+     make it findable, and its label names it. This is a deliberate relaxation: a 20px well does not
+     reach the 3:1 a control's boundary is normally held to, and the library accepts that for an
+     empty mark so that no control in a form is outlined. The overlay stays as a transparent
+     border: forced colors discards the fill and the recess and repaints that border in a system
+     colour, so a mark there keeps its outline.
+     Under the pointer the floor takes a field's engaged step, `tray-deep`. The hover veil alone
+     (`stateLayer.mark`) lifts the dark floor to the card's own tone, and the mark disappears. The
+     guard excludes a selected mark: this selector outranks `selected`, and would grey its fill. */
   mark: /* @__PURE__ */ cx(
     markWellFill,
     text.medium,
-    "after:pointer-events-none after:absolute after:inset-0 after:box-border after:rounded-[inherit] after:border-[1.5px] after:content-['']",
-    "after:border-sherick-rim",
-    "[@media(hover:hover)_and_(pointer:fine)]:group-[:not([data-disabled]):not([data-readonly]):not(:disabled):hover]:after:border-sherick-ink-muted",
-    motionRim
+    "after:pointer-events-none after:absolute after:inset-0 after:box-border after:rounded-[inherit] after:border-[1.5px] after:border-transparent after:content-['']",
+    "[@media(hover:hover)_and_(pointer:fine)]:group-[:not([data-checked]):not([data-indeterminate]):not([data-disabled]):not([data-readonly]):not(:disabled):hover]:bg-sherick-tray-deep"
   ),
   /* A selected mark is the strong accent, edge to edge, and it settles flat: it is identified by
-     its fill and its glyph, and the rim fades out as the fill arrives. The rim fades by opacity
-     rather than by colour, so forced colors cannot repaint a transparent rim as a visible one. */
+     its fill and its glyph. The overlay fades by opacity as the fill arrives, so forced colors
+     cannot repaint its transparent border over a selected mark. */
   selected:
     "group-data-[checked]:bg-sherick-primary-strong group-data-[checked]:text-sherick-on-primary group-data-[checked]:shadow-sherick-flat group-data-[checked]:after:opacity-0",
   indeterminate:
@@ -1021,9 +1021,10 @@ const toneAlpha = (tone: string) => (recipe: string, label: string) => {
   if (!match) throw new Error(`recipe alpha missing for ${label}`);
   return match[1] === undefined ? 1 : Number(match[1]);
 };
-/* A field's `tray` step, which an empty mark's interior shares, its deep step and its danger step. */
+/* A field's `tray` step, its deep step, its danger step, and an empty mark's floor. */
 const trayAlpha = toneAlpha("tray");
 const deepTrayAlpha = toneAlpha("tray-deep");
+const markAlpha = toneAlpha("mark-well");
 const dangerTrayAlpha = toneAlpha("danger-soft");
 
 export const recipeAlphas = {
@@ -1051,7 +1052,7 @@ export const recipeAlphas = {
     control: trayAlpha(material.control, "field.control"),
     hover: deepTrayAlpha(state.field.hover, "field.hover"),
     engaged: deepTrayAlpha(state.field.engaged, "field.engaged"),
-    mark: trayAlpha(markWellFill, "field.mark"),
+    mark: markAlpha(markWellFill, "field.mark"),
     error: dangerTrayAlpha(material.controlError, "field.error"),
   },
 } as const;

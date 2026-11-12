@@ -59,9 +59,9 @@
     },
     "themeCss": {
       "definition": "Published token-only theme stylesheet.",
-      "raw": 11715,
-      "gzip": 1978,
-      "brotli": 1609
+      "raw": 12306,
+      "gzip": 2025,
+      "brotli": 1649
     }
   }
 }

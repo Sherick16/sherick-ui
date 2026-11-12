@@ -18,6 +18,9 @@ export const lightTokens = {
      edge, so its states are carried by its tray and the focus ring; these two steps are a field's
      alone. */
   "tray-deep": "0.922 0.007 290",
+  /* The floor of an empty checkbox or radio. A mark is a soft well with no rim, so its floor is the
+     deepest neutral step: the tone and the `elevation-mark` recess are all that mark it. */
+  "mark-well": "0.900 0.008 290",
   "surface-float": "0.999 0.001 290",
   /* The puck: a held choice that rides in a track — a selected segment, the tab indicator. It is
      the one surface lit *above* every sheet in both themes, because a puck is a part lifted out of
@@ -31,7 +34,7 @@ export const lightTokens = {
      third step of the text ladder. It answers to the 3:1 non-text requirement wherever it carries
      meaning; anything a reader must read uses `ink` or `ink-muted`. */
   "detail": "0.590 0.012 285",
-  /* The rim of a hollow control — a drop target, an empty checkbox or radio. It is the
+  /* The rim of a hollow control — a drop target. It is the
      only border a control carries, so it is tuned to clear the 3:1 non-text requirement against
      every surface a control sits on with a small margin and no more: at `detail` strength the rim
      outshone the labels beside it. Hover steps it to `ink-muted`. */
@@ -87,7 +90,10 @@ export const lightTokens = {
      boundary moving. */
   "elevation-recessed": "inset 0 1px 2px oklch(var(--sui-light-bottom) / 0.18), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.55)",
   "elevation-recessed-top": "inset 0 5px 8px -5px oklch(var(--sui-light-bottom) / 0.18)",
-  "elevation-well": "inset 0 2px 4px oklch(var(--sui-light-bottom) / 0.34), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.55)",
+  "elevation-well": "inset 0 2px 4px oklch(var(--sui-light-bottom) / 0.34), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.80)",
+  /* An empty mark at rest. Stronger than `recessed` and with a brighter lower lip: a 20px well has
+     no rim, so the shaded upper wall and the lit lip are its whole boundary. */
+  "elevation-mark": "inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.30), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.80)",
   /* Fill isolates content even without backdrop filtering; blur only enriches the remaining light. */
   "glass-fill": "0.98",
   "glass-blur": "28px",
@@ -124,6 +130,7 @@ export const darkTokens = {
   "surface-high": "0.252 0.010 285",
   "tray": "0.252 0.010 285",
   "tray-deep": "0.290 0.011 285",
+  "mark-well": "0.135 0.006 285",
   "surface-float": "0.226 0.009 285",
   "puck": "0.315 0.012 285",
   "media": "0.160 0.006 285",
@@ -165,7 +172,8 @@ export const darkTokens = {
   "elevation-control": "0 0 0 0.5px oklch(var(--sui-light-bottom) / 0.40), 0 1px 3px oklch(var(--sui-light-bottom) / 0.45), inset 0 1px 0 oklch(var(--sui-light-top) / 0.09)",
   "elevation-recessed": "inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.42), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.05)",
   "elevation-recessed-top": "inset 0 5px 8px -5px oklch(var(--sui-light-bottom) / 0.40)",
-  "elevation-well": "inset 0 2px 4px oklch(var(--sui-light-bottom) / 0.62), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.05)",
+  "elevation-well": "inset 0 2px 4px oklch(var(--sui-light-bottom) / 0.80), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.12)",
+  "elevation-mark": "inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.65), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.12)",
   "glass-fill": "0.98",
   "glass-blur": "32px",
   "glass-saturation": "1.12",

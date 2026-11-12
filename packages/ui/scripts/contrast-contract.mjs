@@ -124,14 +124,14 @@ export const contrastCompositions = (variables, alphas) => {
   const overlayFill = Number(variables["--sui-overlay-fill"]);
   /* A field is a tray in the `tray` tone over whatever holds it; the common case is a card.
      Under the pointer and while engaged it sinks to the deep tray. A choice row rests on the
-     `selectableRowRest` step. An empty mark's interior is the same `tray` well. */
+     `selectableRowRest` step. An empty mark's floor is the `mark-well` tone. */
   const card = composite(surface, FIELD.card, canvas);
   /* The code well is the `matteHigh` step over the card (`recipeAlphas.code.well`), not a canvas tint. */
   const codeWell = composite(surfaceHigh, alphas.code.well, card);
   const tray = (alpha, base = card) => composite(colour("tray"), alpha, base);
   const deepTray = (alpha, base = card) => composite(colour("tray-deep"), alpha, base);
   const choiceRow = (base = card) => composite(colour("tray"), FIELD.choiceRow, base);
-  const markWell = composite(colour("tray"), FIELD.mark, card);
+  const markWell = composite(colour("mark-well"), FIELD.mark, card);
   const dangerTray = (base) => composite(colour("danger-soft"), FIELD.error, base);
   const surfaces = {
     canvas,
@@ -370,12 +370,8 @@ export const contrastCompositions = (variables, alphas) => {
   add(
     "a hollow control's rim on the surfaces it sits on",
     WCAG_NON_TEXT,
-    "a drop target's dashes, an unchecked box and an unselected radio are hollow controls identified by their `rim`, tuned to clear this by a small margin; a selected mark drops the rim and is identified by its fill. A text field is identified by its label and content and draws no rim",
-    [
-      ...controlEntries.map(([where, base]) => [where, colour("rim"), base]),
-      ["unselected mark on a choice row in a card", colour("rim"), choiceRow()],
-      ["unselected mark on a choice row on the page", colour("rim"), choiceRow(canvas)],
-    ]
+    "a drop target's dashes are a hollow control's `rim`, tuned to clear this by a small margin. A text field is identified by its label and content and draws no rim. An empty checkbox or radio is a soft well with no rim: it is exempt from this rule by decision (DESIGN_LANGUAGE §8), and its label and its recess identify it",
+    controlEntries.map(([where, base]) => [where, colour("rim"), base])
   );
   add(
     "text on a choice row through its states",
