@@ -15,6 +15,7 @@ import { Search01Icon } from "@hugeicons/core-free-icons";
 import { cn, type TimerHandle } from "@/libs/utils";
 import {
   density,
+  elevation,
   fieldLayout,
   fieldMessage,
   focusRingInset,
@@ -180,6 +181,7 @@ const Search = forwardRef<HTMLInputElement, SearchProps>(
                   shape.control,
                   material.control,
                   rim.field,
+                  elevation.recessed,
                   motionFeedback,
                   focusRingWithin,
                   !disabled && state.field.hover,

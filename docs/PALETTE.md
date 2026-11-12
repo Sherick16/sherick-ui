@@ -32,7 +32,8 @@ warm neutrals read as yellowed beside a cool accent. The overhaul separates the 
 | `--sui-canvas` | `0.970 0.003 290` | `0.160 0.006 285` |
 | `--sui-surface` | `0.998 0.001 290` | `0.200 0.008 285` |
 | `--sui-surface-high` | `0.934 0.006 290` | `0.252 0.010 285` |
-| `--sui-tray-deep` | `0.900 0.008 290` | `0.290 0.011 285` |
+| `--sui-tray` | `0.950 0.005 290` | `0.252 0.010 285` |
+| `--sui-tray-deep` | `0.922 0.007 290` | `0.290 0.011 285` |
 | `--sui-surface-float` | `0.999 0.001 290` | `0.226 0.009 285` |
 | `--sui-puck` | `1 0 0` | `0.315 0.012 285` |
 | `--sui-surface-overlay` | `0.995 0.002 290` | `0.214 0.008 285` |

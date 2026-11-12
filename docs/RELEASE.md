@@ -34,7 +34,9 @@ major rather than minor. The `overlay`, `toggles` and `stylesCss` budgets in `bu
 new surface, and that change records the reason. `2.10.1` aligns disclosures and quiets choice rows:
 `Accordion` and `Collapsible` rows and panels hang their 1rem inset, so a disclosure's parent needs
 that much inline padding, and a selected surface choice row drops its accent rim. `2.11.0` adds
-`trailingIcon` to `Button`, a mark after the label. The current source version is `2.11.0`, and
+`trailingIcon` to `Button`, a mark after the label. `2.12.0` makes a text field a light well (the new
+`--sui-tray` token under `elevation.recessed`) and quiets an unselected surface choice row, so a form no
+longer reads as a stack of grey bars. The current source version is `2.12.0`, and
 npm's `latest` is `2.10.1`. An installed package's actual version and exports, not this
 checkout, determine availability.
 

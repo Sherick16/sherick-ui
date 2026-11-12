@@ -151,6 +151,7 @@ const Select = React.forwardRef<HTMLButtonElement, SelectProps>(
                 shape.control,
                 material.control,
                 rim.field,
+                elevation.recessed,
                 motionFeedback,
                 focusRingHeld,
                 state.busy,

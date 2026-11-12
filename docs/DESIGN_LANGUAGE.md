@@ -50,7 +50,7 @@ a sideways shadow or an upward-lit gradient to one component.
 | `canvas` | application background | nested content |
 | `matteQuiet`, `matte`, `matteHigh` | quiet, ordinary and stronger grounded surfaces; every sunk track (slider groove, progress track, segment track) is `matteHigh`, so its full extent stays visible on a card | floating UI |
 | `matteInset` | a passive sheet tucked beneath a stronger control, visible but quieter than that control | independent cards or fields |
-| `control`, `controlError` | text fields and the file drop target: an opaque **tray** in the `surface-high` tone, which under the pointer and while engaged sinks to `tray-deep`; the invalid form is the danger soft surface, with a danger placeholder. (An empty checkbox or radio keeps its canvas-toned well.) | passive cards, buttons |
+| `control`, `controlError` | text fields and the file drop target: an opaque **tray** in the light `tray` tone. A text field sinks it with `recessed` (§5), so it is a well; under the pointer and while engaged it deepens to `tray-deep`; the invalid form is the danger soft surface, with a danger placeholder. (An empty checkbox or radio keeps its canvas-toned well.) | passive cards, buttons |
 | `handle` | a small value-control part that must remain findable, even disabled | large surfaces |
 | `acrylic`, `acrylicDense`, `acrylicHero` | anchored sheets, compact hints, viewport-owning overlays respectively | grounded content |
 
@@ -74,7 +74,7 @@ recess on a card and on the page alike. Its tone is a quiet step over the card, 
 | `flat` | grounded passive surfaces | a recessed track |
 | `raised` | tactile tonal actions at rest | hover or passive data |
 | `control` | switch thumb, a puck held in a track, or a held selection inside a list or calendar | keyboard highlight |
-| `recessed` | grooves, tracks, a checkbox or radio at rest, and a raised control while pressed | fields or flat cards |
+| `recessed` | grooves, tracks, a text field's well, a checkbox or radio at rest, and a raised control while pressed | flat cards or choice rows |
 | `recessedTop` | the upper wall of an inset sheet continuing directly below a control, without a lower rim | standalone tracks or wells |
 | `well` | a checkbox or radio while it is pressed: the floor sinks, the boundary stays | a resting mark, a wide groove |
 | `floating` | real overlay surfaces | anything in document flow |
@@ -156,8 +156,10 @@ to identify a control, and a field identified by its label and content needs no 
 underline or box on every field is what made a form read as a stack of ruled inputs; the tray
 alone says "something goes here".
 
-- the tray is opaque `surface-high`, the same on a card and on the page; the pointer, focus and an
-  open popup sink it to `tray-deep`, and the focus ring (§14) is what says the field is engaged;
+- the tray is the opaque `tray` tone, a light step under the card, and `elevation.recessed` sinks
+  it: the recess, not a heavy fill, marks the field on a card and on the page alike, and at
+  `surface-high` strength a form read as a stack of grey bars; the pointer, focus and an open popup
+  deepen it to `tray-deep`, and the focus ring (§14) is what says the field is engaged;
 - an invalid field is the danger tray — the danger soft surface — with a danger placeholder and the
   message beneath, which carries the error in words;
 - `rim.field` is a transparent border on every side: forced colors discards the tray and repaints
@@ -218,8 +220,8 @@ reads as the field opening rather than as a second surface beside it.
 There are **two readable text roles**: `text.high` for labels and values, `text.medium`
 for descriptions, placeholders and supporting copy. `detail.mark` and `detail.fill`
 are non-text furniture roles, never a third step for readable text. Surface tones
-(`canvas`, `surface`, `surface-high`, `tray-deep`, `surface-float`, `puck`) are not elevations.
-`tray-deep` belongs only to a text field under the pointer or engaged (§8). `puck` is the
+(`canvas`, `surface`, `surface-high`, `tray`, `tray-deep`, `surface-float`, `puck`) are not elevations.
+`tray` is a text field's resting tone and `tray-deep` its tone under the pointer or engaged (§8). `puck` is the
 brightest surface in both themes and belongs only to a choice held in a track (§5).
 
 | Tone | Meaning |
@@ -353,9 +355,10 @@ own label, not the whole menu sheet. A quiet target whose label rises on hover a
 as a dismiss glyph, takes `state.quietInk`: its ink rises from `text.medium` to `text.high`, and no state
 layer is drawn behind it.
 
-RadioGroup's opt-in surface rows rest on the `matteHigh` tray, so every choice reads as a target
-before any is chosen, and the row that holds the selection takes the primary *soft* surface and stays
-flat. The mark the row houses is what says "this one"; an accent rim around the row repeated it, and
+RadioGroup's opt-in surface rows rest on `selectableRowRest` — the `tray` tone at 60%, flat — so
+every choice reads as a target before any is chosen, no row reads as a field, and the row that holds
+the selection is the strongest row in its group: it takes the primary *soft* surface and stays flat.
+An unselected row is never darker than the selected one. The mark the row houses is what says "this one"; an accent rim around the row repeated it, and
 the selected step and a lift turned a whole card into an accent block that outshouted the priority
 action beside it. The resting tray stays light enough
 that an empty mark's rim still clears 3:1 against it.

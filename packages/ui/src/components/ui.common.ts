@@ -314,9 +314,9 @@ export const state = {
      deep step; a composite field engages its outer surface while the input inside stays borderless;
      an expanded control holds the engaged step while its popup is open. Tonality and the focus ring
      carry the state, so no border appears and disappears. */
-  /* A field is a tray in the `surface-high` tone, so it reads as a quiet recess in light and a
-     quiet step up in dark. It draws no line: its label and content identify it (see `rim`), so the
-     tray is laid at full strength to say "something goes here" on a card and on the page alike.
+  /* A field is a well: the light `tray` tone, sunk by `elevation.recessed`. It
+     draws no line: its label and content identify it (see `rim`), and the recess, not a heavy fill,
+     says "something goes here" on a card and on the page alike.
      The pointer sinks it to the deep tray, and so does engagement — focus or an open popup — where
      the focus ring is what says "this one is engaged"; an engaged field never falls back under the
      pointer, because both states share the step. An invalid field is the danger tray — the role's
@@ -471,8 +471,9 @@ export const hitArea =
    - matteInset:  a passive sheet tucked under a stronger control; subdued without
                   blending into the canvas or needing a drawn rim.
    - control:     the fill every text control shares, plus its placeholder tone: an opaque tray
-                  in the `surface-high` tone. The tray says "something goes here"; the field's
-                  label and content, not a drawn edge, are what identify it (see `rim`).
+                  in the `tray` tone, which a field sinks with `elevation.recessed`. The well says
+                  "something goes here"; the field's label and content, not a drawn edge, are what
+                  identify it (see `rim`).
    - handle:      the fill of a small part the user has to find — a value control's handle.
                   Surface steps sit within a few percent of their neighbours, so this role
                   takes the mid-emphasis tone, which inverts with the theme and separates in
@@ -505,7 +506,7 @@ export const material = {
   matteQuiet: "bg-sherick-surface/[0.42] text-sherick-ink",
   matte: "bg-sherick-surface/[0.78] text-sherick-ink",
   matteHigh: "bg-sherick-surface-high/[0.72] text-sherick-ink",
-  control: "bg-sherick-surface-high text-sherick-ink placeholder:text-sherick-ink-muted",
+  control: "bg-sherick-tray text-sherick-ink placeholder:text-sherick-ink-muted",
   /* The invalid fill carries its placeholder at the *full* danger tone, not at a fraction of it. A
      placeholder is text, so it answers to the same 4.5:1 the copy beside it does, and a partial
      opacity of an accent is a different colour from the accent: the 72%-opacity placeholder
@@ -925,14 +926,15 @@ export const currentDestination = {
    brightest surface and a white row on it would vanish. */
 export const puck = "bg-sherick-puck";
 
-/* A choice row — an opt-in `surface` row in a RadioGroup or CheckboxGroup — rests on the
-   `matteHigh` tray, so every choice in the group reads as a target before any is chosen; it stays
-   light enough that the empty mark's rim still clears 3:1 against it. The row that holds the
-   selection takes the role's *soft* surface and stays flat. The mark it houses is what says "this
+/* A choice row — an opt-in `surface` row in a RadioGroup or CheckboxGroup — rests on
+   `selectableRowRest`: a flat step quieter than a field's well, so every choice in the group reads
+   as a target before any is chosen, no row reads as a field, and the row that holds the selection
+   is the strongest row in the group. That row takes the role's *soft* surface and stays flat. The mark it houses is what says "this
    one": an accent rim around the row repeated it and made the chosen row the loudest object on a
    quiet form, and the selected step and a lift turned a whole card into an accent block. The
    transparent overlay stays, so forced colors keeps every row's outline, and the fill and the hover
    layer still reach the row's real edge. */
+export const selectableRowRest = "bg-sherick-tray/[0.6] text-sherick-ink";
 export const selectableRowSurface = /* @__PURE__ */ cx(
   "has-[[data-checked]]:bg-sherick-primary-soft has-[[data-checked]]:text-sherick-ink",
   "after:pointer-events-none after:absolute after:inset-0 after:box-border after:rounded-[inherit] after:border-[1.5px] after:border-transparent after:content-['']"
@@ -1015,9 +1017,9 @@ const toneAlpha = (tone: string) => (recipe: string, label: string) => {
   if (!match) throw new Error(`recipe alpha missing for ${label}`);
   return match[1] === undefined ? 1 : Number(match[1]);
 };
-/* A field tray's `surface-high` step, its deep step, its danger step, and the canvas step an empty
-   mark's interior holds. */
-const trayAlpha = toneAlpha("surface-high");
+/* A field's `tray` step, its deep step, its danger step, and the canvas step an empty mark's
+   interior holds. */
+const trayAlpha = toneAlpha("tray");
 const deepTrayAlpha = toneAlpha("tray-deep");
 const dangerTrayAlpha = toneAlpha("danger-soft");
 const markAlpha = toneAlpha("canvas");
@@ -1043,6 +1045,7 @@ export const recipeAlphas = {
     quiet: fillAlpha(material.matteQuiet, "field.quiet"),
     card: fillAlpha(material.matte, "field.card"),
     groove: fillAlpha(material.matteHigh, "field.groove"),
+    choiceRow: trayAlpha(selectableRowRest, "field.choiceRow"),
     control: trayAlpha(material.control, "field.control"),
     hover: deepTrayAlpha(state.field.hover, "field.hover"),
     engaged: deepTrayAlpha(state.field.engaged, "field.engaged"),

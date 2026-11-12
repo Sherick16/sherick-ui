@@ -7,6 +7,7 @@ import React, { forwardRef, type ComponentProps, type PointerEvent, type ReactNo
 import { cn } from "@/libs/utils";
 import {
   density,
+  elevation,
   focusRingWithin,
   iconStroke,
   material,
@@ -163,6 +164,7 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
             focusRingWithin,
             material.control,
             rim.field,
+            elevation.recessed,
             state.field.invalid,
             !fieldDisabled && state.field.hover,
             !fieldDisabled && state.field.focusWithin,

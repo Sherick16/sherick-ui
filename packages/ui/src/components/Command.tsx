@@ -5,7 +5,7 @@ import React, { forwardRef, useId, useMemo, type ReactNode } from "react";
 import { HugeiconsIcon } from "@hugeicons/react";
 import { Search01Icon } from "@hugeicons/core-free-icons";
 import { cn } from "@/libs/utils";
-import { density, focusRingWithin, iconSlot, iconStroke, list, material, rim, shape, state, text, type } from "./ui.common";
+import { density, elevation, focusRingWithin, iconSlot, iconStroke, list, material, rim, shape, state, text, type } from "./ui.common";
 import { motionFeedback } from "./ui.motion";
 
 /** The English copy a command list names itself and its parts with. */
@@ -236,6 +236,7 @@ const Command = forwardRef<HTMLInputElement, CommandProps>(({
             shape.control,
             material.control,
             rim.field,
+            elevation.recessed,
             motionFeedback,
             focusRingWithin,
             !disabled && state.field.hover,

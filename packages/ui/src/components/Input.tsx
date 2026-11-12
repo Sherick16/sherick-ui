@@ -10,6 +10,7 @@ import React, {
 } from "react";
 import { cn } from "@/libs/utils";
 import {
+  elevation,
   fieldLabel,
   fieldLayout,
   fieldMessage,
@@ -137,6 +138,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                   focusRingWithin,
                   material.control,
                   rim.field,
+                  elevation.recessed,
                   state.field.invalid,
                   !disabled && state.field.hover,
                   !disabled && state.field.focusWithin,
@@ -171,6 +173,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(
                 focusRing,
                 invalid ? material.controlError : material.control,
                 rim.field,
+                elevation.recessed,
                 !disabled && (invalid ? state.field.errorHover : state.field.hover),
                 !disabled && (invalid ? state.field.errorFocus : state.field.focus),
                 disabled ? state.disabled : state.text,

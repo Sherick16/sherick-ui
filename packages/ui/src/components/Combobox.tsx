@@ -502,6 +502,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>((props, ref) => {
             shape.control,
             material.control,
             rim.field,
+            elevation.recessed,
             motionTactileField,
             focusRingWithin,
             !fieldDisabled && !open && state.field.hover,
