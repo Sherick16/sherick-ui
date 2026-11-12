@@ -124,14 +124,14 @@ export const contrastCompositions = (variables, alphas) => {
   const overlayFill = Number(variables["--sui-overlay-fill"]);
   /* A field is a tray in the `tray` tone over whatever holds it; the common case is a card.
      Under the pointer and while engaged it sinks to the deep tray. A choice row rests on the
-     `selectableRowRest` step. An empty mark's interior is a canvas-toned well. */
+     `selectableRowRest` step. An empty mark's interior is the same `tray` well. */
   const card = composite(surface, FIELD.card, canvas);
   /* The code well is the `matteHigh` step over the card (`recipeAlphas.code.well`), not a canvas tint. */
   const codeWell = composite(surfaceHigh, alphas.code.well, card);
   const tray = (alpha, base = card) => composite(colour("tray"), alpha, base);
   const deepTray = (alpha, base = card) => composite(colour("tray-deep"), alpha, base);
   const choiceRow = (base = card) => composite(colour("tray"), FIELD.choiceRow, base);
-  const markWell = composite(canvas, FIELD.mark, card);
+  const markWell = composite(colour("tray"), FIELD.mark, card);
   const dangerTray = (base) => composite(colour("danger-soft"), FIELD.error, base);
   const surfaces = {
     canvas,

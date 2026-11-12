@@ -50,7 +50,7 @@ a sideways shadow or an upward-lit gradient to one component.
 | `canvas` | application background | nested content |
 | `matteQuiet`, `matte`, `matteHigh` | quiet, ordinary and stronger grounded surfaces; every sunk track (slider groove, progress track, segment track) is `matteHigh`, so its full extent stays visible on a card | floating UI |
 | `matteInset` | a passive sheet tucked beneath a stronger control, visible but quieter than that control | independent cards or fields |
-| `control`, `controlError` | text fields and the file drop target: an opaque **tray** in the light `tray` tone. A text field sinks it with `recessed` (§5), so it is a well; under the pointer and while engaged it deepens to `tray-deep`; the invalid form is the danger soft surface, with a danger placeholder. (An empty checkbox or radio keeps its canvas-toned well.) | passive cards, buttons |
+| `control`, `controlError` | text fields and the file drop target: an opaque **tray** in the light `tray` tone. A text field sinks it with `recessed` (§5), so it is a well; under the pointer and while engaged it deepens to `tray-deep`; the invalid form is the danger soft surface, with a danger placeholder. (An empty checkbox or radio is the same `tray` well, inside its rim.) | passive cards, buttons |
 | `handle` | a small value-control part that must remain findable, even disabled | large surfaces |
 | `acrylic`, `acrylicDense`, `acrylicHero` | anchored sheets, compact hints, viewport-owning overlays respectively | grounded content |
 
@@ -162,8 +162,9 @@ alone says "something goes here".
   deepen it to `tray-deep`, and the focus ring (§14) is what says the field is engaged;
 - an invalid field is the danger tray — the danger soft surface — with a danger placeholder and the
   message beneath, which carries the error in words;
-- `rim.field` is a transparent border on every side: forced colors discards the tray and repaints
-  the border in a system colour, so a field there keeps its whole outline;
+- `rim.field` is a border under forced colors only: forced colors discards the tray and its
+  recess, and the border, in a system colour, gives the field its whole outline. In normal colours
+  a field has no border, so the recess starts at the field's real edge;
 - a bare text field with no placeholder and no part is the one field its tray alone identifies:
   give it a placeholder or a part where the form allows, and never place it where the tray is lost
   (on a `surface-high` fill);
@@ -330,7 +331,7 @@ separate calendar glyph, not its text field, owns the popup press.
 
 Checkboxes, radios, switch tracks and slider grooves retain their boundaries through state
 changes. Their selection fills or marks arrive **inside** the boundary; switch thumbs move, but
-tracks do not bounce. A checkbox or radio is a 20px mark: empty, it is a well with a rim; hover
+tracks do not bounce. A checkbox or radio is a 20px mark: empty, it is the field's own `tray` well with a rim, because a 20px well alone cannot be found; hover
 lifts the rim and lays the light `stateLayer.mark` step inside it; a press sinks it to the
 `well` rung without moving it; checked, mixed and selected marks are the strong accent edge to
 edge, flat, with a tick, a minus or a light dot. The accent belongs to a slider's range;

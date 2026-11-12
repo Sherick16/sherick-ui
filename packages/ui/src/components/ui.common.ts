@@ -218,10 +218,12 @@ export const edgeTone = {
    chevron, a calendar glyph, a stepper — show what it is and where it is, which is how WCAG 1.4.11
    lets a control be identified without a 3:1 edge. Its tray says "something goes here", and its
    states ride on the tray and the focus ring (`state.field`). `rim.field` is therefore no visible
-   line: it is a transparent border on all four sides, because forced colors repaints even a
-   transparent border in a system colour, so a field there keeps its whole outline where the tray is
-   discarded; the scoped baseline sizes boxes by their border edge, so it never changes a field's
-   footprint. An invalid field takes the same transparent border.
+   line: it is a border that exists under forced colors only, where the tray and its recess are
+   discarded and the border, in a system colour, gives the field its whole outline. In normal
+   colours a field has no border at all: an inset shadow starts at the padding edge, so even a
+   transparent border leaves a band of plain tray outside the recess, which reads as a double edge.
+   The scoped baseline sizes boxes by their border edge, so the border never changes a field's
+   footprint. An invalid field takes the same border.
    A drop target's rim is dashed, and the dashes are a mask over an overlay rather than the native
    `dashed` style, whose dash length and corner joins the platform decides: the mask fixes the dash
    rhythm and follows the `control` corner exactly. The mask is authored in `tokens.ts`. */
@@ -229,7 +231,7 @@ const dashedRimMask =
   "after:[mask-image:var(--sui-rim-dashed)] after:[mask-size:100%_100%] after:[mask-repeat:no-repeat]";
 
 export const rim = {
-  field: "border-[1.5px] border-transparent",
+  field: "forced-colors:border-[1.5px]",
   dashed: /* @__PURE__ */ cx(
     "after:pointer-events-none after:absolute after:inset-0 after:rounded-[inherit] after:content-['']",
     "after:bg-sherick-rim",
@@ -947,9 +949,11 @@ export const selectableRowSurface = /* @__PURE__ */ cx(
    marker as the surface itself. */
 export const selectableRowSupporting = "group-has-[[data-checked]]:text-sherick-ink";
 
-/* An empty mark's interior: a canvas-toned well. Named on its own so the contrast model can read it
-   without retaining the whole `selectable` table in bundles that never draw a mark. */
-const markWellFill = "bg-sherick-canvas/[0.7]";
+/* An empty mark's interior: the same `tray` well a text field is, so a checkbox, a radio and a field
+   are one sunk material. A 20px well alone cannot be found, so the mark keeps its rim (see
+   `selectable.mark`). Named on its own so the contrast model can read it without retaining the whole
+   `selectable` table in bundles that never draw a mark. */
+const markWellFill = "bg-sherick-tray";
 
 export const selectable = {
   surface: /* @__PURE__ */ cx("relative", elevation.recessed, motionFeedback),
@@ -1017,12 +1021,10 @@ const toneAlpha = (tone: string) => (recipe: string, label: string) => {
   if (!match) throw new Error(`recipe alpha missing for ${label}`);
   return match[1] === undefined ? 1 : Number(match[1]);
 };
-/* A field's `tray` step, its deep step, its danger step, and the canvas step an empty mark's
-   interior holds. */
+/* A field's `tray` step, which an empty mark's interior shares, its deep step and its danger step. */
 const trayAlpha = toneAlpha("tray");
 const deepTrayAlpha = toneAlpha("tray-deep");
 const dangerTrayAlpha = toneAlpha("danger-soft");
-const markAlpha = toneAlpha("canvas");
 
 export const recipeAlphas = {
   state: {
@@ -1049,7 +1051,7 @@ export const recipeAlphas = {
     control: trayAlpha(material.control, "field.control"),
     hover: deepTrayAlpha(state.field.hover, "field.hover"),
     engaged: deepTrayAlpha(state.field.engaged, "field.engaged"),
-    mark: markAlpha(markWellFill, "field.mark"),
+    mark: trayAlpha(markWellFill, "field.mark"),
     error: dangerTrayAlpha(material.controlError, "field.error"),
   },
 } as const;
