@@ -70,7 +70,7 @@ themes. The binding compositions are still the filled press veil (light success 
 floor binds too: it is held as a surface for text and detail (light primary text on a pressed mark
 4.54, detail 3.07; dark detail 3.11), which is why `mark-well` is no deeper in light and no more
 lit in dark. Since 2.12.0 an empty checkbox or radio draws no rim and is exempt from the 3:1 boundary rule
-(DESIGN_LANGUAGE §8), and a choice row rests on `selectableRowRest`. 2.12.0 also widens the surface
+(DESIGN_LANGUAGE §8). 2.12.0 also widens the surface
 ladder: the light canvas is deeper and a card is the opaque `surface` with the `resting` contact shadow; the
 dark floor is deeper, the dark sheet lighter, and the dark neutral parts (`surface-high`, `puck`) lighter, with
 the puck held just under the point where the `detail` tone on it would fall below 3:1 and `surface-high` just

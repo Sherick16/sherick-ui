@@ -144,7 +144,7 @@ export const elevation = {
   control: "shadow-sherick-control",
   recessed: "shadow-sherick-recessed",
   /* One rung further down: the depth a small selection mark sinks to while it is held. A mark
-     rests in the ordinary groove; this is its press, never its identity. See
+     rests at the `mark` rung; this is its press, never its identity. See
      `selectable.markSurface`. */
   well: "shadow-sherick-well",
   /* An empty selection mark at rest: a recess stronger than `recessed`, for a 20px well that has
@@ -1003,7 +1003,7 @@ export const selectable = {
     forcedColorsBorder
   ),
   /* A selected mark is the strong accent, edge to edge, and it settles flat: it is identified by
-     its fill and its glyph. The overlay fades by opacity as the fill arrives, so forced colors
+     its fill and its glyph. The overlay is hidden by opacity as the fill arrives, so forced colors
      cannot repaint its transparent border over a selected mark. */
   selected:
     "group-data-[checked]:bg-sherick-primary-strong group-data-[checked]:text-sherick-on-primary group-data-[checked]:shadow-sherick-flat group-data-[checked]:after:opacity-0",
