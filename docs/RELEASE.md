@@ -374,7 +374,13 @@ The 2.14.0 glass sheets re-record **`themeCss`** with `--update=themeCss`:
 values cause it: `--sui-glaze`, `--sui-glaze-fill` and `--sui-glaze-sheen` (a card's glazed sheet),
 `--sui-canvas-wash` (the page's wash, three gradients in dark), `--sui-elevation-floating-sheet` (a
 floating sheet's contour glow) and the longer `--sui-elevation-resting` (an ambient fall and the
-contour glow). Each value is emitted three times. No other record moved.
+contour glow). Each value is emitted three times.
+
+The same release re-records **`stylesCss`** with `--update=stylesCss`: `144099 / 18487 / 15168` →
+`151719 / 19395 / 15871` (+908 bytes gzip). The component stylesheet embeds the theme, so it carries the
+same token growth, plus four scoped utilities for the glazed sheet, the canvas wash and the floating
+sheet's elevation. The record was already near its 5% tolerance before this change. No other record
+moved.
 
 No other component budget is relaxed.
 
