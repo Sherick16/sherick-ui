@@ -319,7 +319,7 @@ test("the Wave B family reads its semantics from the theme, not from local color
     .getByRole("menuitem", { name: "Rename" })
     .evaluate((element) => getComputedStyle(element).color);
   const sheetLabel = await page
-    .locator(".sui-scope.shadow-sherick-floating")
+    .locator(".sui-scope:is(.shadow-sherick-floating, .shadow-sherick-floating-sheet)")
     .evaluate((element) => getComputedStyle(element).color);
   const expectedDanger = await page.evaluate(() => {
     const probe = document.createElement("div");

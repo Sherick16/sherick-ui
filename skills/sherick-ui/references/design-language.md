@@ -18,7 +18,8 @@ Material, elevation and edge answer different questions: what fills a surface, h
 far it sits from the page, and where two parts meet. A different surface tone does
 not imply a different elevation.
 
-- Grounded content uses matte surfaces, separated by tone. Passive cards stay flat;
+- Grounded content uses matte surfaces, separated by tone. A card is a glazed sheet (from
+  2.14.0) seated by its `resting` elevation;
   grooves and wells can be recessed because that is their anatomy.
 - Tactile controls have shallow depth. Held choices have a selected surface, while
   transient hover/highlight and navigation-only current rows do not acquire depth.

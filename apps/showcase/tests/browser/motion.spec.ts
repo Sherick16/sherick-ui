@@ -360,9 +360,9 @@ test("Select carries tactile, orientation, arrival and anchored presence", async
   expect((await motionOf(chevron)).property).toBe("transform");
   await expectTiming(page, chevron, "--sui-ease-release");
 
-  const entrance = await seekOnStart(page, ".sui-scope.shadow-sherick-floating[data-base-ui-focusable]", "transform", [0]);
+  const entrance = await seekOnStart(page, ".sui-scope:is(.shadow-sherick-floating, .shadow-sherick-floating-sheet)[data-base-ui-focusable]", "transform", [0]);
   await trigger.click();
-  const popup = page.locator(".sui-scope.shadow-sherick-floating[data-base-ui-focusable]");
+  const popup = page.locator(".sui-scope:is(.shadow-sherick-floating, .shadow-sherick-floating-sheet)[data-base-ui-focusable]");
   await expect(popup).toBeVisible();
   await expect(popup).toHaveAttribute("data-side", "bottom");
 
@@ -409,7 +409,7 @@ test("Combobox matches Select and filtering does not choreograph the list", asyn
   expect((await motionOf(chevron)).transform).toBe("none");
 
   await trigger.click();
-  const popup = page.locator(".sui-scope.shadow-sherick-floating");
+  const popup = page.locator(".sui-scope:is(.shadow-sherick-floating, .shadow-sherick-floating-sheet)");
   await expect(popup).toBeVisible();
   await expectDuration(page, popup, "--sui-duration-overlay");
 
@@ -558,7 +558,7 @@ test("reduced motion drops every spatial entrance and keeps the state response",
   await page.getByRole("button", { name: "Open popover" }).click();
   await expect(page.getByTestId("popover-state")).toHaveText("open");
 
-  const popup = page.locator(".sui-scope.shadow-sherick-floating");
+  const popup = page.locator(".sui-scope:is(.shadow-sherick-floating, .shadow-sherick-floating-sheet)");
   await expect(popup).toBeVisible();
   expect((await motionOf(popup)).property, "reduced presence is opacity only").toBe("opacity");
 
@@ -655,7 +655,7 @@ test("a repositioned or rapidly reversed surface never replays or queues", async
   await page.getByRole("button", { name: "Open popover" }).click();
   await expect(page.getByTestId("popover-state")).toHaveText("open");
 
-  const shell = page.locator(".sui-scope.shadow-sherick-floating");
+  const shell = page.locator(".sui-scope:is(.shadow-sherick-floating, .shadow-sherick-floating-sheet)");
   await expect(shell).toBeVisible();
   const settled = (await entrances(page)).length;
 
@@ -669,7 +669,7 @@ test("a repositioned or rapidly reversed surface never replays or queues", async
   await page.goto("/verification/motion");
   await page.getByTestId("motion-speed-slow").click();
   await page.getByTestId("lab-popover-trigger").click();
-  const labShell = page.locator(".sui-scope.shadow-sherick-floating[data-base-ui-focusable]");
+  const labShell = page.locator(".sui-scope:is(.shadow-sherick-floating, .shadow-sherick-floating-sheet)[data-base-ui-focusable]");
   await expect(labShell).toBeVisible();
 
   /* Let the entrance make progress before it is interrupted, so the reversal has a painted
@@ -699,7 +699,7 @@ test("a repositioned or rapidly reversed surface never replays or queues", async
 */
 
 const lab = "/verification/motion";
-const labPopupSelector = ".sui-scope.shadow-sherick-floating[data-base-ui-focusable]";
+const labPopupSelector = ".sui-scope:is(.shadow-sherick-floating, .shadow-sherick-floating-sheet)[data-base-ui-focusable]";
 
 const openLab = async (page: Page) => {
   await page.goto(lab);

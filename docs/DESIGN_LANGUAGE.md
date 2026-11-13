@@ -31,7 +31,7 @@ strong fill in a view rather than making every control compete for attention.
 ## 2. Material, elevation and edge
 
 These roles are independent: **material** fills a surface, **elevation** gives it distance
-from the page, and **edge** marks a structural join. A card may be matte and at rest, a tonal
+from the page, and **edge** marks a structural join. A card may be glazed and at rest, a tonal
 button matte and raised, and a switch track matte and recessed. A material contains no
 shadow, radius or rim. Add a line only where two parts of the same surface meet, or where a
 hollow control needs its rim (§8).
@@ -63,8 +63,9 @@ pools of colour at its top in light and a faint violet and blue glow in dark. Th
 backdrop filter**: an in-flow card sits only on the page's own smooth wash, which a blur would not
 change. Its contour glow belongs to `elevation.resting` (§5). Keep the dark values where they are: at 80%
 fill and below, or with a brighter edge, the glass outshone its content. Do not glaze a table, a field or
-a sheet nested in a card, and do not use it to make one card stand out. Under forced colors the sheen is
-dropped. A semantic card keeps its role's opaque soft surface under the same elevation.
+a sheet nested in a card, and do not use it to make one card stand out. Under forced colors the sheen and
+the page's wash are dropped. A `className` that retones a card replaces its fill and keeps its sheen, as
+it does on an acrylic sheet; add `bg-none` to drop the sheen too. A semantic card keeps its role's opaque soft surface under the same elevation.
 
 An anchored sheet carries enough of its own tone to cover content behind it, with no blur of its
 own (§6): its legibility is its fill. Use the material by what the surface **is**, not by
@@ -106,11 +107,11 @@ Actions follow one depth ladder: a text action sits flat, and tonal and filled a
 `raised` at rest and `recessed` while held. `raised` carries the light model's lit upper lip — one
 inset line of `light-top` — so a filled action reads as a key rather than a flat swatch; `control`
 adds a half-pixel contact edge so a white puck keeps its outline on a pale track; and
-`floating` holds a hairline contact edge (an umbra line in light, a line of light in dark) so a
-white sheet over a white card never loses its boundary. These lines belong to the elevation, not to
+`floating` and `floatingSheet` hold a hairline contact edge (an umbra line in light, a line of light in dark) so a
+sheet over a card never loses its boundary. These lines belong to the elevation, not to
 the component: no component draws a rim to separate a surface. The priority action is never flatter than the
 secondary one beside it, so depth never contradicts the fill hierarchy. `raised` is a contact
-shadow, not a float: a row of raised actions sits on the page. `raised` and `floating` also draw a
+shadow, not a float: a row of raised actions sits on the page. `raised`, `floating` and `floatingSheet` also draw a
 system-coloured outline under forced colors (§14), because forced colors removes the shadow that carries
 their boundary.
 
@@ -140,7 +141,8 @@ a floating sheet is the same glass at 98 to 99% fill, because it must stay legib
 take the diffuse light at their top and the contour glow at their edge (`resting`, `floatingSheet`). A
 control is solid and keeps a crisp lip, and a well is sunk; neither is glass. A floating sheet shows its
 light through its **tone**, not through a lower fill: in light it is a faint step off white
-(`surface-float`, `surface-overlay`). Without a blur, a lower fill shows the copy behind a popup as a
+(`surface-float`, `surface-overlay`); a tooltip and a floating icon button share that tone and keep
+their crisp lip. Without a blur, a lower fill shows the copy behind a popup as a
 ghost, so do not lower `--sui-glass-fill` or `--sui-overlay-fill` to make a sheet look more like glass.
 
 The glass carries **no backdrop filter**. Every presence recipe animates the popup node itself, and a
@@ -295,7 +297,7 @@ a **selected** step (`--sui-<role>-selected`) one rung stronger. Soft and select
 designed values, never a fraction of the foreground: the foreground is tuned for text contrast,
 and a fraction of a deep accent is a greyed version of its hue. The neutral soft step is a step
 *within* its container (`surface-high` over whatever holds it), so a neutral badge or tag stays
-visible inside a card; a neutral card itself is the matte surface.
+visible inside a card; a neutral card itself is the glazed sheet (§4).
 
 Supporting copy inside a row that holds a selection takes full ink (`selectableRowSupporting`):
 `text.medium` is measured against resting surfaces and falls just short of 4.5:1 on the selected
@@ -638,7 +640,7 @@ keyboard mechanics, form participation and restoration where available. Forced c
 replace lost tone/depth with system-color boundaries for selection, highlight and focus. A Switch track takes
 `forced-colors:border`, and its thumb opts out of forced-color adjustment and paints `Highlight` in both states; a rim is
 a real border (or a masked fill with a system colour), so hollow controls keep theirs. A shell that separates by depth alone carries its boundary in its recipe:
-`elevation.floating` and `elevation.raised` both include `forcedBoundary`, a system-coloured outline, so
+`elevation.floating`, `elevation.floatingSheet` and `elevation.raised` all include `forcedBoundary`, a system-coloured outline, so
 overlays and raised actions keep their edge. A control that draws no outline of its own writes
 `[outline-style:none]`, never `outline-none` or a bare `outline-0`: a transparent two-pixel outline is
 painted as a box in forced colors, and a zero width does not stop the browser's own `:focus-visible`

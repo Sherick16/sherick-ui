@@ -392,6 +392,8 @@ for (const dangerousUtility of [
 for (const criticalUtility of [
   "shadow-sherick-raised",
   "shadow-sherick-floating",
+  "shadow-sherick-floating-sheet",
+  "shadow-sherick-resting",
   "shadow-sherick-control",
   "shadow-sherick-recessed",
   "border-sherick-edge",

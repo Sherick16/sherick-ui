@@ -538,7 +538,7 @@ export const hitArea =
                   markedly more opaque and calmer than the smaller sheets: it has to
                   read first as a physical surface and only secondarily as glass, so the
                   scrim behind it does the separating, and the
-                  gradient is a restrained top-to-bottom light rather than a frosted
+                  gradient is a restrained light from the top rather than a frosted
                   haze. Its tone is a subtle step above the canvas in every theme —
                   in dark mode a small step above the canvas rather than a light grey
                   sheet — which is how it separates without leaning on its shadow, and
@@ -546,7 +546,7 @@ export const hitArea =
                   than the page behind it — a large overlay leans on that, not on blur. */
 export const material = {
   /* The wash is the page's own light, part of the material (`--sui-canvas-wash`). */
-  canvas: "bg-sherick-canvas bg-[image:var(--sui-canvas-wash)] text-sherick-ink",
+  canvas: "bg-sherick-canvas bg-[image:var(--sui-canvas-wash)] forced-colors:bg-none text-sherick-ink",
   matteQuiet: "bg-sherick-surface/[0.42] text-sherick-ink",
   matte: "bg-sherick-surface text-sherick-ink",
   glazed:

@@ -375,7 +375,7 @@ test("acrylic fill isolates date and command surfaces without depending on backd
       // The glass carries no backdrop filter (DESIGN_LANGUAGE.md §6), so the authored fill alone
       // isolates the surface; the reset below keeps the check meaningful if a filter ever returns.
       expect(await css(popup, "backdrop-filter")).toBe("none");
-      expect(await css(popup, "background-image")).toContain("linear-gradient");
+      expect(await css(popup, "background-image")).toContain("radial-gradient");
       const alpha = await popup.evaluate(element => {
         element.style.setProperty("backdrop-filter", "none");
         element.style.setProperty("-webkit-backdrop-filter", "none");
@@ -392,7 +392,7 @@ test("acrylic fill isolates date and command surfaces without depending on backd
       if (title === "Palette") {
         await popup.getByRole("combobox").fill("nothing matches");
         await expect(popup).toContainText("No commands found.");
-        expect(await css(popup, "background-image")).toContain("linear-gradient");
+        expect(await css(popup, "background-image")).toContain("radial-gradient");
       }
       await page.keyboard.press("Escape");
       await expect(popup).toBeHidden();
