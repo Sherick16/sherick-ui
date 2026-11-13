@@ -138,7 +138,10 @@ on the page and never floats.
 **One light, two densities.** A sheet is glass: a card is glass seated on the page (about 85% fill) and
 a floating sheet is the same glass at 98 to 99% fill, because it must stay legible over anything. Both
 take the diffuse light at their top and the contour glow at their edge (`resting`, `floatingSheet`). A
-control is solid and keeps a crisp lip, and a well is sunk; neither is glass.
+control is solid and keeps a crisp lip, and a well is sunk; neither is glass. A floating sheet shows its
+light through its **tone**, not through a lower fill: in light it is a faint step off white
+(`surface-float`, `surface-overlay`). Without a blur, a lower fill shows the copy behind a popup as a
+ghost, so do not lower `--sui-glass-fill` or `--sui-overlay-fill` to make a sheet look more like glass.
 
 The glass carries **no backdrop filter**. Every presence recipe animates the popup node itself, and a
 backdrop filter on an animated node re-blurs the page on every frame (§12). The glass fills are 98 to 99%

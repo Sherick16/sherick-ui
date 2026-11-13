@@ -249,6 +249,7 @@ for (const token of [
   "--sui-edge",
   "--sui-elevation-raised",
   "--sui-elevation-floating",
+  "--sui-elevation-floating-sheet",
   "--sui-elevation-control",
   "--sui-elevation-recessed",
   "--sui-elevation-well",
