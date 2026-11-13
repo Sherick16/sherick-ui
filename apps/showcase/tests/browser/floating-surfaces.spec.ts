@@ -7,7 +7,7 @@ const layerOf = (locator: Locator) =>
    can be asked about. `.sui-scope` proves the portaled subtree established the private style
    scope; the elevation, shape and acrylic classes prove it composed the shared overlay recipe
    rather than reconstructing a sheet of its own. */
-const floatingShell = (page: Page) => page.locator(".sui-scope.shadow-sherick-floating");
+const floatingShell = (page: Page) => page.locator(".sui-scope:is(.shadow-sherick-floating, .shadow-sherick-floating-sheet)");
 
 const tokenColor = (page: Page, variable: string) =>
   page.evaluate((name) => {
@@ -137,7 +137,7 @@ test.describe("Popover", () => {
     await page.keyboard.press("Escape");
     await expect(shell).toHaveCount(0);
     await page.getByRole("button", { name: "Open popover" }).click();
-    const below = page.locator('.sui-scope.shadow-sherick-floating[data-side="bottom"]');
+    const below = page.locator('.sui-scope:is(.shadow-sherick-floating, .shadow-sherick-floating-sheet)[data-side="bottom"]');
     await expect(below).toBeVisible();
     const underneath = await originY(below);
     expect(underneath.y).toBeLessThan(underneath.half);

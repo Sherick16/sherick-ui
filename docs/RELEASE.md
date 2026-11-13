@@ -51,7 +51,13 @@ the options an overview table needs, all additive: `Table` `appearance="flush"`,
 fixes change what a consumer can see at `size="sm"` only: a `sm` `Combobox`, `NumberField` and
 `DatePicker` are now 40px like a `sm` `Search`, `Select` and `Button` (their 44px parts overhang the field
 instead of growing it), and the date fields' native input now fills the field's height, which also gives
-it a full-height target. The current source version is `2.13.0`, and
+it a full-height target. `2.14.0` glazes the card: a neutral `Card` is the new `--sui-glaze` tone at
+`--sui-glaze-fill` with a `--sui-glaze-sheen`, `--sui-elevation-resting` gains a soft ambient fall and a
+contour glow, and the canvas gains `--sui-canvas-wash`. Floating sheets (popup, menu, toast, dialog, drawer) take
+the same light through the new `--sui-elevation-floating-sheet`, radial `--sui-glass-gradient` and
+`--sui-glass-hero-gradient` values and a toned light sheet (`--sui-surface-float` and `--sui-surface-overlay` are
+`0.980 0.006 290`); a tooltip and a floating icon button keep `--sui-elevation-floating`. No backdrop filter is
+used, and no component or prop changes. A page that paints its own canvas adds `background-image: var(--sui-canvas-wash)`. The current source version is `2.14.0`, and
 npm's `latest` is `2.10.1`. An installed package's actual version and exports, not this
 checkout, determine availability.
 
@@ -362,6 +368,19 @@ The 2.12.0 form refinement re-records **`themeCss`** with `--update=themeCss`:
 well of an empty checkbox or radio) and `--sui-elevation-resting` (a card's contact shadow). Each
 value is emitted three times, and the first three alone were 6 bytes over the 5% tolerance. No
 other record moved.
+
+The 2.14.0 glass sheets re-record **`themeCss`** with `--update=themeCss`:
+`12696 / 2063 / 1699` → `15583 / 2397 / 1921` (+334 bytes gzip). Five additive tokens and longer
+values cause it: `--sui-glaze`, `--sui-glaze-fill` and `--sui-glaze-sheen` (a card's glazed sheet),
+`--sui-canvas-wash` (the page's wash, three gradients in dark), `--sui-elevation-floating-sheet` (a
+floating sheet's contour glow) and the longer `--sui-elevation-resting` (an ambient fall and the
+contour glow). Each value is emitted three times.
+
+The same release re-records **`stylesCss`** with `--update=stylesCss`: `144099 / 18487 / 15168` →
+`151719 / 19395 / 15871` (+908 bytes gzip). The component stylesheet embeds the theme, so it carries the
+same token growth, plus four scoped utilities for the glazed sheet, the canvas wash and the floating
+sheet's elevation. The record was already near its 5% tolerance before this change. No other record
+moved.
 
 No other component budget is relaxed.
 

@@ -18,7 +18,10 @@ warm neutrals read as yellowed beside a cool accent. The overhaul separates the 
   0.015. Since 2.12.0 the neutral *surfaces* — canvas, tray, `surface-high`, and every dark sheet —
   carry more of the accent's hue (chroma 0.011 to 0.024), so the page reads as a lavender-grey in
   light and an indigo graphite in dark. Light sheets stay white, and the card separates from the
-  canvas by tone and its `resting` contact shadow.
+  canvas by tone and its `resting` elevation. Since 2.14.0 a card is the `glaze` tone at
+  `--sui-glaze-fill` (84% light, 85% dark) over the canvas and its wash; the contract measures that
+  composite as the card. The light floating sheets (`surface-float`, `surface-overlay`) step down to
+  `0.980 0.006 290` in the same release, so their white sheen and contour glow show on a near-whole fill.
 - **One vivid accent.** `primary` is an iris violet (hue 292, chroma 0.205), the most saturated value
   the filled press veil allows at that lightness. In dark it is a luminous lavender fill with
   graphite labels.
@@ -33,13 +36,14 @@ warm neutrals read as yellowed beside a cool accent. The overhaul separates the 
 | --- | --- | --- |
 | `--sui-canvas` | `0.960 0.011 290` | `0.145 0.016 285` |
 | `--sui-surface` | `0.998 0.001 290` | `0.212 0.018 285` |
+| `--sui-glaze` | `0.992 0.004 290` | `0.226 0.021 288` |
 | `--sui-surface-high` | `0.932 0.014 290` | `0.310 0.022 285` |
 | `--sui-tray` | `0.949 0.011 290` | `0.262 0.020 285` |
 | `--sui-tray-deep` | `0.920 0.015 290` | `0.300 0.022 285` |
 | `--sui-mark-well` | `0.902 0.016 290` | `0.335 0.024 285` |
-| `--sui-surface-float` | `0.999 0.001 290` | `0.238 0.019 285` |
+| `--sui-surface-float` | `0.980 0.006 290` | `0.238 0.019 285` |
 | `--sui-puck` | `1 0 0` | `0.335 0.024 285` |
-| `--sui-surface-overlay` | `0.995 0.002 290` | `0.226 0.018 285` |
+| `--sui-surface-overlay` | `0.980 0.006 290` | `0.226 0.018 285` |
 | `--sui-ink` | `0.200 0.012 285` | `0.950 0.004 285` |
 | `--sui-ink-muted` | `0.480 0.014 285` | `0.745 0.010 285` |
 | `--sui-detail` | `0.590 0.012 285` | `0.605 0.010 285` |

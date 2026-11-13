@@ -4,7 +4,7 @@
 color, motion and depth are reserved for selection, manipulation and surfaces that float.
 Consistency means using the same roles, not giving every component identical anatomy.
 
-**Graphite and iris.** The page is a pale lavender-grey canvas; content sits on white sheets; copy is a
+**Graphite and iris.** The page is a pale lavender-grey canvas; content sits on glazed white sheets; copy is a
 graphite ink; and one vivid iris violet is spent only on what the reader acts on — the priority
 action, a made selection, a value's range, the focus ring. The neutral surfaces carry a visible trace of
 the accent's hue: the page, a field's tray and a track are a lavender-grey in light and an indigo
@@ -23,7 +23,7 @@ consumer integration are described in [ARCHITECTURE.md](ARCHITECTURE.md); valida
 
 ## 1. Governing rule
 
-Start at matte. A card rests on the page and nothing more; lift a control only when it is manipulated; recess a track or well
+Start at matte. A card is a glazed sheet that rests on the page and nothing more; lift a control only when it is manipulated; recess a track or well
 because it is sunk; use acrylic only when a surface actually floats above the page. A hover
 or keyboard highlight never earns a new level of depth. Let one primary action hold the
 strong fill in a view rather than making every control compete for attention.
@@ -31,7 +31,7 @@ strong fill in a view rather than making every control compete for attention.
 ## 2. Material, elevation and edge
 
 These roles are independent: **material** fills a surface, **elevation** gives it distance
-from the page, and **edge** marks a structural join. A card may be matte and at rest, a tonal
+from the page, and **edge** marks a structural join. A card may be glazed and at rest, a tonal
 button matte and raised, and a switch track matte and recessed. A material contains no
 shadow, radius or rim. Add a line only where two parts of the same surface meet, or where a
 hollow control needs its rim (§8).
@@ -48,12 +48,24 @@ a sideways shadow or an upward-lit gradient to one component.
 
 | Recipe | Use | Not for |
 | --- | --- | --- |
-| `canvas` | application background | nested content |
+| `canvas` | application background, with the page's wash (`--sui-canvas-wash`) | nested content |
+| `glazed` | a card's sheet: glass seated on the page | tables, fields, nested sheets, floating UI |
 | `matteQuiet`, `matte`, `matteHigh` | quiet, ordinary and stronger grounded surfaces; every sunk track (slider groove, progress track, segment track) is `matteHigh`, so its full extent stays visible on a card | floating UI |
 | `matteInset` | a passive sheet tucked beneath a stronger control, visible but quieter than that control | independent cards or fields |
 | `control`, `controlError` | text fields and the file drop target: an opaque **tray** in the light `tray` tone. A text field sinks it with `recessed` (§5), so it is a well; under the pointer and while engaged it deepens to `tray-deep`; the invalid form is the danger soft surface, with a danger placeholder. (An empty checkbox or radio is a well of its own, the `mark-well` tone; see §8.) | passive cards, buttons |
 | `handle` | a small value-control part that must remain findable, even disabled | large surfaces |
 | `acrylic`, `acrylicDense`, `acrylicHero` | anchored sheets, compact hints, viewport-owning overlays respectively | grounded content |
+
+**A card is glazed.** Its fill is the `glaze` tone at 84% in light and 85% in dark, so a trace of the
+page shows through, and a sheen lights its top: a diffuse pool of white in light, a trace of light in
+dark, where the sheet is smoked glass. The page supplies what the glass shows: the canvas carries a wash, two soft
+pools of colour at its top in light and a faint violet and blue glow in dark. The glaze carries **no
+backdrop filter**: an in-flow card sits only on the page's own smooth wash, which a blur would not
+change. Its contour glow belongs to `elevation.resting` (§5). Keep the dark values where they are: at 80%
+fill and below, or with a brighter edge, the glass outshone its content. Do not glaze a table, a field or
+a sheet nested in a card, and do not use it to make one card stand out. Under forced colors the sheen and
+the page's wash are dropped. A `className` that retones a card replaces its fill and keeps its sheen, as
+it does on an acrylic sheet; add `bg-none` to drop the sheen too. A semantic card keeps its role's opaque soft surface under the same elevation.
 
 An anchored sheet carries enough of its own tone to cover content behind it, with no blur of its
 own (§6): its legibility is its fill. Use the material by what the surface **is**, not by
@@ -73,29 +85,33 @@ recess on a card and on the page alike. Its tone is a quiet step over the card, 
 | Recipe | Use | Not for |
 | --- | --- | --- |
 | `flat` | passive parts inside a surface, and quiet sheets such as a table or a tree | a recessed track |
-| `resting` | a card on the page: a close contact shadow under its lower edge, which seats the sheet without lifting it | a control, a table, a nested sheet, anything that floats |
+| `resting` | a card on the page: a contact shadow and a soft ambient fall under its lower edge, which seat the sheet without lifting it, and the glazed sheet's contour glow | a control, a table, a nested sheet, anything that floats |
 | `raised` | tactile tonal actions at rest | hover or passive data |
 | `control` | switch thumb, a puck held in a track, a held selection inside a list or calendar, or the chosen row of a surface choice group | keyboard highlight |
 | `recessed` | grooves, tracks, a text field's well, an unselected surface choice row, and a raised control while pressed | flat cards |
 | `recessedTop` | the upper wall of an inset sheet continuing directly below a control, without a lower rim | standalone tracks or wells |
 | `mark` | an empty checkbox or radio at rest: a recess one step stronger than `recessed`, because a 20px well has no rim and is found by its depth | a field, a track, any wide groove |
 | `well` | a checkbox or radio while it is pressed: the floor sinks, the boundary stays | a resting mark, a wide groove |
-| `floating` | real overlay surfaces | anything in document flow |
+| `floating` | a small floating part: a tooltip, a floating icon button. It keeps a crisp lit lip | anything in document flow, a floating sheet |
+| `floatingSheet` | a floating sheet: popup, menu, toast, dialog, drawer. The floating depth with the glass's contour glow | a small floating part, anything in document flow |
 
 A card is separated from the page by tone first: the canvas sits a clear step under the white
 sheet in light, and the sheet is lit a clear step over the floor in dark. `resting` then seats it.
-It is weaker than `raised`, so a button on a card is still the lifted part, and it draws no line.
-Do not use it to make one card stand out from another.
+Its ambient fall is long and soft, never a crisp lift, so a button on a card is still the lifted part.
+It also carries the glass's **contour glow**: a faint line on the edge, then light that fades inward
+from the top edge and, more quietly, from the bottom (white in light, a trace in dark). The glow is soft
+on purpose: a crisp bright rim read as a drawn outline, and the glow reads as the edge of a frosted
+pane. Do not use it to make one card stand out from another.
 
 Actions follow one depth ladder: a text action sits flat, and tonal and filled actions are
 `raised` at rest and `recessed` while held. `raised` carries the light model's lit upper lip — one
 inset line of `light-top` — so a filled action reads as a key rather than a flat swatch; `control`
 adds a half-pixel contact edge so a white puck keeps its outline on a pale track; and
-`floating` holds a hairline contact edge (an umbra line in light, a line of light in dark) so a
-white sheet over a white card never loses its boundary. These lines belong to the elevation, not to
+`floating` and `floatingSheet` hold a hairline contact edge (an umbra line in light, a line of light in dark) so a
+sheet over a card never loses its boundary. These lines belong to the elevation, not to
 the component: no component draws a rim to separate a surface. The priority action is never flatter than the
 secondary one beside it, so depth never contradicts the fill hierarchy. `raised` is a contact
-shadow, not a float: a row of raised actions sits on the page. `raised` and `floating` also draw a
+shadow, not a float: a row of raised actions sits on the page. `raised`, `floating` and `floatingSheet` also draw a
 system-coloured outline under forced colors (§14), because forced colors removes the shadow that carries
 their boundary.
 
@@ -117,7 +133,17 @@ alone does not reach 3:1 on a 20px mark, and the language accepts that for an em
 `acrylicDense` to compact hints; `acrylicHero` to dialogs and edge-attached drawers. The
 large sheet is calmer and more self-contained than the small one; the scrim separates it
 from the page. Retune acrylic at the theme owner, never by giving one popup a custom blur
-or fill. Cards, tables and fields stay matte.
+or fill. Tables and fields stay matte, and a card is `glazed` (§4), which is not acrylic: it is seated
+on the page and never floats.
+
+**One light, two densities.** A sheet is glass: a card is glass seated on the page (about 85% fill) and
+a floating sheet is the same glass at 98 to 99% fill, because it must stay legible over anything. Both
+take the diffuse light at their top and the contour glow at their edge (`resting`, `floatingSheet`). A
+control is solid and keeps a crisp lip, and a well is sunk; neither is glass. A floating sheet shows its
+light through its **tone**, not through a lower fill: in light it is a faint step off white
+(`surface-float`, `surface-overlay`); a tooltip and a floating icon button share that tone and keep
+their crisp lip. Without a blur, a lower fill shows the copy behind a popup as a
+ghost, so do not lower `--sui-glass-fill` or `--sui-overlay-fill` to make a sheet look more like glass.
 
 The glass carries **no backdrop filter**. Every presence recipe animates the popup node itself, and a
 backdrop filter on an animated node re-blurs the page on every frame (§12). The glass fills are 98 to 99%
@@ -271,7 +297,7 @@ a **selected** step (`--sui-<role>-selected`) one rung stronger. Soft and select
 designed values, never a fraction of the foreground: the foreground is tuned for text contrast,
 and a fraction of a deep accent is a greyed version of its hue. The neutral soft step is a step
 *within* its container (`surface-high` over whatever holds it), so a neutral badge or tag stays
-visible inside a card; a neutral card itself is the matte surface.
+visible inside a card; a neutral card itself is the glazed sheet (§4).
 
 Supporting copy inside a row that holds a selection takes full ink (`selectableRowSupporting`):
 `text.medium` is measured against resting surfaces and falls just short of 4.5:1 on the selected
@@ -549,7 +575,7 @@ with how much a surface holds and how long it is read:
 | `Alert` | 16px inline, 14px block | a status in the page flow, kept slimmer than a card; a one-line alert is 52px high |
 | `Toast` | 16px | a brief message beside the work, not over it |
 | `Popover`, `CommandPalette` | 20px | an anchored or command sheet that holds a few parts |
-| `Card` | 24px | a matte surface that groups a section of a page |
+| `Card` | 24px | a glazed sheet that groups a section of a page |
 | `Dialog`, `Drawer`, `AlertDialog` | 24px inline (28px from `sm`), 20px top and bottom | a modal surface read in full; the header reserves 64px at its end for the dismissal target |
 
 `Drawer` and `AlertDialog` build on the dialog's own header, description and footer, so the three
@@ -614,7 +640,7 @@ keyboard mechanics, form participation and restoration where available. Forced c
 replace lost tone/depth with system-color boundaries for selection, highlight and focus. A Switch track takes
 `forced-colors:border`, and its thumb opts out of forced-color adjustment and paints `Highlight` in both states; a rim is
 a real border (or a masked fill with a system colour), so hollow controls keep theirs. A shell that separates by depth alone carries its boundary in its recipe:
-`elevation.floating` and `elevation.raised` both include `forcedBoundary`, a system-coloured outline, so
+`elevation.floating`, `elevation.floatingSheet` and `elevation.raised` all include `forcedBoundary`, a system-coloured outline, so
 overlays and raised actions keep their edge. A control that draws no outline of its own writes
 `[outline-style:none]`, never `outline-none` or a bare `outline-0`: a transparent two-pixel outline is
 painted as a box in forced colors, and a zero width does not stop the browser's own `:focus-visible`
@@ -634,7 +660,9 @@ is made from inside the list, because the primitive hides everything outside an 
 The authored values live in `src/styles/tokens.ts`: light and dark are calibrated
 separately, with system dark generated from the same dark object. An absent root theme
 attribute follows `prefers-color-scheme`; `data-sherick-theme="light"` and `"dark"`
-force a mode. Consumers retune `--sui-*` variables at document/root level. Nested theme
+force a mode. Consumers retune `--sui-*` variables at document/root level. A page that paints its
+own canvas adds `background-image: var(--sui-canvas-wash)` to it, so a glazed card has the page's light
+behind it. Nested theme
 islands are not promised because overlays portal outside local subtrees. See the
 [README](../README.md#light-dark-and-system-themes) for the consumer contract.
 
@@ -721,7 +749,8 @@ scroll wrapper alone.
 The language above governs objects; these rules carry it to pages. They are guidance for
 consumers and for the repository's own examples, not new primitives.
 
-- **A surface sits on canvas.** A card is a matte surface on the canvas. Do not nest a card in a
+- **A surface sits on canvas.** A card is a glazed sheet on the canvas, and the canvas carries its
+  wash. Do not nest a card in a
   card to group content: inside a surface, group with spacing, a type role and an `edge.rule`. A table
   inside a card is `flush` for the same reason.
   Specimens of surfaces are shown on a canvas band, not inside another card.

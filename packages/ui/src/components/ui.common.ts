@@ -113,7 +113,8 @@ export const groupFocusRing =
 /* Elevation — distance from the surface plane, and nothing else. These depth roles
    exist, and `control` and `recessed` are a single tactile pair:
    - flat:     at rest on the page. Separation comes from tone alone.
-   - resting:  a card seated on the page by a close contact shadow, not lifted.
+   - resting:  a card seated on the page by a contact shadow and a soft ambient fall, not lifted;
+               it also carries the glazed sheet's contour glow.
    - raised:   a manipulated control, lifted a hair above its own track so it feels
                touchable; pressing it returns it to the track.
    - floating: a surface that genuinely sits above the application.
@@ -137,10 +138,14 @@ export const forcedBoundary =
 
 export const elevation = {
   flat: "shadow-sherick-flat",
-  /* A card at rest on the page: a close contact shadow that seats the sheet without lifting it. */
+  /* A card at rest on the page: a contact shadow and a soft ambient fall seat the sheet without
+     lifting it, and the inset layers are its contour glow. */
   resting: "shadow-sherick-resting",
   raised: /* @__PURE__ */ cx("shadow-sherick-raised", forcedBoundary),
   floating: /* @__PURE__ */ cx("shadow-sherick-floating", forcedBoundary),
+  /* A floating sheet: the floating rung with the glass's contour glow in place of the crisp lip. A
+     small floating part keeps `floating`. */
+  floatingSheet: /* @__PURE__ */ cx("shadow-sherick-floating-sheet", forcedBoundary),
   control: "shadow-sherick-control",
   recessed: "shadow-sherick-recessed",
   /* One rung further down: the depth a small selection mark sinks to while it is held. A mark
@@ -502,6 +507,9 @@ export const hitArea =
    - matteQuiet:  the quietest matte step, for dense data regions and wells that
                   should sit back from the surface around them.
    - matte:       a matte surface that separates from the canvas by tone alone.
+   - glazed:      a card's sheet: glass seated on the page (DL §4). Its contour glow belongs to
+                  `elevation.resting`. Forced colors drops the sheen, which would otherwise sit
+                  over the system canvas.
    - matteHigh:   the second matte step, for nesting inside another matte surface.
    - matteInset:  a passive sheet tucked under a stronger control; subdued without
                   blending into the canvas or needing a drawn rim.
@@ -530,16 +538,19 @@ export const hitArea =
                   markedly more opaque and calmer than the smaller sheets: it has to
                   read first as a physical surface and only secondarily as glass, so the
                   scrim behind it does the separating, and the
-                  gradient is a restrained top-to-bottom light rather than a frosted
+                  gradient is a restrained light from the top rather than a frosted
                   haze. Its tone is a subtle step above the canvas in every theme —
                   in dark mode a small step above the canvas rather than a light grey
                   sheet — which is how it separates without leaning on its shadow, and
                   `--sui-overlay-fill` tunes how much of the sheet is its own tone rather
                   than the page behind it — a large overlay leans on that, not on blur. */
 export const material = {
-  canvas: "bg-sherick-canvas text-sherick-ink",
+  /* The wash is the page's own light, part of the material (`--sui-canvas-wash`). */
+  canvas: "bg-sherick-canvas bg-[image:var(--sui-canvas-wash)] forced-colors:bg-none text-sherick-ink",
   matteQuiet: "bg-sherick-surface/[0.42] text-sherick-ink",
   matte: "bg-sherick-surface text-sherick-ink",
+  glazed:
+    "bg-sherick-glaze/[var(--sui-glaze-fill)] bg-[image:var(--sui-glaze-sheen)] forced-colors:bg-none text-sherick-ink",
   matteHigh: "bg-sherick-surface-high/[0.72] text-sherick-ink",
   control: "bg-sherick-tray text-sherick-ink placeholder:text-sherick-ink-muted",
   /* The invalid fill carries its placeholder at the *full* danger tone, not at a fraction of it. A
@@ -703,13 +714,13 @@ export const overlay = {
      surface corner, because what it holds is read rather than scanned.
      When not to use it: a short list of commands wants `menu`, and a hint wants
      `tooltip`. */
-  popup: /* @__PURE__ */ cx(shape.surface, material.acrylic, elevation.floating),
+  popup: /* @__PURE__ */ cx(shape.surface, material.acrylic, elevation.floatingSheet),
   /* A compact list of commands. The same sheet, the same presence and the same lighting as
      `popup`, tightened in shape so a handful of short actions reads as a list rather than a
      page: a command list should feel like one more control on the surface it came from.
      When not to use it: a list of options that are chosen rather than performed, or a
      surface holding structured content, wants `popup`. */
-  menu: /* @__PURE__ */ cx(shape.control, material.acrylic, elevation.floating),
+  menu: /* @__PURE__ */ cx(shape.control, material.acrylic, elevation.floatingSheet),
   /* A short hint is a compact sheet, not a capsule button. */
   tooltip: /* @__PURE__ */ cx(shape.row, material.acrylicDense, elevation.floating),
   /* A toast is a floating status surface that arrives on its own and leaves on its own. It
@@ -717,19 +728,19 @@ export const overlay = {
      floating corner rather than the wide sheet a popup is.
      When not to use it: a hint attached to a control wants `tooltip`, and anything the user
      opened themselves wants `popup`. */
-  toast: /* @__PURE__ */ cx(shape.prominent, material.acrylic, elevation.floating),
+  toast: /* @__PURE__ */ cx(shape.prominent, material.acrylic, elevation.floatingSheet),
   /* A dialog rises further than a menu. It is anchored to the viewport rather than to a trigger,
      so it has no side to grow from and takes the modal presence instead of the anchored one.
      Its corner is the most generous in the library, because a surface that floats free of every
      edge has nothing to line up with. */
-  dialog: /* @__PURE__ */ cx(shape.expressive, material.acrylicHero, elevation.floating),
+  dialog: /* @__PURE__ */ cx(shape.expressive, material.acrylicHero, elevation.floatingSheet),
   /* A sheet is the same viewport-owning surface as a dialog, attached to one edge of the
      viewport. Its exposed corners take `shape.sheet` — one step below a compact floating
      surface rather than above it — because a surface that meets an edge is read as an extension
      of the page, and its attached edge is squared by the component's own anatomy. Which corners
      those are is decided by the edge; the radius the other two keep is still `shape`'s.
      When not to use it: a surface with no edge to attach to wants `dialog`. */
-  sheet: /* @__PURE__ */ cx(shape.sheet, material.acrylicHero, elevation.floating),
+  sheet: /* @__PURE__ */ cx(shape.sheet, material.acrylicHero, elevation.floatingSheet),
 } as const;
 
 /* Text hierarchy — two roles, because only two can carry readable text. High emphasis carries
@@ -1084,7 +1095,6 @@ export const recipeAlphas = {
   },
   field: {
     quiet: fillAlpha(material.matteQuiet, "field.quiet"),
-    card: toneAlpha("surface")(material.matte, "field.card"),
     groove: fillAlpha(material.matteHigh, "field.groove"),
     choiceRow: trayAlpha(selectableRowRest, "field.choiceRow"),
     control: trayAlpha(material.control, "field.control"),

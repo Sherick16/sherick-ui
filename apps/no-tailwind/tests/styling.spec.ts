@@ -166,7 +166,7 @@ test("portaled Wave B surfaces remain scoped and styled", async ({ page }) => {
 
   /* Each popup is portaled out of the page subtree, so the stylesheet can only style it because
      the subtree establishes the same private scope every other Sherick surface does. */
-  const popupShell = page.locator(".sui-scope.shadow-sherick-floating");
+  const popupShell = page.locator(".sui-scope:is(.shadow-sherick-floating, .shadow-sherick-floating-sheet)");
 
   await page.getByRole("button", { name: "Portaled popover" }).click();
   await expect(page.getByText("Popover content")).toBeVisible();

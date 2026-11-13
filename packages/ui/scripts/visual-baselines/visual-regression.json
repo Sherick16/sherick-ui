@@ -3,11 +3,15 @@
     "@layer sherick-ui-theme | :root, [data-sherick-theme=\"light\"]": {
       "--sui-canvas": "0.960 0.011 290",
       "--sui-surface": "0.998 0.001 290",
+      "--sui-glaze": "0.992 0.004 290",
+      "--sui-glaze-fill": "0.84",
+      "--sui-glaze-sheen": "radial-gradient(120% 85% at 50% 0%, rgb(255 255 255 / 0.90) 0%, rgb(255 255 255 / 0.40) 35%, rgb(255 255 255 / 0) 78%)",
+      "--sui-canvas-wash": "radial-gradient(52rem 36rem at 0% 0%, oklch(0.930 0.035 310 / 0.70), transparent 70%), radial-gradient(44rem 32rem at 100% 0%, oklch(0.940 0.035 250 / 0.80), transparent 70%)",
       "--sui-surface-high": "0.932 0.014 290",
       "--sui-tray": "0.949 0.011 290",
       "--sui-tray-deep": "0.920 0.015 290",
       "--sui-mark-well": "0.902 0.016 290",
-      "--sui-surface-float": "0.999 0.001 290",
+      "--sui-surface-float": "0.980 0.006 290",
       "--sui-puck": "1 0 0",
       "--sui-media": "0.200 0.008 285",
       "--sui-ink": "0.200 0.012 285",
@@ -39,9 +43,10 @@
       "--sui-light-top": "1 0 0",
       "--sui-light-bottom": "0.280 0.025 290",
       "--sui-elevation-flat": "none",
-      "--sui-elevation-resting": "0 1px 2px oklch(var(--sui-light-bottom) / 0.05), 0 3px 8px -3px oklch(var(--sui-light-bottom) / 0.08)",
+      "--sui-elevation-resting": "0 0 0 0.5px oklch(var(--sui-light-bottom) / 0.04), 0 2px 6px -1px oklch(var(--sui-light-bottom) / 0.05), 0 20px 44px -18px oklch(var(--sui-light-bottom) / 0.20), inset 0 0 0 1px oklch(var(--sui-light-top) / 0.45), inset 0 10px 18px -10px oklch(var(--sui-light-top) / 0.95), inset 0 -10px 18px -12px oklch(var(--sui-light-top) / 0.50)",
       "--sui-elevation-raised": "0 1px 1px oklch(var(--sui-light-bottom) / 0.10), 0 2px 5px -1px oklch(var(--sui-light-bottom) / 0.12), inset 0 1px 0 oklch(var(--sui-light-top) / 0.24)",
       "--sui-elevation-floating": "0 0 0 1px oklch(var(--sui-light-bottom) / 0.07), 0 4px 10px -2px oklch(var(--sui-light-bottom) / 0.08), 0 22px 48px -10px oklch(var(--sui-light-bottom) / 0.24), inset 0 1px 0 oklch(var(--sui-light-top) / 0.80)",
+      "--sui-elevation-floating-sheet": "0 0 0 1px oklch(var(--sui-light-bottom) / 0.06), 0 4px 10px -2px oklch(var(--sui-light-bottom) / 0.08), 0 24px 52px -12px oklch(var(--sui-light-bottom) / 0.24), inset 0 0 0 1px oklch(var(--sui-light-top) / 0.50), inset 0 10px 18px -10px oklch(var(--sui-light-top) / 0.95), inset 0 -10px 18px -12px oklch(var(--sui-light-top) / 0.50)",
       "--sui-elevation-control": "0 0 0 0.5px oklch(var(--sui-light-bottom) / 0.10), 0 1px 3px oklch(var(--sui-light-bottom) / 0.16), inset 0 1px 0 oklch(var(--sui-light-top) / 0.70)",
       "--sui-elevation-recessed": "inset 0 1px 2px oklch(var(--sui-light-bottom) / 0.18), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.55)",
       "--sui-elevation-recessed-top": "inset 0 5px 8px -5px oklch(var(--sui-light-bottom) / 0.18)",
@@ -55,13 +60,13 @@
       "--sui-glass-dense-blur": "22px",
       "--sui-glass-dense-saturation": "1.08",
       "--sui-glass-dense-brightness": "1.01",
-      "--sui-glass-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.80) 0%, rgb(255 255 255 / 0.28) 26%, rgb(255 255 255 / 0) 62%, rgb(40 36 60 / 0.04) 100%)",
+      "--sui-glass-gradient": "radial-gradient(120% 85% at 50% 0%, rgb(255 255 255 / 0.90) 0%, rgb(255 255 255 / 0.40) 35%, rgb(255 255 255 / 0) 78%)",
       "--sui-glass-gradient-dense": "linear-gradient(180deg, rgb(255 255 255 / 0.70) 0%, rgb(255 255 255 / 0.22) 34%, rgb(255 255 255 / 0) 72%, rgb(40 36 60 / 0.04) 100%)",
       "--sui-glass-hero-blur": "14px",
       "--sui-glass-hero-saturation": "1.06",
       "--sui-glass-hero-brightness": "1.0",
-      "--sui-glass-hero-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.50) 0%, rgb(255 255 255 / 0.12) 14%, rgb(255 255 255 / 0) 46%, rgb(40 36 60 / 0.035) 100%)",
-      "--sui-surface-overlay": "0.995 0.002 290",
+      "--sui-glass-hero-gradient": "radial-gradient(120% 60% at 50% 0%, rgb(255 255 255 / 0.80) 0%, rgb(255 255 255 / 0.30) 35%, rgb(255 255 255 / 0) 78%)",
+      "--sui-surface-overlay": "0.980 0.006 290",
       "--sui-overlay-fill": "0.99",
       "--sui-scrim-blur": "8px",
       "--sui-code-text": "oklch(0.27 0.012 285)",
@@ -75,6 +80,10 @@
     "@layer sherick-ui-theme | [data-sherick-theme=\"dark\"]": {
       "--sui-canvas": "0.145 0.016 285",
       "--sui-surface": "0.212 0.018 285",
+      "--sui-glaze": "0.226 0.021 288",
+      "--sui-glaze-fill": "0.85",
+      "--sui-glaze-sheen": "radial-gradient(120% 85% at 50% 0%, rgb(255 255 255 / 0.05) 0%, rgb(255 255 255 / 0.015) 40%, rgb(255 255 255 / 0) 78%)",
+      "--sui-canvas-wash": "radial-gradient(48rem 34rem at 4% 0%, oklch(0.360 0.140 300 / 0.14), transparent 70%), radial-gradient(42rem 30rem at 100% 6%, oklch(0.340 0.110 255 / 0.126), transparent 70%), radial-gradient(48rem 28rem at 58% 100%, oklch(0.300 0.120 292 / 0.112), transparent 70%)",
       "--sui-surface-high": "0.310 0.022 285",
       "--sui-tray": "0.262 0.020 285",
       "--sui-tray-deep": "0.300 0.022 285",
@@ -111,9 +120,10 @@
       "--sui-light-top": "1 0 0",
       "--sui-light-bottom": "0.070 0.008 285",
       "--sui-elevation-flat": "none",
-      "--sui-elevation-resting": "0 1px 2px oklch(var(--sui-light-bottom) / 0.45), 0 3px 8px -3px oklch(var(--sui-light-bottom) / 0.45)",
+      "--sui-elevation-resting": "0 2px 6px -1px oklch(var(--sui-light-bottom) / 0.45), 0 22px 44px -18px oklch(var(--sui-light-bottom) / 0.72), inset 0 0 0 1px oklch(var(--sui-light-top) / 0.03), inset 0 12px 20px -12px oklch(var(--sui-light-top) / 0.07), inset 0 -10px 18px -12px oklch(var(--sui-light-top) / 0.025)",
       "--sui-elevation-raised": "0 1px 2px oklch(var(--sui-light-bottom) / 0.40), 0 3px 8px -2px oklch(var(--sui-light-bottom) / 0.30), inset 0 1px 0 oklch(var(--sui-light-top) / 0.13)",
       "--sui-elevation-floating": "0 0 0 1px oklch(var(--sui-light-top) / 0.08), 0 6px 14px -4px oklch(var(--sui-light-bottom) / 0.40), 0 26px 56px -12px oklch(var(--sui-light-bottom) / 0.65), inset 0 1px 0 oklch(var(--sui-light-top) / 0.06)",
+      "--sui-elevation-floating-sheet": "0 0 0 1px oklch(var(--sui-light-top) / 0.07), 0 6px 14px -4px oklch(var(--sui-light-bottom) / 0.40), 0 26px 56px -12px oklch(var(--sui-light-bottom) / 0.65), inset 0 12px 20px -12px oklch(var(--sui-light-top) / 0.13), inset 0 -10px 18px -12px oklch(var(--sui-light-top) / 0.045)",
       "--sui-elevation-control": "0 0 0 0.5px oklch(var(--sui-light-bottom) / 0.40), 0 1px 3px oklch(var(--sui-light-bottom) / 0.45), inset 0 1px 0 oklch(var(--sui-light-top) / 0.09)",
       "--sui-elevation-recessed": "inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.42), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.05)",
       "--sui-elevation-recessed-top": "inset 0 5px 8px -5px oklch(var(--sui-light-bottom) / 0.40)",
@@ -127,12 +137,12 @@
       "--sui-glass-dense-blur": "26px",
       "--sui-glass-dense-saturation": "1.10",
       "--sui-glass-dense-brightness": "1.01",
-      "--sui-glass-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.07) 0%, rgb(255 255 255 / 0.025) 30%, rgb(255 255 255 / 0) 70%, rgb(0 0 0 / 0.10) 100%)",
+      "--sui-glass-gradient": "radial-gradient(120% 85% at 50% 0%, rgb(255 255 255 / 0.08) 0%, rgb(255 255 255 / 0.03) 40%, rgb(255 255 255 / 0) 78%)",
       "--sui-glass-gradient-dense": "linear-gradient(180deg, rgb(255 255 255 / 0.06) 0%, rgb(255 255 255 / 0.018) 36%, rgb(255 255 255 / 0) 76%, rgb(0 0 0 / 0.08) 100%)",
       "--sui-glass-hero-blur": "10px",
       "--sui-glass-hero-saturation": "1.03",
       "--sui-glass-hero-brightness": "1.0",
-      "--sui-glass-hero-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.035) 0%, rgb(255 255 255 / 0.01) 12%, rgb(255 255 255 / 0) 44%, rgb(0 0 0 / 0.16) 100%)",
+      "--sui-glass-hero-gradient": "radial-gradient(120% 60% at 50% 0%, rgb(255 255 255 / 0.065) 0%, rgb(255 255 255 / 0.022) 40%, rgb(255 255 255 / 0) 78%)",
       "--sui-surface-overlay": "0.226 0.018 285",
       "--sui-overlay-fill": "0.99",
       "--sui-scrim-blur": "8px",
@@ -147,6 +157,10 @@
     "@layer sherick-ui-theme | @media (prefers-color-scheme: dark) | :root:not([data-sherick-theme])": {
       "--sui-canvas": "0.145 0.016 285",
       "--sui-surface": "0.212 0.018 285",
+      "--sui-glaze": "0.226 0.021 288",
+      "--sui-glaze-fill": "0.85",
+      "--sui-glaze-sheen": "radial-gradient(120% 85% at 50% 0%, rgb(255 255 255 / 0.05) 0%, rgb(255 255 255 / 0.015) 40%, rgb(255 255 255 / 0) 78%)",
+      "--sui-canvas-wash": "radial-gradient(48rem 34rem at 4% 0%, oklch(0.360 0.140 300 / 0.14), transparent 70%), radial-gradient(42rem 30rem at 100% 6%, oklch(0.340 0.110 255 / 0.126), transparent 70%), radial-gradient(48rem 28rem at 58% 100%, oklch(0.300 0.120 292 / 0.112), transparent 70%)",
       "--sui-surface-high": "0.310 0.022 285",
       "--sui-tray": "0.262 0.020 285",
       "--sui-tray-deep": "0.300 0.022 285",
@@ -183,9 +197,10 @@
       "--sui-light-top": "1 0 0",
       "--sui-light-bottom": "0.070 0.008 285",
       "--sui-elevation-flat": "none",
-      "--sui-elevation-resting": "0 1px 2px oklch(var(--sui-light-bottom) / 0.45), 0 3px 8px -3px oklch(var(--sui-light-bottom) / 0.45)",
+      "--sui-elevation-resting": "0 2px 6px -1px oklch(var(--sui-light-bottom) / 0.45), 0 22px 44px -18px oklch(var(--sui-light-bottom) / 0.72), inset 0 0 0 1px oklch(var(--sui-light-top) / 0.03), inset 0 12px 20px -12px oklch(var(--sui-light-top) / 0.07), inset 0 -10px 18px -12px oklch(var(--sui-light-top) / 0.025)",
       "--sui-elevation-raised": "0 1px 2px oklch(var(--sui-light-bottom) / 0.40), 0 3px 8px -2px oklch(var(--sui-light-bottom) / 0.30), inset 0 1px 0 oklch(var(--sui-light-top) / 0.13)",
       "--sui-elevation-floating": "0 0 0 1px oklch(var(--sui-light-top) / 0.08), 0 6px 14px -4px oklch(var(--sui-light-bottom) / 0.40), 0 26px 56px -12px oklch(var(--sui-light-bottom) / 0.65), inset 0 1px 0 oklch(var(--sui-light-top) / 0.06)",
+      "--sui-elevation-floating-sheet": "0 0 0 1px oklch(var(--sui-light-top) / 0.07), 0 6px 14px -4px oklch(var(--sui-light-bottom) / 0.40), 0 26px 56px -12px oklch(var(--sui-light-bottom) / 0.65), inset 0 12px 20px -12px oklch(var(--sui-light-top) / 0.13), inset 0 -10px 18px -12px oklch(var(--sui-light-top) / 0.045)",
       "--sui-elevation-control": "0 0 0 0.5px oklch(var(--sui-light-bottom) / 0.40), 0 1px 3px oklch(var(--sui-light-bottom) / 0.45), inset 0 1px 0 oklch(var(--sui-light-top) / 0.09)",
       "--sui-elevation-recessed": "inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.42), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.05)",
       "--sui-elevation-recessed-top": "inset 0 5px 8px -5px oklch(var(--sui-light-bottom) / 0.40)",
@@ -199,12 +214,12 @@
       "--sui-glass-dense-blur": "26px",
       "--sui-glass-dense-saturation": "1.10",
       "--sui-glass-dense-brightness": "1.01",
-      "--sui-glass-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.07) 0%, rgb(255 255 255 / 0.025) 30%, rgb(255 255 255 / 0) 70%, rgb(0 0 0 / 0.10) 100%)",
+      "--sui-glass-gradient": "radial-gradient(120% 85% at 50% 0%, rgb(255 255 255 / 0.08) 0%, rgb(255 255 255 / 0.03) 40%, rgb(255 255 255 / 0) 78%)",
       "--sui-glass-gradient-dense": "linear-gradient(180deg, rgb(255 255 255 / 0.06) 0%, rgb(255 255 255 / 0.018) 36%, rgb(255 255 255 / 0) 76%, rgb(0 0 0 / 0.08) 100%)",
       "--sui-glass-hero-blur": "10px",
       "--sui-glass-hero-saturation": "1.03",
       "--sui-glass-hero-brightness": "1.0",
-      "--sui-glass-hero-gradient": "linear-gradient(180deg, rgb(255 255 255 / 0.035) 0%, rgb(255 255 255 / 0.01) 12%, rgb(255 255 255 / 0) 44%, rgb(0 0 0 / 0.16) 100%)",
+      "--sui-glass-hero-gradient": "radial-gradient(120% 60% at 50% 0%, rgb(255 255 255 / 0.065) 0%, rgb(255 255 255 / 0.022) 40%, rgb(255 255 255 / 0) 78%)",
       "--sui-surface-overlay": "0.226 0.018 285",
       "--sui-overlay-fill": "0.99",
       "--sui-scrim-blur": "8px",
@@ -1228,6 +1243,9 @@
       "--tw-bg-opacity: 1",
       "background-color: oklch(var(--sui-detail) / var(--tw-bg-opacity, 1))"
     ],
+    ":where(.sui-scope).bg-sherick-glaze\\/\\[var\\(--sui-glaze-fill\\)\\]": [
+      "background-color: oklch(var(--sui-glaze) / var(--sui-glaze-fill))"
+    ],
     ":where(.sui-scope).bg-sherick-ink-muted": [
       "--tw-bg-opacity: 1",
       "background-color: oklch(var(--sui-ink-muted) / var(--tw-bg-opacity, 1))"
@@ -1323,6 +1341,9 @@
     ":where(.sui-scope).bg-transparent": [
       "background-color: transparent"
     ],
+    ":where(.sui-scope).bg-\\[image\\:var\\(--sui-canvas-wash\\)\\]": [
+      "background-image: var(--sui-canvas-wash)"
+    ],
     ":where(.sui-scope).bg-\\[image\\:var\\(--sui-glass-gradient\\)\\]": [
       "background-image: var(--sui-glass-gradient)"
     ],
@@ -1331,6 +1352,9 @@
     ],
     ":where(.sui-scope).bg-\\[image\\:var\\(--sui-glass-hero-gradient\\)\\]": [
       "background-image: var(--sui-glass-hero-gradient)"
+    ],
+    ":where(.sui-scope).bg-\\[image\\:var\\(--sui-glaze-sheen\\)\\]": [
+      "background-image: var(--sui-glaze-sheen)"
     ],
     ":where(.sui-scope).bg-clip-padding": [
       "background-clip: padding-box"
@@ -1720,6 +1744,11 @@
     ":where(.sui-scope).shadow-sherick-floating": [
       "--tw-shadow-colored: var(--sui-elevation-floating)",
       "--tw-shadow: var(--sui-elevation-floating)",
+      "box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)"
+    ],
+    ":where(.sui-scope).shadow-sherick-floating-sheet": [
+      "--tw-shadow-colored: var(--sui-elevation-floating-sheet)",
+      "--tw-shadow: var(--sui-elevation-floating-sheet)",
       "box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)"
     ],
     ":where(.sui-scope).shadow-sherick-mark": [
@@ -2780,6 +2809,9 @@
     "@media (forced-colors: active) | :where(.sui-scope).forced-colors\\:border-\\[1\\.5px\\]": [
       "border-width: 1.5px"
     ],
+    "@media (forced-colors: active) | :where(.sui-scope).forced-colors\\:bg-none": [
+      "background-image: none"
+    ],
     "@media (forced-colors: active) | :where(.sui-scope).forced-colors\\:outline": [
       "outline-style: solid"
     ],
@@ -3065,7 +3097,7 @@
     "badge.primary": "<span class=\"bg-sherick-surface-high/[0.72] font-semibold gap-1.5 inline-flex items-center justify-center leading-4 max-w-full min-h-7 min-w-0 px-3 py-1 rounded-full sui-scope text-pretty text-sherick-ink text-xs\"><span class=\"min-w-0 sui-scope truncate\">Primary</span></span>",
     "badge.secondary": "<span class=\"bg-sherick-surface-high/[0.72] font-semibold gap-1.5 inline-flex items-center justify-center leading-4 max-w-full min-h-7 min-w-0 px-3 py-1 rounded-full sui-scope text-pretty text-sherick-ink text-xs\"><span class=\"min-w-0 sui-scope truncate\">Neutral</span></span>",
     "badge.success.icon": "<span class=\"bg-sherick-success-soft font-semibold gap-1.5 inline-flex items-center justify-center leading-4 max-w-full min-h-7 min-w-0 px-3 py-1 rounded-full sui-scope text-pretty text-sherick-ink text-xs\"><span class=\"[&amp;&gt;svg]:size-3.5 inline-flex items-center justify-center shrink-0 size-3.5 sui-scope text-sherick-success\" aria-hidden=\"true\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" color=\"currentColor\" class=\"\" aria-hidden=\"true\"><path d=\"M5 14L8.5 17.5L19 6.5\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\"></path></svg></span><span class=\"min-w-0 sui-scope truncate\">Ready</span></span>",
-    "card.secondary": "<div class=\"[overflow-wrap:anywhere] bg-sherick-surface min-w-0 p-6 rounded-[1.25rem] shadow-sherick-resting sui-scope text-sherick-ink\">Neutral card</div>",
+    "card.secondary": "<div class=\"[overflow-wrap:anywhere] bg-[image:var(--sui-glaze-sheen)] bg-sherick-glaze/[var(--sui-glaze-fill)] forced-colors:bg-none min-w-0 p-6 rounded-[1.25rem] shadow-sherick-resting sui-scope text-sherick-ink\">Neutral card</div>",
     "card.primary": "<div class=\"[overflow-wrap:anywhere] bg-sherick-primary-soft min-w-0 p-6 rounded-[1.25rem] shadow-sherick-resting sui-scope text-sherick-ink\">Tonal card</div>",
     "code-block.block": "<div class=\"bg-sherick-surface mt-4 overflow-hidden rounded-[1rem] shadow-sherick-recessed-top sui-scope text-sherick-ink\"><div class=\"flex gap-4 items-center justify-between min-h-11 px-4 py-2 sui-scope\"><span class=\"font-sherick-mono leading-4 sui-scope text-pretty text-sherick-ink-muted text-xs\">tsx</span><button type=\"button\" tabindex=\"0\" class=\"-me-4 -my-2 [&amp;:not([data-disabled]):not([aria-disabled=true]):not([aria-busy=true]):not(:disabled)]:active:before:opacity-[0.09] [&amp;:not([data-disabled]):not([aria-disabled=true]):not([aria-busy=true]):not(:disabled)]:hover:before:opacity-[0.05] active:before:duration-tactile active:before:ease-press active:duration-tactile active:ease-press before:absolute before:bg-current before:content-[&#x27;&#x27;] before:duration-release before:ease-release before:inset-0 before:opacity-0 before:pointer-events-none before:rounded-[inherit] before:transition-opacity cursor-pointer duration-release ease-release focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus-visible:text-sherick-ink focus:[outline-style:none] font-medium gap-2 group-active:before:duration-tactile group-active:before:ease-press hover:text-sherick-ink inline-flex items-center justify-center max-w-full min-h-10 min-w-0 motion-reduce:before:transition-none motion-reduce:transition-none motion-safe:[&amp;.w-full:not([data-disabled],:disabled,[aria-disabled=true],[aria-busy=true],:has(&gt;[role=combobox][data-disabled]))]:active:scale-[0.985] motion-safe:[&amp;:not([data-disabled],:disabled,[aria-disabled=true],[aria-busy=true],:has(&gt;[role=combobox][data-disabled]))]:active:scale-[0.96] px-4 py-2 relative rounded-full sui-scope sui-scope text-sherick-ink-muted text-sm tracking-[-0.01em] transition-[background-color,color,box-shadow,transform,opacity]\"><span class=\"[&amp;&gt;svg]:size-4 inline-flex items-center justify-center shrink-0 size-4 sui-scope\" aria-hidden=\"true\"><span class=\"[&amp;&gt;svg]:size-4 grid items-center justify-center shrink-0 size-4 sui-scope\"><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" color=\"currentColor\" class=\"[&amp;_*]:[stroke-width:1.5px] [&amp;_*]:[vector-effect:non-scaling-stroke] col-start-1 data-[ending-style]:duration-overlay-exit data-[ending-style]:ease-exit data-[ending-style]:opacity-0 data-[ending-style]:scale-50 data-[starting-style]:scale-50 duration-release ease-spring motion-reduce:data-[ending-style]:scale-100 motion-reduce:data-[starting-style]:scale-100 motion-reduce:transform-none motion-reduce:transition-none opacity-100 row-start-1 sui-scope transition-[background-color,color,box-shadow,transform,opacity]\" aria-hidden=\"true\"><path d=\"M7.5 14.5C7.5 11.2002 7.5 9.55025 8.52513 8.52513C9.55025 7.5 11.2002 7.5 14.5 7.5C17.7998 7.5 19.4497 7.5 20.4749 8.52513C21.5 9.55025 21.5 11.2002 21.5 14.5C21.5 17.7998 21.5 19.4497 20.4749 20.4749C19.4497 21.5 17.7998 21.5 14.5 21.5C11.2002 21.5 9.55025 21.5 8.52513 20.4749C7.5 19.4497 7.5 17.7998 7.5 14.5Z\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\"></path><path d=\"M7.5 16.5C6.10355 16.5 5.40533 16.5 4.84402 16.3036C3.83866 15.9518 3.0482 15.1613 2.69641 14.156C2.5 13.5947 2.5 12.8964 2.5 11.5V9.5C2.5 6.20017 2.5 4.55025 3.52513 3.52513C4.55025 2.5 6.20017 2.5 9.5 2.5H11.5C12.8964 2.5 13.5947 2.5 14.156 2.69641C15.1613 3.0482 15.9518 3.83866 16.3036 4.84402C16.5 5.40533 16.5 6.10355 16.5 7.5\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\"></path></svg><svg xmlns=\"http://www.w3.org/2000/svg\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" color=\"currentColor\" class=\"[&amp;_*]:[stroke-width:1.5px] [&amp;_*]:[vector-effect:non-scaling-stroke] col-start-1 data-[ending-style]:duration-overlay-exit data-[ending-style]:ease-exit data-[ending-style]:opacity-0 data-[ending-style]:scale-50 data-[starting-style]:scale-50 duration-release ease-spring motion-reduce:data-[ending-style]:scale-100 motion-reduce:data-[starting-style]:scale-100 motion-reduce:transform-none motion-reduce:transition-none opacity-0 row-start-1 sui-scope transition-[background-color,color,box-shadow,transform,opacity]\" aria-hidden=\"true\"><path d=\"M5 14L8.5 17.5L19 6.5\" stroke=\"currentColor\" stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"1.5\"></path></svg></span></span><span class=\"[overflow-wrap:anywhere] min-w-0 sui-scope\"><span class=\"grid sui-scope\"><span class=\"col-start-1 row-start-1 sui-scope\">Copy</span><span class=\"col-start-1 invisible row-start-1 sui-scope\">Copied</span><span class=\"col-start-1 invisible row-start-1 sui-scope text-sherick-danger\">Copy failed</span></span></span></button><span role=\"status\" aria-live=\"polite\" class=\"sr-only sui-scope\"></span></div><pre dir=\"ltr\" style=\"color:var(--sui-code-text)\" role=\"region\" aria-label=\"tsx code\" class=\"bg-sherick-surface-high/[0.72] border-sherick-edge/[0.075] border-t focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[3px] focus-visible:outline-sherick-focus focus:[outline-style:none] font-sherick-mono language-jsx leading-6 m-0 overflow-auto prism-code px-4 py-4 sui-scope sui-scope text-sherick-ink text-sm\"><code class=\"inline-block min-w-full sui-scope\"><span class=\"block sui-scope token-line\" style=\"color:var(--sui-code-text)\"><span aria-hidden=\"true\" class=\"inline-block mr-4 select-none sui-scope text-right text-sherick-ink-muted\" style=\"width:1ch\">1</span><span class=\"punctuation sui-scope tag token\" style=\"color:var(--sui-code-text)\">&lt;</span><span class=\"class-name sui-scope tag token\" style=\"color:var(--sui-code-tag)\">Button</span><span class=\"sui-scope tag token\" style=\"color:var(--sui-code-tag)\"> </span><span class=\"attr-name sui-scope tag token\" style=\"color:var(--sui-code-keyword)\">appearance</span><span class=\"attr-equals attr-value punctuation sui-scope tag token\" style=\"color:var(--sui-code-text)\">=</span><span class=\"attr-value punctuation sui-scope tag token\" style=\"color:var(--sui-code-text)\">&quot;</span><span class=\"attr-value sui-scope tag token\" style=\"color:var(--sui-code-string)\">filled</span><span class=\"attr-value punctuation sui-scope tag token\" style=\"color:var(--sui-code-text)\">&quot;</span><span class=\"punctuation sui-scope tag token\" style=\"color:var(--sui-code-text)\">&gt;</span><span class=\"plain-text sui-scope token\">Save</span><span class=\"punctuation sui-scope tag token\" style=\"color:var(--sui-code-text)\">&lt;/</span><span class=\"class-name sui-scope tag token\" style=\"color:var(--sui-code-tag)\">Button</span><span class=\"punctuation sui-scope tag token\" style=\"color:var(--sui-code-text)\">&gt;</span></span></code></pre></div>",
     "code-block.inline": "<code class=\"bg-sherick-surface-high/[0.72] font-sherick-mono px-1.5 py-0.5 rounded-[0.5rem] sui-scope sui-scope text-[0.9em] text-sherick-ink\">Button</code>",
@@ -3167,12 +3199,12 @@
   },
   "overlays": {
     "scrim": "fixed inset-0 z-50 backdrop-blur-[var(--sui-scrim-blur)] [@media(pointer:coarse)]:[backdrop-filter:none] before:absolute before:inset-0 before:content-[''] before:bg-sherick-scrim/[0.30]",
-    "popup": "rounded-[1.25rem] bg-sherick-surface-float/[var(--sui-glass-fill)] bg-[image:var(--sui-glass-gradient)] text-sherick-ink shadow-sherick-floating forced-colors:outline forced-colors:outline-1 forced-colors:outline-offset-[-1px]",
-    "menu": "rounded-[0.75rem] bg-sherick-surface-float/[var(--sui-glass-fill)] bg-[image:var(--sui-glass-gradient)] text-sherick-ink shadow-sherick-floating forced-colors:outline forced-colors:outline-1 forced-colors:outline-offset-[-1px]",
+    "popup": "rounded-[1.25rem] bg-sherick-surface-float/[var(--sui-glass-fill)] bg-[image:var(--sui-glass-gradient)] text-sherick-ink shadow-sherick-floating-sheet forced-colors:outline forced-colors:outline-1 forced-colors:outline-offset-[-1px]",
+    "menu": "rounded-[0.75rem] bg-sherick-surface-float/[var(--sui-glass-fill)] bg-[image:var(--sui-glass-gradient)] text-sherick-ink shadow-sherick-floating-sheet forced-colors:outline forced-colors:outline-1 forced-colors:outline-offset-[-1px]",
     "tooltip": "rounded-[0.5rem] bg-sherick-surface-float/[var(--sui-glass-dense-fill)] bg-[image:var(--sui-glass-gradient-dense)] text-sherick-ink shadow-sherick-floating forced-colors:outline forced-colors:outline-1 forced-colors:outline-offset-[-1px]",
-    "toast": "rounded-[1rem] bg-sherick-surface-float/[var(--sui-glass-fill)] bg-[image:var(--sui-glass-gradient)] text-sherick-ink shadow-sherick-floating forced-colors:outline forced-colors:outline-1 forced-colors:outline-offset-[-1px]",
-    "sheet": "rounded-[0.75rem] bg-sherick-surface-overlay/[var(--sui-overlay-fill)] bg-[image:var(--sui-glass-hero-gradient)] text-sherick-ink shadow-sherick-floating forced-colors:outline forced-colors:outline-1 forced-colors:outline-offset-[-1px]",
-    "dialog": "rounded-[1.5rem] bg-sherick-surface-overlay/[var(--sui-overlay-fill)] bg-[image:var(--sui-glass-hero-gradient)] text-sherick-ink shadow-sherick-floating forced-colors:outline forced-colors:outline-1 forced-colors:outline-offset-[-1px]",
+    "toast": "rounded-[1rem] bg-sherick-surface-float/[var(--sui-glass-fill)] bg-[image:var(--sui-glass-gradient)] text-sherick-ink shadow-sherick-floating-sheet forced-colors:outline forced-colors:outline-1 forced-colors:outline-offset-[-1px]",
+    "sheet": "rounded-[0.75rem] bg-sherick-surface-overlay/[var(--sui-overlay-fill)] bg-[image:var(--sui-glass-hero-gradient)] text-sherick-ink shadow-sherick-floating-sheet forced-colors:outline forced-colors:outline-1 forced-colors:outline-offset-[-1px]",
+    "dialog": "rounded-[1.5rem] bg-sherick-surface-overlay/[var(--sui-overlay-fill)] bg-[image:var(--sui-glass-hero-gradient)] text-sherick-ink shadow-sherick-floating-sheet forced-colors:outline forced-colors:outline-1 forced-colors:outline-offset-[-1px]",
     "disclosureTrigger": "group -mx-4 flex w-[calc(100%+2rem)] items-center justify-between gap-4 px-4 py-3 text-start [outline-style:none] [overflow-wrap:anywhere] text-[0.9375rem] leading-[1.375rem] rounded-[0.75rem] transition-[background-color,border-color,color,box-shadow,opacity] duration-press ease-press motion-reduce:transition-none focus:[outline-style:none] focus-visible:[outline-style:none] focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-sherick-focus forced-colors:focus-visible:outline forced-colors:focus-visible:outline-2 forced-colors:focus-visible:outline-offset-[-2px] text-sherick-ink relative before:pointer-events-none before:absolute before:inset-0 before:content-[''] before:opacity-0 before:transition-opacity before:duration-release before:ease-release active:before:duration-tactile active:before:ease-press group-active:before:duration-tactile group-active:before:ease-press motion-reduce:before:transition-none before:rounded-[inherit] before:bg-current [&:not([data-disabled]):not([aria-disabled=true]):not([aria-busy=true]):not(:disabled)]:hover:before:opacity-[0.05] [&:not([data-disabled]):not([aria-disabled=true]):not([aria-busy=true]):not(:disabled)]:active:before:opacity-[0.09] data-[highlighted]:before:opacity-[0.05] before:transition-none data-[disabled]:cursor-not-allowed data-[disabled]:opacity-45 aria-disabled:cursor-not-allowed aria-disabled:opacity-45 disabled:cursor-not-allowed disabled:opacity-45 cursor-pointer",
     "disclosurePanel": "-mx-4 h-[var(--sui-disclose-height)] overflow-hidden [overflow-wrap:anywhere] text-sm leading-6 text-pretty text-sherick-ink-muted transition-[height] duration-release ease-release data-[starting-style]:h-0 data-[ending-style]:h-0 data-[ending-style]:duration-overlay-exit data-[ending-style]:ease-exit motion-reduce:transition-none",
     "motion.feedback": "transition-[background-color,border-color,color,box-shadow,opacity] duration-press ease-press motion-reduce:transition-none",
