@@ -37,9 +37,10 @@ export const lightTokens = {
      neutral step furthest from the sheet: the tone and the `elevation-mark` recess are all that
      mark it. */
   "mark-well": "0.902 0.016 290",
-  /* A floating sheet is the card's own glass at a higher fill, so it takes the glaze's tone: a
-     faint step off white that the sheen and the contour glow can light. */
-  "surface-float": "0.990 0.004 290",
+  /* A floating sheet is the card's own glass at a higher fill. Its tone is a clear step off white:
+     the fill stays near whole so nothing behind shows through, and the tone is what gives the white
+     sheen and the contour glow something to light. */
+  "surface-float": "0.980 0.006 290",
   /* The puck: a held choice that rides in a track — a selected segment, the tab indicator. It is
      the one surface lit *above* every sheet in both themes, because a puck is a part lifted out of
      the groove it sits in; in dark mode no sheet tone can play that role, since a lifted object is
@@ -138,7 +139,7 @@ export const lightTokens = {
   "glass-hero-saturation": "1.06",
   "glass-hero-brightness": "1.0",
   "glass-hero-gradient": "radial-gradient(120% 60% at 50% 0%, rgb(255 255 255 / 0.80) 0%, rgb(255 255 255 / 0.30) 35%, rgb(255 255 255 / 0) 78%)",
-  "surface-overlay": "0.990 0.004 290",
+  "surface-overlay": "0.980 0.006 290",
   "overlay-fill": "0.99",
   "scrim-blur": "8px",
   "code-text": "oklch(0.27 0.012 285)",
@@ -213,7 +214,7 @@ export const darkTokens = {
   "elevation-resting": "0 2px 6px -1px oklch(var(--sui-light-bottom) / 0.45), 0 22px 44px -18px oklch(var(--sui-light-bottom) / 0.72), inset 0 0 0 1px oklch(var(--sui-light-top) / 0.03), inset 0 12px 20px -12px oklch(var(--sui-light-top) / 0.07), inset 0 -10px 18px -12px oklch(var(--sui-light-top) / 0.025)",
   "elevation-raised": "0 1px 2px oklch(var(--sui-light-bottom) / 0.40), 0 3px 8px -2px oklch(var(--sui-light-bottom) / 0.30), inset 0 1px 0 oklch(var(--sui-light-top) / 0.13)",
   "elevation-floating": "0 0 0 1px oklch(var(--sui-light-top) / 0.08), 0 6px 14px -4px oklch(var(--sui-light-bottom) / 0.40), 0 26px 56px -12px oklch(var(--sui-light-bottom) / 0.65), inset 0 1px 0 oklch(var(--sui-light-top) / 0.06)",
-  "elevation-floating-sheet": "0 0 0 1px oklch(var(--sui-light-top) / 0.07), 0 6px 14px -4px oklch(var(--sui-light-bottom) / 0.40), 0 26px 56px -12px oklch(var(--sui-light-bottom) / 0.65), inset 0 12px 20px -12px oklch(var(--sui-light-top) / 0.08), inset 0 -10px 18px -12px oklch(var(--sui-light-top) / 0.03)",
+  "elevation-floating-sheet": "0 0 0 1px oklch(var(--sui-light-top) / 0.07), 0 6px 14px -4px oklch(var(--sui-light-bottom) / 0.40), 0 26px 56px -12px oklch(var(--sui-light-bottom) / 0.65), inset 0 12px 20px -12px oklch(var(--sui-light-top) / 0.13), inset 0 -10px 18px -12px oklch(var(--sui-light-top) / 0.045)",
   "elevation-control": "0 0 0 0.5px oklch(var(--sui-light-bottom) / 0.40), 0 1px 3px oklch(var(--sui-light-bottom) / 0.45), inset 0 1px 0 oklch(var(--sui-light-top) / 0.09)",
   "elevation-recessed": "inset 0 1px 3px oklch(var(--sui-light-bottom) / 0.42), inset 0 -1px 0 oklch(var(--sui-light-top) / 0.05)",
   "elevation-recessed-top": "inset 0 5px 8px -5px oklch(var(--sui-light-bottom) / 0.40)",
@@ -227,12 +228,12 @@ export const darkTokens = {
   "glass-dense-blur": "26px",
   "glass-dense-saturation": "1.10",
   "glass-dense-brightness": "1.01",
-  "glass-gradient": "radial-gradient(120% 85% at 50% 0%, rgb(255 255 255 / 0.06) 0%, rgb(255 255 255 / 0.02) 40%, rgb(255 255 255 / 0) 78%)",
+  "glass-gradient": "radial-gradient(120% 85% at 50% 0%, rgb(255 255 255 / 0.08) 0%, rgb(255 255 255 / 0.03) 40%, rgb(255 255 255 / 0) 78%)",
   "glass-gradient-dense": "linear-gradient(180deg, rgb(255 255 255 / 0.06) 0%, rgb(255 255 255 / 0.018) 36%, rgb(255 255 255 / 0) 76%, rgb(0 0 0 / 0.08) 100%)",
   "glass-hero-blur": "10px",
   "glass-hero-saturation": "1.03",
   "glass-hero-brightness": "1.0",
-  "glass-hero-gradient": "radial-gradient(120% 60% at 50% 0%, rgb(255 255 255 / 0.045) 0%, rgb(255 255 255 / 0.015) 40%, rgb(255 255 255 / 0) 78%)",
+  "glass-hero-gradient": "radial-gradient(120% 60% at 50% 0%, rgb(255 255 255 / 0.065) 0%, rgb(255 255 255 / 0.022) 40%, rgb(255 255 255 / 0) 78%)",
   "surface-overlay": "0.226 0.018 285",
   "overlay-fill": "0.99",
   "scrim-blur": "8px",
