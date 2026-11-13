@@ -64,6 +64,7 @@ module.exports = {
         "sherick-flat": "var(--sui-elevation-flat)",
         "sherick-raised": "var(--sui-elevation-raised)",
         "sherick-floating": "var(--sui-elevation-floating)",
+        "sherick-floating-sheet": "var(--sui-elevation-floating-sheet)",
         "sherick-control": "var(--sui-elevation-control)",
         "sherick-recessed": "var(--sui-elevation-recessed)",
         "sherick-recessed-top": "var(--sui-elevation-recessed-top)",

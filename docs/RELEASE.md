@@ -53,7 +53,7 @@ fixes change what a consumer can see at `size="sm"` only: a `sm` `Combobox`, `Nu
 instead of growing it), and the date fields' native input now fills the field's height, which also gives
 it a full-height target. `2.14.0` glazes the card: a neutral `Card` is the new `--sui-glaze` tone at
 `--sui-glaze-fill` with a `--sui-glaze-sheen`, `--sui-elevation-resting` gains a soft ambient fall and a
-lit rim, and the canvas gains `--sui-canvas-wash`. No backdrop filter is used, and no component or prop
+contour glow, and the canvas gains `--sui-canvas-wash`. No backdrop filter is used, and no component or prop
 changes. A page that paints its own canvas adds `background-image: var(--sui-canvas-wash)`. The current source version is `2.14.0`, and
 npm's `latest` is `2.10.1`. An installed package's actual version and exports, not this
 checkout, determine availability.
@@ -370,7 +370,7 @@ The 2.14.0 glazed card re-records **`themeCss`** with `--update=themeCss`:
 `12696 / 2063 / 1699` → `14386 / 2359 / 1899` (+296 bytes gzip). Four additive tokens and one longer
 value cause it: `--sui-glaze`, `--sui-glaze-fill` and `--sui-glaze-sheen` (a card's glazed sheet),
 `--sui-canvas-wash` (the page's wash, three gradients in dark) and the longer
-`--sui-elevation-resting` (an ambient fall and the lit rim). Each value is emitted three times. No
+`--sui-elevation-resting` (an ambient fall and the contour glow). Each value is emitted three times. No
 other record moved.
 
 No other component budget is relaxed.

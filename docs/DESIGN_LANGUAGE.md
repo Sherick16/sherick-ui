@@ -56,13 +56,13 @@ a sideways shadow or an upward-lit gradient to one component.
 | `handle` | a small value-control part that must remain findable, even disabled | large surfaces |
 | `acrylic`, `acrylicDense`, `acrylicHero` | anchored sheets, compact hints, viewport-owning overlays respectively | grounded content |
 
-**A card is glazed.** Its fill is the `glaze` tone at 88% in light and 85% in dark, so a trace of the
-page shows through, and a sheen lights its top: a white fall in light, a trace of light in dark, where
-the sheet is smoked glass. The page supplies what the glass shows: the canvas carries a wash, two soft
+**A card is glazed.** Its fill is the `glaze` tone at 84% in light and 85% in dark, so a trace of the
+page shows through, and a sheen lights its top: a diffuse pool of white in light, a trace of light in
+dark, where the sheet is smoked glass. The page supplies what the glass shows: the canvas carries a wash, two soft
 pools of colour at its top in light and a faint violet and blue glow in dark. The glaze carries **no
 backdrop filter**: an in-flow card sits only on the page's own smooth wash, which a blur would not
-change. Its lit rim belongs to `elevation.resting` (§5). Keep the dark values where they are: at 80%
-fill and below, or with a brighter rim, the glass outshone its content. Do not glaze a table, a field or
+change. Its contour glow belongs to `elevation.resting` (§5). Keep the dark values where they are: at 80%
+fill and below, or with a brighter edge, the glass outshone its content. Do not glaze a table, a field or
 a sheet nested in a card, and do not use it to make one card stand out. Under forced colors the sheen is
 dropped. A semantic card keeps its role's opaque soft surface under the same elevation.
 
@@ -84,21 +84,23 @@ recess on a card and on the page alike. Its tone is a quiet step over the card, 
 | Recipe | Use | Not for |
 | --- | --- | --- |
 | `flat` | passive parts inside a surface, and quiet sheets such as a table or a tree | a recessed track |
-| `resting` | a card on the page: a contact shadow and a soft ambient fall under its lower edge, which seat the sheet without lifting it, and the glazed sheet's lit rim | a control, a table, a nested sheet, anything that floats |
+| `resting` | a card on the page: a contact shadow and a soft ambient fall under its lower edge, which seat the sheet without lifting it, and the glazed sheet's contour glow | a control, a table, a nested sheet, anything that floats |
 | `raised` | tactile tonal actions at rest | hover or passive data |
 | `control` | switch thumb, a puck held in a track, a held selection inside a list or calendar, or the chosen row of a surface choice group | keyboard highlight |
 | `recessed` | grooves, tracks, a text field's well, an unselected surface choice row, and a raised control while pressed | flat cards |
 | `recessedTop` | the upper wall of an inset sheet continuing directly below a control, without a lower rim | standalone tracks or wells |
 | `mark` | an empty checkbox or radio at rest: a recess one step stronger than `recessed`, because a 20px well has no rim and is found by its depth | a field, a track, any wide groove |
 | `well` | a checkbox or radio while it is pressed: the floor sinks, the boundary stays | a resting mark, a wide groove |
-| `floating` | real overlay surfaces | anything in document flow |
+| `floating` | a small floating part: a tooltip, a floating icon button. It keeps a crisp lit lip | anything in document flow, a floating sheet |
+| `floatingSheet` | a floating sheet: popup, menu, toast, dialog, drawer. The floating depth with the glass's contour glow | a small floating part, anything in document flow |
 
 A card is separated from the page by tone first: the canvas sits a clear step under the white
 sheet in light, and the sheet is lit a clear step over the floor in dark. `resting` then seats it.
 Its ambient fall is long and soft, never a crisp lift, so a button on a card is still the lifted part.
-It also carries the glass's rim as two inset lines: light from above catches the top and start edges
-(full white in light, a trace in dark) and the far edges faintly. Do not use it to make one card stand
-out from another.
+It also carries the glass's **contour glow**: a faint line on the edge, then light that fades inward
+from the top edge and, more quietly, from the bottom (white in light, a trace in dark). The glow is soft
+on purpose: a crisp bright rim read as a drawn outline, and the glow reads as the edge of a frosted
+pane. Do not use it to make one card stand out from another.
 
 Actions follow one depth ladder: a text action sits flat, and tonal and filled actions are
 `raised` at rest and `recessed` while held. `raised` carries the light model's lit upper lip — one
@@ -132,6 +134,11 @@ large sheet is calmer and more self-contained than the small one; the scrim sepa
 from the page. Retune acrylic at the theme owner, never by giving one popup a custom blur
 or fill. Tables and fields stay matte, and a card is `glazed` (§4), which is not acrylic: it is seated
 on the page and never floats.
+
+**One light, two densities.** A sheet is glass: a card is glass seated on the page (about 85% fill) and
+a floating sheet is the same glass at 98 to 99% fill, because it must stay legible over anything. Both
+take the diffuse light at their top and the contour glow at their edge (`resting`, `floatingSheet`). A
+control is solid and keeps a crisp lip, and a well is sunk; neither is glass.
 
 The glass carries **no backdrop filter**. Every presence recipe animates the popup node itself, and a
 backdrop filter on an animated node re-blurs the page on every frame (§12). The glass fills are 98 to 99%
