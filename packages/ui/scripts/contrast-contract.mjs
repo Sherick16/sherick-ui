@@ -126,7 +126,9 @@ export const contrastCompositions = (variables, alphas) => {
      Under the pointer and while engaged it sinks to the deep tray. A choice row rests on the
      `selectableRowRest` step, the same tray; while that recipe is opaque, the row measures the same
      in a card and on the page. An empty mark's floor is the `mark-well` tone. */
-  const card = composite(surface, FIELD.card, canvas);
+  /* A card is the glazed sheet: the `glaze` tone at the theme's `--sui-glaze-fill` over the page. The
+     page's wash under it is at most a few percent of the composite, so the canvas stands for it. */
+  const card = composite(colour("glaze"), Number(variables["--sui-glaze-fill"]), canvas);
   /* The code well is the `matteHigh` step over the card (`recipeAlphas.code.well`), not a canvas tint. */
   const codeWell = composite(surfaceHigh, alphas.code.well, card);
   const tray = (alpha, base = card) => composite(colour("tray"), alpha, base);
@@ -136,10 +138,10 @@ export const contrastCompositions = (variables, alphas) => {
   const surfaces = {
     canvas,
     "quiet well": composite(surface, FIELD.quiet, canvas),
-    "matte card": composite(surface, FIELD.card, canvas),
+    "matte card": card,
     "chip at rest": composite(surfaceHigh, TINT.neutralRest, canvas),
     /* A neutral badge or tag: the neutral soft step inside the card that holds it. */
-    "neutral soft in a card": composite(surfaceHigh, TINT.neutralSoft, composite(surface, FIELD.card, canvas)),
+    "neutral soft in a card": composite(surfaceHigh, TINT.neutralSoft, card),
     "field": tray(FIELD.control),
     "empty mark": markWell,
     "field hover": deepTray(FIELD.hover),
@@ -170,7 +172,7 @@ export const contrastCompositions = (variables, alphas) => {
   /* The sunk track a value control runs in — a Slider's groove, a Progress track, a Stepper
      connector — is the `matteHigh` step, on the page and inside a card. */
   const track = composite(surfaceHigh, FIELD.groove, canvas);
-  const trackInCard = composite(surfaceHigh, FIELD.groove, composite(surface, FIELD.card, canvas));
+  const trackInCard = composite(surfaceHigh, FIELD.groove, card);
 
   const tint = (role, alpha, base) => composite(colour(role), alpha, base);
   /* A role's soft and selected surfaces are authored opaque values, so where the control sits no

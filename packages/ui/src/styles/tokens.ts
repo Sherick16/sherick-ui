@@ -12,6 +12,17 @@ export const lightTokens = {
      straight on the page is still a well. */
   "canvas": "0.960 0.011 290",
   "surface": "0.998 0.001 290",
+  /* A card's glaze: the sheet's own tone, a faint step off pure white so the lit top of the sheen
+     reads against it. `glaze-fill` lets a little of the page through, and `glaze-sheen` is the light
+     that falls across the top of the sheet. The fill stays high enough that copy measures as it does
+     on an opaque card, and the glaze carries no backdrop filter: an in-flow card only ever sits on
+     the page's own smooth wash, which a blur would not change. */
+  "glaze": "0.992 0.004 290",
+  "glaze-fill": "0.88",
+  "glaze-sheen": "linear-gradient(180deg, rgb(255 255 255 / 0.85) 0%, rgb(255 255 255 / 0.30) 24%, rgb(255 255 255 / 0) 58%, rgb(40 36 60 / 0.015) 100%)",
+  /* The page's wash: two soft pools of the accent's neighbours at the top of the canvas. It is what
+     a glazed card lets through, so the page is never one flat tone behind the glass. */
+  "canvas-wash": "radial-gradient(52rem 36rem at 0% 0%, oklch(0.930 0.035 310 / 0.70), transparent 70%), radial-gradient(44rem 32rem at 100% 0%, oklch(0.940 0.035 250 / 0.80), transparent 70%)",
   "surface-high": "0.932 0.014 290",
   /* The tray: a text field's resting tone. A field is a well, sunk by `elevation-recessed`, so its
      tone is a light step under the card and the recess carries its boundary; at `surface-high`
@@ -76,10 +87,11 @@ export const lightTokens = {
   "light-top": "1 0 0",
   "light-bottom": "0.280 0.025 290",
   "elevation-flat": "none",
-  /* A card at rest on the page: a close contact shadow under its lower edge. It seats the sheet; it
-     does not lift it, so it stays well under `raised` and a button on a card is still the lifted
-     part. */
-  "elevation-resting": "0 1px 2px oklch(var(--sui-light-bottom) / 0.05), 0 3px 8px -3px oklch(var(--sui-light-bottom) / 0.08)",
+  /* A card at rest on the page: a hairline contact edge, a close contact shadow and a soft ambient
+     fall under its lower edge, so the sheet is seated rather than lifted. The two inset lines are
+     the glaze's rim: light from above catches the top and start edges fully and the far edges
+     faintly. They belong to the elevation, as every surface's edge lines do. */
+  "elevation-resting": "0 0 0 0.5px oklch(var(--sui-light-bottom) / 0.05), 0 1px 2px oklch(var(--sui-light-bottom) / 0.06), 0 11px 25px -11px oklch(var(--sui-light-bottom) / 0.20), inset 1px 1px 0 oklch(var(--sui-light-top) / 0.90), inset -1px -1px 0 oklch(var(--sui-light-top) / 0.35)",
   /* A contact shadow, not a float: the ambient layer stays close to the control, so a row of raised
      actions sits on the page rather than hovering over it. The inset line is the lit upper lip of a
      key — the light model's upper edge, drawn once — so a filled action reads as a pressable object
@@ -139,6 +151,15 @@ export const darkTokens = {
      never darker than the field. */
   "canvas": "0.145 0.016 285",
   "surface": "0.212 0.018 285",
+  /* Smoked glass: a sheet a step lighter than `surface`, so that at this fill over the floor a card
+     lands on the tone an opaque card had. The sheen and the rim are a trace of light and no more;
+     at 80% fill and below, or with a brighter rim, the glass outshone its content. */
+  "glaze": "0.226 0.021 288",
+  "glaze-fill": "0.85",
+  "glaze-sheen": "linear-gradient(180deg, rgb(255 255 255 / 0.025) 0%, rgb(255 255 255 / 0) 50%)",
+  /* The dark wash is a faint violet and blue glow: without it the floor is one flat tone and smoked
+     glass has nothing to show. */
+  "canvas-wash": "radial-gradient(48rem 34rem at 4% 0%, oklch(0.360 0.140 300 / 0.14), transparent 70%), radial-gradient(42rem 30rem at 100% 6%, oklch(0.340 0.110 255 / 0.126), transparent 70%), radial-gradient(48rem 28rem at 58% 100%, oklch(0.300 0.120 292 / 0.112), transparent 70%)",
   "surface-high": "0.310 0.022 285",
   "tray": "0.262 0.020 285",
   "tray-deep": "0.300 0.022 285",
@@ -179,7 +200,7 @@ export const darkTokens = {
   "light-top": "1 0 0",
   "light-bottom": "0.070 0.008 285",
   "elevation-flat": "none",
-  "elevation-resting": "0 1px 2px oklch(var(--sui-light-bottom) / 0.45), 0 3px 8px -3px oklch(var(--sui-light-bottom) / 0.45)",
+  "elevation-resting": "0 1px 2px oklch(var(--sui-light-bottom) / 0.50), 0 15px 30px -12px oklch(var(--sui-light-bottom) / 0.72), inset 1px 1px 0 oklch(var(--sui-light-top) / 0.055), inset -1px -1px 0 oklch(var(--sui-light-top) / 0.025)",
   "elevation-raised": "0 1px 2px oklch(var(--sui-light-bottom) / 0.40), 0 3px 8px -2px oklch(var(--sui-light-bottom) / 0.30), inset 0 1px 0 oklch(var(--sui-light-top) / 0.13)",
   "elevation-floating": "0 0 0 1px oklch(var(--sui-light-top) / 0.08), 0 6px 14px -4px oklch(var(--sui-light-bottom) / 0.40), 0 26px 56px -12px oklch(var(--sui-light-bottom) / 0.65), inset 0 1px 0 oklch(var(--sui-light-top) / 0.06)",
   "elevation-control": "0 0 0 0.5px oklch(var(--sui-light-bottom) / 0.40), 0 1px 3px oklch(var(--sui-light-bottom) / 0.45), inset 0 1px 0 oklch(var(--sui-light-top) / 0.09)",

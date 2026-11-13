@@ -18,7 +18,9 @@ warm neutrals read as yellowed beside a cool accent. The overhaul separates the 
   0.015. Since 2.12.0 the neutral *surfaces* — canvas, tray, `surface-high`, and every dark sheet —
   carry more of the accent's hue (chroma 0.011 to 0.024), so the page reads as a lavender-grey in
   light and an indigo graphite in dark. Light sheets stay white, and the card separates from the
-  canvas by tone and its `resting` contact shadow.
+  canvas by tone and its `resting` elevation. Since 2.14.0 a card is the `glaze` tone at
+  `--sui-glaze-fill` (88% light, 85% dark) over the canvas and its wash; the contract measures that
+  composite as the card.
 - **One vivid accent.** `primary` is an iris violet (hue 292, chroma 0.205), the most saturated value
   the filled press veil allows at that lightness. In dark it is a luminous lavender fill with
   graphite labels.

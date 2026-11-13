@@ -55,6 +55,8 @@ Application-owned content can use the same semantic variables:
 ```css
 body {
   background-color: oklch(var(--sui-canvas));
+  /* From 2.14.0: the page's wash, which a glazed Card lets through. */
+  background-image: var(--sui-canvas-wash);
   color: oklch(var(--sui-ink));
 }
 

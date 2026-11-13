@@ -113,7 +113,8 @@ export const groupFocusRing =
 /* Elevation — distance from the surface plane, and nothing else. These depth roles
    exist, and `control` and `recessed` are a single tactile pair:
    - flat:     at rest on the page. Separation comes from tone alone.
-   - resting:  a card seated on the page by a close contact shadow, not lifted.
+   - resting:  a card seated on the page by a contact shadow and a soft ambient fall, not lifted;
+               it also carries the glazed sheet's lit rim.
    - raised:   a manipulated control, lifted a hair above its own track so it feels
                touchable; pressing it returns it to the track.
    - floating: a surface that genuinely sits above the application.
@@ -137,7 +138,8 @@ export const forcedBoundary =
 
 export const elevation = {
   flat: "shadow-sherick-flat",
-  /* A card at rest on the page: a close contact shadow that seats the sheet without lifting it. */
+  /* A card at rest on the page: a contact shadow and a soft ambient fall seat the sheet without
+     lifting it, and two inset lines are its lit rim. */
   resting: "shadow-sherick-resting",
   raised: /* @__PURE__ */ cx("shadow-sherick-raised", forcedBoundary),
   floating: /* @__PURE__ */ cx("shadow-sherick-floating", forcedBoundary),
@@ -502,6 +504,10 @@ export const hitArea =
    - matteQuiet:  the quietest matte step, for dense data regions and wells that
                   should sit back from the surface around them.
    - matte:       a matte surface that separates from the canvas by tone alone.
+   - glazed:      a card's sheet: glass seated on the page. The fill is high but not whole, so a
+                  trace of the page's wash shows through, and a sheen lights its top. It carries
+                  no backdrop filter, and its rim belongs to `elevation.resting`. Forced colors
+                  drops the sheen, which would otherwise sit over the system canvas.
    - matteHigh:   the second matte step, for nesting inside another matte surface.
    - matteInset:  a passive sheet tucked under a stronger control; subdued without
                   blending into the canvas or needing a drawn rim.
@@ -537,9 +543,12 @@ export const hitArea =
                   `--sui-overlay-fill` tunes how much of the sheet is its own tone rather
                   than the page behind it — a large overlay leans on that, not on blur. */
 export const material = {
-  canvas: "bg-sherick-canvas text-sherick-ink",
+  /* The wash is the page's own light, part of the material (`--sui-canvas-wash`). */
+  canvas: "bg-sherick-canvas bg-[image:var(--sui-canvas-wash)] text-sherick-ink",
   matteQuiet: "bg-sherick-surface/[0.42] text-sherick-ink",
   matte: "bg-sherick-surface text-sherick-ink",
+  glazed:
+    "bg-sherick-glaze/[var(--sui-glaze-fill)] bg-[image:var(--sui-glaze-sheen)] forced-colors:bg-none text-sherick-ink",
   matteHigh: "bg-sherick-surface-high/[0.72] text-sherick-ink",
   control: "bg-sherick-tray text-sherick-ink placeholder:text-sherick-ink-muted",
   /* The invalid fill carries its placeholder at the *full* danger tone, not at a fraction of it. A
