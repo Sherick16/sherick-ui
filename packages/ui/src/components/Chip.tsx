@@ -19,6 +19,11 @@ interface ChipAnatomy {
   children: ReactNode;
   variant?: Variant;
   icon?: ReactNode;
+  /**
+   * A figure after the label, such as how many records a filter holds ("All 36"). It is part of the
+   * chip's name, set in tabular figures in the label's own ink.
+   */
+  count?: ReactNode;
   className?: string;
 }
 
@@ -79,9 +84,12 @@ const isToggle = (props: ChipProps): props is ChipToggleProps =>
 const dismissLabelFor = (children: ReactNode, removeLabel?: string) =>
   removeLabel ?? (typeof children === "string" ? `Remove ${children}` : "Remove");
 
-/* The icon and the label, whichever form the chip takes. A tag's icon carries the variant's tone, while a
-   toggle's keeps the ink of its own state. */
-const chipContent = (children: ReactNode, icon: ReactNode, variant: Variant, inTag: boolean) => (
+/* The icon, the label and the count, whichever form the chip takes. A tag's icon carries the variant's
+   tone, while a toggle's keeps the ink of its own state. The count is a unit beside the label (§11): the
+   label's own size, weight and ink in tabular figures, and it never truncates — the label gives way first.
+   It does not take the variant's accent on a held chip: the accent on the selected step falls below 4.5:1
+   under the chip's own hover and press layers. */
+const chipContent = (children: ReactNode, icon: ReactNode, count: ReactNode, variant: Variant, inTag: boolean) => (
   <>
     {icon && (
       <span className={cn(iconSlot.compact, inTag && tone.text[variant])} aria-hidden="true">
@@ -89,6 +97,9 @@ const chipContent = (children: ReactNode, icon: ReactNode, variant: Variant, inT
       </span>
     )}
     <span className={cn("min-w-0 truncate")}>{children}</span>
+    {count !== undefined && count !== null && (
+      <span className={cn("ms-0.5 shrink-0 tabular-nums")}>{count}</span>
+    )}
   </>
 );
 
@@ -99,7 +110,7 @@ const chipContent = (children: ReactNode, icon: ReactNode, variant: Variant, inT
  * until the mark sits at the chip's own 16px inset, and it is not allowed to add a trailing void.
  */
 const ChipTag = forwardRef<HTMLElement, ChipTagProps>(
-  ({ children, variant = "primary", icon, onRemove, removeLabel, className, ...tagProps }, ref) => (
+  ({ children, variant = "primary", icon, count, onRemove, removeLabel, className, ...tagProps }, ref) => (
     <span
       {...tagProps}
       ref={ref}
@@ -112,7 +123,7 @@ const ChipTag = forwardRef<HTMLElement, ChipTagProps>(
         className
       )}
     >
-      {chipContent(children, icon, variant, true)}
+      {chipContent(children, icon, count, variant, true)}
       {onRemove && (
         <DismissButton
           label={dismissLabelFor(children, removeLabel)}
@@ -158,6 +169,7 @@ const ChipRoot = forwardRef<HTMLElement, ChipProps>((props, ref) => {
     children,
     variant = "primary",
     icon,
+    count,
     checked,
     defaultChecked,
     onCheckedChange,
@@ -204,7 +216,7 @@ const ChipRoot = forwardRef<HTMLElement, ChipProps>((props, ref) => {
         )
       }
     >
-      {chipContent(children, icon, variant, false)}
+      {chipContent(children, icon, count, variant, false)}
     </Toggle>
   );
 });

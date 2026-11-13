@@ -448,6 +448,9 @@ export default function Home() {
                   <Field label="Tags">
                     <Combobox multiple creatable options={[]} defaultValue={["launch"]} placeholder="Add a tag" />
                   </Field>
+                  <Field label="Scope">
+                    <Combobox clearable={false} options={[{ label: "All projects", value: "all" }, ...comboboxOptions]} defaultValue="all" />
+                  </Field>
                 </div>
               </Specimen>
 
@@ -569,6 +572,13 @@ export default function Home() {
                     <Chip icon={<HugeiconsIcon icon={Tick02Icon} aria-hidden="true" />} onRemove={() => undefined}>Verified</Chip>
                     <Chip onRemove={() => undefined}>Platform</Chip>
                   </div>
+                  <ChipGroup aria-label="Review reason" overflow="scroll" multiple={false} defaultValue={["all"]}>
+                    <Chip value="all" count={36}>All</Chip>
+                    <Chip value="bet" count={19}>Bet amount unclear</Chip>
+                    <Chip value="win" count={19}>Win amount unclear</Chip>
+                    <Chip value="game" count={17}>Game identity unclear</Chip>
+                    <Chip value="casino" count={4}>Identify casino</Chip>
+                  </ChipGroup>
                 </div>
               </Specimen>
 
@@ -751,6 +761,13 @@ export default function Home() {
                   <Badge variant="warning">Warning</Badge>
                   <Badge variant="danger">Danger</Badge>
                 </div>
+                <div className="mt-3 flex flex-wrap gap-2">
+                  <Badge appearance="subtle" variant="primary">Primary</Badge>
+                  <Badge appearance="subtle" variant="secondary">Neutral</Badge>
+                  <Badge appearance="subtle" variant="success">Ready</Badge>
+                  <Badge appearance="subtle" variant="warning">Bet amount unclear</Badge>
+                  <Badge appearance="subtle" variant="danger">Danger</Badge>
+                </div>
               </Specimen>
 
               <Specimen title="Images">
@@ -782,6 +799,30 @@ export default function Home() {
                   ["Marketing site", "Bruno", <Badge key="marketing" variant="warning">In review</Badge>],
                   ["Documentation", "Chen", <Badge key="docs" variant="secondary">Draft</Badge>],
                 ]} />
+              </Specimen>
+
+              <Specimen title="Table in a card">
+                <div className={cn("p-3", shape.control, material.canvas)}>
+                  <Card>
+                    <Table
+                      appearance="flush"
+                      density="compact"
+                      interactive
+                      aria-label="Review queue"
+                      headers={[
+                        { id: "participant", label: "Participant", rowHeader: true },
+                        { id: "reason", label: "Review reason" },
+                        { id: "tickets", label: "Tickets", align: "end" },
+                        { id: "waiting", label: "Waiting", align: "end" },
+                      ]}
+                      rows={[
+                        [<a key="jp" href="#display">J.P.</a>, <Badge key="jp" appearance="subtle" variant="warning">Bet amount unclear</Badge>, "2", "4h 8m"],
+                        [<a key="mq" href="#display">Moniquee</a>, <Badge key="mq" appearance="subtle" variant="warning">Identify casino</Badge>, "7", "4h 1m"],
+                        [<a key="lt" href="#display">Lotte</a>, <Badge key="lt" appearance="subtle" variant="secondary">Reused screenshot</Badge>, "1", "12m"],
+                      ]}
+                    />
+                  </Card>
+                </div>
               </Specimen>
             </div>
           </ShowcaseSection>
@@ -1345,6 +1386,7 @@ function SheetSpecimen() {
         open={open}
         onOpenChange={(next) => setOpen(next)}
         side={side}
+        handle
       >
         <Drawer.Content>
           <Drawer.Header>Sheet</Drawer.Header>

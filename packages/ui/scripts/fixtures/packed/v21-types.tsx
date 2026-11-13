@@ -3,6 +3,8 @@ import {
   Breadcrumb, Calendar, Command, CommandPalette, DatePicker, DateRangePicker, DateTimePicker, FileUpload,
   Media, Pagination, Stepper, TreeView,
   Table, RadioGroup, CheckboxGroup, Combobox, Field, Form, Input, NumberField, Select,
+  Badge, Chip, ChipGroup, Drawer,
+  type BadgeAppearance, type ChipGroupOverflow, type TableAppearance, type TableDensity,
   type BreadcrumbItem, type BreadcrumbProps, type CalendarDate, type CalendarLabels,
   type CalendarProps, type CommandItem, type CommandProps, type CommandPaletteProps,
   type DateRange, type DatePickerProps, type DateRangePickerProps, type FileRejection,
@@ -46,6 +48,17 @@ const columns: TableColumn[] = [
 ];
 const legacyTable: TableProps = { headers: ["Name", "Profile"], rows: [["Ada", <a href="/people/ada">Open</a>]] };
 const describedTable: TableProps = { headers: columns, rows: [["Ada", <a href="/people/ada">Open</a>]], tableClassName: "table-layout-contract" };
+const flushAppearance: TableAppearance = "flush";
+const compactDensity: TableDensity = "compact";
+const overviewTable: TableProps = {
+  headers: [{ id: "name", label: "Name", rowHeader: true }, { id: "waiting", label: "Waiting", align: "end" }],
+  rows: [[<a href="/people/ada">Ada</a>, "4h"]],
+  appearance: flushAppearance,
+  density: compactDensity,
+  interactive: true,
+};
+const subtle: BadgeAppearance = "subtle";
+const scrollRow: ChipGroupOverflow = "scroll";
 
 const surfaceRadio: RadioGroupProps = { appearance: "surface", label: "Plan", options: [{ value: "basic", label: <strong>Basic</strong> }], name: "plan" };
 
@@ -100,7 +113,17 @@ export const wave = <>
   <Media.Video src="/ambient.mp4" autoPlay muted loop decorative />
   <Table {...legacyTable} />
   <Table {...describedTable} />
+  <Table {...overviewTable} />
+  <Badge appearance={subtle} variant="warning">Bet amount unclear</Badge>
+  <ChipGroup aria-label="Reasons" overflow={scrollRow}>
+    <Chip value="all" count={36}>All</Chip>
+  </ChipGroup>
+  <Combobox options={[{ label: "All campaigns", value: "all" }]} defaultValue="all" clearable={false} size="sm" />
+  <Drawer side="bottom" handle><Drawer.Content>Filters</Drawer.Content></Drawer>
 </>;
+
+// @ts-expect-error a column aligns to its start or its end, never its centre
+export const centredColumn: TableColumn = { id: "x", label: "X", align: "center" };
 
 // @ts-expect-error range mode must not accept a single-date value
 export const invalidRange = <Calendar mode="range" value={date} />;

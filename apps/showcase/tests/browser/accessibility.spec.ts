@@ -137,6 +137,7 @@ const ROUTES = [
   "/verification/forms",
   "/verification/interactions",
   "/verification/motion",
+  "/verification/overview",
   "/verification/radio-group",
   "/verification/responsive",
   "/verification/rich-content",

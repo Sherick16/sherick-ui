@@ -58,14 +58,14 @@ export type { ButtonProps, ButtonAppearance, ButtonSize } from "./Button";
 export type { AlertProps } from "./Alert";
 export type { AlertDialogProps, AlertDialogTriggerProps } from "./AlertDialog";
 export type { AvatarProps } from "./Avatar";
-export type { BadgeProps } from "./Badge";
+export type { BadgeAppearance, BadgeProps } from "./Badge";
 export type { BreadcrumbItem, BreadcrumbLabels, BreadcrumbProps } from "./Breadcrumb";
 export type { CalendarDate, CalendarLabels, CalendarProps, DateRange } from "./Calendar";
 export type { CardDescriptionProps, CardProps, CardTitleProps } from "./Card";
 export type { CheckboxProps } from "./Checkbox";
 export type { CheckboxGroupOption, CheckboxGroupProps } from "./CheckboxGroup";
 export type { ChipProps } from "./Chip";
-export type { ChipGroupProps } from "./ChipGroup";
+export type { ChipGroupOverflow, ChipGroupProps } from "./ChipGroup";
 export type {
   ComboboxLabels,
   ComboboxMultipleProps,
@@ -125,7 +125,7 @@ export type { StepperItem, StepperProps } from "./Stepper";
 export type { SwitchProps } from "./Switch";
 export type { Tab, TabsLabels, TabsProps } from "./Tabs";
 export type { ToggleGroupItemProps, ToggleGroupProps } from "./ToggleGroup";
-export type { TableColumn, TableProps } from "./Table";
+export type { TableAppearance, TableColumn, TableDensity, TableProps } from "./Table";
 export type { TextareaProps } from "./Textarea";
 export type { TooltipProps, TooltipProviderProps } from "./Tooltip";
 export type { OverlayAlign, OverlaySide, PartProps, TriggerProps, Variant } from "./ui.types";

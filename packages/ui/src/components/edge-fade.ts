@@ -5,7 +5,7 @@ import { useCallback, useEffect, useState, type CSSProperties } from "react";
 
 /* An overflowing track says that more lies beyond its edge (§19). The cue is a mask on the track itself, so
    it costs no layer and no colour, and it is drawn only on an edge that really has more content behind it.
-   It is internal and not part of the public barrel. Tabs and ToggleGroup use it directly; SegmentedControl
+   It is internal and not part of the public barrel. Tabs, ToggleGroup and a scrolling ChipGroup use it directly; SegmentedControl
    scrolls through ToggleGroup, so it carries the same cue without a second copy. */
 
 /* The width of the fade on an edge that carries more. A tab or a segment is 40px or more, so 16px tells a

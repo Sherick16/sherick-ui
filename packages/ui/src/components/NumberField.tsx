@@ -17,7 +17,7 @@ import {
   tone,
 } from "./ui.common";
 import { motionFeedback, motionInkPress } from "./ui.motion";
-import { fieldDensity, type FieldSize } from "./Field";
+import { fieldDensity, fieldPartFit, type FieldSize } from "./Field";
 
 export interface NumberFieldProps
   extends Omit<
@@ -170,7 +170,7 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
             fieldClassName
           )}
         >
-          <BaseNumberField.Decrement className={cn(stepperClassName)}>
+          <BaseNumberField.Decrement className={cn(stepperClassName, fieldPartFit[size])}>
             <span className={cn(stepperIconClassName)}>
               <HugeiconsIcon icon={MinusSignIcon} aria-hidden="true" className={cn(iconStroke.glyph, "size-5")} />
             </span>
@@ -223,7 +223,7 @@ export const NumberField = forwardRef<HTMLInputElement, NumberFieldProps>(
               )}
             />
           )}
-          <BaseNumberField.Increment className={cn(stepperClassName)}>
+          <BaseNumberField.Increment className={cn(stepperClassName, fieldPartFit[size])}>
             <span className={cn(stepperIconClassName)}>
               <HugeiconsIcon icon={PlusSignIcon} aria-hidden="true" className={cn(iconStroke.glyph, "size-5")} />
             </span>
