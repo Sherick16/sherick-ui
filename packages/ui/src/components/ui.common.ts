@@ -182,11 +182,17 @@ export const recessedTop = "shadow-sherick-recessed-top";
                   also holds compact floating controls, and those must keep their softness.
    - expressive:  an expressive surface that owns the viewport — a dialog, tightened so it
                   reads as a focused surface rather than a pillowy one.
+   - tag:         a subtle badge — a short label set inside a row of content, such as a reason in a
+                  table cell. It labels the row rather than acting, so it is a rounded rectangle
+                  and not a capsule: a run of pills in a navigable row reads as a row of buttons. Its
+                  corner is under a third of its 20px height, like the `mark` box's, so it stays
+                  clearly short of a capsule.
    - pill:        fully rounded controls whose width follows their content.
    - circle:      fully rounded square targets. */
 export const shape = {
   control: "rounded-[0.75rem]",
   mark: "rounded-[0.375rem]",
+  tag: "rounded-[0.375rem]",
   row: "rounded-[0.5rem]",
   prominent: "rounded-[1rem]",
   surface: "rounded-[1.25rem]",
@@ -261,6 +267,11 @@ export const edge = {
   rule: edgeTone.rule,
 } as const;
 
+/* A navigable row's press: the quiet press step, as a fill rather than a layer, because a table row
+   cannot hold a positioned overlay of its own in every engine. It outranks the row's hover step, which
+   compiles later inside its pointer media query, so a held press is not hidden by the hover under it. */
+const rowPress = "[&&]:active:bg-sherick-ink/[0.09]";
+
 const effectiveDisabled =
   "data-[disabled]:cursor-not-allowed data-[disabled]:opacity-45 aria-disabled:cursor-not-allowed aria-disabled:opacity-45 disabled:cursor-not-allowed disabled:opacity-45";
 
@@ -320,6 +331,13 @@ export const state = {
   quietInk: "text-sherick-ink-muted hover:text-sherick-ink focus-visible:text-sherick-ink",
   /* Quiet scan feedback for non-interactive data rows: tonality only. */
   rowHover: "hover:bg-sherick-ink/[0.05]",
+  /* A data row that leads somewhere — a table row whose link opens the record. It adds what a
+     navigable row needs beside `rowHover`: the pointer cursor, the same tint while keyboard focus is
+     inside the row, and the quiet press step, so a touch screen, which sees no hover, still answers.
+     The cursor and the press are only honest if the whole row opens, so the link or button in the
+     row's header cell stretches its hit area over the row (`rowTarget`). It stays square: the row
+     keeps its divider lines, and a fill with corners between two lines reads as a card. */
+  rowNavigable: /* @__PURE__ */ cx("cursor-pointer has-[:focus-visible]:bg-sherick-ink/[0.05]", rowPress),
   /* The field family — one tray, one deeper step, no visible rims. Hover and engagement share the
      deep step; a composite field engages its outer surface while the input inside stays borderless;
      an expanded control holds the engaged step while its popup is open. Tonality and the focus ring
@@ -468,6 +486,13 @@ export const stateLayer = {
    CSS cannot see neighbouring geometry, so it keeps clearance only while surrounding rows are at
    least as tall as that floor — which this library's own `density.normal` rhythm is, and a 40px
    table row is not. */
+/* A navigable row's target: the link or button in the row's header cell (`th scope="row"`) draws its hit
+   area over the whole row, so a press anywhere in the row opens what the row names. The row is the
+   positioned box the area fills. Any other control in the row's data cells stays above that area and
+   keeps its own press. The link keeps its own focus ring; the area paints nothing. */
+export const rowTarget =
+  "relative [&>th[scope=row]_:is(a,button)]:after:absolute [&>th[scope=row]_:is(a,button)]:after:inset-0 [&>th[scope=row]_:is(a,button)]:after:content-[''] [&>td_:is(a,button,input,select,textarea,[tabindex])]:relative [&>td_:is(a,button,input,select,textarea,[tabindex])]:z-[1]";
+
 export const hitArea =
   "relative after:pointer-events-auto after:absolute after:inset-[min(0px,calc((100%-2.75rem)/2))] after:content-['']";
 
@@ -1046,6 +1071,7 @@ export const recipeAlphas = {
     tonalNeutral: { hover: stateAlpha(hoverTonal, "state.tonalNeutral.hover"), press: stateAlpha(pressTonalNeutral, "state.tonalNeutral.press") },
     filled: { hover: stateAlpha(hoverFilled, "state.filled.hover"), press: stateAlpha(pressFilled, "state.filled.press") },
     mark: { hover: stateAlpha(hoverMark, "state.mark.hover") },
+    row: { hover: fillAlpha(state.rowHover, "state.row.hover"), press: fillAlpha(rowPress, "state.row.press") },
   },
   tint: {
     neutralSoft: fillAlpha(tone.soft.secondary, "tint.neutralSoft"),

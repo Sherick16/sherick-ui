@@ -489,6 +489,8 @@ const [open, setOpen] = useState(false);
 </Drawer>
 ```
 
+- `handle?` (2.13.0, default `false`): a grab handle centred at the top of a bottom sheet. It is a
+  visual mark only — the sheet does not follow a drag — and it is ignored on the other sides.
 - `open?` / `defaultOpen?` / `onOpenChange?`, `side?` (default `"bottom"`). Parts:
   `Drawer.Trigger` (`render` element, `children`, `className`), `Drawer.Content`, `Drawer.Header`,
   `Drawer.Description`, `Drawer.Footer` and `Drawer.Close`. No `ref`.

@@ -284,6 +284,19 @@ The showcase browser suite also verifies:
   describes it by its supporting line. The fixture is scanned with the full WCAG tag set in both
   themes with a multiple list open and a described card selected — the scan that found the
   supporting line's 4.25:1 on the selected surface (`selectableRowSupporting`);
+- the overview options (`overview.spec.ts`, against `/verification/overview`): a toolbar of `sm`
+  Search, Combobox, Select, NumberField, DatePicker and Button shares one 40px height while the
+  embedded parts keep their 44px targets; a combobox with `clearable={false}` has no clear control; a
+  flush table has no fill, corner or shadow and its first column's text sits on the card's content edge
+  while its rows reach the compact cell inset past it; a compact table has 10px cells and a 12px
+  header; an end-aligned column ends its header and its figures on one edge; an interactive table's
+  row takes the pointer cursor, tints under the pointer and holds that tint while keyboard focus is
+  inside it, and a press on a data cell opens the row header's link; a subtle badge is the role's tone
+  on the role's soft step, 13px medium, 20px high, with
+  the 6px `tag` corner, while the default badge stays a full-ink capsule; a chip's count is part of
+  its name and keeps the label's ink; a scrolling chip row keeps one line, fades only an
+  edge with more beyond it and walks with the arrow keys; and a bottom sheet's handle is a 40×4px mark
+  8px from its top, centred and hidden from assistive technology. The route is in the axe matrix;
 - the motion invariants (`motion.spec.ts`, below);
 - Wave B surface semantics under the torture theme and in forced colors;
 - hostile custom theme roles, including portaled content;

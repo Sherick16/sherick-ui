@@ -12,6 +12,7 @@ import React, {
   type ReactNode,
 } from "react";
 import { cn } from "@/libs/utils";
+import { detail, shape } from "./ui.common";
 import { DialogDescription } from "./DialogDescription";
 import { DialogFooter } from "./DialogFooter";
 import { DialogHeader } from "./DialogHeader";
@@ -36,6 +37,12 @@ export interface DrawerProps {
   side?: DrawerSide;
   /** The accessible name of the sheet's dismissal control. Defaults to "Close". */
   closeLabel?: string;
+  /**
+   * Draws a grab handle centred at the top of a bottom sheet, the mark a phone's own sheets carry. It is a
+   * visual mark only: the sheet is dismissed by its close control, Escape or a press outside, not by a
+   * drag. It applies to `side="bottom"` and is ignored on the other edges.
+   */
+  handle?: boolean;
 }
 
 export interface DrawerTriggerProps {
@@ -73,10 +80,16 @@ type DrawerComponent = ((props: DrawerProps) => React.JSX.Element) & {
 /* Base's dialog root has no notion of an edge, so the side a sheet was given, and the name of its
    dismissal control, travel down to the sheet's own parts through context rather than through a second
    prop a consumer would have to keep in step with the root. */
-const DrawerContext = createContext<{ side: DrawerSide; closeLabel: string }>({
+const DrawerContext = createContext<{ side: DrawerSide; closeLabel: string; handle: boolean }>({
   side: "bottom",
   closeLabel: "Close",
+  handle: false,
 });
+
+/* The grab handle: a short bar in the non-text `detail` tone, centred in the 20px above the sheet's
+   header line. It is positioned rather than in flow, so the header keeps its own inset, and it is hidden
+   from assistive technology because it is not a control. */
+const handleClassName = "pointer-events-none absolute inset-x-0 top-2 mx-auto h-1 w-10";
 
 const DrawerTrigger = ({ ...props }: DrawerTriggerProps) => <BaseDialog.Trigger {...props} />;
 
@@ -91,7 +104,7 @@ const DrawerTrigger = ({ ...props }: DrawerTriggerProps) => <BaseDialog.Trigger 
  * when the surface has no edge.
  */
 const DrawerContent = forwardRef<HTMLDivElement, DrawerContentProps>(({ children, className, ...props }, ref) => {
-  const { side, closeLabel } = useContext(DrawerContext);
+  const { side, closeLabel, handle } = useContext(DrawerContext);
   const contentRef = useRef<HTMLDivElement | null>(null);
 
   return (
@@ -105,6 +118,7 @@ const DrawerContent = forwardRef<HTMLDivElement, DrawerContentProps>(({ children
       initialFocus={contentRef}
       closeLabel={closeLabel}
     >
+      {handle && side === "bottom" && <div aria-hidden="true" data-sui-sheet-handle="" className={cn(handleClassName, shape.pill, detail.fill)} />}
       <div ref={contentRef} tabIndex={-1} className={cn("flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain [outline-style:none]")}>
         {children}
       </div>
@@ -152,8 +166,8 @@ const DrawerClose = (props: ComponentProps<typeof BaseDialog.Close>) => (
  * Compose a `Drawer.Trigger` and a `Drawer.Content`; the header, description and footer parts
  * mirror a `Dialog`'s, because it is the same surface.
  */
-const Drawer = (({ children, side = "bottom", closeLabel = "Close", ...props }: DrawerProps) => {
-  const context = useMemo(() => ({ side, closeLabel }), [side, closeLabel]);
+const Drawer = (({ children, side = "bottom", closeLabel = "Close", handle = false, ...props }: DrawerProps) => {
+  const context = useMemo(() => ({ side, closeLabel, handle }), [side, closeLabel, handle]);
 
   return (
     <DrawerContext.Provider value={context}>

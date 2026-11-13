@@ -7,6 +7,7 @@ import React, { useEffect, useRef, type ReactNode } from "react";
 import { cn } from "@/libs/utils";
 import { density, fieldWell, focusRingWithin, iconStroke, overlay, shape, stacking, state, stateLayer } from "./ui.common";
 import { motionFeedback, motionInkPress, motionPresenceAnchored } from "./ui.motion";
+import { fieldPartFit, type FieldSize } from "./Field";
 
 /* The parts the two date pickers share.
    ====================================
@@ -49,9 +50,11 @@ export const dateFieldRowClassName = (disabled: boolean) =>
  *  the affordance on the same physical side. */
 
 /* The input takes the row's height rather than its own padding, so the row's density (40, 48 or 56px) is the
-   one source of a date field's height at every size; a padded input made a small field taller than its row. */
+   one source of a date field's height at every size; a padded input made a small field taller than its row.
+   Its slot is a flex row that stretches to the field, so the input's own target is the field's full height,
+   and the input does not shrink, so the affordance it carries past the slot's end stays clipped. */
 export const dateInputClassName =
-  "block w-[calc(100%+2.5rem)] min-w-0 self-stretch bg-transparent py-0 text-inherit [outline-style:none] disabled:cursor-not-allowed";
+  "block w-[calc(100%+2.5rem)] min-w-0 shrink-0 self-stretch bg-transparent py-0 text-inherit [outline-style:none] disabled:cursor-not-allowed";
 
 /** A native date is a left-to-right run of figures in every page direction. Chromium lays its date
  *  inputs out left to right whatever `dir` says, with the affordance on the physical right, while
@@ -71,6 +74,8 @@ export interface DateFieldTriggerProps {
   disabled?: boolean;
   /** The glyph that says what the popup holds: a calendar by default. */
   icon?: ReactNode;
+  /** The density of the field the trigger sits in, so its 44px target fits a compact field. */
+  size?: FieldSize;
 }
 
 /**
@@ -79,10 +84,10 @@ export interface DateFieldTriggerProps {
  * `aria-expanded`, `aria-controls`) and the pointer and keyboard activation that opens the
  * surface; the button itself only carries the type it needs to stay out of form submission.
  */
-export const DateFieldTrigger = ({ label, disabled = false, icon = <HugeiconsIcon icon={Calendar03Icon} aria-hidden="true" className={cn(iconStroke.glyph)} /> }: DateFieldTriggerProps) => (
+export const DateFieldTrigger = ({ label, disabled = false, icon = <HugeiconsIcon icon={Calendar03Icon} aria-hidden="true" className={cn(iconStroke.glyph)} />, size = "md" }: DateFieldTriggerProps) => (
   <BasePopover.Trigger
     disabled={disabled}
-    render={<button type="button" aria-label={label} disabled={disabled} className={cn(datePartClassName)} />}
+    render={<button type="button" aria-label={label} disabled={disabled} className={cn(datePartClassName, fieldPartFit[size])} />}
   >
     <span className={cn("inline-flex size-5 items-center justify-center [&>svg]:size-5", !disabled && motionInkPress)}>
       {icon}

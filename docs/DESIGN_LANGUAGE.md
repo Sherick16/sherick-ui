@@ -136,6 +136,12 @@ viewport-owning surface blurs, and that plane is the scrim (§7).
 | `overlay.dialog` | free-floating Dialog or AlertDialog |
 | `overlay.scrim` | the plane behind a viewport-owning surface; its blur sits on the plane and its tint is the plane's `::before`, which is what fades (§12) |
 
+A bottom sheet may carry a **grab handle**: a 40×4px pill in the non-text `detail` tone, centred 8px
+from its top edge, hidden from assistive technology. It is a mark only, and like any decorative fill it
+is not drawn in forced colours. Base's `Dialog` root, which the
+sheet shares with Dialog, has no drag gesture, so the sheet is dismissed by its close control, Escape
+or a press outside; it is opt-in (`handle`) so no sheet promises a drag it does not follow by default.
+
 Each shell composes material, elevation and shape. Base UI owns popup placement, focus,
 portal, dismissal and mount lifecycle; `ui.motion.ts` owns visual presence on the popup,
 not on its Positioner. Anchored entrances follow the resolved side and origin, including
@@ -203,6 +209,7 @@ their thumb and range, so they keep no rim.
 | Role | Radius | Use |
 | --- | --- | --- |
 | `mark` | 6px | 20px checkbox box |
+| `tag` | 6px | a subtle badge: a 20px label set inside a row of content |
 | `row` | 8px | command-density row, compact segment, navigation row or short hint |
 | `control` | 12px | fields, alerts, tables, segment tracks and full-width option rows |
 | `prominent` | 16px | tab tracks, code wells and compact floating status |
@@ -212,7 +219,10 @@ their thumb and range, so they keep no rim.
 | `pill`, `circle` | full | content-width actions, chips and badges; square round targets |
 
 **A capsule acts; a rounded rectangle holds.** Buttons, chips and badges are pills; a segment
-inside a track takes its track's nested corner instead.
+inside a track takes its track's nested corner instead. A **subtle badge** is the one badge that is not
+a pill: it is a tag set inside a row of content — a reason in a table cell — and it labels that row
+rather than standing on its own, so it holds and takes the `tag` corner. A run of pills inside a
+navigable row reads as a row of buttons. A standalone badge stays a pill.
 Fields, alerts, tables and sheets are rounded rectangles clearly short of a capsule at their
 own height (`control` is a quarter of a 48px field), so a field never reads as an almost-button
 beside a real one. The container corners are deliberately crisp: the contrast between a soft
@@ -270,7 +280,9 @@ step, so the supporting type step, not a dimmer tone, keeps it subordinate there
 Primary marks interaction, and danger/warning/success carry meaning rather than decoration.
 **Spend iris where the reader acts, not where they read.** Passive information is neutral by
 default: an Alert rests on the neutral soft surface with only its status mark in the accent, and a
-Badge is neutral. A semantic variant is chosen because the colour says something, never to make a
+Badge is neutral. A subtle badge carries its role in its copy as well as its tint (`tone.soft`, the role's
+foreground on the role's soft step), because it is small and set among other copy; choose its variant by
+what the colour says, as for any badge. A semantic variant is chosen because the colour says something, never to make a
 passive surface stand out; a tinted Card says something about its content. Iris then remains what
 it is in the thesis — the priority action, a made selection, a value's range and the focus ring.
 `--sui-accent` and `--sui-outline` are reserved: they are published for compatibility, no
@@ -301,8 +313,8 @@ Text takes a **role**, not a size chosen per component. The roles live in `type`
 | `control` | by density (§13) | a control's own label or value; an option row matches the field that opened it |
 | `label` | 14 / 20px medium | the name above a control (`fieldLabel`), a progress label, a column header, a calendar's month |
 | `body` | 14 / 24px | a sentence inside a component: an alert, a toast's description, a dialog's description and content, an open disclosure panel |
-| `supporting` | 13 / 20px | field descriptions, hints and errors (`fieldMessage`), a row's secondary line |
-| `caption` | 12 / 16px | badges, group labels (an option group's heading is `list.groupLabel`), calendar weekdays, a code language label |
+| `supporting` | 13 / 20px | field descriptions, hints and errors (`fieldMessage`), a row's secondary line, a subtle badge (medium weight) |
+| `caption` | 12 / 16px | badges, group labels (an option group's heading is `list.groupLabel`), calendar weekdays, a code language label, a compact table's column header (medium weight) |
 | `title` | 16 / 24px semibold | the heading of a compact surface: card, popover, toast, command palette |
 | `heading` | 20 / 28px semibold | the title of a viewport-owning surface: dialog, alert dialog, drawer |
 | `numeric` | 14 / 20px, tabular figures | table cells, a number field, progress and pagination values |
@@ -373,7 +385,13 @@ tag may have an independent dismiss target. Select/Combobox options hold choices
 rise. A Select's unselected check mark holds its slot at zero opacity, so a choice made while the list is open
 springs in beside its label without moving that label; Menu commands perform actions and stay flat. They share row hover/highlight and
 inset keyboard focus, but their row density differs. A destructive command tints its
-own label, not the whole menu sheet. A quiet target whose label rises on hover and on keyboard focus, such
+own label, not the whole menu sheet. A data row answers the pointer with `state.rowHover`, a tone step only: a table is read, not
+manipulated. A table whose rows **lead somewhere** (`interactive`) adds `state.rowNavigable`: the pointer
+cursor, the same tone while keyboard focus is inside the row, and the quiet press step, so a touch screen
+answers too. The row stays square, because it keeps its divider lines, and the table does not take the
+press: the link or button in the row's header cell does, and its hit area covers the row (`rowTarget`), so
+the cursor and the press tell the truth anywhere in the row. Another control in the row stays above that
+area and keeps its own press. A quiet target whose label rises on hover and on keyboard focus, such
 as a dismiss glyph, takes `state.quietInk`: its ink rises from `text.medium` to `text.high`, and no state
 layer is drawn behind it.
 
@@ -504,7 +522,11 @@ documented gap rather than a local fix in one component.
 
 Density owns control height and type scale; each component owns its own padding. The
 embedded `part` is narrower than a standalone target because its surrounding field is
-already the larger target. Do not make an icon-only standalone button use `part`, shrink
+already the larger target. In a `compact` field (40px) a part keeps its 44px target and overhangs
+the field's block edges by 2px each (`fieldPartFit`), so a `sm` Combobox, NumberField or DatePicker
+is exactly as tall as a `sm` Search, Select or Button, and a toolbar of them shares one height. They
+keep their own corners: a field is a rounded rectangle and a button a capsule (§9), so a toolbar
+row lines up by height, never by shape. Do not make an icon-only standalone button use `part`, shrink
 hit targets for phone layouts or create a fourth size step to solve a local spacing issue.
 
 A leading or trailing mark takes the `iconSlot` for the type step beside it: 16px beside a
@@ -652,7 +674,12 @@ hangs its 16px inset past both edges of its column, and its panel hangs with it,
 chevron and the copy it opens share the edges of the content beside them. Its parent owns at least
 1rem of padding on each side for the fill to reach into; flush against a viewport edge, the row
 would scroll the page. A table's cells and the table's
-scroll wrapper hang likewise, and the wrapper keeps its own overflow. A local
+scroll wrapper hang likewise, and the wrapper keeps its own overflow. A **flush** table — one that sits
+inside a card and gives up its own sheet so the two never draw a frame in a frame — hangs its wrapper by
+its cell inset on both sides (16px, 12px at `compact`), so its first column shares the card's content
+edge with the filters above it and the pages below it, and its row lines and row fills reach into the
+card's padding. A compact table also steps its header down to `caption`, so the column names lead the
+rows without competing with them. A local
 correction should follow the actual geometry, not a global optical-offset token.
 
 ## 18. Showcase
@@ -678,7 +705,14 @@ one affordance, constraints once, selected files as quiet rows, and visible reje
 feedback; it does not invent upload progress.
 
 An overflowing track — Tabs, ToggleGroup, SegmentedControl — says that more lies beyond its edge with an
-edge fade on that side, so the cue belongs to the track and is not a control. A table's end edge gets no
+edge fade on that side, so the cue belongs to the track and is not a control. A row of filter chips does
+the same when it is asked to stay on one line (`ChipGroup overflow="scroll"`): it scrolls inside itself
+behind the same fade. It pads and hangs by the reach of a chip's focus ring at its ends (6px) and of its
+dark raised shadow at its block edges (10px), so neither is clipped; its parent needs 6px of inline
+padding for the hang. A chip's count is a unit beside its label (§11): the label's size, ink and weight in
+tabular figures. It does not take the accent on a held chip: the primary tone on the selected step falls
+to about 4:1 under the chip's hover layer and 3.5:1 under its press. The default row wraps; a "More" menu was not
+chosen, because it would hide the counts and add a second way to make the same choice. A table's end edge gets no
 such cue: that was considered and declined (audit item 4.5), and a table says it scrolls through its own
 scroll wrapper alone.
 
@@ -688,7 +722,8 @@ The language above governs objects; these rules carry it to pages. They are guid
 consumers and for the repository's own examples, not new primitives.
 
 - **A surface sits on canvas.** A card is a matte surface on the canvas. Do not nest a card in a
-  card to group content: inside a surface, group with spacing, a type role and an `edge.rule`.
+  card to group content: inside a surface, group with spacing, a type role and an `edge.rule`. A table
+  inside a card is `flush` for the same reason.
   Specimens of surfaces are shown on a canvas band, not inside another card.
 - **Headings step down, never up.** A page heading, then a section heading, then the surface's
   own title — `Card.Title`, `Popover.Title`, a dialog's header — which sets the `title` or

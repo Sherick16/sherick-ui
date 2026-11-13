@@ -210,7 +210,7 @@ const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(({
           data-invalid={fieldInvalid || undefined}
           className={cn(dateFieldRowClassName(disabled), fieldDensity[size], disabled && state.disabled)}
         >
-          <div dir={dateInputDirection} className={cn("min-w-0 flex-1 overflow-hidden")}>
+          <div dir={dateInputDirection} className={cn("flex min-w-0 flex-1 self-stretch overflow-hidden")}>
             <BaseField.Control
               ref={ref}
               render={<input type="date" ref={inputRef} />}
@@ -227,7 +227,7 @@ const DatePicker = forwardRef<HTMLInputElement, DatePickerProps>(({
               className={cn(dateInputClassName)}
             />
           </div>
-          <DateFieldTrigger label={spokenName ? `Open ${spokenName}` : "Open calendar"} disabled={disabled} />
+          <DateFieldTrigger label={spokenName ? `Open ${spokenName}` : "Open calendar"} disabled={disabled} size={size} />
         </div>
 
         <DateCalendarPopup title={spokenName ?? "Calendar"} anchor={() => inputRef.current?.parentElement?.parentElement ?? null}>

@@ -211,7 +211,17 @@ export const contrastCompositions = (variables, alphas) => {
     "text on a data row under the pointer",
     WCAG_TEXT,
     "a Table row is read rather than activated, and answers the pointer with an ink tint over its own quiet fill",
-    ["ink", "ink-muted"].map((role) => [`${role} on a hovered row`, colour(role), composite(colour("ink"), STATE.quiet.hover, groove)])
+    [["table sheet", groove], ["flush in a card", card]].flatMap(([where, base]) =>
+      ["ink", "ink-muted"].map((role) => [`${role} on a hovered row, ${where}`, colour(role), composite(colour("ink"), STATE.row.hover, base)])
+    )
+  );
+  add(
+    "text on a navigable row while pressed",
+    WCAG_TEXT,
+    "a Table row that leads somewhere (`state.rowNavigable`) answers a press with the quiet press step, as a fill over the table's own quiet sheet or, flush, over the card that holds it",
+    [["table sheet", groove], ["flush in a card", card]].flatMap(([where, base]) =>
+      ["ink", "ink-muted"].map((role) => [`${role} on a pressed row, ${where}`, colour(role), composite(colour("ink"), STATE.row.press, base)])
+    )
   );
   add(
     "text.high on a semantic tint [soft]",

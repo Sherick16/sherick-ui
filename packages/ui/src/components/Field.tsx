@@ -16,6 +16,16 @@ export const fieldDensity: Record<FieldSize, string> = {
   lg: density.prominent,
 };
 
+/* A part embedded in a field — a combobox's clear and trigger, a number field's steppers, a date field's
+   calendar glyph — keeps its 44px target at every size. A compact field is 40px, so there the part
+   overhangs the field's block edges by 2px each rather than growing the field past its density: the
+   field keeps the height a `sm` button beside it has, and the part's 32px hover circle stays centred. */
+export const fieldPartFit: Record<FieldSize, string | undefined> = {
+  sm: "-my-0.5",
+  md: undefined,
+  lg: undefined,
+};
+
 /* A setting row: its label and description at the start, its control at the end, centred on the
    block of text. The gap is the one a row of settings needs, and the text block keeps the column
    rhythm of `fieldLayout`, so the label and its description still touch at 4px. */

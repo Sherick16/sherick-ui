@@ -15,7 +15,7 @@ using it.
 import {
   Calendar, Chip, ChipGroup, Combobox, Command, CommandPalette, DatePicker, DateRangePicker,
   DateTimePicker, SegmentedControl, Select, ToggleGroup,
-  type CalendarDate, type CalendarLabels, type CalendarProps, type ChipGroupProps, type ChipProps,
+  type CalendarDate, type CalendarLabels, type CalendarProps, type ChipGroupOverflow, type ChipGroupProps, type ChipProps,
   type ComboboxOption, type ComboboxProps, type CommandItem, type CommandPaletteProps, type CommandProps,
   type CalendarDateTime, type DatePickerProps, type DateRange, type DateRangePickerProps,
   type DateTimePickerProps, type SelectOption, type SelectProps,
@@ -117,6 +117,11 @@ and `aria-haspopup="listbox"` where `Select`'s button reports neither.
 - The field renders a clear control (`aria-label="Clear selection"`) and a trigger
   (`aria-label="Show options"`). A read-only combobox still opens and browses; only the clear
   control is disabled, because clearing is what would change the value.
+- `clearable={false}` (2.13.0) leaves the clear control out, for a field whose value is its own
+  resting default, such as "All campaigns". It defaults to `true`, and applies to a multiple
+  combobox's "Clear all" as well.
+- At `size="sm"` the field is 40px, the height of a `sm` `Search`, `Select` and `Button` (from 2.13.0;
+  before that its 44px parts made it 44px). Its parts keep their 44px target and overhang the field.
 - It renders no element of its own root and drops props it does not declare, so `aria-label` on the
   root is silently lost. Name it with a `Field` label or a native `<label htmlFor>` against `id`.
 - `name` / `form` submit the value through the primitive's hidden input; the ref is the `<input>`.
@@ -183,6 +188,12 @@ inside it, and a button cannot legally nest in a button.
 - Toggle chip: `checked` / `defaultChecked`, `onCheckedChange(pressed, eventDetails)`, `value`
   (its identity in a group), `variant` (tone of the held state; the rest state is the neutral matte
   control step), `icon`, `disabled`.
+- `count` (2.13.0, both forms): a figure after the label, such as "All 36". It is part of the chip's
+  name, set in tabular figures at the label's size and ink, and never truncates (the label does).
+- `ChipGroup overflow` (2.13.0): `"wrap"` (default) starts new lines; `"scroll"` keeps one line that
+  scrolls inside itself, with an edge fade on each side that has more chips behind it. The scrolling
+  row pads and hangs (6px inline, 10px block) so the chips' shadow and focus ring are not clipped and
+  the first chip keeps the content's edge; give its parent at least 6px of inline padding.
 - Tag: `onRemove()` renders the dismiss control, whose name defaults to `Remove <text>` when
   `children` is a string and `Remove` otherwise, overridable with `removeLabel`. Its icon carries
   the tone; its copy keeps normal emphasis.
@@ -203,6 +214,11 @@ inside it, and a button cannot legally nest in a button.
 </ChipGroup>
 
 <Chip variant="success" icon={<Check />} onRemove={() => drop(id)}>Verified</Chip>
+
+<ChipGroup aria-label="Review reason" overflow="scroll" value={reasons} onValueChange={setReasons}>
+  <Chip value="all" count={36}>All</Chip>
+  <Chip value="bet" count={19}>Bet amount unclear</Chip>
+</ChipGroup>
 ```
 
 ## `SegmentedControl` and `ToggleGroup`

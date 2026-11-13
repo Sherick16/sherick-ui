@@ -44,7 +44,14 @@ rule by decision. A card is the opaque surface with the new `resting` contact sh
 and lighter neutral parts. A `CodeBlock` shell shares the card's opaque sheet, and in dark a raised control's
 lit lip is a little brighter. The neutral surfaces carry more of the iris hue (a lavender-grey page in light,
 an indigo graphite in dark), and the primary soft and selected surfaces are a little richer. Every `--sui-canvas`, `--sui-surface` and `--sui-surface-high` consumer sees the new
-tones. The `themeCss` budget rose with the four new tokens, and the size-budget section records it. The current source version is `2.12.0`, and
+tones. The `themeCss` budget rose with the four new tokens, and the size-budget section records it. `2.13.0` adds
+the options an overview table needs, all additive: `Table` `appearance="flush"`, `density="compact"`,
+`interactive` and `TableColumn.align`; `Badge appearance="subtle"`; a `count` on `Chip` and
+`overflow="scroll"` on `ChipGroup`; `clearable` on `Combobox`; and `handle` on a bottom `Drawer`. Two
+fixes change what a consumer can see at `size="sm"` only: a `sm` `Combobox`, `NumberField` and
+`DatePicker` are now 40px like a `sm` `Search`, `Select` and `Button` (their 44px parts overhang the field
+instead of growing it), and the date fields' native input now fills the field's height, which also gives
+it a full-height target. The current source version is `2.13.0`, and
 npm's `latest` is `2.10.1`. An installed package's actual version and exports, not this
 checkout, determine availability.
 

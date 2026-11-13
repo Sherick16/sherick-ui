@@ -34,7 +34,7 @@ import {
 import { flattenOptions, hasOptionGroups, toOptionSections, type OptionGroup } from "./option-groups";
 import DismissButton from "./DismissButton";
 import { Spinner } from "./Spinner";
-import { fieldDensity, type FieldSize } from "./Field";
+import { fieldDensity, fieldPartFit, type FieldSize } from "./Field";
 
 export interface ComboboxOption {
   label: string;
@@ -96,6 +96,12 @@ interface ComboboxCommonProps {
   loading?: boolean;
   /** The field's density: `sm` for a dense filter row, `md` (the default) or `lg`. */
   size?: FieldSize;
+  /**
+   * Whether the field offers its clear control. Leave it out (`false`) for a field whose value is its own
+   * resting default, such as "All campaigns", where clearing would only empty a choice the reader is
+   * meant to keep. Defaults to `true`.
+   */
+  clearable?: boolean;
   /** The copy of the control's own parts, for a locale or a product's wording. */
   labels?: Partial<ComboboxLabels>;
   /** Styles the control's own box. The popup and its rows style themselves. */
@@ -238,6 +244,7 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>((props, ref) => {
     emptyMessage,
     loading = false,
     size = "md",
+    clearable = true,
     labels,
     className,
     popupClassName,
@@ -551,23 +558,25 @@ const Combobox = forwardRef<HTMLInputElement, ComboboxProps>((props, ref) => {
         ) : (
           input(0)
         )}
-        <BaseCombobox.Clear
-          // Clearing changes the value, so a read-only control cannot offer it — which is Base's own
-          // reading of the same state, since its clear control refuses the press.
-          disabled={disabled || readOnly}
-          render={
-            <DismissButton
-              label={multiple ? copy.clearAll : copy.clearSelection}
-              size="compact"
-              inRow
-              className={cn(clearClassName)}
-            />
-          }
-        />
+        {clearable && (
+          <BaseCombobox.Clear
+            // Clearing changes the value, so a read-only control cannot offer it — which is Base's own
+            // reading of the same state, since its clear control refuses the press.
+            disabled={disabled || readOnly}
+            render={
+              <DismissButton
+                label={multiple ? copy.clearAll : copy.clearSelection}
+                size="compact"
+                inRow
+                className={cn(clearClassName, fieldPartFit[size])}
+              />
+            }
+          />
+        )}
         <BaseCombobox.Trigger
           aria-label={copy.showOptions}
           aria-busy={loading || undefined}
-          className={cn(partClassName, "group")}
+          className={cn(partClassName, "group", fieldPartFit[size])}
         >
           {loading ? (
             <Spinner className={cn("size-5", text.high)} size="small" />

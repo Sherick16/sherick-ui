@@ -14,10 +14,10 @@ verify the consuming application's installed exports before using it. Import fro
 ```tsx
 import {
   Alert, Avatar, Badge, Button, Card, Divider, IconButton, Media, Progress, Skeleton, Spinner, Table,
-  type AlertProps, type AvatarProps, type BadgeProps, type ButtonAppearance, type ButtonProps,
+  type AlertProps, type AvatarProps, type BadgeAppearance, type BadgeProps, type ButtonAppearance, type ButtonProps,
   type ButtonSize, type CardDescriptionProps, type CardProps, type CardTitleProps, type DividerProps, type DividerWeight, type IconButtonAppearance,
   type IconButtonProps, type MediaImageProps, type MediaVideoProps, type ProgressProps,
-  type SkeletonProps, type SpinnerProps, type TableColumn, type TableProps,
+  type SkeletonProps, type SpinnerProps, type TableAppearance, type TableColumn, type TableDensity, type TableProps,
   type Variant,
 } from "sherick-ui";
 ```
@@ -116,6 +116,7 @@ points at the `<button>`.
 | --- | --- | --- |
 | `children` | `ReactNode` (required) | — |
 | `variant` | `Variant` | `"secondary"` |
+| `appearance` | `"default" \| "subtle"` (from 2.13.0) | `"default"` |
 | `icon` | `ReactNode` | — |
 
 Also accepts `HTMLAttributes<HTMLSpanElement>` (`BadgeProps`); it renders a plain
@@ -127,6 +128,14 @@ Also accepts `HTMLAttributes<HTMLSpanElement>` (`BadgeProps`); it renders a plai
   only the leading 14px icon slot takes the semantic tone. The default is neutral: a badge is
   passive information, so choose a semantic variant only when the colour carries meaning. The label truncates instead of
   wrapping, so keep badge copy short.
+- `appearance="subtle"` (2.13.0) is a tag set inside a row of content, such as a reason in a table
+  cell: the role's soft tint with the role's own tone as its copy, at the 13px supporting step and
+  medium weight, 20px high (a table cell's line, so a row keeps its height), in a rounded rectangle (the `tag` corner) rather than a pill. It works for
+  every variant and has no status dot.
+
+```tsx
+<Badge appearance="subtle" variant="warning">Bet amount unclear</Badge>
+```
 
 ## Avatar
 
@@ -332,6 +341,41 @@ Inline and non-portaled; no `ref`, no title or actions prop — the whole copy i
 | `emptyMessage` | `ReactNode` (one spanning row when there are no rows; from 2.10.0) | — |
 | `getRowKey` | `(row, index) => Key` (stable keys for reordered rows; from 2.10.0) | index |
 | `rowHeader` | `TableColumn.rowHeader` (the column's cells become `th scope="row"`; from 2.10.0) | — |
+| `align` | `TableColumn.align`: `"start" \| "end"` (aligns the header and the body cells; from 2.13.0) | `"start"` |
+| `appearance` | `"default" \| "flush"` (from 2.13.0) | `"default"` |
+| `density` | `"normal" \| "compact"` (from 2.13.0) | `"normal"` |
+| `interactive` | `boolean` (rows lead somewhere; from 2.13.0) | `false` |
+
+From **2.13.0**:
+
+- `appearance="flush"` gives up the table's own fill and corner, for a table inside a `Card`. A
+  flush table hangs its cell inset past both edges, so its first column lines up with the card's
+  content above and below it, and its row lines and hover fill reach into the card's padding. The
+  parent needs at least that much inline padding (16px, or 12px at `compact`); a `Card` has 24px.
+- `density="compact"` sets tighter cells (12px inline, 10px block) and a 12px caption-size header.
+- `align: "end"` on a `TableColumn` aligns that column's header and cells to the end: use it for
+  figures compared down a column.
+- `interactive` marks rows as navigable: pointer cursor, the hover tint held while keyboard focus is
+  inside the row, and a press tint. The row stays square. Put the row's link (or button) in its
+  `rowHeader` cell: its hit area covers the whole row, so a press anywhere in the row opens it. Other
+  links, buttons and inputs in the row stay above that area and keep their own press.
+
+```tsx
+<Card>
+  <Table
+    appearance="flush"
+    density="compact"
+    interactive
+    aria-label="Review queue"
+    headers={[
+      { id: "participant", label: "Participant", rowHeader: true },
+      { id: "reason", label: "Review reason" },
+      { id: "waiting", label: "Waiting", align: "end" },
+    ]}
+    rows={rows}
+  />
+</Card>
+```
 
 - The scroll wrapper is keyboard focusable, including for passive cells.
 - String headers remain supported. Starting in **2.2.0**, `TableColumn` is
@@ -344,8 +388,8 @@ Inline and non-portaled; no `ref`, no title or actions prop — the whole copy i
 - Share the same descriptors and `tableClassName` between real rows and `Skeleton` rows.
   Do not style columns with `nth-child` or reach through the wrapper to find the table.
   Verify the installed version before using either new contract.
-- Presentation only: no sorting, selection, sticky columns, density or `variant` (removed
-  in v2). The wrapper owns the quiet matte fill, `control` corners and horizontal
+- Presentation only: no sorting, selection, sticky columns or `variant` (removed
+  in v2). The default wrapper owns the quiet matte fill, `control` corners and horizontal
   scrolling of wide content; rows answer pointer hover with tone only, and the header row
   carries the heavier rule.
 - The rendered table has no `<caption>` and no name or label prop, so a table whose

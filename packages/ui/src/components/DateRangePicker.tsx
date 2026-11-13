@@ -264,7 +264,7 @@ const DateRangePicker = forwardRef<HTMLInputElement, DateRangePickerProps>(({
         data-invalid={invalid || undefined}
         className={cn(dateFieldRowClassName(disabled), disabled && state.disabled)}
       >
-        <div dir={dateInputDirection} className={cn("min-w-0 flex-1 overflow-hidden")}>
+        <div dir={dateInputDirection} className={cn("flex min-w-0 flex-1 self-stretch overflow-hidden")}>
           <BaseField.Control
             ref={inputRef === startInputRef ? ref : undefined}
             render={<input type="date" ref={inputRef} />}
