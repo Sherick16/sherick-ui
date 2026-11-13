@@ -6,6 +6,12 @@ export type ThemeName = "light" | "dark";
    lavender-grey in light and an indigo graphite in dark, which is the palette's character where no
    accent is spent. Ink and the white sheet stay neutral, so text and cards do not take a colour
    cast; shadows are a violet-graphite umbra for the same reason. Every value is measured by the contrast contract (docs/PALETTE.md). */
+/* The light a sheet of glass carries in the light theme, shared by the card and the floating sheets
+   so the two cannot drift: the diffuse pool at the top, and the contour glow that fades inward from
+   the top edge and, more quietly, the bottom (docs/DESIGN_LANGUAGE.md §4 to §6). */
+const lightSheetSheen = "radial-gradient(120% 85% at 50% 0%, rgb(255 255 255 / 0.90) 0%, rgb(255 255 255 / 0.40) 35%, rgb(255 255 255 / 0) 78%)";
+const lightContourGlow = "inset 0 10px 18px -10px oklch(var(--sui-light-top) / 0.95), inset 0 -10px 18px -12px oklch(var(--sui-light-top) / 0.50)";
+
 export const lightTokens = {
   /* The page. It sits far enough under the white card that a card reads as a sheet on it by tone
      alone; at 0.970 a card faded into the page. A field's `tray` stays below it, so a field placed
@@ -13,13 +19,11 @@ export const lightTokens = {
   "canvas": "0.960 0.011 290",
   "surface": "0.998 0.001 290",
   /* A card's glaze: the sheet's own tone, a faint step off pure white so the lit top of the sheen
-     reads against it. `glaze-fill` lets a little of the page through, and `glaze-sheen` is a diffuse
-     pool of light at the top of the sheet. The fill stays high enough that copy measures as it does
-     on an opaque card, and the glaze carries no backdrop filter: an in-flow card only ever sits on
-     the page's own smooth wash, which a blur would not change. */
+     reads against it. `glaze-fill` lets a little of the page through and stays high enough that
+     copy measures as it does on an opaque card. */
   "glaze": "0.992 0.004 290",
   "glaze-fill": "0.84",
-  "glaze-sheen": "radial-gradient(120% 85% at 50% 0%, rgb(255 255 255 / 0.90) 0%, rgb(255 255 255 / 0.40) 35%, rgb(255 255 255 / 0) 78%)",
+  "glaze-sheen": lightSheetSheen,
   /* The page's wash: two soft pools of the accent's neighbours at the top of the canvas. It is what
      a glazed card lets through, so the page is never one flat tone behind the glass. */
   "canvas-wash": "radial-gradient(52rem 36rem at 0% 0%, oklch(0.930 0.035 310 / 0.70), transparent 70%), radial-gradient(44rem 32rem at 100% 0%, oklch(0.940 0.035 250 / 0.80), transparent 70%)",
@@ -92,11 +96,8 @@ export const lightTokens = {
   "elevation-flat": "none",
   /* A card at rest on the page: a hairline contact edge, a close contact shadow and a wide, soft
      ambient fall under its lower edge, so the sheet is seated rather than lifted. The inset layers
-     are the glaze's contour glow: a faint line on the edge, then light that fades inward from the
-     top edge and, more quietly, from the bottom. A crisp bright rim read as a drawn outline; the
-     glow reads as the edge of a frosted pane. It belongs to the elevation, as every surface's edge
-     light does. */
-  "elevation-resting": "0 0 0 0.5px oklch(var(--sui-light-bottom) / 0.04), 0 2px 6px -1px oklch(var(--sui-light-bottom) / 0.05), 0 20px 44px -18px oklch(var(--sui-light-bottom) / 0.20), inset 0 0 0 1px oklch(var(--sui-light-top) / 0.45), inset 0 10px 18px -10px oklch(var(--sui-light-top) / 0.95), inset 0 -10px 18px -12px oklch(var(--sui-light-top) / 0.50)",
+     are the glaze's contour glow, which belongs to the elevation as every surface's edge light does. */
+  "elevation-resting": `0 0 0 0.5px oklch(var(--sui-light-bottom) / 0.04), 0 2px 6px -1px oklch(var(--sui-light-bottom) / 0.05), 0 20px 44px -18px oklch(var(--sui-light-bottom) / 0.20), inset 0 0 0 1px oklch(var(--sui-light-top) / 0.45), ${lightContourGlow}`,
   /* A contact shadow, not a float: the ambient layer stays close to the control, so a row of raised
      actions sits on the page rather than hovering over it. The inset line is the lit upper lip of a
      key — the light model's upper edge, drawn once — so a filled action reads as a pressable object
@@ -106,12 +107,10 @@ export const lightTokens = {
      content it covers — a white sheet over a white card has nothing else to separate it — and then
      two layers of depth: a close penumbra and a long, soft ambient fall. */
   "elevation-floating": "0 0 0 1px oklch(var(--sui-light-bottom) / 0.07), 0 4px 10px -2px oklch(var(--sui-light-bottom) / 0.08), 0 22px 48px -10px oklch(var(--sui-light-bottom) / 0.24), inset 0 1px 0 oklch(var(--sui-light-top) / 0.80)",
-  /* A floating *sheet* — a popup, a menu, a toast, a dialog, a drawer. It keeps the floating rung's
-     contact hairline and depth, and its edge light is the card's contour glow: light that fades
-     inward from the top and, more quietly, the bottom edge. A small floating part (a tooltip, a
-     floating icon button) keeps `floating` and its crisp lip, because a wide glow on a 40px part is
-     a smear. */
-  "elevation-floating-sheet": "0 0 0 1px oklch(var(--sui-light-bottom) / 0.06), 0 4px 10px -2px oklch(var(--sui-light-bottom) / 0.08), 0 24px 52px -12px oklch(var(--sui-light-bottom) / 0.24), inset 0 0 0 1px oklch(var(--sui-light-top) / 0.50), inset 0 10px 18px -10px oklch(var(--sui-light-top) / 0.95), inset 0 -10px 18px -12px oklch(var(--sui-light-top) / 0.50)",
+  /* A floating *sheet* — a popup, a menu, a toast, a dialog, a drawer: the floating rung's contact
+     hairline and depth with the card's contour glow. A small floating part (a tooltip, a floating
+     icon button) keeps `floating` and its crisp lip, because a wide glow on a 40px part is a smear. */
+  "elevation-floating-sheet": `0 0 0 1px oklch(var(--sui-light-bottom) / 0.06), 0 4px 10px -2px oklch(var(--sui-light-bottom) / 0.08), 0 24px 52px -12px oklch(var(--sui-light-bottom) / 0.24), inset 0 0 0 1px oklch(var(--sui-light-top) / 0.50), ${lightContourGlow}`,
   /* A held selection — a puck in a track, a chosen option or date. It carries a half-pixel contact
      edge so a white puck holds its outline on the pale track around it. */
   "elevation-control": "0 0 0 0.5px oklch(var(--sui-light-bottom) / 0.10), 0 1px 3px oklch(var(--sui-light-bottom) / 0.16), inset 0 1px 0 oklch(var(--sui-light-top) / 0.70)",
@@ -133,7 +132,7 @@ export const lightTokens = {
   "glass-dense-blur": "22px",
   "glass-dense-saturation": "1.08",
   "glass-dense-brightness": "1.01",
-  "glass-gradient": "radial-gradient(120% 85% at 50% 0%, rgb(255 255 255 / 0.90) 0%, rgb(255 255 255 / 0.40) 35%, rgb(255 255 255 / 0) 78%)",
+  "glass-gradient": lightSheetSheen,
   "glass-gradient-dense": "linear-gradient(180deg, rgb(255 255 255 / 0.70) 0%, rgb(255 255 255 / 0.22) 34%, rgb(255 255 255 / 0) 72%, rgb(40 36 60 / 0.04) 100%)",
   "glass-hero-blur": "14px",
   "glass-hero-saturation": "1.06",

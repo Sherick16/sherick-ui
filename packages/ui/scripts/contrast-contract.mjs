@@ -119,16 +119,23 @@ export const contrastCompositions = (variables, alphas) => {
   const ACRYLIC_DENSE = "acrylic dense / tooltip";
   const HERO_SHEET = "hero sheet / dialog";
   const CODE_WELL = "code well";
-  const acrylicFill = Number(variables["--sui-glass-fill"]);
-  const acrylicDenseFill = Number(variables["--sui-glass-dense-fill"]);
-  const overlayFill = Number(variables["--sui-overlay-fill"]);
+  /* A fill that is missing or not a number would make every row built on it NaN, and a NaN ratio
+     never counts as the worst one: the rows would leave the gate unseen. */
+  const fill = (name) => {
+    const value = Number(variables[`--sui-${name}`]);
+    if (!Number.isFinite(value)) throw new Error(`contrast contract: --sui-${name} is not a number`);
+    return value;
+  };
+  const acrylicFill = fill("glass-fill");
+  const acrylicDenseFill = fill("glass-dense-fill");
+  const overlayFill = fill("overlay-fill");
   /* A field is a tray in the `tray` tone over whatever holds it; the common case is a card.
      Under the pointer and while engaged it sinks to the deep tray. A choice row rests on the
      `selectableRowRest` step, the same tray; while that recipe is opaque, the row measures the same
      in a card and on the page. An empty mark's floor is the `mark-well` tone. */
   /* A card is the glazed sheet: the `glaze` tone at the theme's `--sui-glaze-fill` over the page. The
      page's wash under it is at most a few percent of the composite, so the canvas stands for it. */
-  const card = composite(colour("glaze"), Number(variables["--sui-glaze-fill"]), canvas);
+  const card = composite(colour("glaze"), fill("glaze-fill"), canvas);
   /* The code well is the `matteHigh` step over the card (`recipeAlphas.code.well`), not a canvas tint. */
   const codeWell = composite(surfaceHigh, alphas.code.well, card);
   const tray = (alpha, base = card) => composite(colour("tray"), alpha, base);
@@ -138,7 +145,7 @@ export const contrastCompositions = (variables, alphas) => {
   const surfaces = {
     canvas,
     "quiet well": composite(surface, FIELD.quiet, canvas),
-    "matte card": card,
+    "glazed card": card,
     "chip at rest": composite(surfaceHigh, TINT.neutralRest, canvas),
     /* A neutral badge or tag: the neutral soft step inside the card that holds it. */
     "neutral soft in a card": composite(surfaceHigh, TINT.neutralSoft, card),
@@ -163,7 +170,7 @@ export const contrastCompositions = (variables, alphas) => {
      foreground-only — and neither is an empty mark's interior, which holds nothing at all.
      Both are still *surfaces* for the roles that do answer to them. */
   const controlEntries = surfaceEntries.filter(([where]) =>
-    ["canvas", "quiet well", "matte card", ACRYLIC, ACRYLIC_DENSE, HERO_SHEET].includes(where)
+    ["canvas", "quiet well", "glazed card", ACRYLIC, ACRYLIC_DENSE, HERO_SHEET].includes(where)
   );
 
   /** The opaque neutral fill a `secondary` control takes, and the groove a value control runs in. */
@@ -205,7 +212,7 @@ export const contrastCompositions = (variables, alphas) => {
     "text.medium on an invalid or engaged field",
     WCAG_TEXT,
     "a field's placeholder in its tray, at rest and engaged",
-    ["canvas", "matte card"].flatMap((where) =>
+    ["canvas", "glazed card"].flatMap((where) =>
       [["at rest", tray(FIELD.control, surfaces[where])], ["engaged", deepTray(FIELD.engaged, surfaces[where])]].map(([state, fill]) => [`field in ${where}, ${state}`, colour("ink-muted"), fill])
     )
   );
@@ -349,7 +356,7 @@ export const contrastCompositions = (variables, alphas) => {
     "tone.text.danger in an invalid field",
     WCAG_TEXT,
     "the error placeholder and value, in the field's danger tray: the danger soft surface at its field strength, over what holds the field",
-    ["canvas", "matte card"].flatMap((where) => [
+    ["canvas", "glazed card"].flatMap((where) => [
       [`danger tray in ${where}`, colour("danger"), dangerTray(surfaces[where])],
       [`value in the danger tray in ${where}`, colour("ink"), dangerTray(surfaces[where])],
     ])
@@ -389,7 +396,7 @@ export const contrastCompositions = (variables, alphas) => {
     "text on a choice row through its states",
     WCAG_TEXT,
     "a surface choice row's label and description on the resting tray, under the row's hover and press layers, which composite toward the label",
-    ["canvas", "matte card"].flatMap((where) => {
+    ["canvas", "glazed card"].flatMap((where) => {
       const row = tray(FIELD.choiceRow, surfaces[where]);
       return ["ink", "ink-muted"].flatMap((role) => [
         [`${role} on a row in ${where} at rest`, colour(role), row],

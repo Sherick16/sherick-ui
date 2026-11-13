@@ -4,7 +4,6 @@ const color = (name: string) => `oklch(var(--sui-${name}) / <alpha-value>)`;
 const colorNames = [
   "canvas",
   "surface",
-  "glaze",
   "surface-high",
   "tray-deep",
   "surface-float",

@@ -507,10 +507,9 @@ export const hitArea =
    - matteQuiet:  the quietest matte step, for dense data regions and wells that
                   should sit back from the surface around them.
    - matte:       a matte surface that separates from the canvas by tone alone.
-   - glazed:      a card's sheet: glass seated on the page. The fill is high but not whole, so a
-                  trace of the page's wash shows through, and a sheen lights its top. It carries
-                  no backdrop filter, and its contour glow belongs to `elevation.resting`. Forced colors
-                  drops the sheen, which would otherwise sit over the system canvas.
+   - glazed:      a card's sheet: glass seated on the page (DL §4). Its contour glow belongs to
+                  `elevation.resting`. Forced colors drops the sheen, which would otherwise sit
+                  over the system canvas.
    - matteHigh:   the second matte step, for nesting inside another matte surface.
    - matteInset:  a passive sheet tucked under a stronger control; subdued without
                   blending into the canvas or needing a drawn rim.
@@ -1096,7 +1095,6 @@ export const recipeAlphas = {
   },
   field: {
     quiet: fillAlpha(material.matteQuiet, "field.quiet"),
-    card: toneAlpha("surface")(material.matte, "field.card"),
     groove: fillAlpha(material.matteHigh, "field.groove"),
     choiceRow: trayAlpha(selectableRowRest, "field.choiceRow"),
     control: trayAlpha(material.control, "field.control"),
